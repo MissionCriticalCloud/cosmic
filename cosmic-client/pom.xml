@@ -1,14 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-client-ui</artifactId>
     <name>Cosmic Client UI</name>
     <packaging>war</packaging>
-    <version>5.1.0.0-SNAPSHOT</version>
+    <version>5.1.0.0</version>
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic</artifactId>
-        <version>5.1.0.0-SNAPSHOT</version>
+        <version>5.1.0.0</version>
     </parent>
 
     <distributionManagement>
@@ -31,84 +30,84 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-systemvm</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-nucleo</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-spring-module</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-spring-lifecycle</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-server</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-acl-static-role-based</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-dedicated-resources</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-api-limit-account-based</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-api-discovery</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-user-authenticator-ldap</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-user-authenticator-sha256salted</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-network-nvp</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-network-internallb</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-hypervisor-xenserver</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-hypervisor-ovm3</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-hypervisor-kvm</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.mortbay.jetty</groupId>
@@ -119,139 +118,139 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-storage-allocator-random</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-planner-user-dispersing</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-planner-skip-heurestics</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-planner-user-concentrated-pod</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-planner-implicit-dedication</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-explicit-dedication</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-host-allocator-random</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-mom-rabbitmq</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-ipc</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-rest</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-api</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-components-api</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-network</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-orchestration</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-schema</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-storage</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-storage-cache</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-controller-secondary-storage</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-storage-image</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-storage-datamotion</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-storage-snapshot</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-storage-volume</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-storage-volume-default</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-storage-image-default</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-storage-image-s3</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-host-anti-affinity</artifactId>
-            <version>5.1.0.0-SNAPSHOT</version>
+            <version>5.1.0.0</version>
         </dependency>
     </dependencies>
 
     <scm>
         <connection>scm:git:git@github.com:MissionCriticalCloud/cosmic-client.git</connection>
         <developerConnection>scm:git:git@github.com:MissionCriticalCloud/cosmic-client.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>cosmic-5.1.0.0</tag>
     </scm>
 
     <build>
@@ -428,79 +427,74 @@
                         <configuration>
                             <target>
                                 <copy todir="${basedir}/target/generated-webapp/WEB-INF/classes/scripts">
-                                    <fileset dir="${project.build.directory}/scripts"/>
+                                    <fileset dir="${project.build.directory}/scripts" />
                                 </copy>
                                 <!-- CLOUDSTACK-1304 -->
-                                <chmod perm="755" file="${basedir}/target/generated-webapp/WEB-INF/classes/scripts/**"
-                                       type="both"/>
+                                <chmod perm="755" file="${basedir}/target/generated-webapp/WEB-INF/classes/scripts/**" type="both" />
                                 <copy todir="${basedir}/target/generated-webapp/WEB-INF/">
                                     <fileset dir="${basedir}/WEB-INF/">
-                                        <include name="web.xml"/>
+                                        <include name="web.xml" />
                                     </fileset>
                                 </copy>
                                 <copy todir="${basedir}/target/generated-webapp/WEB-INF/classes">
                                     <fileset dir="${basedir}/WEB-INF/classes">
-                                        <include name="resources/**/*"/>
+                                        <include name="resources/**/*" />
                                     </fileset>
                                 </copy>
                                 <copy todir="${basedir}/target/generated-webapp">
-                                    <fileset dir="${basedir}/cosmic-ui"/>
+                                    <fileset dir="${basedir}/cosmic-ui" />
                                 </copy>
                                 <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes">
                                     <fileset dir="${basedir}/tomcatconf">
-                                        <include name="*.in"/>
+                                        <include name="*.in" />
                                     </fileset>
-                                    <globmapper from="*.in" to="*"/>
+                                    <globmapper from="*.in" to="*" />
                                     <filterchain>
                                         <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile"
-                                                   value="${project.build.directory}/${cs.replace.properties}"/>
+                                            <param type="propertiesfile" value="${project.build.directory}/${cs.replace.properties}" />
                                         </filterreader>
                                     </filterchain>
                                 </copy>
                                 <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes">
                                     <fileset dir="${basedir}/tomcatconf">
-                                        <exclude name="*.in"/>
+                                        <exclude name="*.in" />
                                     </fileset>
                                 </copy>
                                 <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes/bin">
                                     <fileset dir="${project.build.directory}/setup/bindir">
-                                        <include name="*.in"/>
+                                        <include name="*.in" />
                                     </fileset>
-                                    <globmapper from="*.in" to="*"/>
+                                    <globmapper from="*.in" to="*" />
                                     <filterchain>
                                         <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile"
-                                                   value="${project.build.directory}/${cs.replace.properties}"/>
+                                            <param type="propertiesfile" value="${project.build.directory}/${cs.replace.properties}" />
                                         </filterreader>
                                     </filterchain>
                                 </copy>
                                 <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes/db">
                                     <fileset dir="${project.build.directory}/setup/db/db">
-                                        <include name="**/*"/>
+                                        <include name="**/*" />
                                     </fileset>
                                     <filterchain>
                                         <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile"
-                                                   value="${project.build.directory}/${cs.replace.properties}"/>
+                                            <param type="propertiesfile" value="${project.build.directory}/${cs.replace.properties}" />
                                         </filterreader>
                                     </filterchain>
                                 </copy>
                                 <copy overwrite="true" todir="${basedir}/target/conf">
                                     <fileset dir="${basedir}/tomcatconf">
-                                        <include name="*.in"/>
+                                        <include name="*.in" />
                                     </fileset>
-                                    <globmapper from="*.in" to="*"/>
+                                    <globmapper from="*.in" to="*" />
                                     <filterchain>
                                         <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile"
-                                                   value="${project.build.directory}/${cs.replace.properties}"/>
+                                            <param type="propertiesfile" value="${project.build.directory}/${cs.replace.properties}" />
                                         </filterreader>
                                     </filterchain>
                                 </copy>
                                 <copy overwrite="true" todir="${basedir}/target/conf">
                                     <fileset dir="${basedir}/tomcatconf">
-                                        <exclude name="*.in"/>
+                                        <exclude name="*.in" />
                                     </fileset>
                                 </copy>
                             </target>
