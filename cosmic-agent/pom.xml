@@ -6,25 +6,25 @@
   <parent>
     <groupId>cloud.cosmic</groupId>
     <artifactId>cosmic</artifactId>
-    <version>5.1.0.0</version>
+    <version>5.1.0.1-SNAPSHOT</version>
   </parent>
 
   <scm>
     <connection>scm:git:git@github.com:MissionCriticalCloud/cosmic-agent.git</connection>
     <developerConnection>scm:git:git@github.com:MissionCriticalCloud/cosmic-agent.git</developerConnection>
-    <tag>cosmic-5.1.0.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <dependencies>
     <dependency>
       <groupId>cloud.cosmic</groupId>
       <artifactId>cloud-nucleo</artifactId>
-      <version>5.1.0.0</version>
+      <version>5.1.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>cloud.cosmic</groupId>
       <artifactId>cloud-utils</artifactId>
-      <version>5.1.0.0</version>
+      <version>5.1.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>

@@ -3,7 +3,7 @@
 
   <groupId>cloud.cosmic</groupId>
   <artifactId>cosmic</artifactId>
-  <version>5.1.0.0</version>
+  <version>5.1.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Cosmic</name>
   <description>Cosmic is an IaaS (“Infrastructure as a Service”) cloud orchestration platform.</description>
@@ -420,7 +420,7 @@
   <scm>
     <connection>scm:git:git@github.com:MissionCriticalCloud/blackhole.git</connection>
     <developerConnection>scm:git:git@github.com:MissionCriticalCloud/blackhole.git</developerConnection>
-    <tag>cosmic-5.1.0.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <build>

@@ -4,13 +4,13 @@
   <parent>
     <groupId>cloud.cosmic</groupId>
     <artifactId>cosmic</artifactId>
-    <version>5.1.0.0</version>
+    <version>5.1.0.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>cosmic-core</artifactId>
   <packaging>pom</packaging>
   <name>Cosmic Core</name>
-  <version>5.1.0.0</version>
+  <version>5.1.0.1-SNAPSHOT</version>
   <description>Cosmic is an IaaS (“Infrastructure as a Service”) cloud orchestration platform.</description>
   <url>http://www.cosmic.cloud</url>
 
@@ -42,7 +42,7 @@
   <scm>
     <connection>scm:git:git@github.com:MissionCriticalCloud/${project.artifactId}.git</connection>
     <developerConnection>scm:git:git@github.com:MissionCriticalCloud/${project.artifactId}.git</developerConnection>
-    <tag>cosmic-5.1.0.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <dependencies>
