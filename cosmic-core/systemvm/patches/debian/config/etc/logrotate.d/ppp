@@ -1,0 +1,10 @@
+/var/log/ppp-connect-errors {
+	daily
+	size 10M
+	rotate 5
+	missingok
+	notifempty
+	compress
+	nocreate
+}
+

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cosmic-plugins</artifactId>
+    <name>Cosmic Plugin POM</name>
+    <packaging>pom</packaging>
+    <parent>
+        <groupId>cloud.cosmic</groupId>
+        <artifactId>cosmic-core</artifactId>
+        <version>5.1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <modules>
+        <module>api/rate-limit</module>
+        <module>api/discovery</module>
+        <module>acl/static-role-based</module>
+        <module>affinity-group-processors/host-anti-affinity</module>
+        <module>affinity-group-processors/explicit-dedication</module>
+        <module>deployment-planners/user-concentrated-pod</module>
+        <module>deployment-planners/user-dispersing</module>
+        <module>deployment-planners/implicit-dedication</module>
+        <module>ha-planners/skip-heurestics</module>
+        <module>host-allocators/random</module>
+        <module>dedicated-resources</module>
+        <module>network-elements/nicira-nvp</module>
+        <module>storage-allocators/random</module>
+        <module>storage/image/s3</module>
+        <module>storage/image/default</module>
+        <module>storage/volume/default</module>
+        <module>network-elements/internal-loadbalancer</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-server</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-api</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,555 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cloud-client-ui</artifactId>
+    <name>Cosmic Client UI</name>
+    <packaging>war</packaging>
+    <version>5.1.0.0-SNAPSHOT</version>
+    <parent>
+        <groupId>cloud.cosmic</groupId>
+        <artifactId>cosmic</artifactId>
+        <version>5.1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <distributionManagement>
+        <repository>
+            <id>beta-nexus</id>
+            <name>MCC Nexus</name>
+            <url>https://beta-nexus.mcc.schubergphilis.com/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>beta-nexus</id>
+            <name>MCC Nexus</name>
+            <url>https://beta-nexus.mcc.schubergphilis.com/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <properties>
+        <cs.replace.properties>build/replace.properties</cs.replace.properties>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-systemvm</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-nucleo</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-spring-module</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-spring-lifecycle</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-server</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-acl-static-role-based</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-dedicated-resources</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-api-limit-account-based</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-api-discovery</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-user-authenticator-ldap</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-user-authenticator-sha256salted</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-network-nvp</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-network-internallb</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-hypervisor-xenserver</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-hypervisor-ovm3</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-hypervisor-kvm</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-storage-allocator-random</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-planner-user-dispersing</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-planner-skip-heurestics</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-planner-user-concentrated-pod</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-planner-implicit-dedication</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-explicit-dedication</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-host-allocator-random</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-mom-rabbitmq</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-ipc</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-rest</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-api</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-components-api</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-network</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-orchestration</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-schema</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-storage</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-storage-cache</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-controller-secondary-storage</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-storage-image</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-storage-datamotion</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-storage-snapshot</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-storage-volume</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-storage-volume-default</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-storage-image-default</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-storage-image-s3</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-host-anti-affinity</artifactId>
+            <version>5.1.0.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <scm>
+        <connection>scm:git:git@github.com:MissionCriticalCloud/cosmic-client.git</connection>
+        <developerConnection>scm:git:git@github.com:MissionCriticalCloud/cosmic-client.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>ru.concerteza.buildnumber</groupId>
+                <artifactId>maven-jgit-buildnumber-plugin</artifactId>
+                <version>1.2.6</version>
+                <executions>
+                    <execution>
+                        <id>git-buildnumber</id>
+                        <goals>
+                            <goal>extract-buildnumber</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.googlecode.todomap</groupId>
+                <artifactId>maven-jettygzip-plugin</artifactId>
+                <version>0.0.4</version>
+                <configuration>
+                    <webappDirectory>${project.build.directory}/generated-webapp</webappDirectory>
+                    <outputDirectory>${project.build.directory}/generated-webapp</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <id>extract-systemvm-file</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <workingDirectory>${project.build.directory}/generated-webapp/WEB-INF/classes/vms</workingDirectory>
+                    <executable>jar</executable>
+                    <arguments>
+                        <argument>-xf</argument>
+                        <argument>${project.build.directory}/dependency/cloud-systemvm-${project.version}.jar</argument>
+                        <argument>systemvm.iso</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <webXml>${project.build.directory}/generated-webapp/WEB-INF/web.xml</webXml>
+                    <warSourceDirectory>./target/generated-webapp</warSourceDirectory>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Implementation-Revision>${git.revision}</Implementation-Revision>
+                            <Implementation-Branch>${git.branch}</Implementation-Branch>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <version>6.1.26</version>
+                <dependencies>
+                    <!-- specify the dependent jdbc driver here -->
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>${cs.mysql.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <scanIntervalSeconds>0</scanIntervalSeconds>
+                    <stopPort>9966</stopPort>
+                    <stopKey>stop-jetty</stopKey>
+                    <connectors>
+                        <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                            <port>8080</port>
+                            <maxIdleTime>60000</maxIdleTime>
+                        </connector>
+                    </connectors>
+                    <webXml>${project.build.directory}/generated-webapp/WEB-INF/web.xml</webXml>
+                    <webAppSourceDirectory>${project.build.directory}/generated-webapp</webAppSourceDirectory>
+                    <webAppConfig>
+                        <contextPath>/client</contextPath>
+                    </webAppConfig>
+
+                    <systemProperties>
+                        <systemProperty>
+                            <name>log4j.configuration</name>
+                            <value>log4j-cloud.xml</value>
+                        </systemProperty>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <configuration>
+                    <path>/client</path>
+                    <tomcatWebXml>${basedir}/WEB-INF/web.xml</tomcatWebXml>
+                    <warSourceDirectory>${project.build.directory}/generated-webapp/</warSourceDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <id>extract-core-dependencies</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                            <executable>jar</executable>
+                            <arguments>
+                                <argument>-xf</argument>
+                                <argument>dependency/cloud-nucleo-${project.version}.jar</argument>
+                                <argument>setup</argument>
+                                <argument>scripts</argument>
+                                <argument>build</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-resource</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy todir="${basedir}/target/generated-webapp/WEB-INF/classes/scripts">
+                                    <fileset dir="${project.build.directory}/scripts"/>
+                                </copy>
+                                <!-- CLOUDSTACK-1304 -->
+                                <chmod perm="755" file="${basedir}/target/generated-webapp/WEB-INF/classes/scripts/**"
+                                       type="both"/>
+                                <copy todir="${basedir}/target/generated-webapp/WEB-INF/">
+                                    <fileset dir="${basedir}/WEB-INF/">
+                                        <include name="web.xml"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${basedir}/target/generated-webapp/WEB-INF/classes">
+                                    <fileset dir="${basedir}/WEB-INF/classes">
+                                        <include name="resources/**/*"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${basedir}/target/generated-webapp">
+                                    <fileset dir="${basedir}/cosmic-ui"/>
+                                </copy>
+                                <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes">
+                                    <fileset dir="${basedir}/tomcatconf">
+                                        <include name="*.in"/>
+                                    </fileset>
+                                    <globmapper from="*.in" to="*"/>
+                                    <filterchain>
+                                        <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
+                                            <param type="propertiesfile"
+                                                   value="${project.build.directory}/${cs.replace.properties}"/>
+                                        </filterreader>
+                                    </filterchain>
+                                </copy>
+                                <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes">
+                                    <fileset dir="${basedir}/tomcatconf">
+                                        <exclude name="*.in"/>
+                                    </fileset>
+                                </copy>
+                                <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes/bin">
+                                    <fileset dir="${project.build.directory}/setup/bindir">
+                                        <include name="*.in"/>
+                                    </fileset>
+                                    <globmapper from="*.in" to="*"/>
+                                    <filterchain>
+                                        <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
+                                            <param type="propertiesfile"
+                                                   value="${project.build.directory}/${cs.replace.properties}"/>
+                                        </filterreader>
+                                    </filterchain>
+                                </copy>
+                                <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes/db">
+                                    <fileset dir="${project.build.directory}/setup/db/db">
+                                        <include name="**/*"/>
+                                    </fileset>
+                                    <filterchain>
+                                        <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
+                                            <param type="propertiesfile"
+                                                   value="${project.build.directory}/${cs.replace.properties}"/>
+                                        </filterreader>
+                                    </filterchain>
+                                </copy>
+                                <copy overwrite="true" todir="${basedir}/target/conf">
+                                    <fileset dir="${basedir}/tomcatconf">
+                                        <include name="*.in"/>
+                                    </fileset>
+                                    <globmapper from="*.in" to="*"/>
+                                    <filterchain>
+                                        <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
+                                            <param type="propertiesfile"
+                                                   value="${project.build.directory}/${cs.replace.properties}"/>
+                                        </filterreader>
+                                    </filterchain>
+                                </copy>
+                                <copy overwrite="true" todir="${basedir}/target/conf">
+                                    <fileset dir="${basedir}/tomcatconf">
+                                        <exclude name="*.in"/>
+                                    </fileset>
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- there are the jasypt libs requires by some of the python scripts -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.jasypt</groupId>
+                                    <artifactId>jasypt</artifactId>
+                                    <version>1.9.2</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/pythonlibs</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.jasypt</groupId>
+                                    <artifactId>jasypt</artifactId>
+                                    <version>1.9.2</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/pythonlibs</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>systemvm</id>
+            <activation>
+                <property>
+                    <name>systemvm</name>
+                </property>
+            </activation>
+        </profile>
+    </profiles>
+</project>
