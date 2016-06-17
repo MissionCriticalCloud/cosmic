@@ -496,7 +496,7 @@ class CsSite2SiteVpn(CsDataBag):
         file.addeq(" esp=%s" % obj['esp_policy'])
         file.addeq(" salifetime=%s" % self.convert_sec_to_h(obj['esp_lifetime']))
         file.addeq(" pfs=%s" % CsHelper.bool_to_yn(obj['dpd']))
-        file.addeq(" keyingtries=2")
+        file.addeq(" keyingtries=%forever")
         file.addeq(" auto=start")
         if not obj.has_key('encap'):
             obj['encap']=False
