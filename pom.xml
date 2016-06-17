@@ -418,8 +418,8 @@
   </dependencies>
 
   <scm>
-    <connection>scm:git:git@github.com:MissionCriticalCloud/cosmic.git</connection>
-    <developerConnection>scm:git:git@github.com:MissionCriticalCloud/cosmic.git</developerConnection>
+    <connection>scm:git:git@github.com:MissionCriticalCloud/blackhole.git</connection>
+    <developerConnection>scm:git:git@github.com:MissionCriticalCloud/blackhole.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
