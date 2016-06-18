@@ -7,7 +7,7 @@
   <parent>
     <groupId>cloud.cosmic</groupId>
     <artifactId>cloud-tools</artifactId>
-    <version>5.1.0.0-SNAPSHOT</version>
+    <version>5.1.0.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
