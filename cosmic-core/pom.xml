@@ -138,8 +138,6 @@
                             <exclude>README.md</exclude>
                             <exclude>INSTALL.md</exclude>
                             <exclude>CONTRIBUTING.md</exclude>
-                            <exclude>tools/docker/Dockerfile</exclude>
-                            <exclude>tools/docker/supervisord.conf</exclude>
                             <exclude>.idea/</exclude>
                             <exclude>**/*.log</exclude>
                             <exclude>**/*.patch</exclude>
@@ -177,13 +175,6 @@
                             <exclude>services/console-proxy/server/conf/environment.properties</exclude>
                             <exclude>services/secondary-storage/conf/agent.properties</exclude>
                             <exclude>services/secondary-storage/conf/environment.properties</exclude>
-                            <exclude>tools/appliance/.ruby-version</exclude>
-                            <exclude>tools/vagrant/systemvm/vagrant.pub</exclude>
-                            <exclude>tools/vagrant/systemvm/.ruby-version</exclude>
-                            <exclude>tools/appliance/definitions/systemvmtemplate/*</exclude>
-                            <exclude>tools/appliance/definitions/systemvm64template/*</exclude>
-                            <exclude>tools/appliance/definitions/builtin/*</exclude>
-                            <exclude>tools/cli/cloudmonkey.egg-info/*</exclude>
                             <exclude>systemvm/conf/agent.properties</exclude>
                             <exclude>systemvm/conf/environment.properties</exclude>
                             <exclude>systemvm/js/jquery.js</exclude>
@@ -218,9 +209,6 @@
                             <exclude>systemvm/patches/debian/config/var/www/html/userdata/.htaccess</exclude>
                             <exclude>systemvm/patches/debian/config/var/www/html/latest/.htaccess</exclude>
                             <exclude>systemvm/patches/debian/vpn/etc/ipsec.d/l2tp.conf</exclude>
-                            <exclude>tools/transifex/.tx/config</exclude>
-                            <exclude>tools/ngui/static/bootstrap/*</exclude>
-                            <exclude>tools/ngui/static/js/lib/*</exclude>
                             <exclude>**/.checkstyle</exclude>
                             <exclude>**/*.md</exclude>
                         </excludes>
