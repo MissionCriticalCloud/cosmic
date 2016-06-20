@@ -35,7 +35,7 @@ public interface EntityManager {
      * @param id         id value
      * @return T if found; null if not.
      */
-    public <T, K extends Serializable> T findById(Class<T> entityType, K id);
+    <T, K extends Serializable> T findById(Class<T> entityType, K id);
 
     /**
      * Finds a unique entity by uuid string
@@ -45,7 +45,7 @@ public interface EntityManager {
      * @param uuid       the unique id
      * @return T if found, null if not.
      */
-    public <T> T findByUuid(Class<T> entityType, String uuid);
+    <T> T findByUuid(Class<T> entityType, String uuid);
 
     /**
      * Finds a unique entity by uuid string, including those removed entries
@@ -55,17 +55,7 @@ public interface EntityManager {
      * @param uuid       the unique id
      * @return T if found, null if not.
      */
-    public <T> T findByUuidIncludingRemoved(Class<T> entityType, String uuid);
-
-    /**
-     * Finds an entity by external id which is always String
-     *
-     * @param <T>        entity class
-     * @param entityType type of entity you're looking for.
-     * @param xid        external id
-     * @return T if found, null if not.
-     */
-    public <T> T findByXId(Class<T> entityType, String xid);
+    <T> T findByUuidIncludingRemoved(Class<T> entityType, String uuid);
 
     /**
      * Lists all entities.  Use this method at your own risk.
@@ -74,15 +64,11 @@ public interface EntityManager {
      * @param entityType type of entity you're looking for.
      * @return List<T>
      */
-    public <T> List<? extends T> list(Class<T> entityType);
+    <T> List<? extends T> list(Class<T> entityType);
 
-    public <T, K extends Serializable> void remove(Class<T> entityType, K id);
+    <T, K extends Serializable> void remove(Class<T> entityType, K id);
 
-    public <T, K extends Serializable> T findByIdIncludingRemoved(Class<T> entityType, K id);
+    <T, K extends Serializable> T findByIdIncludingRemoved(Class<T> entityType, K id);
 
-    public static final String MESSAGE_REMOVE_ENTITY_EVENT = "Message.RemoveEntity.Event";
-
-    public static final String MESSAGE_GRANT_ENTITY_EVENT = "Message.GrantEntity.Event";
-    public static final String MESSAGE_REVOKE_ENTITY_EVENT = "Message.RevokeEntity.Event";
-    public static final String MESSAGE_ADD_DOMAIN_WIDE_ENTITY_EVENT = "Message.AddDomainWideEntity.Event";
+    String MESSAGE_REMOVE_ENTITY_EVENT = "Message.RemoveEntity.Event";
 }
