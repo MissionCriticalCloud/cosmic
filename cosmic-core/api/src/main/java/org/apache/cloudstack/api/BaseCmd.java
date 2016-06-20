@@ -19,6 +19,7 @@ package org.apache.cloudstack.api;
 
 import com.cloud.configuration.ConfigurationService;
 import com.cloud.dao.EntityManager;
+import com.cloud.dao.UUIDManager;
 import com.cloud.exception.*;
 import com.cloud.network.*;
 import com.cloud.network.as.AutoScaleService;
@@ -47,7 +48,6 @@ import com.cloud.user.DomainService;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.utils.HttpUtils;
 import com.cloud.utils.ReflectUtil;
-import com.cloud.utils.db.UUIDManager;
 import com.cloud.vm.UserVmService;
 import com.cloud.vm.snapshot.VMSnapshotService;
 import org.apache.cloudstack.acl.RoleType;
