@@ -571,9 +571,9 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.sonar</groupId>
-                    <artifactId>sonar-maven3-plugin</artifactId>
-                    <version>5.2</version>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>3.0.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -622,7 +622,7 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.codehaus.sonar</groupId>
+                        <groupId>org.sonarsource.scanner.maven</groupId>
                         <artifactId>sonar-maven-plugin</artifactId>
                     </plugin>
                     <plugin>
