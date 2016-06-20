@@ -313,7 +313,7 @@
             <id>developer</id>
             <modules>
                 <module>developer</module>
-                <module>tools</module>
+                <module>apidoc</module>
             </modules>
         </profile>
     </profiles>

@@ -6,9 +6,8 @@
     <packaging>pom</packaging>
     <parent>
         <groupId>cloud.cosmic</groupId>
-        <artifactId>cloud-tools</artifactId>
+        <artifactId>cosmic-core</artifactId>
         <version>5.1.0.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     <properties>
         <client.config.base>${project.build.directory}/dependency</client.config.base>
