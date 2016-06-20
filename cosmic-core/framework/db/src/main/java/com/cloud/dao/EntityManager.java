@@ -17,56 +17,60 @@
 // under the License.
 //
 
-package com.cloud.utils.db;
+package com.cloud.dao;
 
 import java.io.Serializable;
 import java.util.List;
 
 /**
  * Generic Entity Manager to retrieve database objects.
- *
  */
 public interface EntityManager {
     /**
      * Finds an entity by its id.
-     * @param <T> class of the entity you're trying to find.
-     * @param <K> class of the id that the entity uses.
+     *
+     * @param <T>        class of the entity you're trying to find.
+     * @param <K>        class of the id that the entity uses.
      * @param entityType Type of the entity.
-     * @param id id value
+     * @param id         id value
      * @return T if found; null if not.
      */
     public <T, K extends Serializable> T findById(Class<T> entityType, K id);
 
     /**
      * Finds a unique entity by uuid string
-     * @param <T> entity class
+     *
+     * @param <T>        entity class
      * @param entityType type of entity you're looking for.
-     * @param uuid the unique id
+     * @param uuid       the unique id
      * @return T if found, null if not.
      */
     public <T> T findByUuid(Class<T> entityType, String uuid);
 
     /**
      * Finds a unique entity by uuid string, including those removed entries
-     * @param <T> entity class
+     *
+     * @param <T>        entity class
      * @param entityType type of entity you're looking for.
-     * @param uuid the unique id
+     * @param uuid       the unique id
      * @return T if found, null if not.
      */
     public <T> T findByUuidIncludingRemoved(Class<T> entityType, String uuid);
 
     /**
      * Finds an entity by external id which is always String
-     * @param <T> entity class
+     *
+     * @param <T>        entity class
      * @param entityType type of entity you're looking for.
-     * @param xid external id
+     * @param xid        external id
      * @return T if found, null if not.
      */
     public <T> T findByXId(Class<T> entityType, String xid);
 
     /**
      * Lists all entities.  Use this method at your own risk.
-     * @param <T> entity class
+     *
+     * @param <T>        entity class
      * @param entityType type of entity you're looking for.
      * @return List<T>
      */

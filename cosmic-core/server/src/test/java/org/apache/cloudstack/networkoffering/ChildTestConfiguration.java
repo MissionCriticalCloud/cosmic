@@ -17,49 +17,21 @@
 
 package org.apache.cloudstack.networkoffering;
 
-import java.io.IOException;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.alert.AlertManager;
 import com.cloud.api.query.dao.UserAccountJoinDaoImpl;
 import com.cloud.capacity.dao.CapacityDaoImpl;
 import com.cloud.cluster.agentlb.dao.HostTransferMapDaoImpl;
+import com.cloud.dao.EntityManager;
 import com.cloud.dc.ClusterDetailsDao;
-import com.cloud.dc.dao.AccountVlanMapDaoImpl;
-import com.cloud.dc.dao.ClusterDaoImpl;
-import com.cloud.dc.dao.DataCenterDaoImpl;
-import com.cloud.dc.dao.DataCenterDetailsDaoImpl;
-import com.cloud.dc.dao.DataCenterIpAddressDaoImpl;
-import com.cloud.dc.dao.DataCenterLinkLocalIpAddressDao;
-import com.cloud.dc.dao.DataCenterVnetDaoImpl;
-import com.cloud.dc.dao.DedicatedResourceDao;
-import com.cloud.dc.dao.DomainVlanMapDaoImpl;
-import com.cloud.dc.dao.HostPodDaoImpl;
-import com.cloud.dc.dao.PodVlanDaoImpl;
-import com.cloud.dc.dao.PodVlanMapDaoImpl;
-import com.cloud.dc.dao.VlanDaoImpl;
+import com.cloud.dc.dao.*;
 import com.cloud.domain.dao.DomainDaoImpl;
 import com.cloud.event.dao.UsageEventDaoImpl;
 import com.cloud.host.dao.HostDaoImpl;
 import com.cloud.host.dao.HostDetailsDaoImpl;
 import com.cloud.host.dao.HostTagsDaoImpl;
-import com.cloud.network.IpAddressManager;
-import com.cloud.network.Ipv6AddressManager;
-import com.cloud.network.NetworkModel;
-import com.cloud.network.NetworkService;
-import com.cloud.network.StorageNetworkManager;
-import com.cloud.network.dao.AccountGuestVlanMapDaoImpl;
-import com.cloud.network.dao.FirewallRulesCidrsDaoImpl;
-import com.cloud.network.dao.FirewallRulesDaoImpl;
-import com.cloud.network.dao.IPAddressDaoImpl;
-import com.cloud.network.dao.LoadBalancerDaoImpl;
-import com.cloud.network.dao.NetworkDao;
-import com.cloud.network.dao.NetworkDomainDaoImpl;
-import com.cloud.network.dao.NetworkServiceMapDaoImpl;
-import com.cloud.network.dao.PhysicalNetworkDaoImpl;
-import com.cloud.network.dao.PhysicalNetworkServiceProviderDaoImpl;
-import com.cloud.network.dao.PhysicalNetworkTrafficTypeDaoImpl;
-import com.cloud.network.dao.UserIpv6AddressDaoImpl;
+import com.cloud.network.*;
+import com.cloud.network.dao.*;
 import com.cloud.network.element.DhcpServiceProvider;
 import com.cloud.network.element.IpDeployer;
 import com.cloud.network.element.NetworkElement;
@@ -90,13 +62,7 @@ import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.user.dao.AccountDaoImpl;
 import com.cloud.user.dao.UserDaoImpl;
-import com.cloud.utils.db.EntityManager;
-import com.cloud.vm.dao.InstanceGroupDaoImpl;
-import com.cloud.vm.dao.NicDaoImpl;
-import com.cloud.vm.dao.NicSecondaryIpDaoImpl;
-import com.cloud.vm.dao.UserVmDao;
-import com.cloud.vm.dao.VMInstanceDaoImpl;
-
+import com.cloud.vm.dao.*;
 import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.affinity.AffinityGroupService;
 import org.apache.cloudstack.affinity.dao.AffinityGroupDao;
@@ -120,21 +86,23 @@ import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.TypeFilter;
 
+import java.io.IOException;
+
 @Configuration
 @ComponentScan(basePackageClasses = {AccountVlanMapDaoImpl.class, DomainVlanMapDaoImpl.class, VolumeDaoImpl.class, HostPodDaoImpl.class, DomainDaoImpl.class, ServiceOfferingDaoImpl.class,
-    ServiceOfferingDetailsDaoImpl.class, VlanDaoImpl.class, IPAddressDaoImpl.class, ResourceTagsDaoImpl.class, AccountDaoImpl.class,
-    InstanceGroupDaoImpl.class, UserAccountJoinDaoImpl.class, CapacityDaoImpl.class, SnapshotDaoImpl.class, HostDaoImpl.class, VMInstanceDaoImpl.class,
-    HostTransferMapDaoImpl.class, PortForwardingRulesDaoImpl.class, PrivateIpDaoImpl.class, UsageEventDaoImpl.class, PodVlanMapDaoImpl.class,
-    DiskOfferingDaoImpl.class, DataCenterDaoImpl.class, DataCenterIpAddressDaoImpl.class, DataCenterVnetDaoImpl.class, PodVlanDaoImpl.class,
-    DataCenterDetailsDaoImpl.class, NicSecondaryIpDaoImpl.class, UserIpv6AddressDaoImpl.class, UserDaoImpl.class, NicDaoImpl.class,
-    NetworkDomainDaoImpl.class, HostDetailsDaoImpl.class, HostTagsDaoImpl.class, ClusterDaoImpl.class, FirewallRulesDaoImpl.class,
-    FirewallRulesCidrsDaoImpl.class, PhysicalNetworkDaoImpl.class, PhysicalNetworkTrafficTypeDaoImpl.class, PhysicalNetworkServiceProviderDaoImpl.class,
-    LoadBalancerDaoImpl.class, NetworkServiceMapDaoImpl.class, PrimaryDataStoreDaoImpl.class, StoragePoolDetailsDaoImpl.class,
-    PortableIpRangeDaoImpl.class, RegionDaoImpl.class, PortableIpDaoImpl.class, AccountGuestVlanMapDaoImpl.class},
-               includeFilters = {@Filter(value = ChildTestConfiguration.Library.class, type = FilterType.CUSTOM)},
-               useDefaultFilters = false)
+        ServiceOfferingDetailsDaoImpl.class, VlanDaoImpl.class, IPAddressDaoImpl.class, ResourceTagsDaoImpl.class, AccountDaoImpl.class,
+        InstanceGroupDaoImpl.class, UserAccountJoinDaoImpl.class, CapacityDaoImpl.class, SnapshotDaoImpl.class, HostDaoImpl.class, VMInstanceDaoImpl.class,
+        HostTransferMapDaoImpl.class, PortForwardingRulesDaoImpl.class, PrivateIpDaoImpl.class, UsageEventDaoImpl.class, PodVlanMapDaoImpl.class,
+        DiskOfferingDaoImpl.class, DataCenterDaoImpl.class, DataCenterIpAddressDaoImpl.class, DataCenterVnetDaoImpl.class, PodVlanDaoImpl.class,
+        DataCenterDetailsDaoImpl.class, NicSecondaryIpDaoImpl.class, UserIpv6AddressDaoImpl.class, UserDaoImpl.class, NicDaoImpl.class,
+        NetworkDomainDaoImpl.class, HostDetailsDaoImpl.class, HostTagsDaoImpl.class, ClusterDaoImpl.class, FirewallRulesDaoImpl.class,
+        FirewallRulesCidrsDaoImpl.class, PhysicalNetworkDaoImpl.class, PhysicalNetworkTrafficTypeDaoImpl.class, PhysicalNetworkServiceProviderDaoImpl.class,
+        LoadBalancerDaoImpl.class, NetworkServiceMapDaoImpl.class, PrimaryDataStoreDaoImpl.class, StoragePoolDetailsDaoImpl.class,
+        PortableIpRangeDaoImpl.class, RegionDaoImpl.class, PortableIpDaoImpl.class, AccountGuestVlanMapDaoImpl.class},
+        includeFilters = {@Filter(value = ChildTestConfiguration.Library.class, type = FilterType.CUSTOM)},
+        useDefaultFilters = false)
 public class
-        ChildTestConfiguration {
+ChildTestConfiguration {
 
     @Bean
     public ManagementService managementService() {
@@ -339,9 +307,9 @@ public class
     public static class Library implements TypeFilter {
 
         @Override
-        public boolean match(MetadataReader mdr, MetadataReaderFactory arg1) throws IOException {
+        public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) throws IOException {
             mdr.getClassMetadata().getClassName();
-            ComponentScan cs = ChildTestConfiguration.class.getAnnotation(ComponentScan.class);
+            final ComponentScan cs = ChildTestConfiguration.class.getAnnotation(ComponentScan.class);
             return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);
         }
 

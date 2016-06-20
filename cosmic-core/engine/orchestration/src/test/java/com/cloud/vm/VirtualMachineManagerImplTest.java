@@ -17,48 +17,16 @@
 
 package com.cloud.vm;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.CheckVirtualMachineAnswer;
-import com.cloud.agent.api.CheckVirtualMachineCommand;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.MigrateWithStorageAnswer;
-import com.cloud.agent.api.MigrateWithStorageCommand;
-import com.cloud.agent.api.MigrateWithStorageCompleteAnswer;
-import com.cloud.agent.api.MigrateWithStorageCompleteCommand;
-import com.cloud.agent.api.MigrateWithStorageReceiveAnswer;
-import com.cloud.agent.api.MigrateWithStorageReceiveCommand;
-import com.cloud.agent.api.MigrateWithStorageSendAnswer;
-import com.cloud.agent.api.MigrateWithStorageSendCommand;
-import com.cloud.agent.api.PrepareForMigrationAnswer;
-import com.cloud.agent.api.PrepareForMigrationCommand;
-import com.cloud.agent.api.ScaleVmAnswer;
-import com.cloud.agent.api.ScaleVmCommand;
-import com.cloud.agent.api.StopAnswer;
-import com.cloud.agent.api.StopCommand;
+import com.cloud.agent.api.*;
 import com.cloud.capacity.CapacityManager;
+import com.cloud.dao.EntityManager;
 import com.cloud.dc.dao.ClusterDao;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlanner;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ManagementServerException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.exception.VirtualMachineMigrationException;
+import com.cloud.exception.*;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
@@ -81,7 +49,6 @@ import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.Pair;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VirtualMachine.Event;
 import com.cloud.vm.VirtualMachine.PowerState;
@@ -90,7 +57,7 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotManager;
-
+import junit.framework.Assert;
 import org.apache.cloudstack.api.command.user.vm.RestoreVMCmd;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.engine.orchestration.service.VolumeOrchestrationService;
@@ -105,7 +72,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
-import junit.framework.Assert;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.*;
 
 public class VirtualMachineManagerImplTest {
 
@@ -249,8 +224,8 @@ public class VirtualMachineManagerImplTest {
     @Test(expected = CloudRuntimeException.class)
     public void testScaleVM1() throws Exception {
 
-        DeployDestination dest = new DeployDestination(null, null, null, _host);
-        long l = 1L;
+        final DeployDestination dest = new DeployDestination(null, null, null, _host);
+        final long l = 1L;
 
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
         _vmMgr.migrateForScale(_vmInstance.getUuid(), l, dest, l);
@@ -263,13 +238,13 @@ public class VirtualMachineManagerImplTest {
         new DeployDestination(null, null, null, _host);
         doReturn(3L).when(_vmInstance).getId();
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
-        ServiceOfferingVO newServiceOffering = getSvcoffering(512);
+        final ServiceOfferingVO newServiceOffering = getSvcoffering(512);
         doReturn(1L).when(_vmInstance).getHostId();
         doReturn(hostVO).when(_hostDao).findById(1L);
         doReturn(1L).when(_vmInstance).getDataCenterId();
         doReturn(1L).when(hostVO).getClusterId();
         when(CapacityManager.CpuOverprovisioningFactor.valueIn(1L)).thenReturn(1.0f);
-        ScaleVmCommand reconfigureCmd =
+        final ScaleVmCommand reconfigureCmd =
                 new ScaleVmCommand("myVmName", newServiceOffering.getCpu(), newServiceOffering.getSpeed(), newServiceOffering.getSpeed(), newServiceOffering.getRamSize(),
                         newServiceOffering.getRamSize(), newServiceOffering.getLimitCpuUse());
         new ScaleVmAnswer(reconfigureCmd, true, "details");
@@ -292,23 +267,23 @@ public class VirtualMachineManagerImplTest {
         when(_vmInstance.getHostId()).thenReturn(null);
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
         when(_vmInstanceDao.findByUuid(any(String.class))).thenReturn(_vmInstance);
-        DeploymentPlanner.ExcludeList excludeHostList = new DeploymentPlanner.ExcludeList();
+        final DeploymentPlanner.ExcludeList excludeHostList = new DeploymentPlanner.ExcludeList();
         _vmMgr.findHostAndMigrate(_vmInstance.getUuid(), 2l, excludeHostList);
 
     }
 
-    private ServiceOfferingVO getSvcoffering(int ramSize) {
+    private ServiceOfferingVO getSvcoffering(final int ramSize) {
 
-        String name = "name";
-        String displayText = "displayText";
-        int cpu = 1;
+        final String name = "name";
+        final String displayText = "displayText";
+        final int cpu = 1;
         //int ramSize = 256;
-        int speed = 128;
+        final int speed = 128;
 
-        boolean ha = false;
-        boolean useLocalStorage = false;
+        final boolean ha = false;
+        final boolean useLocalStorage = false;
 
-        ServiceOfferingVO serviceOffering =
+        final ServiceOfferingVO serviceOffering =
                 new ServiceOfferingVO(name, cpu, ramSize, speed, null, null, ha, displayText, ProvisioningType.THIN, useLocalStorage, false, null, false, null, false);
         return serviceOffering;
     }
@@ -340,12 +315,12 @@ public class VirtualMachineManagerImplTest {
         doNothing().when(_work).setStep(ItWorkVO.Step.Done);
 
         // Mock the vm guru and the user vm object that gets returned.
-        _vmMgr._vmGurus = new HashMap<VirtualMachine.Type, VirtualMachineGuru>();
+        _vmMgr._vmGurus = new HashMap<>();
 //        UserVmManagerImpl userVmManager = mock(UserVmManagerImpl.class);
 //        _vmMgr.registerGuru(VirtualMachine.Type.User, userVmManager);
 
         // Mock the iteration over all the volumes of an instance.
-        Iterator<VolumeVO> volumeIterator = mock(Iterator.class);
+        final Iterator<VolumeVO> volumeIterator = mock(Iterator.class);
         when(_volsDao.findUsableVolumesForInstance(anyLong())).thenReturn(_rootVols);
         when(_rootVols.iterator()).thenReturn(volumeIterator);
         when(volumeIterator.hasNext()).thenReturn(true, false);
@@ -368,40 +343,40 @@ public class VirtualMachineManagerImplTest {
         when(_poolHostDao.findByPoolHost(anyLong(), anyLong())).thenReturn(mock(StoragePoolHostVO.class));
 
         // Mock hypervisor guru.
-        HypervisorGuru guruMock = mock(HypervisorGuru.class);
+        final HypervisorGuru guruMock = mock(HypervisorGuru.class);
         when(_hvGuruMgr.getGuru(HypervisorType.XenServer)).thenReturn(guruMock);
 
         when(_srcHostMock.getClusterId()).thenReturn(3L);
         when(_destHostMock.getClusterId()).thenReturn(3L);
 
         // Mock the commands and answers to the agent.
-        PrepareForMigrationAnswer prepAnswerMock = mock(PrepareForMigrationAnswer.class);
+        final PrepareForMigrationAnswer prepAnswerMock = mock(PrepareForMigrationAnswer.class);
         when(prepAnswerMock.getResult()).thenReturn(true);
         when(_agentMgr.send(anyLong(), isA(PrepareForMigrationCommand.class))).thenReturn(prepAnswerMock);
 
-        MigrateWithStorageAnswer migAnswerMock = mock(MigrateWithStorageAnswer.class);
+        final MigrateWithStorageAnswer migAnswerMock = mock(MigrateWithStorageAnswer.class);
         when(migAnswerMock.getResult()).thenReturn(true);
         when(_agentMgr.send(anyLong(), isA(MigrateWithStorageCommand.class))).thenReturn(migAnswerMock);
 
-        MigrateWithStorageReceiveAnswer migRecAnswerMock = mock(MigrateWithStorageReceiveAnswer.class);
+        final MigrateWithStorageReceiveAnswer migRecAnswerMock = mock(MigrateWithStorageReceiveAnswer.class);
         when(migRecAnswerMock.getResult()).thenReturn(true);
         when(_agentMgr.send(anyLong(), isA(MigrateWithStorageReceiveCommand.class))).thenReturn(migRecAnswerMock);
 
-        MigrateWithStorageSendAnswer migSendAnswerMock = mock(MigrateWithStorageSendAnswer.class);
+        final MigrateWithStorageSendAnswer migSendAnswerMock = mock(MigrateWithStorageSendAnswer.class);
         when(migSendAnswerMock.getResult()).thenReturn(true);
         when(_agentMgr.send(anyLong(), isA(MigrateWithStorageSendCommand.class))).thenReturn(migSendAnswerMock);
 
-        MigrateWithStorageCompleteAnswer migCompleteAnswerMock = mock(MigrateWithStorageCompleteAnswer.class);
+        final MigrateWithStorageCompleteAnswer migCompleteAnswerMock = mock(MigrateWithStorageCompleteAnswer.class);
         when(migCompleteAnswerMock.getResult()).thenReturn(true);
         when(_agentMgr.send(anyLong(), isA(MigrateWithStorageCompleteCommand.class))).thenReturn(migCompleteAnswerMock);
 
-        CheckVirtualMachineAnswer checkVmAnswerMock = mock(CheckVirtualMachineAnswer.class);
+        final CheckVirtualMachineAnswer checkVmAnswerMock = mock(CheckVirtualMachineAnswer.class);
         when(checkVmAnswerMock.getResult()).thenReturn(true);
         when(checkVmAnswerMock.getState()).thenReturn(PowerState.PowerOn);
         when(_agentMgr.send(anyLong(), isA(CheckVirtualMachineCommand.class))).thenReturn(checkVmAnswerMock);
 
         // Mock the state transitions of vm.
-        Pair<Long, Long> opaqueMock = new Pair<Long, Long>(_vmMock.getHostId(), _destHostMock.getId());
+        final Pair<Long, Long> opaqueMock = new Pair<>(_vmMock.getHostId(), _destHostMock.getId());
         when(_vmSnapshotMgr.hasActiveVMSnapshotTasks(anyLong())).thenReturn(false);
         when(_vmInstanceDao.updateState(State.Running, Event.MigrationRequested, State.Migrating, _vmMock, opaqueMock)).thenReturn(true);
         when(_vmInstanceDao.updateState(State.Migrating, Event.OperationSucceeded, State.Running, _vmMock, opaqueMock)).thenReturn(true);
@@ -410,7 +385,7 @@ public class VirtualMachineManagerImplTest {
     // Check migration of a vm with its volumes within a cluster.
     @Test
     public void testMigrateWithVolumeWithinCluster() throws ResourceUnavailableException, ConcurrentOperationException, ManagementServerException,
-    VirtualMachineMigrationException, OperationTimedoutException {
+            VirtualMachineMigrationException, OperationTimedoutException {
 
         initializeMockConfigForMigratingVmWithVolumes();
         when(_srcHostMock.getClusterId()).thenReturn(3L);
@@ -422,7 +397,7 @@ public class VirtualMachineManagerImplTest {
     // Check migration of a vm with its volumes across a cluster.
     @Test
     public void testMigrateWithVolumeAcrossCluster() throws ResourceUnavailableException, ConcurrentOperationException, ManagementServerException,
-    VirtualMachineMigrationException, OperationTimedoutException {
+            VirtualMachineMigrationException, OperationTimedoutException {
 
         initializeMockConfigForMigratingVmWithVolumes();
         when(_srcHostMock.getClusterId()).thenReturn(3L);
@@ -435,7 +410,7 @@ public class VirtualMachineManagerImplTest {
     // other is local.
     @Test(expected = CloudRuntimeException.class)
     public void testMigrateWithVolumeFail1() throws ResourceUnavailableException, ConcurrentOperationException, ManagementServerException,
-    VirtualMachineMigrationException, OperationTimedoutException {
+            VirtualMachineMigrationException, OperationTimedoutException {
 
         initializeMockConfigForMigratingVmWithVolumes();
         when(_srcHostMock.getClusterId()).thenReturn(3L);
@@ -450,7 +425,7 @@ public class VirtualMachineManagerImplTest {
     // Check migration of a vm fails when vm is not in Running state.
     @Test(expected = ConcurrentOperationException.class)
     public void testMigrateWithVolumeFail2() throws ResourceUnavailableException, ConcurrentOperationException, ManagementServerException,
-    VirtualMachineMigrationException, OperationTimedoutException {
+            VirtualMachineMigrationException, OperationTimedoutException {
 
         initializeMockConfigForMigratingVmWithVolumes();
         when(_srcHostMock.getClusterId()).thenReturn(3L);
@@ -463,44 +438,44 @@ public class VirtualMachineManagerImplTest {
 
     @Test
     public void testSendStopWithOkAnswer() throws Exception {
-        VirtualMachineGuru guru = mock(VirtualMachineGuru.class);
-        VirtualMachine vm = mock(VirtualMachine.class);
-        VirtualMachineProfile profile = mock(VirtualMachineProfile.class);
-        StopAnswer answer = new StopAnswer(new StopCommand(vm, false, false), "ok", true);
+        final VirtualMachineGuru guru = mock(VirtualMachineGuru.class);
+        final VirtualMachine vm = mock(VirtualMachine.class);
+        final VirtualMachineProfile profile = mock(VirtualMachineProfile.class);
+        final StopAnswer answer = new StopAnswer(new StopCommand(vm, false, false), "ok", true);
         when(profile.getVirtualMachine()).thenReturn(vm);
         when(vm.getHostId()).thenReturn(1L);
-        when(_agentMgr.send(anyLong(), (Command)any())).thenReturn(answer);
+        when(_agentMgr.send(anyLong(), (Command) any())).thenReturn(answer);
 
-        boolean actual = _vmMgr.sendStop(guru, profile, false, false);
+        final boolean actual = _vmMgr.sendStop(guru, profile, false, false);
 
         Assert.assertTrue(actual);
     }
 
     @Test
     public void testSendStopWithFailAnswer() throws Exception {
-        VirtualMachineGuru guru = mock(VirtualMachineGuru.class);
-        VirtualMachine vm = mock(VirtualMachine.class);
-        VirtualMachineProfile profile = mock(VirtualMachineProfile.class);
-        StopAnswer answer = new StopAnswer(new StopCommand(vm, false, false), "fail", false);
+        final VirtualMachineGuru guru = mock(VirtualMachineGuru.class);
+        final VirtualMachine vm = mock(VirtualMachine.class);
+        final VirtualMachineProfile profile = mock(VirtualMachineProfile.class);
+        final StopAnswer answer = new StopAnswer(new StopCommand(vm, false, false), "fail", false);
         when(profile.getVirtualMachine()).thenReturn(vm);
         when(vm.getHostId()).thenReturn(1L);
-        when(_agentMgr.send(anyLong(), (Command)any())).thenReturn(answer);
+        when(_agentMgr.send(anyLong(), (Command) any())).thenReturn(answer);
 
-        boolean actual = _vmMgr.sendStop(guru, profile, false, false);
+        final boolean actual = _vmMgr.sendStop(guru, profile, false, false);
 
         Assert.assertFalse(actual);
     }
 
     @Test
     public void testSendStopWithNullAnswer() throws Exception {
-        VirtualMachineGuru guru = mock(VirtualMachineGuru.class);
-        VirtualMachine vm = mock(VirtualMachine.class);
-        VirtualMachineProfile profile = mock(VirtualMachineProfile.class);
+        final VirtualMachineGuru guru = mock(VirtualMachineGuru.class);
+        final VirtualMachine vm = mock(VirtualMachine.class);
+        final VirtualMachineProfile profile = mock(VirtualMachineProfile.class);
         when(profile.getVirtualMachine()).thenReturn(vm);
         when(vm.getHostId()).thenReturn(1L);
-        when(_agentMgr.send(anyLong(), (Command)any())).thenReturn(null);
+        when(_agentMgr.send(anyLong(), (Command) any())).thenReturn(null);
 
-        boolean actual = _vmMgr.sendStop(guru, profile, false, false);
+        final boolean actual = _vmMgr.sendStop(guru, profile, false, false);
 
         Assert.assertFalse(actual);
     }

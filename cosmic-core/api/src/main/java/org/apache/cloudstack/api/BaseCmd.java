@@ -17,29 +17,10 @@
 
 package org.apache.cloudstack.api;
 
-import java.lang.reflect.Field;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-
 import com.cloud.configuration.ConfigurationService;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.network.NetworkModel;
-import com.cloud.network.NetworkService;
-import com.cloud.network.NetworkUsageService;
-import com.cloud.network.StorageNetworkService;
-import com.cloud.network.VpcVirtualNetworkApplianceService;
+import com.cloud.dao.EntityManager;
+import com.cloud.exception.*;
+import com.cloud.network.*;
 import com.cloud.network.as.AutoScaleService;
 import com.cloud.network.firewall.FirewallService;
 import com.cloud.network.lb.LoadBalancingRulesService;
@@ -66,11 +47,9 @@ import com.cloud.user.DomainService;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.utils.HttpUtils;
 import com.cloud.utils.ReflectUtil;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.utils.db.UUIDManager;
 import com.cloud.vm.UserVmService;
 import com.cloud.vm.snapshot.VMSnapshotService;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.affinity.AffinityGroupService;
 import org.apache.cloudstack.alert.AlertService;
@@ -83,6 +62,13 @@ import org.apache.cloudstack.usage.UsageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Pattern;
+
 public abstract class BaseCmd {
     private static final Logger s_logger = LoggerFactory.getLogger(BaseCmd.class.getName());
     public static final String RESPONSE_TYPE_XML = HttpUtils.RESPONSE_TYPE_XML;
@@ -90,10 +76,12 @@ public abstract class BaseCmd {
     public static final String USER_ERROR_MESSAGE = "Internal error executing command, please contact your system administrator";
     public static Pattern newInputDateFormat = Pattern.compile("[\\d]+-[\\d]+-[\\d]+ [\\d]+:[\\d]+:[\\d]+");
     private static final DateFormat s_outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-    protected static final Map<Class<?>, List<Field>> fieldsForCmdClass = new HashMap<Class<?>, List<Field>>();
+    protected static final Map<Class<?>, List<Field>> fieldsForCmdClass = new HashMap<>();
+
     public static enum HTTPMethod {
         GET, POST, PUT, DELETE
     }
+
     public static enum CommandType {
         BOOLEAN, DATE, FLOAT, DOUBLE, INTEGER, SHORT, LIST, LONG, OBJECT, MAP, STRING, TZDATE, UUID
     }
@@ -191,7 +179,7 @@ public abstract class BaseCmd {
     public UUIDManager _uuidMgr;
 
     public abstract void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException, NetworkRuleConflictException;
+            ResourceAllocationException, NetworkRuleConflictException;
 
     public void configure() {
     }
@@ -249,7 +237,7 @@ public abstract class BaseCmd {
         } else {
             cmdName = this.getClass().getName();
         }
-       return cmdName;
+        return cmdName;
     }
 
     /**
@@ -285,20 +273,20 @@ public abstract class BaseCmd {
         // If list of fields was not cached yet
         if (filteredFields == null) {
             final List<Field> allFields = ReflectUtil.getAllFieldsForClass(this.getClass(), BaseCmd.class);
-            filteredFields = new ArrayList<Field>();
+            filteredFields = new ArrayList<>();
 
             for (final Field field : allFields) {
                 final Parameter parameterAnnotation = field.getAnnotation(Parameter.class);
                 if ((parameterAnnotation != null) && parameterAnnotation.expose()) {
                     filteredFields.add(field);
-                    }
                 }
+            }
 
             // Cache the prepared list for future use
             fieldsForCmdClass.put(clazz, filteredFields);
-                    }
+        }
         return filteredFields;
-                }
+    }
 
     /**
      * This method doesn't return all the @{link Parameter}, but only the ones exposed
@@ -311,7 +299,7 @@ public abstract class BaseCmd {
      */
     public List<Field> getParamFields() {
         final List<Field> allFields = getAllFieldsForClass(this.getClass());
-        final List<Field> validFields = new ArrayList<Field>();
+        final List<Field> validFields = new ArrayList<>();
         final Account caller = CallContext.current().getCallingAccount();
 
         for (final Field field : allFields) {
@@ -351,33 +339,34 @@ public abstract class BaseCmd {
     /**
      * To be overwritten by any class who needs specific validation
      */
-    public void validateSpecificParameters(final Map<String, String> params){
+    public void validateSpecificParameters(final Map<String, String> params) {
         // To be overwritten by any class who needs specific validation
     }
 
     /**
      * display flag is used to control the display of the resource only to the end user. It doesnt affect Root Admin.
+     *
      * @return display flag
      */
-    public boolean isDisplay(){
-        CallContext context = CallContext.current();
-        Map<Object, Object> contextMap = context.getContextParameters();
+    public boolean isDisplay() {
+        final CallContext context = CallContext.current();
+        final Map<Object, Object> contextMap = context.getContextParameters();
         boolean isDisplay = true;
 
         // Iterate over all the first class entities in context and check their display property.
-        for(Map.Entry<Object, Object> entry : contextMap.entrySet()){
-            try{
-                Object key = entry.getKey();
-                Class clz = Class.forName((String)key);
-                if(Displayable.class.isAssignableFrom(clz)){
+        for (final Map.Entry<Object, Object> entry : contextMap.entrySet()) {
+            try {
+                final Object key = entry.getKey();
+                final Class clz = Class.forName((String) key);
+                if (Displayable.class.isAssignableFrom(clz)) {
                     final Object objVO = getEntityVO(clz, entry.getValue());
                     isDisplay = ((Displayable) objVO).isDisplay();
                 }
 
                 // If the flag is false break immediately
-                if(!isDisplay)
+                if (!isDisplay)
                     break;
-            } catch (Exception e){
+            } catch (final Exception e) {
                 s_logger.trace("Caught exception while checking first class entities for display property, continuing on", e);
             }
         }
@@ -387,21 +376,21 @@ public abstract class BaseCmd {
 
     }
 
-    private Object getEntityVO(Class entityType, Object entityId){
+    private Object getEntityVO(final Class entityType, final Object entityId) {
 
         // entityId can be internal db id or UUID so accordingly call findbyId or findByUUID
 
-        if (entityId instanceof Long){
+        if (entityId instanceof Long) {
             // Its internal db id - use findById
-            return _entityMgr.findById(entityType, (Long)entityId);
-        } else if(entityId instanceof String){
-            try{
+            return _entityMgr.findById(entityType, (Long) entityId);
+        } else if (entityId instanceof String) {
+            try {
                 // In case its an async job the internal db id would be a string because of json deserialization
-                Long internalId = Long.valueOf((String) entityId);
+                final Long internalId = Long.valueOf((String) entityId);
                 return _entityMgr.findById(entityType, internalId);
-            } catch (NumberFormatException e){
-               // It is uuid - use findByUuid`
-               return _entityMgr.findByUuid(entityType, (String)entityId);
+            } catch (final NumberFormatException e) {
+                // It is uuid - use findByUuid`
+                return _entityMgr.findByUuid(entityType, (String) entityId);
             }
         }
 

@@ -16,17 +16,7 @@
 // under the License.
 package com.cloud.network.element;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.exception.ResourceUnavailableException;
@@ -34,10 +24,8 @@ import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VpnUser;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManagerImpl;
 import com.cloud.network.vpc.Vpc;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.dao.DomainRouterDao;
-
 import org.apache.cloudstack.network.topology.AdvancedNetworkTopology;
 import org.apache.cloudstack.network.topology.BasicNetworkTopology;
 import org.apache.cloudstack.network.topology.NetworkTopologyContext;
@@ -48,11 +36,18 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 @RunWith(MockitoJUnitRunner.class)
 public class VpcVirtualRouterElementTest {
     @Mock
     DataCenterDao _dcDao;
-    @Mock private DomainRouterDao _routerDao;
+    @Mock
+    private DomainRouterDao _routerDao;
 
     @Mock
     EntityManager _entityMgr;
@@ -86,11 +81,11 @@ public class VpcVirtualRouterElementTest {
         final VpnUser vpnUser1 = Mockito.mock(VpnUser.class);
         final VpnUser vpnUser2 = Mockito.mock(VpnUser.class);
 
-        final List<VpnUser> users = new ArrayList<VpnUser>();
+        final List<VpnUser> users = new ArrayList<>();
         users.add(vpnUser1);
         users.add(vpnUser2);
 
-        final List<DomainRouterVO> routers = new ArrayList<DomainRouterVO>();
+        final List<DomainRouterVO> routers = new ArrayList<>();
         routers.add(domainRouterVO1);
         routers.add(domainRouterVO2);
 
@@ -112,7 +107,7 @@ public class VpcVirtualRouterElementTest {
         }
 
         try {
-            final String [] results = vpcVirtualRouterElement.applyVpnUsers(remoteAccessVpn, users);
+            final String[] results = vpcVirtualRouterElement.applyVpnUsers(remoteAccessVpn, users);
 
             assertNotNull(results);
             assertEquals(results[0], "user1");
@@ -141,12 +136,12 @@ public class VpcVirtualRouterElementTest {
         networkTopologyContext.init();
 
         final RemoteAccessVpn remoteAccessVpn = Mockito.mock(RemoteAccessVpn.class);
-        final List<VpnUser> users = new ArrayList<VpnUser>();
+        final List<VpnUser> users = new ArrayList<>();
 
         when(remoteAccessVpn.getVpcId()).thenReturn(null);
 
         try {
-            final String [] results = vpcVirtualRouterElement.applyVpnUsers(remoteAccessVpn, users);
+            final String[] results = vpcVirtualRouterElement.applyVpnUsers(remoteAccessVpn, users);
             assertNull(results);
         } catch (final ResourceUnavailableException e) {
             fail(e.getMessage());
@@ -168,7 +163,7 @@ public class VpcVirtualRouterElementTest {
 
         final RemoteAccessVpn remoteAccessVpn = Mockito.mock(RemoteAccessVpn.class);
 
-        final List<VpnUser> users = new ArrayList<VpnUser>();
+        final List<VpnUser> users = new ArrayList<>();
 
         final Long vpcId = new Long(1l);
 
@@ -176,7 +171,7 @@ public class VpcVirtualRouterElementTest {
         when(_vpcRouterMgr.getVpcRouters(vpcId)).thenReturn(null);
 
         try {
-            final String [] results = vpcVirtualRouterElement.applyVpnUsers(remoteAccessVpn, users);
+            final String[] results = vpcVirtualRouterElement.applyVpnUsers(remoteAccessVpn, users);
 
             assertNull(results);
         } catch (final ResourceUnavailableException e) {

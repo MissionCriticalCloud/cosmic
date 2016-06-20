@@ -16,31 +16,10 @@
 // under the License.
 package com.cloud.network.vpc;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.Resource.ResourceType;
+import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.Vlan.VlanType;
@@ -50,46 +29,21 @@ import com.cloud.dc.dao.VlanDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InvalidParameterValueException;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.exception.*;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.network.IpAddress;
-import com.cloud.network.IpAddressManager;
-import com.cloud.network.Network;
+import com.cloud.network.*;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
-import com.cloud.network.NetworkModel;
-import com.cloud.network.NetworkService;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.TrafficType;
-import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.addr.PublicIp;
-import com.cloud.network.dao.FirewallRulesDao;
-import com.cloud.network.dao.IPAddressDao;
-import com.cloud.network.dao.IPAddressVO;
-import com.cloud.network.dao.NetworkDao;
-import com.cloud.network.dao.NetworkVO;
-import com.cloud.network.dao.PhysicalNetworkDao;
-import com.cloud.network.dao.Site2SiteVpnGatewayDao;
+import com.cloud.network.dao.*;
 import com.cloud.network.element.NetworkElement;
 import com.cloud.network.element.StaticNatServiceProvider;
 import com.cloud.network.element.VpcProvider;
 import com.cloud.network.vpc.VpcOffering.State;
-import com.cloud.network.vpc.dao.NetworkACLDao;
-import com.cloud.network.vpc.dao.PrivateIpDao;
-import com.cloud.network.vpc.dao.StaticRouteDao;
-import com.cloud.network.vpc.dao.VpcDao;
-import com.cloud.network.vpc.dao.VpcGatewayDao;
-import com.cloud.network.vpc.dao.VpcOfferingDao;
-import com.cloud.network.vpc.dao.VpcOfferingServiceMapDao;
-import com.cloud.network.vpc.dao.VpcServiceMapDao;
+import com.cloud.network.vpc.dao.*;
 import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.NetworkOfferingServiceMapVO;
@@ -110,26 +64,14 @@ import com.cloud.utils.StringUtils;
 import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.concurrency.NamedThreadFactory;
-import com.cloud.utils.db.DB;
-import com.cloud.utils.db.EntityManager;
-import com.cloud.utils.db.Filter;
-import com.cloud.utils.db.GlobalLock;
-import com.cloud.utils.db.JoinBuilder;
-import com.cloud.utils.db.SearchBuilder;
-import com.cloud.utils.db.SearchCriteria;
+import com.cloud.utils.db.*;
 import com.cloud.utils.db.SearchCriteria.Op;
-import com.cloud.utils.db.Transaction;
-import com.cloud.utils.db.TransactionCallback;
-import com.cloud.utils.db.TransactionCallbackNoReturn;
-import com.cloud.utils.db.TransactionCallbackWithException;
-import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionUtil;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.ReservationContextImpl;
 import com.cloud.vm.dao.DomainRouterDao;
-
 import org.apache.cloudstack.acl.ControlledEntity.ACLType;
 import org.apache.cloudstack.api.command.user.vpc.ListPrivateGatewaysCmd;
 import org.apache.cloudstack.api.command.user.vpc.ListStaticRoutesCmd;
@@ -140,6 +82,13 @@ import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.*;
 
 public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvisioningService, VpcService {
     private static final Logger s_logger = LoggerFactory.getLogger(VpcManagerImpl.class);
@@ -642,19 +591,19 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             final List<? extends VpcOffering> wPagination = StringUtils.applyPagination(supportedOfferings, startIndex,
                     pageSizeVal);
             if (wPagination != null) {
-                final Pair<List<? extends VpcOffering>, Integer> listWPagination = new Pair<List<? extends VpcOffering>, Integer>(
+                final Pair<List<? extends VpcOffering>, Integer> listWPagination = new Pair<>(
                         wPagination, supportedOfferings.size());
                 return listWPagination;
             }
-            return new Pair<List<? extends VpcOffering>, Integer>(supportedOfferings, supportedOfferings.size());
+            return new Pair<>(supportedOfferings, supportedOfferings.size());
         } else {
             final List<? extends VpcOffering> wPagination = StringUtils.applyPagination(offerings, startIndex, pageSizeVal);
             if (wPagination != null) {
-                final Pair<List<? extends VpcOffering>, Integer> listWPagination = new Pair<List<? extends VpcOffering>, Integer>(
+                final Pair<List<? extends VpcOffering>, Integer> listWPagination = new Pair<>(
                         wPagination, offerings.size());
                 return listWPagination;
             }
-            return new Pair<List<? extends VpcOffering>, Integer>(offerings, offerings.size());
+            return new Pair<>(offerings, offerings.size());
         }
     }
 
@@ -1123,19 +1072,19 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
             final List<? extends Vpc> wPagination = StringUtils.applyPagination(supportedVpcs, startIndex, pageSizeVal);
             if (wPagination != null) {
-                final Pair<List<? extends Vpc>, Integer> listWPagination = new Pair<List<? extends Vpc>, Integer>(wPagination,
+                final Pair<List<? extends Vpc>, Integer> listWPagination = new Pair<>(wPagination,
                         supportedVpcs.size());
                 return listWPagination;
             }
-            return new Pair<List<? extends Vpc>, Integer>(supportedVpcs, supportedVpcs.size());
+            return new Pair<>(supportedVpcs, supportedVpcs.size());
         } else {
             final List<? extends Vpc> wPagination = StringUtils.applyPagination(vpcs, startIndex, pageSizeVal);
             if (wPagination != null) {
-                final Pair<List<? extends Vpc>, Integer> listWPagination = new Pair<List<? extends Vpc>, Integer>(wPagination,
+                final Pair<List<? extends Vpc>, Integer> listWPagination = new Pair<>(wPagination,
                         vpcs.size());
                 return listWPagination;
             }
-            return new Pair<List<? extends Vpc>, Integer>(vpcs, vpcs.size());
+            return new Pair<>(vpcs, vpcs.size());
         }
     }
 
@@ -2204,7 +2153,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         }
 
         final Pair<List<StaticRouteVO>, Integer> result = _staticRouteDao.searchAndCount(sc, searchFilter);
-        return new Pair<List<? extends StaticRoute>, Integer>(result.first(), result.second());
+        return new Pair<>(result.first(), result.second());
     }
 
     private void detectDuplicateCidr(final StaticRoute newRoute) throws NetworkRuleConflictException {
@@ -2301,7 +2250,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         // check permissions
         _accountMgr.checkAccess(caller, null, true, owner, vpc);
 
-        if (! hasSourceNatService(vpc)) {
+        if (!hasSourceNatService(vpc)) {
             throw new InvalidParameterValueException("VPC does not support SourceNat service so no public ip addresses can be assigned.");
         }
 
@@ -2333,7 +2282,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         return _ipAddressDao.findById(ipId);
     }
 
-    private boolean hasSourceNatService(Vpc vpc) {
+    private boolean hasSourceNatService(final Vpc vpc) {
         final Map<Network.Service, Set<Network.Provider>> vpcOffSvcProvidersMap = getVpcOffSvcProvidersMap(vpc.getVpcOfferingId());
 
         return vpcOffSvcProvidersMap.containsKey(Network.Service.SourceNat) &&

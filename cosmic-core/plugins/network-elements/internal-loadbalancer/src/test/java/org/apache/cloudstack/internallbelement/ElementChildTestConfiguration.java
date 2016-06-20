@@ -16,9 +16,8 @@
 // under the License.
 package org.apache.cloudstack.internallbelement;
 
-import java.io.IOException;
-
 import com.cloud.configuration.ConfigurationManager;
+import com.cloud.dao.EntityManager;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.NetworkModel;
@@ -26,10 +25,8 @@ import com.cloud.network.dao.NetworkServiceMapDao;
 import com.cloud.network.dao.PhysicalNetworkServiceProviderDao;
 import com.cloud.network.dao.VirtualRouterProviderDao;
 import com.cloud.user.AccountManager;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.dao.DomainRouterDao;
-
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.lb.dao.ApplicationLoadBalancerRuleDao;
 import org.apache.cloudstack.network.lb.InternalLoadBalancerVMManager;
@@ -44,10 +41,12 @@ import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.TypeFilter;
 
+import java.io.IOException;
+
 @Configuration
 @ComponentScan(basePackageClasses = {NetUtils.class},
-               includeFilters = {@Filter(value = ElementChildTestConfiguration.Library.class, type = FilterType.CUSTOM)},
-               useDefaultFilters = false)
+        includeFilters = {@Filter(value = ElementChildTestConfiguration.Library.class, type = FilterType.CUSTOM)},
+        useDefaultFilters = false)
 public class ElementChildTestConfiguration {
     public static class Library implements TypeFilter {
         @Bean
@@ -116,9 +115,9 @@ public class ElementChildTestConfiguration {
         }
 
         @Override
-        public boolean match(MetadataReader mdr, MetadataReaderFactory arg1) throws IOException {
+        public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) throws IOException {
             mdr.getClassMetadata().getClassName();
-            ComponentScan cs = ElementChildTestConfiguration.class.getAnnotation(ComponentScan.class);
+            final ComponentScan cs = ElementChildTestConfiguration.class.getAnnotation(ComponentScan.class);
             return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);
         }
     }

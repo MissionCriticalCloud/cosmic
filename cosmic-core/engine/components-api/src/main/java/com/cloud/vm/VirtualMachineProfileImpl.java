@@ -16,23 +16,22 @@
 // under the License.
 package com.cloud.vm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.agent.api.to.DiskTO;
+import com.cloud.dao.EntityManager;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.template.VirtualMachineTemplate.BootloaderType;
 import com.cloud.user.Account;
-import com.cloud.utils.db.EntityManager;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation of VirtualMachineProfile.
- *
  */
 public class VirtualMachineProfileImpl implements VirtualMachineProfile {
 
@@ -41,8 +40,8 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
     VirtualMachineTemplate _template;
     UserVmDetailVO _userVmDetails;
     Map<Param, Object> _params;
-    List<NicProfile> _nics = new ArrayList<NicProfile>();
-    List<DiskTO> _disks = new ArrayList<DiskTO>();
+    List<NicProfile> _nics = new ArrayList<>();
+    List<DiskTO> _disks = new ArrayList<>();
     StringBuilder _bootArgs = new StringBuilder();
     Account _owner;
     BootloaderType _bootloader;
@@ -58,24 +57,24 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
     String configDriveIsoRootFolder = null;
     String configDriveIsoFile = null;
 
-    public VirtualMachineProfileImpl(VirtualMachine vm, VirtualMachineTemplate template, ServiceOffering offering, Account owner, Map<Param, Object> params) {
+    public VirtualMachineProfileImpl(final VirtualMachine vm, final VirtualMachineTemplate template, final ServiceOffering offering, final Account owner, final Map<Param, Object> params) {
         _vm = vm;
         _template = template;
         _offering = offering;
         _params = params;
         _owner = owner;
         if (_params == null) {
-            _params = new HashMap<Param, Object>();
+            _params = new HashMap<>();
         }
         if (vm != null)
             _type = vm.getType();
     }
 
-    public VirtualMachineProfileImpl(VirtualMachine vm) {
+    public VirtualMachineProfileImpl(final VirtualMachine vm) {
         this(vm, null, null, null, null);
     }
 
-    public VirtualMachineProfileImpl(VirtualMachine.Type type) {
+    public VirtualMachineProfileImpl(final VirtualMachine.Type type) {
         _type = type;
     }
 
@@ -98,12 +97,12 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
     }
 
     @Override
-    public void setParameter(Param name, Object value) {
+    public void setParameter(final Param name, final Object value) {
         _params.put(name, value);
     }
 
     @Override
-    public void setBootLoaderType(BootloaderType bootLoader) {
+    public void setBootLoaderType(final BootloaderType bootLoader) {
         _bootloader = bootLoader;
     }
 
@@ -140,11 +139,11 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
         return _vm.getUuid();
     }
 
-    public void setNics(List<NicProfile> nics) {
+    public void setNics(final List<NicProfile> nics) {
         _nics = nics;
     }
 
-    public void setDisks(List<DiskTO> disks) {
+    public void setDisks(final List<DiskTO> disks) {
         _disks = disks;
     }
 
@@ -159,12 +158,12 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
     }
 
     @Override
-    public void addNic(int index, NicProfile nic) {
+    public void addNic(final int index, final NicProfile nic) {
         _nics.add(index, nic);
     }
 
     @Override
-    public void addDisk(int index, DiskTO disk) {
+    public void addDisk(final int index, final DiskTO disk) {
         _disks.add(index, disk);
     }
 
@@ -174,8 +173,8 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
     }
 
     @Override
-    public void addBootArgs(String... args) {
-        for (String arg : args) {
+    public void addBootArgs(final String... args) {
+        for (final String arg : args) {
             _bootArgs.append(arg).append(" ");
         }
     }
@@ -200,22 +199,22 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
 
     static EntityManager s_entityMgr;
 
-    static void init(EntityManager entityMgr) {
+    static void init(final EntityManager entityMgr) {
         s_entityMgr = entityMgr;
     }
 
     @Override
-    public void addNic(NicProfile nic) {
+    public void addNic(final NicProfile nic) {
         _nics.add(nic);
     }
 
     @Override
-    public void addDisk(DiskTO disk) {
+    public void addDisk(final DiskTO disk) {
         _disks.add(disk);
     }
 
     @Override
-    public Object getParameter(Param name) {
+    public Object getParameter(final Param name) {
         return _params.get(name);
     }
 
@@ -239,16 +238,16 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
         return _params;
     }
 
-    public void setServiceOffering(ServiceOfferingVO offering) {
+    public void setServiceOffering(final ServiceOfferingVO offering) {
         _offering = offering;
     }
 
-    public void setCpuOvercommitRatio(Float cpuOvercommitRatio) {
+    public void setCpuOvercommitRatio(final Float cpuOvercommitRatio) {
         this.cpuOvercommitRatio = cpuOvercommitRatio;
 
     }
 
-    public void setMemoryOvercommitRatio(Float memoryOvercommitRatio) {
+    public void setMemoryOvercommitRatio(final Float memoryOvercommitRatio) {
         this.memoryOvercommitRatio = memoryOvercommitRatio;
 
     }
@@ -269,7 +268,7 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
     }
 
     @Override
-    public void setVmData(List<String[]> vmData) {
+    public void setVmData(final List<String[]> vmData) {
         this.vmData = vmData;
     }
 
@@ -279,7 +278,7 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
     }
 
     @Override
-    public void setConfigDriveLabel(String configDriveLabel) {
+    public void setConfigDriveLabel(final String configDriveLabel) {
         this.configDriveLabel = configDriveLabel;
     }
 
@@ -289,7 +288,7 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
     }
 
     @Override
-    public void setConfigDriveIsoRootFolder(String configDriveIsoRootFolder) {
+    public void setConfigDriveIsoRootFolder(final String configDriveIsoRootFolder) {
         this.configDriveIsoRootFolder = configDriveIsoRootFolder;
     }
 
@@ -303,7 +302,7 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
     }
 
     @Override
-    public void setConfigDriveIsoFile(String isoFile) {
+    public void setConfigDriveIsoFile(final String isoFile) {
         this.configDriveIsoFile = isoFile;
     }
 }

@@ -16,20 +16,18 @@
 // under the License.
 package com.cloud.uuididentity;
 
-import java.util.UUID;
-
-import javax.ejb.Local;
-import javax.inject.Inject;
-
+import com.cloud.dao.EntityManager;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.utils.db.UUIDManager;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.context.CallContext;
+
+import javax.ejb.Local;
+import javax.inject.Inject;
+import java.util.UUID;
 
 @Local(value = {UUIDManager.class})
 public class UUIDManagerImpl implements UUIDManager {
@@ -42,12 +40,12 @@ public class UUIDManagerImpl implements UUIDManager {
     private static final int UUID_RETRY = 3;
 
     @Override
-    public <T> void checkUuid(String uuid, Class<T> entityType) {
+    public <T> void checkUuid(final String uuid, final Class<T> entityType) {
 
         if (uuid == null)
             return;
 
-        Account caller = CallContext.current().getCallingAccount();
+        final Account caller = CallContext.current().getCallingAccount();
 
         // Only admin and system allowed to do this
         if (!(caller.getId() == Account.ACCOUNT_ID_SYSTEM || _accountMgr.isRootAdmin(caller.getId()))) {
@@ -58,7 +56,7 @@ public class UUIDManagerImpl implements UUIDManager {
     }
 
     @Override
-    public <T> void checkUuidSimple(String uuid, Class<T> entityType) {
+    public <T> void checkUuidSimple(final String uuid, final Class<T> entityType) {
 
         if (uuid == null)
             return;
@@ -73,16 +71,16 @@ public class UUIDManagerImpl implements UUIDManager {
 
     }
 
-    public boolean IsUuidFormat(String uuid) {
+    public boolean IsUuidFormat(final String uuid) {
 
         // Match against UUID regex to check if input is uuid string
-        boolean isUuid = uuid.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
+        final boolean isUuid = uuid.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
         return isUuid;
     }
 
-    public <T> boolean IsUuidUnique(Class<T> entityType, String uuid) {
+    public <T> boolean IsUuidUnique(final Class<T> entityType, final String uuid) {
 
-        T obj = _entityMgr.findByUuid(entityType, uuid);
+        final T obj = _entityMgr.findByUuid(entityType, uuid);
         if (obj != null)
             return false;
         else
@@ -90,12 +88,12 @@ public class UUIDManagerImpl implements UUIDManager {
     }
 
     @Override
-    public <T> String generateUuid(Class<T> entityType, String customId) {
+    public <T> String generateUuid(final Class<T> entityType, final String customId) {
 
         if (customId == null) { // if no customid is passed then generate it.
             int retry = UUID_RETRY;
             while (retry-- != 0) {  // there might be collision so retry
-                String uuid = UUID.randomUUID().toString();
+                final String uuid = UUID.randomUUID().toString();
                 if (IsUuidUnique(entityType, uuid))
                     return uuid;
             }

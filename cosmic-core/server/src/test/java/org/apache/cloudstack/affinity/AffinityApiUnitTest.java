@@ -16,22 +16,7 @@
 // under the License.
 package org.apache.cloudstack.affinity;
 
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
+import com.cloud.dao.EntityManager;
 import com.cloud.dc.dao.DedicatedResourceDao;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.event.ActionEventUtils;
@@ -41,21 +26,13 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceInUseException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.projects.dao.ProjectDao;
-import com.cloud.user.Account;
-import com.cloud.user.AccountManager;
-import com.cloud.user.AccountService;
-import com.cloud.user.AccountVO;
-import com.cloud.user.DomainManager;
-import com.cloud.user.User;
-import com.cloud.user.UserVO;
+import com.cloud.user.*;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.UserVmDao;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.affinity.dao.AffinityGroupDao;
 import org.apache.cloudstack.affinity.dao.AffinityGroupDomainMapDao;
@@ -82,6 +59,17 @@ import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
@@ -123,7 +111,7 @@ public class AffinityApiUnitTest {
     @Inject
     DedicatedResourceDao _dedicatedDao;
 
-    private static long domainId = 5L;
+    private static final long domainId = 5L;
 
     @BeforeClass
     public static void setUpClass() throws ConfigurationException {
@@ -132,24 +120,24 @@ public class AffinityApiUnitTest {
     @Before
     public void setUp() {
         ComponentContext.initComponentsLifeCycle();
-        AccountVO acct = new AccountVO(200L);
+        final AccountVO acct = new AccountVO(200L);
         acct.setType(Account.ACCOUNT_TYPE_NORMAL);
         acct.setAccountName("user");
         acct.setDomainId(domainId);
 
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
 
         CallContext.register(user, acct);
 
-        when(_acctMgr.finalizeOwner((Account)anyObject(), anyString(), anyLong(), anyLong())).thenReturn(acct);
+        when(_acctMgr.finalizeOwner((Account) anyObject(), anyString(), anyLong(), anyLong())).thenReturn(acct);
         when(_processor.getType()).thenReturn("mock");
         when(_accountDao.findByIdIncludingRemoved(0L)).thenReturn(acct);
 
-        List<AffinityGroupProcessor> affinityProcessors = new ArrayList<AffinityGroupProcessor>();
+        final List<AffinityGroupProcessor> affinityProcessors = new ArrayList<>();
         affinityProcessors.add(_processor);
         _affinityService.setAffinityGroupProcessors(affinityProcessors);
 
-        AffinityGroupVO group = new AffinityGroupVO("group1", "mock", "mock group", domainId, 200L, ControlledEntity.ACLType.Account);
+        final AffinityGroupVO group = new AffinityGroupVO("group1", "mock", "mock group", domainId, 200L, ControlledEntity.ACLType.Account);
         Mockito.when(_affinityGroupDao.persist(Matchers.any(AffinityGroupVO.class))).thenReturn(group);
         Mockito.when(_affinityGroupDao.findById(Matchers.anyLong())).thenReturn(group);
         Mockito.when(_affinityGroupDao.findByAccountAndName(Matchers.anyLong(), Matchers.anyString())).thenReturn(group);
@@ -166,21 +154,21 @@ public class AffinityApiUnitTest {
     @Test
     public void createAffinityGroupTest() {
         when(_groupDao.isNameInUse(anyLong(), anyLong(), eq("group1"))).thenReturn(false);
-        AffinityGroup group = _affinityService.createAffinityGroup("user", null, domainId, "group1", "mock", "affinity group one");
+        final AffinityGroup group = _affinityService.createAffinityGroup("user", null, domainId, "group1", "mock", "affinity group one");
         assertNotNull("Affinity group 'group1' of type 'mock' failed to create ", group);
 
     }
 
     @Test(expected = InvalidParameterValueException.class)
     public void invalidAffinityTypeTest() {
-        AffinityGroup group = _affinityService.createAffinityGroup("user", null, domainId, "group1", "invalid", "affinity group one");
+        final AffinityGroup group = _affinityService.createAffinityGroup("user", null, domainId, "group1", "invalid", "affinity group one");
 
     }
 
     @Test(expected = InvalidParameterValueException.class)
     public void uniqueAffinityNameTest() {
         when(_groupDao.isNameInUse(anyLong(), anyLong(), eq("group1"))).thenReturn(true);
-        AffinityGroup group2 = _affinityService.createAffinityGroup("user", null, domainId, "group1", "mock", "affinity group two");
+        final AffinityGroup group2 = _affinityService.createAffinityGroup("user", null, domainId, "group1", "mock", "affinity group two");
     }
 
     @Test(expected = InvalidParameterValueException.class)
@@ -204,11 +192,11 @@ public class AffinityApiUnitTest {
     @Test(expected = InvalidParameterValueException.class)
     public void updateAffinityGroupVMRunning() throws ResourceInUseException {
 
-        UserVmVO vm = new UserVmVO(10L, "test", "test", 101L, HypervisorType.Any, 21L, false, false, domainId, 200L, 1, 5L, "", "test", 1L);
+        final UserVmVO vm = new UserVmVO(10L, "test", "test", 101L, HypervisorType.Any, 21L, false, false, domainId, 200L, 1, 5L, "", "test", 1L);
         vm.setState(VirtualMachine.State.Running);
         when(_vmDao.findById(10L)).thenReturn(vm);
 
-        List<Long> affinityGroupIds = new ArrayList<Long>();
+        final List<Long> affinityGroupIds = new ArrayList<>();
         affinityGroupIds.add(20L);
 
         _affinityService.updateVMAffinityGroups(10L, affinityGroupIds);
@@ -216,8 +204,8 @@ public class AffinityApiUnitTest {
 
     @Configuration
     @ComponentScan(basePackageClasses = {AffinityGroupServiceImpl.class, ActionEventUtils.class},
-                   includeFilters = {@Filter(value = TestConfiguration.Library.class, type = FilterType.CUSTOM)},
-                   useDefaultFilters = false)
+            includeFilters = {@Filter(value = TestConfiguration.Library.class, type = FilterType.CUSTOM)},
+            useDefaultFilters = false)
     public static class TestConfiguration extends SpringUtils.CloudStackTestConfiguration {
 
         @Bean
@@ -308,8 +296,8 @@ public class AffinityApiUnitTest {
         public static class Library implements TypeFilter {
 
             @Override
-            public boolean match(MetadataReader mdr, MetadataReaderFactory arg1) throws IOException {
-                ComponentScan cs = TestConfiguration.class.getAnnotation(ComponentScan.class);
+            public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) throws IOException {
+                final ComponentScan cs = TestConfiguration.class.getAnnotation(ComponentScan.class);
                 return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);
             }
         }

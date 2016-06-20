@@ -16,9 +16,8 @@
 // under the License.
 package com.cloud.network.guru;
 
-import javax.inject.Inject;
-
 import com.cloud.configuration.ConfigurationManager;
+import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.deploy.DeployDestination;
@@ -31,11 +30,7 @@ import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.State;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
-import com.cloud.network.Networks.AddressFormat;
-import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.Networks.IsolationType;
-import com.cloud.network.Networks.Mode;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.network.Networks.*;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.vpc.PrivateIpAddress;
 import com.cloud.network.vpc.PrivateIpVO;
@@ -43,16 +38,16 @@ import com.cloud.network.vpc.dao.PrivateIpDao;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.user.Account;
 import com.cloud.utils.component.AdapterBase;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.Nic.ReservationStrategy;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachineProfile;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
 
 public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     private static final Logger s_logger = LoggerFactory.getLogger(PrivateNetworkGuru.class);
@@ -72,8 +67,8 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     }
 
     @Override
-    public boolean isMyTrafficType(TrafficType type) {
-        for (TrafficType t : TrafficTypes) {
+    public boolean isMyTrafficType(final TrafficType type) {
+        for (final TrafficType t : TrafficTypes) {
             if (t == type) {
                 return true;
             }
@@ -86,10 +81,10 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
         return TrafficTypes;
     }
 
-    protected boolean canHandle(NetworkOffering offering, DataCenter dc) {
+    protected boolean canHandle(final NetworkOffering offering, final DataCenter dc) {
         // This guru handles only system Guest network
         if (dc.getNetworkType() == NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() == Network.GuestType.Isolated &&
-            offering.isSystemOnly()) {
+                offering.isSystemOnly()) {
             return true;
         } else {
             s_logger.trace("We only take care of system Guest networks of type   " + GuestType.Isolated + " in zone of type " + NetworkType.Advanced);
@@ -98,21 +93,21 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     }
 
     @Override
-    public Network design(NetworkOffering offering, DeploymentPlan plan, Network userSpecified, Account owner) {
-        DataCenter dc = _entityMgr.findById(DataCenter.class, plan.getDataCenterId());
+    public Network design(final NetworkOffering offering, final DeploymentPlan plan, final Network userSpecified, final Account owner) {
+        final DataCenter dc = _entityMgr.findById(DataCenter.class, plan.getDataCenterId());
         if (!canHandle(offering, dc)) {
             return null;
         }
 
-        BroadcastDomainType broadcastType;
+        final BroadcastDomainType broadcastType;
         if (userSpecified != null) {
             broadcastType = userSpecified.getBroadcastDomainType();
         } else {
             broadcastType = BroadcastDomainType.Vlan;
         }
-        NetworkVO network =
-            new NetworkVO(offering.getTrafficType(), Mode.Static, broadcastType, offering.getId(), State.Allocated, plan.getDataCenterId(),
-                    plan.getPhysicalNetworkId(), offering.getRedundantRouter());
+        final NetworkVO network =
+                new NetworkVO(offering.getTrafficType(), Mode.Static, broadcastType, offering.getId(), State.Allocated, plan.getDataCenterId(),
+                        plan.getPhysicalNetworkId(), offering.getRedundantRouter());
         if (userSpecified != null) {
             if ((userSpecified.getCidr() == null && userSpecified.getGateway() != null) || (userSpecified.getCidr() != null && userSpecified.getGateway() == null)) {
                 throw new InvalidParameterValueException("cidr and gateway must be specified together.");
@@ -138,12 +133,12 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     }
 
     @Override
-    public void deallocate(Network network, NicProfile nic, VirtualMachineProfile vm) {
+    public void deallocate(final Network network, final NicProfile nic, final VirtualMachineProfile vm) {
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Deallocate network: networkId: " + nic.getNetworkId() + ", ip: " + nic.getIPv4Address());
         }
 
-        PrivateIpVO ip = _privateIpDao.findByIpAndSourceNetworkId(nic.getNetworkId(), nic.getIPv4Address());
+        final PrivateIpVO ip = _privateIpDao.findByIpAndSourceNetworkId(nic.getNetworkId(), nic.getIPv4Address());
         if (ip != null) {
             _privateIpDao.releaseIpAddress(nic.getIPv4Address(), nic.getNetworkId());
         }
@@ -151,17 +146,17 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     }
 
     @Override
-    public Network implement(Network network, NetworkOffering offering, DeployDestination dest, ReservationContext context)
-        throws InsufficientVirtualNetworkCapacityException {
+    public Network implement(final Network network, final NetworkOffering offering, final DeployDestination dest, final ReservationContext context)
+            throws InsufficientVirtualNetworkCapacityException {
 
         return network;
     }
 
     @Override
-    public NicProfile allocate(Network network, NicProfile nic, VirtualMachineProfile vm) throws InsufficientVirtualNetworkCapacityException,
-        InsufficientAddressCapacityException {
-        DataCenter dc = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
-        NetworkOffering offering = _entityMgr.findById(NetworkOffering.class, network.getNetworkOfferingId());
+    public NicProfile allocate(final Network network, NicProfile nic, final VirtualMachineProfile vm) throws InsufficientVirtualNetworkCapacityException,
+            InsufficientAddressCapacityException {
+        final DataCenter dc = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
+        final NetworkOffering offering = _entityMgr.findById(NetworkOffering.class, network.getNetworkOfferingId());
         if (!canHandle(offering, dc)) {
             return null;
         }
@@ -181,13 +176,13 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
         return nic;
     }
 
-    protected void getIp(NicProfile nic, DataCenter dc, Network network) throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
+    protected void getIp(final NicProfile nic, final DataCenter dc, final Network network) throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
         if (nic.getIPv4Address() == null) {
-            PrivateIpVO ipVO = _privateIpDao.allocateIpAddress(network.getDataCenterId(), network.getId(), null);
-            String vlanTag = BroadcastDomainType.getValue(network.getBroadcastUri());
-            String netmask = NetUtils.getCidrNetmask(network.getCidr());
-            PrivateIpAddress ip =
-                new PrivateIpAddress(ipVO, vlanTag, network.getGateway(), netmask, NetUtils.long2Mac(NetUtils.createSequenceBasedMacAddress(ipVO.getMacAddress())));
+            final PrivateIpVO ipVO = _privateIpDao.allocateIpAddress(network.getDataCenterId(), network.getId(), null);
+            final String vlanTag = BroadcastDomainType.getValue(network.getBroadcastUri());
+            final String netmask = NetUtils.getCidrNetmask(network.getCidr());
+            final PrivateIpAddress ip =
+                    new PrivateIpAddress(ipVO, vlanTag, network.getGateway(), netmask, NetUtils.long2Mac(NetUtils.createSequenceBasedMacAddress(ipVO.getMacAddress())));
 
             nic.setIPv4Address(ip.getIpAddress());
             nic.setIPv4Gateway(ip.getGateway());
@@ -205,8 +200,8 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     }
 
     @Override
-    public void updateNicProfile(NicProfile profile, Network network) {
-        DataCenter dc = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
+    public void updateNicProfile(final NicProfile profile, final Network network) {
+        final DataCenter dc = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
         if (profile != null) {
             profile.setIPv4Dns1(dc.getDns1());
             profile.setIPv4Dns2(dc.getDns2());
@@ -214,8 +209,8 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     }
 
     @Override
-    public void reserve(NicProfile nic, Network network, VirtualMachineProfile vm, DeployDestination dest, ReservationContext context)
-        throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
+    public void reserve(final NicProfile nic, final Network network, final VirtualMachineProfile vm, final DeployDestination dest, final ReservationContext context)
+            throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
         if (nic.getIPv4Address() == null) {
             getIp(nic, _entityMgr.findById(DataCenter.class, network.getDataCenterId()), network);
             nic.setReservationStrategy(ReservationStrategy.Create);
@@ -223,23 +218,23 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     }
 
     @Override
-    public boolean release(NicProfile nic, VirtualMachineProfile vm, String reservationId) {
+    public boolean release(final NicProfile nic, final VirtualMachineProfile vm, final String reservationId) {
         return true;
     }
 
     @Override
-    public void shutdown(NetworkProfile profile, NetworkOffering offering) {
+    public void shutdown(final NetworkProfile profile, final NetworkOffering offering) {
 
     }
 
     @Override
-    public boolean trash(Network network, NetworkOffering offering) {
+    public boolean trash(final Network network, final NetworkOffering offering) {
         return true;
     }
 
     @Override
-    public void updateNetworkProfile(NetworkProfile networkProfile) {
-        DataCenter dc = _entityMgr.findById(DataCenter.class, networkProfile.getDataCenterId());
+    public void updateNetworkProfile(final NetworkProfile networkProfile) {
+        final DataCenter dc = _entityMgr.findById(DataCenter.class, networkProfile.getDataCenterId());
         networkProfile.setDns1(dc.getDns1());
         networkProfile.setDns2(dc.getDns2());
     }

@@ -16,34 +16,26 @@
 // under the License.
 package com.cloud.api;
 
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.api.dispatch.DispatchChain;
 import com.cloud.api.dispatch.DispatchChainFactory;
 import com.cloud.api.dispatch.DispatchTask;
+import com.cloud.dao.EntityManager;
 import com.cloud.projects.Project;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.utils.db.EntityManager;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.InfrastructureEntity;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseAsyncCmd;
-import org.apache.cloudstack.api.BaseAsyncCreateCmd;
-import org.apache.cloudstack.api.BaseAsyncCustomIdCmd;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.BaseCustomIdCmd;
+import org.apache.cloudstack.api.*;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.jobs.AsyncJob;
 import org.apache.cloudstack.framework.jobs.AsyncJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.Map;
 
 public class ApiDispatcher {
     private static final Logger s_logger = LoggerFactory.getLogger(ApiDispatcher.class.getName());
@@ -84,14 +76,14 @@ public class ApiDispatcher {
         asyncCreationDispatchChain.dispatch(new DispatchTask(cmd, params));
     }
 
-    private void doAccessChecks(BaseCmd cmd, Map<Object, AccessType> entitiesToAccess) {
-        Account caller = CallContext.current().getCallingAccount();
+    private void doAccessChecks(final BaseCmd cmd, final Map<Object, AccessType> entitiesToAccess) {
+        final Account caller = CallContext.current().getCallingAccount();
 
-        APICommand commandAnnotation = cmd.getClass().getAnnotation(APICommand.class);
-        String apiName = commandAnnotation != null ? commandAnnotation.name() : null;
+        final APICommand commandAnnotation = cmd.getClass().getAnnotation(APICommand.class);
+        final String apiName = commandAnnotation != null ? commandAnnotation.name() : null;
 
         if (!entitiesToAccess.isEmpty()) {
-            for (Object entity : entitiesToAccess.keySet()) {
+            for (final Object entity : entitiesToAccess.keySet()) {
                 if (entity instanceof ControlledEntity) {
                     _accountMgr.checkAccess(caller, entitiesToAccess.get(entity), false, apiName, (ControlledEntity) entity);
                 } else if (entity instanceof InfrastructureEntity) {
@@ -107,15 +99,15 @@ public class ApiDispatcher {
 
         final CallContext ctx = CallContext.current();
         ctx.setEventDisplayEnabled(cmd.isDisplay());
-        if(params.get(ApiConstants.PROJECT_ID) != null) {
-            Project project = _entityMgr.findByUuidIncludingRemoved(Project.class, params.get(ApiConstants.PROJECT_ID));
+        if (params.get(ApiConstants.PROJECT_ID) != null) {
+            final Project project = _entityMgr.findByUuidIncludingRemoved(Project.class, params.get(ApiConstants.PROJECT_ID));
             ctx.setProject(project);
         }
 
         // TODO This if shouldn't be here. Use polymorphism and move it to validateSpecificParameters
         if (cmd instanceof BaseAsyncCmd) {
 
-            final BaseAsyncCmd asyncCmd = (BaseAsyncCmd)cmd;
+            final BaseAsyncCmd asyncCmd = (BaseAsyncCmd) cmd;
             final String startEventId = params.get(ApiConstants.CTX_START_EVENT_ID);
             ctx.setStartEventId(Long.parseLong(startEventId));
 
@@ -131,7 +123,7 @@ public class ApiDispatcher {
                 if (queueSizeLimit != null) {
                     if (!execute) {
                         // if we are not within async-execution context, enqueue the command
-                        _asyncMgr.syncAsyncJobExecution((AsyncJob)asyncCmd.getJob(), asyncCmd.getSyncObjType(), asyncCmd.getSyncObjId().longValue(), queueSizeLimit);
+                        _asyncMgr.syncAsyncJobExecution((AsyncJob) asyncCmd.getJob(), asyncCmd.getSyncObjType(), asyncCmd.getSyncObjId().longValue(), queueSizeLimit);
                         return;
                     }
                 } else {
@@ -142,12 +134,12 @@ public class ApiDispatcher {
 
         // TODO This if shouldn't be here. Use polymorphism and move it to validateSpecificParameters
         if (cmd instanceof BaseAsyncCustomIdCmd) {
-            ((BaseAsyncCustomIdCmd)cmd).checkUuid();
+            ((BaseAsyncCustomIdCmd) cmd).checkUuid();
         } else if (cmd instanceof BaseCustomIdCmd) {
-            ((BaseCustomIdCmd)cmd).checkUuid();
+            ((BaseCustomIdCmd) cmd).checkUuid();
         }
 
         cmd.execute();
-                            }
+    }
 
 }
