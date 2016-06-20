@@ -300,7 +300,6 @@
         <profile>
             <id>developer</id>
             <modules>
-                <module>developer</module>
                 <module>apidoc</module>
             </modules>
         </profile>
