@@ -1680,7 +1680,6 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         // Only return volumes that are not destroyed
         sb.and("state", sb.entity().getState(), SearchCriteria.Op.NEQ);
         sb.and("systemUse", sb.entity().isSystemUse(), SearchCriteria.Op.NEQ);
-        sb.and("nulltype", sb.entity().getVmType(), SearchCriteria.Op.NULL);
 
         // now set the SC criteria...
         final SearchCriteria<VolumeJoinVO> sc = sb.create();
