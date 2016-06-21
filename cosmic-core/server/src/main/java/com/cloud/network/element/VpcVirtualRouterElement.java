@@ -16,15 +16,7 @@
 // under the License.
 package com.cloud.network.element;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-
+import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.deploy.DeployDestination;
@@ -32,20 +24,12 @@ import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.IllegalVirtualMachineException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.network.IpAddress;
-import com.cloud.network.IpAddressManager;
-import com.cloud.network.Network;
+import com.cloud.network.*;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.Network.State;
-import com.cloud.network.NetworkModel;
-import com.cloud.network.PublicIpAddress;
-import com.cloud.network.RemoteAccessVpn;
-import com.cloud.network.Site2SiteVpnConnection;
-import com.cloud.network.Site2SiteVpnGateway;
 import com.cloud.network.VirtualRouterProvider.Type;
-import com.cloud.network.VpnUser;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.Site2SiteVpnGatewayDao;
@@ -53,26 +37,12 @@ import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.network.router.VpcNetworkHelperImpl;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
-import com.cloud.network.vpc.NetworkACLItem;
-import com.cloud.network.vpc.NetworkACLItemDao;
-import com.cloud.network.vpc.NetworkACLItemVO;
-import com.cloud.network.vpc.PrivateGateway;
-import com.cloud.network.vpc.StaticRouteProfile;
-import com.cloud.network.vpc.Vpc;
-import com.cloud.network.vpc.VpcGateway;
-import com.cloud.network.vpc.VpcManager;
+import com.cloud.network.vpc.*;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.network.vpc.dao.VpcGatewayDao;
 import com.cloud.offering.NetworkOffering;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.vm.DomainRouterVO;
-import com.cloud.vm.NicProfile;
-import com.cloud.vm.ReservationContext;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachineManager;
-import com.cloud.vm.VirtualMachineProfile;
-
+import com.cloud.vm.*;
 import org.apache.cloudstack.network.topology.NetworkTopology;
 import org.cloud.network.router.deployment.RouterDeploymentDefinition;
 import org.cloud.network.router.deployment.RouterDeploymentDefinitionBuilder;
@@ -80,6 +50,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import javax.inject.Inject;
+import java.util.*;
 
 public class VpcVirtualRouterElement extends VirtualRouterElement implements VpcProvider, Site2SiteVpnServiceProvider, NetworkACLServiceProvider {
 
@@ -116,7 +89,8 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
     @Qualifier("vpcNetworkHelper")
     private VpcNetworkHelperImpl _vpcNetWprkHelper;
 
-    @Inject RouterDeploymentDefinitionBuilder routerDeploymentDefinitionBuilder;
+    @Inject
+    RouterDeploymentDefinitionBuilder routerDeploymentDefinitionBuilder;
 
     @Override
     protected boolean canHandle(final Network network, final Service service) {
@@ -150,9 +124,9 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
 
     @Override
     public boolean implementVpc(final Vpc vpc, final DeployDestination dest, final ReservationContext context) throws ConcurrentOperationException, ResourceUnavailableException,
-    InsufficientCapacityException {
+            InsufficientCapacityException {
 
-        final Map<VirtualMachineProfile.Param, Object> params = new HashMap<VirtualMachineProfile.Param, Object>(1);
+        final Map<VirtualMachineProfile.Param, Object> params = new HashMap<>(1);
         params.put(VirtualMachineProfile.Param.ReProgramGuestNetworks, true);
 
         final RouterDeploymentDefinition routerDeploymentDefinition = routerDeploymentDefinitionBuilder.create().setVpc(vpc).setDeployDestination(dest)
@@ -193,7 +167,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
             return false;
         }
 
-        final Map<VirtualMachineProfile.Param, Object> params = new HashMap<VirtualMachineProfile.Param, Object>(1);
+        final Map<VirtualMachineProfile.Param, Object> params = new HashMap<>(1);
         params.put(VirtualMachineProfile.Param.ReProgramGuestNetworks, true);
 
         final RouterDeploymentDefinition routerDeploymentDefinition = routerDeploymentDefinitionBuilder.create()
@@ -215,14 +189,14 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
         return true;
     }
 
-    protected void configureGuestNetwork(final Network network, final List<DomainRouterVO> routers )
+    protected void configureGuestNetwork(final Network network, final List<DomainRouterVO> routers)
             throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException {
 
         s_logger.info("Adding VPC routers to Guest Network: " + routers.size() + " to be added!");
 
         for (final DomainRouterVO router : routers) {
             if (!_networkMdl.isVmPartOfNetwork(router.getId(), network.getId())) {
-                final Map<VirtualMachineProfile.Param, Object> paramsForRouter = new HashMap<VirtualMachineProfile.Param, Object>(1);
+                final Map<VirtualMachineProfile.Param, Object> paramsForRouter = new HashMap<>(1);
                 if (network.getState() == State.Setup) {
                     paramsForRouter.put(VirtualMachineProfile.Param.ReProgramGuestNetworks, true);
                 }
@@ -252,7 +226,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
         }
 
         if (vm.getType() == VirtualMachine.Type.User) {
-            final Map<VirtualMachineProfile.Param, Object> params = new HashMap<VirtualMachineProfile.Param, Object>(1);
+            final Map<VirtualMachineProfile.Param, Object> params = new HashMap<>(1);
             params.put(VirtualMachineProfile.Param.ReProgramGuestNetworks, true);
 
             final RouterDeploymentDefinition routerDeploymentDefinition = routerDeploymentDefinitionBuilder.create()
@@ -379,16 +353,16 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
     }
 
     private static Map<Service, Map<Capability, String>> setCapabilities() {
-        final Map<Service, Map<Capability, String>> capabilities = new HashMap<Service, Map<Capability, String>>();
+        final Map<Service, Map<Capability, String>> capabilities = new HashMap<>();
         capabilities.putAll(VirtualRouterElement.capabilities);
 
-        final Map<Capability, String> sourceNatCapabilities = new HashMap<Capability, String>();
+        final Map<Capability, String> sourceNatCapabilities = new HashMap<>();
         sourceNatCapabilities.putAll(capabilities.get(Service.SourceNat));
         // TODO This kind of logic is already placed in the DB
         sourceNatCapabilities.put(Capability.RedundantRouter, "true");
         capabilities.put(Service.SourceNat, sourceNatCapabilities);
 
-        final Map<Capability, String> vpnCapabilities = new HashMap<Capability, String>();
+        final Map<Capability, String> vpnCapabilities = new HashMap<>();
         vpnCapabilities.putAll(capabilities.get(Service.Vpn));
         vpnCapabilities.put(Capability.VpnTypes, "s2svpn");
         capabilities.put(Service.Vpn, vpnCapabilities);
@@ -397,7 +371,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
         capabilities.remove(Service.Firewall);
 
         // add network ACL capability
-        final Map<Capability, String> networkACLCapabilities = new HashMap<Capability, String>();
+        final Map<Capability, String> networkACLCapabilities = new HashMap<>();
         networkACLCapabilities.put(Capability.SupportedProtocols, "tcp,udp,icmp");
         capabilities.put(Service.NetworkACL, networkACLCapabilities);
 
@@ -656,13 +630,13 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
         final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
 
         String[] result = null;
-        final List<String> combinedResults = new ArrayList<String>();
+        final List<String> combinedResults = new ArrayList<>();
         for (final DomainRouterVO domainRouterVO : routers) {
             result = networkTopology.applyVpnUsers(vpn, users, domainRouterVO);
             combinedResults.addAll(Arrays.asList(result));
         }
         result = new String[combinedResults.size()];
-        final Object [] resultCast = combinedResults.toArray();
+        final Object[] resultCast = combinedResults.toArray();
         System.arraycopy(resultCast, 0, result, 0, resultCast.length);
 
         return result;

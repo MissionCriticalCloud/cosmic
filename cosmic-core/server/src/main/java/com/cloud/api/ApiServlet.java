@@ -16,32 +16,13 @@
 // under the License.
 package com.cloud.api;
 
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.URLDecoder;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.cloud.dao.EntityManager;
 import com.cloud.user.Account;
 import com.cloud.user.AccountService;
 import com.cloud.user.User;
 import com.cloud.utils.HttpUtils;
 import com.cloud.utils.StringUtils;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.utils.net.NetUtils;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiServerService;
 import org.apache.cloudstack.api.ServerApiException;
@@ -55,8 +36,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
+import javax.inject.Inject;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.*;
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.URLDecoder;
+import java.util.*;
+
 @Component("apiServlet")
-@SuppressWarnings("serial")
 public class ApiServlet extends HttpServlet {
     public static final Logger s_logger = LoggerFactory.getLogger(ApiServlet.class.getName());
     private static final Logger s_accessLogger = LoggerFactory.getLogger("apiserver." + ApiServer.class.getName());
@@ -103,9 +92,9 @@ public class ApiServlet extends HttpServlet {
             for (final String param : paramsInQueryString) {
                 final String[] paramTokens = param.split("=", 2);
                 if (paramTokens.length == 2) {
-                    String name = decodeUtf8(paramTokens[0]);
-                    String value = decodeUtf8(paramTokens[1]);
-                    params.put(name, new String[] {value});
+                    final String name = decodeUtf8(paramTokens[0]);
+                    final String value = decodeUtf8(paramTokens[1]);
+                    params.put(name, new String[]{value});
                 } else {
                     s_logger.debug("Invalid parameter in URL found. param: " + param);
                 }
@@ -138,7 +127,7 @@ public class ApiServlet extends HttpServlet {
         auditTrailSb.append(" -- ").append(req.getMethod()).append(' ');
         // get the response format since we'll need it in a couple of places
         String responseType = HttpUtils.RESPONSE_TYPE_XML;
-        final Map<String, Object[]> params = new HashMap<String, Object[]>();
+        final Map<String, Object[]> params = new HashMap<>();
         params.putAll(req.getParameterMap());
 
         // For HTTP GET requests, it seems that HttpServletRequest.getParameterMap() actually tries
@@ -149,7 +138,7 @@ public class ApiServlet extends HttpServlet {
 
         // logging the request start and end in management log for easy debugging
         String reqStr = "";
-        String cleanQueryString = StringUtils.cleanString(req.getQueryString());
+        final String cleanQueryString = StringUtils.cleanString(req.getQueryString());
         if (s_logger.isDebugEnabled()) {
             reqStr = auditTrailSb.toString() + " " + cleanQueryString;
             s_logger.debug("===START=== " + reqStr);
@@ -159,21 +148,21 @@ public class ApiServlet extends HttpServlet {
 
             if (HttpUtils.RESPONSE_TYPE_JSON.equalsIgnoreCase(responseType)) {
                 resp.setContentType(ApiServer.getJSONContentType());
-            } else if (HttpUtils.RESPONSE_TYPE_XML.equalsIgnoreCase(responseType)){
+            } else if (HttpUtils.RESPONSE_TYPE_XML.equalsIgnoreCase(responseType)) {
                 resp.setContentType(HttpUtils.XML_CONTENT_TYPE);
             }
 
             HttpSession session = req.getSession(false);
             final Object[] responseTypeParam = params.get(ApiConstants.RESPONSE);
             if (responseTypeParam != null) {
-                responseType = (String)responseTypeParam[0];
+                responseType = (String) responseTypeParam[0];
             }
 
             final Object[] commandObj = params.get(ApiConstants.COMMAND);
             if (commandObj != null) {
                 final String command = (String) commandObj[0];
 
-                APIAuthenticator apiAuthenticator = _authManager.getAPIAuthenticator(command);
+                final APIAuthenticator apiAuthenticator = _authManager.getAPIAuthenticator(command);
                 if (apiAuthenticator != null) {
                     auditTrailSb.append("command=");
                     auditTrailSb.append(command);
@@ -204,7 +193,7 @@ public class ApiServlet extends HttpServlet {
                         if (session != null && session.getAttribute(ApiConstants.SESSIONKEY) != null) {
                             resp.addHeader("SET-COOKIE", String.format("%s=%s;HttpOnly", ApiConstants.SESSIONKEY, session.getAttribute(ApiConstants.SESSIONKEY)));
                         }
-                    } catch (ServerApiException e) {
+                    } catch (final ServerApiException e) {
                         httpResponseCode = e.getErrorCode().getHttpCode();
                         responseString = e.getMessage();
                         s_logger.debug("Authentication failure: " + e.getMessage());
@@ -227,7 +216,7 @@ public class ApiServlet extends HttpServlet {
                             } catch (final IllegalStateException ignored) {
                             }
                         }
-                        Cookie sessionKeyCookie = new Cookie(ApiConstants.SESSIONKEY, "");
+                        final Cookie sessionKeyCookie = new Cookie(ApiConstants.SESSIONKEY, "");
                         sessionKeyCookie.setMaxAge(0);
                         resp.addCookie(sessionKeyCookie);
                     }
@@ -245,7 +234,7 @@ public class ApiServlet extends HttpServlet {
             Long userId = null;
 
             if (!isNew) {
-                userId = (Long)session.getAttribute("userid");
+                userId = (Long) session.getAttribute("userid");
                 final String account = (String) session.getAttribute("account");
                 final Object accountObj = session.getAttribute("accountobj");
                 if (!HttpUtils.validateSessionKey(session, params, req.getCookies(), ApiConstants.SESSIONKEY)) {
@@ -255,14 +244,14 @@ public class ApiServlet extends HttpServlet {
                     }
                     auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "unable to verify user credentials");
                     final String serializedResponse =
-                        _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials", params, responseType);
+                            _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials", params, responseType);
                     HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
                     return;
                 }
 
                 // Do a sanity check here to make sure the user hasn't already been deleted
                 if ((userId != null) && (account != null) && (accountObj != null) && _apiServer.verifyUser(userId)) {
-                    final String[] command = (String[])params.get(ApiConstants.COMMAND);
+                    final String[] command = (String[]) params.get(ApiConstants.COMMAND);
                     if (command == null) {
                         s_logger.info("missing command, ignoring request...");
                         auditTrailSb.append(" " + HttpServletResponse.SC_BAD_REQUEST + " " + "no command specified");
@@ -271,7 +260,7 @@ public class ApiServlet extends HttpServlet {
                         return;
                     }
                     final User user = _entityMgr.findById(User.class, userId);
-                    CallContext.register(user, (Account)accountObj);
+                    CallContext.register(user, (Account) accountObj);
                 } else {
                     // Invalidate the session to ensure we won't allow a request across management server
                     // restarts if the userId was serialized to the stored session
@@ -282,7 +271,7 @@ public class ApiServlet extends HttpServlet {
 
                     auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "unable to verify user credentials");
                     final String serializedResponse =
-                        _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials", params, responseType);
+                            _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials", params, responseType);
                     HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
                     return;
                 }
@@ -292,10 +281,10 @@ public class ApiServlet extends HttpServlet {
 
             if (_apiServer.verifyRequest(params, userId)) {
                 auditTrailSb.insert(0, "(userId=" + CallContext.current().getCallingUserId() + " accountId=" + CallContext.current().getCallingAccount().getId() +
-                    " sessionId=" + (session != null ? session.getId() : null) + ")");
+                        " sessionId=" + (session != null ? session.getId() : null) + ")");
 
                 // Add the HTTP method (GET/POST/PUT/DELETE) as well into the params map.
-                params.put("httpmethod", new String[] {req.getMethod()});
+                params.put("httpmethod", new String[]{req.getMethod()});
                 final String response = _apiServer.handleRequest(params, responseType, auditTrailSb);
                 HttpUtils.writeHttpResponse(resp, response != null ? response : "", HttpServletResponse.SC_OK, responseType, ApiServer.getJSONContentType());
             } else {
@@ -308,8 +297,8 @@ public class ApiServlet extends HttpServlet {
 
                 auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "unable to verify user credentials and/or request signature");
                 final String serializedResponse =
-                    _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials and/or request signature", params,
-                        responseType);
+                        _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials and/or request signature", params,
+                                responseType);
                 HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
 
             }
@@ -333,7 +322,7 @@ public class ApiServlet extends HttpServlet {
 
     //This method will try to get login IP of user even if servlet is behind reverseProxy or loadBalancer
     static String getClientAddress(final HttpServletRequest request) {
-        for(final String header : s_clientAddressHeaders) {
+        for (final String header : s_clientAddressHeaders) {
             final String ip = getCorrectIPAddress(request.getHeader(header));
             if (ip != null) {
                 return ip;
@@ -343,18 +332,18 @@ public class ApiServlet extends HttpServlet {
         return request.getRemoteAddr();
     }
 
-    private static String getCorrectIPAddress(String ip) {
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+    private static String getCorrectIPAddress(final String ip) {
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             return null;
         }
-        if(NetUtils.isValidIp(ip) || NetUtils.isValidIpv6(ip)) {
+        if (NetUtils.isValidIp(ip) || NetUtils.isValidIpv6(ip)) {
             return ip;
         }
         //it could be possible to have multiple IPs in HTTP header, this happens if there are multiple proxy in between
         //the client and the servlet, so parse the client IP
-        String[] ips = ip.split(",");
-        for(String i : ips) {
-            if(NetUtils.isValidIp(i.trim()) || NetUtils.isValidIpv6(i.trim())) {
+        final String[] ips = ip.split(",");
+        for (final String i : ips) {
+            if (NetUtils.isValidIp(i.trim()) || NetUtils.isValidIpv6(i.trim())) {
                 return i.trim();
             }
         }

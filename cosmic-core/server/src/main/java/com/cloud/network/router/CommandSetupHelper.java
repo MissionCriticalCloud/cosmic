@@ -16,88 +16,29 @@
 // under the License.
 package com.cloud.network.router;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.api.SetupGuestNetworkCommand;
-import com.cloud.agent.api.routing.CreateIpAliasCommand;
-import com.cloud.agent.api.routing.DeleteIpAliasCommand;
-import com.cloud.agent.api.routing.DhcpEntryCommand;
-import com.cloud.agent.api.routing.DnsMasqConfigCommand;
-import com.cloud.agent.api.routing.IpAliasTO;
-import com.cloud.agent.api.routing.IpAssocCommand;
-import com.cloud.agent.api.routing.IpAssocVpcCommand;
-import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
-import com.cloud.agent.api.routing.NetworkElementCommand;
-import com.cloud.agent.api.routing.RemoteAccessVpnCfgCommand;
-import com.cloud.agent.api.routing.SavePasswordCommand;
-import com.cloud.agent.api.routing.SetFirewallRulesCommand;
-import com.cloud.agent.api.routing.SetNetworkACLCommand;
-import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
-import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
-import com.cloud.agent.api.routing.SetSourceNatCommand;
-import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
-import com.cloud.agent.api.routing.SetStaticRouteCommand;
-import com.cloud.agent.api.routing.Site2SiteVpnCfgCommand;
-import com.cloud.agent.api.routing.VmDataCommand;
-import com.cloud.agent.api.routing.VpnUsersCfgCommand;
-import com.cloud.agent.api.to.DhcpTO;
-import com.cloud.agent.api.to.FirewallRuleTO;
-import com.cloud.agent.api.to.IpAddressTO;
-import com.cloud.agent.api.to.LoadBalancerTO;
-import com.cloud.agent.api.to.NetworkACLTO;
-import com.cloud.agent.api.to.NicTO;
-import com.cloud.agent.api.to.PortForwardingRuleTO;
-import com.cloud.agent.api.to.StaticNatRuleTO;
+import com.cloud.agent.api.routing.*;
+import com.cloud.agent.api.to.*;
 import com.cloud.agent.manager.Commands;
 import com.cloud.configuration.Config;
+import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.VlanDao;
-import com.cloud.network.IpAddress;
-import com.cloud.network.Network;
+import com.cloud.network.*;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
-import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.TrafficType;
-import com.cloud.network.PublicIpAddress;
-import com.cloud.network.RemoteAccessVpn;
-import com.cloud.network.Site2SiteVpnConnection;
-import com.cloud.network.VpnUser;
-import com.cloud.network.VpnUserVO;
-import com.cloud.network.dao.FirewallRulesDao;
-import com.cloud.network.dao.IPAddressDao;
-import com.cloud.network.dao.NetworkDao;
-import com.cloud.network.dao.NetworkVO;
-import com.cloud.network.dao.Site2SiteCustomerGatewayDao;
-import com.cloud.network.dao.Site2SiteCustomerGatewayVO;
-import com.cloud.network.dao.Site2SiteVpnGatewayDao;
-import com.cloud.network.dao.Site2SiteVpnGatewayVO;
-import com.cloud.network.dao.VpnUserDao;
+import com.cloud.network.dao.*;
 import com.cloud.network.lb.LoadBalancingRule;
 import com.cloud.network.lb.LoadBalancingRule.LbDestination;
 import com.cloud.network.lb.LoadBalancingRule.LbStickinessPolicy;
-import com.cloud.network.rules.FirewallRule;
+import com.cloud.network.rules.*;
 import com.cloud.network.rules.FirewallRule.Purpose;
-import com.cloud.network.rules.FirewallRuleVO;
-import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.network.rules.StaticNat;
-import com.cloud.network.rules.StaticNatRule;
-import com.cloud.network.vpc.NetworkACLItem;
-import com.cloud.network.vpc.PrivateIpAddress;
-import com.cloud.network.vpc.StaticRouteProfile;
-import com.cloud.network.vpc.Vpc;
-import com.cloud.network.vpc.VpcGateway;
+import com.cloud.network.vpc.*;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.NetworkOfferingVO;
@@ -109,28 +50,18 @@ import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.Pair;
 import com.cloud.utils.StringUtils;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.DomainRouterVO;
-import com.cloud.vm.Nic;
-import com.cloud.vm.NicIpAlias;
-import com.cloud.vm.NicProfile;
-import com.cloud.vm.NicVO;
-import com.cloud.vm.UserVmVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachineManager;
-import com.cloud.vm.VirtualMachineProfile;
-import com.cloud.vm.dao.DomainRouterDao;
-import com.cloud.vm.dao.NicDao;
-import com.cloud.vm.dao.NicIpAliasDao;
-import com.cloud.vm.dao.NicIpAliasVO;
-import com.cloud.vm.dao.UserVmDao;
-
+import com.cloud.vm.*;
+import com.cloud.vm.dao.*;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import javax.inject.Inject;
+import java.net.URI;
+import java.util.*;
 
 public class CommandSetupHelper {
 
@@ -197,8 +128,8 @@ public class CommandSetupHelper {
     }
 
     public void createApplyVpnUsersCommand(final List<? extends VpnUser> users, final VirtualRouter router, final Commands cmds) {
-        final List<VpnUser> addUsers = new ArrayList<VpnUser>();
-        final List<VpnUser> removeUsers = new ArrayList<VpnUser>();
+        final List<VpnUser> addUsers = new ArrayList<>();
+        final List<VpnUser> removeUsers = new ArrayList<>();
         for (final VpnUser user : users) {
             if (user.getState() == VpnUser.State.Add || user.getState() == VpnUser.State.Active) {
                 addUsers.add(user);
@@ -266,7 +197,7 @@ public class CommandSetupHelper {
     public void configDnsMasq(final VirtualRouter router, final Network network, final Commands cmds) {
         final DataCenterVO dcVo = _dcDao.findById(router.getDataCenterId());
         final List<NicIpAliasVO> ipAliasVOList = _nicIpAliasDao.listByNetworkIdAndState(network.getId(), NicIpAlias.State.active);
-        final List<DhcpTO> ipList = new ArrayList<DhcpTO>();
+        final List<DhcpTO> ipList = new ArrayList<>();
 
         final NicVO router_guest_nic = _nicDao.findByNtwkIdAndInstanceId(network.getId(), router.getId());
         final String cidr = NetUtils.getCidrFromGatewayAndNetmask(router_guest_nic.getIPv4Gateway(), router_guest_nic.getIPv4Netmask());
@@ -353,7 +284,7 @@ public class CommandSetupHelper {
     }
 
     public void createApplyPortForwardingRulesCommands(final List<? extends PortForwardingRule> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId) {
-        final List<PortForwardingRuleTO> rulesTO = new ArrayList<PortForwardingRuleTO>();
+        final List<PortForwardingRuleTO> rulesTO = new ArrayList<>();
         if (rules != null) {
             for (final PortForwardingRule rule : rules) {
                 final IpAddress sourceIp = _networkModel.getIp(rule.getSourceIpAddressId());
@@ -380,7 +311,7 @@ public class CommandSetupHelper {
     }
 
     public void createApplyStaticNatRulesCommands(final List<? extends StaticNatRule> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId) {
-        final List<StaticNatRuleTO> rulesTO = new ArrayList<StaticNatRuleTO>();
+        final List<StaticNatRuleTO> rulesTO = new ArrayList<>();
         if (rules != null) {
             for (final StaticNatRule rule : rules) {
                 final IpAddress sourceIp = _networkModel.getIp(rule.getSourceIpAddressId());
@@ -399,7 +330,7 @@ public class CommandSetupHelper {
     }
 
     public void createApplyFirewallRulesCommands(final List<? extends FirewallRule> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId) {
-        final List<FirewallRuleTO> rulesTO = new ArrayList<FirewallRuleTO>();
+        final List<FirewallRuleTO> rulesTO = new ArrayList<>();
         String systemRule = null;
         Boolean defaultEgressPolicy = false;
         if (rules != null) {
@@ -442,7 +373,7 @@ public class CommandSetupHelper {
     }
 
     public void createFirewallRulesCommands(final List<? extends FirewallRule> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId) {
-        final List<FirewallRuleTO> rulesTO = new ArrayList<FirewallRuleTO>();
+        final List<FirewallRuleTO> rulesTO = new ArrayList<>();
         String systemRule = null;
         Boolean defaultEgressPolicy = false;
         if (rules != null) {
@@ -490,8 +421,8 @@ public class CommandSetupHelper {
     }
 
     public void createNetworkACLsCommands(final List<? extends NetworkACLItem> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId,
-            final boolean privateGateway) {
-        final List<NetworkACLTO> rulesTO = new ArrayList<NetworkACLTO>();
+                                          final boolean privateGateway) {
+        final List<NetworkACLTO> rulesTO = new ArrayList<>();
         String guestVlan = null;
         final Network guestNtwk = _networkDao.findById(guestNetworkId);
         final URI uri = guestNtwk.getBroadcastUri();
@@ -506,7 +437,7 @@ public class CommandSetupHelper {
             }
         }
 
-        NicTO nicTO = _networkHelper.getNicTO(router, guestNetworkId, null);
+        final NicTO nicTO = _networkHelper.getNicTO(router, guestNetworkId, null);
         final SetNetworkACLCommand cmd = new SetNetworkACLCommand(rulesTO, nicTO);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP, _routerControlHelper.getRouterIpInNetwork(guestNetworkId, router.getId()));
@@ -540,7 +471,7 @@ public class CommandSetupHelper {
     }
 
     public void createApplyStaticNatCommands(final List<? extends StaticNat> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId) {
-        final List<StaticNatRuleTO> rulesTO = new ArrayList<StaticNatRuleTO>();
+        final List<StaticNatRuleTO> rulesTO = new ArrayList<>();
         if (rules != null) {
             for (final StaticNat rule : rules) {
                 final IpAddress sourceIp = _networkModel.getIp(rule.getSourceIpAddressId());
@@ -638,7 +569,7 @@ public class CommandSetupHelper {
     }
 
     public void createDeleteIpAliasCommand(final DomainRouterVO router, final List<IpAliasTO> deleteIpAliasTOs, final List<IpAliasTO> createIpAliasTos, final long networkId,
-            final Commands cmds) {
+                                           final Commands cmds) {
         final String routerip = _routerControlHelper.getRouterIpInNetwork(networkId, router.getId());
         final DataCenterVO dcVo = _dcDao.findById(router.getDataCenterId());
         final DeleteIpAliasCommand deleteIpaliasCmd = new DeleteIpAliasCommand(routerip, deleteIpAliasTOs, createIpAliasTos);
@@ -651,7 +582,7 @@ public class CommandSetupHelper {
     }
 
     public void createVpcAssociatePublicIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds,
-            final Map<String, String> vlanMacAddress) {
+                                                   final Map<String, String> vlanMacAddress) {
         final String ipAssocCommand = "IPAssocVpcCommand";
         if (router.getIsRedundantRouter()) {
             createRedundantAssociateIPCommands(router, ips, cmds, ipAssocCommand, 0);
@@ -662,12 +593,12 @@ public class CommandSetupHelper {
         Boolean addSourceNat = null;
         // Ensure that in multiple vlans case we first send all ip addresses of
         // vlan1, then all ip addresses of vlan2, etc..
-        final Map<String, ArrayList<PublicIpAddress>> vlanIpMap = new HashMap<String, ArrayList<PublicIpAddress>>();
+        final Map<String, ArrayList<PublicIpAddress>> vlanIpMap = new HashMap<>();
         for (final PublicIpAddress ipAddress : ips) {
             final String vlanTag = ipAddress.getVlanTag();
             ArrayList<PublicIpAddress> ipList = vlanIpMap.get(vlanTag);
             if (ipList == null) {
-                ipList = new ArrayList<PublicIpAddress>();
+                ipList = new ArrayList<>();
             }
             // VR doesn't support release for sourceNat IP address; so reset the
             // state
@@ -701,7 +632,7 @@ public class CommandSetupHelper {
 
                 ipsToSend[i++] = ip;
                 if (ipAddr.isSourceNat()) {
-                    sourceNatIpAdd = new Pair<IpAddressTO, Long>(ip, ipAddr.getNetworkId());
+                    sourceNatIpAdd = new Pair<>(ip, ipAddr.getNetworkId());
                     addSourceNat = add;
                 }
             }
@@ -730,12 +661,12 @@ public class CommandSetupHelper {
     public void createRedundantAssociateIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds, final String ipAssocCommand, final long vmId) {
         // Ensure that in multiple vlans case we first send all ip addresses of
         // vlan1, then all ip addresses of vlan2, etc..
-        final Map<String, ArrayList<PublicIpAddress>> vlanIpMap = new HashMap<String, ArrayList<PublicIpAddress>>();
+        final Map<String, ArrayList<PublicIpAddress>> vlanIpMap = new HashMap<>();
         for (final PublicIpAddress ipAddress : ips) {
             final String vlanTag = ipAddress.getVlanTag();
             ArrayList<PublicIpAddress> ipList = vlanIpMap.get(vlanTag);
             if (ipList == null) {
-                ipList = new ArrayList<PublicIpAddress>();
+                ipList = new ArrayList<>();
             }
             // domR doesn't support release for sourceNat IP address; so reset
             // the state
@@ -803,7 +734,7 @@ public class CommandSetupHelper {
                     }
                 }
 
-                String ipAddress = ipAddr.getAddress().addr();
+                final String ipAddress = ipAddr.getAddress().addr();
                 final IpAddressTO ip = new IpAddressTO(ipAddr.getAccountId(), ipAddress, add, firstIP, sourceNat, vlanId, vlanGateway, vlanNetmask,
                         vifMacAddress, networkRate, ipAddr.isOneToOneNat());
 
@@ -872,15 +803,15 @@ public class CommandSetupHelper {
         cmds.addCommand("applyS2SVpn", cmd);
     }
 
-    public void createVpcAssociatePrivateIPCommands(final VirtualRouter router, final List<PrivateIpAddress> ips, final Commands cmds, NicProfile nicProfile, final boolean add) {
+    public void createVpcAssociatePrivateIPCommands(final VirtualRouter router, final List<PrivateIpAddress> ips, final Commands cmds, final NicProfile nicProfile, final boolean add) {
         // Ensure that in multiple vlans case we first send all ip addresses of
         // vlan1, then all ip addresses of vlan2, etc..
-        final Map<String, ArrayList<PrivateIpAddress>> vlanIpMap = new HashMap<String, ArrayList<PrivateIpAddress>>();
+        final Map<String, ArrayList<PrivateIpAddress>> vlanIpMap = new HashMap<>();
         for (final PrivateIpAddress ipAddress : ips) {
             final String vlanTag = ipAddress.getBroadcastUri();
             ArrayList<PrivateIpAddress> ipList = vlanIpMap.get(vlanTag);
             if (ipList == null) {
-                ipList = new ArrayList<PrivateIpAddress>();
+                ipList = new ArrayList<>();
             }
 
             ipList.add(ipAddress);
@@ -900,9 +831,9 @@ public class CommandSetupHelper {
                 ip.setTrafficType(network.getTrafficType());
                 ip.setNetworkName(_networkModel.getNetworkTag(router.getHypervisorType(), network));
 
-                String ipAddress = ipAddr.getIpAddress();
-                Long networkId = network.getId();
-                int deviceId = nicProfile.getDeviceId();
+                final String ipAddress = ipAddr.getIpAddress();
+                final Long networkId = network.getId();
+                final int deviceId = nicProfile.getDeviceId();
                 ip.setNicDevId(deviceId);
 
                 s_logger.debug("Nic device for IP address using: address = " + ipAddress + " and networkId = " + networkId + " is ==> " + deviceId);
@@ -963,8 +894,8 @@ public class CommandSetupHelper {
     }
 
     private VmDataCommand generateVmDataCommand(final VirtualRouter router, final String vmPrivateIpAddress, final String userData, final String serviceOffering,
-            final String zoneName, final String guestIpAddress, final String vmName, final String vmInstanceName, final long vmId, final String vmUuid, final String publicKey,
-            final long guestNetworkId) {
+                                                final String zoneName, final String guestIpAddress, final String vmName, final String vmInstanceName, final long vmId, final String vmUuid, final String publicKey,
+                                                final long guestNetworkId) {
         final VmDataCommand cmd = new VmDataCommand(vmPrivateIpAddress, vmName, _networkModel.getExecuteInSeqNtwkElmtCmd());
 
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
@@ -1032,7 +963,7 @@ public class CommandSetupHelper {
         final boolean isZoneBasic = dc.getNetworkType() == NetworkType.Basic;
 
         // find domR's nic in the network
-        NicVO domrDefaultNic;
+        final NicVO domrDefaultNic;
         if (isZoneBasic) {
             domrDefaultNic = _nicDao.findByNetworkIdTypeAndGateway(defaultNic.getNetworkId(), VirtualMachine.Type.DomainRouter, defaultNic.getIPv4Gateway());
         } else {

@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.vm;
 
+import com.cloud.dao.EntityManager;
 import com.cloud.domain.Domain;
 import com.cloud.user.Account;
 import com.cloud.user.User;
 import com.cloud.utils.Journal;
-import com.cloud.utils.db.EntityManager;
 
 public class ReservationContextImpl implements ReservationContext {
     User _caller;
@@ -29,16 +29,16 @@ public class ReservationContextImpl implements ReservationContext {
     Journal _journal;
     String _reservationId;
 
-    public ReservationContextImpl(String reservationId, Journal journal, User caller) {
+    public ReservationContextImpl(final String reservationId, final Journal journal, final User caller) {
         this(reservationId, journal, caller, null, null);
     }
 
-    public ReservationContextImpl(String reservationId, Journal journal, User caller, Account account) {
+    public ReservationContextImpl(final String reservationId, final Journal journal, final User caller, final Account account) {
         this(reservationId, journal, caller, account, null);
 
     }
 
-    public ReservationContextImpl(String reservationId, Journal journal, User caller, Account account, Domain domain) {
+    public ReservationContextImpl(final String reservationId, final Journal journal, final User caller, final Account account, final Domain domain) {
         _caller = caller;
         _account = account;
         _domain = domain;
@@ -90,7 +90,7 @@ public class ReservationContextImpl implements ReservationContext {
 
     static EntityManager s_entityMgr;
 
-    static public void init(EntityManager entityMgr) {
+    static public void init(final EntityManager entityMgr) {
         s_entityMgr = entityMgr;
     }
 }

@@ -16,9 +16,7 @@
 // under the License.
 package com.cloud.vm;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.Pod;
 import com.cloud.deploy.DeployDestination;
@@ -26,7 +24,9 @@ import com.cloud.host.Host;
 import com.cloud.org.Cluster;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.Volume;
-import com.cloud.utils.db.EntityManager;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class VmWorkMigrate extends VmWork {
     private static final long serialVersionUID = 1689203333114836522L;
@@ -35,11 +35,11 @@ public class VmWorkMigrate extends VmWork {
     Long podId;
     Long clusterId;
     Long hostId;
-    private Map<String, String> storage;
+    private final Map<String, String> storage;
     long srcHostId;
 
-    public VmWorkMigrate(long userId, long accountId, long vmId, String handlerName,
-            long srcHostId, DeployDestination dst) {
+    public VmWorkMigrate(final long userId, final long accountId, final long vmId, final String handlerName,
+                         final long srcHostId, final DeployDestination dst) {
         super(userId, accountId, vmId, handlerName);
         this.srcHostId = srcHostId;
         zoneId = dst.getDataCenter() != null ? dst.getDataCenter().getId() : null;
@@ -47,8 +47,8 @@ public class VmWorkMigrate extends VmWork {
         clusterId = dst.getCluster() != null ? dst.getCluster().getId() : null;
         hostId = dst.getHost() != null ? dst.getHost().getId() : null;
         if (dst.getStorageForDisks() != null) {
-            storage = new HashMap<String, String>(dst.getStorageForDisks().size());
-            for (Map.Entry<Volume, StoragePool> entry : dst.getStorageForDisks().entrySet()) {
+            storage = new HashMap<>(dst.getStorageForDisks().size());
+            for (final Map.Entry<Volume, StoragePool> entry : dst.getStorageForDisks().entrySet()) {
                 storage.put(entry.getKey().getUuid(), entry.getValue().getUuid());
             }
         } else {
@@ -57,21 +57,21 @@ public class VmWorkMigrate extends VmWork {
     }
 
     public DeployDestination getDeployDestination() {
-        DataCenter zone = zoneId != null ? s_entityMgr.findById(DataCenter.class, zoneId) : null;
-        Pod pod = podId != null ? s_entityMgr.findById(Pod.class, podId) : null;
-        Cluster cluster = clusterId != null ? s_entityMgr.findById(Cluster.class, clusterId) : null;
-        Host host = hostId != null ? s_entityMgr.findById(Host.class, hostId) : null;
+        final DataCenter zone = zoneId != null ? s_entityMgr.findById(DataCenter.class, zoneId) : null;
+        final Pod pod = podId != null ? s_entityMgr.findById(Pod.class, podId) : null;
+        final Cluster cluster = clusterId != null ? s_entityMgr.findById(Cluster.class, clusterId) : null;
+        final Host host = hostId != null ? s_entityMgr.findById(Host.class, hostId) : null;
 
         Map<Volume, StoragePool> vols = null;
 
         if (storage != null) {
-            vols = new HashMap<Volume, StoragePool>(storage.size());
-            for (Map.Entry<String, String> entry : storage.entrySet()) {
+            vols = new HashMap<>(storage.size());
+            for (final Map.Entry<String, String> entry : storage.entrySet()) {
                 vols.put(s_entityMgr.findByUuid(Volume.class, entry.getKey()), s_entityMgr.findByUuid(StoragePool.class, entry.getValue()));
             }
         }
 
-        DeployDestination dest = new DeployDestination(zone, pod, cluster, host, vols);
+        final DeployDestination dest = new DeployDestination(zone, pod, cluster, host, vols);
         return dest;
     }
 
@@ -81,7 +81,7 @@ public class VmWorkMigrate extends VmWork {
 
     static private EntityManager s_entityMgr;
 
-    static public void init(EntityManager entityMgr) {
+    static public void init(final EntityManager entityMgr) {
         s_entityMgr = entityMgr;
     }
 }

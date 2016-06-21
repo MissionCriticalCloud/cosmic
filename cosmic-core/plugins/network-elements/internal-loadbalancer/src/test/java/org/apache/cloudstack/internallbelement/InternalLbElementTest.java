@@ -16,26 +16,14 @@
 // under the License.
 package org.apache.cloudstack.internallbelement;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.configuration.ConfigurationManager;
+import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
 import com.cloud.network.VirtualRouterProvider.Type;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.NetworkVO;
@@ -48,9 +36,7 @@ import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.utils.net.Ip;
-
 import org.apache.cloudstack.lb.ApplicationLoadBalancerRuleVO;
 import org.apache.cloudstack.network.element.InternalLoadBalancerElement;
 import org.apache.cloudstack.network.lb.InternalLoadBalancerVMManager;
@@ -61,6 +47,14 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.inject.Inject;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/lb_element.xml")
@@ -96,10 +90,10 @@ public class InternalLbElementTest {
     public void setUp() {
 
         ComponentContext.initComponentsLifeCycle();
-        VirtualRouterProviderVO validElement = new VirtualRouterProviderVO(1, Type.InternalLbVm);
+        final VirtualRouterProviderVO validElement = new VirtualRouterProviderVO(1, Type.InternalLbVm);
         validElement.setEnabled(true);
-        VirtualRouterProviderVO invalidElement = new VirtualRouterProviderVO(1, Type.VirtualRouter);
-        VirtualRouterProviderVO notEnabledElement = new VirtualRouterProviderVO(1, Type.InternalLbVm);
+        final VirtualRouterProviderVO invalidElement = new VirtualRouterProviderVO(1, Type.VirtualRouter);
+        final VirtualRouterProviderVO notEnabledElement = new VirtualRouterProviderVO(1, Type.InternalLbVm);
 
         Mockito.when(_vrProviderDao.findByNspIdAndType(validElId, Type.InternalLbVm)).thenReturn(validElement);
         Mockito.when(_vrProviderDao.findByNspIdAndType(invalidElId, Type.InternalLbVm)).thenReturn(invalidElement);
@@ -109,15 +103,15 @@ public class InternalLbElementTest {
 
         Mockito.when(_vrProviderDao.findByNspIdAndType(validProviderId, Type.InternalLbVm)).thenReturn(validElement);
 
-        PhysicalNetworkServiceProviderVO validProvider = new PhysicalNetworkServiceProviderVO(1, "InternalLoadBalancerElement");
-        PhysicalNetworkServiceProviderVO invalidProvider = new PhysicalNetworkServiceProviderVO(1, "Invalid name!");
+        final PhysicalNetworkServiceProviderVO validProvider = new PhysicalNetworkServiceProviderVO(1, "InternalLoadBalancerElement");
+        final PhysicalNetworkServiceProviderVO invalidProvider = new PhysicalNetworkServiceProviderVO(1, "Invalid name!");
 
         Mockito.when(_pNtwkProviderDao.findById(validProviderId)).thenReturn(validProvider);
         Mockito.when(_pNtwkProviderDao.findById(invalidProviderId)).thenReturn(invalidProvider);
 
         Mockito.when(_vrProviderDao.persist(Matchers.any(VirtualRouterProviderVO.class))).thenReturn(validElement);
 
-        DataCenterVO dc = new DataCenterVO(1L, null, null, null, null, null, null, null, null, null, NetworkType.Advanced, null, null);
+        final DataCenterVO dc = new DataCenterVO(1L, null, null, null, null, null, null, null, null, null, NetworkType.Advanced, null, null);
         Mockito.when(_entityMgr.findById(Matchers.eq(DataCenter.class), Matchers.anyLong())).thenReturn(dc);
     }
 
@@ -125,7 +119,7 @@ public class InternalLbElementTest {
 
     @Test
     public void verifyProviderName() {
-        Provider pr = _lbEl.getProvider();
+        final Provider pr = _lbEl.getProvider();
         assertEquals("Wrong provider is returned", pr.getName(), Provider.InternalLbVm.getName());
     }
 
@@ -135,7 +129,7 @@ public class InternalLbElementTest {
     public void verifyValidProviderState() {
         PhysicalNetworkServiceProviderVO provider = new PhysicalNetworkServiceProviderVO();
         provider = setId(provider, validElId);
-        boolean isReady = _lbEl.isReady(provider);
+        final boolean isReady = _lbEl.isReady(provider);
         assertTrue("Valid provider is returned as not ready", isReady);
     }
 
@@ -143,7 +137,7 @@ public class InternalLbElementTest {
     public void verifyNonExistingProviderState() {
         PhysicalNetworkServiceProviderVO provider = new PhysicalNetworkServiceProviderVO();
         provider = setId(provider, nonExistingElId);
-        boolean isReady = _lbEl.isReady(provider);
+        final boolean isReady = _lbEl.isReady(provider);
         assertFalse("Non existing provider is returned as ready", isReady);
     }
 
@@ -151,7 +145,7 @@ public class InternalLbElementTest {
     public void verifyInvalidProviderState() {
         PhysicalNetworkServiceProviderVO provider = new PhysicalNetworkServiceProviderVO();
         provider = setId(provider, invalidElId);
-        boolean isReady = _lbEl.isReady(provider);
+        final boolean isReady = _lbEl.isReady(provider);
         assertFalse("Not valid provider is returned as ready", isReady);
     }
 
@@ -159,61 +153,61 @@ public class InternalLbElementTest {
     public void verifyNotEnabledProviderState() {
         PhysicalNetworkServiceProviderVO provider = new PhysicalNetworkServiceProviderVO();
         provider = setId(provider, notEnabledElId);
-        boolean isReady = _lbEl.isReady(provider);
+        final boolean isReady = _lbEl.isReady(provider);
         assertFalse("Not enabled provider is returned as ready", isReady);
     }
 
     //TEST FOR canEnableIndividualServices METHOD
     @Test
     public void verifyCanEnableIndividualSvc() {
-        boolean result = _lbEl.canEnableIndividualServices();
+        final boolean result = _lbEl.canEnableIndividualServices();
         assertTrue("Wrong value is returned by canEnableIndividualSvc", result);
     }
 
     //TEST FOR verifyServicesCombination METHOD
     @Test
     public void verifyServicesCombination() {
-        boolean result = _lbEl.verifyServicesCombination(new HashSet<Service>());
+        final boolean result = _lbEl.verifyServicesCombination(new HashSet<>());
         assertTrue("Wrong value is returned by verifyServicesCombination", result);
     }
 
     //TEST FOR applyIps METHOD
     @Test
     public void verifyApplyIps() throws ResourceUnavailableException {
-        List<PublicIp> ips = new ArrayList<PublicIp>();
-        boolean result = _lbEl.applyIps(new NetworkVO(), ips, new HashSet<Service>());
+        final List<PublicIp> ips = new ArrayList<>();
+        final boolean result = _lbEl.applyIps(new NetworkVO(), ips, new HashSet<>());
         assertTrue("Wrong value is returned by applyIps method", result);
     }
 
     //TEST FOR updateHealthChecks METHOD
     @Test
     public void verifyUpdateHealthChecks() throws ResourceUnavailableException {
-        List<LoadBalancerTO> check = _lbEl.updateHealthChecks(new NetworkVO(), new ArrayList<LoadBalancingRule>());
+        final List<LoadBalancerTO> check = _lbEl.updateHealthChecks(new NetworkVO(), new ArrayList<>());
         assertNull("Wrong value is returned by updateHealthChecks method", check);
     }
 
     //TEST FOR validateLBRule METHOD
     @Test
     public void verifyValidateLBRule() throws ResourceUnavailableException {
-        ApplicationLoadBalancerRuleVO lb = new ApplicationLoadBalancerRuleVO(null, null, 22, 22, "roundrobin", 1L, 1L, 1L, new Ip("10.10.10.1"), 1L, Scheme.Internal);
+        final ApplicationLoadBalancerRuleVO lb = new ApplicationLoadBalancerRuleVO(null, null, 22, 22, "roundrobin", 1L, 1L, 1L, new Ip("10.10.10.1"), 1L, Scheme.Internal);
         lb.setState(FirewallRule.State.Add);
 
-        LoadBalancingRule rule = new LoadBalancingRule(lb, null, null, null, new Ip("10.10.10.1"));
+        final LoadBalancingRule rule = new LoadBalancingRule(lb, null, null, null, new Ip("10.10.10.1"));
 
-        boolean result = _lbEl.validateLBRule(new NetworkVO(), rule);
+        final boolean result = _lbEl.validateLBRule(new NetworkVO(), rule);
         assertTrue("Wrong value is returned by validateLBRule method", result);
     }
 
-    private static PhysicalNetworkServiceProviderVO setId(PhysicalNetworkServiceProviderVO vo, long id) {
-        PhysicalNetworkServiceProviderVO voToReturn = vo;
-        Class<?> c = voToReturn.getClass();
+    private static PhysicalNetworkServiceProviderVO setId(final PhysicalNetworkServiceProviderVO vo, final long id) {
+        final PhysicalNetworkServiceProviderVO voToReturn = vo;
+        final Class<?> c = voToReturn.getClass();
         try {
-            Field f = c.getDeclaredField("id");
+            final Field f = c.getDeclaredField("id");
             f.setAccessible(true);
             f.setLong(voToReturn, id);
-        } catch (NoSuchFieldException ex) {
+        } catch (final NoSuchFieldException ex) {
             return null;
-        } catch (IllegalAccessException ex) {
+        } catch (final IllegalAccessException ex) {
             return null;
         }
 

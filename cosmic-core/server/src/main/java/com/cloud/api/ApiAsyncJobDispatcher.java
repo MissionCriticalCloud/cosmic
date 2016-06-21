@@ -16,20 +16,14 @@
 // under the License.
 package com.cloud.api;
 
-import java.lang.reflect.Type;
-import java.util.Map;
-
-import javax.inject.Inject;
-
+import com.cloud.dao.EntityManager;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.user.Account;
 import com.cloud.user.User;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.db.EntityManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
@@ -42,6 +36,10 @@ import org.apache.cloudstack.framework.jobs.AsyncJobManager;
 import org.apache.cloudstack.jobs.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.lang.reflect.Type;
+import java.util.Map;
 
 public class ApiAsyncJobDispatcher extends AdapterBase implements AsyncJobDispatcher {
     private static final Logger s_logger = LoggerFactory.getLogger(ApiAsyncJobDispatcher.class);
@@ -61,27 +59,27 @@ public class ApiAsyncJobDispatcher extends AdapterBase implements AsyncJobDispat
     public void runJob(final AsyncJob job) {
         BaseAsyncCmd cmdObj = null;
         try {
-            Class<?> cmdClass = Class.forName(job.getCmd());
-            cmdObj = (BaseAsyncCmd)cmdClass.newInstance();
+            final Class<?> cmdClass = Class.forName(job.getCmd());
+            cmdObj = (BaseAsyncCmd) cmdClass.newInstance();
             cmdObj = ComponentContext.inject(cmdObj);
             cmdObj.configure();
             cmdObj.setJob(job);
 
-            Type mapType = new TypeToken<Map<String, String>>() {
+            final Type mapType = new TypeToken<Map<String, String>>() {
             }.getType();
-            Gson gson = ApiGsonHelper.getBuilder().create();
-            Map<String, String> params = gson.fromJson(job.getCmdInfo(), mapType);
+            final Gson gson = ApiGsonHelper.getBuilder().create();
+            final Map<String, String> params = gson.fromJson(job.getCmdInfo(), mapType);
 
             // whenever we deserialize, the UserContext needs to be updated
-            String userIdStr = params.get("ctxUserId");
-            String acctIdStr = params.get("ctxAccountId");
-            String contextDetails = params.get("ctxDetails");
+            final String userIdStr = params.get("ctxUserId");
+            final String acctIdStr = params.get("ctxAccountId");
+            final String contextDetails = params.get("ctxDetails");
 
             Long userId = null;
             Account accountObject = null;
 
             if (cmdObj instanceof BaseAsyncCreateCmd) {
-                BaseAsyncCreateCmd create = (BaseAsyncCreateCmd)cmdObj;
+                final BaseAsyncCreateCmd create = (BaseAsyncCreateCmd) cmdObj;
                 create.setEntityId(Long.parseLong(params.get("id")));
                 create.setEntityUuid(params.get("uuid"));
             }
@@ -96,9 +94,10 @@ public class ApiAsyncJobDispatcher extends AdapterBase implements AsyncJobDispat
                 accountObject = _entityMgr.findById(Account.class, Long.parseLong(acctIdStr));
             }
 
-            CallContext ctx = CallContext.register(user, accountObject);
-            if(contextDetails != null){
-                Type objectMapType = new TypeToken<Map<Object, Object>>() {}.getType();
+            final CallContext ctx = CallContext.register(user, accountObject);
+            if (contextDetails != null) {
+                final Type objectMapType = new TypeToken<Map<Object, Object>>() {
+                }.getType();
                 ctx.putContextParameters((Map<Object, Object>) gson.fromJson(contextDetails, objectMapType));
             }
 
@@ -108,24 +107,24 @@ public class ApiAsyncJobDispatcher extends AdapterBase implements AsyncJobDispat
 
                 // serialize this to the async job table
                 _asyncJobMgr.completeAsyncJob(job.getId(), JobInfo.Status.SUCCEEDED, 0, ApiSerializerHelper.toSerializedString(cmdObj.getResponseObject()));
-            } catch (InvalidParameterValueException ipve) {
+            } catch (final InvalidParameterValueException ipve) {
                 throw new ServerApiException(ApiErrorCode.PARAM_ERROR, ipve.getMessage());
             } finally {
                 CallContext.unregister();
             }
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             String errorMsg = null;
             int errorCode = ApiErrorCode.INTERNAL_ERROR.getHttpCode();
             if (!(e instanceof ServerApiException)) {
                 s_logger.error("Unexpected exception while executing " + job.getCmd(), e);
                 errorMsg = e.getMessage();
             } else {
-                ServerApiException sApiEx = (ServerApiException)e;
+                final ServerApiException sApiEx = (ServerApiException) e;
                 errorMsg = sApiEx.getDescription();
                 errorCode = sApiEx.getErrorCode().getHttpCode();
             }
 
-            ExceptionResponse response = new ExceptionResponse();
+            final ExceptionResponse response = new ExceptionResponse();
             response.setErrorCode(errorCode);
             response.setErrorText(errorMsg);
             response.setResponseName((cmdObj == null) ? "unknowncommandresponse" : cmdObj.getCommandName());

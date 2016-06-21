@@ -16,12 +16,11 @@
 // under the License.
 package org.apache.cloudstack.context;
 
+import com.cloud.dao.EntityManager;
+import org.apache.cloudstack.managed.context.ManagedContextListener;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-
-import com.cloud.utils.db.EntityManager;
-
-import org.apache.cloudstack.managed.context.ManagedContextListener;
 
 public class LogContextListener implements ManagedContextListener<Object> {
 
@@ -29,7 +28,7 @@ public class LogContextListener implements ManagedContextListener<Object> {
     EntityManager entityMgr;
 
     @Override
-    public Object onEnterContext(boolean reentry) {
+    public Object onEnterContext(final boolean reentry) {
         if (!reentry && LogContext.current() == null) {
             LogContext.registerSystemLogContextOnceOnly();
         }
@@ -37,7 +36,7 @@ public class LogContextListener implements ManagedContextListener<Object> {
     }
 
     @Override
-    public void onLeaveContext(Object unused, boolean reentry) {
+    public void onLeaveContext(final Object unused, final boolean reentry) {
         if (!reentry) {
             LogContext.unregister();
         }

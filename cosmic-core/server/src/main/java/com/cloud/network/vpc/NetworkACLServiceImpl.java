@@ -16,12 +16,7 @@
 // under the License.
 package com.cloud.network.vpc;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
+import com.cloud.dao.EntityManager;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
@@ -43,7 +38,6 @@ import com.cloud.user.AccountManager;
 import com.cloud.utils.Pair;
 import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.JoinBuilder;
 import com.cloud.utils.db.SearchBuilder;
@@ -51,7 +45,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
-
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.network.CreateNetworkACLCmd;
@@ -62,6 +55,11 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLService {
@@ -147,7 +145,7 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
             sc.setParameters("display", display);
         }
 
-        if(id != null){
+        if (id != null) {
             sc.setParameters("id", id);
         }
 
@@ -168,14 +166,13 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
 
             // VpcId is not specified. Find permitted VPCs for the caller
             // and list ACLs belonging to the permitted VPCs
-            final List<Long> permittedAccounts = new ArrayList<Long>();
+            final List<Long> permittedAccounts = new ArrayList<>();
             Long domainId = cmd.getDomainId();
             boolean isRecursive = cmd.isRecursive();
             final String accountName = cmd.getAccountName();
             final Long projectId = cmd.getProjectId();
             final boolean listAll = cmd.listAll();
-            final Ternary<Long, Boolean, ListProjectResourcesCriteria> domainIdRecursiveListProject = new Ternary<Long, Boolean,
-                    ListProjectResourcesCriteria>(domainId, isRecursive, null);
+            final Ternary<Long, Boolean, ListProjectResourcesCriteria> domainIdRecursiveListProject = new Ternary<>(domainId, isRecursive, null);
             _accountMgr.buildACLSearchParameters(caller, id, accountName, projectId, permittedAccounts, domainIdRecursiveListProject,
                     listAll, false);
             domainId = domainIdRecursiveListProject.first();
@@ -186,7 +183,7 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
             final SearchCriteria<VpcVO> scVpc = sbVpc.create();
             _accountMgr.buildACLSearchCriteria(scVpc, domainId, isRecursive, permittedAccounts, listProjectResourcesCriteria);
             final List<VpcVO> vpcs = _vpcDao.search(scVpc, null);
-            final List<Long> vpcIds = new ArrayList<Long>();
+            final List<Long> vpcIds = new ArrayList<>();
             for (final VpcVO vpc : vpcs) {
                 vpcIds.add(vpc.getId());
             }
@@ -200,8 +197,8 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
         }
 
         final Filter filter = new Filter(NetworkACLVO.class, "id", false, null, null);
-        final Pair<List<NetworkACLVO>, Integer> acls =  _networkACLDao.searchAndCount(sc, filter);
-        return new Pair<List<? extends NetworkACL>, Integer>(acls.first(), acls.second());
+        final Pair<List<NetworkACLVO>, Integer> acls = _networkACLDao.searchAndCount(sc, filter);
+        return new Pair<>(acls.first(), acls.second());
     }
 
     @Override
@@ -262,7 +259,7 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
         final PrivateGateway privateGateway = _vpcSvc.getVpcPrivateGateway(gateway.getId());
         _accountMgr.checkAccess(caller, null, true, privateGateway);
 
-        return  _networkAclMgr.replaceNetworkACLForPrivateGw(acl, privateGateway);
+        return _networkAclMgr.replaceNetworkACLForPrivateGw(acl, privateGateway);
 
     }
 
@@ -345,7 +342,7 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
                 aclId = acl.getId();
                 //Apply acl to network
                 try {
-                    if (!_networkAclMgr.replaceNetworkACL(acl, (NetworkVO)network)) {
+                    if (!_networkAclMgr.replaceNetworkACL(acl, (NetworkVO) network)) {
                         throw new CloudRuntimeException("Unable to apply auto created ACL to network " + network.getId());
                     }
                     s_logger.debug("Created ACL is applied to network " + network.getId());
@@ -386,7 +383,7 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
     }
 
     private void validateNetworkACLItem(final Integer portStart, final Integer portEnd, final List<String> sourceCidrList, final String protocol, final Integer icmpCode, final Integer icmpType,
-            final String action, final Integer number) {
+                                        final String action, final Integer number) {
 
         if (portStart != null && !NetUtils.isValidPort(portStart)) {
             throw new InvalidParameterValueException("publicPort is an invalid value: " + portStart);
@@ -525,7 +522,7 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
         if (networkId != null) {
             final Network network = _networkDao.findById(networkId);
             aclId = network.getNetworkACLId();
-            if( aclId == null){
+            if (aclId == null) {
                 // No aclId associated with the network.
                 //Return empty list
                 return new Pair(new ArrayList<NetworkACLItem>(), 0);
@@ -553,14 +550,13 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
 
             // aclId is not specified
             // List permitted VPCs and filter aclItems
-            final List<Long> permittedAccounts = new ArrayList<Long>();
+            final List<Long> permittedAccounts = new ArrayList<>();
             Long domainId = cmd.getDomainId();
             boolean isRecursive = cmd.isRecursive();
             final String accountName = cmd.getAccountName();
             final Long projectId = cmd.getProjectId();
             final boolean listAll = cmd.listAll();
-            final Ternary<Long, Boolean, ListProjectResourcesCriteria> domainIdRecursiveListProject = new Ternary<Long, Boolean,
-                    ListProjectResourcesCriteria>(domainId, isRecursive, null);
+            final Ternary<Long, Boolean, ListProjectResourcesCriteria> domainIdRecursiveListProject = new Ternary<>(domainId, isRecursive, null);
             _accountMgr.buildACLSearchParameters(caller, id, accountName, projectId, permittedAccounts, domainIdRecursiveListProject,
                     listAll, false);
             domainId = domainIdRecursiveListProject.first();
@@ -571,7 +567,7 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
             final SearchCriteria<VpcVO> scVpc = sbVpc.create();
             _accountMgr.buildACLSearchCriteria(scVpc, domainId, isRecursive, permittedAccounts, listProjectResourcesCriteria);
             final List<VpcVO> vpcs = _vpcDao.search(scVpc, null);
-            final List<Long> vpcIds = new ArrayList<Long>();
+            final List<Long> vpcIds = new ArrayList<>();
             for (final VpcVO vpc : vpcs) {
                 vpcIds.add(vpc.getId());
             }
@@ -600,22 +596,22 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
 
         final Pair<List<NetworkACLItemVO>, Integer> result = _networkACLItemDao.searchAndCount(sc, filter);
         final List<NetworkACLItemVO> aclItemVOs = result.first();
-        for (final NetworkACLItemVO item: aclItemVOs) {
+        for (final NetworkACLItemVO item : aclItemVOs) {
             _networkACLItemDao.loadCidrs(item);
         }
-        return new Pair<List<? extends NetworkACLItem>, Integer>(aclItemVOs, result.second());
+        return new Pair<>(aclItemVOs, result.second());
     }
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_NETWORK_ACL_ITEM_DELETE, eventDescription = "Deleting Network ACL Item", async = true)
     public boolean revokeNetworkACLItem(final long ruleId) {
         final NetworkACLItemVO aclItem = _networkACLItemDao.findById(ruleId);
-        if(aclItem != null){
+        if (aclItem != null) {
             final NetworkACL acl = _networkAclMgr.getNetworkACL(aclItem.getAclId());
 
             final Vpc vpc = _entityMgr.findById(Vpc.class, acl.getVpcId());
 
-            if(aclItem.getAclId() == NetworkACL.DEFAULT_ALLOW || aclItem.getAclId() == NetworkACL.DEFAULT_DENY){
+            if (aclItem.getAclId() == NetworkACL.DEFAULT_ALLOW || aclItem.getAclId() == NetworkACL.DEFAULT_DENY) {
                 throw new InvalidParameterValueException("ACL Items in default ACL cannot be deleted");
             }
 
@@ -629,7 +625,7 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
 
     @Override
     public NetworkACLItem updateNetworkACLItem(final Long id, final String protocol, final List<String> sourceCidrList, final NetworkACLItem.TrafficType trafficType, final String action,
-            final Integer number, final Integer sourcePortStart, final Integer sourcePortEnd, final Integer icmpCode, final Integer icmpType, final String newUUID, final Boolean forDisplay) throws ResourceUnavailableException {
+                                               final Integer number, final Integer sourcePortStart, final Integer sourcePortEnd, final Integer icmpCode, final Integer icmpType, final String newUUID, final Boolean forDisplay) throws ResourceUnavailableException {
         final NetworkACLItemVO aclItem = _networkACLItemDao.findById(id);
         if (aclItem == null) {
             throw new InvalidParameterValueException("Unable to find ACL Item cannot be found");

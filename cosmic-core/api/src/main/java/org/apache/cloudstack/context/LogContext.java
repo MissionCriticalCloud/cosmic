@@ -16,21 +16,20 @@
 // under the License.
 package org.apache.cloudstack.context;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
+import com.cloud.dao.EntityManager;
 import com.cloud.exception.CloudAuthenticationException;
 import com.cloud.user.Account;
 import com.cloud.user.User;
 import com.cloud.utils.UuidUtils;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.managed.threadlocal.ManagedThreadLocal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * LogContext records information about the environment the API call is made.  This
@@ -38,7 +37,7 @@ import org.slf4j.MDC;
  */
 public class LogContext {
     private static final Logger s_logger = LoggerFactory.getLogger(LogContext.class);
-    private static ManagedThreadLocal<LogContext> s_currentContext = new ManagedThreadLocal<LogContext>();
+    private static final ManagedThreadLocal<LogContext> s_currentContext = new ManagedThreadLocal<>();
 
     private String logContextId;
     private Account account;
@@ -50,24 +49,24 @@ public class LogContext {
     private boolean isEventDisplayEnabled = true; // default to true unless specifically set
     private User user;
     private long userId;
-    private final Map<String, String> context = new HashMap<String, String>();
+    private final Map<String, String> context = new HashMap<>();
 
     static EntityManager s_entityMgr;
 
-    public static void init(EntityManager entityMgr) {
+    public static void init(final EntityManager entityMgr) {
         s_entityMgr = entityMgr;
     }
 
     protected LogContext() {
     }
 
-    protected LogContext(long userId, long accountId, String logContextId) {
+    protected LogContext(final long userId, final long accountId, final String logContextId) {
         this.userId = userId;
         this.accountId = accountId;
         this.logContextId = logContextId;
     }
 
-    protected LogContext(User user, Account account, String logContextId) {
+    protected LogContext(final User user, final Account account, final String logContextId) {
         this.user = user;
         userId = user.getId();
         this.account = account;
@@ -75,11 +74,11 @@ public class LogContext {
         this.logContextId = logContextId;
     }
 
-    public void putContextParameter(String key, String value) {
+    public void putContextParameter(final String key, final String value) {
         context.put(key, value);
     }
 
-    public String getContextParameter(String key) {
+    public String getContextParameter(final String key) {
         return context.get(key);
     }
 
@@ -117,16 +116,16 @@ public class LogContext {
      * This method should only be called if you can propagate the context id
      * from another LogContext.
      *
-     * @param callingUser calling user
+     * @param callingUser    calling user
      * @param callingAccount calling account
-     * @param contextId context id propagated from another call context
+     * @param contextId      context id propagated from another call context
      * @return LogContext
      */
-    public static LogContext register(User callingUser, Account callingAccount, String contextId) {
+    public static LogContext register(final User callingUser, final Account callingAccount, final String contextId) {
         return register(callingUser, callingAccount, null, null, contextId);
     }
 
-    protected static LogContext register(User callingUser, Account callingAccount, Long userId, Long accountId, String contextId) {
+    protected static LogContext register(final User callingUser, final Account callingAccount, final Long userId, final Long accountId, final String contextId) {
         LogContext callingContext = null;
         if (userId == null || accountId == null) {
             callingContext = new LogContext(callingUser, callingAccount, contextId);
@@ -142,60 +141,60 @@ public class LogContext {
     }
 
     public static LogContext registerPlaceHolderContext() {
-        LogContext context = new LogContext(0, 0, UUID.randomUUID().toString());
+        final LogContext context = new LogContext(0, 0, UUID.randomUUID().toString());
         s_currentContext.set(context);
         return context;
     }
 
-    public static LogContext register(User callingUser, Account callingAccount) {
+    public static LogContext register(final User callingUser, final Account callingAccount) {
         return register(callingUser, callingAccount, UUID.randomUUID().toString());
     }
 
     public static LogContext registerSystemLogContextOnceOnly() {
         try {
-            LogContext context = s_currentContext.get();
+            final LogContext context = s_currentContext.get();
             if (context == null) {
                 return register(null, null, User.UID_SYSTEM, Account.ACCOUNT_ID_SYSTEM, UUID.randomUUID().toString());
             }
             assert context.getCallingUserId() == User.UID_SYSTEM : "You are calling a very specific method that registers a one time system context.  This method is meant for background threads that does processing.";
             return context;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             s_logger.error("Failed to register the system log context.", e);
             throw new CloudRuntimeException("Failed to register system log context", e);
         }
     }
 
-    public static LogContext register(String callingUserUuid, String callingAccountUuid) {
-        Account account = s_entityMgr.findByUuid(Account.class, callingAccountUuid);
+    public static LogContext register(final String callingUserUuid, final String callingAccountUuid) {
+        final Account account = s_entityMgr.findByUuid(Account.class, callingAccountUuid);
         if (account == null) {
             throw new CloudAuthenticationException("The account is no longer current.").add(Account.class, callingAccountUuid);
         }
 
-        User user = s_entityMgr.findByUuid(User.class, callingUserUuid);
+        final User user = s_entityMgr.findByUuid(User.class, callingUserUuid);
         if (user == null) {
             throw new CloudAuthenticationException("The user is no longer current.").add(User.class, callingUserUuid);
         }
         return register(user, account);
     }
 
-    public static LogContext register(long callingUserId, long callingAccountId) throws CloudAuthenticationException {
-        Account account = s_entityMgr.findById(Account.class, callingAccountId);
+    public static LogContext register(final long callingUserId, final long callingAccountId) throws CloudAuthenticationException {
+        final Account account = s_entityMgr.findById(Account.class, callingAccountId);
         if (account == null) {
             throw new CloudAuthenticationException("The account is no longer current.").add(Account.class, Long.toString(callingAccountId));
         }
-        User user = s_entityMgr.findById(User.class, callingUserId);
+        final User user = s_entityMgr.findById(User.class, callingUserId);
         if (user == null) {
             throw new CloudAuthenticationException("The user is no longer current.").add(User.class, Long.toString(callingUserId));
         }
         return register(user, account);
     }
 
-    public static LogContext register(long callingUserId, long callingAccountId, String contextId) throws CloudAuthenticationException {
-        Account account = s_entityMgr.findById(Account.class, callingAccountId);
+    public static LogContext register(final long callingUserId, final long callingAccountId, final String contextId) throws CloudAuthenticationException {
+        final Account account = s_entityMgr.findById(Account.class, callingAccountId);
         if (account == null) {
             throw new CloudAuthenticationException("The account is no longer current.").add(Account.class, Long.toString(callingAccountId));
         }
-        User user = s_entityMgr.findById(User.class, callingUserId);
+        final User user = s_entityMgr.findById(User.class, callingUserId);
         if (user == null) {
             throw new CloudAuthenticationException("The user is no longer current.").add(User.class, Long.toString(callingUserId));
         }
@@ -203,7 +202,7 @@ public class LogContext {
     }
 
     public static void unregister() {
-        LogContext context = s_currentContext.get();
+        final LogContext context = s_currentContext.get();
         if (context != null) {
             s_currentContext.remove();
             if (s_logger.isTraceEnabled()) {
@@ -213,7 +212,7 @@ public class LogContext {
         MDC.clear();
     }
 
-    public void setStartEventId(long startEventId) {
+    public void setStartEventId(final long startEventId) {
         this.startEventId = startEventId;
     }
 
@@ -233,7 +232,7 @@ public class LogContext {
         return getCallingUser().getUuid();
     }
 
-    public void setEventDetails(String eventDetails) {
+    public void setEventDetails(final String eventDetails) {
         this.eventDetails = eventDetails;
     }
 
@@ -245,7 +244,7 @@ public class LogContext {
         return eventType;
     }
 
-    public void setEventType(String eventType) {
+    public void setEventType(final String eventType) {
         this.eventType = eventType;
     }
 
@@ -253,19 +252,20 @@ public class LogContext {
         return eventDescription;
     }
 
-    public void setEventDescription(String eventDescription) {
+    public void setEventDescription(final String eventDescription) {
         this.eventDescription = eventDescription;
     }
 
     /**
      * Whether to display the event to the end user.
+     *
      * @return true - if the event is to be displayed to the end user, false otherwise.
      */
     public boolean isEventDisplayEnabled() {
         return isEventDisplayEnabled;
     }
 
-    public void setEventDisplayEnabled(boolean eventDisplayEnabled) {
+    public void setEventDisplayEnabled(final boolean eventDisplayEnabled) {
         isEventDisplayEnabled = eventDisplayEnabled;
     }
 
@@ -273,16 +273,16 @@ public class LogContext {
         return context;
     }
 
-    public void putContextParameters(Map<String, String> details) {
+    public void putContextParameters(final Map<String, String> details) {
         if (details == null)
             return;
-        for (Map.Entry<String, String> entry : details.entrySet()) {
+        for (final Map.Entry<String, String> entry : details.entrySet()) {
             putContextParameter(entry.getKey(), entry.getValue());
         }
     }
 
-    public static void setActionEventInfo(String eventType, String description) {
-        LogContext context = LogContext.current();
+    public static void setActionEventInfo(final String eventType, final String description) {
+        final LogContext context = LogContext.current();
         if (context != null) {
             context.setEventType(eventType);
             context.setEventDescription(description);

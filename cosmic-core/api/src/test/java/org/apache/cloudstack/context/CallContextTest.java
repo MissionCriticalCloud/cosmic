@@ -19,12 +19,9 @@
 
 package org.apache.cloudstack.context;
 
-import java.util.UUID;
-
+import com.cloud.dao.EntityManager;
 import com.cloud.user.Account;
 import com.cloud.user.User;
-import com.cloud.utils.db.EntityManager;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,6 +30,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CallContextTest {
@@ -53,13 +52,13 @@ public class CallContextTest {
 
     @Test
     public void testGetContextParameter() {
-        CallContext currentContext = CallContext.current();
+        final CallContext currentContext = CallContext.current();
 
         Assert.assertEquals("There is nothing in the context. It should return null", null, currentContext.getContextParameter("key"));
         Assert.assertTrue("There is nothing in the context. The map should be empty", currentContext.getContextParameters().isEmpty());
 
-        UUID objectUUID = UUID.randomUUID();
-        UUID stringUUID = UUID.randomUUID();
+        final UUID objectUUID = UUID.randomUUID();
+        final UUID stringUUID = UUID.randomUUID();
 
         //Case1: when an entry with the object class is present
         currentContext.putContextParameter(User.class, objectUUID);

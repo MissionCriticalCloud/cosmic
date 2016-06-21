@@ -17,39 +17,15 @@
 
 package com.cloud.vm;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyFloat;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import com.cloud.capacity.CapacityManager;
 import com.cloud.configuration.ConfigurationManager;
+import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.event.dao.UsageEventDao;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InvalidParameterValueException;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.exception.*;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.network.IpAddressManager;
@@ -72,16 +48,9 @@ import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
-import com.cloud.user.Account;
-import com.cloud.user.AccountManager;
-import com.cloud.user.AccountService;
-import com.cloud.user.AccountVO;
-import com.cloud.user.ResourceLimitService;
-import com.cloud.user.User;
-import com.cloud.user.UserVO;
+import com.cloud.user.*;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.NicDao;
@@ -89,7 +58,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ServerApiException;
@@ -111,6 +79,20 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyFloat;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 public class UserVmManagerTest {
 
@@ -248,10 +230,10 @@ public class UserVmManagerTest {
         when(_vmMock.getId()).thenReturn(314L);
         when(_vmInstance.getId()).thenReturn(1L);
         when(_vmInstance.getServiceOfferingId()).thenReturn(2L);
-        List<VMSnapshotVO> mockList = mock(List.class);
+        final List<VMSnapshotVO> mockList = mock(List.class);
         when(_vmSnapshotDao.findByVm(anyLong())).thenReturn(mockList);
         when(mockList.size()).thenReturn(0);
-        when(_templateStoreDao.findByTemplateZoneReady(anyLong(),anyLong())).thenReturn(_templateDataStoreMock);
+        when(_templateStoreDao.findByTemplateZoneReady(anyLong(), anyLong())).thenReturn(_templateDataStoreMock);
 
     }
 
@@ -262,8 +244,8 @@ public class UserVmManagerTest {
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_templateDao.findById(anyLong())).thenReturn(_templateMock);
         doReturn(VirtualMachine.State.Error).when(_vmMock).getState();
-        Account account = new AccountVO("testaccount", 1L, "networkdomain", (short)0, "uuid");
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
 
         CallContext.register(user, account);
         try {
@@ -276,7 +258,7 @@ public class UserVmManagerTest {
     // Test restoreVm when VM is in stopped state
     @Test
     public void testRestoreVMF2() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException {
+            ResourceAllocationException {
 
         doReturn(VirtualMachine.State.Stopped).when(_vmMock).getState();
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
@@ -292,10 +274,10 @@ public class UserVmManagerTest {
 
         when(_templateMock.getUuid()).thenReturn("e0552266-7060-11e2-bbaa-d55f5db67735");
 
-        Account account = new AccountVO("testaccount", 1L, "networkdomain", (short)0, "uuid");
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
 
-        StoragePoolVO storagePool = new StoragePoolVO();
+        final StoragePoolVO storagePool = new StoragePoolVO();
 
         storagePool.setManaged(false);
 
@@ -313,7 +295,7 @@ public class UserVmManagerTest {
     // Test restoreVM when VM is in running state
     @Test
     public void testRestoreVMF3() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException {
+            ResourceAllocationException {
 
         doReturn(VirtualMachine.State.Running).when(_vmMock).getState();
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
@@ -329,10 +311,10 @@ public class UserVmManagerTest {
 
         when(_templateMock.getUuid()).thenReturn("e0552266-7060-11e2-bbaa-d55f5db67735");
 
-        Account account = new AccountVO("testaccount", 1L, "networkdomain", (short)0, "uuid");
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
 
-        StoragePoolVO storagePool = new StoragePoolVO();
+        final StoragePoolVO storagePool = new StoragePoolVO();
 
         storagePool.setManaged(false);
 
@@ -350,7 +332,7 @@ public class UserVmManagerTest {
     // Test restoreVM on providing new template Id, when VM is in running state
     @Test
     public void testRestoreVMF4() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException {
+            ResourceAllocationException {
         doReturn(VirtualMachine.State.Running).when(_vmMock).getState();
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_volsDao.findByInstanceAndType(314L, Volume.Type.ROOT)).thenReturn(_rootVols);
@@ -369,15 +351,15 @@ public class UserVmManagerTest {
         doNothing().when(_volsDao).attachVolume(anyLong(), anyLong(), anyLong());
         when(_volumeMock.getId()).thenReturn(3L);
         doNothing().when(_volsDao).detachVolume(anyLong());
-        List<VMSnapshotVO> mockList = mock(List.class);
+        final List<VMSnapshotVO> mockList = mock(List.class);
         when(_vmSnapshotDao.findByVm(anyLong())).thenReturn(mockList);
         when(mockList.size()).thenReturn(0);
         when(_templateMock.getUuid()).thenReturn("b1a3626e-72e0-4697-8c7c-a110940cc55d");
 
-        Account account = new AccountVO("testaccount", 1L, "networkdomain", (short)0, "uuid");
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
 
-        StoragePoolVO storagePool = new StoragePoolVO();
+        final StoragePoolVO storagePool = new StoragePoolVO();
 
         storagePool.setManaged(false);
 
@@ -395,7 +377,7 @@ public class UserVmManagerTest {
     // Test restoreVM on providing new ISO Id, when VM(deployed using ISO) is in running state
     @Test
     public void testRestoreVMF5() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException {
+            ResourceAllocationException {
         doReturn(VirtualMachine.State.Running).when(_vmMock).getState();
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_volsDao.findByInstanceAndType(314L, Volume.Type.ROOT)).thenReturn(_rootVols);
@@ -416,15 +398,15 @@ public class UserVmManagerTest {
         doNothing().when(_volsDao).attachVolume(anyLong(), anyLong(), anyLong());
         when(_volumeMock.getId()).thenReturn(3L);
         doNothing().when(_volsDao).detachVolume(anyLong());
-        List<VMSnapshotVO> mockList = mock(List.class);
+        final List<VMSnapshotVO> mockList = mock(List.class);
         when(_vmSnapshotDao.findByVm(anyLong())).thenReturn(mockList);
         when(mockList.size()).thenReturn(0);
         when(_templateMock.getUuid()).thenReturn("b1a3626e-72e0-4697-8c7c-a110940cc55d");
 
-        Account account = new AccountVO("testaccount", 1L, "networkdomain", (short)0, "uuid");
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
 
-        StoragePoolVO storagePool = new StoragePoolVO();
+        final StoragePoolVO storagePool = new StoragePoolVO();
 
         storagePool.setManaged(false);
 
@@ -443,24 +425,24 @@ public class UserVmManagerTest {
 
     // Test scaleVm on incompatible HV.
     @Test(expected = InvalidParameterValueException.class)
-    public void testScaleVMF1()  throws Exception {
+    public void testScaleVMF1() throws Exception {
 
-        ScaleVMCmd cmd = new ScaleVMCmd();
-        Class<?> _class = cmd.getClass();
+        final ScaleVMCmd cmd = new ScaleVMCmd();
+        final Class<?> _class = cmd.getClass();
 
-        Field idField = _class.getDeclaredField("id");
+        final Field idField = _class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(cmd, 1L);
 
-        Field serviceOfferingIdField = _class.getDeclaredField("serviceOfferingId");
+        final Field serviceOfferingIdField = _class.getDeclaredField("serviceOfferingId");
         serviceOfferingIdField.setAccessible(true);
         serviceOfferingIdField.set(cmd, 1L);
 
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
 
-       // UserContext.current().setEventDetails("Vm Id: "+getId());
-        Account account = new AccountVO("testaccount", 1L, "networkdomain", (short)0, "uuid");
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        // UserContext.current().setEventDetails("Vm Id: "+getId());
+        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
         //AccountVO(String accountName, long domainId, String networkDomain, short type, int regionId)
         doReturn(VirtualMachine.State.Running).when(_vmInstance).getState();
 
@@ -475,16 +457,16 @@ public class UserVmManagerTest {
 
     // Test scaleVm on equal service offerings.
     @Test(expected = InvalidParameterValueException.class)
-    public void testScaleVMF2()  throws Exception {
+    public void testScaleVMF2() throws Exception {
 
-        ScaleVMCmd cmd = new ScaleVMCmd();
-        Class<?> _class = cmd.getClass();
+        final ScaleVMCmd cmd = new ScaleVMCmd();
+        final Class<?> _class = cmd.getClass();
 
-        Field idField = _class.getDeclaredField("id");
+        final Field idField = _class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(cmd, 1L);
 
-        Field serviceOfferingIdField = _class.getDeclaredField("serviceOfferingId");
+        final Field serviceOfferingIdField = _class.getDeclaredField("serviceOfferingId");
         serviceOfferingIdField.setAccessible(true);
         serviceOfferingIdField.set(cmd, 1L);
 
@@ -497,14 +479,14 @@ public class UserVmManagerTest {
 
         doNothing().when(_itMgr).checkIfCanUpgrade(_vmMock, _offeringVo);
 
-        ServiceOffering so1 =  getSvcoffering(512);
-        ServiceOffering so2 =  getSvcoffering(256);
+        final ServiceOffering so1 = getSvcoffering(512);
+        final ServiceOffering so2 = getSvcoffering(256);
 
-        when(_offeringDao.findById(anyLong())).thenReturn((ServiceOfferingVO)so1);
-        when(_offeringDao.findByIdIncludingRemoved(anyLong(), anyLong())).thenReturn((ServiceOfferingVO)so1);
+        when(_offeringDao.findById(anyLong())).thenReturn((ServiceOfferingVO) so1);
+        when(_offeringDao.findByIdIncludingRemoved(anyLong(), anyLong())).thenReturn((ServiceOfferingVO) so1);
 
-        Account account = new AccountVO("testaccount", 1L, "networkdomain", (short)0, UUID.randomUUID().toString());
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, UUID.randomUUID().toString());
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
         CallContext.register(user, account);
         try {
             _userVmMgr.upgradeVirtualMachine(cmd);
@@ -516,24 +498,24 @@ public class UserVmManagerTest {
 
     // Test scaleVm for Stopped vm.
     //@Test(expected=InvalidParameterValueException.class)
-    public void testScaleVMF3()  throws Exception {
+    public void testScaleVMF3() throws Exception {
 
-        ScaleVMCmd cmd = new ScaleVMCmd();
-        Class<?> _class = cmd.getClass();
+        final ScaleVMCmd cmd = new ScaleVMCmd();
+        final Class<?> _class = cmd.getClass();
 
-        Field idField = _class.getDeclaredField("id");
+        final Field idField = _class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(cmd, 1L);
 
-        Field serviceOfferingIdField = _class.getDeclaredField("serviceOfferingId");
+        final Field serviceOfferingIdField = _class.getDeclaredField("serviceOfferingId");
         serviceOfferingIdField.setAccessible(true);
         serviceOfferingIdField.set(cmd, 1L);
 
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
         doReturn(Hypervisor.HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
 
-        ServiceOffering so1 =  getSvcoffering(512);
-        ServiceOffering so2 =  getSvcoffering(256);
+        final ServiceOffering so1 = getSvcoffering(512);
+        final ServiceOffering so2 = getSvcoffering(256);
 
         when(_entityMgr.findById(eq(ServiceOffering.class), anyLong())).thenReturn(so2);
         when(_entityMgr.findById(ServiceOffering.class, 1L)).thenReturn(so1);
@@ -545,8 +527,8 @@ public class UserVmManagerTest {
 
         //when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
 
-        Account account = new AccountVO("testaccount", 1L, "networkdomain", (short)0, UUID.randomUUID().toString());
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, UUID.randomUUID().toString());
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
         CallContext.register(user, account);
         try {
             _userVmMgr.upgradeVirtualMachine(cmd);
@@ -557,16 +539,16 @@ public class UserVmManagerTest {
     }
 
     // Test scaleVm for Running vm. Full positive test.
-    public void testScaleVMF4()  throws Exception {
+    public void testScaleVMF4() throws Exception {
 
-        ScaleVMCmd cmd = new ScaleVMCmd();
-        Class<?> _class = cmd.getClass();
+        final ScaleVMCmd cmd = new ScaleVMCmd();
+        final Class<?> _class = cmd.getClass();
 
-        Field idField = _class.getDeclaredField("id");
+        final Field idField = _class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(cmd, 1L);
 
-        Field serviceOfferingIdField = _class.getDeclaredField("serviceOfferingId");
+        final Field serviceOfferingIdField = _class.getDeclaredField("serviceOfferingId");
         serviceOfferingIdField.setAccessible(true);
         serviceOfferingIdField.set(cmd, 1L);
 
@@ -578,8 +560,8 @@ public class UserVmManagerTest {
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
         doReturn(Hypervisor.HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
 
-        ServiceOffering so1 =  getSvcoffering(512);
-        ServiceOffering so2 =  getSvcoffering(256);
+        final ServiceOffering so1 = getSvcoffering(512);
+        final ServiceOffering so2 = getSvcoffering(256);
 
         when(_entityMgr.findById(eq(ServiceOffering.class), anyLong())).thenReturn(so2);
         when(_entityMgr.findById(ServiceOffering.class, 1L)).thenReturn(so1);
@@ -587,15 +569,15 @@ public class UserVmManagerTest {
         doReturn(VirtualMachine.State.Running).when(_vmInstance).getState();
 
         //when(ApiDBUtils.getCpuOverprovisioningFactor()).thenReturn(3f);
-        when(_capacityMgr.checkIfHostHasCapacity(anyLong(), anyInt(), anyLong(), anyBoolean(), anyFloat(), anyFloat(),  anyBoolean())).thenReturn(false);
+        when(_capacityMgr.checkIfHostHasCapacity(anyLong(), anyInt(), anyLong(), anyBoolean(), anyFloat(), anyFloat(), anyBoolean())).thenReturn(false);
         when(_itMgr.reConfigureVm(_vmInstance.getUuid(), so1, false)).thenReturn(_vmInstance);
 
         doReturn(true).when(_itMgr).upgradeVmDb(anyLong(), anyLong());
 
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
 
-        Account account = new AccountVO("testaccount", 1L, "networkdomain", (short)0, UUID.randomUUID().toString());
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, UUID.randomUUID().toString());
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
         CallContext.register(user, account);
         try {
             _userVmMgr.upgradeVirtualMachine(cmd);
@@ -605,50 +587,50 @@ public class UserVmManagerTest {
 
     }
 
-    private ServiceOfferingVO getSvcoffering(int ramSize) {
+    private ServiceOfferingVO getSvcoffering(final int ramSize) {
 
-        long id  = 4L;
-        String name = "name";
-        String displayText = "displayText";
-        int cpu = 1;
+        final long id = 4L;
+        final String name = "name";
+        final String displayText = "displayText";
+        final int cpu = 1;
         //int ramSize = 256;
-        int speed = 128;
+        final int speed = 128;
 
-        boolean ha = false;
-        boolean useLocalStorage = false;
+        final boolean ha = false;
+        final boolean useLocalStorage = false;
 
-        ServiceOfferingVO serviceOffering =
-            new ServiceOfferingVO(name, cpu, ramSize, speed, null, null, ha, displayText, Storage.ProvisioningType.THIN,
-                    useLocalStorage, false, null, false, null, false);
+        final ServiceOfferingVO serviceOffering =
+                new ServiceOfferingVO(name, cpu, ramSize, speed, null, null, ha, displayText, Storage.ProvisioningType.THIN,
+                        useLocalStorage, false, null, false, null, false);
         return serviceOffering;
     }
 
     // Test Move VM b/w accounts where caller is not ROOT/Domain admin
     @Test(expected = InvalidParameterValueException.class)
-    public void testMoveVmToUser1()  throws Exception {
-        AssignVMCmd cmd = new AssignVMCmd();
-        Class<?> _class = cmd.getClass();
+    public void testMoveVmToUser1() throws Exception {
+        final AssignVMCmd cmd = new AssignVMCmd();
+        final Class<?> _class = cmd.getClass();
 
-        Field virtualmachineIdField = _class.getDeclaredField("virtualMachineId");
+        final Field virtualmachineIdField = _class.getDeclaredField("virtualMachineId");
         virtualmachineIdField.setAccessible(true);
         virtualmachineIdField.set(cmd, 1L);
 
-        Field accountNameField = _class.getDeclaredField("accountName");
+        final Field accountNameField = _class.getDeclaredField("accountName");
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "account");
 
-        Field domainIdField = _class.getDeclaredField("domainId");
+        final Field domainIdField = _class.getDeclaredField("domainId");
         domainIdField.setAccessible(true);
         domainIdField.set(cmd, 1L);
 
         // caller is of type 0
-        Account caller = new AccountVO("testaccount", 1, "networkdomain", (short)0, UUID.randomUUID().toString());
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account caller = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
 
         CallContext.register(user, caller);
         try {
 
-        _userVmMgr.moveVMToUser(cmd);
+            _userVmMgr.moveVMToUser(cmd);
         } finally {
             CallContext.unregister();
         }
@@ -656,30 +638,30 @@ public class UserVmManagerTest {
 
     // Test Move VM b/w accounts where caller doesn't have access to the old or new account
     @Test(expected = PermissionDeniedException.class)
-    public void testMoveVmToUser2()  throws Exception {
-        AssignVMCmd cmd = new AssignVMCmd();
-        Class<?> _class = cmd.getClass();
+    public void testMoveVmToUser2() throws Exception {
+        final AssignVMCmd cmd = new AssignVMCmd();
+        final Class<?> _class = cmd.getClass();
 
-        Field virtualmachineIdField = _class.getDeclaredField("virtualMachineId");
+        final Field virtualmachineIdField = _class.getDeclaredField("virtualMachineId");
         virtualmachineIdField.setAccessible(true);
         virtualmachineIdField.set(cmd, 1L);
 
-        Field accountNameField = _class.getDeclaredField("accountName");
+        final Field accountNameField = _class.getDeclaredField("accountName");
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "account");
 
-        Field domainIdField = _class.getDeclaredField("domainId");
+        final Field domainIdField = _class.getDeclaredField("domainId");
         domainIdField.setAccessible(true);
         domainIdField.set(cmd, 1L);
 
         // caller is of type 0
-        Account caller = new AccountVO("testaccount", 1, "networkdomain", (short)1, UUID.randomUUID().toString());
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account caller = new AccountVO("testaccount", 1, "networkdomain", (short) 1, UUID.randomUUID().toString());
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
 
-        Account oldAccount = new AccountVO("testaccount", 1, "networkdomain", (short)0, UUID.randomUUID().toString());
-        Account newAccount = new AccountVO("testaccount", 1, "networkdomain", (short)1, UUID.randomUUID().toString());
+        final Account oldAccount = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
+        final Account newAccount = new AccountVO("testaccount", 1, "networkdomain", (short) 1, UUID.randomUUID().toString());
 
-        UserVmVO vm = new UserVmVO(10L, "test", "test", 1L, HypervisorType.Any, 1L, false, false, 1L, 1L, 1, 5L, "test", "test", 1L);
+        final UserVmVO vm = new UserVmVO(10L, "test", "test", 1L, HypervisorType.Any, 1L, false, false, 1L, 1L, 1, 5L, "test", "test", 1L);
         vm.setState(VirtualMachine.State.Stopped);
         when(_vmDao.findById(anyLong())).thenReturn(vm);
 
@@ -688,7 +670,7 @@ public class UserVmManagerTest {
         when(_accountService.getActiveAccountByName(anyString(), anyLong())).thenReturn(newAccount);
 
         doThrow(new PermissionDeniedException("Access check failed")).when(_accountMgr).checkAccess(any(Account.class), any(AccessType.class), any(Boolean.class),
-            any(ControlledEntity.class));
+                any(ControlledEntity.class));
 
         CallContext.register(user, caller);
 
@@ -703,18 +685,18 @@ public class UserVmManagerTest {
 
     @Test
     public void testUpdateVmNicIpSuccess1() throws Exception {
-        UpdateVmNicIpCmd cmd = new UpdateVmNicIpCmd();
-        Class<?> _class = cmd.getClass();
+        final UpdateVmNicIpCmd cmd = new UpdateVmNicIpCmd();
+        final Class<?> _class = cmd.getClass();
 
-        Field virtualmachineIdField = _class.getDeclaredField("nicId");
+        final Field virtualmachineIdField = _class.getDeclaredField("nicId");
         virtualmachineIdField.setAccessible(true);
         virtualmachineIdField.set(cmd, 1L);
 
-        Field accountNameField = _class.getDeclaredField("ipAddr");
+        final Field accountNameField = _class.getDeclaredField("ipAddr");
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);
@@ -722,7 +704,7 @@ public class UserVmManagerTest {
         when(_networkOfferingDao.findByIdIncludingRemoved(anyLong())).thenReturn(_networkOfferingMock);
         doReturn(10L).when(_networkOfferingMock).getId();
 
-        List<Service> services = new ArrayList<Service>();
+        final List<Service> services = new ArrayList<>();
         services.add(Service.Dhcp);
         when(_networkModel.listNetworkOfferingServices(anyLong())).thenReturn(services);
         when(_vmMock.getState()).thenReturn(State.Stopped);
@@ -739,8 +721,8 @@ public class UserVmManagerTest {
         doNothing().when(_networkMgr).implementNetworkElementsAndResources(Mockito.any(DeployDestination.class), Mockito.any(ReservationContext.class), Mockito.eq(_networkMock), Mockito.eq(_networkOfferingMock));
         when(_nicDao.persist(any(NicVO.class))).thenReturn(nic);
 
-        Account caller = new AccountVO("testaccount", 1, "networkdomain", (short)0, UUID.randomUUID().toString());
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account caller = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
         CallContext.register(user, caller);
         try {
             _userVmMgr.updateNicIpForVirtualMachine(cmd);
@@ -751,18 +733,18 @@ public class UserVmManagerTest {
 
     @Test
     public void testUpdateVmNicIpSuccess2() throws Exception {
-        UpdateVmNicIpCmd cmd = new UpdateVmNicIpCmd();
-        Class<?> _class = cmd.getClass();
+        final UpdateVmNicIpCmd cmd = new UpdateVmNicIpCmd();
+        final Class<?> _class = cmd.getClass();
 
-        Field virtualmachineIdField = _class.getDeclaredField("nicId");
+        final Field virtualmachineIdField = _class.getDeclaredField("nicId");
         virtualmachineIdField.setAccessible(true);
         virtualmachineIdField.set(cmd, 1L);
 
-        Field accountNameField = _class.getDeclaredField("ipAddr");
+        final Field accountNameField = _class.getDeclaredField("ipAddr");
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);
@@ -770,7 +752,7 @@ public class UserVmManagerTest {
         when(_networkOfferingDao.findByIdIncludingRemoved(anyLong())).thenReturn(_networkOfferingMock);
         doReturn(10L).when(_networkOfferingMock).getId();
 
-        List<Service> services = new ArrayList<Service>();
+        final List<Service> services = new ArrayList<>();
         when(_networkModel.listNetworkOfferingServices(anyLong())).thenReturn(services);
         when(_vmMock.getState()).thenReturn(State.Running);
         doNothing().when(_accountMgr).checkAccess(_account, null, true, _vmMock);
@@ -786,8 +768,8 @@ public class UserVmManagerTest {
         when(_ipAddressDao.findByIpAndSourceNetworkId(anyLong(), anyString())).thenReturn(null);
         when(_nicDao.persist(any(NicVO.class))).thenReturn(nic);
 
-        Account caller = new AccountVO("testaccount", 1, "networkdomain", (short)0, UUID.randomUUID().toString());
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account caller = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
         CallContext.register(user, caller);
         try {
             _userVmMgr.updateNicIpForVirtualMachine(cmd);
@@ -799,18 +781,18 @@ public class UserVmManagerTest {
     // vm is running in network with dhcp support
     @Test(expected = InvalidParameterValueException.class)
     public void testUpdateVmNicIpFailure1() throws Exception {
-        UpdateVmNicIpCmd cmd = new UpdateVmNicIpCmd();
-        Class<?> _class = cmd.getClass();
+        final UpdateVmNicIpCmd cmd = new UpdateVmNicIpCmd();
+        final Class<?> _class = cmd.getClass();
 
-        Field virtualmachineIdField = _class.getDeclaredField("nicId");
+        final Field virtualmachineIdField = _class.getDeclaredField("nicId");
         virtualmachineIdField.setAccessible(true);
         virtualmachineIdField.set(cmd, 1L);
 
-        Field accountNameField = _class.getDeclaredField("ipAddr");
+        final Field accountNameField = _class.getDeclaredField("ipAddr");
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);
@@ -819,13 +801,13 @@ public class UserVmManagerTest {
         when(_networkOfferingDao.findByIdIncludingRemoved(anyLong())).thenReturn(_networkOfferingMock);
         doReturn(10L).when(_networkOfferingMock).getId();
 
-        List<Service> services = new ArrayList<Service>();
+        final List<Service> services = new ArrayList<>();
         services.add(Service.Dhcp);
         when(_networkModel.listNetworkOfferingServices(anyLong())).thenReturn(services);
         when(_vmMock.getState()).thenReturn(State.Running);
 
-        Account caller = new AccountVO("testaccount", 1, "networkdomain", (short)0, UUID.randomUUID().toString());
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account caller = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
         CallContext.register(user, caller);
         try {
             _userVmMgr.updateNicIpForVirtualMachine(cmd);
@@ -837,18 +819,18 @@ public class UserVmManagerTest {
     // vm is stopped in isolated network in advanced zone
     @Test(expected = InvalidParameterValueException.class)
     public void testUpdateVmNicIpFailure2() throws Exception {
-        UpdateVmNicIpCmd cmd = new UpdateVmNicIpCmd();
-        Class<?> _class = cmd.getClass();
+        final UpdateVmNicIpCmd cmd = new UpdateVmNicIpCmd();
+        final Class<?> _class = cmd.getClass();
 
-        Field virtualmachineIdField = _class.getDeclaredField("nicId");
+        final Field virtualmachineIdField = _class.getDeclaredField("nicId");
         virtualmachineIdField.setAccessible(true);
         virtualmachineIdField.set(cmd, 1L);
 
-        Field accountNameField = _class.getDeclaredField("ipAddr");
+        final Field accountNameField = _class.getDeclaredField("ipAddr");
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);
@@ -856,7 +838,7 @@ public class UserVmManagerTest {
         when(_networkOfferingDao.findByIdIncludingRemoved(anyLong())).thenReturn(_networkOfferingMock);
         doReturn(10L).when(_networkOfferingMock).getId();
 
-        List<Service> services = new ArrayList<Service>();
+        final List<Service> services = new ArrayList<>();
         services.add(Service.Dhcp);
         when(_networkModel.listNetworkOfferingServices(anyLong())).thenReturn(services);
         when(_vmMock.getState()).thenReturn(State.Stopped);
@@ -871,8 +853,8 @@ public class UserVmManagerTest {
 
         when(_ipAddrMgr.allocateGuestIP(Mockito.eq(_networkMock), anyString())).thenReturn(null);
 
-        Account caller = new AccountVO("testaccount", 1, "networkdomain", (short)0, UUID.randomUUID().toString());
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account caller = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
         CallContext.register(user, caller);
         try {
             _userVmMgr.updateNicIpForVirtualMachine(cmd);
@@ -884,18 +866,18 @@ public class UserVmManagerTest {
     // vm is stopped in shared network in advanced zone
     @Test(expected = InvalidParameterValueException.class)
     public void testUpdateVmNicIpFailure3() throws Exception {
-        UpdateVmNicIpCmd cmd = new UpdateVmNicIpCmd();
-        Class<?> _class = cmd.getClass();
+        final UpdateVmNicIpCmd cmd = new UpdateVmNicIpCmd();
+        final Class<?> _class = cmd.getClass();
 
-        Field virtualmachineIdField = _class.getDeclaredField("nicId");
+        final Field virtualmachineIdField = _class.getDeclaredField("nicId");
         virtualmachineIdField.setAccessible(true);
         virtualmachineIdField.set(cmd, 1L);
 
-        Field accountNameField = _class.getDeclaredField("ipAddr");
+        final Field accountNameField = _class.getDeclaredField("ipAddr");
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);
@@ -903,7 +885,7 @@ public class UserVmManagerTest {
         when(_networkOfferingDao.findByIdIncludingRemoved(anyLong())).thenReturn(_networkOfferingMock);
         doReturn(10L).when(_networkOfferingMock).getId();
 
-        List<Service> services = new ArrayList<Service>();
+        final List<Service> services = new ArrayList<>();
         services.add(Service.Dhcp);
         when(_networkModel.listNetworkOfferingServices(anyLong())).thenReturn(services);
         when(_vmMock.getState()).thenReturn(State.Stopped);
@@ -918,8 +900,8 @@ public class UserVmManagerTest {
 
         when(_ipAddrMgr.allocatePublicIpForGuestNic(Mockito.eq(_networkMock), anyLong(), Mockito.eq(_accountMock), anyString())).thenReturn(null);
 
-        Account caller = new AccountVO("testaccount", 1, "networkdomain", (short)0, UUID.randomUUID().toString());
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account caller = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
         CallContext.register(user, caller);
         try {
             _userVmMgr.updateNicIpForVirtualMachine(cmd);

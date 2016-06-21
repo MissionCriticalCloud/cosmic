@@ -1,33 +1,133 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>cloud-engine-schema</artifactId>
-  <name>Cosmic Cloud Engine Schema Component</name>
-  <parent>
-    <groupId>cloud.cosmic</groupId>
-    <artifactId>cloud-engine</artifactId>
-    <version>5.1.0.1-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
-  <dependencies>
-    <dependency>
-      <groupId>cloud.cosmic</groupId>
-      <artifactId>cloud-engine-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>cloud.cosmic</groupId>
-      <artifactId>cloud-framework-ipc</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>cloud.cosmic</groupId>
-      <artifactId>cloud-framework-config</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>cloud.cosmic</groupId>
-      <artifactId>cloud-framework-db</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cloud-engine-schema</artifactId>
+    <name>Cosmic Cloud Engine Schema Component</name>
+    <parent>
+        <groupId>cloud.cosmic</groupId>
+        <artifactId>cloud-engine</artifactId>
+        <version>5.1.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <dependencies>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-ipc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-db</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <!-- default deploydb property -->
+            <id>deploydb</id>
+            <build>
+                <defaultGoal>process-test-resources</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>properties-maven-plugin</artifactId>
+                        <version>1.0-alpha-2</version>
+                        <executions>
+                            <execution>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>read-project-properties</goal>
+                                </goals>
+                                <configuration>
+                                    <files>
+                                        <file>${basedir}/../../utils/conf/db.properties</file>
+                                        <file>${basedir}/../../utils/conf/db.properties.override</file>
+                                    </files>
+                                    <quiet>true</quiet>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <filter token="VERSION" value="${project.version}"/>
+                                        <copy todir="${basedir}/target/db" filtering="true">
+                                            <fileset dir="${basedir}/../../setup/db/"/>
+                                        </copy>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.2.1</version>
+                        <executions>
+                            <execution>
+                                <phase>process-test-resources</phase>
+                                <id>create-schema</id>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <mainClass>com.cloud.upgrade.DatabaseCreator</mainClass>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <arguments>
+                                <!-- db properties file -->
+                                <argument>${basedir}/../../utils/conf/db.properties</argument>
+                                <argument>${basedir}/../../utils/conf/db.properties.override</argument>
+                                <!-- Create default schema and db table views -->
+                                <argument>${basedir}/target/db/create-schema.sql</argument>
+                                <argument>${basedir}/target/db/create-schema-premium.sql</argument>
+                                <!-- Seed templates -->
+                                <argument>${basedir}/target/db/templates.sql</argument>
+                                <!-- Seed the database -->
+                                <argument>${basedir}/target/test-classes/developer-prefill.sql</argument>
+                                <argument>${basedir}/target/test-classes/developer-prefill.sql.override</argument>
+                                <!-- Do database upgrade-->
+                                <argument>com.cloud.upgrade.DatabaseUpgradeChecker</argument>
+                                <argument>--database=cloud,usage</argument>
+                                <argument>--rootpassword=${db.root.password}</argument>
+                                <!-- Print help using -h or dash-dash-help -->
+                                <!-- Do dry run using -d or dash-dash-dry -->
+                                <!-- Enable verbosity by -v or dash-dash-verbose -->
+                            </arguments>
+                            <systemProperties>
+                                <systemProperty>
+                                    <key>catalina.home</key>
+                                    <value>${basedir}/../utils</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <key>paths.script</key>
+                                    <value>${basedir}/target/db</value>
+                                </systemProperty>
+                            </systemProperties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

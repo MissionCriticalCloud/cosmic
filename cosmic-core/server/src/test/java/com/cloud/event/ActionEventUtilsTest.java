@@ -16,16 +16,8 @@
 // under the License.
 package com.cloud.event;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
 import com.cloud.configuration.Config;
+import com.cloud.dao.EntityManager;
 import com.cloud.event.dao.EventDao;
 import com.cloud.network.IpAddress;
 import com.cloud.projects.dao.ProjectDao;
@@ -35,11 +27,9 @@ import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.db.EntityManager;
 import com.cloud.vm.VirtualMachine;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.events.Event;
@@ -56,6 +46,10 @@ import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import javax.inject.Inject;
+import java.lang.reflect.Field;
+import java.util.*;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ComponentContext.class)
@@ -101,6 +95,7 @@ public class ActionEventUtilsTest {
      * Because ActionEventUtils has static methods, we must also remember these fields
      * and restore them later, as otherwise strange behavior can result in other unit
      * tests due to the way the JVM handles static fields.
+     *
      * @throws Exception
      */
     @Before
@@ -109,21 +104,20 @@ public class ActionEventUtilsTest {
         staticFieldValues = new HashMap<>();
         setupCommonMocks();
 
-        ActionEventUtils utils = new ActionEventUtils();
+        final ActionEventUtils utils = new ActionEventUtils();
 
-        for (Field field : ActionEventUtils.class.getDeclaredFields()) {
+        for (final Field field : ActionEventUtils.class.getDeclaredFields()) {
             if (field.getAnnotation(Inject.class) != null) {
                 field.setAccessible(true);
 
                 try {
                     //Inject the mocked field from this class into the ActionEventUtils
                     //and keep track of its original value.
-                    Field mockField = this.getClass().getDeclaredField(field.getName());
+                    final Field mockField = this.getClass().getDeclaredField(field.getName());
                     field.set(utils, mockField.get(this));
-                    Field staticField = ActionEventUtils.class.getDeclaredField("s_" + field.getName());
+                    final Field staticField = ActionEventUtils.class.getDeclaredField("s_" + field.getName());
                     staticFieldValues.put(field.getName(), staticField.get(null));
-                }
-                catch (Exception e) {
+                } catch (final Exception e) {
                     // ignore missing fields
                 }
             }
@@ -147,9 +141,9 @@ public class ActionEventUtilsTest {
         //methods.
         Mockito.when(eventDao.persist(Mockito.any(EventVO.class))).thenAnswer(new Answer<EventVO>() {
             @Override
-            public EventVO answer(InvocationOnMock invocation) throws Throwable {
-                EventVO event = (EventVO)invocation.getArguments()[0];
-                Field id = event.getClass().getDeclaredField("id");
+            public EventVO answer(final InvocationOnMock invocation) throws Throwable {
+                final EventVO event = (EventVO) invocation.getArguments()[0];
+                final Field id = event.getClass().getDeclaredField("id");
                 id.setAccessible(true);
                 id.set(event, EVENT_ID);
                 return event;
@@ -158,8 +152,9 @@ public class ActionEventUtilsTest {
 
         //Needed to record events published on the bus.
         Mockito.doAnswer(new Answer<Void>() {
-            @Override public Void answer(InvocationOnMock invocation) throws Throwable {
-                Event event = (Event)invocation.getArguments()[0];
+            @Override
+            public Void answer(final InvocationOnMock invocation) throws Throwable {
+                final Event event = (Event) invocation.getArguments()[0];
                 publishedEvents.add(event);
                 return null;
             }
@@ -173,15 +168,14 @@ public class ActionEventUtilsTest {
      */
     @After
     public void teardown() {
-        ActionEventUtils utils = new ActionEventUtils();
+        final ActionEventUtils utils = new ActionEventUtils();
 
-        for (String fieldName : staticFieldValues.keySet()) {
+        for (final String fieldName : staticFieldValues.keySet()) {
             try {
-                Field field = ActionEventUtils.class.getDeclaredField(fieldName);
+                final Field field = ActionEventUtils.class.getDeclaredField(fieldName);
                 field.setAccessible(true);
                 field.set(utils, staticFieldValues.get(fieldName));
-            }
-            catch (Exception e) {
+            } catch (final Exception e) {
                 e.printStackTrace();
             }
         }
@@ -191,9 +185,9 @@ public class ActionEventUtilsTest {
 
     @Test
     public void testPopulateFirstClassEntities() {
-        AccountVO account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
+        final AccountVO account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
         account.setId(ACCOUNT_ID);
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone",
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone",
                 UUID.randomUUID().toString(), User.Source.UNKNOWN);
 
         Mockito.when(accountDao.findById(ACCOUNT_ID)).thenReturn(account);
@@ -202,8 +196,8 @@ public class ActionEventUtilsTest {
         CallContext.register(user, account);
 
         //Inject some entity UUIDs into the call context
-        String instanceUuid = UUID.randomUUID().toString();
-        String ipUuid = UUID.randomUUID().toString();
+        final String instanceUuid = UUID.randomUUID().toString();
+        final String ipUuid = UUID.randomUUID().toString();
         CallContext.current().putContextParameter(VirtualMachine.class, instanceUuid);
         CallContext.current().putContextParameter(IpAddress.class, ipUuid);
 
@@ -213,10 +207,10 @@ public class ActionEventUtilsTest {
         Assert.assertNotEquals(publishedEvents.size(), 0);
         Assert.assertEquals(publishedEvents.size(), 1);
 
-        Event event = publishedEvents.get(0);
+        final Event event = publishedEvents.get(0);
         Assert.assertNotNull(event.getDescription());
 
-        JsonObject json = new JsonParser().parse(event.getDescription()).getAsJsonObject();
+        final JsonObject json = new JsonParser().parse(event.getDescription()).getAsJsonObject();
 
         Assert.assertTrue(json.has("VirtualMachine"));
         Assert.assertTrue(json.has("IpAddress"));
