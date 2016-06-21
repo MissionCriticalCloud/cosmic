@@ -176,7 +176,6 @@
               <exclude>services/console-proxy/server/conf/environment.properties</exclude>
               <exclude>services/secondary-storage/conf/agent.properties</exclude>
               <exclude>services/secondary-storage/conf/environment.properties</exclude>
-              <exclude>test/systemvm/README.md</exclude>
               <exclude>tools/appliance/.ruby-version</exclude>
               <exclude>tools/vagrant/systemvm/vagrant.pub</exclude>
               <exclude>tools/vagrant/systemvm/.ruby-version</exclude>
@@ -309,7 +308,6 @@
     <profile>
       <id>developer</id>
       <modules>
-        <module>test</module>
         <module>developer</module>
         <module>tools</module>
       </modules>
