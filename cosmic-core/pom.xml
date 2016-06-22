@@ -15,19 +15,6 @@
     <description>Cosmic is an IaaS (“Infrastructure as a Service”) cloud orchestration platform.</description>
     <url>http://www.cosmic.cloud</url>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <organization>
-        <name>The Apache Software Foundation</name>
-        <url>http://www.apache.org/</url>
-    </organization>
-
     <modules>
         <module>api</module>
         <module>nucleo</module>
@@ -39,12 +26,6 @@
         <module>framework</module>
         <module>services</module>
     </modules>
-
-    <scm>
-        <connection>scm:git:git@github.com:MissionCriticalCloud/${project.artifactId}.git</connection>
-        <developerConnection>scm:git:git@github.com:MissionCriticalCloud/${project.artifactId}.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
 
     <dependencies>
         <dependency>

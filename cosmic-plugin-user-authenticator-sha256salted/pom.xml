@@ -32,31 +32,6 @@
         </dependency>
     </dependencies>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>checkstyle-maven-repo</id>
-            <name>MCC Maven Repo</name>
-            <url>https://github.com/MissionCriticalCloud/maven-repo/raw/checkstyle/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-
-    <scm>
-        <connection>scm:git:git@github.com:MissionCriticalCloud/cosmic-plugin-user-authenticator-sha256salted.git
-        </connection>
-        <developerConnection>
-            scm:git:git@github.com:MissionCriticalCloud/cosmic-plugin-user-authenticator-sha256salted.git
-        </developerConnection>
-        <tag>HEAD</tag>
-    </scm>
-
     <build>
         <plugins>
             <plugin>
