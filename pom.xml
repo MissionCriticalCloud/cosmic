@@ -64,7 +64,6 @@
         <cs.commons-lang3.version>3.4</cs.commons-lang3.version>
         <cs.commons-net.version>3.3</cs.commons-net.version>
         <cs.commons-validator.version>1.4.0</cs.commons-validator.version>
-        <cs.ehcache-core.version>2.6.9</cs.ehcache-core.version>
         <cs.ejb-api.version>3.0</cs.ejb-api.version>
         <cs.esapi.version>2.1.0</cs.esapi.version>
         <cs.guava-testlib.version>18.0</cs.guava-testlib.version>
@@ -116,6 +115,7 @@
         <module>cosmic-plugin-hypervisor-kvm</module>
         <module>cosmic-plugin-hypervisor-ovm3</module>
         <module>cosmic-plugin-hypervisor-xenserver</module>
+        <module>cosmic-plugin-network-nicira-nvp</module>
         <module>cosmic-plugin-user-authenticator-ldap</module>
         <module>cosmic-plugin-user-authenticator-sha256salted</module>
     </modules>
@@ -205,11 +205,7 @@
                 <artifactId>cglib-nodep</artifactId>
                 <version>${cs.cglib-nodep.version}</version>
             </dependency>
-            <dependency>
-                <groupId>net.sf.ehcache</groupId>
-                <artifactId>ehcache-core</artifactId>
-                <version>${cs.ehcache-core.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
