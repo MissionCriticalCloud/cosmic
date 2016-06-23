@@ -108,11 +108,6 @@
         </license>
     </licenses>
 
-    <organization>
-        <name>The Apache Software Foundation</name>
-        <url>http://www.apache.org/</url>
-    </organization>
-
     <modules>
         <module>cosmic-agent</module>
         <module>cosmic-client</module>

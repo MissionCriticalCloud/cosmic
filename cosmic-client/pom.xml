@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-client-ui</artifactId>
     <name>Cosmic Client UI</name>
@@ -247,12 +248,6 @@
         </dependency>
     </dependencies>
 
-    <scm>
-        <connection>scm:git:git@github.com:MissionCriticalCloud/cosmic-client.git</connection>
-        <developerConnection>scm:git:git@github.com:MissionCriticalCloud/cosmic-client.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
-
     <build>
         <plugins>
             <plugin>
@@ -427,74 +422,79 @@
                         <configuration>
                             <target>
                                 <copy todir="${basedir}/target/generated-webapp/WEB-INF/classes/scripts">
-                                    <fileset dir="${project.build.directory}/scripts" />
+                                    <fileset dir="${project.build.directory}/scripts"/>
                                 </copy>
                                 <!-- CLOUDSTACK-1304 -->
-                                <chmod perm="755" file="${basedir}/target/generated-webapp/WEB-INF/classes/scripts/**" type="both" />
+                                <chmod perm="755" file="${basedir}/target/generated-webapp/WEB-INF/classes/scripts/**"
+                                       type="both"/>
                                 <copy todir="${basedir}/target/generated-webapp/WEB-INF/">
                                     <fileset dir="${basedir}/WEB-INF/">
-                                        <include name="web.xml" />
+                                        <include name="web.xml"/>
                                     </fileset>
                                 </copy>
                                 <copy todir="${basedir}/target/generated-webapp/WEB-INF/classes">
                                     <fileset dir="${basedir}/WEB-INF/classes">
-                                        <include name="resources/**/*" />
+                                        <include name="resources/**/*"/>
                                     </fileset>
                                 </copy>
                                 <copy todir="${basedir}/target/generated-webapp">
-                                    <fileset dir="${basedir}/cosmic-ui" />
+                                    <fileset dir="${basedir}/cosmic-ui"/>
                                 </copy>
                                 <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes">
                                     <fileset dir="${basedir}/tomcatconf">
-                                        <include name="*.in" />
+                                        <include name="*.in"/>
                                     </fileset>
-                                    <globmapper from="*.in" to="*" />
+                                    <globmapper from="*.in" to="*"/>
                                     <filterchain>
                                         <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile" value="${project.build.directory}/${cs.replace.properties}" />
+                                            <param type="propertiesfile"
+                                                   value="${project.build.directory}/${cs.replace.properties}"/>
                                         </filterreader>
                                     </filterchain>
                                 </copy>
                                 <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes">
                                     <fileset dir="${basedir}/tomcatconf">
-                                        <exclude name="*.in" />
+                                        <exclude name="*.in"/>
                                     </fileset>
                                 </copy>
                                 <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes/bin">
                                     <fileset dir="${project.build.directory}/setup/bindir">
-                                        <include name="*.in" />
+                                        <include name="*.in"/>
                                     </fileset>
-                                    <globmapper from="*.in" to="*" />
+                                    <globmapper from="*.in" to="*"/>
                                     <filterchain>
                                         <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile" value="${project.build.directory}/${cs.replace.properties}" />
+                                            <param type="propertiesfile"
+                                                   value="${project.build.directory}/${cs.replace.properties}"/>
                                         </filterreader>
                                     </filterchain>
                                 </copy>
                                 <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes/db">
                                     <fileset dir="${project.build.directory}/setup/db/db">
-                                        <include name="**/*" />
+                                        <include name="**/*"/>
                                     </fileset>
                                     <filterchain>
                                         <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile" value="${project.build.directory}/${cs.replace.properties}" />
+                                            <param type="propertiesfile"
+                                                   value="${project.build.directory}/${cs.replace.properties}"/>
                                         </filterreader>
                                     </filterchain>
                                 </copy>
                                 <copy overwrite="true" todir="${basedir}/target/conf">
                                     <fileset dir="${basedir}/tomcatconf">
-                                        <include name="*.in" />
+                                        <include name="*.in"/>
                                     </fileset>
-                                    <globmapper from="*.in" to="*" />
+                                    <globmapper from="*.in" to="*"/>
                                     <filterchain>
                                         <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile" value="${project.build.directory}/${cs.replace.properties}" />
+                                            <param type="propertiesfile"
+                                                   value="${project.build.directory}/${cs.replace.properties}"/>
                                         </filterreader>
                                     </filterchain>
                                 </copy>
                                 <copy overwrite="true" todir="${basedir}/target/conf">
                                     <fileset dir="${basedir}/tomcatconf">
-                                        <exclude name="*.in" />
+                                        <exclude name="*.in"/>
                                     </fileset>
                                 </copy>
                             </target>
