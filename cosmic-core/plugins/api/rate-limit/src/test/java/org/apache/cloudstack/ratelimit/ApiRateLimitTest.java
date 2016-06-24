@@ -16,56 +16,47 @@
 // under the License.
 package org.apache.cloudstack.ratelimit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.Collections;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.configuration.Config;
 import com.cloud.exception.RequestLimitException;
-import com.cloud.user.Account;
-import com.cloud.user.AccountService;
-import com.cloud.user.AccountVO;
-import com.cloud.user.User;
-import com.cloud.user.UserVO;
-
+import com.cloud.user.*;
 import org.apache.cloudstack.api.response.ApiLimitResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.naming.ConfigurationException;
+import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class ApiRateLimitTest {
 
     static ApiRateLimitServiceImpl s_limitService = new ApiRateLimitServiceImpl();
     static AccountService s_accountService = mock(AccountService.class);
     static ConfigurationDao s_configDao = mock(ConfigurationDao.class);
-    private static long s_acctIdSeq = 5L;
+    private static final long s_acctIdSeq = 5L;
     private static Account s_testAccount;
 
     @BeforeClass
-public static void setUp() throws ConfigurationException {
-
+    public static void setUp() throws ConfigurationException {
         when(s_configDao.getValue(Config.ApiLimitInterval.key())).thenReturn(null);
         when(s_configDao.getValue(Config.ApiLimitMax.key())).thenReturn(null);
         when(s_configDao.getValue(Config.ApiLimitCacheSize.key())).thenReturn(null);
         when(s_configDao.getValue(Config.ApiLimitEnabled.key())).thenReturn("true"); // enable api rate limiting
         s_limitService._configDao = s_configDao;
 
-        s_limitService.configure("ApiRateLimitTest", Collections.<String, Object> emptyMap());
+        s_limitService.configure("ApiRateLimitTest", Collections.<String, Object>emptyMap());
 
         s_limitService._accountService = s_accountService;
 
         // Standard responses
-        AccountVO acct = new AccountVO(s_acctIdSeq);
+        final AccountVO acct = new AccountVO(s_acctIdSeq);
         acct.setType(Account.ACCOUNT_TYPE_NORMAL);
         acct.setAccountName("demo");
         s_testAccount = acct;
@@ -81,27 +72,27 @@ public static void setUp() throws ConfigurationException {
     }
 
     private User createFakeUser() {
-        UserVO user = new UserVO();
+        final UserVO user = new UserVO();
         user.setAccountId(s_acctIdSeq);
         return user;
     }
 
-    private boolean isUnderLimit(User key) {
+    private boolean isUnderLimit(final User key) {
         try {
             s_limitService.checkAccess(key, null);
             return true;
-        } catch (RequestLimitException ex) {
+        } catch (final RequestLimitException ex) {
             return false;
         }
     }
 
     @Test
     public void sequentialApiAccess() {
-        int allowedRequests = 1;
+        final int allowedRequests = 1;
         s_limitService.setMaxAllowed(allowedRequests);
         s_limitService.setTimeToLive(1);
 
-        User key = createFakeUser();
+        final User key = createFakeUser();
         assertTrue("Allow for the first request", isUnderLimit(key));
 
         assertFalse("Second request should be blocked, since we assume that the two api " + " accesses take less than a second to perform", isUnderLimit(key));
@@ -109,11 +100,11 @@ public static void setUp() throws ConfigurationException {
 
     @Test
     public void canDoReasonableNumberOfApiAccessPerSecond() throws Exception {
-        int allowedRequests = 200;
+        final int allowedRequests = 200;
         s_limitService.setMaxAllowed(allowedRequests);
         s_limitService.setTimeToLive(1);
 
-        User key = createFakeUser();
+        final User key = createFakeUser();
 
         for (int i = 0; i < allowedRequests; i++) {
             assertTrue("We should allow " + allowedRequests + " requests per second, but failed at request " + i, isUnderLimit(key));
@@ -124,14 +115,14 @@ public static void setUp() throws ConfigurationException {
 
     @Test
     public void multipleClientsCanAccessWithoutBlocking() throws Exception {
-        int allowedRequests = 200;
+        final int allowedRequests = 200;
         s_limitService.setMaxAllowed(allowedRequests);
         s_limitService.setTimeToLive(1);
 
         final User key = createFakeUser();
 
-        int clientCount = allowedRequests;
-        Runnable[] clients = new Runnable[clientCount];
+        final int clientCount = allowedRequests;
+        final Runnable[] clients = new Runnable[clientCount];
         final boolean[] isUsable = new boolean[clientCount];
 
         final CountDownLatch startGate = new CountDownLatch(1);
@@ -152,7 +143,7 @@ public static void setUp() throws ConfigurationException {
 
                         isUsable[j] = isUnderLimit(key);
 
-                    } catch (InterruptedException e) {
+                    } catch (final InterruptedException e) {
                         e.printStackTrace();
                     } finally {
                         endGate.countDown();
@@ -161,9 +152,9 @@ public static void setUp() throws ConfigurationException {
             };
         }
 
-        ExecutorService executor = Executors.newFixedThreadPool(clientCount);
+        final ExecutorService executor = Executors.newFixedThreadPool(clientCount);
 
-        for (Runnable runnable : clients) {
+        for (final Runnable runnable : clients) {
             executor.execute(runnable);
         }
 
@@ -171,18 +162,18 @@ public static void setUp() throws ConfigurationException {
 
         endGate.await();
 
-        for (boolean b : isUsable) {
+        for (final boolean b : isUsable) {
             assertTrue("Concurrent client request should be allowed within limit", b);
         }
     }
 
     @Test
     public void expiryOfCounterIsSupported() throws Exception {
-        int allowedRequests = 1;
+        final int allowedRequests = 1;
         s_limitService.setMaxAllowed(allowedRequests);
         s_limitService.setTimeToLive(1);
 
-        User key = createFakeUser();
+        final User key = createFakeUser();
 
         assertTrue("The first request should be allowed", isUnderLimit(key));
 
@@ -194,11 +185,11 @@ public static void setUp() throws ConfigurationException {
 
     @Test
     public void verifyResetCounters() throws Exception {
-        int allowedRequests = 1;
+        final int allowedRequests = 1;
         s_limitService.setMaxAllowed(allowedRequests);
         s_limitService.setTimeToLive(1);
 
-        User key = createFakeUser();
+        final User key = createFakeUser();
 
         assertTrue("The first request should be allowed", isUnderLimit(key));
 
@@ -211,17 +202,17 @@ public static void setUp() throws ConfigurationException {
 
     @Test
     public void verifySearchCounter() throws Exception {
-        int allowedRequests = 10;
+        final int allowedRequests = 10;
         s_limitService.setMaxAllowed(allowedRequests);
         s_limitService.setTimeToLive(1);
 
-        User key = createFakeUser();
+        final User key = createFakeUser();
 
         for (int i = 0; i < 5; i++) {
             assertTrue("Issued 5 requests", isUnderLimit(key));
         }
 
-        ApiLimitResponse response = s_limitService.searchApiLimit(s_testAccount);
+        final ApiLimitResponse response = s_limitService.searchApiLimit(s_testAccount);
         assertEquals("apiIssued is incorrect", 5, response.getApiIssued());
         assertEquals("apiAllowed is incorrect", 5, response.getApiAllowed());
         // using <= to account for inaccurate System.currentTimeMillis() clock in Windows environment
@@ -232,19 +223,19 @@ public static void setUp() throws ConfigurationException {
     @Test
     public void disableApiLimit() throws Exception {
         try {
-            int allowedRequests = 200;
+            final int allowedRequests = 200;
             s_limitService.setMaxAllowed(allowedRequests);
             s_limitService.setTimeToLive(1);
             s_limitService.setEnabled(false);
 
-            User key = createFakeUser();
+            final User key = createFakeUser();
 
             for (int i = 0; i < allowedRequests + 1; i++) {
                 assertTrue("We should allow more than " + allowedRequests + " requests per second when api throttling is disabled.", isUnderLimit(key));
             }
         } finally {
             s_limitService.setEnabled(true); // enable api throttling to avoid
-                                            // impacting other testcases
+            // impacting other testcases
         }
 
     }
