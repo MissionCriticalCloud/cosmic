@@ -16,16 +16,16 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import com.google.gson.annotations.SerializedName;
 
 @SuppressWarnings("unused")
 @EntityReference(value = SecurityGroup.class)
@@ -117,6 +117,16 @@ public class SecurityGroupResponse extends BaseResponse implements ControlledVie
     }
 
     @Override
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    @Override
     public void setDomainId(String domainId) {
         this.domainId = domainId;
     }
@@ -152,29 +162,24 @@ public class SecurityGroupResponse extends BaseResponse implements ControlledVie
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        SecurityGroupResponse other = (SecurityGroupResponse)obj;
+        }
+        SecurityGroupResponse other = (SecurityGroupResponse) obj;
         if (id == null) {
-            if (other.id != null)
+            if (other.id != null) {
                 return false;
-        } else if (!id.equals(other.id))
+            }
+        } else if (!id.equals(other.id)) {
             return false;
+        }
         return true;
-    }
-
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
     }
 
     public void setTags(Set<ResourceTagResponse> tags) {

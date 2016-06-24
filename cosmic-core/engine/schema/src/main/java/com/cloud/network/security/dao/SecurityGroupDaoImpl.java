@@ -16,10 +16,6 @@
 // under the License.
 package com.cloud.network.security.dao;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.network.security.SecurityGroupVO;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.dao.ResourceTagDao;
@@ -29,15 +25,18 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 
+import javax.inject.Inject;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class SecurityGroupDaoImpl extends GenericDaoBase<SecurityGroupVO, Long> implements SecurityGroupDao {
+    @Inject
+    ResourceTagDao _tagsDao;
     private SearchBuilder<SecurityGroupVO> AccountIdSearch;
     private SearchBuilder<SecurityGroupVO> AccountIdNameSearch;
     private SearchBuilder<SecurityGroupVO> AccountIdNamesSearch;
-    @Inject
-    ResourceTagDao _tagsDao;
 
     protected SecurityGroupDaoImpl() {
         AccountIdSearch = createSearchBuilder();
@@ -90,7 +89,7 @@ public class SecurityGroupDaoImpl extends GenericDaoBase<SecurityGroupVO, Long> 
         SearchCriteria<SecurityGroupVO> sc = AccountIdNamesSearch.create();
         sc.setParameters("accountId", accountId);
 
-        sc.setParameters("groupNames", (Object[])names);
+        sc.setParameters("groupNames", (Object[]) names);
 
         return listBy(sc);
     }
@@ -104,20 +103,6 @@ public class SecurityGroupDaoImpl extends GenericDaoBase<SecurityGroupVO, Long> 
 
     @Override
     @DB
-    public boolean remove(Long id) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        SecurityGroupVO entry = findById(id);
-        if (entry != null) {
-            _tagsDao.removeByIdAndType(id, ResourceObjectType.SecurityGroup);
-        }
-        boolean result = super.remove(id);
-        txn.commit();
-        return result;
-    }
-
-    @Override
-    @DB
     public boolean expunge(Long id) {
         TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
@@ -126,6 +111,20 @@ public class SecurityGroupDaoImpl extends GenericDaoBase<SecurityGroupVO, Long> 
             _tagsDao.removeByIdAndType(id, ResourceObjectType.SecurityGroup);
         }
         boolean result = super.expunge(id);
+        txn.commit();
+        return result;
+    }
+
+    @Override
+    @DB
+    public boolean remove(Long id) {
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        txn.start();
+        SecurityGroupVO entry = findById(id);
+        if (entry != null) {
+            _tagsDao.removeByIdAndType(id, ResourceObjectType.SecurityGroup);
+        }
+        boolean result = super.remove(id);
         txn.commit();
         return result;
     }

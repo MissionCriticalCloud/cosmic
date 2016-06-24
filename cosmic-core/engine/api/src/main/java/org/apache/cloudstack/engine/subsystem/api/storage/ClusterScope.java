@@ -50,5 +50,4 @@ public class ClusterScope extends AbstractScope {
     public Long getZoneId() {
         return this.zoneId;
     }
-
 }

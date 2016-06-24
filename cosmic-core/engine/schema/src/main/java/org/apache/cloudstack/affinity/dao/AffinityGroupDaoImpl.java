@@ -16,29 +16,26 @@
 // under the License.
 package org.apache.cloudstack.affinity.dao;
 
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.JoinBuilder.JoinType;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.affinity.AffinityGroupDomainMapVO;
 import org.apache.cloudstack.affinity.AffinityGroupVO;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.List;
+
 public class AffinityGroupDaoImpl extends GenericDaoBase<AffinityGroupVO, Long> implements AffinityGroupDao {
+    @Inject
+    AffinityGroupDomainMapDao _groupDomainDao;
     private SearchBuilder<AffinityGroupVO> AccountIdSearch;
     private SearchBuilder<AffinityGroupVO> AccountIdNameSearch;
     private SearchBuilder<AffinityGroupVO> AccountIdNamesSearch;
     private SearchBuilder<AffinityGroupVO> DomainLevelNameSearch;
     private SearchBuilder<AffinityGroupVO> AccountIdTypeSearch;
-    @Inject
-    AffinityGroupDomainMapDao _groupDomainDao;
-
     private SearchBuilder<AffinityGroupVO> DomainLevelTypeSearch;
 
     public AffinityGroupDaoImpl() {
@@ -67,7 +64,7 @@ public class AffinityGroupDaoImpl extends GenericDaoBase<AffinityGroupVO, Long> 
         DomainLevelNameSearch.and("name", DomainLevelNameSearch.entity().getName(), SearchCriteria.Op.EQ);
         DomainLevelNameSearch.and("aclType", DomainLevelNameSearch.entity().getAclType(), SearchCriteria.Op.EQ);
         DomainLevelNameSearch.join("domainMapSearch", domainMapSearch, domainMapSearch.entity().getAffinityGroupId(), DomainLevelNameSearch.entity().getId(),
-            JoinType.INNER);
+                JoinType.INNER);
         DomainLevelNameSearch.done();
 
         AccountIdTypeSearch = createSearchBuilder();
@@ -80,7 +77,7 @@ public class AffinityGroupDaoImpl extends GenericDaoBase<AffinityGroupVO, Long> 
         DomainLevelTypeSearch.and("type", DomainLevelTypeSearch.entity().getType(), SearchCriteria.Op.EQ);
         DomainLevelTypeSearch.and("aclType", DomainLevelTypeSearch.entity().getAclType(), SearchCriteria.Op.EQ);
         DomainLevelTypeSearch.join("domainTypeSearch", domainTypeSearch, domainTypeSearch.entity().getAffinityGroupId(), DomainLevelTypeSearch.entity().getId(),
-            JoinType.INNER);
+                JoinType.INNER);
         DomainLevelTypeSearch.done();
     }
 
@@ -120,7 +117,7 @@ public class AffinityGroupDaoImpl extends GenericDaoBase<AffinityGroupVO, Long> 
         SearchCriteria<AffinityGroupVO> sc = AccountIdNamesSearch.create();
         sc.setParameters("accountId", accountId);
 
-        sc.setParameters("groupNames", (Object[])names);
+        sc.setParameters("groupNames", (Object[]) names);
 
         return listBy(sc);
     }

@@ -17,15 +17,6 @@
 
 package com.cloud.network;
 
-import java.lang.reflect.Field;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.routing.HealthCheckLBConfigAnswer;
@@ -61,9 +52,17 @@ import com.cloud.user.dao.UserStatisticsDao;
 import com.cloud.utils.net.Ip;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import java.lang.reflect.Field;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,6 +74,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ExternalLoadBalancerDeviceManagerImplTest {
 
+    @Mock
+    protected HostPodDao _podDao = null;
     @Mock
     NetworkExternalLoadBalancerDao _networkExternalLBDao;
     @Mock
@@ -132,8 +133,6 @@ public class ExternalLoadBalancerDeviceManagerImplTest {
     @Mock
     ExternalFirewallDeviceDao _externalFirewallDeviceDao;
     @Mock
-    protected HostPodDao _podDao = null;
-    @Mock
     IpAddressManager _ipAddrMgr;
 
     @Mock
@@ -168,25 +167,12 @@ public class ExternalLoadBalancerDeviceManagerImplTest {
         HealthCheckLBConfigAnswer answer = Mockito
                 .mock(HealthCheckLBConfigAnswer.class);
         Mockito.when(answer.getLoadBalancers()).thenReturn(
-                Collections.<LoadBalancerTO> emptyList());
+                Collections.<LoadBalancerTO>emptyList());
         Mockito.when(
                 _agentMgr.easySend(Mockito.anyLong(),
                         Mockito.any(Command.class))).thenReturn(answer);
 
         Assert.assertNotNull(externalLoadBalancerDeviceManager
-                .getLBHealthChecks(network, Arrays.asList(rule)));
-    }
-
-    @Test
-    public void getLBHealthChecksNullAnswer() throws ResourceUnavailableException,
-            URISyntaxException {
-        setupLBHealthChecksMocks();
-
-        Mockito.when(
-                _agentMgr.easySend(Mockito.anyLong(),
-                        Mockito.any(Command.class))).thenReturn(null);
-
-        Assert.assertNull(externalLoadBalancerDeviceManager
                 .getLBHealthChecks(network, Arrays.asList(rule)));
     }
 
@@ -210,9 +196,21 @@ public class ExternalLoadBalancerDeviceManagerImplTest {
         Mockito.when(_hostDao.findById(Mockito.anyLong())).thenReturn(hostVo);
     }
 
+    @Test
+    public void getLBHealthChecksNullAnswer() throws ResourceUnavailableException,
+            URISyntaxException {
+        setupLBHealthChecksMocks();
+
+        Mockito.when(
+                _agentMgr.easySend(Mockito.anyLong(),
+                        Mockito.any(Command.class))).thenReturn(null);
+
+        Assert.assertNull(externalLoadBalancerDeviceManager
+                .getLBHealthChecks(network, Arrays.asList(rule)));
+    }
 
     @Test
-    public void testUsageTask()  {
+    public void testUsageTask() {
         ExternalDeviceUsageManagerImpl.ExternalDeviceNetworkUsageTask usageTask = Mockito
                 .mock(ExternalDeviceUsageManagerImpl.ExternalDeviceNetworkUsageTask.class);
         Mockito.when(_hostDao.listByType(Host.Type.ExternalFirewall)).thenReturn(new ArrayList<HostVO>());

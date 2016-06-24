@@ -19,12 +19,11 @@
 
 package com.cloud.utils.crypt;
 
+import com.cloud.utils.NumbersUtil;
+
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-
-import com.cloud.utils.NumbersUtil;
-
 
 public class EncryptionSecretKeySender {
     public static void main(String args[]) {
@@ -38,9 +37,8 @@ public class EncryptionSecretKeySender {
                 port = NumbersUtil.parseInt(args[1], port);
             }
             InetAddress addr = InetAddress.getByName(hostname);
-            try(Socket socket = new Socket(addr, port);
-                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);)
-            {
+            try (Socket socket = new Socket(addr, port);
+                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);) {
                 java.io.BufferedReader stdin = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
                 String validationWord = "cloudnine";
                 String validationInput = "";
@@ -54,12 +52,11 @@ public class EncryptionSecretKeySender {
                 if (input != null) {
                     out.println(input);
                 }
-            }catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.out.println("Exception " + e.getMessage());
             }
         } catch (Exception e) {
             System.out.print("Exception while sending secret key " + e);
         }
-   }
+    }
 }

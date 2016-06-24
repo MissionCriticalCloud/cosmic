@@ -677,7 +677,7 @@ class TestInternalLb(cloudstackTestCase):
 
     def get_lb_stats_settings(self):
         self.logger.debug("Retrieving haproxy stats settings")
-        settings = {}
+        settings = { }
         try:
             settings["stats_port"] = Configurations.list(
                 self.apiclient, name="network.loadbalancer.haproxy.stats.port")[0].value

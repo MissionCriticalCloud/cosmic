@@ -16,6 +16,14 @@
 // under the License.
 package com.cloud.consoleproxy.vnc;
 
+import com.cloud.consoleproxy.util.Logger;
+import com.cloud.consoleproxy.vnc.packet.client.ClientPacket;
+import com.cloud.consoleproxy.vnc.packet.client.FramebufferUpdateRequestPacket;
+import com.cloud.consoleproxy.vnc.packet.client.KeyboardEventPacket;
+import com.cloud.consoleproxy.vnc.packet.client.MouseEventPacket;
+import com.cloud.consoleproxy.vnc.packet.client.SetEncodingsPacket;
+import com.cloud.consoleproxy.vnc.packet.client.SetPixelFormatPacket;
+
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -26,14 +34,6 @@ import java.io.DataOutputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import com.cloud.consoleproxy.util.Logger;
-import com.cloud.consoleproxy.vnc.packet.client.ClientPacket;
-import com.cloud.consoleproxy.vnc.packet.client.FramebufferUpdateRequestPacket;
-import com.cloud.consoleproxy.vnc.packet.client.KeyboardEventPacket;
-import com.cloud.consoleproxy.vnc.packet.client.MouseEventPacket;
-import com.cloud.consoleproxy.vnc.packet.client.SetEncodingsPacket;
-import com.cloud.consoleproxy.vnc.packet.client.SetPixelFormatPacket;
 
 public class VncClientPacketSender implements Runnable, PaintNotificationListener, KeyListener, MouseListener, MouseMotionListener, FrameBufferUpdateListener {
     private static final Logger s_logger = Logger.getLogger(VncClientPacketSender.class);
@@ -58,6 +58,21 @@ public class VncClientPacketSender implements Runnable, PaintNotificationListene
         sendSetPixelFormat();
         sendSetEncodings();
         requestFullScreenUpdate();
+    }
+
+    private void sendSetPixelFormat() {
+        if (!screen.isRGB888_32_LE()) {
+            queue.add(new SetPixelFormatPacket(screen, 32, 24, RfbConstants.LITTLE_ENDIAN, RfbConstants.TRUE_COLOR, 255, 255, 255, 16, 8, 0));
+        }
+    }
+
+    private void sendSetEncodings() {
+        queue.add(new SetEncodingsPacket(RfbConstants.SUPPORTED_ENCODINGS_ARRAY));
+    }
+
+    public void requestFullScreenUpdate() {
+        queue.add(new FramebufferUpdateRequestPacket(RfbConstants.FRAMEBUFFER_FULL_UPDATE_REQUEST, 0, 0, screen.getFramebufferWidth(), screen.getFramebufferHeight()));
+        updateRequestSent = true;
     }
 
     public void sendClientPacket(ClientPacket packet) {
@@ -85,30 +100,15 @@ public class VncClientPacketSender implements Runnable, PaintNotificationListene
         }
     }
 
-    private void sendSetEncodings() {
-        queue.add(new SetEncodingsPacket(RfbConstants.SUPPORTED_ENCODINGS_ARRAY));
-    }
-
-    private void sendSetPixelFormat() {
-        if (!screen.isRGB888_32_LE()) {
-            queue.add(new SetPixelFormatPacket(screen, 32, 24, RfbConstants.LITTLE_ENDIAN, RfbConstants.TRUE_COLOR, 255, 255, 255, 16, 8, 0));
-        }
-    }
-
     public void closeConnection() {
         connectionAlive = false;
-    }
-
-    public void requestFullScreenUpdate() {
-        queue.add(new FramebufferUpdateRequestPacket(RfbConstants.FRAMEBUFFER_FULL_UPDATE_REQUEST, 0, 0, screen.getFramebufferWidth(), screen.getFramebufferHeight()));
-        updateRequestSent = true;
     }
 
     @Override
     public void imagePaintedOnScreen() {
         if (!updateRequestSent) {
             queue.add(new FramebufferUpdateRequestPacket(RfbConstants.FRAMEBUFFER_INCREMENTAL_UPDATE_REQUEST, 0, 0, screen.getFramebufferWidth(),
-                screen.getFramebufferHeight()));
+                    screen.getFramebufferHeight()));
             updateRequestSent = true;
         }
     }
@@ -126,6 +126,24 @@ public class VncClientPacketSender implements Runnable, PaintNotificationListene
     @Override
     public void mouseMoved(MouseEvent e) {
         queue.add(new MouseEventPacket(mapAwtModifiersToVncButtonMask(e.getModifiersEx()), e.getX(), e.getY()));
+    }
+
+    /**
+     * Current state of buttons 1 to 8 are represented by bits 0 to 7 of
+     * button-mask respectively, 0 meaning up, 1 meaning down (pressed). On a
+     * conventional mouse, buttons 1, 2 and 3 correspond to the left, middle and
+     * right buttons on the mouse. On a wheel mouse, each step of the wheel
+     * upwards is represented by a press and release of button 4, and each step
+     * downwards is represented by a press and release of button 5.
+     *
+     * @param modifiers extended modifiers from AWT mouse event
+     * @return VNC mouse button mask
+     */
+    public static int mapAwtModifiersToVncButtonMask(int modifiers) {
+        int mask =
+                (((modifiers & InputEvent.BUTTON1_DOWN_MASK) != 0) ? 0x1 : 0) | (((modifiers & InputEvent.BUTTON2_DOWN_MASK) != 0) ? 0x2 : 0) |
+                        (((modifiers & InputEvent.BUTTON3_DOWN_MASK) != 0) ? 0x4 : 0);
+        return mask;
     }
 
     @Override
@@ -151,25 +169,6 @@ public class VncClientPacketSender implements Runnable, PaintNotificationListene
     @Override
     public void mouseExited(MouseEvent e) {
         // Nothing to do
-    }
-
-    /**
-     * Current state of buttons 1 to 8 are represented by bits 0 to 7 of
-     * button-mask respectively, 0 meaning up, 1 meaning down (pressed). On a
-     * conventional mouse, buttons 1, 2 and 3 correspond to the left, middle and
-     * right buttons on the mouse. On a wheel mouse, each step of the wheel
-     * upwards is represented by a press and release of button 4, and each step
-     * downwards is represented by a press and release of button 5.
-     *
-     * @param modifiers
-     *            extended modifiers from AWT mouse event
-     * @return VNC mouse button mask
-     */
-    public static int mapAwtModifiersToVncButtonMask(int modifiers) {
-        int mask =
-            (((modifiers & InputEvent.BUTTON1_DOWN_MASK) != 0) ? 0x1 : 0) | (((modifiers & InputEvent.BUTTON2_DOWN_MASK) != 0) ? 0x2 : 0) |
-                (((modifiers & InputEvent.BUTTON3_DOWN_MASK) != 0) ? 0x4 : 0);
-        return mask;
     }
 
     @Override
@@ -259,5 +258,4 @@ public class VncClientPacketSender implements Runnable, PaintNotificationListene
 
         return key;
     }
-
 }

@@ -36,7 +36,7 @@ public class CreatePrivateTemplateCommand extends StorageCommand {
     }
 
     public CreatePrivateTemplateCommand(String secondaryStorageURL, long templateId, long accountId, String userSpecifiedName, String uniqueName, String snapshotFolder,
-            String snapshotPath, String snapshotName, String userFolder) {
+                                        String snapshotPath, String snapshotName, String userFolder) {
         _secondaryStorageURL = secondaryStorageURL;
         _templateId = templateId;
         _accountId = accountId;
@@ -85,11 +85,11 @@ public class CreatePrivateTemplateCommand extends StorageCommand {
         return _templateId;
     }
 
-    public long getAccountId() {
-        return _accountId;
-    }
-
     public void setTemplateId(long templateId) {
         _templateId = templateId;
+    }
+
+    public long getAccountId() {
+        return _accountId;
     }
 }

@@ -19,12 +19,12 @@
 
 package com.cloud.agent.api.routing;
 
+import com.cloud.network.vpc.StaticRoute;
+import com.cloud.network.vpc.StaticRouteProfile;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.cloud.network.vpc.StaticRoute;
-import com.cloud.network.vpc.StaticRouteProfile;
 
 public class SetStaticRouteCommand extends NetworkElementCommand {
     StaticRouteProfile[] staticRoutes;
@@ -32,7 +32,7 @@ public class SetStaticRouteCommand extends NetworkElementCommand {
     protected SetStaticRouteCommand() {
     }
 
-    public SetStaticRouteCommand(List<StaticRouteProfile> staticRoutes) {
+    public SetStaticRouteCommand(final List<StaticRouteProfile> staticRoutes) {
         this.staticRoutes = staticRoutes.toArray(new StaticRouteProfile[staticRoutes.size()]);
     }
 
@@ -41,11 +41,11 @@ public class SetStaticRouteCommand extends NetworkElementCommand {
     }
 
     public String[] generateSRouteRules() {
-        Set<String> toAdd = new HashSet<String>();
-        for (StaticRouteProfile route : staticRoutes) {
-            String entry;
+        final Set<String> toAdd = new HashSet<>();
+        for (final StaticRouteProfile route : staticRoutes) {
+            final String entry;
             if (route.getState() == StaticRoute.State.Active || route.getState() == StaticRoute.State.Add) {
-                entry = route.getIp4Address() + ":"  + route.getCidr();
+                entry = route.getIp4Address() + ":" + route.getCidr();
             } else {
                 entry = "Revoke:" + route.getCidr();
             }

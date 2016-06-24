@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.tags.dao;
 
-import java.util.List;
-
 import com.cloud.server.ResourceTag;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.ResourceTagVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface ResourceTagDao extends GenericDao<ResourceTagVO, Long> {
 

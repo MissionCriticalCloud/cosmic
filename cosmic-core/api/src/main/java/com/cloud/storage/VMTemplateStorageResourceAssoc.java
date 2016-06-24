@@ -16,16 +16,14 @@
 // under the License.
 package com.cloud.storage;
 
-import java.util.Date;
-
 import org.apache.cloudstack.api.InternalIdentity;
 
-public interface VMTemplateStorageResourceAssoc extends InternalIdentity {
-    public static enum Status {
-        UNKNOWN, DOWNLOAD_ERROR, NOT_DOWNLOADED, DOWNLOAD_IN_PROGRESS, DOWNLOADED, ABANDONED, UPLOADED, NOT_UPLOADED, UPLOAD_ERROR, UPLOAD_IN_PROGRESS, CREATING, CREATED
-    }
+import java.util.Date;
 
+public interface VMTemplateStorageResourceAssoc extends InternalIdentity {
     String getInstallPath();
+
+    void setInstallPath(String installPath);
 
     long getTemplateId();
 
@@ -35,30 +33,31 @@ public interface VMTemplateStorageResourceAssoc extends InternalIdentity {
 
     void setDownloadPercent(int downloadPercent);
 
-    void setDownloadState(Status downloadState);
-
     Date getCreated();
 
     Date getLastUpdated();
 
     void setLastUpdated(Date date);
 
-    void setInstallPath(String installPath);
-
     Status getDownloadState();
 
-    void setLocalDownloadPath(String localPath);
+    void setDownloadState(Status downloadState);
 
     String getLocalDownloadPath();
 
-    void setErrorString(String errorString);
+    void setLocalDownloadPath(String localPath);
 
     String getErrorString();
 
-    void setJobId(String jobId);
+    void setErrorString(String errorString);
 
-    String getJobId();;
+    String getJobId();
+
+    void setJobId(String jobId);
 
     long getTemplateSize();
 
+    public static enum Status {
+        UNKNOWN, DOWNLOAD_ERROR, NOT_DOWNLOADED, DOWNLOAD_IN_PROGRESS, DOWNLOADED, ABANDONED, UPLOADED, NOT_UPLOADED, UPLOAD_ERROR, UPLOAD_IN_PROGRESS, CREATING, CREATED
+    }
 }

@@ -24,7 +24,6 @@ import java.io.InputStream;
 
 import com.trilead.ssh2.ChannelCondition;
 import com.trilead.ssh2.Session;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,18 +62,6 @@ public class SSHCmdHelper {
         }
     }
 
-    public static boolean sshExecuteCmd(com.trilead.ssh2.Connection sshConnection, String cmd, int nTimes) {
-        for (int i = 0; i < nTimes; i++) {
-            try {
-                if (sshExecuteCmdOneShot(sshConnection, cmd))
-                    return true;
-            } catch (SshException e) {
-                continue;
-            }
-        }
-        return false;
-    }
-
     public static int sshExecuteCmdWithExitCode(com.trilead.ssh2.Connection sshConnection, String cmd) {
         return sshExecuteCmdWithExitCode(sshConnection, cmd, 3);
     }
@@ -88,10 +75,6 @@ public class SSHCmdHelper {
             }
         }
         return -1;
-    }
-
-    public static boolean sshExecuteCmd(com.trilead.ssh2.Connection sshConnection, String cmd) {
-        return sshExecuteCmd(sshConnection, cmd, 3);
     }
 
     public static int sshExecuteCmdOneShotWithExitCode(com.trilead.ssh2.Connection sshConnection, String cmd) throws SshException {
@@ -122,8 +105,8 @@ public class SSHCmdHelper {
                 }
                 if ((stdout.available() == 0) && (stderr.available() == 0)) {
                     int conditions = sshSession.waitForCondition(ChannelCondition.STDOUT_DATA
-                                | ChannelCondition.STDERR_DATA | ChannelCondition.EOF | ChannelCondition.EXIT_STATUS,
-                                120000);
+                                    | ChannelCondition.STDERR_DATA | ChannelCondition.EOF | ChannelCondition.EXIT_STATUS,
+                            120000);
 
                     if ((conditions & ChannelCondition.TIMEOUT) != 0) {
                         String msg = "Timed out in waiting SSH execution result";
@@ -156,12 +139,13 @@ public class SSHCmdHelper {
             }
 
             String result = sbResult.toString();
-            if (result != null && !result.isEmpty())
+            if (result != null && !result.isEmpty()) {
                 s_logger.debug(cmd + " output:" + result);
+            }
             // exit status delivery might get delayed
-            for(int i = 0 ; i<10 ; i++ ) {
+            for (int i = 0; i < 10; i++) {
                 Integer status = sshSession.getExitStatus();
-                if( status != null ) {
+                if (status != null) {
                     return status;
                 }
                 Thread.sleep(100);
@@ -171,9 +155,27 @@ public class SSHCmdHelper {
             s_logger.debug("Ssh executed failed", e);
             throw new SshException("Ssh executed failed " + e.getMessage());
         } finally {
-            if (sshSession != null)
+            if (sshSession != null) {
                 sshSession.close();
+            }
         }
+    }
+
+    public static boolean sshExecuteCmd(com.trilead.ssh2.Connection sshConnection, String cmd) {
+        return sshExecuteCmd(sshConnection, cmd, 3);
+    }
+
+    public static boolean sshExecuteCmd(com.trilead.ssh2.Connection sshConnection, String cmd, int nTimes) {
+        for (int i = 0; i < nTimes; i++) {
+            try {
+                if (sshExecuteCmdOneShot(sshConnection, cmd)) {
+                    return true;
+                }
+            } catch (SshException e) {
+                continue;
+            }
+        }
+        return false;
     }
 
     public static boolean sshExecuteCmdOneShot(com.trilead.ssh2.Connection sshConnection, String cmd) throws SshException {

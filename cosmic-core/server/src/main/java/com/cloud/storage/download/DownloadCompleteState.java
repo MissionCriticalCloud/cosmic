@@ -17,23 +17,21 @@
 package com.cloud.storage.download;
 
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
-
 import org.apache.cloudstack.storage.command.DownloadProgressCommand.RequestType;
 
 public class DownloadCompleteState extends DownloadInactiveState {
 
-    public DownloadCompleteState(DownloadListener dl) {
+    public DownloadCompleteState(final DownloadListener dl) {
         super(dl);
     }
 
     @Override
     public String getName() {
         return Status.DOWNLOADED.toString();
-
     }
 
     @Override
-    public void onEntry(String prevState, DownloadEvent event, Object evtObj) {
+    public void onEntry(final String prevState, final DownloadEvent event, final Object evtObj) {
         super.onEntry(prevState, event, evtObj);
         if (!prevState.equals(getName())) {
             if (event == DownloadEvent.DOWNLOAD_ANSWER) {
@@ -41,8 +39,6 @@ public class DownloadCompleteState extends DownloadInactiveState {
             }
         } else {
             getDownloadListener().setDownloadInactive(Status.DOWNLOADED);
-
         }
     }
-
 }

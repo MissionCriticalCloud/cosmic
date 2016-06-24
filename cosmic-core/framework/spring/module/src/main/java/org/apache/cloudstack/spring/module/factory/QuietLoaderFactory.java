@@ -58,5 +58,4 @@ public class QuietLoaderFactory implements FactoryBean<Resource[]> {
     public void setResources(Resource[] resources) {
         this.resources = resources;
     }
-
 }

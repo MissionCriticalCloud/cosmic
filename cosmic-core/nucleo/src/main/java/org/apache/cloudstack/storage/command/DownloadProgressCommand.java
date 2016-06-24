@@ -20,10 +20,6 @@
 package org.apache.cloudstack.storage.command;
 
 public class DownloadProgressCommand extends DownloadCommand {
-    public static enum RequestType {
-        GET_STATUS, ABORT, RESTART, PURGE, GET_OR_RESTART
-    }
-
     private String jobId;
     private RequestType request;
 
@@ -31,7 +27,7 @@ public class DownloadProgressCommand extends DownloadCommand {
         super();
     }
 
-    public DownloadProgressCommand(DownloadCommand cmd, String jobId, RequestType req) {
+    public DownloadProgressCommand(final DownloadCommand cmd, final String jobId, final RequestType req) {
         super(cmd);
 
         this.jobId = jobId;
@@ -42,11 +38,15 @@ public class DownloadProgressCommand extends DownloadCommand {
         return jobId;
     }
 
-    public void setRequest(RequestType request) {
+    public RequestType getRequest() {
+        return request;
+    }
+
+    public void setRequest(final RequestType request) {
         this.request = request;
     }
 
-    public RequestType getRequest() {
-        return request;
+    public static enum RequestType {
+        GET_STATUS, ABORT, RESTART, PURGE, GET_OR_RESTART
     }
 }

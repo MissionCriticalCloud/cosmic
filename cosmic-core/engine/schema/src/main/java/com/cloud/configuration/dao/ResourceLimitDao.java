@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.configuration.dao;
 
-import java.util.List;
-
 import com.cloud.configuration.Resource.ResourceOwnerType;
 import com.cloud.configuration.ResourceCount;
 import com.cloud.configuration.ResourceLimitVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface ResourceLimitDao extends GenericDao<ResourceLimitVO, Long> {
 

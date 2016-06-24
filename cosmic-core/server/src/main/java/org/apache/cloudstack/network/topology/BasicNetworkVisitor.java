@@ -17,11 +17,6 @@
 
 package org.apache.cloudstack.network.topology;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.routing.IpAliasTO;
 import com.cloud.agent.manager.Commands;
@@ -65,6 +60,10 @@ import com.cloud.vm.NicVO;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicIpAliasVO;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,25 +131,21 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
             _commandSetupHelper.createApplyLoadBalancingRulesCommands(loadbalancingRules, router, cmds, network.getId());
 
             return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
-
         } else if (purpose == Purpose.PortForwarding) {
 
             _commandSetupHelper.createApplyPortForwardingRulesCommands((List<? extends PortForwardingRule>) rules, router, cmds, network.getId());
 
             return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
-
         } else if (purpose == Purpose.StaticNat) {
 
             _commandSetupHelper.createApplyStaticNatRulesCommands((List<StaticNatRule>) rules, router, cmds, network.getId());
 
             return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
-
         } else if (purpose == Purpose.Firewall) {
 
             _commandSetupHelper.createApplyFirewallRulesCommands(rules, router, cmds, network.getId());
 
             return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
-
         }
         s_logger.warn("Unable to apply rules of purpose: " + rules.get(0).getPurpose());
 
@@ -239,6 +234,16 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
     }
 
     @Override
+    public boolean visit(final NetworkAclsRules aclsRules) throws ResourceUnavailableException {
+        throw new CloudRuntimeException("NetworkAclsRules not implemented in Basic Network Topology.");
+    }
+
+    @Override
+    public boolean visit(final VpcIpAssociationRules ipRules) throws ResourceUnavailableException {
+        throw new CloudRuntimeException("VpcIpAssociationRules not implemented in Basic Network Topology.");
+    }
+
+    @Override
     public boolean visit(final UserdataToRouterRules userdata) throws ResourceUnavailableException {
         final VirtualRouter router = userdata.getRouter();
 
@@ -263,6 +268,21 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
     }
 
     @Override
+    public boolean visit(final AdvancedVpnRules vpnRules) throws ResourceUnavailableException {
+        throw new CloudRuntimeException("AdvancedVpnRules not implemented in Basic Network Topology.");
+    }
+
+    @Override
+    public boolean visit(final PrivateGatewayRules pvtGatewayRules) throws ResourceUnavailableException {
+        throw new CloudRuntimeException("PrivateGatewayRules not implemented in Basic Network Topology.");
+    }
+
+    @Override
+    public boolean visit(final DhcpPvlanRules dhcpRules) throws ResourceUnavailableException {
+        throw new CloudRuntimeException("DhcpPvlanRules not implemented in Basic Network Topology.");
+    }
+
+    @Override
     public boolean visit(final DhcpSubNetRules subnet) throws ResourceUnavailableException {
         final VirtualRouter router = subnet.getRouter();
         final Network network = subnet.getNetwork();
@@ -284,37 +304,12 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
     }
 
     @Override
-    public boolean visit(final DhcpPvlanRules dhcpRules) throws ResourceUnavailableException {
-        throw new CloudRuntimeException("DhcpPvlanRules not implemented in Basic Network Topology.");
-    }
-
-    @Override
     public boolean visit(final NicPlugInOutRules nicPlugInOutRules) throws ResourceUnavailableException {
         throw new CloudRuntimeException("NicPlugInOutRules not implemented in Basic Network Topology.");
     }
 
     @Override
-    public boolean visit(final NetworkAclsRules aclsRules) throws ResourceUnavailableException {
-        throw new CloudRuntimeException("NetworkAclsRules not implemented in Basic Network Topology.");
-    }
-
-    @Override
-    public boolean visit(final VpcIpAssociationRules ipRules) throws ResourceUnavailableException {
-        throw new CloudRuntimeException("VpcIpAssociationRules not implemented in Basic Network Topology.");
-    }
-
-    @Override
-    public boolean visit(final PrivateGatewayRules pvtGatewayRules) throws ResourceUnavailableException {
-        throw new CloudRuntimeException("PrivateGatewayRules not implemented in Basic Network Topology.");
-    }
-
-    @Override
     public boolean visit(final StaticRoutesRules staticRoutesRules) throws ResourceUnavailableException {
         throw new CloudRuntimeException("StaticRoutesRules not implemented in Basic Network Topology.");
-    }
-
-    @Override
-    public boolean visit(final AdvancedVpnRules vpnRules) throws ResourceUnavailableException {
-        throw new CloudRuntimeException("AdvancedVpnRules not implemented in Basic Network Topology.");
     }
 }

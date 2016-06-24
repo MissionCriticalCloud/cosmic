@@ -40,5 +40,4 @@ public class GuestOSDaoImpl extends GenericDaoBase<GuestOSVO, Long> implements G
         sc.setParameters("display_name", displayName);
         return findOneBy(sc);
     }
-
 }

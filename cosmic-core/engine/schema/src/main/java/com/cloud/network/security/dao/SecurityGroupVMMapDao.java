@@ -16,13 +16,13 @@
 // under the License.
 package com.cloud.network.security.dao;
 
-import java.util.List;
-
 import com.cloud.network.security.SecurityGroupVMMapVO;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.VirtualMachine.State;
+
+import java.util.List;
 
 public interface SecurityGroupVMMapDao extends GenericDao<SecurityGroupVMMapVO, Long> {
     List<SecurityGroupVMMapVO> listByIpAndInstanceId(String ipAddress, long instanceId);

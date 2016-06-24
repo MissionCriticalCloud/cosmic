@@ -17,10 +17,10 @@
 
 package com.cloud.api.dispatch;
 
+import com.cloud.user.AccountManager;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-
-import com.cloud.user.AccountManager;
 
 public class DispatchChainFactory {
 
@@ -49,17 +49,17 @@ public class DispatchChainFactory {
     @PostConstruct
     public void setup() {
         standardDispatchChain = new DispatchChain().
-                add(paramUnpackWorker).
-                add(paramProcessWorker).
-                add(paramGenericValidationWorker).
-                add(specificCmdValidationWorker);
+                                                           add(paramUnpackWorker).
+                                                           add(paramProcessWorker).
+                                                           add(paramGenericValidationWorker).
+                                                           add(specificCmdValidationWorker);
 
         asyncCreationDispatchChain = new DispatchChain().
-                add(paramUnpackWorker).
-                add(paramProcessWorker).
-                add(paramGenericValidationWorker).
-                add(specificCmdValidationWorker).
-                add(commandCreationWorker);
+                                                                add(paramUnpackWorker).
+                                                                add(paramProcessWorker).
+                                                                add(paramGenericValidationWorker).
+                                                                add(specificCmdValidationWorker).
+                                                                add(commandCreationWorker);
     }
 
     public DispatchChain getStandardDispatchChain() {

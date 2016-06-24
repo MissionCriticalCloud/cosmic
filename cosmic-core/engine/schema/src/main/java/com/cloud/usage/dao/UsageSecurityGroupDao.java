@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.usage.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.usage.UsageSecurityGroupVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Date;
+import java.util.List;
 
 public interface UsageSecurityGroupDao extends GenericDao<UsageSecurityGroupVO, Long> {
     public void update(UsageSecurityGroupVO usage);

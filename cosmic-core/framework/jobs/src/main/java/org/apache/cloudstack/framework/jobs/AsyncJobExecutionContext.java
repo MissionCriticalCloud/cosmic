@@ -21,7 +21,6 @@ import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.user.Account;
 import com.cloud.user.User;
-
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.jobs.dao.AsyncJobJoinMapDao;
 import org.apache.cloudstack.framework.jobs.impl.AsyncJobJoinMapVO;
@@ -29,23 +28,16 @@ import org.apache.cloudstack.framework.jobs.impl.JobSerializerHelper;
 import org.apache.cloudstack.framework.jobs.impl.SyncQueueItem;
 import org.apache.cloudstack.jobs.JobInfo;
 import org.apache.cloudstack.managed.threadlocal.ManagedThreadLocal;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AsyncJobExecutionContext  {
+public class AsyncJobExecutionContext {
     private static final Logger s_logger = LoggerFactory.getLogger(AsyncJobExecutionContext.class);
-
-    private AsyncJob _job;
-
     static private AsyncJobManager s_jobMgr;
     static private AsyncJobJoinMapDao s_joinMapDao;
-
-    public static void init(AsyncJobManager jobMgr, AsyncJobJoinMapDao joinMapDao) {
-        s_jobMgr = jobMgr;
-        s_joinMapDao = joinMapDao;
-    }
-
     private static ManagedThreadLocal<AsyncJobExecutionContext> s_currentExectionContext = new ManagedThreadLocal<AsyncJobExecutionContext>();
+    private AsyncJob _job;
 
     public AsyncJobExecutionContext() {
     }
@@ -54,12 +46,46 @@ public class AsyncJobExecutionContext  {
         _job = job;
     }
 
-    public SyncQueueItem getSyncSource() {
-        return _job.getSyncSource();
+    public static void init(AsyncJobManager jobMgr, AsyncJobJoinMapDao joinMapDao) {
+        s_jobMgr = jobMgr;
+        s_joinMapDao = joinMapDao;
     }
 
-    public void resetSyncSource() {
-        _job.setSyncSource(null);
+    // return currentExecutionContext without create it
+    public static AsyncJobExecutionContext getCurrent() {
+        return s_currentExectionContext.get();
+    }
+
+    public static AsyncJobExecutionContext unregister() {
+        AsyncJobExecutionContext context = s_currentExectionContext.get();
+        setCurrentExecutionContext(null);
+        return context;
+    }
+
+    public static String getOriginJobId() {
+        AsyncJobExecutionContext context = AsyncJobExecutionContext.getCurrentExecutionContext();
+        if (context != null && context.getJob() != null) {
+            return "" + context.getJob().getId();
+        }
+
+        return "";
+    }
+
+    public static AsyncJobExecutionContext getCurrentExecutionContext() {
+        AsyncJobExecutionContext context = s_currentExectionContext.get();
+        if (context == null) {
+            // TODO, this has security implications, operations carried from API layer should always
+            // set its context, otherwise, the fall-back here will use system security context
+            //
+            s_logger.warn("Job is executed without a context, setup psudo job for the executing thread");
+            if (CallContext.current() != null) {
+                context = registerPseudoExecutionContext(CallContext.current().getCallingAccountId(),
+                        CallContext.current().getCallingUserId());
+            } else {
+                context = registerPseudoExecutionContext(Account.ACCOUNT_ID_SYSTEM, User.UID_SYSTEM);
+            }
+        }
+        return context;
     }
 
     public AsyncJob getJob() {
@@ -70,10 +96,35 @@ public class AsyncJobExecutionContext  {
         _job = job;
     }
 
+    public static AsyncJobExecutionContext registerPseudoExecutionContext(long accountId, long userId) {
+        AsyncJobExecutionContext context = s_currentExectionContext.get();
+        if (context == null) {
+            context = new AsyncJobExecutionContext();
+            context.setJob(s_jobMgr.getPseudoJob(accountId, userId));
+            setCurrentExecutionContext(context);
+        }
+
+        return context;
+    }
+
+    // This is intended to be package level access for AsyncJobManagerImpl only.
+    public static void setCurrentExecutionContext(AsyncJobExecutionContext currentContext) {
+        s_currentExectionContext.set(currentContext);
+    }
+
+    public SyncQueueItem getSyncSource() {
+        return _job.getSyncSource();
+    }
+
+    public void resetSyncSource() {
+        _job.setSyncSource(null);
+    }
+
     public boolean isJobDispatchedBy(String jobDispatcherName) {
         assert (jobDispatcherName != null);
-        if (_job != null && _job.getDispatcher() != null && _job.getDispatcher().equals(jobDispatcherName))
+        if (_job != null && _job.getDispatcher() != null && _job.getDispatcher().equals(jobDispatcherName)) {
             return true;
+        }
 
         return false;
     }
@@ -109,7 +160,7 @@ public class AsyncJobExecutionContext  {
     }
 
     public void joinJob(long joinJobId, String wakeupHandler, String wakeupDispatcher,
-            String[] wakeupTopcisOnMessageBus, long wakeupIntervalInMilliSeconds, long timeoutInMilliSeconds) {
+                        String[] wakeupTopcisOnMessageBus, long wakeupIntervalInMilliSeconds, long timeoutInMilliSeconds) {
         assert (_job != null);
         s_jobMgr.joinJob(_job.getId(), joinJobId, wakeupHandler, wakeupDispatcher, wakeupTopcisOnMessageBus,
                 wakeupIntervalInMilliSeconds, timeoutInMilliSeconds);
@@ -133,19 +184,16 @@ public class AsyncJobExecutionContext  {
                 if (exception != null && exception instanceof Exception) {
                     if (exception instanceof InsufficientCapacityException) {
                         s_logger.error("Job " + joinedJobId + " failed with InsufficientCapacityException");
-                        throw (InsufficientCapacityException)exception;
-                    }
-                    else if (exception instanceof ConcurrentOperationException) {
+                        throw (InsufficientCapacityException) exception;
+                    } else if (exception instanceof ConcurrentOperationException) {
                         s_logger.error("Job " + joinedJobId + " failed with ConcurrentOperationException");
-                        throw (ConcurrentOperationException)exception;
-                    }
-                    else if (exception instanceof ResourceUnavailableException) {
+                        throw (ConcurrentOperationException) exception;
+                    } else if (exception instanceof ResourceUnavailableException) {
                         s_logger.error("Job " + joinedJobId + " failed with ResourceUnavailableException");
-                        throw (ResourceUnavailableException)exception;
-                    }
-                    else {
+                        throw (ResourceUnavailableException) exception;
+                    } else {
                         s_logger.error("Job " + joinedJobId + " failed with exception");
-                        throw new RuntimeException((Exception)exception);
+                        throw new RuntimeException((Exception) exception);
                     }
                 }
             } else {
@@ -164,56 +212,5 @@ public class AsyncJobExecutionContext  {
         assert (_job != null);
         s_jobMgr.completeJoin(_job.getId(), joinStatus, joinResult);
         s_jobMgr.completeAsyncJob(_job.getId(), joinStatus, 0, null);
-    }
-
-    public static AsyncJobExecutionContext getCurrentExecutionContext() {
-        AsyncJobExecutionContext context = s_currentExectionContext.get();
-        if (context == null) {
-            // TODO, this has security implications, operations carried from API layer should always
-            // set its context, otherwise, the fall-back here will use system security context
-            //
-            s_logger.warn("Job is executed without a context, setup psudo job for the executing thread");
-            if (CallContext.current() != null)
-                context = registerPseudoExecutionContext(CallContext.current().getCallingAccountId(),
-                        CallContext.current().getCallingUserId());
-            else
-                context = registerPseudoExecutionContext(Account.ACCOUNT_ID_SYSTEM, User.UID_SYSTEM);
-        }
-        return context;
-    }
-
-    // return currentExecutionContext without create it
-    public static AsyncJobExecutionContext getCurrent() {
-        return s_currentExectionContext.get();
-    }
-
-    public static AsyncJobExecutionContext registerPseudoExecutionContext(long accountId, long userId) {
-        AsyncJobExecutionContext context = s_currentExectionContext.get();
-        if (context == null) {
-            context = new AsyncJobExecutionContext();
-            context.setJob(s_jobMgr.getPseudoJob(accountId, userId));
-            setCurrentExecutionContext(context);
-        }
-
-        return context;
-    }
-
-    public static AsyncJobExecutionContext unregister() {
-        AsyncJobExecutionContext context = s_currentExectionContext.get();
-        setCurrentExecutionContext(null);
-        return context;
-    }
-
-    // This is intended to be package level access for AsyncJobManagerImpl only.
-    public static void setCurrentExecutionContext(AsyncJobExecutionContext currentContext) {
-        s_currentExectionContext.set(currentContext);
-    }
-
-    public static String getOriginJobId() {
-        AsyncJobExecutionContext context = AsyncJobExecutionContext.getCurrentExecutionContext();
-        if (context != null && context.getJob() != null)
-            return "" + context.getJob().getId();
-
-        return "";
     }
 }

@@ -16,12 +16,9 @@
 // under the License.
 package org.apache.cloudstack.engine.datacenter.entity.api;
 
-import javax.inject.Inject;
-
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.utils.fsm.StateMachine2;
-
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State;
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineClusterVO;
@@ -32,24 +29,23 @@ import org.apache.cloudstack.engine.datacenter.entity.api.db.dao.EngineClusterDa
 import org.apache.cloudstack.engine.datacenter.entity.api.db.dao.EngineDataCenterDao;
 import org.apache.cloudstack.engine.datacenter.entity.api.db.dao.EngineHostDao;
 import org.apache.cloudstack.engine.datacenter.entity.api.db.dao.EngineHostPodDao;
+
+import javax.inject.Inject;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class DataCenterResourceManagerImpl implements DataCenterResourceManager {
 
+    protected StateMachine2<State, Event, DataCenterResourceEntity> _stateMachine = DataCenterResourceEntity.State.s_fsm;
     @Inject
     EngineDataCenterDao _dataCenterDao;
-
     @Inject
     EngineHostPodDao _podDao;
-
     @Inject
     EngineClusterDao _clusterDao;
-
     @Inject
     EngineHostDao _hostDao;
-
-    protected StateMachine2<State, Event, DataCenterResourceEntity> _stateMachine = DataCenterResourceEntity.State.s_fsm;
 
     @Override
     public EngineDataCenterVO loadDataCenter(String dataCenterId) {
@@ -63,7 +59,16 @@ public class DataCenterResourceManagerImpl implements DataCenterResourceManager 
     @Override
     public void saveDataCenter(EngineDataCenterVO dc) {
         _dataCenterDao.persist(dc);
+    }
 
+    @Override
+    public void savePod(EngineHostPodVO pod) {
+        _podDao.persist(pod);
+    }
+
+    @Override
+    public void saveCluster(EngineClusterVO cluster) {
+        _clusterDao.persist(cluster);
     }
 
     @Override
@@ -101,16 +106,6 @@ public class DataCenterResourceManagerImpl implements DataCenterResourceManager 
     }
 
     @Override
-    public void savePod(EngineHostPodVO pod) {
-        _podDao.persist(pod);
-    }
-
-    @Override
-    public void saveCluster(EngineClusterVO cluster) {
-        _clusterDao.persist(cluster);
-    }
-
-    @Override
     public EngineHostVO loadHost(String uuid) {
         EngineHostVO host = _hostDao.findByUuid(uuid);
         if (host == null) {
@@ -123,5 +118,4 @@ public class DataCenterResourceManagerImpl implements DataCenterResourceManager 
     public void saveHost(EngineHostVO hostVO) {
         _hostDao.persist(hostVO);
     }
-
 }

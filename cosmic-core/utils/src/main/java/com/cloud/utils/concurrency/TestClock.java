@@ -25,16 +25,8 @@ import java.util.TimerTask;
 
 /**
  * A test clock which is also a TimerTask. The task calls a Scheduler's poll method
- *
  */
 public class TestClock extends TimerTask {
-    private int _minute = 0;
-    private int _hour = 0;
-    private int _day = 0;
-    private int _week = 0;
-    private int _month = 0;
-    private int _year = 0;
-    private Calendar _cal = null;
     private final int _minutesPerHour;
     private final int _hoursPerDay;
     private final int _daysPerWeek;
@@ -42,6 +34,13 @@ public class TestClock extends TimerTask {
     private final int _weeksPerMonth;
     private final int _monthsPerYear;
     private final Scheduler _scheduler;
+    private int _minute = 0;
+    private int _hour = 0;
+    private int _day = 0;
+    private int _week = 0;
+    private int _month = 0;
+    private int _year = 0;
+    private Calendar _cal = null;
 
     public TestClock(Scheduler scheduler, int minutesPerHour, int hoursPerDay, int daysPerWeek, int daysPerMonth, int weeksPerMonth, int monthsPerYear) {
         _minutesPerHour = minutesPerHour;

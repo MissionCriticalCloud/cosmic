@@ -28,7 +28,6 @@ import com.fasterxml.jackson.databind.introspect.NopAnnotationIntrospector;
 /**
  * Adds introspectors for the annotations added specifically for CloudStack
  * Web Services.
- *
  */
 public class CSJacksonAnnotationIntrospector extends NopAnnotationIntrospector {
 
@@ -54,6 +53,5 @@ public class CSJacksonAnnotationIntrospector extends NopAnnotationIntrospector {
         }
 
         throw new UnsupportedOperationException("Unsupported type " + an.type());
-
     }
 }

@@ -40,5 +40,4 @@ public class StaticRoutes extends ConfigBase {
     public void setRoutes(List<StaticRoute> routes) {
         this.routes = routes;
     }
-
 }

@@ -16,7 +16,9 @@
 // under the License.
 package com.cloud.api.query.vo;
 
-import java.util.Date;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.ApiCommandJobType;
+import org.apache.cloudstack.framework.jobs.AsyncJob;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,14 +26,10 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.ApiCommandJobType;
-import org.apache.cloudstack.framework.jobs.AsyncJob;
+import java.util.Date;
 
 @Entity
-@Table(name="async_job_view")
+@Table(name = "async_job_view")
 public class AsyncJobJoinVO extends BaseViewVO implements ControlledViewEntity { //InternalIdentity, Identity {
     @Id
     @Column(name = "id")
@@ -120,13 +118,13 @@ public class AsyncJobJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     @Override
-    public String getAccountUuid() {
-        return accountUuid;
+    public long getDomainId() {
+        return domainId;
     }
 
     @Override
-    public String getAccountName() {
-        return accountName;
+    public String getDomainPath() {
+        return domainPath;
     }
 
     @Override
@@ -135,8 +133,13 @@ public class AsyncJobJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     @Override
-    public long getDomainId() {
-        return domainId;
+    public String getAccountUuid() {
+        return accountUuid;
+    }
+
+    @Override
+    public String getAccountName() {
+        return accountName;
     }
 
     @Override
@@ -150,8 +153,15 @@ public class AsyncJobJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     @Override
-    public String getDomainPath() {
-        return domainPath;
+    public String getProjectUuid() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getProjectName() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     public long getUserId() {
@@ -206,17 +216,4 @@ public class AsyncJobJoinVO extends BaseViewVO implements ControlledViewEntity {
     public Class<?> getEntityType() {
         return AsyncJob.class;
     }
-
-    @Override
-    public String getProjectUuid() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getProjectName() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

@@ -33,19 +33,21 @@ public class DhcpEntryCommand extends NetworkElementCommand {
     String vmIp6Address;
     String ip6Gateway;
     String duid;
-    private boolean isDefault;
     boolean executeInSequence = false;
+    private boolean isDefault;
 
     protected DhcpEntryCommand() {
 
     }
 
-    @Override
-    public boolean executeInSequence() {
-        return executeInSequence;
+    public DhcpEntryCommand(final String vmMac, final String vmIpAddress, final String vmName, final String vmIp6Address, final String dns, final String gateway, final String
+            ip6Gateway, final boolean executeInSequence) {
+        this(vmMac, vmIpAddress, vmName, vmIp6Address, executeInSequence);
+        this.dns = dns;
+        this.gateway = gateway;
     }
 
-    public DhcpEntryCommand(String vmMac, String vmIpAddress, String vmName, String vmIp6Address, boolean executeInSequence) {
+    public DhcpEntryCommand(final String vmMac, final String vmIpAddress, final String vmName, final String vmIp6Address, final boolean executeInSequence) {
         this.vmMac = vmMac;
         this.vmIpAddress = vmIpAddress;
         this.vmName = vmName;
@@ -54,10 +56,9 @@ public class DhcpEntryCommand extends NetworkElementCommand {
         this.executeInSequence = executeInSequence;
     }
 
-    public DhcpEntryCommand(String vmMac, String vmIpAddress, String vmName, String vmIp6Address, String dns, String gateway, String ip6Gateway, boolean executeInSequence) {
-        this(vmMac, vmIpAddress, vmName, vmIp6Address, executeInSequence);
-        this.dns = dns;
-        this.gateway = gateway;
+    @Override
+    public boolean executeInSequence() {
+        return executeInSequence;
     }
 
     public String getDns() {
@@ -80,19 +81,19 @@ public class DhcpEntryCommand extends NetworkElementCommand {
         return vmName;
     }
 
-    public void setNextServer(String ip) {
-        nextServer = ip;
-    }
-
     public String getNextServer() {
         return nextServer;
+    }
+
+    public void setNextServer(final String ip) {
+        nextServer = ip;
     }
 
     public String getDefaultRouter() {
         return defaultRouter;
     }
 
-    public void setDefaultRouter(String defaultRouter) {
+    public void setDefaultRouter(final String defaultRouter) {
         this.defaultRouter = defaultRouter;
     }
 
@@ -100,7 +101,7 @@ public class DhcpEntryCommand extends NetworkElementCommand {
         return staticRoutes;
     }
 
-    public void setStaticRoutes(String staticRoutes) {
+    public void setStaticRoutes(final String staticRoutes) {
         this.staticRoutes = staticRoutes;
     }
 
@@ -108,7 +109,7 @@ public class DhcpEntryCommand extends NetworkElementCommand {
         return defaultDns;
     }
 
-    public void setDefaultDns(String defaultDns) {
+    public void setDefaultDns(final String defaultDns) {
         this.defaultDns = defaultDns;
     }
 
@@ -116,7 +117,7 @@ public class DhcpEntryCommand extends NetworkElementCommand {
         return ip6Gateway;
     }
 
-    public void setIp6Gateway(String ip6Gateway) {
+    public void setIp6Gateway(final String ip6Gateway) {
         this.ip6Gateway = ip6Gateway;
     }
 
@@ -124,7 +125,7 @@ public class DhcpEntryCommand extends NetworkElementCommand {
         return duid;
     }
 
-    public void setDuid(String duid) {
+    public void setDuid(final String duid) {
         this.duid = duid;
     }
 
@@ -132,7 +133,7 @@ public class DhcpEntryCommand extends NetworkElementCommand {
         return vmIp6Address;
     }
 
-    public void setVmIp6Address(String ip6Address) {
+    public void setVmIp6Address(final String ip6Address) {
         this.vmIp6Address = ip6Address;
     }
 
@@ -140,7 +141,7 @@ public class DhcpEntryCommand extends NetworkElementCommand {
         return isDefault;
     }
 
-    public void setDefault(boolean isDefault) {
+    public void setDefault(final boolean isDefault) {
         this.isDefault = isDefault;
     }
 }

@@ -1,14 +1,5 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.MigrateAnswer;
 import com.cloud.agent.api.MigrateCommand;
@@ -20,6 +11,15 @@ import com.cloud.hypervisor.kvm.resource.VifDriver;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.DomainInfo.DomainState;
@@ -29,31 +29,31 @@ import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = MigrateCommand.class)
 public final class LibvirtMigrateCommandWrapper
-    extends CommandWrapper<MigrateCommand, Answer, LibvirtComputingResource> {
+        extends CommandWrapper<MigrateCommand, Answer, LibvirtComputingResource> {
 
-  private static final Logger s_logger = LoggerFactory.getLogger(LibvirtMigrateCommandWrapper.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(LibvirtMigrateCommandWrapper.class);
 
-  @Override
-  public Answer execute(final MigrateCommand command, final LibvirtComputingResource libvirtComputingResource) {
-    final String vmName = command.getVmName();
+    @Override
+    public Answer execute(final MigrateCommand command, final LibvirtComputingResource libvirtComputingResource) {
+        final String vmName = command.getVmName();
 
-    String result = null;
+        String result = null;
 
-    List<InterfaceDef> ifaces = null;
-    List<DiskDef> disks = null;
+        List<InterfaceDef> ifaces = null;
+        List<DiskDef> disks = null;
 
-    Domain dm = null;
-    Connect dconn = null;
-    Domain destDomain = null;
-    Connect conn = null;
-    String xmlDesc = null;
-    try {
-      final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();
+        Domain dm = null;
+        Connect dconn = null;
+        Domain destDomain = null;
+        Connect conn = null;
+        String xmlDesc = null;
+        try {
+            final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();
 
-      conn = libvirtUtilitiesHelper.getConnectionByVmName(vmName);
-      ifaces = libvirtComputingResource.getInterfaces(conn, vmName);
-      disks = libvirtComputingResource.getDisks(conn, vmName);
-      dm = conn.domainLookupByName(vmName);
+            conn = libvirtUtilitiesHelper.getConnectionByVmName(vmName);
+            ifaces = libvirtComputingResource.getInterfaces(conn, vmName);
+            disks = libvirtComputingResource.getDisks(conn, vmName);
+            dm = conn.domainLookupByName(vmName);
       /*
        * We replace the private IP address with the address of the destination host. This is because the VNC listens on
        * the private IP address of the hypervisor, but that address is ofcourse different on the target host.
@@ -70,108 +70,108 @@ public final class LibvirtMigrateCommandWrapper
        *
        * Use VIR_DOMAIN_XML_SECURE (value = 1) prior to v1.0.0.
        */
-      final int xmlFlag = conn.getLibVirVersion() >= 1000000 ? 8 : 1; // 1000000 equals v1.0.0
+            final int xmlFlag = conn.getLibVirVersion() >= 1000000 ? 8 : 1; // 1000000 equals v1.0.0
 
-      xmlDesc = dm.getXMLDesc(xmlFlag).replace(libvirtComputingResource.getPrivateIp(), command.getDestinationIp());
+            xmlDesc = dm.getXMLDesc(xmlFlag).replace(libvirtComputingResource.getPrivateIp(), command.getDestinationIp());
 
-      dconn = libvirtUtilitiesHelper.retrieveQemuConnection("qemu+tcp://" + command.getDestinationIp() + "/system");
+            dconn = libvirtUtilitiesHelper.retrieveQemuConnection("qemu+tcp://" + command.getDestinationIp() + "/system");
 
-      // run migration in thread so we can monitor it
-      s_logger.info("Live migration of instance " + vmName + " initiated");
-      final ExecutorService executor = Executors.newFixedThreadPool(1);
-      final Callable<Domain> worker = new MigrateKvmAsync(libvirtComputingResource, dm, dconn, xmlDesc, vmName,
-          command.getDestinationIp());
-      final Future<Domain> migrateThread = executor.submit(worker);
-      executor.shutdown();
-      long sleeptime = 0;
-      while (!executor.isTerminated()) {
-        Thread.sleep(100);
-        sleeptime += 100;
-        if (sleeptime == 1000) {
-          final int migrateDowntime = libvirtComputingResource.getMigrateDowntime();
-          if (migrateDowntime > 0) {
-            try {
-              final int setDowntime = dm.migrateSetMaxDowntime(migrateDowntime);
-              if (setDowntime == 0) {
-                s_logger.debug(
-                    "Set max downtime for migration of " + vmName + " to " + String.valueOf(migrateDowntime) + "ms");
-              }
-            } catch (final LibvirtException e) {
-              s_logger.debug(
-                  "Failed to set max downtime for migration, perhaps migration completed? Error: " + e.getMessage());
+            // run migration in thread so we can monitor it
+            s_logger.info("Live migration of instance " + vmName + " initiated");
+            final ExecutorService executor = Executors.newFixedThreadPool(1);
+            final Callable<Domain> worker = new MigrateKvmAsync(libvirtComputingResource, dm, dconn, xmlDesc, vmName,
+                    command.getDestinationIp());
+            final Future<Domain> migrateThread = executor.submit(worker);
+            executor.shutdown();
+            long sleeptime = 0;
+            while (!executor.isTerminated()) {
+                Thread.sleep(100);
+                sleeptime += 100;
+                if (sleeptime == 1000) {
+                    final int migrateDowntime = libvirtComputingResource.getMigrateDowntime();
+                    if (migrateDowntime > 0) {
+                        try {
+                            final int setDowntime = dm.migrateSetMaxDowntime(migrateDowntime);
+                            if (setDowntime == 0) {
+                                s_logger.debug(
+                                        "Set max downtime for migration of " + vmName + " to " + String.valueOf(migrateDowntime) + "ms");
+                            }
+                        } catch (final LibvirtException e) {
+                            s_logger.debug(
+                                    "Failed to set max downtime for migration, perhaps migration completed? Error: " + e.getMessage());
+                        }
+                    }
+                }
+                if (sleeptime % 1000 == 0) {
+                    s_logger.info("Waiting for migration of " + vmName + " to complete, waited " + sleeptime + "ms");
+                }
+
+                // pause vm if we meet the vm.migrate.pauseafter threshold and not already paused
+                final int migratePauseAfter = libvirtComputingResource.getMigratePauseAfter();
+                if (migratePauseAfter > 0 && sleeptime > migratePauseAfter
+                        && dm.getInfo().state == DomainState.VIR_DOMAIN_RUNNING) {
+                    s_logger.info("Pausing VM " + vmName + " due to property vm.migrate.pauseafter setting to "
+                            + migratePauseAfter + "ms to complete migration");
+                    try {
+                        dm.suspend();
+                    } catch (final LibvirtException e) {
+                        // pause could be racy if it attempts to pause right when vm is finished, simply warn
+                        s_logger.info("Failed to pause vm " + vmName + " : " + e.getMessage());
+                    }
+                }
             }
-          }
-        }
-        if (sleeptime % 1000 == 0) {
-          s_logger.info("Waiting for migration of " + vmName + " to complete, waited " + sleeptime + "ms");
+            s_logger.info("Migration thread for " + vmName + " is done");
+
+            destDomain = migrateThread.get(10, TimeUnit.SECONDS);
+
+            if (destDomain != null) {
+                for (final DiskDef disk : disks) {
+                    libvirtComputingResource.cleanupDisk(disk);
+                }
+            }
+        } catch (final LibvirtException e) {
+            s_logger.debug("Can't migrate domain: " + e.getMessage());
+            result = e.getMessage();
+        } catch (final InterruptedException e) {
+            s_logger.debug("Interrupted while migrating domain: " + e.getMessage());
+            result = e.getMessage();
+        } catch (final ExecutionException e) {
+            s_logger.debug("Failed to execute while migrating domain: " + e.getMessage());
+            result = e.getMessage();
+        } catch (final TimeoutException e) {
+            s_logger.debug("Timed out while migrating domain: " + e.getMessage());
+            result = e.getMessage();
+        } finally {
+            try {
+                if (dm != null) {
+                    if (dm.isPersistent() == 1) {
+                        dm.undefine();
+                    }
+                    dm.free();
+                }
+                if (dconn != null) {
+                    dconn.close();
+                }
+                if (destDomain != null) {
+                    destDomain.free();
+                }
+            } catch (final LibvirtException e) {
+                s_logger.trace("Ignoring libvirt error.", e);
+            }
         }
 
-        // pause vm if we meet the vm.migrate.pauseafter threshold and not already paused
-        final int migratePauseAfter = libvirtComputingResource.getMigratePauseAfter();
-        if (migratePauseAfter > 0 && sleeptime > migratePauseAfter
-            && dm.getInfo().state == DomainState.VIR_DOMAIN_RUNNING) {
-          s_logger.info("Pausing VM " + vmName + " due to property vm.migrate.pauseafter setting to "
-              + migratePauseAfter + "ms to complete migration");
-          try {
-            dm.suspend();
-          } catch (final LibvirtException e) {
-            // pause could be racy if it attempts to pause right when vm is finished, simply warn
-            s_logger.info("Failed to pause vm " + vmName + " : " + e.getMessage());
-          }
+        if (result == null) {
+            libvirtComputingResource.destroyNetworkRulesForVm(conn, vmName);
+            for (final InterfaceDef iface : ifaces) {
+                // We don't know which "traffic type" is associated with
+                // each interface at this point, so inform all vif drivers
+                final List<VifDriver> allVifDrivers = libvirtComputingResource.getAllVifDrivers();
+                for (final VifDriver vifDriver : allVifDrivers) {
+                    vifDriver.unplug(iface);
+                }
+            }
         }
-      }
-      s_logger.info("Migration thread for " + vmName + " is done");
 
-      destDomain = migrateThread.get(10, TimeUnit.SECONDS);
-
-      if (destDomain != null) {
-        for (final DiskDef disk : disks) {
-          libvirtComputingResource.cleanupDisk(disk);
-        }
-      }
-    } catch (final LibvirtException e) {
-      s_logger.debug("Can't migrate domain: " + e.getMessage());
-      result = e.getMessage();
-    } catch (final InterruptedException e) {
-      s_logger.debug("Interrupted while migrating domain: " + e.getMessage());
-      result = e.getMessage();
-    } catch (final ExecutionException e) {
-      s_logger.debug("Failed to execute while migrating domain: " + e.getMessage());
-      result = e.getMessage();
-    } catch (final TimeoutException e) {
-      s_logger.debug("Timed out while migrating domain: " + e.getMessage());
-      result = e.getMessage();
-    } finally {
-      try {
-        if (dm != null) {
-          if (dm.isPersistent() == 1) {
-            dm.undefine();
-          }
-          dm.free();
-        }
-        if (dconn != null) {
-          dconn.close();
-        }
-        if (destDomain != null) {
-          destDomain.free();
-        }
-      } catch (final LibvirtException e) {
-        s_logger.trace("Ignoring libvirt error.", e);
-      }
+        return new MigrateAnswer(command, result == null, result, null);
     }
-
-    if (result == null) {
-      libvirtComputingResource.destroyNetworkRulesForVm(conn, vmName);
-      for (final InterfaceDef iface : ifaces) {
-        // We don't know which "traffic type" is associated with
-        // each interface at this point, so inform all vif drivers
-        final List<VifDriver> allVifDrivers = libvirtComputingResource.getAllVifDrivers();
-        for (final VifDriver vifDriver : allVifDrivers) {
-          vifDriver.unplug(iface);
-        }
-      }
-    }
-
-    return new MigrateAnswer(command, result == null, result, null);
-  }
 }

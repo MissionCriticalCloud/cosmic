@@ -15,8 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from pprint import pprint
-
 
 def merge(dbag, rules):
     for rule in rules["rules"]:
@@ -76,4 +74,4 @@ def ruleCompare(ruleA, ruleB):
         return ruleA["public_ip"] == ruleB["public_ip"]
     elif ruleA["type"] == "forward":
         return ruleA["public_ip"] == ruleB["public_ip"] and ruleA["public_ports"] == ruleB["public_ports"] \
-            and ruleA["protocol"] == ruleB["protocol"]
+               and ruleA["protocol"] == ruleB["protocol"]

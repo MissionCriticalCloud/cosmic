@@ -16,7 +16,7 @@
 // under the License.
 package com.cloud.dc;
 
-import java.util.Date;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,39 +26,41 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "op_dc_vnet_alloc")
 public class DataCenterVnetVO implements InternalIdentity {
 
+    @Column(name = "vnet", updatable = false, nullable = false)
+    protected String vnet;
+    @Column(name = "physical_network_id", updatable = false, nullable = false)
+    protected long physicalNetworkId;
+    @Column(name = "data_center_id", updatable = false, nullable = false)
+    protected long dataCenterId;
+    @Column(name = "account_id")
+    protected Long accountId;
+    @Column(name = "reservation_id")
+    protected String reservationId;
+    @Column(name = "account_vnet_map_id")
+    protected Long accountGuestVlanMapId;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     long id;
-
     @Column(name = "taken", nullable = true)
     @Temporal(value = TemporalType.TIMESTAMP)
     Date takenAt;
 
-    @Column(name = "vnet", updatable = false, nullable = false)
-    protected String vnet;
+    public DataCenterVnetVO(String vnet, long dcId, long physicalNetworkId) {
+        this.vnet = vnet;
+        this.dataCenterId = dcId;
+        this.physicalNetworkId = physicalNetworkId;
+        this.takenAt = null;
+    }
 
-    @Column(name = "physical_network_id", updatable = false, nullable = false)
-    protected long physicalNetworkId;
-
-    @Column(name = "data_center_id", updatable = false, nullable = false)
-    protected long dataCenterId;
-
-    @Column(name = "account_id")
-    protected Long accountId;
-
-    @Column(name = "reservation_id")
-    protected String reservationId;
-
-    @Column(name = "account_vnet_map_id")
-    protected Long accountGuestVlanMapId;
+    protected DataCenterVnetVO() {
+    }
 
     public Date getTakenAt() {
         return takenAt;
@@ -66,13 +68,6 @@ public class DataCenterVnetVO implements InternalIdentity {
 
     public void setTakenAt(Date taken) {
         this.takenAt = taken;
-    }
-
-    public DataCenterVnetVO(String vnet, long dcId, long physicalNetworkId) {
-        this.vnet = vnet;
-        this.dataCenterId = dcId;
-        this.physicalNetworkId = physicalNetworkId;
-        this.takenAt = null;
     }
 
     @Override
@@ -108,14 +103,11 @@ public class DataCenterVnetVO implements InternalIdentity {
         return physicalNetworkId;
     }
 
-    public void setAccountGuestVlanMapId(Long accountGuestVlanMapId) {
-        this.accountGuestVlanMapId = accountGuestVlanMapId;
-    }
-
     public Long getAccountGuestVlanMapId() {
         return accountGuestVlanMapId;
     }
 
-    protected DataCenterVnetVO() {
+    public void setAccountGuestVlanMapId(Long accountGuestVlanMapId) {
+        this.accountGuestVlanMapId = accountGuestVlanMapId;
     }
 }

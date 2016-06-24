@@ -19,9 +19,6 @@
 
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SetFirewallRulesCommand;
 import com.cloud.agent.api.to.FirewallRuleTO;
@@ -31,7 +28,10 @@ import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.FirewallRule;
 import com.cloud.agent.resource.virtualnetwork.model.FirewallRules;
 
-public class SetFirewallRulesConfigItem extends AbstractConfigItemFacade{
+import java.util.ArrayList;
+import java.util.List;
+
+public class SetFirewallRulesConfigItem extends AbstractConfigItemFacade {
 
     @Override
     public List<ConfigItem> generateConfig(final NetworkElementCommand cmd) {

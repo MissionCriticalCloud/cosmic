@@ -19,9 +19,6 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xen610;
 
-import java.util.List;
-import java.util.Set;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.MigrateWithStorageCompleteAnswer;
 import com.cloud.agent.api.MigrateWithStorageCompleteCommand;
@@ -31,15 +28,18 @@ import com.cloud.hypervisor.xenserver.resource.XsHost;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.exception.CloudRuntimeException;
+import org.apache.cloudstack.storage.to.VolumeObjectTO;
+
+import java.util.List;
+import java.util.Set;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Host;
 import com.xensource.xenapi.VM;
-
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  MigrateWithStorageCompleteCommand.class)
+@ResourceWrapper(handles = MigrateWithStorageCompleteCommand.class)
 public final class XenServer610MigrateWithStorageCompleteCommandWrapper extends CommandWrapper<MigrateWithStorageCompleteCommand, Answer, XenServer610Resource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(XenServer610MigrateWithStorageCompleteCommandWrapper.class);

@@ -23,15 +23,16 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.ProjectInvitationResponse;
 import org.apache.cloudstack.api.response.ProjectResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "listProjectInvitations",
-            description = "Lists project invitations and provides detailed information for listed invitations",
-            responseObject = ProjectInvitationResponse.class,
-            since = "3.0.0",
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = false)
+        description = "Lists project invitations and provides detailed information for listed invitations",
+        responseObject = ProjectInvitationResponse.class,
+        since = "3.0.0",
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = false)
 public class ListProjectInvitationsCmd extends BaseListAccountResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListProjectInvitationsCmd.class.getName());
     private static final String s_name = "listprojectinvitationsresponse";
@@ -43,8 +44,8 @@ public class ListProjectInvitationsCmd extends BaseListAccountResourcesCmd {
     private Long projectId;
 
     @Parameter(name = ApiConstants.ACTIVE_ONLY,
-               type = CommandType.BOOLEAN,
-               description = "if true, list only active invitations - having Pending state and ones that are not timed out yet")
+            type = CommandType.BOOLEAN,
+            description = "if true, list only active invitations - having Pending state and ones that are not timed out yet")
     private boolean activeOnly;
 
     @Parameter(name = ApiConstants.STATE, type = CommandType.STRING, description = "list invitations by state")
@@ -73,8 +74,10 @@ public class ListProjectInvitationsCmd extends BaseListAccountResourcesCmd {
     }
 
     @Override
-    public String getCommandName() {
-        return s_name;
+    public void execute() {
+        ListResponse<ProjectInvitationResponse> response = _queryService.listProjectInvitations(this);
+        response.setResponseName(getCommandName());
+        this.setResponseObject(response);
     }
 
     // ///////////////////////////////////////////////////
@@ -82,10 +85,7 @@ public class ListProjectInvitationsCmd extends BaseListAccountResourcesCmd {
     // ///////////////////////////////////////////////////
 
     @Override
-    public void execute() {
-        ListResponse<ProjectInvitationResponse> response = _queryService.listProjectInvitations(this);
-        response.setResponseName(getCommandName());
-        this.setResponseObject(response);
+    public String getCommandName() {
+        return s_name;
     }
-
 }

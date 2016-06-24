@@ -47,12 +47,6 @@ public class VifAttachment extends Attachment {
         return type;
     }
 
-
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.reflectionToString(this, ToStringStyle.DEFAULT_STYLE, false);
-    }
-
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 31)
@@ -74,5 +68,10 @@ public class VifAttachment extends Attachment {
         }
         final VifAttachment another = (VifAttachment) obj;
         return new EqualsBuilder().append(vifUuid, another.vifUuid).isEquals();
+    }
+
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.reflectionToString(this, ToStringStyle.DEFAULT_STYLE, false);
     }
 }

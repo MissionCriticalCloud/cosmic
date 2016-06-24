@@ -16,16 +16,11 @@
 // under the License.
 package com.cloud.template;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.util.List;
-
 import com.cloud.exception.InternalErrorException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.StorageUnavailableException;
 import com.cloud.user.Account;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.api.BaseListTemplateOrIsoPermissionsCmd;
 import org.apache.cloudstack.api.BaseUpdateTemplateOrIsoPermissionsCmd;
 import org.apache.cloudstack.api.command.user.iso.DeleteIsoCmd;
@@ -40,6 +35,10 @@ import org.apache.cloudstack.api.command.user.template.GetUploadParamsForTemplat
 import org.apache.cloudstack.api.command.user.template.RegisterTemplateCmd;
 import org.apache.cloudstack.api.command.user.template.UpdateTemplateCmd;
 import org.apache.cloudstack.api.response.GetUploadParamsResponse;
+
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.util.List;
 
 public interface TemplateApiService {
 
@@ -60,16 +59,14 @@ public interface TemplateApiService {
     /**
      * Deletes a template
      *
-     * @param cmd
-     *            - the command specifying templateId
+     * @param cmd - the command specifying templateId
      */
     boolean deleteTemplate(DeleteTemplateCmd cmd);
 
     /**
      * Deletes a template
      *
-     * @param cmd
-     *            - the command specifying isoId
+     * @param cmd - the command specifying isoId
      * @return true if deletion is successful, false otherwise
      */
     boolean deleteIso(DeleteIsoCmd cmd);
@@ -77,8 +74,7 @@ public interface TemplateApiService {
     /**
      * Extracts an ISO
      *
-     * @param cmd
-     *            - the command specifying the mode and id of the ISO
+     * @param cmd - the command specifying the mode and id of the ISO
      * @return extractUrl extract url.
      */
     String extract(ExtractIsoCmd cmd) throws InternalErrorException;
@@ -86,8 +82,7 @@ public interface TemplateApiService {
     /**
      * Extracts a Template
      *
-     * @param cmd
-     *            - the command specifying the mode and id of the template
+     * @param cmd - the command specifying the mode and id of the template
      * @return extractUrl  extract url
      */
     String extract(ExtractTemplateCmd cmd) throws InternalErrorException;

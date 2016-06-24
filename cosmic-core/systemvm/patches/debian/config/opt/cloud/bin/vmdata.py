@@ -16,11 +16,11 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import sys
+import base64
 import getopt
 import json
 import os
-import base64
+import sys
 from fcntl import flock, LOCK_EX, LOCK_UN
 
 
@@ -130,7 +130,7 @@ def createfile(ip, folder, file, data):
 def htaccess(ip, folder, file):
     entry = "Options -Indexes\nOrder Deny,Allow\nDeny from all\nAllow from " + ip
     htaccessFolder = "/var/www/html/" + folder + "/" + ip
-    htaccessFile = htaccessFolder+"/.htaccess"
+    htaccessFile = htaccessFolder + "/.htaccess"
 
     try:
         os.makedirs(htaccessFolder, 0755)
@@ -163,6 +163,7 @@ def unflock(file):
         print "failed to unlock file" + file.name + " due to : " + e.strerror
         sys.exit(1)
     return True
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])

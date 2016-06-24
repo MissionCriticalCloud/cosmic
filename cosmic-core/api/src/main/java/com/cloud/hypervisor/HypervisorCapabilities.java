@@ -17,12 +17,11 @@
 package com.cloud.hypervisor;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
 
 /**
- *  HypervisorCapability represents one particular hypervisor version's capabilities.
+ * HypervisorCapability represents one particular hypervisor version's capabilities.
  */
 public interface HypervisorCapabilities extends Identity, InternalIdentity {
 
@@ -51,5 +50,4 @@ public interface HypervisorCapabilities extends Identity, InternalIdentity {
     Integer getMaxHostsPerCluster();
 
     boolean isStorageMotionSupported();
-
 }

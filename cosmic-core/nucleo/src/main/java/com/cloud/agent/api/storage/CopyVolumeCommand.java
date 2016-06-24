@@ -36,8 +36,9 @@ public class CopyVolumeCommand extends Command {
     public CopyVolumeCommand() {
     }
 
-    public CopyVolumeCommand(long volumeId, String volumePath, StoragePool pool, String secondaryStorageURL, boolean toSecondaryStorage, int wait,
-            boolean executeInSequence) {
+    public CopyVolumeCommand(final long volumeId, final String volumePath, final StoragePool pool, final String secondaryStorageURL, final boolean toSecondaryStorage, final int
+            wait,
+                             final boolean executeInSequence) {
         this.volumeId = volumeId;
         this.volumePath = volumePath;
         this.pool = new StorageFilerTO(pool);

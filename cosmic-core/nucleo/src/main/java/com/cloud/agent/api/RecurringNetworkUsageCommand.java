@@ -35,5 +35,4 @@ public class RecurringNetworkUsageCommand extends Command implements CronCommand
     public boolean executeInSequence() {
         return false;
     }
-
 }

@@ -18,9 +18,8 @@
 """ P1 for Deploy VM from ISO
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import cleanup_resources
+from marvin.codes import PASS
 from marvin.lib.base import (Account,
                              VirtualMachine,
                              ServiceOffering,
@@ -29,11 +28,11 @@ from marvin.lib.base import (Account,
 from marvin.lib.common import (get_zone,
                                get_domain,
                                get_template)
-from marvin.codes import PASS
+from marvin.lib.utils import cleanup_resources
+from nose.plugins.attrib import attr
 
 
 class TestDeployVMFromISO(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
 

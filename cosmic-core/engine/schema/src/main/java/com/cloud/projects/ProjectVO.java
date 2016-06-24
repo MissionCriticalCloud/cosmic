@@ -16,8 +16,10 @@
 // under the License.
 package com.cloud.projects;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.NumbersUtil;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.Identity;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,33 +29,24 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "projects")
 public class ProjectVO implements Project, Identity, InternalIdentity {
+    @Column(name = "display_text")
+    String displayText;
+    @Column(name = "domain_id")
+    long domainId;
+    @Column(name = "project_account_id")
+    long projectAccountId;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
     @Column(name = "name")
     private String name;
-
-    @Column(name = "display_text")
-    String displayText;
-
-    @Column(name = "domain_id")
-    long domainId;
-
-    @Column(name = "project_account_id")
-    long projectAccountId;
-
     @Column(name = "state")
     @Enumerated(value = EnumType.STRING)
     private State state;
@@ -78,11 +71,6 @@ public class ProjectVO implements Project, Identity, InternalIdentity {
         this.domainId = domainId;
         this.state = State.Disabled;
         this.uuid = UUID.randomUUID().toString();
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -115,32 +103,13 @@ public class ProjectVO implements Project, Identity, InternalIdentity {
     }
 
     @Override
-    public String toString() {
-        StringBuilder buf = new StringBuilder("Project[");
-        buf.append(id).append("|name=").append(name).append("|domainid=").append(domainId).append("]");
-        return buf.toString();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ProjectVO)) {
-            return false;
-        }
-        ProjectVO that = (ProjectVO)obj;
-        if (this.id != that.id) {
-            return false;
-        }
-
-        return true;
+    public String getName() {
+        return name;
     }
 
     @Override
     public long getProjectAccountId() {
         return projectAccountId;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override
@@ -151,6 +120,10 @@ public class ProjectVO implements Project, Identity, InternalIdentity {
     @Override
     public void setState(State state) {
         this.state = state;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
@@ -165,5 +138,25 @@ public class ProjectVO implements Project, Identity, InternalIdentity {
     @Override
     public int hashCode() {
         return NumbersUtil.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ProjectVO)) {
+            return false;
+        }
+        ProjectVO that = (ProjectVO) obj;
+        if (this.id != that.id) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder("Project[");
+        buf.append(id).append("|name=").append(name).append("|domainid=").append(domainId).append("]");
+        return buf.toString();
     }
 }

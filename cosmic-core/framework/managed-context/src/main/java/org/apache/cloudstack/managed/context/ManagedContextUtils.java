@@ -46,10 +46,9 @@ public class ManagedContextUtils {
 
     public static void rethrowException(Throwable t) {
         if (t instanceof RuntimeException) {
-            throw (RuntimeException)t;
+            throw (RuntimeException) t;
         } else if (t instanceof Error) {
-            throw (Error)t;
+            throw (Error) t;
         }
     }
-
 }

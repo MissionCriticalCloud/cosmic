@@ -17,7 +17,6 @@
 package com.cloud.consoleproxy;
 
 /**
- *
  * Data object to store parameter info needed by client to connect to its host
  */
 public class ConsoleProxyClientParam {
@@ -113,25 +112,26 @@ public class ConsoleProxyClientParam {
     }
 
     public String getClientMapKey() {
-        if (clientTag != null && !clientTag.isEmpty())
+        if (clientTag != null && !clientTag.isEmpty()) {
             return clientTag;
+        }
 
         return clientHostAddress + ":" + clientHostPort;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
         return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

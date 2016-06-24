@@ -16,6 +16,8 @@
 // under the License.
 package com.cloud.storage;
 
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,11 +25,37 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.apache.cloudstack.api.InternalIdentity;
-
 @Entity
 @Table(name = "storage_pool_work")
 public class StoragePoolWorkVO implements InternalIdentity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "pool_id")
+    private Long poolId;
+    @Column(name = "vm_id")
+    private Long vmId;
+    @Column(name = "stopped_for_maintenance")
+    private boolean stoppedForMaintenance;
+    @Column(name = "started_after_maintenance")
+    private boolean startedAfterMaintenance;
+    @Column(name = "mgmt_server_id")
+    private Long managementServerId;
+
+    public StoragePoolWorkVO(long vmId, long poolId, boolean stoppedForMaintenance, boolean startedAfterMaintenance, long mgmtServerId) {
+        super();
+        this.vmId = vmId;
+        this.poolId = poolId;
+        this.stoppedForMaintenance = stoppedForMaintenance;
+        this.startedAfterMaintenance = startedAfterMaintenance;
+        this.managementServerId = mgmtServerId;
+    }
+
+    public StoragePoolWorkVO() {
+
+    }
 
     @Override
     public long getId() {
@@ -76,38 +104,5 @@ public class StoragePoolWorkVO implements InternalIdentity {
 
     public void setManagementServerId(Long managementServerId) {
         this.managementServerId = managementServerId;
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
-
-    @Column(name = "pool_id")
-    private Long poolId;
-
-    @Column(name = "vm_id")
-    private Long vmId;
-
-    @Column(name = "stopped_for_maintenance")
-    private boolean stoppedForMaintenance;
-
-    @Column(name = "started_after_maintenance")
-    private boolean startedAfterMaintenance;
-
-    @Column(name = "mgmt_server_id")
-    private Long managementServerId;
-
-    public StoragePoolWorkVO(long vmId, long poolId, boolean stoppedForMaintenance, boolean startedAfterMaintenance, long mgmtServerId) {
-        super();
-        this.vmId = vmId;
-        this.poolId = poolId;
-        this.stoppedForMaintenance = stoppedForMaintenance;
-        this.startedAfterMaintenance = startedAfterMaintenance;
-        this.managementServerId = mgmtServerId;
-    }
-
-    public StoragePoolWorkVO() {
-
     }
 }

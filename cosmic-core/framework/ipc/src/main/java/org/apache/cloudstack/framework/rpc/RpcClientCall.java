@@ -27,13 +27,13 @@ public interface RpcClientCall {
 
     RpcClientCall setTimeout(int timeoutMilliseconds);
 
-    RpcClientCall setCommandArg(Object arg);
-
     Object getCommandArg();
 
-    RpcClientCall setContext(Object param);
+    RpcClientCall setCommandArg(Object arg);
 
     <T> T getContext();
+
+    RpcClientCall setContext(Object param);
 
     <T> RpcClientCall addCallbackListener(RpcCallbackListener<T> listener);
 

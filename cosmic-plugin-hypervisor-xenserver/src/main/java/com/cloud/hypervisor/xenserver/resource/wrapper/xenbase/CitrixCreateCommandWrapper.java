@@ -19,8 +19,6 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import java.util.HashMap;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.storage.CreateAnswer;
 import com.cloud.agent.api.storage.CreateCommand;
@@ -30,15 +28,17 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.vm.DiskProfile;
+
+import java.util.HashMap;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.SR;
 import com.xensource.xenapi.Types;
 import com.xensource.xenapi.VDI;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  CreateCommand.class)
+@ResourceWrapper(handles = CreateCommand.class)
 public final class CitrixCreateCommandWrapper extends CommandWrapper<CreateCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixCreateCommandWrapper.class);
@@ -56,7 +56,7 @@ public final class CitrixCreateCommandWrapper extends CommandWrapper<CreateComma
                 VDI tmpltvdi = null;
 
                 tmpltvdi = citrixResourceBase.getVDIbyUuid(conn, command.getTemplateUrl());
-                vdi = tmpltvdi.createClone(conn, new HashMap<String, String>());
+                vdi = tmpltvdi.createClone(conn, new HashMap<>());
                 vdi.setNameLabel(conn, dskch.getName());
             } else {
                 final VDI.Record vdir = new VDI.Record();
@@ -68,7 +68,7 @@ public final class CitrixCreateCommandWrapper extends CommandWrapper<CreateComma
                 vdi = VDI.create(conn, vdir);
             }
 
-            VDI.Record vdir;
+            final VDI.Record vdir;
             vdir = vdi.getRecord(conn);
 
             s_logger.debug("Succesfully created VDI for " + command + ".  Uuid = " + vdir.uuid);

@@ -16,19 +16,19 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.api.ApiSerializerHelper;
 import com.cloud.api.SerializationContext;
 import com.cloud.api.query.vo.AsyncJobJoinVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.ResponseObject;
 import org.apache.cloudstack.api.response.AsyncJobResponse;
 import org.apache.cloudstack.framework.jobs.AsyncJob;
+
+import java.util.Date;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -63,7 +63,6 @@ public class AsyncJobJoinDaoImpl extends GenericDaoBase<AsyncJobJoinVO, Long> im
             jobResponse.setJobInstanceType(job.getInstanceType().toString());
 
             jobResponse.setJobInstanceId(job.getInstanceUuid());
-
         }
         jobResponse.setJobResultCode(job.getResultCode());
 
@@ -71,7 +70,7 @@ public class AsyncJobJoinDaoImpl extends GenericDaoBase<AsyncJobJoinVO, Long> im
         SerializationContext.current().setUuidTranslation(false);
 
         Object resultObject = ApiSerializerHelper.fromSerializedString(job.getResult());
-        jobResponse.setJobResult((ResponseObject)resultObject);
+        jobResponse.setJobResult((ResponseObject) resultObject);
         SerializationContext.current().setUuidTranslation(savedValue);
 
         if (resultObject != null) {
@@ -94,7 +93,5 @@ public class AsyncJobJoinDaoImpl extends GenericDaoBase<AsyncJobJoinVO, Long> im
         List<AsyncJobJoinVO> accounts = searchIncludingRemoved(sc, null, null, false);
         assert accounts != null && accounts.size() == 1 : "No async job found for job id " + job.getId();
         return accounts.get(0);
-
     }
-
 }

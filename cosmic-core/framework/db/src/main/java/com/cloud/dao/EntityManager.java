@@ -26,6 +26,8 @@ import java.util.List;
  * Generic Entity Manager to retrieve database objects.
  */
 public interface EntityManager {
+    String MESSAGE_REMOVE_ENTITY_EVENT = "Message.RemoveEntity.Event";
+
     /**
      * Finds an entity by its id.
      *
@@ -69,6 +71,4 @@ public interface EntityManager {
     <T, K extends Serializable> void remove(Class<T> entityType, K id);
 
     <T, K extends Serializable> T findByIdIncludingRemoved(Class<T> entityType, K id);
-
-    String MESSAGE_REMOVE_ENTITY_EVENT = "Message.RemoveEntity.Event";
 }

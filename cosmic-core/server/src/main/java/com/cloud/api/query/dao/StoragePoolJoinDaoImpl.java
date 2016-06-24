@@ -16,11 +16,6 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.vo.StoragePoolJoinVO;
 import com.cloud.capacity.CapacityManager;
@@ -30,9 +25,13 @@ import com.cloud.utils.StringUtils;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.response.StoragePoolResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -40,13 +39,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class StoragePoolJoinDaoImpl extends GenericDaoBase<StoragePoolJoinVO, Long> implements StoragePoolJoinDao {
     public static final Logger s_logger = LoggerFactory.getLogger(StoragePoolJoinDaoImpl.class);
-
+    private final SearchBuilder<StoragePoolJoinVO> spSearch;
+    private final SearchBuilder<StoragePoolJoinVO> spIdSearch;
     @Inject
     private ConfigurationDao _configDao;
-
-    private final SearchBuilder<StoragePoolJoinVO> spSearch;
-
-    private final SearchBuilder<StoragePoolJoinVO> spIdSearch;
 
     protected StoragePoolJoinDaoImpl() {
 
@@ -192,7 +188,6 @@ public class StoragePoolJoinDaoImpl extends GenericDaoBase<StoragePoolJoinVO, Lo
         SearchCriteria<StoragePoolJoinVO> sc = spIdSearch.create();
         sc.setParameters("id", host.getId());
         return searchIncludingRemoved(sc, null, null, false);
-
     }
 
     @Override
@@ -238,5 +233,4 @@ public class StoragePoolJoinDaoImpl extends GenericDaoBase<StoragePoolJoinVO, Lo
         }
         return uvList;
     }
-
 }

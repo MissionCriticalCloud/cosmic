@@ -16,18 +16,17 @@
 // under the License.
 package org.apache.cloudstack.affinity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
 import org.apache.cloudstack.api.response.ControlledViewEntityResponse;
 
-@SuppressWarnings("unused")
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
+
 @EntityReference(value = AffinityGroup.class)
 public class AffinityGroupResponse extends BaseResponse implements ControlledViewEntityResponse {
 
@@ -83,35 +82,45 @@ public class AffinityGroupResponse extends BaseResponse implements ControlledVie
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
     @Override
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    @Override
+    public void setProjectId(final String projectId) {
+        this.projectId = projectId;
     }
 
     @Override
-    public void setDomainId(String domainId) {
+    public void setProjectName(final String projectName) {
+        this.projectName = projectName;
+    }
+
+    @Override
+    public void setDomainId(final String domainId) {
         this.domainId = domainId;
     }
 
     @Override
-    public void setDomainName(String domainName) {
+    public void setDomainName(final String domainName) {
         this.domainName = domainName;
+    }
+
+    public void setType(final String type) {
+        this.type = type;
     }
 
     @Override
@@ -123,42 +132,36 @@ public class AffinityGroupResponse extends BaseResponse implements ControlledVie
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        AffinityGroupResponse other = (AffinityGroupResponse)obj;
+        }
+        final AffinityGroupResponse other = (AffinityGroupResponse) obj;
         if (id == null) {
-            if (other.id != null)
+            if (other.id != null) {
                 return false;
-        } else if (!id.equals(other.id))
+            }
+        } else if (!id.equals(other.id)) {
             return false;
+        }
         return true;
     }
 
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public void setVMIdList(List<String> vmIdList) {
+    public void setVMIdList(final List<String> vmIdList) {
         this.vmIdList = vmIdList;
     }
 
-    public void addVMId(String vmId) {
+    public void addVMId(final String vmId) {
         if (this.vmIdList == null) {
-            this.vmIdList = new ArrayList<String>();
+            this.vmIdList = new ArrayList<>();
         }
 
         this.vmIdList.add(vmId);
     }
-
 }

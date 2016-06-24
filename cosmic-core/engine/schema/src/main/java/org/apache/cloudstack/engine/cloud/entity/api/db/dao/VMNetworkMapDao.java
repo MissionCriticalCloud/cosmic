@@ -16,11 +16,10 @@
 // under the License.
 package org.apache.cloudstack.engine.cloud.entity.api.db.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
-
 import org.apache.cloudstack.engine.cloud.entity.api.db.VMNetworkMapVO;
+
+import java.util.List;
 
 public interface VMNetworkMapDao extends GenericDao<VMNetworkMapVO, Long> {
 
@@ -29,5 +28,4 @@ public interface VMNetworkMapDao extends GenericDao<VMNetworkMapVO, Long> {
     List<Long> getNetworks(long vmId);
 
     VMNetworkMapVO findByVmAndNetworkId(long vmId, long networkId);
-
 }

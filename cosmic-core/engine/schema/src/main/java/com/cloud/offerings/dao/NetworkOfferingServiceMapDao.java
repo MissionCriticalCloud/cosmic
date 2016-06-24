@@ -16,17 +16,16 @@
 // under the License.
 package com.cloud.offerings.dao;
 
-import java.util.List;
-
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.offerings.NetworkOfferingServiceMapVO;
 import com.cloud.utils.db.GenericDao;
 
+import java.util.List;
+
 /**
  * NetworkOfferingServiceDao deals with searches and operations done on the
  * ntwk_offering_service_map table.
- *
  */
 public interface NetworkOfferingServiceMapDao extends GenericDao<NetworkOfferingServiceMapVO, Long> {
     boolean areServicesSupportedByNetworkOffering(long networkOfferingId, Service... services);

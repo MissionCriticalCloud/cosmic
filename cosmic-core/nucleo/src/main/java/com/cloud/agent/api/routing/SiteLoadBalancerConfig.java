@@ -50,20 +50,20 @@ public class SiteLoadBalancerConfig {
     // wight corresponding to this site
     long weight = 1;
 
+    public SiteLoadBalancerConfig(String gslbProviderPublicIP, String gslbProviderPrivateIp, boolean local, boolean revoked, String serviceType, String servicePublicIp,
+                                  String port, long dataCenterId) {
+        this(revoked, serviceType, servicePublicIp, port, dataCenterId);
+        this.gslbProviderPrivateIp = gslbProviderPrivateIp;
+        this.gslbProviderPublicIp = gslbProviderPublicIP;
+        this.local = local;
+    }
+
     public SiteLoadBalancerConfig(boolean revoked, String serviceType, String servicePublicIp, String servicePort, long dataCenterId) {
         this.revoked = revoked;
         this.serviceType = serviceType;
         this.servicePublicIp = servicePublicIp;
         this.servicePort = servicePort;
         this.dataCenterId = dataCenterId;
-    }
-
-    public SiteLoadBalancerConfig(String gslbProviderPublicIP, String gslbProviderPrivateIp, boolean local, boolean revoked, String serviceType, String servicePublicIp,
-            String port, long dataCenterId) {
-        this(revoked, serviceType, servicePublicIp, port, dataCenterId);
-        this.gslbProviderPrivateIp = gslbProviderPrivateIp;
-        this.gslbProviderPublicIp = gslbProviderPublicIP;
-        this.local = local;
     }
 
     public String getServiceType() {
@@ -102,12 +102,12 @@ public class SiteLoadBalancerConfig {
         return gslbProviderPublicIp;
     }
 
-    public long getDataCenterId() {
-        return dataCenterId;
-    }
-
     public void setGslbProviderPublicIp(String publicIp) {
         this.gslbProviderPublicIp = publicIp;
+    }
+
+    public long getDataCenterId() {
+        return dataCenterId;
     }
 
     public boolean isLocal() {
@@ -122,13 +122,12 @@ public class SiteLoadBalancerConfig {
         return revoked;
     }
 
-    public void setWeight(long weight) {
-        assert (weight >= 1 && weight <= 100);
-        this.weight = weight;
-    }
-
     public long getWeight() {
         return weight;
     }
 
+    public void setWeight(long weight) {
+        assert (weight >= 1 && weight <= 100);
+        this.weight = weight;
+    }
 }

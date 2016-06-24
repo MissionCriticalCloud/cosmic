@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.utils.db;
 
-import java.sql.PreparedStatement;
-
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.sql.PreparedStatement;
 
 public class DbTestDao extends GenericDaoBase<DbTestVO, Long> implements GenericDao<DbTestVO, Long> {
     protected DbTestDao() {

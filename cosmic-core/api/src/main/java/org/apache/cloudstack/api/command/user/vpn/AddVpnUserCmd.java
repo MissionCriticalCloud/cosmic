@@ -20,7 +20,6 @@ import com.cloud.domain.Domain;
 import com.cloud.event.EventTypes;
 import com.cloud.network.VpnUser;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -31,6 +30,7 @@ import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.api.response.VpnUsersResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,9 +57,9 @@ public class AddVpnUserCmd extends BaseAsyncCreateCmd {
     private Long projectId;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               description = "an optional domainId for the vpn user. If the account parameter is used, domainId must also be used.")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            description = "an optional domainId for the vpn user. If the account parameter is used, domainId must also be used.")
     private Long domainId;
 
     /////////////////////////////////////////////////////
@@ -74,10 +74,6 @@ public class AddVpnUserCmd extends BaseAsyncCreateCmd {
         return domainId;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -86,33 +82,22 @@ public class AddVpnUserCmd extends BaseAsyncCreateCmd {
         return projectId;
     }
 
+    @Override
+    public String getEventType() {
+        return EventTypes.EVENT_VPN_USER_ADD;
+    }
+
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, projectId, true);
-        if (accountId == null) {
-            return CallContext.current().getCallingAccount().getId();
-        }
-
-        return accountId;
-    }
 
     @Override
     public String getEventDescription() {
         return "Add Remote Access VPN user for account " + getEntityOwnerId() + " username= " + getUserName();
     }
 
-    @Override
-    public String getEventType() {
-        return EventTypes.EVENT_VPN_USER_ADD;
+    public String getUserName() {
+        return userName;
     }
 
     @Override
@@ -137,6 +122,21 @@ public class AddVpnUserCmd extends BaseAsyncCreateCmd {
         vpnResponse.setResponseName(getCommandName());
         vpnResponse.setObjectName("vpnuser");
         setResponseObject(vpnResponse);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, projectId, true);
+        if (accountId == null) {
+            return CallContext.current().getCallingAccount().getId();
+        }
+
+        return accountId;
     }
 
     @Override

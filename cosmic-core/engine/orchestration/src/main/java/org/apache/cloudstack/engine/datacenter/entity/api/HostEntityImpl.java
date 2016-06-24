@@ -16,16 +16,15 @@
 // under the License.
 package org.apache.cloudstack.engine.datacenter.entity.api;
 
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.utils.fsm.NoTransitionException;
+import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
+import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineHostVO;
+
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.utils.fsm.NoTransitionException;
-
-import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
-import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineHostVO;
 
 public class HostEntityImpl implements HostEntity {
 
@@ -93,6 +92,10 @@ public class HostEntityImpl implements HostEntity {
         return hostVO.getName();
     }
 
+    public void setName(String name) {
+        hostVO.setName(name);
+    }
+
     @Override
     public String getUuid() {
         return hostVO.getUuid();
@@ -131,13 +134,13 @@ public class HostEntityImpl implements HostEntity {
         return hostVO.getOwner();
     }
 
-    public void setDetails(Map<String, String> details) {
-        hostVO.setDetails(details);
-    }
-
     @Override
     public Map<String, String> getDetails() {
         return hostVO.getDetails();
+    }
+
+    public void setDetails(Map<String, String> details) {
+        hostVO.setDetails(details);
     }
 
     @Override
@@ -160,6 +163,10 @@ public class HostEntityImpl implements HostEntity {
     public List<Method> getApplicableActions() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public void setOwner(String owner) {
+        hostVO.setOwner(owner);
     }
 
     @Override
@@ -201,13 +208,4 @@ public class HostEntityImpl implements HostEntity {
     public Long getClusterId() {
         return hostVO.getClusterId();
     }
-
-    public void setOwner(String owner) {
-        hostVO.setOwner(owner);
-    }
-
-    public void setName(String name) {
-        hostVO.setName(name);
-    }
-
 }

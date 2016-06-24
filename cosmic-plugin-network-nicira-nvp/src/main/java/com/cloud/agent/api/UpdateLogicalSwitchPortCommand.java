@@ -27,7 +27,7 @@ public class UpdateLogicalSwitchPortCommand extends Command {
     private final String nicName;
 
     public UpdateLogicalSwitchPortCommand(final String logicalSwitchPortUuid, final String logicalSwitchUuid, final String attachmentUuid, final String ownerName,
-            final String nicName) {
+                                          final String nicName) {
         this.logicalSwitchUuid = logicalSwitchUuid;
         this.logicalSwitchPortUuid = logicalSwitchPortUuid;
         this.attachmentUuid = attachmentUuid;
@@ -59,5 +59,4 @@ public class UpdateLogicalSwitchPortCommand extends Command {
     public boolean executeInSequence() {
         return false;
     }
-
 }

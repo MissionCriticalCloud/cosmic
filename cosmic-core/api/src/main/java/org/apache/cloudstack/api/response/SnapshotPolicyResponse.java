@@ -18,12 +18,12 @@ package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
 import com.cloud.storage.snapshot.SnapshotPolicy;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = SnapshotPolicy.class)
 public class SnapshotPolicyResponse extends BaseResponse {
@@ -59,7 +59,7 @@ public class SnapshotPolicyResponse extends BaseResponse {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -67,7 +67,7 @@ public class SnapshotPolicyResponse extends BaseResponse {
         return volumeId;
     }
 
-    public void setVolumeId(String volumeId) {
+    public void setVolumeId(final String volumeId) {
         this.volumeId = volumeId;
     }
 
@@ -75,7 +75,7 @@ public class SnapshotPolicyResponse extends BaseResponse {
         return schedule;
     }
 
-    public void setSchedule(String schedule) {
+    public void setSchedule(final String schedule) {
         this.schedule = schedule;
     }
 
@@ -83,7 +83,7 @@ public class SnapshotPolicyResponse extends BaseResponse {
         return intervalType;
     }
 
-    public void setIntervalType(short intervalType) {
+    public void setIntervalType(final short intervalType) {
         this.intervalType = intervalType;
     }
 
@@ -91,7 +91,7 @@ public class SnapshotPolicyResponse extends BaseResponse {
         return maxSnaps;
     }
 
-    public void setMaxSnaps(int maxSnaps) {
+    public void setMaxSnaps(final int maxSnaps) {
         this.maxSnaps = maxSnaps;
     }
 
@@ -99,7 +99,7 @@ public class SnapshotPolicyResponse extends BaseResponse {
         return timezone;
     }
 
-    public void setTimezone(String timezone) {
+    public void setTimezone(final String timezone) {
         this.timezone = timezone;
     }
 
@@ -107,7 +107,7 @@ public class SnapshotPolicyResponse extends BaseResponse {
         return forDisplay;
     }
 
-    public void setForDisplay(Boolean forDisplay) {
+    public void setForDisplay(final Boolean forDisplay) {
         this.forDisplay = forDisplay;
     }
 }

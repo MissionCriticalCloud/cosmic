@@ -39,5 +39,4 @@ public class SetupAnswer extends Answer {
     public boolean needReconnect() {
         return _reconnect;
     }
-
 }

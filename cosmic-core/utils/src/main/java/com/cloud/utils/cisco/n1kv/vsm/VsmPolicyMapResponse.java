@@ -59,10 +59,10 @@ public class VsmPolicyMapResponse extends VsmResponse {
 
     protected void parseData(Node data) {
         try {
-            NodeList list = ((Element)data).getElementsByTagName(s_policyMapDetails);
+            NodeList list = ((Element) data).getElementsByTagName(s_policyMapDetails);
             if (list.getLength() > 0) {
-                NodeList readOnlyList = ((Element)list.item(0)).getElementsByTagName("__readonly__");
-                Element readOnly = (Element)readOnlyList.item(0);
+                NodeList readOnlyList = ((Element) list.item(0)).getElementsByTagName("__readonly__");
+                Element readOnly = (Element) readOnlyList.item(0);
 
                 for (Node node = readOnly.getFirstChild(); node != null; node = node.getNextSibling()) {
                     String currentNode = node.getNodeName();

@@ -18,18 +18,11 @@
  */
 package org.apache.cloudstack.storage.cache.manager;
 
-import java.util.Calendar;
-import java.util.Date;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.configuration.Config;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
@@ -40,6 +33,11 @@ import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreVO;
 import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
 import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreVO;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.Calendar;
+import java.util.Date;
 
 public class StorageCacheReplacementAlgorithmLRU implements StorageCacheReplacementAlgorithm {
     @Inject

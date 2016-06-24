@@ -16,11 +16,6 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.ApiResponseHelper;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
@@ -34,10 +29,14 @@ import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.response.VolumeResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -45,15 +44,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implements VolumeJoinDao {
     public static final Logger s_logger = LoggerFactory.getLogger(VolumeJoinDaoImpl.class);
-
-    @Inject
-    private ConfigurationDao  _configDao;
+    private final SearchBuilder<VolumeJoinVO> volSearch;
+    private final SearchBuilder<VolumeJoinVO> volIdSearch;
     @Inject
     public AccountManager _accountMgr;
-
-    private final SearchBuilder<VolumeJoinVO> volSearch;
-
-    private final SearchBuilder<VolumeJoinVO> volIdSearch;
+    @Inject
+    private ConfigurationDao _configDao;
 
     protected VolumeJoinDaoImpl() {
 
@@ -114,8 +110,9 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
             volResponse.setSize(volume.getVolumeStoreSize());
             volResponse.setCreated(volume.getCreatedOnStore());
 
-            if (view == ResponseView.Full)
+            if (view == ResponseView.Full) {
                 volResponse.setHypervisor(ApiDBUtils.getHypervisorTypeFromFormat(volume.getDataCenterId(), volume.getFormat()).toString());
+            }
             if (volume.getDownloadState() != Status.DOWNLOADED) {
                 String volumeStatus = "Processing";
                 if (volume.getDownloadState() == VMTemplateHostVO.Status.DOWNLOAD_IN_PROGRESS) {
@@ -179,7 +176,6 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
             volResponse.setBytesWriteRate(volume.getBytesReadRate());
             volResponse.setIopsReadRate(volume.getIopsWriteRate());
             volResponse.setIopsWriteRate(volume.getIopsWriteRate());
-
         }
 
         // return hypervisor and storage pool info for ROOT and Resource domain only
@@ -304,5 +300,4 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
         }
         return uvList;
     }
-
 }

@@ -16,7 +16,9 @@
 // under the License.
 package org.apache.cloudstack.framework.config.impl;
 
-import java.util.Date;
+import com.cloud.utils.crypt.DBEncryptionUtil;
+import org.apache.cloudstack.config.Configuration;
+import org.apache.cloudstack.framework.config.ConfigKey;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,11 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.utils.crypt.DBEncryptionUtil;
-
-import org.apache.cloudstack.config.Configuration;
-import org.apache.cloudstack.framework.config.ConfigKey;
+import java.util.Date;
 
 @Entity
 @Table(name = "configuration")
@@ -68,6 +66,13 @@ public class ConfigurationVO implements Configuration {
     protected ConfigurationVO() {
     }
 
+    public ConfigurationVO(String component, ConfigKey<?> key) {
+        this(key.category(), "DEFAULT", component, key.key(), key.defaultValue(), key.description());
+        defaultValue = key.defaultValue();
+        dynamic = key.isDynamic();
+        scope = key.scope() != null ? key.scope().toString() : null;
+    }
+
     public ConfigurationVO(String category, String instance, String component, String name, String value, String description) {
         this.category = category;
         this.instance = instance;
@@ -77,11 +82,8 @@ public class ConfigurationVO implements Configuration {
         setValue(value);
     }
 
-    public ConfigurationVO(String component, ConfigKey<?> key) {
-        this(key.category(), "DEFAULT", component, key.key(), key.defaultValue(), key.description());
-        defaultValue = key.defaultValue();
-        dynamic = key.isDynamic();
-        scope = key.scope() != null ? key.scope().toString() : null;
+    private boolean isEncryptedConfig() {
+        return "Hidden".equals(getCategory()) || "Secure".equals(getCategory());
     }
 
     @Override
@@ -122,7 +124,7 @@ public class ConfigurationVO implements Configuration {
 
     @Override
     public String getValue() {
-        if(isEncryptedConfig()) {
+        if (isEncryptedConfig()) {
             return DBEncryptionUtil.decrypt(value);
         } else {
             return value;
@@ -130,15 +132,11 @@ public class ConfigurationVO implements Configuration {
     }
 
     public void setValue(String value) {
-        if(isEncryptedConfig()) {
+        if (isEncryptedConfig()) {
             this.value = DBEncryptionUtil.encrypt(value);
         } else {
             this.value = value;
         }
-    }
-
-    private boolean isEncryptedConfig() {
-        return "Hidden".equals(getCategory()) || "Secure".equals(getCategory());
     }
 
     @Override
@@ -148,6 +146,11 @@ public class ConfigurationVO implements Configuration {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String getDefaultValue() {
+        return defaultValue;
     }
 
     @Override
@@ -165,24 +168,19 @@ public class ConfigurationVO implements Configuration {
     }
 
     @Override
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
-    public void setScope(String scope) {
-        this.scope = scope;
-    }
-
-    @Override
     public Date getUpdated() {
         return updated;
     }
 
     public void setUpdated(Date updated) {
         this.updated = updated;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }

@@ -16,14 +16,6 @@
 // under the License.
 package org.apache.cloudstack.storage.allocator;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
@@ -36,9 +28,16 @@ import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -59,6 +58,19 @@ public class LocalStoragePoolAllocator extends AbstractStoragePoolAllocator {
     CapacityDao _capacityDao;
     @Inject
     ConfigurationDao _configDao;
+
+    public LocalStoragePoolAllocator() {
+    }
+
+    @Override
+    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+        super.configure(name, params);
+
+        _storageOverprovisioningFactor = new BigDecimal(1);
+        _extraBytesPerVolume = NumbersUtil.parseLong((String) params.get("extra.bytes.per.volume"), 50 * 1024L * 1024L);
+
+        return true;
+    }
 
     @Override
     protected List<StoragePool> select(DiskProfile dskCh, VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoid, int returnUpTo) {
@@ -85,7 +97,7 @@ public class LocalStoragePoolAllocator extends AbstractStoragePoolAllocator {
             List<StoragePoolVO> hostTagsPools = _storagePoolDao.findLocalStoragePoolsByHostAndTags(plan.getHostId(), dskCh.getTags());
             for (StoragePoolVO pool : hostTagsPools) {
                 if (pool != null && pool.isLocal()) {
-                    StoragePool storagePool = (StoragePool)this.dataStoreMgr.getPrimaryDataStore(pool.getId());
+                    StoragePool storagePool = (StoragePool) this.dataStoreMgr.getPrimaryDataStore(pool.getId());
                     if (filter(avoid, storagePool, dskCh, plan)) {
                         s_logger.debug("Found suitable local storage pool " + pool.getId() + ", adding to list");
                         suitablePools.add(storagePool);
@@ -104,12 +116,12 @@ public class LocalStoragePoolAllocator extends AbstractStoragePoolAllocator {
                 return null;
             }
             List<StoragePoolVO> availablePools =
-                _storagePoolDao.findLocalStoragePoolsByTags(plan.getDataCenterId(), plan.getPodId(), plan.getClusterId(), dskCh.getTags());
+                    _storagePoolDao.findLocalStoragePoolsByTags(plan.getDataCenterId(), plan.getPodId(), plan.getClusterId(), dskCh.getTags());
             for (StoragePoolVO pool : availablePools) {
                 if (suitablePools.size() == returnUpTo) {
                     break;
                 }
-                StoragePool storagePool = (StoragePool)this.dataStoreMgr.getPrimaryDataStore(pool.getId());
+                StoragePool storagePool = (StoragePool) this.dataStoreMgr.getPrimaryDataStore(pool.getId());
                 if (filter(avoid, storagePool, dskCh, plan)) {
                     suitablePools.add(storagePool);
                 } else {
@@ -131,18 +143,5 @@ public class LocalStoragePoolAllocator extends AbstractStoragePoolAllocator {
         }
 
         return suitablePools;
-    }
-
-    @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
-        super.configure(name, params);
-
-        _storageOverprovisioningFactor = new BigDecimal(1);
-        _extraBytesPerVolume = NumbersUtil.parseLong((String)params.get("extra.bytes.per.volume"), 50 * 1024L * 1024L);
-
-        return true;
-    }
-
-    public LocalStoragePoolAllocator() {
     }
 }

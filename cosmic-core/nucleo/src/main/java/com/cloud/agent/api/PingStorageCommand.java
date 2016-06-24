@@ -19,9 +19,9 @@
 
 package com.cloud.agent.api;
 
-import java.util.Map;
-
 import com.cloud.host.Host;
+
+import java.util.Map;
 
 public class PingStorageCommand extends PingCommand {
     Map<String, Boolean> changes;

@@ -16,8 +16,7 @@
 // under the License.
 package com.cloud.projects;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,8 +26,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "project_invitations")
@@ -116,15 +115,15 @@ public class ProjectInvitationVO implements ProjectInvitation {
     }
 
     @Override
+    public Long getInDomainId() {
+        return inDomainId;
+    }
+
+    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder("ProjectInvitation[");
         buf.append(id).append("|projectId=").append(projectId).append("|accountId=").append(forAccountId).append("]");
         return buf.toString();
-    }
-
-    @Override
-    public Long getInDomainId() {
-        return inDomainId;
     }
 
     @Override

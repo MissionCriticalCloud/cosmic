@@ -49,5 +49,4 @@ public abstract class AbstractRect implements Rect {
     public int getHeight() {
         return height;
     }
-
 }

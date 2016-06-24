@@ -21,8 +21,6 @@ import com.cloud.vm.SecondaryStorageVmVO;
 
 public class SecStorageVmAlertEventArgs extends EventArgs {
 
-    private static final long serialVersionUID = 23773987551479885L;
-
     public static final int SSVM_CREATED = 1;
     public static final int SSVM_UP = 2;
     public static final int SSVM_DOWN = 3;
@@ -31,9 +29,8 @@ public class SecStorageVmAlertEventArgs extends EventArgs {
     public static final int SSVM_FIREWALL_ALERT = 6;
     public static final int SSVM_STORAGE_ALERT = 7;
     public static final int SSVM_REBOOTED = 8;
-
     public static final String ALERT_SUBJECT = "ssvm-alert";
-
+    private static final long serialVersionUID = 23773987551479885L;
     private int type;
     private long zoneId;
     private long ssVmId;

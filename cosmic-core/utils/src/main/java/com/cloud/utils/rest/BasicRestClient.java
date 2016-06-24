@@ -46,14 +46,14 @@ public class BasicRestClient implements RestClient {
         clientContext.setTargetHost(buildHttpHost(builder.host));
     }
 
+    private static HttpHost buildHttpHost(final String host) {
+        return new HttpHost(host, HTTPS_PORT, HTTPS);
+    }
+
     protected BasicRestClient(final CloseableHttpClient client, final HttpClientContext clientContex, final String host) {
         this.client = client;
         clientContext = clientContex;
         clientContext.setTargetHost(buildHttpHost(host));
-    }
-
-    private static HttpHost buildHttpHost(final String host) {
-        return new HttpHost(host, HTTPS_PORT, HTTPS);
     }
 
     @SuppressWarnings("rawtypes")
@@ -90,7 +90,7 @@ public class BasicRestClient implements RestClient {
         }
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     protected static class Builder<T extends Builder> {
         private CloseableHttpClient client;
         private HttpClientContext clientContext = HttpClientContext.create();
@@ -115,5 +115,4 @@ public class BasicRestClient implements RestClient {
             return new BasicRestClient(this);
         }
     }
-
 }

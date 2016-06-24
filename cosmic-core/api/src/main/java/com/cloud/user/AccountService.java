@@ -16,50 +16,39 @@
 // under the License.
 package com.cloud.user;
 
-import java.util.Map;
-
 import com.cloud.domain.Domain;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.offering.DiskOffering;
 import com.cloud.offering.ServiceOffering;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.command.admin.user.RegisterCmd;
+
+import java.util.Map;
 
 public interface AccountService {
 
     /**
      * Creates a new user and account, stores the password as is so encrypted passwords are recommended.
      *
-     * @param userName
-     *            TODO
-     * @param password
-     *            TODO
-     * @param firstName
-     *            TODO
-     * @param lastName
-     *            TODO
-     * @param email
-     *            TODO
-     * @param timezone
-     *            TODO
-     * @param accountName
-     *            TODO
-     * @param accountType
-     *            TODO
-     * @param domainId
-     *            TODO
-     * @param networkDomain
-     *            TODO
-     *
+     * @param userName      TODO
+     * @param password      TODO
+     * @param firstName     TODO
+     * @param lastName      TODO
+     * @param email         TODO
+     * @param timezone      TODO
+     * @param accountName   TODO
+     * @param accountType   TODO
+     * @param domainId      TODO
+     * @param networkDomain TODO
      * @return the user if created successfully, null otherwise
      */
     UserAccount createUserAccount(String userName, String password, String firstName, String lastName, String email, String timezone, String accountName,
-        short accountType, Long domainId, String networkDomain, Map<String, String> details, String accountUUID, String userUUID);
+                                  short accountType, Long domainId, String networkDomain, Map<String, String> details, String accountUUID, String userUUID);
 
-    UserAccount createUserAccount(String userName, String password, String firstName, String lastName, String email, String timezone, String accountName, short accountType, Long domainId, String networkDomain,
+    UserAccount createUserAccount(String userName, String password, String firstName, String lastName, String email, String timezone, String accountName, short accountType, Long
+            domainId, String networkDomain,
                                   Map<String, String> details, String accountUUID, String userUUID, User.Source source);
 
     /**
@@ -125,15 +114,15 @@ public interface AccountService {
     void checkAccess(Account account, DiskOffering dof) throws PermissionDeniedException;
 
     void checkAccess(Account account, AccessType accessType, boolean sameOwner, String apiName,
-            ControlledEntity... entities) throws PermissionDeniedException;
+                     ControlledEntity... entities) throws PermissionDeniedException;
 
     Long finalyzeAccountId(String accountName, Long domainId, Long projectId, boolean enabledOnly);
 
     /**
      * returns the user account object for a given user id
+     *
      * @param userId user id
      * @return useraccount object if it exists else null
      */
     UserAccount getUserAccountById(Long userId);
-
 }

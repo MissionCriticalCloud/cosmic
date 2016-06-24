@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.List;
 
 public class SslCertDaoImpl extends GenericDaoBase<SslCertVO, Long> implements SslCertDao {
 
@@ -38,5 +38,4 @@ public class SslCertDaoImpl extends GenericDaoBase<SslCertVO, Long> implements S
         sc.setParameters("accountId", accountId);
         return listBy(sc);
     }
-
 }

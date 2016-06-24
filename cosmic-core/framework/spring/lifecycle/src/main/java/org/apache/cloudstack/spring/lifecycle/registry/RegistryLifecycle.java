@@ -18,12 +18,12 @@
  */
 package org.apache.cloudstack.spring.lifecycle.registry;
 
+import com.cloud.utils.component.Registry;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
-
-import com.cloud.utils.component.Registry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,11 +36,9 @@ import org.springframework.util.StringUtils;
 
 public class RegistryLifecycle implements BeanPostProcessor, SmartLifecycle, ApplicationContextAware {
 
-    private static final Logger log = LoggerFactory.getLogger(RegistryLifecycle.class);
-
     public static final String EXTENSION_EXCLUDE = "extensions.exclude";
     public static final String EXTENSION_INCLUDE_PREFIX = "extensions.include.";
-
+    private static final Logger log = LoggerFactory.getLogger(RegistryLifecycle.class);
     Registry<Object> registry;
 
     /* The bean name works around circular dependency issues in Spring.  This shouldn't be
@@ -133,6 +131,11 @@ public class RegistryLifecycle implements BeanPostProcessor, SmartLifecycle, App
         return false;
     }
 
+    @SuppressWarnings("unchecked")
+    protected Registry<Object> lookupRegistry() {
+        return registry == null ? applicationContext.getBean(registryBeanName, Registry.class) : registry;
+    }
+
     @Override
     public int getPhase() {
         return 2000;
@@ -152,11 +155,6 @@ public class RegistryLifecycle implements BeanPostProcessor, SmartLifecycle, App
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected Registry<Object> lookupRegistry() {
-        return registry == null ? applicationContext.getBean(registryBeanName, Registry.class) : registry;
     }
 
     public Registry<Object> getRegistry() {
@@ -182,5 +180,4 @@ public class RegistryLifecycle implements BeanPostProcessor, SmartLifecycle, App
     public void setRegistryBeanName(String registryBeanName) {
         this.registryBeanName = registryBeanName;
     }
-
 }

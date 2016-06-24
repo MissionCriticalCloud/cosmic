@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.network.as;
 
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = ("autoscale_vmgroup_policy_map"))
@@ -42,13 +42,13 @@ public class AutoScaleVmGroupPolicyMapVO implements InternalIdentity {
     public AutoScaleVmGroupPolicyMapVO() {
     }
 
+    public AutoScaleVmGroupPolicyMapVO(long vmgroupId, long policyId, boolean revoke) {
+        this(vmgroupId, policyId);
+    }
+
     public AutoScaleVmGroupPolicyMapVO(long vmGroupId, long policyId) {
         this.vmGroupId = vmGroupId;
         this.policyId = policyId;
-    }
-
-    public AutoScaleVmGroupPolicyMapVO(long vmgroupId, long policyId, boolean revoke) {
-        this(vmgroupId, policyId);
     }
 
     @Override

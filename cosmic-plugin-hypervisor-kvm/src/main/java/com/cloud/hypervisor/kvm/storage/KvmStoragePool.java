@@ -1,58 +1,57 @@
 package com.cloud.hypervisor.kvm.storage;
 
+import com.cloud.storage.Storage;
+import com.cloud.storage.Storage.StoragePoolType;
+import org.apache.cloudstack.utils.qemu.QemuImg.PhysicalDiskFormat;
+
 import java.util.List;
 import java.util.Map;
 
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.StoragePoolType;
-
-import org.apache.cloudstack.utils.qemu.QemuImg.PhysicalDiskFormat;
-
 public interface KvmStoragePool {
-  public KvmPhysicalDisk createPhysicalDisk(String volumeUuid, PhysicalDiskFormat format,
-      Storage.ProvisioningType provisioningType, long size);
+    public KvmPhysicalDisk createPhysicalDisk(String volumeUuid, PhysicalDiskFormat format,
+                                              Storage.ProvisioningType provisioningType, long size);
 
-  public KvmPhysicalDisk createPhysicalDisk(String volumeUuid, Storage.ProvisioningType provisioningType, long size);
+    public KvmPhysicalDisk createPhysicalDisk(String volumeUuid, Storage.ProvisioningType provisioningType, long size);
 
-  public boolean connectPhysicalDisk(String volumeUuid, Map<String, String> details);
+    public boolean connectPhysicalDisk(String volumeUuid, Map<String, String> details);
 
-  public KvmPhysicalDisk getPhysicalDisk(String volumeUuid);
+    public KvmPhysicalDisk getPhysicalDisk(String volumeUuid);
 
-  public boolean disconnectPhysicalDisk(String volumeUuid);
+    public boolean disconnectPhysicalDisk(String volumeUuid);
 
-  public boolean deletePhysicalDisk(String volumeUuid, Storage.ImageFormat format);
+    public boolean deletePhysicalDisk(String volumeUuid, Storage.ImageFormat format);
 
-  public List<KvmPhysicalDisk> listPhysicalDisks();
+    public List<KvmPhysicalDisk> listPhysicalDisks();
 
-  public String getUuid();
+    public String getUuid();
 
-  public long getCapacity();
+    public long getCapacity();
 
-  public long getUsed();
+    public long getUsed();
 
-  public long getAvailable();
+    public long getAvailable();
 
-  public boolean refresh();
+    public boolean refresh();
 
-  public boolean isExternalSnapshot();
+    public boolean isExternalSnapshot();
 
-  public String getLocalPath();
+    public String getLocalPath();
 
-  public String getSourceHost();
+    public String getSourceHost();
 
-  public String getSourceDir();
+    public String getSourceDir();
 
-  public int getSourcePort();
+    public int getSourcePort();
 
-  public String getAuthUserName();
+    public String getAuthUserName();
 
-  public String getAuthSecret();
+    public String getAuthSecret();
 
-  public StoragePoolType getType();
+    public StoragePoolType getType();
 
-  public boolean delete();
+    public boolean delete();
 
-  PhysicalDiskFormat getDefaultFormat();
+    PhysicalDiskFormat getDefaultFormat();
 
-  public boolean createFolder(String path);
+    public boolean createFolder(String path);
 }

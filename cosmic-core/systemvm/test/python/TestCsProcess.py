@@ -15,19 +15,19 @@
 # specific language governing permissions and limitations
 # under the License.
 
+import merge
 import unittest
 from cs.CsProcess import CsProcess
-import merge
 
 
 class TestCsProcess(unittest.TestCase):
-
     def setUp(self):
         merge.DataBag.DPATH = "."
 
     def test_init(self):
-        csprocess = CsProcess({})
+        csprocess = CsProcess({ })
         self.assertTrue(csprocess is not None)
+
 
 if __name__ == '__main__':
     unittest.main()

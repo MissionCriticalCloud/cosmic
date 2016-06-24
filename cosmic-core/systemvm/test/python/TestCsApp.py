@@ -15,15 +15,14 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import unittest
-from cs.CsApp import CsApp
-from cs.CsAddress import CsIP
-from cs.CsConfig import CsConfig
 import merge
+import unittest
+from cs.CsAddress import CsIP
+from cs.CsApp import CsApp
+from cs.CsConfig import CsConfig
 
 
 class TestCsApp(unittest.TestCase):
-
     def setUp(self):
         merge.DataBag.DPATH = "."
 
@@ -33,6 +32,7 @@ class TestCsApp(unittest.TestCase):
         csip = CsIP("eth0", csconfig)
         csapp = CsApp(csip)
         self.assertTrue(csapp is not None)
+
 
 if __name__ == '__main__':
     unittest.main()

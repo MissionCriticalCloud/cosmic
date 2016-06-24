@@ -18,13 +18,14 @@
  */
 package org.apache.cloudstack.api;
 
-import java.net.URL;
-import java.util.UUID;
-
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.GetUploadParamsResponse;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.net.URL;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +85,7 @@ public abstract class AbstractGetUploadParamsCmd extends BaseCmd {
         return projectId;
     }
 
-    public GetUploadParamsResponse createGetUploadParamsResponse(UUID id, URL postURL, String metadata, String timeout, String signature) {
+    public GetUploadParamsResponse createGetUploadParamsResponse(final UUID id, final URL postURL, final String metadata, final String timeout, final String signature) {
         return new GetUploadParamsResponse(id, postURL, metadata, timeout, signature);
     }
 }

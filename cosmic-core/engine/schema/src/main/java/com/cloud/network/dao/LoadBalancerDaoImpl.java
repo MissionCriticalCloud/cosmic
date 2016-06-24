@@ -16,10 +16,6 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.network.rules.FirewallRule.State;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.utils.db.GenericDaoBase;
@@ -27,13 +23,15 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 
+import javax.inject.Inject;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class LoadBalancerDaoImpl extends GenericDaoBase<LoadBalancerVO, Long> implements LoadBalancerDao {
-    private final SearchBuilder<LoadBalancerVO> ListByIp;
     protected final SearchBuilder<LoadBalancerVO> TransitionStateSearch;
-
+    private final SearchBuilder<LoadBalancerVO> ListByIp;
     @Inject
     protected FirewallRulesCidrsDao _portForwardingRulesCidrsDao;
 
@@ -52,27 +50,26 @@ public class LoadBalancerDaoImpl extends GenericDaoBase<LoadBalancerVO, Long> im
     }
 
     @Override
-    public List<LoadBalancerVO> listByIpAddress(long ipAddressId) {
-        SearchCriteria<LoadBalancerVO> sc = ListByIp.create();
+    public List<LoadBalancerVO> listByIpAddress(final long ipAddressId) {
+        final SearchCriteria<LoadBalancerVO> sc = ListByIp.create();
         sc.setParameters("ipAddressId", ipAddressId);
         return listBy(sc);
     }
 
     @Override
-    public List<LoadBalancerVO> listByNetworkIdAndScheme(long networkId, Scheme scheme) {
-        SearchCriteria<LoadBalancerVO> sc = ListByIp.create();
+    public List<LoadBalancerVO> listByNetworkIdAndScheme(final long networkId, final Scheme scheme) {
+        final SearchCriteria<LoadBalancerVO> sc = ListByIp.create();
         sc.setParameters("networkId", networkId);
         sc.setParameters("scheme", scheme);
         return listBy(sc);
     }
 
     @Override
-    public List<LoadBalancerVO> listInTransitionStateByNetworkIdAndScheme(long networkId, Scheme scheme) {
-        SearchCriteria<LoadBalancerVO> sc = TransitionStateSearch.create();
+    public List<LoadBalancerVO> listInTransitionStateByNetworkIdAndScheme(final long networkId, final Scheme scheme) {
+        final SearchCriteria<LoadBalancerVO> sc = TransitionStateSearch.create();
         sc.setParameters("networkId", networkId);
         sc.setParameters("state", State.Add.toString(), State.Revoke.toString());
         sc.setParameters("scheme", scheme);
         return listBy(sc);
     }
-
 }

@@ -38,5 +38,4 @@ public class CreateLogicalRouterAnswer extends Answer {
     public String getLogicalRouterUuid() {
         return logicalRouterUuid;
     }
-
 }

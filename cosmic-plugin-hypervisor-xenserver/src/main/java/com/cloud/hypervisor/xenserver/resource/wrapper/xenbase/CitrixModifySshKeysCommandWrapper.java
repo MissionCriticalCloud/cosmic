@@ -25,7 +25,7 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 
-@ResourceWrapper(handles =  ModifySshKeysCommand.class)
+@ResourceWrapper(handles = ModifySshKeysCommand.class)
 public final class CitrixModifySshKeysCommandWrapper extends CommandWrapper<ModifySshKeysCommand, Answer, CitrixResourceBase> {
 
     @Override

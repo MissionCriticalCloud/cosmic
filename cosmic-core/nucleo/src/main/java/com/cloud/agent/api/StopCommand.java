@@ -23,12 +23,12 @@ import com.cloud.agent.api.to.GPUDeviceTO;
 import com.cloud.vm.VirtualMachine;
 
 public class StopCommand extends RebootCommand {
+    boolean executeInSequence = false;
+    boolean checkBeforeCleanup = false;
     private boolean isProxy = false;
     private String urlPort = null;
     private String publicConsoleProxyIpAddress = null;
-    boolean executeInSequence = false;
     private GPUDeviceTO gpuDevice;
-    boolean checkBeforeCleanup = false;
 
     protected StopCommand() {
     }

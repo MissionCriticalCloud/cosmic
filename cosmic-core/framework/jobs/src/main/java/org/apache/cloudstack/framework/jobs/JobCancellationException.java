@@ -16,25 +16,19 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs;
 
-import java.util.concurrent.CancellationException;
-
 import com.cloud.utils.SerialVersionUID;
+
+import java.util.concurrent.CancellationException;
 
 /**
  * This exception is fired when the job has been cancelled
- *
  */
 public class JobCancellationException extends CancellationException {
 
     private static final long serialVersionUID = SerialVersionUID.AffinityConflictException;
-
-    public enum Reason {
-        RequestedByUser, RequestedByCaller, TimedOut;
-    }
-
     Reason reason;
 
-    public JobCancellationException(Reason reason) {
+    public JobCancellationException(final Reason reason) {
         super("The job was cancelled due to " + reason.toString());
         this.reason = reason;
     }
@@ -43,4 +37,7 @@ public class JobCancellationException extends CancellationException {
         return reason;
     }
 
+    public enum Reason {
+        RequestedByUser, RequestedByCaller, TimedOut
+    }
 }

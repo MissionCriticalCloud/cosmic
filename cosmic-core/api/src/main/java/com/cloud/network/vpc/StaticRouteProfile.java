@@ -16,8 +16,8 @@
 // under the License.
 package com.cloud.network.vpc;
 
-
 public class StaticRouteProfile implements StaticRoute {
+    String ipAddress;
     private long id;
     private String uuid;
     private String targetCidr;
@@ -25,7 +25,6 @@ public class StaticRouteProfile implements StaticRoute {
     private long domainId;
     private StaticRoute.State state;
     private long vpcId;
-    String ipAddress;
 
     public StaticRouteProfile(StaticRoute staticRoute) {
         id = staticRoute.getId();
@@ -60,7 +59,11 @@ public class StaticRouteProfile implements StaticRoute {
 
     @Override
     public Long getVpcId() {
-       return vpcId;
+        return vpcId;
+    }
+
+    public String getGwIpAddress() {
+        return ipAddress;
     }
 
     @Override
@@ -71,10 +74,6 @@ public class StaticRouteProfile implements StaticRoute {
     @Override
     public String getUuid() {
         return uuid;
-    }
-
-    public String getGwIpAddress() {
-        return ipAddress;
     }
 
     public String getIp4Address() {

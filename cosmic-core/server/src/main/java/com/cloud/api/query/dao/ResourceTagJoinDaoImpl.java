@@ -16,11 +16,6 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.api.ApiResponseHelper;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
 import com.cloud.server.ResourceTag;
@@ -29,9 +24,13 @@ import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
-
 import org.apache.cloudstack.api.response.ResourceTagResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -39,15 +38,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ResourceTagJoinDaoImpl extends GenericDaoBase<ResourceTagJoinVO, Long> implements ResourceTagJoinDao {
     public static final Logger s_logger = LoggerFactory.getLogger(ResourceTagJoinDaoImpl.class);
-
+    private final SearchBuilder<ResourceTagJoinVO> tagSearch;
+    private final SearchBuilder<ResourceTagJoinVO> tagIdSearch;
+    private final SearchBuilder<ResourceTagJoinVO> AllFieldsSearch;
     @Inject
     private ConfigurationDao _configDao;
-
-    private final SearchBuilder<ResourceTagJoinVO> tagSearch;
-
-    private final SearchBuilder<ResourceTagJoinVO> tagIdSearch;
-
-    private final SearchBuilder<ResourceTagJoinVO> AllFieldsSearch;
 
     protected ResourceTagJoinDaoImpl() {
 
@@ -92,11 +87,15 @@ public class ResourceTagJoinDaoImpl extends GenericDaoBase<ResourceTagJoinVO, Lo
     }
 
     @Override
-    public List<ResourceTagJoinVO> listBy(String resourceUUID, ResourceObjectType resourceType) {
-        SearchCriteria<ResourceTagJoinVO> sc = AllFieldsSearch.create();
-        sc.setParameters("uuid", resourceUUID);
-        sc.setParameters("resourceType", resourceType);
-        return listBy(sc);
+    public ResourceTagJoinVO newResourceTagView(ResourceTag vr) {
+        SearchCriteria<ResourceTagJoinVO> sc = tagIdSearch.create();
+        sc.setParameters("id", vr.getId());
+        List<ResourceTagJoinVO> tags = searchIncludingRemoved(sc, null, null, false);
+        if (tags != null && tags.size() > 0) {
+            return tags.get(0);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -144,6 +143,14 @@ public class ResourceTagJoinDaoImpl extends GenericDaoBase<ResourceTagJoinVO, Lo
     }
 
     @Override
+    public List<ResourceTagJoinVO> listBy(String resourceUUID, ResourceObjectType resourceType) {
+        SearchCriteria<ResourceTagJoinVO> sc = AllFieldsSearch.create();
+        sc.setParameters("uuid", resourceUUID);
+        sc.setParameters("resourceType", resourceType);
+        return listBy(sc);
+    }
+
+    @Override
     public ResourceTagJoinVO searchById(Long id) {
         SearchCriteria<ResourceTagJoinVO> sc = tagIdSearch.create();
         sc.setParameters("id", id);
@@ -154,17 +161,4 @@ public class ResourceTagJoinDaoImpl extends GenericDaoBase<ResourceTagJoinVO, Lo
             return null;
         }
     }
-
-    @Override
-    public ResourceTagJoinVO newResourceTagView(ResourceTag vr) {
-        SearchCriteria<ResourceTagJoinVO> sc = tagIdSearch.create();
-        sc.setParameters("id", vr.getId());
-        List<ResourceTagJoinVO> tags = searchIncludingRemoved(sc, null, null, false);
-        if (tags != null && tags.size() > 0) {
-            return tags.get(0);
-        } else {
-            return null;
-        }
-    }
-
 }

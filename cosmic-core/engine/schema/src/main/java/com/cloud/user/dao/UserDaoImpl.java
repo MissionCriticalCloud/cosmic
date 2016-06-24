@@ -16,13 +16,13 @@
 // under the License.
 package com.cloud.user.dao;
 
-import java.util.List;
-
 import com.cloud.user.UserVO;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -77,13 +77,6 @@ public class UserDaoImpl extends GenericDaoBase<UserVO, Long> implements UserDao
     }
 
     @Override
-    public List<UserVO> listByAccount(long accountId) {
-        SearchCriteria<UserVO> sc = AccountIdSearch.create();
-        sc.setParameters("account", accountId);
-        return listBy(sc, null);
-    }
-
-    @Override
     public UserVO getUser(String username) {
         SearchCriteria<UserVO> sc = UsernameSearch.create();
         sc.setParameters("username", username);
@@ -102,6 +95,13 @@ public class UserDaoImpl extends GenericDaoBase<UserVO, Long> implements UserDao
         SearchCriteria<UserVO> sc = UsernameLikeSearch.create();
         sc.setParameters("username", "%" + username + "%");
         return listBy(sc);
+    }
+
+    @Override
+    public List<UserVO> listByAccount(long accountId) {
+        SearchCriteria<UserVO> sc = AccountIdSearch.create();
+        sc.setParameters("account", accountId);
+        return listBy(sc, null);
     }
 
     @Override
@@ -124,5 +124,4 @@ public class UserDaoImpl extends GenericDaoBase<UserVO, Long> implements UserDao
         sc.setParameters("username", username);
         return listBy(sc);
     }
-
 }

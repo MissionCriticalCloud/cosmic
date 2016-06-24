@@ -26,12 +26,12 @@ import com.cloud.hypervisor.xenserver.resource.XenServer56Resource;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.ExecutionResult;
-import com.xensource.xenapi.Connection;
 
+import com.xensource.xenapi.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  NetworkUsageCommand.class)
+@ResourceWrapper(handles = NetworkUsageCommand.class)
 public final class XenServer56NetworkUsageCommandWrapper extends CommandWrapper<NetworkUsageCommand, Answer, XenServer56Resource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(XenServer56NetworkUsageCommandWrapper.class);

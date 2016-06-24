@@ -22,6 +22,7 @@ import org.apache.cloudstack.api.BaseListAccountResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.UserResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +38,8 @@ public class ListUsersCmd extends BaseListAccountResourcesCmd {
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.ACCOUNT_TYPE,
-               type = CommandType.LONG,
-               description = "List users by account type. Valid types include admin, domain-admin, read-only-admin, or user.")
+            type = CommandType.LONG,
+            description = "List users by account type. Valid types include admin, domain-admin, read-only-admin, or user.")
     private Long accountType;
 
     @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = UserResponse.class, description = "List user by ID.")
@@ -75,14 +76,14 @@ public class ListUsersCmd extends BaseListAccountResourcesCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
         ListResponse<UserResponse> response = _queryService.searchForUsers(this);
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

@@ -51,6 +51,11 @@ public class StartupCommand extends Command {
         this.type = type;
     }
 
+    public StartupCommand(Long id, Host.Type type, String name, String dataCenter, String pod, String guid, String version, String gatewayIpAddress) {
+        this(id, type, name, dataCenter, pod, guid, version);
+        this.gatewayIpAddress = gatewayIpAddress;
+    }
+
     public StartupCommand(Long id, Host.Type type, String name, String dataCenter, String pod, String guid, String version) {
         super();
         this.id = id;
@@ -60,11 +65,6 @@ public class StartupCommand extends Command {
         this.name = name;
         this.version = version;
         this.type = type;
-    }
-
-    public StartupCommand(Long id, Host.Type type, String name, String dataCenter, String pod, String guid, String version, String gatewayIpAddress) {
-        this(id, type, name, dataCenter, pod, guid, version);
-        this.gatewayIpAddress = gatewayIpAddress;
     }
 
     public Host.Type getHostType() {
@@ -79,28 +79,40 @@ public class StartupCommand extends Command {
         return iqn;
     }
 
-    public void setCluster(String cluster) {
-        this.cluster = cluster;
+    public void setIqn(String iqn) {
+        this.iqn = iqn;
     }
 
     public String getCluster() {
         return cluster;
     }
 
-    public void setIqn(String iqn) {
-        this.iqn = iqn;
+    public void setCluster(String cluster) {
+        this.cluster = cluster;
     }
 
     public String getDataCenter() {
         return dataCenter;
     }
 
+    public void setDataCenter(String dataCenter) {
+        this.dataCenter = dataCenter;
+    }
+
     public String getPod() {
         return pod;
     }
 
+    public void setPod(String pod) {
+        this.pod = pod;
+    }
+
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getStorageIpAddressDeux() {
@@ -131,24 +143,24 @@ public class StartupCommand extends Command {
         return guid;
     }
 
+    public void setGuid(String guid) {
+        this.guid = guid;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getVersion() {
         return version;
     }
 
-    public void setDataCenter(String dataCenter) {
-        this.dataCenter = dataCenter;
-    }
-
-    public void setPod(String pod) {
-        this.pod = pod;
-    }
-
-    public void setGuid(String guid) {
-        this.guid = guid;
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public void setGuid(String guid, String resourceName) {
@@ -224,18 +236,6 @@ public class StartupCommand extends Command {
         return publicIpAddress;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
     public void setPublicIpAddress(String publicIpAddress) {
         this.publicIpAddress = publicIpAddress;
     }
@@ -246,10 +246,6 @@ public class StartupCommand extends Command {
 
     public void setAgentTag(String tag) {
         agentTag = tag;
-    }
-
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
     }
 
     public String getGuidWithoutResource() {
@@ -271,6 +267,10 @@ public class StartupCommand extends Command {
 
     public String getResourceName() {
         return resourceName;
+    }
+
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
     }
 
     public String getGatewayIpAddress() {

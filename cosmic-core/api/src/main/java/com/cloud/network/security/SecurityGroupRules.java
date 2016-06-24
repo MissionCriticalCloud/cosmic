@@ -17,7 +17,6 @@
 package com.cloud.network.security;
 
 import com.cloud.network.security.SecurityRule.SecurityRuleType;
-
 import org.apache.cloudstack.api.InternalIdentity;
 
 public interface SecurityGroupRules extends InternalIdentity {

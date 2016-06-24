@@ -23,9 +23,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.DataCenterVnetDao;
@@ -33,30 +30,25 @@ import com.cloud.network.dao.PhysicalNetworkDao;
 import com.cloud.network.dao.PhysicalNetworkVO;
 import com.cloud.utils.db.TransactionLegacy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 public class UpdatePhysicalNetworkTest {
-    private PhysicalNetworkDao _physicalNetworkDao = mock(PhysicalNetworkDao.class);
-    private DataCenterVnetDao _datacenterVnetDao = mock(DataCenterVnetDao.class);
-    private DataCenterDao _datacenterDao = mock(DataCenterDao.class);
-    private DataCenterVO datacentervo = mock(DataCenterVO.class);
-    private PhysicalNetworkVO physicalNetworkVO = mock(PhysicalNetworkVO.class);
-    List<String> existingRange = new ArrayList<String>();
+    private final PhysicalNetworkDao _physicalNetworkDao = mock(PhysicalNetworkDao.class);
+    private final DataCenterVnetDao _datacenterVnetDao = mock(DataCenterVnetDao.class);
+    private final DataCenterDao _datacenterDao = mock(DataCenterDao.class);
+    private final DataCenterVO datacentervo = mock(DataCenterVO.class);
+    private final PhysicalNetworkVO physicalNetworkVO = mock(PhysicalNetworkVO.class);
+    List<String> existingRange = new ArrayList<>();
     ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
-
-    public NetworkServiceImpl setUp() {
-        NetworkServiceImpl networkService = new NetworkServiceImpl();
-        networkService._dcDao = _datacenterDao;
-        networkService._physicalNetworkDao = _physicalNetworkDao;
-        networkService._datacneterVnet = _datacenterVnetDao;
-        return networkService;
-    }
 
     @Test
     public void updatePhysicalNetworkTest() {
-        TransactionLegacy txn = TransactionLegacy.open("updatePhysicalNetworkTest");
-        NetworkServiceImpl networkService = setUp();
+        final TransactionLegacy txn = TransactionLegacy.open("updatePhysicalNetworkTest");
+        final NetworkServiceImpl networkService = setUp();
         existingRange.add("524");
         when(_physicalNetworkDao.findById(anyLong())).thenReturn(physicalNetworkVO);
         when(_datacenterDao.findById(anyLong())).thenReturn(datacentervo);
@@ -68,4 +60,11 @@ public class UpdatePhysicalNetworkTest {
         assertEquals("524-530", argumentCaptor.getValue());
     }
 
+    public NetworkServiceImpl setUp() {
+        final NetworkServiceImpl networkService = new NetworkServiceImpl();
+        networkService._dcDao = _datacenterDao;
+        networkService._physicalNetworkDao = _physicalNetworkDao;
+        networkService._datacneterVnet = _datacenterVnetDao;
+        return networkService;
+    }
 }

@@ -59,7 +59,7 @@ public class UsageNetworkVO {
     }
 
     public UsageNetworkVO(Long accountId, long zoneId, long hostId, String hostType, Long networkId, long bytesSent, long bytesReceived, long aggBytesReceived,
-            long aggBytesSent, long eventTimeMillis) {
+                          long aggBytesSent, long eventTimeMillis) {
         this.accountId = accountId;
         this.zoneId = zoneId;
         this.hostId = hostId;
@@ -112,12 +112,12 @@ public class UsageNetworkVO {
         this.eventTimeMillis = eventTimeMillis;
     }
 
-    public void setHostId(long hostId) {
-        this.hostId = hostId;
-    }
-
     public long getHostId() {
         return hostId;
+    }
+
+    public void setHostId(long hostId) {
+        this.hostId = hostId;
     }
 
     public String getHostType() {

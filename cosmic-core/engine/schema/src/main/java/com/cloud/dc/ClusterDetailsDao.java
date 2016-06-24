@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.dc;
 
-import java.util.Map;
-
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Map;
 
 public interface ClusterDetailsDao extends GenericDao<ClusterDetailsVO, Long> {
     Map<String, String> findDetails(long clusterId);

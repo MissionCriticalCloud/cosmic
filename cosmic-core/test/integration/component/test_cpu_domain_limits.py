@@ -232,9 +232,9 @@ class TestDomainCPULimitsUpdateResources(cloudstackTestCase):
 
         self.debug("Setting up account and domain hierarchy")
         self.setupAccounts()
-        users = {self.domain: self.admin,
-                 self.child_domain: self.child_do_admin
-                 }
+        users = { self.domain: self.admin,
+                  self.child_domain: self.child_do_admin
+                  }
         for domain, admin in users.items():
             self.account = admin
             self.domain = domain
@@ -306,9 +306,9 @@ class TestDomainCPULimitsUpdateResources(cloudstackTestCase):
 
         self.debug("Setting up account and domain hierarchy")
         self.setupAccounts()
-        users = {self.domain: self.admin,
-                 self.child_domain: self.child_do_admin
-                 }
+        users = { self.domain: self.admin,
+                  self.child_domain: self.child_do_admin
+                  }
         for domain, admin in users.items():
             self.account = admin
             self.domain = domain
@@ -367,9 +367,9 @@ class TestDomainCPULimitsUpdateResources(cloudstackTestCase):
 
         self.debug("Setting up account and domain hierarchy")
         self.setupAccounts()
-        users = {self.domain: self.admin,
-                 self.child_domain: self.child_do_admin
-                 }
+        users = { self.domain: self.admin,
+                  self.child_domain: self.child_do_admin
+                  }
         for domain, admin in users.items():
             self.account = admin
             self.domain = domain
@@ -431,9 +431,9 @@ class TestDomainCPULimitsUpdateResources(cloudstackTestCase):
 
         self.debug("Setting up account and domain hierarchy")
         self.setupAccounts()
-        users = {self.domain: self.admin,
-                 self.child_domain: self.child_do_admin
-                 }
+        users = { self.domain: self.admin,
+                  self.child_domain: self.child_do_admin
+                  }
         for domain, admin in users.items():
             self.account = admin
             self.domain = domain

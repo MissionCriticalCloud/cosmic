@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.host.dao;
 
-import java.util.List;
-
 import com.cloud.host.HostTagVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface HostTagsDao extends GenericDao<HostTagVO, Long> {
 
@@ -30,5 +30,4 @@ public interface HostTagsDao extends GenericDao<HostTagVO, Long> {
     List<String> getDistinctImplicitHostTags(List<Long> hostIds, String[] implicitHostTags);
 
     void deleteTags(long hostId);
-
 }

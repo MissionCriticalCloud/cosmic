@@ -15,10 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from marvin.codes import FAILED
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import cleanup_resources
+from marvin.codes import FAILED
 from marvin.lib.base import (
     VirtualMachine,
     Account,
@@ -34,10 +32,11 @@ from marvin.lib.common import (
     is_snapshot_on_nfs
 )
 from marvin.lib.decoratorGenerators import skipTestIf
+from marvin.lib.utils import cleanup_resources
+from nose.plugins.attrib import attr
 
 
 class TestSnapshotRootDisk(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestSnapshotRootDisk, cls).getClsTestClient()
@@ -190,7 +189,7 @@ class TestSnapshotRootDisk(cloudstackTestCase):
 
         qresult = qresultset[0]
 
-        snapshot_uuid = qresult[0]      # backup_snap_id = snapshot UUID
+        snapshot_uuid = qresult[0]  # backup_snap_id = snapshot UUID
 
         self.assertNotEqual(
             str(snapshot_uuid),

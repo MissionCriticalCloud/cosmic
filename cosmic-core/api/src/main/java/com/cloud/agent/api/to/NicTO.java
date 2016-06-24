@@ -30,12 +30,12 @@ public class NicTO extends NetworkTO {
         super();
     }
 
-    public void setDeviceId(final int deviceId) {
-        this.deviceId = deviceId;
-    }
-
     public int getDeviceId() {
         return deviceId;
+    }
+
+    public void setDeviceId(final int deviceId) {
+        this.deviceId = deviceId;
     }
 
     public Integer getNetworkRateMbps() {
@@ -73,12 +73,12 @@ public class NicTO extends NetworkTO {
         return new StringBuilder("[Nic:").append(type).append("-").append(ip).append("-").append(broadcastUri).append("]").toString();
     }
 
-    public void setNicSecIps(final List<String> secIps) {
-        this.nicSecIps = secIps;
-    }
-
     public List<String> getNicSecIps() {
         return nicSecIps;
+    }
+
+    public void setNicSecIps(final List<String> secIps) {
+        this.nicSecIps = secIps;
     }
 
     public String getNetworkUuid() {

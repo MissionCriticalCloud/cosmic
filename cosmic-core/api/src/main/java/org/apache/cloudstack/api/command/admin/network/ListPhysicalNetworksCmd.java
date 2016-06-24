@@ -16,13 +16,9 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.network;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -32,6 +28,10 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,27 +59,6 @@ public class ListPhysicalNetworksCmd extends BaseListCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
-    }
-
-    public Long getZoneId() {
-        return zoneId;
-    }
-
-    public String getNetworkName() {
-        return networkName;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
     @Override
     public long getEntityOwnerId() {
         return Account.ACCOUNT_ID_SYSTEM;
@@ -88,7 +67,7 @@ public class ListPhysicalNetworksCmd extends BaseListCmd {
     @Override
     public void execute() {
         Pair<List<? extends PhysicalNetwork>, Integer> result =
-            _networkService.searchPhysicalNetworks(getId(), getZoneId(), this.getKeyword(), this.getStartIndex(), this.getPageSizeVal(), getNetworkName());
+                _networkService.searchPhysicalNetworks(getId(), getZoneId(), this.getKeyword(), this.getStartIndex(), this.getPageSizeVal(), getNetworkName());
         if (result != null) {
             ListResponse<PhysicalNetworkResponse> response = new ListResponse<PhysicalNetworkResponse>();
             List<PhysicalNetworkResponse> networkResponses = new ArrayList<PhysicalNetworkResponse>();
@@ -102,5 +81,26 @@ public class ListPhysicalNetworksCmd extends BaseListCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to search for physical networks");
         }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public Long getZoneId() {
+        return zoneId;
+    }
+
+    public String getNetworkName() {
+        return networkName;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

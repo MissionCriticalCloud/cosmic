@@ -26,22 +26,12 @@ import java.security.NoSuchAlgorithmException;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.KeyPair;
-
 import org.apache.commons.codec.binary.Base64;
 
 public class SSHKeysHelper {
 
-    private KeyPair keyPair;
     private static final char[] hexChars = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-
-    private static String toHexString(byte[] b) {
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < b.length; i++) {
-            sb.append(hexChars[(b[i] >> 4) & 0x0f]);
-            sb.append(hexChars[(b[i]) & 0x0f]);
-        }
-        return sb.toString();
-    }
+    private KeyPair keyPair;
 
     public SSHKeysHelper() {
         try {
@@ -49,6 +39,23 @@ public class SSHKeysHelper {
         } catch (JSchException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String getPublicKeyFromKeyMaterial(String keyMaterial) {
+        if (!keyMaterial.contains(" ")) {
+            keyMaterial = new String(Base64.decodeBase64(keyMaterial.getBytes()));
+        }
+
+        if ((!keyMaterial.startsWith("ssh-rsa") && !keyMaterial.startsWith("ssh-dss")) || !keyMaterial.contains(" ")) {
+            return null;
+        }
+
+        String[] key = keyMaterial.split(" ");
+        if (key.length < 2) {
+            return null;
+        }
+
+        return key[0].concat(" ").concat(key[1]);
     }
 
     public String getPublicKeyFingerPrint() {
@@ -77,25 +84,12 @@ public class SSHKeysHelper {
 
         for (int i = 2; i <= sumString.length(); i += 2) {
             rString += sumString.substring(i - 2, i);
-            if (i != sumString.length())
+            if (i != sumString.length()) {
                 rString += ":";
+            }
         }
 
         return rString;
-    }
-
-    public static String getPublicKeyFromKeyMaterial(String keyMaterial) {
-        if (!keyMaterial.contains(" "))
-            keyMaterial = new String(Base64.decodeBase64(keyMaterial.getBytes()));
-
-        if ((!keyMaterial.startsWith("ssh-rsa") && !keyMaterial.startsWith("ssh-dss")) || !keyMaterial.contains(" "))
-            return null;
-
-        String[] key = keyMaterial.split(" ");
-        if (key.length < 2)
-            return null;
-
-        return key[0].concat(" ").concat(key[1]);
     }
 
     public String getPublicKey() {
@@ -105,11 +99,19 @@ public class SSHKeysHelper {
         return baos.toString();
     }
 
+    private static String toHexString(byte[] b) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < b.length; i++) {
+            sb.append(hexChars[(b[i] >> 4) & 0x0f]);
+            sb.append(hexChars[(b[i]) & 0x0f]);
+        }
+        return sb.toString();
+    }
+
     public String getPrivateKey() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         keyPair.writePrivateKey(baos);
 
         return baos.toString();
     }
-
 }

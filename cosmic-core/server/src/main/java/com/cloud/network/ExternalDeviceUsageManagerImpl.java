@@ -16,18 +16,6 @@
 // under the License.
 package com.cloud.network;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.ExternalNetworkResourceUsageAnswer;
 import com.cloud.agent.api.ExternalNetworkResourceUsageCommand;
@@ -82,9 +70,20 @@ import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -92,6 +91,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExternalDeviceUsageManagerImpl extends ManagerBase implements ExternalDeviceUsageManager {
 
+    private static final Logger s_logger = LoggerFactory.getLogger(ExternalDeviceUsageManagerImpl.class);
+    @Inject
+    protected HostPodDao _podDao = null;
     String _name;
     @Inject
     NetworkExternalLoadBalancerDao _networkExternalLBDao;
@@ -146,13 +148,14 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
     @Inject
     ExternalFirewallDeviceDao _externalFirewallDeviceDao;
     @Inject
-    protected HostPodDao _podDao = null;
-    @Inject
     NetworkModel _networkModel;
-
     ScheduledExecutorService _executor;
     private int _externalNetworkStatsInterval;
-    private static final Logger s_logger = LoggerFactory.getLogger(ExternalDeviceUsageManagerImpl.class);
+
+    @Override
+    public String getName() {
+        return _name;
+    }
 
     @Override
     public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
@@ -161,7 +164,6 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
             _executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("ExternalNetworkMonitor"));
         }
         return true;
-
     }
 
     @Override
@@ -175,22 +177,6 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
     @Override
     public boolean stop() {
         return true;
-    }
-
-    @Override
-    public String getName() {
-        return _name;
-    }
-
-    private ExternalLoadBalancerDeviceVO getExternalLoadBalancerForNetwork(Network network) {
-        NetworkExternalLoadBalancerVO lbDeviceForNetwork = _networkExternalLBDao.findByNetworkId(network.getId());
-        if (lbDeviceForNetwork != null) {
-            long lbDeviceId = lbDeviceForNetwork.getExternalLBDeviceId();
-            ExternalLoadBalancerDeviceVO lbDeviceVo = _externalLoadBalancerDeviceDao.findById(lbDeviceId);
-            assert (lbDeviceVo != null);
-            return lbDeviceVo;
-        }
-        return null;
     }
 
     private ExternalFirewallDeviceVO getExternalFirewallForNetwork(Network network) {
@@ -236,7 +222,7 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
         HostVO externalLoadBalancer = _hostDao.findById(lbDeviceVO.getHostId());
         if (externalLoadBalancer != null) {
             ExternalNetworkResourceUsageCommand cmd = new ExternalNetworkResourceUsageCommand();
-            lbAnswer = (ExternalNetworkResourceUsageAnswer)_agentMgr.easySend(externalLoadBalancer.getId(), cmd);
+            lbAnswer = (ExternalNetworkResourceUsageAnswer) _agentMgr.easySend(externalLoadBalancer.getId(), cmd);
             if (lbAnswer == null || !lbAnswer.getResult()) {
                 String details = (lbAnswer != null) ? lbAnswer.getDetails() : "details unavailable";
                 String msg = "Unable to get external load balancer stats for network" + networkId + " due to: " + details + ".";
@@ -255,7 +241,7 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
         String publicIp = _networkModel.getIp(lb.getSourceIpAddressId()).getAddress().addr();
         DataCenterVO zone = _dcDao.findById(network.getDataCenterId());
         String statsEntryIdentifier =
-            "account " + account.getAccountName() + ", zone " + zone.getName() + ", network ID " + networkId + ", host ID " + externalLoadBalancer.getName();
+                "account " + account.getAccountName() + ", zone " + zone.getName() + ", network ID " + networkId + ", host ID " + externalLoadBalancer.getName();
 
         long newCurrentBytesSent = 0;
         long newCurrentBytesReceived = 0;
@@ -292,8 +278,19 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
         }
     }
 
+    private ExternalLoadBalancerDeviceVO getExternalLoadBalancerForNetwork(Network network) {
+        NetworkExternalLoadBalancerVO lbDeviceForNetwork = _networkExternalLBDao.findByNetworkId(network.getId());
+        if (lbDeviceForNetwork != null) {
+            long lbDeviceId = lbDeviceForNetwork.getExternalLBDeviceId();
+            ExternalLoadBalancerDeviceVO lbDeviceVo = _externalLoadBalancerDeviceDao.findById(lbDeviceId);
+            assert (lbDeviceVo != null);
+            return lbDeviceVo;
+        }
+        return null;
+    }
+
     private void commitStats(final long networkId, final HostVO externalLoadBalancer, final long accountId, final String publicIp, final DataCenterVO zone,
-        final String statsEntryIdentifier, final long newCurrentBytesSent, final long newCurrentBytesReceived) {
+                             final String statsEntryIdentifier, final long newCurrentBytesSent, final long newCurrentBytesReceived) {
         Transaction.execute(new TransactionCallbackNoReturn() {
             @Override
             public void doInTransactionWithoutResult(TransactionStatus status) {
@@ -306,8 +303,8 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
                     long oldCurrentBytesSent = userStats.getCurrentBytesSent();
                     long oldCurrentBytesReceived = userStats.getCurrentBytesReceived();
                     String warning =
-                        "Received an external network stats byte count that was less than the stored value. Zone ID: " + userStats.getDataCenterId() + ", account ID: " +
-                            userStats.getAccountId() + ".";
+                            "Received an external network stats byte count that was less than the stored value. Zone ID: " + userStats.getDataCenterId() + ", account ID: " +
+                                    userStats.getAccountId() + ".";
 
                     userStats.setCurrentBytesSent(newCurrentBytesSent);
                     if (oldCurrentBytesSent > newCurrentBytesSent) {
@@ -345,7 +342,7 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
             // Check if there are any external devices
             // Skip external device usage collection if none exist
 
-            if(_hostDao.listByType(Host.Type.ExternalFirewall).isEmpty() && _hostDao.listByType(Host.Type.ExternalLoadBalancer).isEmpty()){
+            if (_hostDao.listByType(Host.Type.ExternalFirewall).isEmpty() && _hostDao.listByType(Host.Type.ExternalLoadBalancer).isEmpty()) {
                 s_logger.debug("External devices are not used. Skipping external device usage collection");
                 return;
             }
@@ -417,7 +414,7 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
                                 if (!fwDeviceUsageAnswerMap.containsKey(fwDeviceId)) {
                                     try {
                                         ExternalNetworkResourceUsageCommand cmd = new ExternalNetworkResourceUsageCommand();
-                                        firewallAnswer = (ExternalNetworkResourceUsageAnswer)_agentMgr.easySend(externalFirewall.getId(), cmd);
+                                        firewallAnswer = (ExternalNetworkResourceUsageAnswer) _agentMgr.easySend(externalFirewall.getId(), cmd);
                                         if (firewallAnswer == null || !firewallAnswer.getResult()) {
                                             String details = (firewallAnswer != null) ? firewallAnswer.getDetails() : "details unavailable";
                                             String msg = "Unable to get external firewall stats for network" + zone.getName() + " due to: " + details + ".";
@@ -448,7 +445,7 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
                                 if (!lbDeviceUsageAnswerMap.containsKey(lbDeviceId)) {
                                     try {
                                         ExternalNetworkResourceUsageCommand cmd = new ExternalNetworkResourceUsageCommand();
-                                        lbAnswer = (ExternalNetworkResourceUsageAnswer)_agentMgr.easySend(externalLoadBalancer.getId(), cmd);
+                                        lbAnswer = (ExternalNetworkResourceUsageAnswer) _agentMgr.easySend(externalLoadBalancer.getId(), cmd);
                                         if (lbAnswer == null || !lbAnswer.getResult()) {
                                             String details = (lbAnswer != null) ? lbAnswer.getDetails() : "details unavailable";
                                             String msg = "Unable to get external load balancer stats for " + zone.getName() + " due to: " + details + ".";
@@ -491,132 +488,14 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
             }
         }
 
-        private boolean updateBytes(UserStatisticsVO userStats, long newCurrentBytesSent, long newCurrentBytesReceived) {
-            long oldNetBytesSent = userStats.getNetBytesSent();
-            long oldNetBytesReceived = userStats.getNetBytesReceived();
-            long oldCurrentBytesSent = userStats.getCurrentBytesSent();
-            long oldCurrentBytesReceived = userStats.getCurrentBytesReceived();
-            String warning =
-                "Received an external network stats byte count that was less than the stored value. Zone ID: " + userStats.getDataCenterId() + ", account ID: " +
-                    userStats.getAccountId() + ".";
-
-            userStats.setCurrentBytesSent(newCurrentBytesSent);
-            if (oldCurrentBytesSent > newCurrentBytesSent) {
-                s_logger.warn(warning + "Stored bytes sent: " + oldCurrentBytesSent + ", new bytes sent: " + newCurrentBytesSent + ".");
-                userStats.setNetBytesSent(oldNetBytesSent + oldCurrentBytesSent);
-            }
-
-            userStats.setCurrentBytesReceived(newCurrentBytesReceived);
-            if (oldCurrentBytesReceived > newCurrentBytesReceived) {
-                s_logger.warn(warning + "Stored bytes received: " + oldCurrentBytesReceived + ", new bytes received: " + newCurrentBytesReceived + ".");
-                userStats.setNetBytesReceived(oldNetBytesReceived + oldCurrentBytesReceived);
-            }
-
-            return _userStatsDao.update(userStats.getId(), userStats);
-        }
-
-        // Creates a new stats entry for the specified parameters, if one doesn't already exist.
-        private boolean createStatsEntry(long accountId, long zoneId, long networkId, String publicIp, long hostId) {
-            HostVO host = _hostDao.findById(hostId);
-            UserStatisticsVO userStats = _userStatsDao.findBy(accountId, zoneId, networkId, publicIp, hostId, host.getType().toString());
-            if (userStats == null) {
-                return (_userStatsDao.persist(new UserStatisticsVO(accountId, zoneId, publicIp, hostId, host.getType().toString(), networkId)) != null);
-            } else {
-                return true;
-            }
-        }
-
-        // Updates an existing stats entry with new data from the specified usage answer.
-        private boolean updateStatsEntry(long accountId, long zoneId, long networkId, String publicIp, long hostId, ExternalNetworkResourceUsageAnswer answer,
-            boolean inline) {
-            AccountVO account = _accountDao.findById(accountId);
-            DataCenterVO zone = _dcDao.findById(zoneId);
-            NetworkVO network = _networkDao.findById(networkId);
-            HostVO host = _hostDao.findById(hostId);
-            String statsEntryIdentifier =
-                "account " + account.getAccountName() + ", zone " + zone.getName() + ", network ID " + networkId + ", host ID " + host.getName();
-
-            long newCurrentBytesSent = 0;
-            long newCurrentBytesReceived = 0;
-
-            if (publicIp != null) {
-                long[] bytesSentAndReceived = null;
-                statsEntryIdentifier += ", public IP: " + publicIp;
-
-                if (host.getType().equals(Host.Type.ExternalLoadBalancer) && inline) {
-                    // Look up stats for the guest IP address that's mapped to the public IP address
-                    InlineLoadBalancerNicMapVO mapping = _inlineLoadBalancerNicMapDao.findByPublicIpAddress(publicIp);
-
-                    if (mapping != null) {
-                        NicVO nic = _nicDao.findById(mapping.getNicId());
-                        String loadBalancingIpAddress = nic.getIPv4Address();
-                        bytesSentAndReceived = answer.ipBytes.get(loadBalancingIpAddress);
-
-                        if (bytesSentAndReceived != null) {
-                            bytesSentAndReceived[0] = 0;
-                        }
-                    }
-                } else {
-                    bytesSentAndReceived = answer.ipBytes.get(publicIp);
-                }
-
-                if (bytesSentAndReceived == null) {
-                    s_logger.debug("Didn't get an external network usage answer for public IP " + publicIp);
-                } else {
-                    newCurrentBytesSent += bytesSentAndReceived[0];
-                    newCurrentBytesReceived += bytesSentAndReceived[1];
-                }
-            } else {
-                URI broadcastURI = network.getBroadcastUri();
-                if (broadcastURI == null) {
-                    s_logger.debug("Not updating stats for guest network with ID " + network.getId() + " because the network is not implemented.");
-                    return true;
-                } else {
-                    long vlanTag = Integer.parseInt(BroadcastDomainType.getValue(broadcastURI));
-                    long[] bytesSentAndReceived = answer.guestVlanBytes.get(String.valueOf(vlanTag));
-
-                    if (bytesSentAndReceived == null) {
-                        s_logger.warn("Didn't get an external network usage answer for guest VLAN " + vlanTag);
-                    } else {
-                        newCurrentBytesSent += bytesSentAndReceived[0];
-                        newCurrentBytesReceived += bytesSentAndReceived[1];
-                    }
-                }
-            }
-
-            UserStatisticsVO userStats;
-            try {
-                userStats = _userStatsDao.lock(accountId, zoneId, networkId, publicIp, hostId, host.getType().toString());
-            } catch (Exception e) {
-                s_logger.warn("Unable to find user stats entry for " + statsEntryIdentifier);
-                return false;
-            }
-
-            if (updateBytes(userStats, newCurrentBytesSent, newCurrentBytesReceived)) {
-                s_logger.debug("Successfully updated stats for " + statsEntryIdentifier);
-                return true;
-            } else {
-                s_logger.debug("Failed to update stats for " + statsEntryIdentifier);
-                return false;
-            }
-        }
-
-        private boolean createOrUpdateStatsEntry(boolean create, long accountId, long zoneId, long networkId, String publicIp, long hostId,
-            ExternalNetworkResourceUsageAnswer answer, boolean inline) {
-            if (create) {
-                return createStatsEntry(accountId, zoneId, networkId, publicIp, hostId);
-            } else {
-                return updateStatsEntry(accountId, zoneId, networkId, publicIp, hostId, answer, inline);
-            }
-        }
-
         /*
          * Creates/updates all necessary stats entries for an account and zone.
          * Stats entries are created for source NAT IP addresses, static NAT rules, port forwarding rules, and load
          * balancing rules
          */
         private boolean manageStatsEntries(final boolean create, final long accountId, final long zoneId, final Network network, final HostVO externalFirewall,
-            final ExternalNetworkResourceUsageAnswer firewallAnswer, final HostVO externalLoadBalancer, final ExternalNetworkResourceUsageAnswer lbAnswer) {
+                                           final ExternalNetworkResourceUsageAnswer firewallAnswer, final HostVO externalLoadBalancer, final ExternalNetworkResourceUsageAnswer
+                                                   lbAnswer) {
             final String accountErrorMsg = "Failed to update external network stats entry. Details: account ID = " + accountId;
             try {
                 Transaction.execute(new TransactionCallbackNoReturn() {
@@ -687,6 +566,125 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
                 s_logger.warn("Exception: ", e);
                 return false;
             }
+        }
+
+        private boolean createOrUpdateStatsEntry(boolean create, long accountId, long zoneId, long networkId, String publicIp, long hostId,
+                                                 ExternalNetworkResourceUsageAnswer answer, boolean inline) {
+            if (create) {
+                return createStatsEntry(accountId, zoneId, networkId, publicIp, hostId);
+            } else {
+                return updateStatsEntry(accountId, zoneId, networkId, publicIp, hostId, answer, inline);
+            }
+        }
+
+        // Creates a new stats entry for the specified parameters, if one doesn't already exist.
+        private boolean createStatsEntry(long accountId, long zoneId, long networkId, String publicIp, long hostId) {
+            HostVO host = _hostDao.findById(hostId);
+            UserStatisticsVO userStats = _userStatsDao.findBy(accountId, zoneId, networkId, publicIp, hostId, host.getType().toString());
+            if (userStats == null) {
+                return (_userStatsDao.persist(new UserStatisticsVO(accountId, zoneId, publicIp, hostId, host.getType().toString(), networkId)) != null);
+            } else {
+                return true;
+            }
+        }
+
+        // Updates an existing stats entry with new data from the specified usage answer.
+        private boolean updateStatsEntry(long accountId, long zoneId, long networkId, String publicIp, long hostId, ExternalNetworkResourceUsageAnswer answer,
+                                         boolean inline) {
+            AccountVO account = _accountDao.findById(accountId);
+            DataCenterVO zone = _dcDao.findById(zoneId);
+            NetworkVO network = _networkDao.findById(networkId);
+            HostVO host = _hostDao.findById(hostId);
+            String statsEntryIdentifier =
+                    "account " + account.getAccountName() + ", zone " + zone.getName() + ", network ID " + networkId + ", host ID " + host.getName();
+
+            long newCurrentBytesSent = 0;
+            long newCurrentBytesReceived = 0;
+
+            if (publicIp != null) {
+                long[] bytesSentAndReceived = null;
+                statsEntryIdentifier += ", public IP: " + publicIp;
+
+                if (host.getType().equals(Host.Type.ExternalLoadBalancer) && inline) {
+                    // Look up stats for the guest IP address that's mapped to the public IP address
+                    InlineLoadBalancerNicMapVO mapping = _inlineLoadBalancerNicMapDao.findByPublicIpAddress(publicIp);
+
+                    if (mapping != null) {
+                        NicVO nic = _nicDao.findById(mapping.getNicId());
+                        String loadBalancingIpAddress = nic.getIPv4Address();
+                        bytesSentAndReceived = answer.ipBytes.get(loadBalancingIpAddress);
+
+                        if (bytesSentAndReceived != null) {
+                            bytesSentAndReceived[0] = 0;
+                        }
+                    }
+                } else {
+                    bytesSentAndReceived = answer.ipBytes.get(publicIp);
+                }
+
+                if (bytesSentAndReceived == null) {
+                    s_logger.debug("Didn't get an external network usage answer for public IP " + publicIp);
+                } else {
+                    newCurrentBytesSent += bytesSentAndReceived[0];
+                    newCurrentBytesReceived += bytesSentAndReceived[1];
+                }
+            } else {
+                URI broadcastURI = network.getBroadcastUri();
+                if (broadcastURI == null) {
+                    s_logger.debug("Not updating stats for guest network with ID " + network.getId() + " because the network is not implemented.");
+                    return true;
+                } else {
+                    long vlanTag = Integer.parseInt(BroadcastDomainType.getValue(broadcastURI));
+                    long[] bytesSentAndReceived = answer.guestVlanBytes.get(String.valueOf(vlanTag));
+
+                    if (bytesSentAndReceived == null) {
+                        s_logger.warn("Didn't get an external network usage answer for guest VLAN " + vlanTag);
+                    } else {
+                        newCurrentBytesSent += bytesSentAndReceived[0];
+                        newCurrentBytesReceived += bytesSentAndReceived[1];
+                    }
+                }
+            }
+
+            UserStatisticsVO userStats;
+            try {
+                userStats = _userStatsDao.lock(accountId, zoneId, networkId, publicIp, hostId, host.getType().toString());
+            } catch (Exception e) {
+                s_logger.warn("Unable to find user stats entry for " + statsEntryIdentifier);
+                return false;
+            }
+
+            if (updateBytes(userStats, newCurrentBytesSent, newCurrentBytesReceived)) {
+                s_logger.debug("Successfully updated stats for " + statsEntryIdentifier);
+                return true;
+            } else {
+                s_logger.debug("Failed to update stats for " + statsEntryIdentifier);
+                return false;
+            }
+        }
+
+        private boolean updateBytes(UserStatisticsVO userStats, long newCurrentBytesSent, long newCurrentBytesReceived) {
+            long oldNetBytesSent = userStats.getNetBytesSent();
+            long oldNetBytesReceived = userStats.getNetBytesReceived();
+            long oldCurrentBytesSent = userStats.getCurrentBytesSent();
+            long oldCurrentBytesReceived = userStats.getCurrentBytesReceived();
+            String warning =
+                    "Received an external network stats byte count that was less than the stored value. Zone ID: " + userStats.getDataCenterId() + ", account ID: " +
+                            userStats.getAccountId() + ".";
+
+            userStats.setCurrentBytesSent(newCurrentBytesSent);
+            if (oldCurrentBytesSent > newCurrentBytesSent) {
+                s_logger.warn(warning + "Stored bytes sent: " + oldCurrentBytesSent + ", new bytes sent: " + newCurrentBytesSent + ".");
+                userStats.setNetBytesSent(oldNetBytesSent + oldCurrentBytesSent);
+            }
+
+            userStats.setCurrentBytesReceived(newCurrentBytesReceived);
+            if (oldCurrentBytesReceived > newCurrentBytesReceived) {
+                s_logger.warn(warning + "Stored bytes received: " + oldCurrentBytesReceived + ", new bytes received: " + newCurrentBytesReceived + ".");
+                userStats.setNetBytesReceived(oldNetBytesReceived + oldCurrentBytesReceived);
+            }
+
+            return _userStatsDao.update(userStats.getId(), userStats);
         }
     }
 }

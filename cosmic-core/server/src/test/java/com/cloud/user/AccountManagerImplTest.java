@@ -16,14 +16,6 @@
 // under the License.
 package com.cloud.user;
 
-import java.lang.reflect.Field;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import javax.inject.Inject;
-
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.dao.ResourceCountDao;
 import com.cloud.configuration.dao.ResourceLimitDao;
@@ -72,7 +64,6 @@ import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotManager;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
@@ -82,6 +73,14 @@ import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationSe
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
 import org.apache.cloudstack.region.gslb.GlobalLoadBalancerRuleDao;
+
+import javax.inject.Inject;
+import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -94,6 +93,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AccountManagerImplTest {
+    @Mock
+    protected SnapshotDao _snapshotDao;
+    @Mock
+    protected VMTemplateDao _vmTemplateDao;
     @Mock
     AccountDao _accountDao;
     @Mock
@@ -118,10 +121,6 @@ public class AccountManagerImplTest {
     SecurityGroupDao _securityGroupDao;
     @Mock
     VMInstanceDao _vmDao;
-    @Mock
-    protected SnapshotDao _snapshotDao;
-    @Mock
-    protected VMTemplateDao _vmTemplateDao;
     @Mock
     SecurityGroupManager _networkGroupMgr;
     @Mock
@@ -270,17 +269,17 @@ public class AccountManagerImplTest {
         Mockito.when(_accountDao.findById(42l)).thenReturn(account);
         Mockito.when(
                 securityChecker.checkAccess(Mockito.any(Account.class),
-                    Mockito.any(ControlledEntity.class), Mockito.any(AccessType.class),
-                    Mockito.anyString()))
-                .thenReturn(true);
+                        Mockito.any(ControlledEntity.class), Mockito.any(AccessType.class),
+                        Mockito.anyString()))
+               .thenReturn(true);
         Mockito.when(_accountDao.remove(42l)).thenReturn(true);
         Mockito.when(_configMgr.releaseAccountSpecificVirtualRanges(42l))
-                .thenReturn(true);
+               .thenReturn(true);
         Mockito.when(_domainMgr.getDomain(Mockito.anyLong())).thenReturn(domain);
         Mockito.when(
                 securityChecker.checkAccess(Mockito.any(Account.class),
                         Mockito.any(Domain.class)))
-                .thenReturn(true);
+               .thenReturn(true);
         Mockito.when(_vmSnapshotDao.listByAccountId(Mockito.anyLong())).thenReturn(new ArrayList<VMSnapshotVO>());
 
         Assert.assertTrue(accountManager.deleteUserAccount(42));
@@ -299,10 +298,10 @@ public class AccountManagerImplTest {
                 securityChecker.checkAccess(Mockito.any(Account.class),
                         Mockito.any(ControlledEntity.class), Mockito.any(AccessType.class),
                         Mockito.anyString()))
-                .thenReturn(true);
+               .thenReturn(true);
         Mockito.when(_accountDao.remove(42l)).thenReturn(true);
         Mockito.when(_configMgr.releaseAccountSpecificVirtualRanges(42l))
-                .thenReturn(true);
+               .thenReturn(true);
         Mockito.when(_userVmDao.listByAccountId(42l)).thenReturn(
                 Arrays.asList(Mockito.mock(UserVmVO.class)));
         Mockito.when(
@@ -312,7 +311,7 @@ public class AccountManagerImplTest {
         Mockito.when(
                 securityChecker.checkAccess(Mockito.any(Account.class),
                         Mockito.any(Domain.class)))
-                .thenReturn(true);
+               .thenReturn(true);
 
         Assert.assertTrue(accountManager.deleteUserAccount(42));
         // assert that this was NOT a clean delete
@@ -320,12 +319,11 @@ public class AccountManagerImplTest {
                 Mockito.eq(42l));
     }
 
-
     @Test
     public void testAuthenticateUser() throws UnknownHostException {
         Pair<Boolean, UserAuthenticator.ActionOnFailedAuthentication> successAuthenticationPair = new Pair<>(true, null);
         Pair<Boolean, UserAuthenticator.ActionOnFailedAuthentication> failureAuthenticationPair = new Pair<>(false,
-                                                                                                             UserAuthenticator.ActionOnFailedAuthentication.INCREMENT_INCORRECT_LOGIN_ATTEMPT_COUNT);
+                UserAuthenticator.ActionOnFailedAuthentication.INCREMENT_INCORRECT_LOGIN_ATTEMPT_COUNT);
 
         UserAccountVO userAccountVO = new UserAccountVO();
         userAccountVO.setSource(User.Source.UNKNOWN);
@@ -351,6 +349,5 @@ public class AccountManagerImplTest {
         Mockito.verify(userAuthenticator, Mockito.times(1)).authenticate("test", "fail", 1L, null);
         Mockito.verify(userAuthenticator, Mockito.never()).authenticate("test", null, 1L, null);
         Mockito.verify(userAuthenticator, Mockito.never()).authenticate("test", "", 1L, null);
-
     }
 }

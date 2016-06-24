@@ -17,24 +17,21 @@
 
 package com.cloud.network.security;
 
+import com.cloud.network.security.SecurityGroupManagerImpl.CidrComparator;
+
+import javax.inject.Inject;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
-
-import com.cloud.network.security.SecurityGroupManagerImpl.CidrComparator;
-
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import junit.framework.TestCase;
-
 /**
  * @author daan
- *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/SecurityGroupManagerTestContext.xml")

@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import com.cloud.network.PhysicalNetwork;
+import com.cloud.utils.NumbersUtil;
+import com.cloud.utils.Pair;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -32,70 +32,56 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-
-import com.cloud.network.PhysicalNetwork;
-import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
-import com.cloud.utils.db.GenericDao;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * NetworkConfigurationVO contains information about a specific physical network.
- *
  */
 @Entity
 @Table(name = "physical_network")
 public class PhysicalNetworkVO implements PhysicalNetwork {
     @Id
     @TableGenerator(name = "physical_networks_sq",
-                    table = "sequence",
-                    pkColumnName = "name",
-                    valueColumnName = "value",
-                    pkColumnValue = "physical_networks_seq",
-                    allocationSize = 1)
+            table = "sequence",
+            pkColumnName = "name",
+            valueColumnName = "value",
+            pkColumnValue = "physical_networks_seq",
+            allocationSize = 1)
     @Column(name = "id")
     long id;
-
-    @Column(name = "uuid")
-    private String uuid;
-
-    @Column(name = "name")
-    private String name;
-
     @Column(name = "data_center_id")
     long dataCenterId;
-
-    @Column(name = "vnet")
-    private String vnet = null;
-
-    @Column(name = "speed")
-    private String speed = null;
-
     @Column(name = "domain_id")
     Long domainId = null;
-
     @Column(name = "broadcast_domain_range")
     @Enumerated(value = EnumType.STRING)
     BroadcastDomainRange broadcastDomainRange;
-
     @Column(name = "state")
     @Enumerated(value = EnumType.STRING)
     State state;
-
     @Column(name = GenericDao.REMOVED_COLUMN)
     Date removed;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     Date created;
-
     @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
     @Column(name = "tag")
     @CollectionTable(name = "physical_network_tags", joinColumns = @JoinColumn(name = "physical_network_id"))
     List<String> tags;
-
     @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
     @Column(name = "isolation_method")
     @CollectionTable(name = "physical_network_isolation_methods", joinColumns = @JoinColumn(name = "physical_network_id"))
     List<String> isolationMethods;
+    @Column(name = "uuid")
+    private String uuid;
+    @Column(name = "name")
+    private String name;
+    @Column(name = "vnet")
+    private String vnet = null;
+    @Column(name = "speed")
+    private String speed = null;
 
     public PhysicalNetworkVO() {
 
@@ -118,22 +104,8 @@ public class PhysicalNetworkVO implements PhysicalNetwork {
     }
 
     @Override
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
-    }
-
-    @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    public List<String> getTags() {
-        return tags != null ? tags : new ArrayList<String>();
     }
 
     public void addTag(String tag) {
@@ -141,15 +113,6 @@ public class PhysicalNetworkVO implements PhysicalNetwork {
             tags = new ArrayList<String>();
         }
         tags.add(tag);
-    }
-
-    public void setTags(List<String> tags) {
-        this.tags = tags;
-    }
-
-    @Override
-    public Long getDomainId() {
-        return domainId;
     }
 
     @Override
@@ -162,13 +125,82 @@ public class PhysicalNetworkVO implements PhysicalNetwork {
     }
 
     @Override
-    public int hashCode() {
-        return NumbersUtil.hash(id);
+    public long getDataCenterId() {
+        return dataCenterId;
     }
 
     @Override
-    public long getDataCenterId() {
-        return dataCenterId;
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    @Override
+    public List<String> getTags() {
+        return tags != null ? tags : new ArrayList<String>();
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    @Override
+    public List<String> getIsolationMethods() {
+        return isolationMethods != null ? isolationMethods : new ArrayList<String>();
+    }
+
+    @Override
+    public Long getDomainId() {
+        return domainId;
+    }
+
+    @Override
+    public List<Pair<Integer, Integer>> getVnet() {
+        List<Pair<Integer, Integer>> vnetList = new ArrayList<Pair<Integer, Integer>>();
+        if (vnet != null) {
+            String[] Temp = vnet.split(",");
+            String[] vnetSplit = null;
+            for (String vnetRange : Temp) {
+                vnetSplit = vnetRange.split("-");
+                vnetList.add(new Pair<Integer, Integer>(Integer.parseInt(vnetSplit[0]), Integer.parseInt(vnetSplit[1])));
+            }
+        }
+        return vnetList;
+    }
+
+    public void setVnet(String vnet) {
+        this.vnet = vnet;
+    }
+
+    @Override
+    public String getVnetString() {
+        return vnet;
+    }
+
+    @Override
+    public String getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(String speed) {
+        this.speed = speed;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setIsolationMethods(List<String> isolationMethods) {
+        this.isolationMethods = isolationMethods;
+    }
+
+    @Override
+    public int hashCode() {
+        return NumbersUtil.hash(id);
     }
 
     public Date getRemoved() {
@@ -187,52 +219,11 @@ public class PhysicalNetworkVO implements PhysicalNetwork {
         this.created = created;
     }
 
-    @Override
-    public List<String> getIsolationMethods() {
-        return isolationMethods != null ? isolationMethods : new ArrayList<String>();
-    }
-
     public void addIsolationMethod(String isolationMethod) {
         if (isolationMethods == null) {
             isolationMethods = new ArrayList<String>();
         }
         isolationMethods.add(isolationMethod);
-    }
-
-    public void setIsolationMethods(List<String> isolationMethods) {
-        this.isolationMethods = isolationMethods;
-    }
-
-    public void setVnet(String vnet) {
-        this.vnet = vnet;
-    }
-
-    @Override
-    public List<Pair<Integer, Integer>> getVnet() {
-        List<Pair<Integer, Integer>> vnetList = new ArrayList<Pair<Integer, Integer>>();
-        if (vnet != null) {
-            String[] Temp = vnet.split(",");
-            String[] vnetSplit = null;
-            for (String vnetRange : Temp) {
-                vnetSplit = vnetRange.split("-");
-                vnetList.add(new Pair<Integer, Integer>(Integer.parseInt(vnetSplit[0]), Integer.parseInt(vnetSplit[1])));
-            }
-        }
-        return vnetList;
-    }
-
-    @Override
-    public String getVnetString() {
-        return vnet;
-    }
-
-    public void setSpeed(String speed) {
-        this.speed = speed;
-    }
-
-    @Override
-    public String getSpeed() {
-        return speed;
     }
 
     @Override
@@ -242,10 +233,5 @@ public class PhysicalNetworkVO implements PhysicalNetwork {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 }

@@ -16,21 +16,20 @@
 // under the License.
 package org.apache.cloudstack.framework.security.keys;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-
-import javax.inject.Inject;
-import javax.net.ssl.KeyManager;
-
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.framework.config.ConfigDepot;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.config.impl.ConfigurationVO;
+
+import javax.inject.Inject;
+import javax.net.ssl.KeyManager;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,11 +42,10 @@ import org.slf4j.LoggerFactory;
  * mainly be used for dynamic generation.  I added this class because after
  * talking to Kelven, we think there will be other functionalities we need
  * to centralize to this class.  We'll see how that works out.
- *
+ * <p>
  * There's multiple problems here that we need to fix.
- *   - Multiple servers can be generating keys.  This is not atomic.
- *   - The functionality of generating the keys should be moved over to setup/upgrade.
- *
+ * - Multiple servers can be generating keys.  This is not atomic.
+ * - The functionality of generating the keys should be moved over to setup/upgrade.
  */
 public class KeysManagerImpl implements KeysManager, Configurable {
     private static final Logger s_logger = LoggerFactory.getLogger(KeysManagerImpl.class);
@@ -56,16 +54,6 @@ public class KeysManagerImpl implements KeysManager, Configurable {
     ConfigurationDao _configDao;
     @Inject
     ConfigDepot _configDepot;
-
-    @Override
-    public String getHashKey() {
-        String value = HashKey.value();
-        if (value == null) {
-            _configDao.getValueAndInitIfNotExist(HashKey.key(), HashKey.category(), getBase64EncodedRandomKey(128), HashKey.description());
-        }
-
-        return HashKey.value();
-    }
 
     @Override
     public String getEncryptionKey() {
@@ -87,19 +75,6 @@ public class KeysManagerImpl implements KeysManager, Configurable {
         return EncryptionIV.value();
     }
 
-    private static String getBase64EncodedRandomKey(int nBits) {
-        SecureRandom random;
-        try {
-            random = SecureRandom.getInstance("SHA1PRNG");
-            byte[] keyBytes = new byte[nBits / 8];
-            random.nextBytes(keyBytes);
-            return Base64.encodeBase64URLSafeString(keyBytes);
-        } catch (NoSuchAlgorithmException e) {
-            s_logger.error("Unhandled exception: ", e);
-        }
-        return null;
-    }
-
     @Override
     @DB
     public void resetEncryptionKeyIV() {
@@ -117,13 +92,35 @@ public class KeysManagerImpl implements KeysManager, Configurable {
     }
 
     @Override
+    public String getHashKey() {
+        String value = HashKey.value();
+        if (value == null) {
+            _configDao.getValueAndInitIfNotExist(HashKey.key(), HashKey.category(), getBase64EncodedRandomKey(128), HashKey.description());
+        }
+
+        return HashKey.value();
+    }
+
+    private static String getBase64EncodedRandomKey(int nBits) {
+        SecureRandom random;
+        try {
+            random = SecureRandom.getInstance("SHA1PRNG");
+            byte[] keyBytes = new byte[nBits / 8];
+            random.nextBytes(keyBytes);
+            return Base64.encodeBase64URLSafeString(keyBytes);
+        } catch (NoSuchAlgorithmException e) {
+            s_logger.error("Unhandled exception: ", e);
+        }
+        return null;
+    }
+
+    @Override
     public String getConfigComponentName() {
         return KeyManager.class.getSimpleName();
     }
 
     @Override
     public ConfigKey<?>[] getConfigKeys() {
-        return new ConfigKey<?>[] {EncryptionKey, EncryptionIV, HashKey};
+        return new ConfigKey<?>[]{EncryptionKey, EncryptionIV, HashKey};
     }
-
 }

@@ -16,17 +16,17 @@
 // under the License.
 package com.cloud.vm;
 
+import com.cloud.serializer.GsonHelper;
+import com.cloud.utils.Pair;
+import org.apache.cloudstack.framework.jobs.impl.JobSerializerHelper;
+import org.apache.cloudstack.jobs.JobInfo;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.cloud.serializer.GsonHelper;
-import com.cloud.utils.Pair;
 import com.google.gson.Gson;
-
-import org.apache.cloudstack.framework.jobs.impl.JobSerializerHelper;
-import org.apache.cloudstack.jobs.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
  * reflection usage in its implementation, run-time reflection conflicts with Spring proxy mode.
  * It means that we can not instantiate VmWorkJobHandlerProxy beans directly in Spring and expect
  * it can handle VmWork directly from there.
- *
  */
 public class VmWorkJobHandlerProxy implements VmWorkJobHandler {
 
@@ -74,22 +73,21 @@ public class VmWorkJobHandlerProxy implements VmWorkJobHandler {
 
     @SuppressWarnings("deprecation")
     private boolean isVmWorkJobHandlerMethod(Method method) {
-        if (method.getParameterTypes().length != 1)
+        if (method.getParameterTypes().length != 1) {
             return false;
+        }
 
         Class<?> returnType = method.getReturnType();
-        if (!Pair.class.isAssignableFrom(returnType))
+        if (!Pair.class.isAssignableFrom(returnType)) {
             return false;
+        }
 
         Class<?> paramType = method.getParameterTypes()[0];
-        if (!VmWork.class.isAssignableFrom(paramType))
+        if (!VmWork.class.isAssignableFrom(paramType)) {
             return false;
+        }
 
         return true;
-    }
-
-    private Method getHandlerMethod(Class<?> paramType) {
-        return _handlerMethodMap.get(paramType);
     }
 
     @SuppressWarnings("unchecked")
@@ -100,16 +98,18 @@ public class VmWorkJobHandlerProxy implements VmWorkJobHandler {
         if (method != null) {
 
             try {
-                if (s_logger.isDebugEnabled())
+                if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Execute VM work job: " + work.getClass().getName() + _gsonLogger.toJson(work));
+                }
 
                 Object obj = method.invoke(_target, work);
 
-                if (s_logger.isDebugEnabled())
+                if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Done executing VM work job: " + work.getClass().getName() + _gsonLogger.toJson(work));
+                }
 
                 assert (obj instanceof Pair);
-                return (Pair<JobInfo.Status, String>)obj;
+                return (Pair<JobInfo.Status, String>) obj;
             } catch (InvocationTargetException e) {
                 s_logger.error("Invocation exception, caused by: " + e.getCause());
 
@@ -117,7 +117,7 @@ public class VmWorkJobHandlerProxy implements VmWorkJobHandler {
                 // we need to re-throw the real exception here
                 if (e.getCause() != null && e.getCause() instanceof Exception) {
                     s_logger.info("Rethrow exception " + e.getCause());
-                    throw (Exception)e.getCause();
+                    throw (Exception) e.getCause();
                 }
 
                 throw e;
@@ -128,5 +128,9 @@ public class VmWorkJobHandlerProxy implements VmWorkJobHandler {
             RuntimeException ex = new RuntimeException("Unable to find handler for VM work job: " + work.getClass().getName());
             return new Pair<JobInfo.Status, String>(JobInfo.Status.FAILED, JobSerializerHelper.toObjectSerializedString(ex));
         }
+    }
+
+    private Method getHandlerMethod(Class<?> paramType) {
+        return _handlerMethodMap.get(paramType);
     }
 }

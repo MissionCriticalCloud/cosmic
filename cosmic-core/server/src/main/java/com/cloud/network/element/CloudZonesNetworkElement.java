@@ -16,12 +16,6 @@
 // under the License.
 package com.cloud.network.element;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
@@ -58,6 +52,11 @@ import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.UserVmDao;
 
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,8 +84,36 @@ public class CloudZonesNetworkElement extends AdapterBase implements NetworkElem
     @Inject
     ServiceOfferingDao _serviceOfferingDao;
 
+    private static Map<Service, Map<Capability, String>> setCapabilities() {
+        Map<Service, Map<Capability, String>> capabilities = new HashMap<Service, Map<Capability, String>>();
+
+        capabilities.put(Service.UserData, null);
+
+        return capabilities;
+    }
+
+    @Override
+    public Map<Service, Map<Capability, String>> getCapabilities() {
+        return capabilities;
+    }
+
+    @Override
+    public Provider getProvider() {
+        return Provider.ExternalDhcpServer;
+    }
+
+    @Override
+    public boolean implement(Network network, NetworkOffering offering, DeployDestination dest, ReservationContext context) throws ResourceUnavailableException,
+            ConcurrentOperationException, InsufficientCapacityException {
+        if (!canHandle(dest, offering.getTrafficType())) {
+            return false;
+        }
+
+        return true;
+    }
+
     private boolean canHandle(DeployDestination dest, TrafficType trafficType) {
-        DataCenterVO dc = (DataCenterVO)dest.getDataCenter();
+        DataCenterVO dc = (DataCenterVO) dest.getDataCenter();
 
         if (dc.getDhcpProvider().equalsIgnoreCase(Provider.ExternalDhcpServer.getName())) {
             _dcDao.loadDetails(dc);
@@ -100,18 +127,8 @@ public class CloudZonesNetworkElement extends AdapterBase implements NetworkElem
     }
 
     @Override
-    public boolean implement(Network network, NetworkOffering offering, DeployDestination dest, ReservationContext context) throws ResourceUnavailableException,
-        ConcurrentOperationException, InsufficientCapacityException {
-        if (!canHandle(dest, offering.getTrafficType())) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
     public boolean prepare(Network network, NicProfile nic, VirtualMachineProfile vmProfile, DeployDestination dest, ReservationContext context)
-        throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException, IllegalVirtualMachineException {
+            throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException, IllegalVirtualMachineException {
         return true;
     }
 
@@ -131,25 +148,74 @@ public class CloudZonesNetworkElement extends AdapterBase implements NetworkElem
     }
 
     @Override
-    public Provider getProvider() {
-        return Provider.ExternalDhcpServer;
+    public boolean isReady(PhysicalNetworkServiceProvider provider) {
+        // TODO Auto-generated method stub
+        return true;
     }
 
     @Override
-    public Map<Service, Map<Capability, String>> getCapabilities() {
-        return capabilities;
+    public boolean shutdownProviderInstances(PhysicalNetworkServiceProvider provider, ReservationContext context) throws ConcurrentOperationException,
+            ResourceUnavailableException {
+        // TODO Auto-generated method stub
+        return true;
     }
 
-    private static Map<Service, Map<Capability, String>> setCapabilities() {
-        Map<Service, Map<Capability, String>> capabilities = new HashMap<Service, Map<Capability, String>>();
+    @Override
+    public boolean canEnableIndividualServices() {
+        return false;
+    }
 
-        capabilities.put(Service.UserData, null);
+    @Override
+    public boolean verifyServicesCombination(Set<Service> services) {
+        return true;
+    }
 
-        return capabilities;
+    @Override
+    public boolean addPasswordAndUserdata(Network network, NicProfile nic, VirtualMachineProfile vm, DeployDestination dest, ReservationContext context)
+            throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException {
+        if (canHandle(dest, network.getTrafficType())) {
+
+            if (vm.getType() != VirtualMachine.Type.User) {
+                return false;
+            }
+            @SuppressWarnings("unchecked")
+            UserVmVO uservm = _userVmDao.findById(vm.getId());
+            _userVmDao.loadDetails(uservm);
+            String password = (String) vm.getParameter(VirtualMachineProfile.Param.VmPassword);
+            String userData = uservm.getUserData();
+            String sshPublicKey = uservm.getDetail("SSH.PublicKey");
+
+            Commands cmds = new Commands(Command.OnError.Continue);
+            if (password != null && nic.isDefaultNic()) {
+                SavePasswordCommand cmd = new SavePasswordCommand(password, nic.getIPv4Address(), uservm.getHostName(), _networkMgr.getExecuteInSeqNtwkElmtCmd());
+                cmds.addCommand("password", cmd);
+            }
+            String serviceOffering = _serviceOfferingDao.findByIdIncludingRemoved(uservm.getServiceOfferingId()).getDisplayText();
+            String zoneName = _dcDao.findById(network.getDataCenterId()).getName();
+
+            cmds.addCommand(
+                    "vmdata",
+                    generateVmDataCommand(nic.getIPv4Address(), userData, serviceOffering, zoneName, nic.getIPv4Address(), uservm.getHostName(), uservm.getInstanceName(),
+                            uservm.getId(), uservm.getUuid(), sshPublicKey));
+            try {
+                _agentManager.send(dest.getHost().getId(), cmds);
+            } catch (OperationTimedoutException e) {
+                s_logger.debug("Unable to send vm data command to host " + dest.getHost());
+                return false;
+            }
+            Answer dataAnswer = cmds.getAnswer("vmdata");
+            if (dataAnswer != null && dataAnswer.getResult()) {
+                s_logger.info("Sent vm data successfully to vm " + uservm.getInstanceName());
+                return true;
+            }
+            s_logger.info("Failed to send vm data to vm " + uservm.getInstanceName());
+            return false;
+        }
+        return false;
     }
 
     private VmDataCommand generateVmDataCommand(String vmPrivateIpAddress, String userData, String serviceOffering, String zoneName, String guestIpAddress,
-        String vmName, String vmInstanceName, long vmId, String vmUuid, String publicKey) {
+                                                String vmName, String vmInstanceName, long vmId, String vmUuid, String publicKey) {
         VmDataCommand cmd = new VmDataCommand(vmPrivateIpAddress, vmName, _networkMgr.getExecuteInSeqNtwkElmtCmd());
         // if you add new metadata files, also edit systemvm/patches/debian/config/var/www/html/latest/.htaccess
         cmd.addVmData("userdata", "user-data", userData);
@@ -169,86 +235,18 @@ public class CloudZonesNetworkElement extends AdapterBase implements NetworkElem
         return cmd;
     }
 
-    private void setVmInstanceId(String vmUuid, VmDataCommand cmd) {
-        cmd.addVmData("metadata", "instance-id", vmUuid);
-        cmd.addVmData("metadata", "vm-id", vmUuid);
-    }
-
     private void setVmInstanceId(String vmInstanceName, long vmId, VmDataCommand cmd) {
         cmd.addVmData("metadata", "instance-id", vmInstanceName);
         cmd.addVmData("metadata", "vm-id", String.valueOf(vmId));
     }
 
-    @Override
-    public boolean isReady(PhysicalNetworkServiceProvider provider) {
-        // TODO Auto-generated method stub
-        return true;
-    }
-
-    @Override
-    public boolean shutdownProviderInstances(PhysicalNetworkServiceProvider provider, ReservationContext context) throws ConcurrentOperationException,
-        ResourceUnavailableException {
-        // TODO Auto-generated method stub
-        return true;
-    }
-
-    @Override
-    public boolean canEnableIndividualServices() {
-        return false;
-    }
-
-    @Override
-    public boolean addPasswordAndUserdata(Network network, NicProfile nic, VirtualMachineProfile vm, DeployDestination dest, ReservationContext context)
-        throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException {
-        if (canHandle(dest, network.getTrafficType())) {
-
-            if (vm.getType() != VirtualMachine.Type.User) {
-                return false;
-            }
-            @SuppressWarnings("unchecked")
-            UserVmVO uservm = _userVmDao.findById(vm.getId());
-            _userVmDao.loadDetails(uservm);
-            String password = (String)vm.getParameter(VirtualMachineProfile.Param.VmPassword);
-            String userData = uservm.getUserData();
-            String sshPublicKey = uservm.getDetail("SSH.PublicKey");
-
-            Commands cmds = new Commands(Command.OnError.Continue);
-            if (password != null && nic.isDefaultNic()) {
-                SavePasswordCommand cmd = new SavePasswordCommand(password, nic.getIPv4Address(), uservm.getHostName(), _networkMgr.getExecuteInSeqNtwkElmtCmd());
-                cmds.addCommand("password", cmd);
-            }
-            String serviceOffering = _serviceOfferingDao.findByIdIncludingRemoved(uservm.getServiceOfferingId()).getDisplayText();
-            String zoneName = _dcDao.findById(network.getDataCenterId()).getName();
-
-            cmds.addCommand(
-                "vmdata",
-                generateVmDataCommand(nic.getIPv4Address(), userData, serviceOffering, zoneName, nic.getIPv4Address(), uservm.getHostName(), uservm.getInstanceName(),
-                    uservm.getId(), uservm.getUuid(), sshPublicKey));
-            try {
-                _agentManager.send(dest.getHost().getId(), cmds);
-            } catch (OperationTimedoutException e) {
-                s_logger.debug("Unable to send vm data command to host " + dest.getHost());
-                return false;
-            }
-            Answer dataAnswer = cmds.getAnswer("vmdata");
-            if (dataAnswer != null && dataAnswer.getResult()) {
-                s_logger.info("Sent vm data successfully to vm " + uservm.getInstanceName());
-                return true;
-            }
-            s_logger.info("Failed to send vm data to vm " + uservm.getInstanceName());
-            return false;
-        }
-        return false;
+    private void setVmInstanceId(String vmUuid, VmDataCommand cmd) {
+        cmd.addVmData("metadata", "instance-id", vmUuid);
+        cmd.addVmData("metadata", "vm-id", vmUuid);
     }
 
     @Override
     public boolean savePassword(Network network, NicProfile nic, VirtualMachineProfile vm) throws ResourceUnavailableException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean saveSSHKey(Network network, NicProfile nic, VirtualMachineProfile vm, String sshPublicKey) throws ResourceUnavailableException {
         // TODO Auto-generated method stub
         return false;
     }
@@ -260,8 +258,8 @@ public class CloudZonesNetworkElement extends AdapterBase implements NetworkElem
     }
 
     @Override
-    public boolean verifyServicesCombination(Set<Service> services) {
-        return true;
+    public boolean saveSSHKey(Network network, NicProfile nic, VirtualMachineProfile vm, String sshPublicKey) throws ResourceUnavailableException {
+        // TODO Auto-generated method stub
+        return false;
     }
-
 }

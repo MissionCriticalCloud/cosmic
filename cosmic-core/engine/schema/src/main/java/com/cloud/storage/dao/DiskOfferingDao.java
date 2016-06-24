@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.storage.dao;
 
-import java.util.List;
-
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface DiskOfferingDao extends GenericDao<DiskOfferingVO, Long> {
     List<DiskOfferingVO> listByDomainId(long domainId);
@@ -31,5 +31,4 @@ public interface DiskOfferingDao extends GenericDao<DiskOfferingVO, Long> {
     DiskOfferingVO findByUniqueName(String uniqueName);
 
     DiskOfferingVO persistDeafultDiskOffering(DiskOfferingVO offering);
-
 }

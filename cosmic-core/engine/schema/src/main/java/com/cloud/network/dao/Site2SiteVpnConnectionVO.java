@@ -16,8 +16,9 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.network.Site2SiteVpnConnection;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,51 +28,37 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.network.Site2SiteVpnConnection;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.InternalIdentity;
-
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = ("s2s_vpn_connection"))
 public class Site2SiteVpnConnectionVO implements Site2SiteVpnConnection, InternalIdentity {
+    @Column(name = "display", updatable = true, nullable = false)
+    protected boolean display = true;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "vpn_gateway_id")
     private long vpnGatewayId;
-
     @Column(name = "customer_gateway_id")
     private long customerGatewayId;
-
     @Column(name = "state")
     @Enumerated(value = EnumType.STRING)
     private State state;
-
     @Column(name = "domain_id")
     private Long domainId;
-
     @Column(name = "account_id")
     private Long accountId;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
-
     @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
-
     @Column(name = "passive")
     private boolean passive;
-
-    @Column(name = "display", updatable = true, nullable = false)
-    protected boolean display = true;
 
     public Site2SiteVpnConnectionVO() {
     }
@@ -92,12 +79,8 @@ public class Site2SiteVpnConnectionVO implements Site2SiteVpnConnection, Interna
     }
 
     @Override
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
+    public String getUuid() {
+        return uuid;
     }
 
     @Override
@@ -114,8 +97,13 @@ public class Site2SiteVpnConnectionVO implements Site2SiteVpnConnection, Interna
         return customerGatewayId;
     }
 
-    public void setCustomerGatewayId(long customerGatewayId) {
-        this.customerGatewayId = customerGatewayId;
+    @Override
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 
     @Override
@@ -137,8 +125,29 @@ public class Site2SiteVpnConnectionVO implements Site2SiteVpnConnection, Interna
     }
 
     @Override
-    public String getUuid() {
-        return uuid;
+    public boolean isPassive() {
+        return passive;
+    }
+
+    public void setPassive(boolean passive) {
+        this.passive = passive;
+    }
+
+    @Override
+    public boolean isDisplay() {
+        return display;
+    }
+
+    public void setDisplay(boolean display) {
+        this.display = display;
+    }
+
+    public void setCustomerGatewayId(long customerGatewayId) {
+        this.customerGatewayId = customerGatewayId;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     @Override
@@ -149,28 +158,6 @@ public class Site2SiteVpnConnectionVO implements Site2SiteVpnConnection, Interna
     @Override
     public long getAccountId() {
         return accountId;
-    }
-
-    @Override
-    public boolean isPassive() {
-        return passive;
-    }
-
-    public void setPassive(boolean passive) {
-        this.passive = passive;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public void setDisplay(boolean display) {
-        this.display = display;
-    }
-
-    @Override
-    public boolean isDisplay() {
-        return display;
     }
 
     @Override

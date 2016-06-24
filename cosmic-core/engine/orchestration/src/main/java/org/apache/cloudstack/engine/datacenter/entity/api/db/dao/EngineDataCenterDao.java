@@ -16,13 +16,12 @@
 // under the License.
 package org.apache.cloudstack.engine.datacenter.entity.api.db.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;
-
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity;
 import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineDataCenterVO;
+
+import java.util.List;
 
 public interface EngineDataCenterDao extends GenericDao<EngineDataCenterVO, Long>,
         StateDao<DataCenterResourceEntity.State, DataCenterResourceEntity.State.Event, DataCenterResourceEntity> {
@@ -57,5 +56,4 @@ public interface EngineDataCenterDao extends GenericDao<EngineDataCenterVO, Long
     List<EngineDataCenterVO> findZonesByDomainId(Long domainId, String keyword);
 
     List<EngineDataCenterVO> findByKeyword(String keyword);
-
 }

@@ -52,20 +52,12 @@ public class Argument implements Comparable<Object>, Serializable {
         this.type = type;
     }
 
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
-    }
-
     public String getDataType() {
         return this.dataType;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
     }
 
     public String getDescription() {
@@ -102,10 +94,19 @@ public class Argument implements Comparable<Object>, Serializable {
 
     @Override
     public int compareTo(Object anotherAgrument) throws ClassCastException {
-        if (!(anotherAgrument instanceof Argument))
+        if (!(anotherAgrument instanceof Argument)) {
             throw new ClassCastException("An Argument object expected.");
-        Argument argument = (Argument)anotherAgrument;
+        }
+        Argument argument = (Argument) anotherAgrument;
         return this.getName().compareToIgnoreCase(argument.getName());
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public boolean hasArguments() {
@@ -114,6 +115,7 @@ public class Argument implements Comparable<Object>, Serializable {
 
     @Override
     public String toString() {
-        return "name=" + this.name + ", description=" + description + ", required=" + required + ", type=" + this.type + ", sinceVersion=" + this.sinceVersion + ", arguments=" + this.arguments + ", dataType=" + this.dataType;
+        return "name=" + this.name + ", description=" + description + ", required=" + required + ", type=" + this.type + ", sinceVersion=" + this.sinceVersion + ", arguments=" +
+                this.arguments + ", dataType=" + this.dataType;
     }
 }

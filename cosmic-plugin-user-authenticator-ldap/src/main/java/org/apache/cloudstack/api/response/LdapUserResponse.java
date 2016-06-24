@@ -17,9 +17,9 @@
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 public class LdapUserResponse extends BaseResponse {
     @SerializedName("email")
@@ -50,7 +50,7 @@ public class LdapUserResponse extends BaseResponse {
         super();
     }
 
-    public LdapUserResponse(final String username, final String email, final String firstname, final String lastname, final String principal, String domain) {
+    public LdapUserResponse(final String username, final String email, final String firstname, final String lastname, final String principal, final String domain) {
         super();
         this.username = username;
         this.email = email;
@@ -64,47 +64,47 @@ public class LdapUserResponse extends BaseResponse {
         return email;
     }
 
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public String getPrincipal() {
-        return principal;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
     public void setEmail(final String email) {
         this.email = email;
+    }
+
+    public String getFirstname() {
+        return firstname;
     }
 
     public void setFirstname(final String firstname) {
         this.firstname = firstname;
     }
 
+    public String getLastname() {
+        return lastname;
+    }
+
     public void setLastname(final String lastname) {
         this.lastname = lastname;
+    }
+
+    public String getPrincipal() {
+        return principal;
     }
 
     public void setPrincipal(final String principal) {
         this.principal = principal;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
     public void setUsername(final String username) {
         this.username = username;
     }
 
-    public void setDomain(String domain) {
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(final String domain) {
         this.domain = domain;
     }
 }

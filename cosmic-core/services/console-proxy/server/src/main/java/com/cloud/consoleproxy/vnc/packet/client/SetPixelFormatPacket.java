@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.consoleproxy.vnc.packet.client;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import com.cloud.consoleproxy.vnc.RfbConstants;
 import com.cloud.consoleproxy.vnc.VncScreenDescription;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class SetPixelFormatPacket implements ClientPacket {
 
@@ -29,7 +29,7 @@ public class SetPixelFormatPacket implements ClientPacket {
     private final VncScreenDescription screen;
 
     public SetPixelFormatPacket(VncScreenDescription screen, int bitsPerPixel, int depth, int bigEndianFlag, int trueColorFlag, int redMax, int greenMax, int blueMax,
-            int redShift, int greenShift, int blueShift) {
+                                int redShift, int greenShift, int blueShift) {
         this.screen = screen;
         this.bitsPerPixel = bitsPerPixel;
         this.depth = depth;
@@ -71,5 +71,4 @@ public class SetPixelFormatPacket implements ClientPacket {
 
         screen.setPixelFormat(bitsPerPixel, depth, bigEndianFlag, trueColourFlag, redMax, greenMax, blueMax, redShift, greenShift, blueShift);
     }
-
 }

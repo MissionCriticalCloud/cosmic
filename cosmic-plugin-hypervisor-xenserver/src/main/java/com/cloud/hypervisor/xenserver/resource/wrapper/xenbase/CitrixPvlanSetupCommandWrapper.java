@@ -27,14 +27,14 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.exception.CloudRuntimeException;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Types.XenAPIException;
-
 import org.apache.xmlrpc.XmlRpcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  PvlanSetupCommand.class)
+@ResourceWrapper(handles = PvlanSetupCommand.class)
 public final class CitrixPvlanSetupCommandWrapper extends CommandWrapper<PvlanSetupCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixPvlanSetupCommandWrapper.class);

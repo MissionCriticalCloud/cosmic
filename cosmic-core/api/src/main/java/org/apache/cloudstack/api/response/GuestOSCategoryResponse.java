@@ -18,11 +18,11 @@ package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
 import com.cloud.storage.GuestOsCategory;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = GuestOsCategory.class)
 public class GuestOSCategoryResponse extends BaseResponse {

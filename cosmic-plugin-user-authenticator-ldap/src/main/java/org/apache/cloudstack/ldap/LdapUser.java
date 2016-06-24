@@ -25,7 +25,7 @@ public class LdapUser implements Comparable<LdapUser> {
     private final String domain;
     private final boolean disabled;
 
-    public LdapUser(final String username, final String email, final String firstname, final String lastname, final String principal, String domain, boolean disabled) {
+    public LdapUser(final String username, final String email, final String firstname, final String lastname, final String principal, final String domain, final boolean disabled) {
         this.username = username;
         this.email = email;
         this.firstname = firstname;
@@ -40,16 +40,8 @@ public class LdapUser implements Comparable<LdapUser> {
         return getUsername().compareTo(other.getUsername());
     }
 
-    @Override
-    public boolean equals(final Object other) {
-        if (this == other) {
-            return true;
-        }
-        if (other instanceof LdapUser) {
-            final LdapUser otherLdapUser = (LdapUser)other;
-            return getUsername().equals(otherLdapUser.getUsername());
-        }
-        return false;
+    public String getUsername() {
+        return username;
     }
 
     public String getEmail() {
@@ -68,10 +60,6 @@ public class LdapUser implements Comparable<LdapUser> {
         return principal;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
     public String getDomain() {
         return domain;
     }
@@ -80,9 +68,20 @@ public class LdapUser implements Comparable<LdapUser> {
         return disabled;
     }
 
-
     @Override
     public int hashCode() {
         return getUsername().hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other instanceof LdapUser) {
+            final LdapUser otherLdapUser = (LdapUser) other;
+            return getUsername().equals(otherLdapUser.getUsername());
+        }
+        return false;
     }
 }

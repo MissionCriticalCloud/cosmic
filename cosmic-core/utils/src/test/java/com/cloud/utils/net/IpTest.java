@@ -22,7 +22,6 @@ package com.cloud.utils.net;
 import static org.junit.Assert.assertEquals;
 
 import com.google.common.testing.EqualsTester;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,9 +29,10 @@ public class IpTest {
 
     @Test
     public void testUltimate() {
-        Ip max = new Ip(2L * Integer.MAX_VALUE +1 );
+        Ip max = new Ip(2L * Integer.MAX_VALUE + 1);
         assertEquals("Maximal address not created", "255.255.255.255", max.addr());
     }
+
     @Test
     public void testTurningOfTheCentury() {
         Ip eve = new Ip(Integer.MAX_VALUE);
@@ -40,6 +40,7 @@ public class IpTest {
         Ip dawn = new Ip(Integer.MAX_VALUE + 1L);
         assertEquals("Minimal address not created", "128.0.0.0", dawn.addr());
     }
+
     @Test
     public void testStart() {
         Ip min = new Ip(0);
@@ -59,5 +60,4 @@ public class IpTest {
         Assert.assertTrue("1 and one should be considdered the same address", new Ip(1L).isSameAddressAs("0.0.0.1"));
         Assert.assertTrue("zero and 0L should be considdered the same address", new Ip("0.0.0.0").isSameAddressAs(0L));
     }
-
 }

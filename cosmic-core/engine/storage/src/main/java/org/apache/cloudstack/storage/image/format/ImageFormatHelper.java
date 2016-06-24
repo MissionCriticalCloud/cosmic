@@ -18,25 +18,15 @@
  */
 package org.apache.cloudstack.storage.image.format;
 
-import java.util.List;
-
 import javax.inject.Inject;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
 @Component
 public class ImageFormatHelper {
-    private static List<ImageFormat> formats;
     private static final ImageFormat defaultFormat = new Unknown();
-
-    @Inject
-    public void setFormats(List<ImageFormat> formats) {
-        ImageFormatHelper.initFormats(formats);
-    }
-
-    private static synchronized void initFormats(List<ImageFormat> newFormats) {
-        formats = newFormats;
-    }
+    private static List<ImageFormat> formats;
 
     public static ImageFormat getFormat(String format) {
         for (ImageFormat fm : formats) {
@@ -45,5 +35,14 @@ public class ImageFormatHelper {
             }
         }
         return ImageFormatHelper.defaultFormat;
+    }
+
+    @Inject
+    public void setFormats(List<ImageFormat> formats) {
+        ImageFormatHelper.initFormats(formats);
+    }
+
+    private static synchronized void initFormats(List<ImageFormat> newFormats) {
+        formats = newFormats;
     }
 }

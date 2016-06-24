@@ -16,35 +16,33 @@
 // under the License.
 package org.apache.cloudstack.api.command.test;
 
-import java.util.Arrays;
-
 import com.cloud.exception.DiscoveryException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.host.Host;
 import com.cloud.resource.ResourceService;
-
 import org.apache.cloudstack.api.ResponseGenerator;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.admin.host.AddHostCmd;
 import org.apache.cloudstack.api.response.HostResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
+import java.util.Arrays;
+
+import junit.framework.Assert;
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 public class AddHostCmdTest extends TestCase {
-
-    private AddHostCmd addHostCmd;
-    private ResourceService resourceService;
-    private ResponseGenerator responseGenerator;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+    private AddHostCmd addHostCmd;
+    private ResourceService resourceService;
+    private ResponseGenerator responseGenerator;
 
     @Override
     @Before
@@ -64,7 +62,6 @@ public class AddHostCmdTest extends TestCase {
         } catch (ServerApiException exception) {
             Assert.assertEquals("Failed to add host", exception.getDescription());
         }
-
     }
 
     @Test
@@ -91,7 +88,6 @@ public class AddHostCmdTest extends TestCase {
         } catch (ServerApiException exception) {
             Assert.assertEquals("Failed to add host", exception.getDescription());
         }
-
     }
 
     /*
@@ -119,7 +115,7 @@ public class AddHostCmdTest extends TestCase {
         addHostCmd._resourceService = resourceService;
         addHostCmd._responseGenerator = responseGenerator;
         Host host = Mockito.mock(Host.class);
-        Host[] mockArray = new Host[] {host};
+        Host[] mockArray = new Host[]{host};
 
         HostResponse responseHost = new HostResponse();
         responseHost.setName("Test");
@@ -128,10 +124,9 @@ public class AddHostCmdTest extends TestCase {
         addHostCmd.execute();
         Mockito.verify(responseGenerator).createHostResponse(host);
         @SuppressWarnings("unchecked")
-        ListResponse<HostResponse> actualResponse = ((ListResponse<HostResponse>)addHostCmd.getResponseObject());
+        ListResponse<HostResponse> actualResponse = ((ListResponse<HostResponse>) addHostCmd.getResponseObject());
         Assert.assertEquals(responseHost, actualResponse.getResponses().get(0));
         Assert.assertEquals("addhostresponse", actualResponse.getResponseName());
-
     }
 
     @Test
@@ -154,7 +149,5 @@ public class AddHostCmdTest extends TestCase {
         } catch (ServerApiException exception) {
             Assert.assertNull(exception.getDescription());
         }
-
     }
-
 }

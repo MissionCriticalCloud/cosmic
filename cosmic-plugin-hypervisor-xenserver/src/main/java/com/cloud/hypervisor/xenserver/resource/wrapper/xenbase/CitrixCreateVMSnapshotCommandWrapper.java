@@ -19,10 +19,6 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CreateVMSnapshotAnswer;
 import com.cloud.agent.api.CreateVMSnapshotCommand;
@@ -30,6 +26,12 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.vm.snapshot.VMSnapshot;
+import org.apache.cloudstack.storage.to.VolumeObjectTO;
+
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Pool;
 import com.xensource.xenapi.SR;
@@ -39,12 +41,10 @@ import com.xensource.xenapi.Types.VmPowerState;
 import com.xensource.xenapi.VBD;
 import com.xensource.xenapi.VDI;
 import com.xensource.xenapi.VM;
-
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  CreateVMSnapshotCommand.class)
+@ResourceWrapper(handles = CreateVMSnapshotCommand.class)
 public final class CitrixCreateVMSnapshotCommandWrapper extends CommandWrapper<CreateVMSnapshotCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixCreateVMSnapshotCommandWrapper.class);
@@ -78,11 +78,11 @@ public final class CitrixCreateVMSnapshotCommandWrapper extends CommandWrapper<C
             // check if there is already a task for this VM snapshot
             Task task = null;
             Set<Task> tasks = Task.getByNameLabel(conn, "Async.VM.snapshot");
-            if(tasks == null) {
+            if (tasks == null) {
                 tasks = new LinkedHashSet<>();
             }
             final Set<Task> tasksByName = Task.getByNameLabel(conn, "Async.VM.checkpoint");
-            if(tasksByName != null) {
+            if (tasksByName != null) {
                 tasks.addAll(tasksByName);
             }
             for (final Task taskItem : tasks) {
@@ -153,7 +153,7 @@ public final class CitrixCreateVMSnapshotCommandWrapper extends CommandWrapper<C
             String msg = "";
             if (e instanceof Types.BadAsyncResult) {
                 final String licenseKeyWord = "LICENCE_RESTRICTION";
-                final Types.BadAsyncResult errorResult = (Types.BadAsyncResult)e;
+                final Types.BadAsyncResult errorResult = (Types.BadAsyncResult) e;
                 if (errorResult.shortDescription != null && errorResult.shortDescription.contains(licenseKeyWord)) {
                     msg = licenseKeyWord;
                 }

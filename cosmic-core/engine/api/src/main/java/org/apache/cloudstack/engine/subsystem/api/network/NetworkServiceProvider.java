@@ -21,6 +21,7 @@ package org.apache.cloudstack.engine.subsystem.api.network;
 public interface NetworkServiceProvider {
     /**
      * Plug your network elements into this network
+     *
      * @param network
      * @param reservationId
      */
@@ -28,6 +29,7 @@ public interface NetworkServiceProvider {
 
     /**
      * Unplug your network elements from this network
+     *
      * @param network
      * @param reservationId
      */
@@ -35,6 +37,7 @@ public interface NetworkServiceProvider {
 
     /**
      * Cancel a previous work
+     *
      * @param reservationId
      */
     void cancel(String reservationId);

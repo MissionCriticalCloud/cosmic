@@ -16,17 +16,6 @@
 // under the License.
 package com.cloud.network.security;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.agent.api.SecurityGroupRulesCmd;
 import com.cloud.agent.manager.Commands;
 import com.cloud.configuration.Config;
@@ -40,12 +29,20 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.mgmt.JmxUtil;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.VirtualMachine.State;
-
 import org.apache.cloudstack.managed.context.ManagedContext;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Same as the base class -- except it uses the abstracted security group work queue
- *
  */
 public class SecurityGroupManagerImpl2 extends SecurityGroupManagerImpl {
     SecurityGroupWorkQueue _workQueue = new LocalSecurityGroupWorkQueue();
@@ -59,40 +56,9 @@ public class SecurityGroupManagerImpl2 extends SecurityGroupManagerImpl {
     private Set<Long> _disabledVms = Collections.newSetFromMap(new ConcurrentHashMap<Long, Boolean>());
     private boolean _schedulerDisabled = false;
 
-    protected class WorkerThread extends Thread {
-        public WorkerThread(String name) {
-            super(name);
-        }
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    _managedContext.runWithContext(new Runnable() {
-                        @Override
-                        public void run() {
-                            work();
-                        }
-                    });
-                } catch (final Throwable th) {
-                    s_logger.error("SG Work: Caught this throwable, ", th);
-                }
-            }
-        }
-    }
-
-    @Override
-    protected void createThreadPools() {
-        _workers = new WorkerThread[_numWorkerThreads];
-        for (int i = 0; i < _workers.length; i++) {
-            _workers[i] = new WorkerThread("SecGrp-Worker-" + i);
-        }
-    }
-
     @Override
     //@DB
-        public
-        void scheduleRulesetUpdateToHosts(List<Long> affectedVms, boolean updateSeqno, Long delayMs) {
+    public void scheduleRulesetUpdateToHosts(List<Long> affectedVms, boolean updateSeqno, Long delayMs) {
         if (affectedVms.size() == 0) {
             return;
         }
@@ -106,7 +72,7 @@ public class SecurityGroupManagerImpl2 extends SecurityGroupManagerImpl {
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Security Group Mgr v2: scheduling ruleset updates for " + affectedVms.size() + " vms " + " (unique=" + workItems.size() +
-                "), current queue size=" + _workQueue.size());
+                    "), current queue size=" + _workQueue.size());
         }
 
         Profiler p = new Profiler();
@@ -123,7 +89,31 @@ public class SecurityGroupManagerImpl2 extends SecurityGroupManagerImpl {
         p.stop();
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Security Group Mgr v2: done scheduling ruleset updates for " + workItems.size() + " vms: num new jobs=" + newJobs +
-                " num rows insert or updated=" + updated + " time taken=" + p.getDurationInMillis());
+                    " num rows insert or updated=" + updated + " time taken=" + p.getDurationInMillis());
+        }
+    }
+
+    @Override
+    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+        _mBean = new SecurityManagerMBeanImpl(this);
+        try {
+            JmxUtil.registerMBean("SecurityGroupManager", "SecurityGroupManagerImpl2", _mBean);
+        } catch (Exception e) {
+            s_logger.error("Failed to register MBean", e);
+        }
+        boolean result = super.configure(name, params);
+        Map<String, String> configs = _configDao.getConfiguration("Network", params);
+        int bufferLength = NumbersUtil.parseInt(configs.get(Config.SecurityGroupWorkPerAgentMaxQueueSize.key()), 100);
+        _workTracker = new SecurityGroupWorkTracker(_agentMgr, _answerListener, bufferLength);
+        _answerListener.setWorkDispatcher(_workTracker);
+        return result;
+    }
+
+    @Override
+    protected void createThreadPools() {
+        _workers = new WorkerThread[_numWorkerThreads];
+        for (int i = 0; i < _workers.length; i++) {
+            _workers[i] = new WorkerThread("SecGrp-Worker-" + i);
         }
     }
 
@@ -188,13 +178,13 @@ public class SecurityGroupManagerImpl2 extends SecurityGroupManagerImpl {
                     }
                 }
                 SecurityGroupRulesCmd cmd =
-                    generateRulesetCmd(vm.getInstanceName(), vm.getPrivateIpAddress(), vm.getPrivateMacAddress(), vm.getId(), null, work.getLogsequenceNumber(),
-                        ingressRules, egressRules, nicSecIps);
+                        generateRulesetCmd(vm.getInstanceName(), vm.getPrivateIpAddress(), vm.getPrivateMacAddress(), vm.getId(), null, work.getLogsequenceNumber(),
+                                ingressRules, egressRules, nicSecIps);
                 cmd.setMsId(_serverId);
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("SecurityGroupManager v2: sending ruleset update for vm " + vm.getInstanceName() + ":ingress num rules=" +
-                        cmd.getIngressRuleSet().length + ":egress num rules=" + cmd.getEgressRuleSet().length + " num cidrs=" + cmd.getTotalNumCidrs() + " sig=" +
-                        cmd.getSignature());
+                            cmd.getIngressRuleSet().length + ":egress num rules=" + cmd.getEgressRuleSet().length + " num cidrs=" + cmd.getTotalNumCidrs() + " sig=" +
+                            cmd.getSignature());
                 }
                 Commands cmds = new Commands(cmd);
                 try {
@@ -209,17 +199,13 @@ public class SecurityGroupManagerImpl2 extends SecurityGroupManagerImpl {
             }
         } else {
             if (s_logger.isDebugEnabled()) {
-                if (vm != null)
+                if (vm != null) {
                     s_logger.debug("No rules sent to vm " + vm + "state=" + vm.getState());
-                else
+                } else {
                     s_logger.debug("Could not find vm: No rules sent to vm " + userVmId);
+                }
             }
         }
-    }
-
-    @Override
-    public void cleanupFinishedWork() {
-        //TODO: over time clean up op_vm_ruleset_log table for destroyed vms
     }
 
     /*
@@ -263,28 +249,17 @@ public class SecurityGroupManagerImpl2 extends SecurityGroupManagerImpl {
         return allowed;
     }
 
+    @Override
+    public void cleanupFinishedWork() {
+        //TODO: over time clean up op_vm_ruleset_log table for destroyed vms
+    }
+
     public int getQueueSize() {
         return _workQueue.size();
     }
 
     public SecurityGroupWorkQueue getWorkQueue() {
         return _workQueue;
-    }
-
-    @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
-        _mBean = new SecurityManagerMBeanImpl(this);
-        try {
-            JmxUtil.registerMBean("SecurityGroupManager", "SecurityGroupManagerImpl2", _mBean);
-        } catch (Exception e) {
-            s_logger.error("Failed to register MBean", e);
-        }
-        boolean result = super.configure(name, params);
-        Map<String, String> configs = _configDao.getConfiguration("Network", params);
-        int bufferLength = NumbersUtil.parseInt(configs.get(Config.SecurityGroupWorkPerAgentMaxQueueSize.key()), 100);
-        _workTracker = new SecurityGroupWorkTracker(_agentMgr, _answerListener, bufferLength);
-        _answerListener.setWorkDispatcher(_workTracker);
-        return result;
     }
 
     public void disableSchedulerForVm(Long vmId, boolean disable) {
@@ -294,7 +269,6 @@ public class SecurityGroupManagerImpl2 extends SecurityGroupManagerImpl {
             _disabledVms.remove(vmId);
         }
         s_logger.warn("JMX operation: Scheduler state for vm " + vmId + ": new state disabled=" + disable);
-
     }
 
     public Long[] getDisabledVmsForScheduler() {
@@ -321,4 +295,25 @@ public class SecurityGroupManagerImpl2 extends SecurityGroupManagerImpl {
         s_logger.warn("Cleared the work queue (possible JMX operation)");
     }
 
+    protected class WorkerThread extends Thread {
+        public WorkerThread(String name) {
+            super(name);
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    _managedContext.runWithContext(new Runnable() {
+                        @Override
+                        public void run() {
+                            work();
+                        }
+                    });
+                } catch (final Throwable th) {
+                    s_logger.error("SG Work: Caught this throwable, ", th);
+                }
+            }
+        }
+    }
 }

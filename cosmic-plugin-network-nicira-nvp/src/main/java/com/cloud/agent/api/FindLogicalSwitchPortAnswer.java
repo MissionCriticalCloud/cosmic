@@ -27,12 +27,11 @@ public class FindLogicalSwitchPortAnswer extends Answer {
         logicalSwitchPortUuid = localSwitchPortUuid;
     }
 
-    public String getLogicalSwitchPortUuid() {
-        return logicalSwitchPortUuid;
-    }
-
     public FindLogicalSwitchPortAnswer(final Command command, final Exception e) {
         super(command, e);
     }
 
+    public String getLogicalSwitchPortUuid() {
+        return logicalSwitchPortUuid;
+    }
 }

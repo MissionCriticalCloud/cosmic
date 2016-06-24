@@ -17,7 +17,6 @@
 package org.apache.cloudstack.api.command.admin.iso;
 
 import com.cloud.uservm.UserVm;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
@@ -26,6 +25,7 @@ import org.apache.cloudstack.api.command.user.iso.AttachIsoCmd;
 import org.apache.cloudstack.api.command.user.vm.DeployVMCmd;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +35,8 @@ public class AttachIsoCmdByAdmin extends AttachIsoCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(AttachIsoCmdByAdmin.class.getName());
 
     @Override
-    public void execute(){
-        CallContext.current().setEventDetails("Vm Id: " +getVirtualMachineId()+ " ISO Id: "+getId());
+    public void execute() {
+        CallContext.current().setEventDetails("Vm Id: " + getVirtualMachineId() + " ISO Id: " + getId());
         boolean result = _templateService.attachIso(id, virtualMachineId);
         if (result) {
             UserVm userVm = _responseGenerator.findUserVmById(virtualMachineId);

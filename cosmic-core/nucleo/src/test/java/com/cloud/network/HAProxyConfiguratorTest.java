@@ -21,12 +21,12 @@ package com.cloud.network;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
 import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.network.lb.LoadBalancingRule.LbDestination;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -36,7 +36,6 @@ import org.junit.Test;
 
 /**
  * @author dhoogland
- *
  */
 public class HAProxyConfiguratorTest {
 
@@ -91,6 +90,15 @@ public class HAProxyConfiguratorTest {
         // httpmode
     }
 
+    private String genConfig(HAProxyConfigurator hpg, LoadBalancerConfigCommand cmd) {
+        String[] sa = hpg.generateConfiguration(cmd);
+        StringBuilder sb = new StringBuilder();
+        for (String s : sa) {
+            sb.append(s).append('\n');
+        }
+        return sb.toString();
+    }
+
     /**
      * Test method for {@link com.cloud.network.HAProxyConfigurator#generateConfiguration(com.cloud.agent.api.routing.LoadBalancerConfigCommand)}.
      */
@@ -108,14 +116,4 @@ public class HAProxyConfiguratorTest {
         String result = genConfig(hpg, cmd);
         assertTrue("'send-proxy' should result if protocol is 'tcp-proxy'", result.contains("send-proxy"));
     }
-
-    private String genConfig(HAProxyConfigurator hpg, LoadBalancerConfigCommand cmd) {
-        String[] sa = hpg.generateConfiguration(cmd);
-        StringBuilder sb = new StringBuilder();
-        for (String s : sa) {
-            sb.append(s).append('\n');
-        }
-        return sb.toString();
-    }
-
 }

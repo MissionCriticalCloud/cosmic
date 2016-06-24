@@ -25,7 +25,6 @@ import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.user.Account;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -35,6 +34,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.DomainRouterResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,32 +55,13 @@ public class StartRouterCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
+    public static String getResultObjectName() {
+        return "router";
     }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public static String getResultObjectName() {
-        return "router";
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        VirtualRouter router = _entityMgr.findById(VirtualRouter.class, getId());
-        if (router != null) {
-            return router.getAccountId();
-        }
-
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
 
     @Override
     public String getEventType() {
@@ -93,31 +74,50 @@ public class StartRouterCmd extends BaseAsyncCmd {
     }
 
     @Override
+    public Long getInstanceId() {
+        return getId();
+    }
+
+    @Override
     public ApiCommandJobType getInstanceType() {
         return ApiCommandJobType.DomainRouter;
     }
 
-    @Override
-    public Long getInstanceId() {
-        return getId();
+    public Long getId() {
+        return id;
     }
 
     @Override
     public void execute() throws ConcurrentOperationException, ResourceUnavailableException, InsufficientCapacityException {
         CallContext.current().setEventDetails("Router Id: " + getId());
         VirtualRouter result = null;
-        VirtualRouter router = _routerService.findRouter(getId());
+        final VirtualRouter router = _routerService.findRouter(getId());
         if (router == null || router.getRole() != Role.VIRTUAL_ROUTER) {
             throw new InvalidParameterValueException("Can't find router by id");
         } else {
             result = _routerService.startRouter(getId());
         }
         if (result != null) {
-            DomainRouterResponse routerResponse = _responseGenerator.createDomainRouterResponse(result);
+            final DomainRouterResponse routerResponse = _responseGenerator.createDomainRouterResponse(result);
             routerResponse.setResponseName(getCommandName());
             setResponseObject(routerResponse);
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to start router");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final VirtualRouter router = _entityMgr.findById(VirtualRouter.class, getId());
+        if (router != null) {
+            return router.getAccountId();
+        }
+
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 }

@@ -52,5 +52,4 @@ public class ManageVolumeAvailabilityCommand extends Command {
     public String getVolumeUuid() {
         return volumeUuid;
     }
-
 }

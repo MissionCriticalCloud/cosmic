@@ -16,21 +16,21 @@
 // under the License.
 package com.cloud.deploy.dao;
 
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
 import com.cloud.deploy.DeploymentPlanner.PlannerResourceUsage;
 import com.cloud.deploy.PlannerHostReservationVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 
+import javax.annotation.PostConstruct;
+import java.util.List;
+
 public class PlannerHostReservationDaoImpl extends GenericDaoBase<PlannerHostReservationVO, Long> implements PlannerHostReservationDao {
 
     private SearchBuilder<PlannerHostReservationVO> _hostIdSearch;
     private SearchBuilder<PlannerHostReservationVO> _reservedHostSearch;
-    private SearchBuilder<PlannerHostReservationVO> _dedicatedHostSearch;;
+    private SearchBuilder<PlannerHostReservationVO> _dedicatedHostSearch;
+    ;
 
     public PlannerHostReservationDaoImpl() {
 

@@ -16,8 +16,11 @@
 // under the License.
 package com.cloud.user;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.user.Account.State;
+import com.cloud.utils.db.Encrypt;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.Identity;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,76 +30,53 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.user.Account.State;
-import com.cloud.utils.db.Encrypt;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * A bean representing a user
- *
  */
 @Entity
 @Table(name = "user")
 public class UserVO implements User, Identity, InternalIdentity {
+    @Column(name = "is_registered")
+    boolean registered;
+    @Column(name = "default")
+    boolean isDefault;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
     @Column(name = "username")
     private String username = null;
-
     @Column(name = "password")
     private String password = null;
-
     @Column(name = "firstname")
     private String firstname = null;
-
     @Column(name = "lastname")
     private String lastname = null;
-
     @Column(name = "account_id")
     private long accountId;
-
     @Column(name = "email")
     private String email = null;
-
     @Column(name = "state")
     @Enumerated(value = EnumType.STRING)
     private State state;
-
     @Column(name = "api_key")
     private String apiKey = null;
-
     @Encrypt
     @Column(name = "secret_key")
     private String secretKey = null;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
-
     @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
-
     @Column(name = "timezone")
     private String timezone;
-
     @Column(name = "registration_token")
     private String registrationToken = null;
-
-    @Column(name = "is_registered")
-    boolean registered;
-
     @Column(name = "uuid")
     private String uuid;
-
-    @Column(name = "default")
-    boolean isDefault;
-
     @Column(name = "source")
     @Enumerated(value = EnumType.STRING)
     private Source source;
@@ -129,6 +109,11 @@ public class UserVO implements User, Identity, InternalIdentity {
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public String getUuid() {
+        return this.uuid;
     }
 
     @Override
@@ -179,6 +164,10 @@ public class UserVO implements User, Identity, InternalIdentity {
     @Override
     public void setLastname(String lastname) {
         this.lastname = lastname;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     @Override
@@ -260,20 +249,6 @@ public class UserVO implements User, Identity, InternalIdentity {
     }
 
     @Override
-    public String toString() {
-        return new StringBuilder("User[").append(id).append("-").append(username).append("]").toString();
-    }
-
-    @Override
-    public String getUuid() {
-        return this.uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    @Override
     public boolean isDefault() {
         return isDefault;
     }
@@ -292,5 +267,10 @@ public class UserVO implements User, Identity, InternalIdentity {
 
     public void setExternalEntity(String externalEntity) {
         this.externalEntity = externalEntity;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("User[").append(id).append("-").append(username).append("]").toString();
     }
 }

@@ -30,12 +30,12 @@ import java.util.Map;
 
 public class VmWorkMigrate extends VmWork {
     private static final long serialVersionUID = 1689203333114836522L;
-
+    static private EntityManager s_entityMgr;
+    private final Map<String, String> storage;
     Long zoneId;
     Long podId;
     Long clusterId;
     Long hostId;
-    private final Map<String, String> storage;
     long srcHostId;
 
     public VmWorkMigrate(final long userId, final long accountId, final long vmId, final String handlerName,
@@ -54,6 +54,10 @@ public class VmWorkMigrate extends VmWork {
         } else {
             storage = null;
         }
+    }
+
+    static public void init(final EntityManager entityMgr) {
+        s_entityMgr = entityMgr;
     }
 
     public DeployDestination getDeployDestination() {
@@ -77,11 +81,5 @@ public class VmWorkMigrate extends VmWork {
 
     public long getSrcHostId() {
         return srcHostId;
-    }
-
-    static private EntityManager s_entityMgr;
-
-    static public void init(final EntityManager entityMgr) {
-        s_entityMgr = entityMgr;
     }
 }

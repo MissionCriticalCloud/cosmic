@@ -16,12 +16,8 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import com.cloud.network.rules.StickinessPolicy;
+import com.cloud.utils.Pair;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,42 +26,37 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
-
-import com.cloud.network.rules.StickinessPolicy;
-import com.cloud.utils.Pair;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Entity
 @Table(name = ("load_balancer_stickiness_policies"))
 @PrimaryKeyJoinColumn(name = "load_balancer_id", referencedColumnName = "id")
 public class LBStickinessPolicyVO implements StickinessPolicy {
+    @Column(name = "display", updatable = true, nullable = false)
+    protected boolean display = true;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
     @Column(name = "load_balancer_id")
     private long loadBalancerId;
-
     @Column(name = "name")
     private String name;
-
     @Column(name = "description")
     private String description;
-
     @Column(name = "method_name")
     private String methodName;
-
     @Column(name = "params")
     private String paramsInDB;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "revoke")
     private boolean revoke = false;
-
-    @Column(name = "display", updatable = true, nullable = false)
-    protected boolean display = true;
 
     protected LBStickinessPolicyVO() {
         this.uuid = UUID.randomUUID().toString();
@@ -101,17 +92,6 @@ public class LBStickinessPolicyVO implements StickinessPolicy {
     }
 
     @Override
-    public List<Pair<String, String>> getParams() {
-        List<Pair<String, String>> paramsList = new ArrayList<Pair<String, String>>();
-        String[] params = paramsInDB.split("[=&]");
-
-        for (int i = 0; i < (params.length - 1); i = i + 2) {
-            paramsList.add(new Pair<String, String>(params[i], params[i + 1]));
-        }
-        return paramsList;
-    }
-
-    @Override
     public long getId() {
         return id;
     }
@@ -141,6 +121,26 @@ public class LBStickinessPolicyVO implements StickinessPolicy {
         return revoke;
     }
 
+    @Override
+    public List<Pair<String, String>> getParams() {
+        List<Pair<String, String>> paramsList = new ArrayList<Pair<String, String>>();
+        String[] params = paramsInDB.split("[=&]");
+
+        for (int i = 0; i < (params.length - 1); i = i + 2) {
+            paramsList.add(new Pair<String, String>(params[i], params[i + 1]));
+        }
+        return paramsList;
+    }
+
+    @Override
+    public boolean isDisplay() {
+        return display;
+    }
+
+    public void setDisplay(boolean display) {
+        this.display = display;
+    }
+
     public void setRevoke(boolean revoke) {
         this.revoke = revoke;
     }
@@ -152,14 +152,5 @@ public class LBStickinessPolicyVO implements StickinessPolicy {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    public void setDisplay(boolean display) {
-        this.display = display;
-    }
-
-    @Override
-    public boolean isDisplay() {
-        return display;
     }
 }

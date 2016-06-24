@@ -37,7 +37,7 @@ public class GetHostStatsAnswer extends Answer implements HostStats {
     }
 
     public GetHostStatsAnswer(GetHostStatsCommand cmd, double cpuUtilization, double freeMemoryKBs, double totalMemoryKBs, double networkReadKBs, double networkWriteKBs,
-            String entityType) {
+                              String entityType) {
         super(cmd);
         hostStats = new HostStatsEntry();
 
@@ -50,28 +50,8 @@ public class GetHostStatsAnswer extends Answer implements HostStats {
     }
 
     @Override
-    public double getUsedMemory() {
-        return hostStats.getUsedMemory();
-    }
-
-    @Override
-    public double getFreeMemoryKBs() {
-        return hostStats.getFreeMemoryKBs();
-    }
-
-    @Override
-    public double getTotalMemoryKBs() {
-        return hostStats.getTotalMemoryKBs();
-    }
-
-    @Override
     public double getCpuUtilization() {
         return hostStats.getCpuUtilization();
-    }
-
-    @Override
-    public double getNetworkReadKBs() {
-        return hostStats.getNetworkReadKBs();
     }
 
     @Override
@@ -80,8 +60,28 @@ public class GetHostStatsAnswer extends Answer implements HostStats {
     }
 
     @Override
+    public double getTotalMemoryKBs() {
+        return hostStats.getTotalMemoryKBs();
+    }
+
+    @Override
+    public double getFreeMemoryKBs() {
+        return hostStats.getFreeMemoryKBs();
+    }
+
+    @Override
+    public double getNetworkReadKBs() {
+        return hostStats.getNetworkReadKBs();
+    }
+
+    @Override
     public String getEntityType() {
         return hostStats.getEntityType();
+    }
+
+    @Override
+    public double getUsedMemory() {
+        return hostStats.getUsedMemory();
     }
 
     @Override

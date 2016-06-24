@@ -18,17 +18,6 @@ package com.cloud.utils.db;
 
 import static com.cloud.utils.AutoCloseableUtil.closeAutoCloseable;
 
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
@@ -42,6 +31,16 @@ import javax.persistence.SecondaryTable;
 import javax.persistence.SecondaryTables;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,40 +49,6 @@ public class DbUtil {
     protected final static Logger s_logger = LoggerFactory.getLogger(DbUtil.class);
 
     private static Map<String, Connection> s_connectionForGlobalLocks = new HashMap<String, Connection>();
-
-    public static Connection getConnectionForGlobalLocks(String name, boolean forLock) {
-        synchronized (s_connectionForGlobalLocks) {
-            if (forLock) {
-                if (s_connectionForGlobalLocks.get(name) != null) {
-                    s_logger.error("Sanity check failed, global lock name " + name + " is already in use");
-                    assert (false);
-                }
-
-                Connection connection = TransactionLegacy.getStandaloneConnection();
-                if (connection != null) {
-                    try {
-                        connection.setAutoCommit(true);
-                    } catch (SQLException e) {
-                        closeAutoCloseable(connection, "error closing connection for global locks");
-                        return null;
-                    }
-                    s_connectionForGlobalLocks.put(name, connection);
-                    return connection;
-                }
-                return null;
-            } else {
-                Connection connection = s_connectionForGlobalLocks.get(name);
-                s_connectionForGlobalLocks.remove(name);
-                return connection;
-            }
-        }
-    }
-
-    public static void removeConnectionForGlobalLocks(String name) {
-        synchronized (s_connectionForGlobalLocks) {
-            s_connectionForGlobalLocks.remove(name);
-        }
-    }
 
     public static String getColumnName(Field field, AttributeOverride[] overrides) {
         if (overrides != null) {
@@ -111,7 +76,7 @@ public class DbUtil {
     public static PrimaryKeyJoinColumn[] getPrimaryKeyJoinColumns(Class<?> clazz) {
         PrimaryKeyJoinColumn pkjc = clazz.getAnnotation(PrimaryKeyJoinColumn.class);
         if (pkjc != null) {
-            return new PrimaryKeyJoinColumn[] {pkjc};
+            return new PrimaryKeyJoinColumn[]{pkjc};
         }
 
         PrimaryKeyJoinColumns pkjcs = clazz.getAnnotation(PrimaryKeyJoinColumns.class);
@@ -185,7 +150,7 @@ public class DbUtil {
             SecondaryTables stsAnnotation = clazz.getAnnotation(SecondaryTables.class);
             sts = stsAnnotation != null ? stsAnnotation.value() : new SecondaryTable[0];
         } else {
-            sts = new SecondaryTable[] {stAnnotation};
+            sts = new SecondaryTable[]{stAnnotation};
         }
 
         return sts;
@@ -212,8 +177,9 @@ public class DbUtil {
                     if (rs.getInt(1) > 0) {
                         return true;
                     } else {
-                        if (s_logger.isDebugEnabled())
+                        if (s_logger.isDebugEnabled()) {
                             s_logger.debug("GET_LOCK() timed out on lock : " + name);
+                        }
                     }
                 }
             }
@@ -226,6 +192,40 @@ public class DbUtil {
         removeConnectionForGlobalLocks(name);
         closeAutoCloseable(conn, "connection for global lock");
         return false;
+    }
+
+    public static Connection getConnectionForGlobalLocks(String name, boolean forLock) {
+        synchronized (s_connectionForGlobalLocks) {
+            if (forLock) {
+                if (s_connectionForGlobalLocks.get(name) != null) {
+                    s_logger.error("Sanity check failed, global lock name " + name + " is already in use");
+                    assert (false);
+                }
+
+                Connection connection = TransactionLegacy.getStandaloneConnection();
+                if (connection != null) {
+                    try {
+                        connection.setAutoCommit(true);
+                    } catch (SQLException e) {
+                        closeAutoCloseable(connection, "error closing connection for global locks");
+                        return null;
+                    }
+                    s_connectionForGlobalLocks.put(name, connection);
+                    return connection;
+                }
+                return null;
+            } else {
+                Connection connection = s_connectionForGlobalLocks.get(name);
+                s_connectionForGlobalLocks.remove(name);
+                return connection;
+            }
+        }
+    }
+
+    public static void removeConnectionForGlobalLocks(String name) {
+        synchronized (s_connectionForGlobalLocks) {
+            s_connectionForGlobalLocks.remove(name);
+        }
     }
 
     public static Class<?> getEntityBeanType(GenericDao<?, Long> dao) {
@@ -257,18 +257,16 @@ public class DbUtil {
         return false;
     }
 
+    public static void closeResources(final Statement statement, final ResultSet resultSet) {
+
+        closeResources(null, statement, resultSet);
+    }
+
     public static void closeResources(final Connection connection, final Statement statement, final ResultSet resultSet) {
 
         closeResultSet(resultSet);
         closeStatement(statement);
         closeConnection(connection);
-
-    }
-
-    public static void closeResources(final Statement statement, final ResultSet resultSet) {
-
-        closeResources(null, statement, resultSet);
-
     }
 
     public static void closeResultSet(final ResultSet resultSet) {
@@ -282,5 +280,4 @@ public class DbUtil {
     public static void closeConnection(final Connection connection) {
         closeAutoCloseable(connection, "exception while close connection.");
     }
-
 }

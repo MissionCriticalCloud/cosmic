@@ -28,12 +28,21 @@ import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.vm.VirtualMachine;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.events.Event;
 import org.apache.cloudstack.framework.events.EventBus;
+
+import javax.inject.Inject;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,10 +55,6 @@ import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import javax.inject.Inject;
-import java.lang.reflect.Field;
-import java.util.*;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ComponentContext.class)
@@ -158,7 +163,6 @@ public class ActionEventUtilsTest {
                 publishedEvents.add(event);
                 return null;
             }
-
         }).when(eventBus).publish(Mockito.any(Event.class));
     }
 

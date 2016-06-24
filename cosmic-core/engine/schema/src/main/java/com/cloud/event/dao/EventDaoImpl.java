@@ -16,9 +16,6 @@
 // under the License.
 package com.cloud.event.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.event.Event.State;
 import com.cloud.event.EventVO;
 import com.cloud.utils.db.Filter;
@@ -27,6 +24,9 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,8 +62,9 @@ public class EventDaoImpl extends GenericDaoBase<EventVO, Long> implements Event
 
     @Override
     public List<EventVO> listOlderEvents(Date oldTime) {
-        if (oldTime == null)
+        if (oldTime == null) {
             return null;
+        }
         SearchCriteria<EventVO> sc = createSearchCriteria();
         sc.addAnd("createDate", SearchCriteria.Op.LT, oldTime);
         sc.addAnd("archived", SearchCriteria.Op.EQ, false);

@@ -29,29 +29,33 @@ public enum ZoneConfig {
     DhcpStrategy(String.class, "zone.dhcp.strategy", "cloudstack-systemvm", "Who controls DHCP", "cloudstack-systemvm,cloudstack-external,external"),
     DnsSearchOrder(String.class, "network.guestnetwork.dns.search.order", null, "Domains list to be used for domain search order", null);
 
+    private static final List<String> ZoneConfigKeys = new ArrayList<>();
+
+    static {
+        // Add keys into List
+        for (final ZoneConfig c : ZoneConfig.values()) {
+            final String key = c.key();
+            ZoneConfigKeys.add(key);
+        }
+    }
+
     private final Class<?> _type;
     private final String _name;
     private final String _defaultValue;
     private final String _description;
     private final String _range;
 
-    private static final List<String> ZoneConfigKeys = new ArrayList<String>();
-
-    static {
-        // Add keys into List
-        for (ZoneConfig c : ZoneConfig.values()) {
-            String key = c.key();
-            ZoneConfigKeys.add(key);
-        }
-    }
-
-    private ZoneConfig(Class<?> type, String name, String defaultValue, String description, String range) {
+    private ZoneConfig(final Class<?> type, final String name, final String defaultValue, final String description, final String range) {
 
         _type = type;
         _name = name;
         _defaultValue = defaultValue;
         _description = description;
         _range = range;
+    }
+
+    public static boolean doesKeyExist(final String key) {
+        return ZoneConfigKeys.contains(key);
     }
 
     public Class<?> getType() {
@@ -76,10 +80,6 @@ public enum ZoneConfig {
 
     public String key() {
         return _name;
-    }
-
-    public static boolean doesKeyExist(String key) {
-        return ZoneConfigKeys.contains(key);
     }
 
 }

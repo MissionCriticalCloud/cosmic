@@ -21,12 +21,12 @@ package org.apache.cloudstack.ldap.dao;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.ldap.LdapTrustMapVO;
+
 import org.springframework.stereotype.Component;
 
 @Component
-public class LdapTrustMapDaoImpl extends GenericDaoBase<LdapTrustMapVO, Long> implements LdapTrustMapDao  {
+public class LdapTrustMapDaoImpl extends GenericDaoBase<LdapTrustMapVO, Long> implements LdapTrustMapDao {
     private final SearchBuilder<LdapTrustMapVO> domainIdSearch;
 
     public LdapTrustMapDaoImpl() {
@@ -37,7 +37,7 @@ public class LdapTrustMapDaoImpl extends GenericDaoBase<LdapTrustMapVO, Long> im
     }
 
     @Override
-    public LdapTrustMapVO findByDomainId(long domainId) {
+    public LdapTrustMapVO findByDomainId(final long domainId) {
         final SearchCriteria<LdapTrustMapVO> sc = domainIdSearch.create();
         sc.setParameters("domainId", domainId);
         return findOneBy(sc);

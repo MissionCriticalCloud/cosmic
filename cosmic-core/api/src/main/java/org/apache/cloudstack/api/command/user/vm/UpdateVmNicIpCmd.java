@@ -16,9 +16,6 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.vm;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.event.EventTypes;
@@ -31,7 +28,6 @@ import com.cloud.network.Network;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.Nic;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -44,6 +40,10 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.NicResponse;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,17 +55,21 @@ public class UpdateVmNicIpCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
-    @Parameter(name=ApiConstants.NIC_ID, type=CommandType.UUID, entityType = NicResponse.class, required = true,
-            description="the ID of the nic to which you want to assign private IP")
-            private Long nicId;
+    @Parameter(name = ApiConstants.NIC_ID, type = CommandType.UUID, entityType = NicResponse.class, required = true,
+            description = "the ID of the nic to which you want to assign private IP")
+    private Long nicId;
 
     @Parameter(name = ApiConstants.IP_ADDRESS, type = CommandType.STRING, required = false,
             description = "Secondary IP Address")
-            private String ipAddr;
+    private String ipAddr;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
+
+    public static String getResultObjectName() {
+        return "addressinfo";
+    }
 
     public String getEntityTable() {
         return "nic_secondary_ips";
@@ -79,12 +83,10 @@ public class UpdateVmNicIpCmd extends BaseAsyncCmd {
         return CallContext.current().getCallingAccount().getDomainId();
     }
 
-    private long getZoneId() {
+    public NetworkType getNetworkType() {
         Network ntwk = _entityMgr.findById(Network.class, getNetworkId());
-        if (ntwk == null) {
-            throw new InvalidParameterValueException("Can't find zone id for specified");
-        }
-        return ntwk.getDataCenterId();
+        DataCenter dc = _entityMgr.findById(DataCenter.class, ntwk.getDataCenterId());
+        return dc.getNetworkType();
     }
 
     public Long getNetworkId() {
@@ -96,29 +98,6 @@ public class UpdateVmNicIpCmd extends BaseAsyncCmd {
         return networkId;
     }
 
-    public Long getNicId() {
-        return nicId;
-    }
-
-    public String getIpaddress () {
-        if (ipAddr != null) {
-            return ipAddr;
-        } else {
-            return null;
-        }
-    }
-
-    public NetworkType getNetworkType() {
-        Network ntwk = _entityMgr.findById(Network.class, getNetworkId());
-        DataCenter dc = _entityMgr.findById(DataCenter.class, ntwk.getDataCenterId());
-        return dc.getNetworkType();
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return CallContext.current().getCallingAccountId();
-    }
-
     @Override
     public String getEventType() {
         return EventTypes.EVENT_NET_IP_ASSIGN;
@@ -126,28 +105,41 @@ public class UpdateVmNicIpCmd extends BaseAsyncCmd {
 
     @Override
     public String getEventDescription() {
-        return  "associating ip to nic id: " + getNetworkId() + " in zone " + getZoneId();
+        return "associating ip to nic id: " + getNetworkId() + " in zone " + getZoneId();
+    }
+
+    private long getZoneId() {
+        Network ntwk = _entityMgr.findById(Network.class, getNetworkId());
+        if (ntwk == null) {
+            throw new InvalidParameterValueException("Can't find zone id for specified");
+        }
+        return ntwk.getDataCenterId();
+    }
+
+    @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.IpAddress;
+    }
+
+    @Override
+    public String getSyncObjType() {
+        return BaseAsyncCmd.networkSyncObject;
     }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
 
-
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public static String getResultObjectName() {
-        return "addressinfo";
+    public Long getSyncObjId() {
+        return getNetworkId();
     }
 
     @Override
     public void execute() throws ResourceUnavailableException, ResourceAllocationException,
-    ConcurrentOperationException, InsufficientCapacityException {
+            ConcurrentOperationException, InsufficientCapacityException {
 
-        CallContext.current().setEventDetails("Nic Id: " + getNicId() );
+        CallContext.current().setEventDetails("Nic Id: " + getNicId());
         String ip;
         if ((ip = getIpaddress()) != null) {
             if (!NetUtils.isValidIp(ip)) {
@@ -159,7 +151,7 @@ public class UpdateVmNicIpCmd extends BaseAsyncCmd {
         ArrayList<VMDetails> dc = new ArrayList<VMDetails>();
         dc.add(VMDetails.valueOf("nics"));
         EnumSet<VMDetails> details = EnumSet.copyOf(dc);
-        if (vm != null){
+        if (vm != null) {
             UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Restricted, "virtualmachine", details, vm).get(0);
             response.setResponseName(getCommandName());
             this.setResponseObject(response);
@@ -168,19 +160,25 @@ public class UpdateVmNicIpCmd extends BaseAsyncCmd {
         }
     }
 
-    @Override
-    public String getSyncObjType() {
-        return BaseAsyncCmd.networkSyncObject;
+    public Long getNicId() {
+        return nicId;
+    }
+
+    public String getIpaddress() {
+        if (ipAddr != null) {
+            return ipAddr;
+        } else {
+            return null;
+        }
     }
 
     @Override
-    public Long getSyncObjId() {
-        return getNetworkId();
+    public String getCommandName() {
+        return s_name;
     }
 
     @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.IpAddress;
+    public long getEntityOwnerId() {
+        return CallContext.current().getCallingAccountId();
     }
-
 }

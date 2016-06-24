@@ -17,11 +17,9 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-import os, sys, subprocess, socket, fcntl, struct
-from socket import gethostname
-from xml.dom.minidom import parseString
 
 from xmlrpclib import ServerProxy, Error
+
 
 def spCon(proto, host, port):
     print "trying %s on %s:%s" % (proto, host, port)
@@ -33,6 +31,7 @@ def spCon(proto, host, port):
         print "ERROR", v
         return
 
+
 def getCon(host, port):
     try:
         server = spCon("http", host, port)
@@ -41,6 +40,7 @@ def getCon(host, port):
         server = spCon("https", host, port)
 
     return server
+
 
 # hmm master actions don't apply to a slave
 port = 8899

@@ -162,7 +162,7 @@ known_categories = {
     'StratosphereSsp': ' Stratosphere SSP'
 }
 
-categories = {}
+categories = { }
 
 
 def choose_category(fn):

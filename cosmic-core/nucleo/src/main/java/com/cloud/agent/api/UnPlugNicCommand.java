@@ -25,6 +25,14 @@ public class UnPlugNicCommand extends Command {
     NicTO nic;
     String instanceName;
 
+    protected UnPlugNicCommand() {
+    }
+
+    public UnPlugNicCommand(NicTO nic, String instanceName) {
+        this.nic = nic;
+        this.instanceName = instanceName;
+    }
+
     public NicTO getNic() {
         return nic;
     }
@@ -32,14 +40,6 @@ public class UnPlugNicCommand extends Command {
     @Override
     public boolean executeInSequence() {
         return true;
-    }
-
-    protected UnPlugNicCommand() {
-    }
-
-    public UnPlugNicCommand(NicTO nic, String instanceName) {
-        this.nic = nic;
-        this.instanceName = instanceName;
     }
 
     public String getVmName() {

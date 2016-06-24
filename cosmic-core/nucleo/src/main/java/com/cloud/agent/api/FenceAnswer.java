@@ -35,5 +35,4 @@ public class FenceAnswer extends Answer {
     public FenceAnswer(FenceCommand cmd, boolean result, String details) {
         super(cmd, result, details);
     }
-
 }

@@ -16,11 +16,10 @@
 // under the License.
 package com.cloud.utils.db;
 
-import java.util.List;
+import com.cloud.utils.component.ComponentContext;
 
 import javax.inject.Inject;
-
-import com.cloud.utils.component.ComponentContext;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

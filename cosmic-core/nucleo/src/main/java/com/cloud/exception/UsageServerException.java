@@ -33,5 +33,4 @@ public class UsageServerException extends CloudException {
     public UsageServerException(String message) {
         super(message);
     }
-
 }

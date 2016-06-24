@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.user.vpc;
 import com.cloud.event.EventTypes;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
@@ -32,6 +31,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.VpcResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,27 +54,24 @@ public class UpdateVPCCmd extends BaseAsyncCustomIdCmd {
     @Parameter(name = ApiConstants.DISPLAY_TEXT, type = CommandType.STRING, description = "the display text of the VPC")
     private String displayText;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the vpc to the end user or not", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the vpc to the end user or not", since = "4" +
+            ".4", authorized = {RoleType.Admin})
     private Boolean display;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public String getVpcName() {
-        return vpcName;
-    }
-
-    public String getDisplayText() {
-        return displayText;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Boolean getDisplayVpc() {
-        return display;
+    @Override
+    public void execute() {
+        final Vpc result = _vpcService.updateVpc(getId(), getVpcName(), getDisplayText(), getCustomId(), getDisplayVpc());
+        if (result != null) {
+            final VpcResponse response = _responseGenerator.createVpcResponse(ResponseView.Restricted, result);
+            response.setResponseName(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update VPC");
+        }
     }
 
     /////////////////////////////////////////////////////
@@ -87,7 +84,7 @@ public class UpdateVPCCmd extends BaseAsyncCustomIdCmd {
 
     @Override
     public long getEntityOwnerId() {
-        Vpc vpc = _entityMgr.findById(Vpc.class, getId());
+        final Vpc vpc = _entityMgr.findById(Vpc.class, getId());
         if (vpc != null) {
             return vpc.getAccountId();
         }
@@ -95,16 +92,20 @@ public class UpdateVPCCmd extends BaseAsyncCustomIdCmd {
         return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 
-    @Override
-    public void execute() {
-        Vpc result = _vpcService.updateVpc(getId(), getVpcName(), getDisplayText(), getCustomId(), getDisplayVpc());
-        if (result != null) {
-            VpcResponse response = _responseGenerator.createVpcResponse(ResponseView.Restricted, result);
-            response.setResponseName(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update VPC");
-        }
+    public Long getId() {
+        return id;
+    }
+
+    public String getVpcName() {
+        return vpcName;
+    }
+
+    public String getDisplayText() {
+        return displayText;
+    }
+
+    public Boolean getDisplayVpc() {
+        return display;
     }
 
     @Override

@@ -16,10 +16,12 @@
 # under the License.
 """ Test Path for VM Life Cycle (VMLC)
 """
-from nose.plugins.attrib import attr
+from ddt import ddt, data
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources,
-                              validateList)
+from marvin.codes import (PASS,
+                          ISOLATED_NETWORK,
+                          SHARED_NETWORK,
+                          VPC_NETWORK)
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              VirtualMachine,
@@ -37,16 +39,13 @@ from marvin.lib.base import (Account,
 from marvin.lib.common import (get_domain,
                                get_zone,
                                get_builtin_template_info,
-                               findSuitableHostForMigration,
                                createEnabledNetworkOffering,
                                setSharedNetworkParams,
                                get_free_vlan)
-from marvin.codes import (PASS,
-                          ISOLATED_NETWORK,
-                          SHARED_NETWORK,
-                          VPC_NETWORK)
+from marvin.lib.utils import (cleanup_resources,
+                              validateList)
 from marvin.sshClient import SshClient
-from ddt import ddt, data
+from nose.plugins.attrib import attr
 
 
 def VerifyChangeInServiceOffering(self, virtualmachine, serviceoffering):
@@ -156,14 +155,13 @@ def CreateEnabledNetworkOffering(apiclient, networkServices):
     """Create network offering of given services and enable it"""
 
     result = createEnabledNetworkOffering(apiclient, networkServices)
-    assert result[0] == PASS,\
+    assert result[0] == PASS, \
         "Network offering creation/enabling failed due to %s" % result[2]
     return result[1]
 
 
 @ddt
 class TestPathVMLC(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestPathVMLC, cls).getClsTestClient()
@@ -279,7 +277,7 @@ class TestPathVMLC(cloudstackTestCase):
                 password=cls.testdata["account"]["password"]
             )
 
-            assert respose.sessionkey is not None,\
+            assert respose.sessionkey is not None, \
                 "Login to the CloudStack should be successful\
                             response shall have non Null key"
 

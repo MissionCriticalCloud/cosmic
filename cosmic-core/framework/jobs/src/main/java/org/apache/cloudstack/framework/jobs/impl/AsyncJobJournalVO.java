@@ -16,7 +16,9 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs.impl;
 
-import java.util.Date;
+import com.cloud.utils.DateUtil;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.framework.jobs.AsyncJob;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,35 +28,26 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.DateUtil;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.framework.jobs.AsyncJob;
+import java.util.Date;
 
 @Entity
 @Table(name = "async_job_journal")
 public class AsyncJobJournalVO {
+    @Column(name = GenericDao.CREATED_COLUMN)
+    protected Date created;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id = null;
-
     @Column(name = "job_id")
     private long jobId;
-
     @Column(name = "journal_type", updatable = false, nullable = false, length = 32)
     @Enumerated(value = EnumType.STRING)
     private AsyncJob.JournalType journalType;
-
     @Column(name = "journal_text", length = 1024)
     private String journalText;
-
     @Column(name = "journal_obj", length = 1024)
     private String journalObjJsonString;
-
-    @Column(name = GenericDao.CREATED_COLUMN)
-    protected Date created;
 
     public AsyncJobJournalVO() {
         created = DateUtil.currentGMTTime();

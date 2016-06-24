@@ -41,5 +41,4 @@ public class SetSourceNatCommand extends NetworkElementCommand {
     public IpAddressTO getIpAddress() {
         return ipAddress;
     }
-
 }

@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.user.template;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.template.VirtualMachineTemplate.TemplateFilter;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -30,10 +29,12 @@ import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.TemplateResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listTemplates", description = "List all public, private, and privileged templates.", responseObject = TemplateResponse.class, entityType = {VirtualMachineTemplate.class}, responseView = ResponseView.Restricted,
+@APICommand(name = "listTemplates", description = "List all public, private, and privileged templates.", responseObject = TemplateResponse.class, entityType =
+        {VirtualMachineTemplate.class}, responseView = ResponseView.Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListTemplatesCmd extends BaseListTaggedResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListTemplatesCmd.class.getName());
@@ -54,21 +55,21 @@ public class ListTemplatesCmd extends BaseListTaggedResourcesCmd {
     private String templateName;
 
     @Parameter(name = ApiConstants.TEMPLATE_FILTER,
-               type = CommandType.STRING,
-               required = true,
-               description = "possible values are \"featured\", \"self\", \"selfexecutable\",\"sharedexecutable\",\"executable\", and \"community\". "
-                   + "* featured : templates that have been marked as featured and public. "
-                   + "* self : templates that have been registered or created by the calling user. "
-                   + "* selfexecutable : same as self, but only returns templates that can be used to deploy a new VM. "
-                   + "* sharedexecutable : templates ready to be deployed that have been granted to the calling user by another user. "
-                   + "* executable : templates that are owned by the calling user, or public templates, that can be used to deploy a VM. "
-                   + "* community : templates that have been marked as public but not featured. " + "* all : all templates (only usable by admins).")
+            type = CommandType.STRING,
+            required = true,
+            description = "possible values are \"featured\", \"self\", \"selfexecutable\",\"sharedexecutable\",\"executable\", and \"community\". "
+                    + "* featured : templates that have been marked as featured and public. "
+                    + "* self : templates that have been registered or created by the calling user. "
+                    + "* selfexecutable : same as self, but only returns templates that can be used to deploy a new VM. "
+                    + "* sharedexecutable : templates ready to be deployed that have been granted to the calling user by another user. "
+                    + "* executable : templates that are owned by the calling user, or public templates, that can be used to deploy a VM. "
+                    + "* community : templates that have been marked as public but not featured. " + "* all : all templates (only usable by admins).")
     private String templateFilter;
 
     @Parameter(name = ApiConstants.ZONE_ID, type = CommandType.UUID, entityType = ZoneResponse.class, description = "list templates by zoneId")
     private Long zoneId;
 
-    @Parameter(name=ApiConstants.SHOW_REMOVED, type=CommandType.BOOLEAN, description="show removed templates as well")
+    @Parameter(name = ApiConstants.SHOW_REMOVED, type = CommandType.BOOLEAN, description = "show removed templates as well")
     private Boolean showRemoved;
 
     /////////////////////////////////////////////////////
@@ -87,10 +88,6 @@ public class ListTemplatesCmd extends BaseListTaggedResourcesCmd {
         return templateName;
     }
 
-    public String getTemplateFilter() {
-        return templateFilter;
-    }
-
     public Long getZoneId() {
         return zoneId;
     }
@@ -107,19 +104,18 @@ public class ListTemplatesCmd extends BaseListTaggedResourcesCmd {
         // Show only those that are downloaded.
         TemplateFilter templateFilter = TemplateFilter.valueOf(getTemplateFilter());
         boolean onlyReady =
-            (templateFilter == TemplateFilter.featured) || (templateFilter == TemplateFilter.selfexecutable) || (templateFilter == TemplateFilter.sharedexecutable) ||
-                (templateFilter == TemplateFilter.executable && isAccountSpecific) || (templateFilter == TemplateFilter.community);
+                (templateFilter == TemplateFilter.featured) || (templateFilter == TemplateFilter.selfexecutable) || (templateFilter == TemplateFilter.sharedexecutable) ||
+                        (templateFilter == TemplateFilter.executable && isAccountSpecific) || (templateFilter == TemplateFilter.community);
         return onlyReady;
+    }
+
+    public String getTemplateFilter() {
+        return templateFilter;
     }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
 
     @Override
     public ApiCommandJobType getInstanceType() {
@@ -131,5 +127,10 @@ public class ListTemplatesCmd extends BaseListTaggedResourcesCmd {
         ListResponse<TemplateResponse> response = _queryService.listTemplates(this);
         response.setResponseName(getCommandName());
         setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

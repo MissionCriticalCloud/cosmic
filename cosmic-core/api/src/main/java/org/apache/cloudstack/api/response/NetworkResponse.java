@@ -16,18 +16,18 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.List;
-import java.util.Set;
-
 import com.cloud.network.Network;
 import com.cloud.projects.ProjectAccount;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.List;
+import java.util.Set;
+
+import com.google.gson.annotations.SerializedName;
 
 @SuppressWarnings("unused")
 @EntityReference(value = {Network.class, ProjectAccount.class})
@@ -295,8 +295,23 @@ public class NetworkResponse extends BaseResponse implements ControlledEntityRes
     }
 
     @Override
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    @Override
     public void setDomainId(String domainId) {
         this.domainId = domainId;
+    }
+
+    @Override
+    public void setDomainName(String domain) {
+        this.domain = domain;
     }
 
     public void setNetworkOfferingName(String networkOfferingName) {
@@ -323,11 +338,6 @@ public class NetworkResponse extends BaseResponse implements ControlledEntityRes
         this.isSystem = isSystem;
     }
 
-    @Override
-    public void setDomainName(String domain) {
-        this.domain = domain;
-    }
-
     public void setNetworkOfferingAvailability(String networkOfferingAvailability) {
         this.networkOfferingAvailability = networkOfferingAvailability;
     }
@@ -342,16 +352,6 @@ public class NetworkResponse extends BaseResponse implements ControlledEntityRes
 
     public void setNetworkDomain(String networkDomain) {
         this.networkDomain = networkDomain;
-    }
-
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
     }
 
     public void setPhysicalNetworkId(String physicalNetworkId) {

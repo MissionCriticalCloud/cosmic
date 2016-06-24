@@ -24,16 +24,16 @@ import com.cloud.vm.VirtualMachine;
 
 public class FenceCommand extends Command {
 
-    public FenceCommand() {
-        super();
-    }
-
     String vmName;
     String hostGuid;
     String hostIp;
     boolean inSeq;
 
-    public FenceCommand(VirtualMachine vm, Host host) {
+    public FenceCommand() {
+        super();
+    }
+
+    public FenceCommand(final VirtualMachine vm, final Host host) {
         super();
         vmName = vm.getInstanceName();
         hostGuid = host.getGuid();
@@ -41,7 +41,7 @@ public class FenceCommand extends Command {
         inSeq = false;
     }
 
-    public void setSeq(boolean inseq) {
+    public void setSeq(final boolean inseq) {
         inSeq = inseq;
     }
 

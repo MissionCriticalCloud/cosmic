@@ -17,11 +17,11 @@
 
 package com.cloud.upgrade.dao;
 
-import java.io.File;
-import java.sql.Connection;
-
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.script.Script;
+
+import java.io.File;
+import java.sql.Connection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class Upgrade460to461 implements DbUpgrade {
 
     @Override
     public String[] getUpgradableVersionRange() {
-        return new String[] {"4.6.0", "4.6.1"};
+        return new String[]{"4.6.0", "4.6.1"};
     }
 
     @Override
@@ -50,7 +50,7 @@ public class Upgrade460to461 implements DbUpgrade {
         if (script == null) {
             throw new CloudRuntimeException("Unable to find db/schema-460to461.sql");
         }
-        return new File[] {new File(script)};
+        return new File[]{new File(script)};
     }
 
     @Override
@@ -64,6 +64,6 @@ public class Upgrade460to461 implements DbUpgrade {
             throw new CloudRuntimeException("Unable to find db/schema-460to461-cleanup.sql");
         }
 
-        return new File[] {new File(script)};
+        return new File[]{new File(script)};
     }
 }

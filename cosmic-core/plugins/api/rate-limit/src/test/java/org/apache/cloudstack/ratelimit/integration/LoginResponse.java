@@ -17,13 +17,12 @@
 package org.apache.cloudstack.ratelimit.integration;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Login Response object
- *
  */
 public class LoginResponse extends BaseResponse {
 
@@ -134,5 +133,4 @@ public class LoginResponse extends BaseResponse {
     public void setType(int type) {
         this.type = type;
     }
-
 }

@@ -29,7 +29,7 @@ public abstract class BaseAsyncCreateCmd extends BaseAsyncCmd {
         return id;
     }
 
-    public void setEntityId(Long id) {
+    public void setEntityId(final Long id) {
         this.id = id;
     }
 
@@ -37,7 +37,7 @@ public abstract class BaseAsyncCreateCmd extends BaseAsyncCmd {
         return uuid;
     }
 
-    public void setEntityUuid(String uuid) {
+    public void setEntityUuid(final String uuid) {
         this.uuid = uuid;
     }
 
@@ -48,5 +48,4 @@ public abstract class BaseAsyncCreateCmd extends BaseAsyncCmd {
     public String getCreateEventDescription() {
         return null;
     }
-
 }

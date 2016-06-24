@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.consoleproxy.vnc.packet.client;
 
+import com.cloud.consoleproxy.vnc.RfbConstants;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
-
-import com.cloud.consoleproxy.vnc.RfbConstants;
 
 public class KeyboardEventPacket implements ClientPacket {
 
@@ -38,5 +38,4 @@ public class KeyboardEventPacket implements ClientPacket {
         os.writeShort(0); // padding
         os.writeInt(key);
     }
-
 }

@@ -18,15 +18,9 @@
  */
 package org.apache.cloudstack.storage.volume;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
@@ -34,6 +28,11 @@ import org.apache.cloudstack.engine.subsystem.api.storage.VolumeDataFactory;
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
 import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreVO;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -98,7 +97,7 @@ public class VolumeDataFactoryImpl implements VolumeDataFactory {
     @Override
     public VolumeInfo getVolume(DataObject volume, DataStore store) {
         VolumeInfo vol = getVolume(volume.getId(), store);
-        vol.addPayload(((VolumeInfo)volume).getpayload());
+        vol.addPayload(((VolumeInfo) volume).getpayload());
         return vol;
     }
 
@@ -120,5 +119,4 @@ public class VolumeDataFactoryImpl implements VolumeDataFactory {
         }
         return cacheVols;
     }
-
 }

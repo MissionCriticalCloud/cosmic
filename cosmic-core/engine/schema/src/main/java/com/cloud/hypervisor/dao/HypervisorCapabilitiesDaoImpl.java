@@ -16,13 +16,13 @@
 // under the License.
 package com.cloud.hypervisor.dao;
 
-import java.util.List;
-
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +32,9 @@ import org.springframework.stereotype.Component;
 public class HypervisorCapabilitiesDaoImpl extends GenericDaoBase<HypervisorCapabilitiesVO, Long> implements HypervisorCapabilitiesDao {
 
     private static final Logger s_logger = LoggerFactory.getLogger(HypervisorCapabilitiesDaoImpl.class);
-
+    private static final String DEFAULT_VERSION = "default";
     protected final SearchBuilder<HypervisorCapabilitiesVO> HypervisorTypeSearch;
     protected final SearchBuilder<HypervisorCapabilitiesVO> HypervisorTypeAndVersionSearch;
-
-    private static final String DEFAULT_VERSION = "default";
 
     protected HypervisorCapabilitiesDaoImpl() {
         HypervisorTypeSearch = createSearchBuilder();
@@ -47,14 +45,6 @@ public class HypervisorCapabilitiesDaoImpl extends GenericDaoBase<HypervisorCapa
         HypervisorTypeAndVersionSearch.and("hypervisorType", HypervisorTypeAndVersionSearch.entity().getHypervisorType(), SearchCriteria.Op.EQ);
         HypervisorTypeAndVersionSearch.and("hypervisorVersion", HypervisorTypeAndVersionSearch.entity().getHypervisorVersion(), SearchCriteria.Op.EQ);
         HypervisorTypeAndVersionSearch.done();
-    }
-
-    HypervisorCapabilitiesVO getCapabilities(HypervisorType hypervisorType, String hypervisorVersion) {
-        HypervisorCapabilitiesVO result = findByHypervisorTypeAndVersion(hypervisorType, hypervisorVersion);
-        if (result == null) { // if data is not available for a specific version then use 'default' as version
-            result = findByHypervisorTypeAndVersion(hypervisorType, DEFAULT_VERSION);
-        }
-        return result;
     }
 
     @Override
@@ -76,12 +66,22 @@ public class HypervisorCapabilitiesDaoImpl extends GenericDaoBase<HypervisorCapa
     public Long getMaxGuestsLimit(HypervisorType hypervisorType, String hypervisorVersion) {
         Long defaultLimit = new Long(50);
         HypervisorCapabilitiesVO result = getCapabilities(hypervisorType, hypervisorVersion);
-        if (result == null)
+        if (result == null) {
             return defaultLimit;
+        }
         Long limit = result.getMaxGuestsLimit();
-        if (limit == null)
+        if (limit == null) {
             return defaultLimit;
+        }
         return limit;
+    }
+
+    HypervisorCapabilitiesVO getCapabilities(HypervisorType hypervisorType, String hypervisorVersion) {
+        HypervisorCapabilitiesVO result = findByHypervisorTypeAndVersion(hypervisorType, hypervisorVersion);
+        if (result == null) { // if data is not available for a specific version then use 'default' as version
+            result = findByHypervisorTypeAndVersion(hypervisorType, DEFAULT_VERSION);
+        }
+        return result;
     }
 
     @Override

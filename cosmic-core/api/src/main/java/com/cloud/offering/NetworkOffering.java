@@ -18,35 +18,20 @@ package com.cloud.offering;
 
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Networks.TrafficType;
-
 import org.apache.cloudstack.acl.InfrastructureEntity;
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
 
 /**
  * Describes network offering
- *
  */
 public interface NetworkOffering extends InfrastructureEntity, InternalIdentity, Identity {
-
-    public enum Availability {
-        Required, Optional
-    }
-
-    public enum State {
-        Disabled, Enabled
-    }
-
-    public enum Detail {
-        InternalLbProvider, PublicLbProvider
-    }
 
     public final static String SystemPublicNetwork = "System-Public-Network";
     public final static String SystemControlNetwork = "System-Control-Network";
     public final static String SystemManagementNetwork = "System-Management-Network";
     public final static String SystemStorageNetwork = "System-Storage-Network";
     public final static String SystemPrivateGatewayNetworkOffering = "System-Private-Gateway-Network-Offering";
-
     public final static String DefaultSharedNetworkOfferingWithSGService = "DefaultSharedNetworkOfferingWithSGService";
     public final static String DefaultIsolatedNetworkOfferingWithSourceNatService = "DefaultIsolatedNetworkOfferingWithSourceNatService";
     public final static String DefaultSharedNetworkOffering = "DefaultSharedNetworkOffering";
@@ -89,9 +74,9 @@ public interface NetworkOffering extends InfrastructureEntity, InternalIdentity,
 
     String getUniqueName();
 
-    void setState(State state);
-
     State getState();
+
+    void setState(State state);
 
     GuestType getGuestType();
 
@@ -128,4 +113,16 @@ public interface NetworkOffering extends InfrastructureEntity, InternalIdentity,
     boolean isKeepAliveEnabled();
 
     boolean getSupportsStrechedL2();
+
+    public enum Availability {
+        Required, Optional
+    }
+
+    public enum State {
+        Disabled, Enabled
+    }
+
+    public enum Detail {
+        InternalLbProvider, PublicLbProvider
+    }
 }

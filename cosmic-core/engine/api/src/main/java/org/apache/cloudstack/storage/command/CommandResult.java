@@ -31,12 +31,12 @@ public class CommandResult {
         return this.success;
     }
 
-    public boolean isFailed() {
-        return !this.success;
-    }
-
     public void setSuccess(boolean success) {
         this.success = success;
+    }
+
+    public boolean isFailed() {
+        return !this.success;
     }
 
     public String getResult() {

@@ -22,8 +22,6 @@ import org.apache.cloudstack.api.InternalIdentity;
 
 /**
  * This is the interface for all VO classes representing DB views created for previous ControlledEntity.
- *
- *
  */
 public interface ControlledViewEntity extends ControlledEntity, InternalIdentity, Identity {
 
@@ -42,5 +40,4 @@ public interface ControlledViewEntity extends ControlledEntity, InternalIdentity
     public String getProjectUuid();
 
     public String getProjectName();
-
 }

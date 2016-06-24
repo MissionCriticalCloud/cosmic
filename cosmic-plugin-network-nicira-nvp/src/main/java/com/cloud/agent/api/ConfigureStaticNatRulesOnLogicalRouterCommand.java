@@ -19,9 +19,9 @@
 
 package com.cloud.agent.api;
 
-import java.util.List;
-
 import com.cloud.agent.api.to.StaticNatRuleTO;
+
+import java.util.List;
 
 /**
  *
@@ -35,7 +35,6 @@ public class ConfigureStaticNatRulesOnLogicalRouterCommand extends Command {
         super();
         this.logicalRouterUuid = logicalRouterUuid;
         this.rules = rules;
-
     }
 
     public String getLogicalRouterUuid() {
@@ -61,5 +60,4 @@ public class ConfigureStaticNatRulesOnLogicalRouterCommand extends Command {
     public boolean executeInSequence() {
         return false;
     }
-
 }

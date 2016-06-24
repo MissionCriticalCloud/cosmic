@@ -19,6 +19,7 @@
 package org.apache.cloudstack.managed.context;
 
 import org.apache.cloudstack.managed.context.impl.DefaultManagedContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +36,17 @@ public abstract class ManagedContextRunnable implements Runnable {
      * in a static global.  Any ManagedContextListener can be a fully managed object
      * and not have to rely on global statics
      */
-    public static ManagedContext initializeGlobalContext(ManagedContext context) {
+    public static ManagedContext initializeGlobalContext(final ManagedContext context) {
         setManagedContext(true);
         return ManagedContextRunnable.context = context;
+    }
+
+    public static boolean isManagedContext() {
+        return managedContext;
+    }
+
+    public static void setManagedContext(final boolean managedContext) {
+        ManagedContextRunnable.managedContext = managedContext;
     }
 
     @Override
@@ -53,17 +62,19 @@ public abstract class ManagedContextRunnable implements Runnable {
     protected abstract void runInContext();
 
     protected ManagedContext getContext() {
-        if (!managedContext)
+        if (!managedContext) {
             return DEFAULT_MANAGED_CONTEXT;
+        }
 
         for (int i = 0; i < SLEEP_COUNT; i++) {
             if (context == null) {
                 try {
                     Thread.sleep(1000);
 
-                    if (context == null)
+                    if (context == null) {
                         log.info("Sleeping until ManagedContext becomes available");
-                } catch (InterruptedException e) {
+                    }
+                } catch (final InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             } else {
@@ -73,13 +84,4 @@ public abstract class ManagedContextRunnable implements Runnable {
 
         throw new RuntimeException("Failed to obtain ManagedContext");
     }
-
-    public static boolean isManagedContext() {
-        return managedContext;
-    }
-
-    public static void setManagedContext(boolean managedContext) {
-        ManagedContextRunnable.managedContext = managedContext;
-    }
-
 }

@@ -29,12 +29,12 @@ import com.cloud.resource.ServerResource;
 
 /**
  * HypervisorResource specifies all of the commands a hypervisor agent needs
- *
  */
 public interface HypervisorResource extends ServerResource {
     /**
      * Starts a VM.  All information regarding the VM
      * are carried within the command.
+     *
      * @param cmd carries all the information necessary to start a VM
      * @return Start2Answer answer.
      */
@@ -42,6 +42,7 @@ public interface HypervisorResource extends ServerResource {
 
     /**
      * Stops a VM.  Must return true as long as the VM does not exist.
+     *
      * @param cmd information necessary to identify the VM to stop.
      * @return StopAnswer
      */
@@ -49,6 +50,7 @@ public interface HypervisorResource extends ServerResource {
 
     /**
      * Reboots a VM.
+     *
      * @param cmd information necessary to identify the VM to reboot.
      * @return RebootAnswer
      */

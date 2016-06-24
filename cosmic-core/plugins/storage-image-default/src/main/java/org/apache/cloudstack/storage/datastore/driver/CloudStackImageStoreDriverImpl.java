@@ -18,10 +18,6 @@
  */
 package org.apache.cloudstack.storage.datastore.driver;
 
-import java.util.UUID;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.storage.CreateEntityDownloadURLCommand;
 import com.cloud.agent.api.storage.DeleteEntityDownloadURLCommand;
@@ -32,7 +28,6 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Upload;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
@@ -41,6 +36,10 @@ import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.image.BaseImageStoreDriverImpl;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreEntity;
 import org.apache.cloudstack.storage.image.store.ImageStoreImpl;
+
+import javax.inject.Inject;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +55,7 @@ public class CloudStackImageStoreDriverImpl extends BaseImageStoreDriverImpl {
 
     @Override
     public DataStoreTO getStoreTO(DataStore store) {
-        ImageStoreImpl nfsStore = (ImageStoreImpl)store;
+        ImageStoreImpl nfsStore = (ImageStoreImpl) store;
         NfsTO nfsTO = new NfsTO();
         nfsTO.setRole(store.getRole());
         nfsTO.setUrl(nfsStore.getUri());
@@ -70,7 +69,7 @@ public class CloudStackImageStoreDriverImpl extends BaseImageStoreDriverImpl {
         // Create Symlink at ssvm
         String path = installPath;
         String uuid = UUID.randomUUID().toString() + "." + format.getFileExtension();
-        CreateEntityDownloadURLCommand cmd = new CreateEntityDownloadURLCommand(((ImageStoreEntity)store).getMountPoint(), path, uuid, dataObject.getTO());
+        CreateEntityDownloadURLCommand cmd = new CreateEntityDownloadURLCommand(((ImageStoreEntity) store).getMountPoint(), path, uuid, dataObject.getTO());
         Answer ans = null;
         if (ep == null) {
             String errMsg = "No remote endpoint to send command, check if host or ssvm is down?";
@@ -98,12 +97,12 @@ public class CloudStackImageStoreDriverImpl extends BaseImageStoreDriverImpl {
         if (sslCfg != null) {
             _sslCopy = Boolean.parseBoolean(sslCfg);
         }
-        if(_sslCopy && (_ssvmUrlDomain == null || _ssvmUrlDomain.isEmpty())){
+        if (_sslCopy && (_ssvmUrlDomain == null || _ssvmUrlDomain.isEmpty())) {
             s_logger.warn("Empty secondary storage url domain, ignoring SSL");
             _sslCopy = false;
         }
         if (_sslCopy) {
-            if(_ssvmUrlDomain.startsWith("*")) {
+            if (_ssvmUrlDomain.startsWith("*")) {
                 hostname = ipAddress.replace(".", "-");
                 hostname = hostname + _ssvmUrlDomain.substring(1);
             } else {
@@ -135,7 +134,5 @@ public class CloudStackImageStoreDriverImpl extends BaseImageStoreDriverImpl {
             s_logger.error(errorString);
             throw new CloudRuntimeException(errorString);
         }
-
     }
-
 }

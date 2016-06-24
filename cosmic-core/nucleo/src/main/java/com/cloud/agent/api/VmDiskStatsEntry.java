@@ -42,42 +42,20 @@ public class VmDiskStatsEntry implements VmDiskStats {
         this.path = path;
     }
 
-    public void setVmName(String vmName) {
-        this.vmName = vmName;
-    }
-
     public String getVmName() {
         return vmName;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setVmName(String vmName) {
+        this.vmName = vmName;
     }
 
     public String getPath() {
         return path;
     }
 
-    public void setBytesRead(long bytesRead) {
-        this.bytesRead = bytesRead;
-    }
-
-    @Override
-    public long getBytesRead() {
-        return bytesRead;
-    }
-
-    public void setBytesWrite(long bytesWrite) {
-        this.bytesWrite = bytesWrite;
-    }
-
-    @Override
-    public long getBytesWrite() {
-        return bytesWrite;
-    }
-
-    public void setIORead(long ioRead) {
-        this.ioRead = ioRead;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     @Override
@@ -85,8 +63,8 @@ public class VmDiskStatsEntry implements VmDiskStats {
         return ioRead;
     }
 
-    public void setIOWrite(long ioWrite) {
-        this.ioWrite = ioWrite;
+    public void setIORead(long ioRead) {
+        this.ioRead = ioRead;
     }
 
     @Override
@@ -94,4 +72,25 @@ public class VmDiskStatsEntry implements VmDiskStats {
         return ioWrite;
     }
 
+    @Override
+    public long getBytesRead() {
+        return bytesRead;
+    }
+
+    public void setBytesRead(long bytesRead) {
+        this.bytesRead = bytesRead;
+    }
+
+    @Override
+    public long getBytesWrite() {
+        return bytesWrite;
+    }
+
+    public void setBytesWrite(long bytesWrite) {
+        this.bytesWrite = bytesWrite;
+    }
+
+    public void setIOWrite(long ioWrite) {
+        this.ioWrite = ioWrite;
+    }
 }

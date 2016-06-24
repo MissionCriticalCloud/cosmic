@@ -16,12 +16,13 @@
 // under the License.
 package com.cloud.api;
 
+import org.apache.cloudstack.usage.UsageService;
+
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
-import org.apache.cloudstack.usage.UsageService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class ApiResponseHelperTest {
     @Before
     public void injectMocks() throws SecurityException, NoSuchFieldException,
             IllegalArgumentException, IllegalAccessException {
-        Field usageSvcField = ApiResponseHelper.class
+        final Field usageSvcField = ApiResponseHelper.class
                 .getDeclaredField("_usageSvc");
         usageSvcField.setAccessible(true);
         helper = new ApiResponseHelper();

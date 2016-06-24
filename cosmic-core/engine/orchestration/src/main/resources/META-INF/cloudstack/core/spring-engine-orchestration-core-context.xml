@@ -16,42 +16,40 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:aop="http://www.springframework.org/schema/aop"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util"
-       
+       xmlns="http://www.springframework.org/schema/beans"
+
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                      http://www.springframework.org/schema/aop 
-                      http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
-                      http://www.springframework.org/schema/context
-                      http://www.springframework.org/schema/context/spring-context-3.0.xsd
+
+
+
+
                       http://www.springframework.org/schema/util
                       http://www.springframework.org/schema/util/spring-util-3.0.xsd"
-                      >
+>
 
     <bean id="clusterBasedAgentLoadBalancerPlanner"
-        class="com.cloud.cluster.agentlb.ClusterBasedAgentLoadBalancerPlanner">
+          class="com.cloud.cluster.agentlb.ClusterBasedAgentLoadBalancerPlanner">
         <property name="name" value="ClusterBasedAgentLoadBalancerPlanner" />
     </bean>
 
     <bean id="volumeOrchestrator"
-        class="org.apache.cloudstack.engine.orchestration.VolumeOrchestrator">
+          class="org.apache.cloudstack.engine.orchestration.VolumeOrchestrator">
         <property name="podAllocators" value="#{podAllocatorsRegistry.registered}" />
         <property name="storagePoolAllocators"
-            value="#{storagePoolAllocatorsRegistry.registered}" />
+                  value="#{storagePoolAllocatorsRegistry.registered}" />
     </bean>
 
     <bean id="clusteredVirtualMachineManagerImpl" class="com.cloud.vm.ClusteredVirtualMachineManagerImpl">
         <property name="hostAllocators" value="#{hostAllocatorsRegistry.registered}" />
         <property name="storagePoolAllocators"
-            value="#{storagePoolAllocatorsRegistry.registered}" />
+                  value="#{storagePoolAllocatorsRegistry.registered}" />
     </bean>
 
     <bean id="networkOrchestrator"
-        class="org.apache.cloudstack.engine.orchestration.NetworkOrchestrator">
+          class="org.apache.cloudstack.engine.orchestration.NetworkOrchestrator">
         <property name="networkGurus" value="#{networkGurusRegistry.registered}" />
         <property name="networkElements" value="#{networkElementsRegistry.registered}" />
         <property name="ipDeployers" value="#{ipDeployersRegistry.registered}" />
@@ -61,21 +59,21 @@
     <bean id="clusteredAgentManagerImpl" class="com.cloud.agent.manager.ClusteredAgentManagerImpl" />
 
     <bean id="cloudOrchestrator"
-        class="org.apache.cloudstack.engine.orchestration.CloudOrchestrator" />
+          class="org.apache.cloudstack.engine.orchestration.CloudOrchestrator" />
     <bean id="dataCenterResourceManagerImpl"
-        class="org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceManagerImpl" />
-    
-    <bean id="vMEntityManagerImpl" class="org.apache.cloudstack.engine.cloud.entity.api.VMEntityManagerImpl" >
+          class="org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceManagerImpl" />
+
+    <bean id="vMEntityManagerImpl" class="org.apache.cloudstack.engine.cloud.entity.api.VMEntityManagerImpl">
         <property name="planners" value="#{deploymentPlannersRegistry.registered}" />
     </bean>
-    
+
     <bean id="virtualMachineEntityImpl" class="org.apache.cloudstack.engine.cloud.entity.api.VirtualMachineEntityImpl" />
-    
+
     <bean id="virtualMachinePowerStateSyncImpl" class="com.cloud.vm.VirtualMachinePowerStateSyncImpl" />
-    
-    <bean id= "vmWorkJobDispatcher" class="com.cloud.vm.VmWorkJobDispatcher">
+
+    <bean id="vmWorkJobDispatcher" class="com.cloud.vm.VmWorkJobDispatcher">
         <property name="name">
-            <util:constant static-field="com.cloud.vm.VmWorkConstants.VM_WORK_JOB_DISPATCHER"/>
+            <util:constant static-field="com.cloud.vm.VmWorkConstants.VM_WORK_JOB_DISPATCHER" />
         </property>
         <property name="handlers">
             <map>
@@ -85,10 +83,10 @@
             </map>
         </property>
     </bean>
-    <bean id= "vmWorkJobWakeupDispatcher" class="com.cloud.vm.VmWorkJobWakeupDispatcher">
+    <bean id="vmWorkJobWakeupDispatcher" class="com.cloud.vm.VmWorkJobWakeupDispatcher">
         <property name="name">
-            <util:constant static-field="com.cloud.vm.VmWorkConstants.VM_WORK_JOB_WAKEUP_DISPATCHER"/>
+            <util:constant static-field="com.cloud.vm.VmWorkConstants.VM_WORK_JOB_WAKEUP_DISPATCHER" />
         </property>
     </bean>
-    
+
 </beans>

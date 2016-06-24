@@ -16,27 +16,23 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs;
 
-import java.util.Random;
+import com.cloud.utils.component.AdapterBase;
+import org.apache.cloudstack.jobs.JobInfo.Status;
 
 import javax.inject.Inject;
+import java.util.Random;
 
-import com.cloud.utils.component.AdapterBase;
-
-import org.apache.cloudstack.jobs.JobInfo.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AsyncJobTestDispatcher extends AdapterBase implements AsyncJobDispatcher {
     private static final Logger s_logger =
             LoggerFactory.getLogger(AsyncJobTestDispatcher.class);
-
+    Random _random = new Random();
     @Inject
     private AsyncJobManager _asyncJobMgr;
-
     @Inject
     private AsyncJobTestDashboard _testDashboard;
-
-    Random _random = new Random();
 
     public AsyncJobTestDispatcher() {
     }

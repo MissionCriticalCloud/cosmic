@@ -16,17 +16,17 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.address;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.network.IpAddress;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.command.user.address.ListPublicIpAddressesCmd;
 import org.apache.cloudstack.api.response.IPAddressResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ public class ListPublicIpAddressesCmdByAdmin extends ListPublicIpAddressesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListPublicIpAddressesCmdByAdmin.class.getName());
 
     @Override
-    public void execute(){
+    public void execute() {
         Pair<List<? extends IpAddress>, Integer> result = _mgr.searchForIPAddresses(this);
         ListResponse<IPAddressResponse> response = new ListResponse<IPAddressResponse>();
         List<IPAddressResponse> ipAddrResponses = new ArrayList<IPAddressResponse>();
@@ -50,5 +50,4 @@ public class ListPublicIpAddressesCmdByAdmin extends ListPublicIpAddressesCmd {
         response.setResponseName(getCommandName());
         setResponseObject(response);
     }
-
 }

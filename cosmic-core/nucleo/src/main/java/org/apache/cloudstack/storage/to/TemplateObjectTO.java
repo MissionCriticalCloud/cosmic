@@ -25,7 +25,6 @@ import com.cloud.agent.api.to.DataTO;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.template.VirtualMachineTemplate;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.TemplateInfo;
 
 public class TemplateObjectTO implements DataTO {
@@ -79,34 +78,36 @@ public class TemplateObjectTO implements DataTO {
         this.hypervisorType = template.getHypervisorType();
     }
 
-    @Override
-    public String getPath() {
-        return this.path;
-    }
-
     public String getUuid() {
         return this.uuid;
     }
 
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public ImageFormat getFormat() {
         return format;
     }
 
+    public void setFormat(ImageFormat format) {
+        this.format = format;
+    }
+
     public long getAccountId() {
         return accountId;
     }
 
+    public void setAccountId(long accountId) {
+        this.accountId = accountId;
+    }
+
     public String getChecksum() {
         return checksum;
+    }
+
+    public void setChecksum(String checksum) {
+        this.checksum = checksum;
     }
 
     public boolean isRequiresHvm() {
@@ -135,13 +136,31 @@ public class TemplateObjectTO implements DataTO {
         return this.imageDataStore;
     }
 
-    public void setHypervisorType(Hypervisor.HypervisorType hypervisorType) {
-        this.hypervisorType = hypervisorType;
-    }
-
     @Override
     public Hypervisor.HypervisorType getHypervisorType() {
         return this.hypervisorType;
+    }
+
+    @Override
+    public String getPath() {
+        return this.path;
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public void setHypervisorType(Hypervisor.HypervisorType hypervisorType) {
+        this.hypervisorType = hypervisorType;
     }
 
     public void setDataStore(DataStoreTO store) {
@@ -155,14 +174,6 @@ public class TemplateObjectTO implements DataTO {
         return name;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -173,18 +184,6 @@ public class TemplateObjectTO implements DataTO {
 
     public void setOrigUrl(String origUrl) {
         this.origUrl = origUrl;
-    }
-
-    public void setFormat(ImageFormat format) {
-        this.format = format;
-    }
-
-    public void setAccountId(long accountId) {
-        this.accountId = accountId;
-    }
-
-    public void setChecksum(String checksum) {
-        this.checksum = checksum;
     }
 
     public void setImageDataStore(DataStoreTO imageDataStore) {

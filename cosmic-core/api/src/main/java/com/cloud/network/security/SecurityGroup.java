@@ -26,5 +26,4 @@ public interface SecurityGroup extends ControlledEntity, InternalIdentity, Ident
     String getName();
 
     String getDescription();
-
 }

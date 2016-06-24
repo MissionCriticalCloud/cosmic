@@ -16,17 +16,16 @@
 // under the License.
 package com.cloud.network.vpn;
 
-import java.util.List;
-
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VpnUser;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.command.user.vpn.ListRemoteAccessVpnsCmd;
 import org.apache.cloudstack.api.command.user.vpn.ListVpnUsersCmd;
+
+import java.util.List;
 
 public interface RemoteAccessVpnService {
     static final String RemoteAccessVpnClientIpRangeCK = "remote.access.vpn.client.iprange";
@@ -56,5 +55,4 @@ public interface RemoteAccessVpnService {
     RemoteAccessVpn getRemoteAccessVpnById(long vpnId);
 
     RemoteAccessVpn updateRemoteAccessVpn(long id, String customId, Boolean forDisplay);
-
 }

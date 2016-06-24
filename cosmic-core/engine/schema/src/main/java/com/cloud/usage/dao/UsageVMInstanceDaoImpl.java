@@ -16,17 +16,17 @@
 // under the License.
 package com.cloud.usage.dao;
 
+import com.cloud.usage.UsageVMInstanceVO;
+import com.cloud.utils.DateUtil;
+import com.cloud.utils.db.GenericDaoBase;
+import com.cloud.utils.db.TransactionLegacy;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-
-import com.cloud.usage.UsageVMInstanceVO;
-import com.cloud.utils.DateUtil;
-import com.cloud.utils.db.GenericDaoBase;
-import com.cloud.utils.db.TransactionLegacy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +37,13 @@ public class UsageVMInstanceDaoImpl extends GenericDaoBase<UsageVMInstanceVO, Lo
     public static final Logger s_logger = LoggerFactory.getLogger(UsageVMInstanceDaoImpl.class.getName());
 
     protected static final String UPDATE_USAGE_INSTANCE_SQL = "UPDATE usage_vm_instance SET end_date = ? "
-        + "WHERE account_id = ? and vm_instance_id = ? and usage_type = ? and end_date IS NULL";
+            + "WHERE account_id = ? and vm_instance_id = ? and usage_type = ? and end_date IS NULL";
     protected static final String DELETE_USAGE_INSTANCE_SQL = "DELETE FROM usage_vm_instance WHERE account_id = ? and vm_instance_id = ? and usage_type = ?";
     protected static final String GET_USAGE_RECORDS_BY_ACCOUNT =
-        "SELECT usage_type, zone_id, account_id, vm_instance_id, vm_name, cpu_speed, cpu_cores, memory, service_offering_id, template_id, hypervisor_type, start_date, end_date "
-            + "FROM usage_vm_instance WHERE account_id = ? AND ((end_date IS NULL) OR (start_date BETWEEN ? AND ?) OR "
-            + "      (end_date BETWEEN ? AND ?) OR ((start_date <= ?) AND (end_date >= ?)))";
+            "SELECT usage_type, zone_id, account_id, vm_instance_id, vm_name, cpu_speed, cpu_cores, memory, service_offering_id, template_id, hypervisor_type, start_date, " +
+                    "end_date "
+                    + "FROM usage_vm_instance WHERE account_id = ? AND ((end_date IS NULL) OR (start_date BETWEEN ? AND ?) OR "
+                    + "      (end_date BETWEEN ? AND ?) OR ((start_date <= ?) AND (end_date >= ?)))";
 
     public UsageVMInstanceDaoImpl() {
     }
@@ -137,7 +138,8 @@ public class UsageVMInstanceDaoImpl extends GenericDaoBase<UsageVMInstanceVO, Lo
                     instanceEndDate = DateUtil.parseDateString(s_gmtTimeZone, r_endDate);
                 }
                 UsageVMInstanceVO usageInstance =
-                    new UsageVMInstanceVO(r_usageType, r_zoneId, r_accountId, r_vmId, r_vmName, r_soId, r_tId, r_cpuSpeed, r_cpuCores, r_memory, hypervisorType, instanceStartDate, instanceEndDate);
+                        new UsageVMInstanceVO(r_usageType, r_zoneId, r_accountId, r_vmId, r_vmName, r_soId, r_tId, r_cpuSpeed, r_cpuCores, r_memory, hypervisorType,
+                                instanceStartDate, instanceEndDate);
                 usageInstances.add(usageInstance);
             }
         } catch (Exception ex) {

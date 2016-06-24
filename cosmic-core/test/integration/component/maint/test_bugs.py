@@ -16,18 +16,12 @@
 # under the License.
 
 # Import Local Modules
-from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+import time
 from marvin.cloudstackAPI import (updateStoragePool,
                                   resizeVolume,
                                   listCapacity,
                                   addCluster)
-from marvin.sshClient import SshClient
-from marvin.lib.common import (get_zone,
-                               get_template,
-                               get_domain,
-                               list_volumes,
-                               get_pod,
-                               is_config_suitable)
+from marvin.cloudstackTestCase import cloudstackTestCase, unittest
 from marvin.lib.base import (Domain,
                              Account,
                              Template,
@@ -37,13 +31,18 @@ from marvin.lib.base import (Domain,
                              StoragePool,
                              ServiceOffering,
                              Configurations)
+from marvin.lib.common import (get_zone,
+                               get_template,
+                               get_domain,
+                               list_volumes,
+                               get_pod,
+                               is_config_suitable)
 from marvin.lib.utils import cleanup_resources
+from marvin.sshClient import SshClient
 from nose.plugins.attrib import attr
-import time
 
 
 class Test42xBugsMgmtSvr(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         try:

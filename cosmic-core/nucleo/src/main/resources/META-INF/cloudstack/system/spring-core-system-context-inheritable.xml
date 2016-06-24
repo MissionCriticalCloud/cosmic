@@ -18,9 +18,9 @@
     under the License.
 
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd"
@@ -29,25 +29,25 @@
     <!--
       LifeCycle
     -->
-    <bean id="cloudStackLifeCycle" class="org.apache.cloudstack.spring.lifecycle.CloudStackExtendedLifeCycle"/>
+    <bean id="cloudStackLifeCycle" class="org.apache.cloudstack.spring.lifecycle.CloudStackExtendedLifeCycle" />
     <bean id="moduleStartup" class="org.apache.cloudstack.spring.lifecycle.CloudStackExtendedLifeCycleStart">
-        <property name="lifeCycle" ref="cloudStackLifeCycle"/>
+        <property name="lifeCycle" ref="cloudStackLifeCycle" />
     </bean>
 
     <!--
       AOP
     -->
-    <bean id="transactionContextInterceptor" class="com.cloud.utils.db.TransactionContextInterceptor"/>
-    <bean id="actionEventInterceptor" class="com.cloud.event.ActionEventInterceptor"/>
+    <bean id="transactionContextInterceptor" class="com.cloud.utils.db.TransactionContextInterceptor" />
+    <bean id="actionEventInterceptor" class="com.cloud.event.ActionEventInterceptor" />
     <aop:config>
         <aop:advisor advice-ref="transactionContextInterceptor"
-                     pointcut="target(com.cloud.utils.db.GenericDaoBase)"/>
+                     pointcut="target(com.cloud.utils.db.GenericDaoBase)" />
         <aop:advisor advice-ref="transactionContextInterceptor"
-                     pointcut="execution(* com.cloud.dao.EntityManager.*(..))"/>
+                     pointcut="execution(* com.cloud.dao.EntityManager.*(..))" />
         <aop:advisor advice-ref="actionEventInterceptor"
-                     pointcut="execution(* *(..)) &amp;&amp; @annotation(com.cloud.event.ActionEvent)"/>
+                     pointcut="execution(* *(..)) &amp;&amp; @annotation(com.cloud.event.ActionEvent)" />
         <aop:advisor advice-ref="actionEventInterceptor"
-                     pointcut="execution(* *(..)) &amp;&amp; @annotation(com.cloud.event.ActionEvents)"/>
+                     pointcut="execution(* *(..)) &amp;&amp; @annotation(com.cloud.event.ActionEvents)" />
     </aop:config>
 
 </beans>

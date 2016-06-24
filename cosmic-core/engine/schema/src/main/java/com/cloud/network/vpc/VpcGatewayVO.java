@@ -16,8 +16,7 @@
 // under the License.
 package com.cloud.network.vpc;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,67 +26,51 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "vpc_gateways")
 public class VpcGatewayVO implements VpcGateway {
 
+    @Column(name = "ip4_address")
+    String ip4Address;
+    @Column(name = "gateway")
+    String gateway;
+    @Column(name = "netmask")
+    String netmask;
+    @Column(name = "vlan_tag")
+    String broadcastUri;
+    @Column(name = "type")
+    @Enumerated(value = EnumType.STRING)
+    VpcGateway.Type type;
+    @Column(name = "vpc_id")
+    Long vpcId;
+    @Column(name = "zone_id")
+    long zoneId;
+    @Column(name = "network_id")
+    long networkId;
+    @Column(name = GenericDao.CREATED_COLUMN)
+    Date created;
+    @Column(name = GenericDao.REMOVED_COLUMN)
+    Date removed;
+    @Column(name = "account_id")
+    long accountId;
+    @Column(name = "domain_id")
+    long domainId;
+    @Column(name = "state")
+    @Enumerated(value = EnumType.STRING)
+    State state;
+    @Column(name = "source_nat")
+    boolean sourceNat;
+    @Column(name = "network_acl_id")
+    long networkACLId;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
-    @Column(name = "ip4_address")
-    String ip4Address;
-
-    @Column(name = "gateway")
-    String gateway;
-
-    @Column(name = "netmask")
-    String netmask;
-
-    @Column(name = "vlan_tag")
-    String broadcastUri;
-
-    @Column(name = "type")
-    @Enumerated(value = EnumType.STRING)
-    VpcGateway.Type type;
-
-    @Column(name = "vpc_id")
-    Long vpcId;
-
-    @Column(name = "zone_id")
-    long zoneId;
-
-    @Column(name = "network_id")
-    long networkId;
-
-    @Column(name = GenericDao.CREATED_COLUMN)
-    Date created;
-
-    @Column(name = GenericDao.REMOVED_COLUMN)
-    Date removed;
-
     @Column(name = "uuid")
     private String uuid;
-
-    @Column(name = "account_id")
-    long accountId;
-
-    @Column(name = "domain_id")
-    long domainId;
-
-    @Column(name = "state")
-    @Enumerated(value = EnumType.STRING)
-    State state;
-
-    @Column(name = "source_nat")
-    boolean sourceNat;
-
-    @Column(name = "network_acl_id")
-    long networkACLId;
 
     protected VpcGatewayVO() {
         uuid = UUID.randomUUID().toString();
@@ -100,15 +83,15 @@ public class VpcGatewayVO implements VpcGateway {
      * @param zoneId
      * @param networkId
      * @param broadcastUri TODO
-     * @param gateway TODO
-     * @param netmask TODO
-     * @param accountId TODO
-     * @param domainId TODO
+     * @param gateway      TODO
+     * @param netmask      TODO
+     * @param accountId    TODO
+     * @param domainId     TODO
      * @param account_id
      * @param sourceNat
      */
     public VpcGatewayVO(String ip4Address, Type type, long vpcId, long zoneId, long networkId, String broadcastUri, String gateway, String netmask, long accountId,
-            long domainId, boolean sourceNat, long networkACLId) {
+                        long domainId, boolean sourceNat, long networkACLId) {
         this.ip4Address = ip4Address;
         this.type = type;
         this.vpcId = vpcId;
@@ -123,7 +106,6 @@ public class VpcGatewayVO implements VpcGateway {
         state = State.Creating;
         this.sourceNat = sourceNat;
         this.networkACLId = networkACLId;
-
     }
 
     @Override
@@ -162,13 +144,6 @@ public class VpcGatewayVO implements VpcGateway {
     }
 
     @Override
-    public String toString() {
-        StringBuilder buf = new StringBuilder("VpcGateway[");
-        buf.append(id).append("|").append(ip4Address.toString()).append("|").append(vpcId).append("]");
-        return buf.toString();
-    }
-
-    @Override
     public String getGateway() {
         return gateway;
     }
@@ -181,16 +156,6 @@ public class VpcGatewayVO implements VpcGateway {
     @Override
     public String getBroadcastUri() {
         return broadcastUri;
-    }
-
-    @Override
-    public long getAccountId() {
-        return accountId;
-    }
-
-    @Override
-    public long getDomainId() {
-        return domainId;
     }
 
     @Override
@@ -207,13 +172,30 @@ public class VpcGatewayVO implements VpcGateway {
         return sourceNat;
     }
 
+    @Override
+    public long getNetworkACLId() {
+        return networkACLId;
+    }
+
     public void setNetworkACLId(long networkACLId) {
         this.networkACLId = networkACLId;
     }
 
     @Override
-    public long getNetworkACLId() {
-        return networkACLId;
+    public String toString() {
+        StringBuilder buf = new StringBuilder("VpcGateway[");
+        buf.append(id).append("|").append(ip4Address.toString()).append("|").append(vpcId).append("]");
+        return buf.toString();
+    }
+
+    @Override
+    public long getAccountId() {
+        return accountId;
+    }
+
+    @Override
+    public long getDomainId() {
+        return domainId;
     }
 
     @Override

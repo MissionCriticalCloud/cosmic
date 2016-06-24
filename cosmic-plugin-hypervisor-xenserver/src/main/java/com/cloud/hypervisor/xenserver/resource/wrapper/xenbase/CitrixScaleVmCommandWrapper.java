@@ -19,9 +19,6 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import java.util.Iterator;
-import java.util.Set;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.ScaleVmAnswer;
 import com.cloud.agent.api.ScaleVmCommand;
@@ -30,17 +27,20 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.util.Iterator;
+import java.util.Set;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Host;
 import com.xensource.xenapi.Types.VmPowerState;
 import com.xensource.xenapi.Types.XenAPIException;
 import com.xensource.xenapi.VM;
-
 import org.apache.xmlrpc.XmlRpcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  ScaleVmCommand.class)
+@ResourceWrapper(handles = ScaleVmCommand.class)
 public final class CitrixScaleVmCommandWrapper extends CommandWrapper<ScaleVmCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixScaleVmCommandWrapper.class);
@@ -86,12 +86,10 @@ public final class CitrixScaleVmCommandWrapper extends CommandWrapper<ScaleVmCom
                     s_logger.debug(msg);
                     return new ScaleVmAnswer(command, false, msg);
                 }
-
             }
             final String msg = "scaling VM " + vmName + " is successful on host " + host;
             s_logger.debug(msg);
             return new ScaleVmAnswer(command, true, msg);
-
         } catch (final XenAPIException e) {
             final String msg = "Upgrade Vm " + vmName + " fail due to " + e.toString();
             s_logger.warn(msg, e);

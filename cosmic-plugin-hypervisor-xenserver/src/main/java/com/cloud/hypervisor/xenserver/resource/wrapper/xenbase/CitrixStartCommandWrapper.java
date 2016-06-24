@@ -19,12 +19,6 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.StartAnswer;
 import com.cloud.agent.api.StartCommand;
@@ -38,16 +32,22 @@ import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.storage.Volume;
 import com.cloud.vm.VirtualMachine;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Host;
 import com.xensource.xenapi.Types.VmPowerState;
 import com.xensource.xenapi.VDI;
 import com.xensource.xenapi.VM;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  StartCommand.class)
+@ResourceWrapper(handles = StartCommand.class)
 public final class CitrixStartCommandWrapper extends CommandWrapper<StartCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixStartCommandWrapper.class);
@@ -60,7 +60,7 @@ public final class CitrixStartCommandWrapper extends CommandWrapper<StartCommand
         VmPowerState state = VmPowerState.HALTED;
         VM vm = null;
         // if a VDI is created, record its UUID to send back to the CS MS
-        final Map<String, String> iqnToPath = new HashMap<String, String>();
+        final Map<String, String> iqnToPath = new HashMap<>();
         try {
             final Set<VM> vms = VM.getByNameLabel(conn, vmName);
             if (vms != null) {
@@ -95,7 +95,7 @@ public final class CitrixStartCommandWrapper extends CommandWrapper<StartCommand
                 citrixResourceBase.createPatchVbd(conn, vmName, vm);
             }
             // put cdrom at the first place in the list
-            final List<DiskTO> disks = new ArrayList<DiskTO>(vmSpec.getDisks().length);
+            final List<DiskTO> disks = new ArrayList<>(vmSpec.getDisks().length);
             int index = 0;
             for (final DiskTO disk : vmSpec.getDisks()) {
                 if (Volume.Type.ISO.equals(disk.getType())) {
@@ -141,7 +141,6 @@ public final class CitrixStartCommandWrapper extends CommandWrapper<StartCommand
                             s_logger.info("Programmed default network rules for " + vmName);
                         }
                     }
-
                 } else {
                     // For user vm, program the rules for each nic if the
                     // isolation uri scheme is ec2
@@ -149,7 +148,7 @@ public final class CitrixStartCommandWrapper extends CommandWrapper<StartCommand
                     for (final NicTO nic : nics) {
                         if (nic.isSecurityGroupEnabled() || nic.getIsolationUri() != null && nic.getIsolationUri().getScheme().equalsIgnoreCase(IsolationType.Ec2.toString())) {
                             final List<String> nicSecIps = nic.getNicSecIps();
-                            String secIpsStr;
+                            final String secIpsStr;
                             final StringBuilder sb = new StringBuilder();
                             if (nicSecIps != null) {
                                 for (final String ip : nicSecIps) {

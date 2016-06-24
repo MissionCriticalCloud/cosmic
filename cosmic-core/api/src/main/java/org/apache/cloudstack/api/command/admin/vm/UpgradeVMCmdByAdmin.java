@@ -21,7 +21,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
@@ -29,20 +28,20 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.vm.UpgradeVMCmd;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "changeServiceForVirtualMachine", responseObject=UserVmResponse.class, description="Changes the service offering for a virtual machine. " +
-                                            "The virtual machine must be in a \"Stopped\" state for " +
+@APICommand(name = "changeServiceForVirtualMachine", responseObject = UserVmResponse.class, description = "Changes the service offering for a virtual machine. " +
+        "The virtual machine must be in a \"Stopped\" state for " +
         "this command to take effect.", responseView = ResponseView.Full, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class UpgradeVMCmdByAdmin extends UpgradeVMCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpgradeVMCmdByAdmin.class.getName());
 
-
     @Override
-    public void execute() throws ResourceAllocationException{
-        CallContext.current().setEventDetails("Vm Id: "+getId());
+    public void execute() throws ResourceAllocationException {
+        CallContext.current().setEventDetails("Vm Id: " + getId());
 
         ServiceOffering serviceOffering = _entityMgr.findById(ServiceOffering.class, serviceOfferingId);
         if (serviceOffering == null) {
@@ -50,7 +49,7 @@ public class UpgradeVMCmdByAdmin extends UpgradeVMCmd {
         }
 
         UserVm result = _userVmService.upgradeVirtualMachine(this);
-        if (result != null){
+        if (result != null) {
             UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Full, "virtualmachine", result).get(0);
             response.setResponseName(getCommandName());
             setResponseObject(response);

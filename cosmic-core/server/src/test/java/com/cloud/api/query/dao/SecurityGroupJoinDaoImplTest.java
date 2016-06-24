@@ -20,11 +20,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import com.cloud.api.query.vo.ResourceTagJoinVO;
 import com.cloud.api.query.vo.SecurityGroupJoinVO;
 import com.cloud.network.security.SecurityGroupVMMapVO;
@@ -33,8 +28,14 @@ import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.user.Account;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
-
 import org.apache.cloudstack.api.response.SecurityGroupResponse;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,44 +44,37 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import junit.framework.TestCase;
-
 @RunWith(MockitoJUnitRunner.class)
 public class SecurityGroupJoinDaoImplTest extends TestCase {
 
+    // Random generated UUIDs
+    private final String uuidOne = "463e022a-249d-4212-bdf4-726bc9047aa7";
+    private final String uuidTwo = "d8714c5f-766f-4b14-bdf4-17571042b9c5";
     // Mock private variables.
-    @Mock (name = "_resourceTagJoinDao")
+    @Mock(name = "_resourceTagJoinDao")
     private ResourceTagJoinDao _resourceTagJoinDao;
-    @Mock (name = "_securityGroupVMMapDao")
+    @Mock(name = "_securityGroupVMMapDao")
     private SecurityGroupVMMapDao _securityGroupVMMapDao;
-    @Mock (name = "_userVmDao")
+    @Mock(name = "_userVmDao")
     private UserVmDao _userVmDao;
-
     // Inject mocks in class to be tested.
     @InjectMocks
     private SecurityGroupJoinDaoImpl _securityGroupJoinDaoImpl;
-
     // Mock a caller and a SecurityGroupJoinVO
     @Mock
     private Account caller;
     @Mock
     private SecurityGroupJoinVO vsg;
-
     // Mock securitygroups
     @Mock
     private SecurityGroupVMMapVO securityGroupVMMapVOone;
     @Mock
     private SecurityGroupVMMapVO securityGroupVMMapVOtwo;
-
     // Mock 2 UserVmVOs
     @Mock
     private UserVmVO userVmVOone;
     @Mock
     private UserVmVO userVmVOtwo;
-
-    // Random generated UUIDs
-    private final String uuidOne = "463e022a-249d-4212-bdf4-726bc9047aa7";
-    private final String uuidTwo = "d8714c5f-766f-4b14-bdf4-17571042b9c5";
 
     @Before
     public void setup() {
@@ -128,7 +122,7 @@ public class SecurityGroupJoinDaoImplTest extends TestCase {
 
         Field virtualMachineCount = securityGroupResponse.getClass().getDeclaredField("virtualMachineCount");
         virtualMachineCount.setAccessible(true);
-        assertEquals(0, ((Integer)virtualMachineCount.get(securityGroupResponse)).intValue());
+        assertEquals(0, ((Integer) virtualMachineCount.get(securityGroupResponse)).intValue());
     }
 
     @Test
@@ -140,7 +134,7 @@ public class SecurityGroupJoinDaoImplTest extends TestCase {
 
         Field virtualMachineCount = securityGroupResponse.getClass().getDeclaredField("virtualMachineCount");
         virtualMachineCount.setAccessible(true);
-        assertEquals(1, ((Integer)virtualMachineCount.get(securityGroupResponse)).intValue());
+        assertEquals(1, ((Integer) virtualMachineCount.get(securityGroupResponse)).intValue());
     }
 
     @Test
@@ -152,7 +146,7 @@ public class SecurityGroupJoinDaoImplTest extends TestCase {
 
         Field virtualMachineCount = securityGroupResponse.getClass().getDeclaredField("virtualMachineCount");
         virtualMachineCount.setAccessible(true);
-        assertEquals(2, ((Integer)virtualMachineCount.get(securityGroupResponse)).intValue());
+        assertEquals(2, ((Integer) virtualMachineCount.get(securityGroupResponse)).intValue());
     }
 
     @Test
@@ -165,7 +159,7 @@ public class SecurityGroupJoinDaoImplTest extends TestCase {
         Field fieldVirtualMachineIds = securityGroupResponse.getClass().getDeclaredField("virtualMachineIds");
         fieldVirtualMachineIds.setAccessible(true);
 
-        Set<String> virtualMachineIds = (Set<String>)fieldVirtualMachineIds.get(securityGroupResponse);
+        Set<String> virtualMachineIds = (Set<String>) fieldVirtualMachineIds.get(securityGroupResponse);
 
         assertEquals(0, virtualMachineIds.size());
     }
@@ -180,7 +174,7 @@ public class SecurityGroupJoinDaoImplTest extends TestCase {
         Field fieldVirtualMachineIds = securityGroupResponse.getClass().getDeclaredField("virtualMachineIds");
         fieldVirtualMachineIds.setAccessible(true);
 
-        Set<String> virtualMachineIds = (Set<String>)fieldVirtualMachineIds.get(securityGroupResponse);
+        Set<String> virtualMachineIds = (Set<String>) fieldVirtualMachineIds.get(securityGroupResponse);
 
         assertEquals(1, virtualMachineIds.size());
         assertTrue(virtualMachineIds.contains(uuidOne));
@@ -196,7 +190,7 @@ public class SecurityGroupJoinDaoImplTest extends TestCase {
         Field fieldVirtualMachineIds = securityGroupResponse.getClass().getDeclaredField("virtualMachineIds");
         fieldVirtualMachineIds.setAccessible(true);
 
-        Set<String> virtualMachineIds = (Set<String>)fieldVirtualMachineIds.get(securityGroupResponse);
+        Set<String> virtualMachineIds = (Set<String>) fieldVirtualMachineIds.get(securityGroupResponse);
 
         assertEquals(2, virtualMachineIds.size());
         assertTrue(virtualMachineIds.contains(uuidOne));

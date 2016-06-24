@@ -19,7 +19,6 @@
 package org.apache.cloudstack.engine.subsystem.api.storage;
 
 import com.cloud.agent.api.Answer;
-
 import org.apache.cloudstack.storage.command.CommandResult;
 
 public class CreateCmdResult extends CommandResult {
@@ -43,5 +42,4 @@ public class CreateCmdResult extends CommandResult {
     public void setAnswer(Answer answer) {
         this.answer = answer;
     }
-
 }

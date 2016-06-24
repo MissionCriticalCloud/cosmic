@@ -19,10 +19,10 @@
 
 package com.cloud.utils.storage;
 
+import com.cloud.utils.NumbersUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import com.cloud.utils.NumbersUtil;
 
 public final class QCOW2Utils {
     private static final int VIRTUALSIZE_HEADER_LOCATION = 24;
@@ -31,7 +31,8 @@ public final class QCOW2Utils {
     /**
      * Private constructor ->  This utility class cannot be instantiated.
      */
-    private QCOW2Utils() {}
+    private QCOW2Utils() {
+    }
 
     /**
      * @return the header location of the virtual size field.

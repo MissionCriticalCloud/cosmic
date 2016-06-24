@@ -17,14 +17,13 @@
 
 package com.cloud.network.rules;
 
-import java.util.List;
-
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Network;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.router.VirtualRouter;
-
 import org.apache.cloudstack.network.topology.NetworkTopologyVisitor;
+
+import java.util.List;
 
 public class IpAssociationRules extends RuleApplier {
 

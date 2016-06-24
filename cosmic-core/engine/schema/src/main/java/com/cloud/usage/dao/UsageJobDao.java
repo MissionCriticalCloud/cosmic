@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.usage.dao;
 
-import java.util.Date;
-
 import com.cloud.usage.UsageJobVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Date;
 
 public interface UsageJobDao extends GenericDao<UsageJobVO, Long> {
     Long checkHeartbeat(String hostname, int pid, int aggregationDuration);

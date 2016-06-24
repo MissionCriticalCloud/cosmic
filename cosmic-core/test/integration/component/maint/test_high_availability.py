@@ -19,11 +19,10 @@
 """ P1 tests for high availability
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+import time
 from marvin.cloudstackAPI import (prepareHostForMaintenance,
                                   cancelHostMaintenance)
-from marvin.lib.utils import cleanup_resources
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (Account,
                              Host,
                              VirtualMachine,
@@ -42,11 +41,11 @@ from marvin.lib.common import (get_zone,
                                list_snapshots,
                                list_templates,
                                wait_for_ssvms)
-import time
+from marvin.lib.utils import cleanup_resources
+from nose.plugins.attrib import attr
 
 
 class Services:
-
     """Test network offering Services
     """
 
@@ -65,8 +64,8 @@ class Services:
                 "name": "Tiny Instance",
                 "displaytext": "Tiny Instance",
                 "cpunumber": 1,
-                "cpuspeed": 100,    # in MHz
-                                    "memory": 128,       # In MBs
+                "cpuspeed": 100,  # in MHz
+                "memory": 128,  # In MBs
             },
             "lbrule": {
                 "name": "SSH",
@@ -119,7 +118,6 @@ class Services:
 
 
 class TestHighAvailability(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
 

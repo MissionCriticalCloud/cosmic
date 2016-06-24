@@ -29,24 +29,24 @@ public class PasswordGeneratorTest {
         Assert.assertTrue(PasswordGenerator.generateRandomPassword(0).length() == 3);
         Assert.assertTrue(PasswordGenerator.generateRandomPassword(1).length() == 3);
         Assert.assertTrue(PasswordGenerator.generateRandomPassword(5).length() == 5);
-        String password = PasswordGenerator.generateRandomPassword(8);
+        final String password = PasswordGenerator.generateRandomPassword(8);
 
         Assert.assertTrue(containsDigit(password));
         Assert.assertTrue(containsLowercase(password));
         Assert.assertTrue(containsUppercase(password));
     }
 
-    private boolean containsUppercase(String password) {
-        for (char c : password.toCharArray()) {
-            if (Character.isUpperCase(c)) {
+    private boolean containsDigit(final String password) {
+        for (final char c : password.toCharArray()) {
+            if (Character.isDigit(c)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean containsLowercase(String password) {
-        for (char c : password.toCharArray()) {
+    private boolean containsLowercase(final String password) {
+        for (final char c : password.toCharArray()) {
             if (Character.isLowerCase(c)) {
                 return true;
             }
@@ -54,9 +54,9 @@ public class PasswordGeneratorTest {
         return false;
     }
 
-    private boolean containsDigit(String password) {
-        for (char c : password.toCharArray()) {
-            if (Character.isDigit(c)) {
+    private boolean containsUppercase(final String password) {
+        for (final char c : password.toCharArray()) {
+            if (Character.isUpperCase(c)) {
                 return true;
             }
         }

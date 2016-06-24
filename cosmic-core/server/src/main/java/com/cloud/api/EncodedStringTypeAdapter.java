@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.api;
 
+import com.cloud.utils.encoding.URLEncoder;
+
 import java.lang.reflect.Type;
 
-import com.cloud.utils.encoding.URLEncoder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,6 @@ public class EncodedStringTypeAdapter implements JsonSerializer<String> {
     @Override
     public JsonElement serialize(String src, Type typeOfResponseObj, JsonSerializationContext ctx) {
         return new JsonPrimitive(encodeString(src));
-
     }
 
     private static String encodeString(String value) {
@@ -47,5 +46,4 @@ public class EncodedStringTypeAdapter implements JsonSerializer<String> {
         }
         return value;
     }
-
 }

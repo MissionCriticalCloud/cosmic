@@ -40,5 +40,4 @@ public class IpAliases extends ConfigBase {
     public void setAliases(List<IpAddressAlias> aliases) {
         this.aliases = aliases;
     }
-
 }

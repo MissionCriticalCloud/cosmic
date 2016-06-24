@@ -16,8 +16,9 @@
 # under the License.
 
 # Import Local Modules
-from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import cleanup_resources, validateList
+import time
+from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import PASS
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              NetworkOffering,
@@ -36,12 +37,10 @@ from marvin.lib.base import (Account,
                              Host)
 from marvin.lib.common import (get_zone,
                                get_template,
-                               get_domain,
-                               find_storage_pool_type)
-from marvin.codes import PASS
+                               get_domain)
+from marvin.lib.utils import cleanup_resources, validateList
 from marvin.sshClient import SshClient
 from nose.plugins.attrib import attr
-import time
 
 
 class TestListInstances(cloudstackTestCase):
@@ -731,7 +730,7 @@ class TestListInstances(cloudstackTestCase):
             list_vms_before,
             "Virtual Machine already exists for newly created user"
         )
-        vms = {}
+        vms = { }
         for i in range(0, 2):
             # Deploying a VM
             vm_created = VirtualMachine.create(
@@ -745,7 +744,7 @@ class TestListInstances(cloudstackTestCase):
                 vm_created,
                 "VM creation failed"
             )
-            vms.update({i: vm_created})
+            vms.update({ i: vm_created })
 
         # Listing all the VM's for a User
         list_vms_after = VirtualMachine.list(
@@ -2530,7 +2529,6 @@ class TestInstances(cloudstackTestCase):
             self.fail("Exception occurred: %s" % e)
         return
 
-
     @attr(tags=["advanced", "basic"], required_hardware="true")
     def test_13_attach_detach_iso(self):
         """
@@ -4007,7 +4005,7 @@ class TestInstances(cloudstackTestCase):
         # populating Security Groups id's
         securitygroupids = {
             security_groups_list[0].id,
-            security_groups_list[1].id}
+            security_groups_list[1].id }
         # Listing all the VM's for a User
         list_vms_before = VirtualMachine.list(
             self.userapiclient,
@@ -4253,7 +4251,7 @@ class TestInstances(cloudstackTestCase):
         )
         self.assertIsNotNone(
             vm1, "VM1 creation failed with ip address %s and host name %s" %
-            (vm_ip1, name1))
+                 (vm_ip1, name1))
         # self.cleanup.append(vm_created)
         # Listing all the VMs for a user again
         vm_response = VirtualMachine.list(
@@ -4395,6 +4393,3 @@ class TestInstances(cloudstackTestCase):
                 "Warning: Exception in expunging vms vm3 and vm4 : %s" %
                 e)
         return
-
-
-

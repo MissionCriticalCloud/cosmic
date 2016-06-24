@@ -19,20 +19,34 @@
 
 package com.cloud.agent.api;
 
-import java.util.List;
-
 import org.apache.cloudstack.storage.to.VolumeObjectTO;
+
+import java.util.List;
 
 public class CreateVMSnapshotAnswer extends Answer {
 
     private List<VolumeObjectTO> volumeTOs;
     private VMSnapshotTO vmSnapshotTo;
 
+    public CreateVMSnapshotAnswer() {
+
+    }
+
+    public CreateVMSnapshotAnswer(final CreateVMSnapshotCommand cmd, final boolean success, final String result) {
+        super(cmd, success, result);
+    }
+
+    public CreateVMSnapshotAnswer(final CreateVMSnapshotCommand cmd, final VMSnapshotTO vmSnapshotTo, final List<VolumeObjectTO> volumeTOs) {
+        super(cmd, true, "");
+        this.vmSnapshotTo = vmSnapshotTo;
+        this.volumeTOs = volumeTOs;
+    }
+
     public List<VolumeObjectTO> getVolumeTOs() {
         return volumeTOs;
     }
 
-    public void setVolumeTOs(List<VolumeObjectTO> volumeTOs) {
+    public void setVolumeTOs(final List<VolumeObjectTO> volumeTOs) {
         this.volumeTOs = volumeTOs;
     }
 
@@ -40,22 +54,7 @@ public class CreateVMSnapshotAnswer extends Answer {
         return vmSnapshotTo;
     }
 
-    public void setVmSnapshotTo(VMSnapshotTO vmSnapshotTo) {
+    public void setVmSnapshotTo(final VMSnapshotTO vmSnapshotTo) {
         this.vmSnapshotTo = vmSnapshotTo;
     }
-
-    public CreateVMSnapshotAnswer() {
-
-    }
-
-    public CreateVMSnapshotAnswer(CreateVMSnapshotCommand cmd, boolean success, String result) {
-        super(cmd, success, result);
-    }
-
-    public CreateVMSnapshotAnswer(CreateVMSnapshotCommand cmd, VMSnapshotTO vmSnapshotTo, List<VolumeObjectTO> volumeTOs) {
-        super(cmd, true, "");
-        this.vmSnapshotTo = vmSnapshotTo;
-        this.volumeTOs = volumeTOs;
-    }
-
 }

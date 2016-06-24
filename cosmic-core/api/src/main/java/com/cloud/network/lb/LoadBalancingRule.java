@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.network.lb;
 
-import java.util.List;
-
 import com.cloud.network.as.AutoScalePolicy;
 import com.cloud.network.as.AutoScaleVmGroup;
 import com.cloud.network.as.AutoScaleVmProfile;
@@ -28,6 +26,8 @@ import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.utils.Pair;
 import com.cloud.utils.net.Ip;
+
+import java.util.List;
 
 public class LoadBalancingRule {
     private LoadBalancer lb;
@@ -40,7 +40,7 @@ public class LoadBalancingRule {
     private String lbProtocol;
 
     public LoadBalancingRule(LoadBalancer lb, List<LbDestination> destinations, List<LbStickinessPolicy> stickinessPolicies,
-            List<LbHealthCheckPolicy> healthCheckPolicies, Ip sourceIp) {
+                             List<LbHealthCheckPolicy> healthCheckPolicies, Ip sourceIp) {
         this.lb = lb;
         this.destinations = destinations;
         this.stickinessPolicies = stickinessPolicies;
@@ -49,7 +49,7 @@ public class LoadBalancingRule {
     }
 
     public LoadBalancingRule(LoadBalancer lb, List<LbDestination> destinations, List<LbStickinessPolicy> stickinessPolicies,
-            List<LbHealthCheckPolicy> healthCheckPolicies, Ip sourceIp, LbSslCert sslCert, String lbProtocol) {
+                             List<LbHealthCheckPolicy> healthCheckPolicies, Ip sourceIp, LbSslCert sslCert, String lbProtocol) {
         this.lb = lb;
         this.destinations = destinations;
         this.stickinessPolicies = stickinessPolicies;
@@ -119,28 +119,48 @@ public class LoadBalancingRule {
         return lb.getNetworkId();
     }
 
-    public void setDestinations(List<LbDestination> destinations) {
-        this.destinations = destinations;
-    }
-
     public List<LbDestination> getDestinations() {
         return destinations;
+    }
+
+    public void setDestinations(List<LbDestination> destinations) {
+        this.destinations = destinations;
     }
 
     public List<LbStickinessPolicy> getStickinessPolicies() {
         return stickinessPolicies;
     }
 
-    public void setHealthCheckPolicies(List<LbHealthCheckPolicy> healthCheckPolicies) {
-        this.healthCheckPolicies = healthCheckPolicies;
-    }
-
     public List<LbHealthCheckPolicy> getHealthCheckPolicies() {
         return healthCheckPolicies;
     }
 
+    public void setHealthCheckPolicies(List<LbHealthCheckPolicy> healthCheckPolicies) {
+        this.healthCheckPolicies = healthCheckPolicies;
+    }
+
     public LbSslCert getLbSslCert() {
         return sslCert;
+    }
+
+    public LbAutoScaleVmGroup getAutoScaleVmGroup() {
+        return autoScaleVmGroup;
+    }
+
+    public void setAutoScaleVmGroup(LbAutoScaleVmGroup autoScaleVmGroup) {
+        this.autoScaleVmGroup = autoScaleVmGroup;
+    }
+
+    public boolean isAutoScaleConfig() {
+        return this.autoScaleVmGroup != null;
+    }
+
+    public Ip getSourceIp() {
+        return sourceIp;
+    }
+
+    public Scheme getScheme() {
+        return lb.getScheme();
     }
 
     public interface Destination {
@@ -197,7 +217,7 @@ public class LoadBalancingRule {
         }
 
         public LbHealthCheckPolicy(String pingpath, String description, int responseTime, int healthcheckInterval, int healthcheckThresshold, int unhealthThresshold,
-                boolean revoke) {
+                                   boolean revoke) {
             this.pingpath = pingpath;
             this.description = description;
             this.responseTime = responseTime;
@@ -237,14 +257,13 @@ public class LoadBalancingRule {
         public boolean isRevoked() {
             return _revoke;
         }
-
     }
 
     public static class LbDestination implements Destination {
+        boolean revoked;
         private int portStart;
         private int portEnd;
         private String ip;
-        boolean revoked;
 
         public LbDestination(int portStart, int portEnd, String ip, boolean revoked) {
             this.portStart = portStart;
@@ -276,18 +295,6 @@ public class LoadBalancingRule {
         public void setRevoked(boolean revoked) {
             this.revoked = revoked;
         }
-    }
-
-    public LbAutoScaleVmGroup getAutoScaleVmGroup() {
-        return autoScaleVmGroup;
-    }
-
-    public boolean isAutoScaleConfig() {
-        return this.autoScaleVmGroup != null;
-    }
-
-    public void setAutoScaleVmGroup(LbAutoScaleVmGroup autoScaleVmGroup) {
-        this.autoScaleVmGroup = autoScaleVmGroup;
     }
 
     public static class LbCondition {
@@ -336,7 +343,6 @@ public class LoadBalancingRule {
     }
 
     public static class LbAutoScaleVmProfile {
-        AutoScaleVmProfile profile;
         private final String autoScaleUserApiKey;
         private final String autoScaleUserSecretKey;
         private final String csUrl;
@@ -346,9 +352,10 @@ public class LoadBalancingRule {
         private final String templateId;
         private final String networkId;
         private final String vmName;
+        AutoScaleVmProfile profile;
 
         public LbAutoScaleVmProfile(AutoScaleVmProfile profile, String autoScaleUserApiKey, String autoScaleUserSecretKey, String csUrl, String zoneId, String domainId,
-                String serviceOfferingId, String templateId, String vmName, String networkId) {
+                                    String serviceOfferingId, String templateId, String vmName, String networkId) {
             this.profile = profile;
             this.autoScaleUserApiKey = autoScaleUserApiKey;
             this.autoScaleUserSecretKey = autoScaleUserSecretKey;
@@ -403,10 +410,10 @@ public class LoadBalancingRule {
     }
 
     public static class LbAutoScaleVmGroup {
-        AutoScaleVmGroup vmGroup;
         private final List<LbAutoScalePolicy> policies;
         private final LbAutoScaleVmProfile profile;
         private final String currentState;
+        AutoScaleVmGroup vmGroup;
 
         public LbAutoScaleVmGroup(AutoScaleVmGroup vmGroup, List<LbAutoScalePolicy> policies, LbAutoScaleVmProfile profile, String currentState) {
             this.vmGroup = vmGroup;
@@ -473,13 +480,5 @@ public class LoadBalancingRule {
         public boolean isRevoked() {
             return revoked;
         }
-    }
-
-    public Ip getSourceIp() {
-        return sourceIp;
-    }
-
-    public Scheme getScheme() {
-        return lb.getScheme();
     }
 }

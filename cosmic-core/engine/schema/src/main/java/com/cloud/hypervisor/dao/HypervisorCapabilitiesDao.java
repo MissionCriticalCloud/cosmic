@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.hypervisor.dao;
 
-import java.util.List;
-
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface HypervisorCapabilitiesDao extends GenericDao<HypervisorCapabilitiesVO, Long> {
 

@@ -16,16 +16,6 @@
 // under the License.
 package com.cloud.cluster.agentlb;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
@@ -33,6 +23,15 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +53,7 @@ public class ClusterBasedAgentLoadBalancerPlanner extends AdapterBase implements
 
         if (allHosts.size() <= avLoad) {
             s_logger.debug("Agent load = " + allHosts.size() + " for management server " + msId + " doesn't exceed average system agent load = " + avLoad +
-                "; so it doesn't participate in agent rebalancing process");
+                    "; so it doesn't participate in agent rebalancing process");
             return null;
         }
 
@@ -66,7 +65,7 @@ public class ClusterBasedAgentLoadBalancerPlanner extends AdapterBase implements
 
         if (directHosts.isEmpty()) {
             s_logger.debug("No direct agents in status " + Status.Up + " exist for the management server " + msId +
-                "; so it doesn't participate in agent rebalancing process");
+                    "; so it doesn't participate in agent rebalancing process");
             return null;
         }
 
@@ -92,7 +91,7 @@ public class ClusterBasedAgentLoadBalancerPlanner extends AdapterBase implements
         List<HostVO> hostsToReturn = new ArrayList<HostVO>();
 
         s_logger.debug("Management server " + msId + " can give away " + hostsToGive + " as it currently owns " + allHosts.size() +
-            " and the average agent load in the system is " + avLoad + "; finalyzing list of hosts to give away...");
+                " and the average agent load in the system is " + avLoad + "; finalyzing list of hosts to give away...");
         for (Long cluster : hostToClusterMap.keySet()) {
             List<HostVO> hostsInCluster = hostToClusterMap.get(cluster);
             hostsLeft = hostsLeft - hostsInCluster.size();
@@ -146,5 +145,4 @@ public class ClusterBasedAgentLoadBalancerPlanner extends AdapterBase implements
         }
         return sortedMap;
     }
-
 }

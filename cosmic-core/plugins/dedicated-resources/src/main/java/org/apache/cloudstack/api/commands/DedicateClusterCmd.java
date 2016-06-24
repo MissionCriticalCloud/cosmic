@@ -16,15 +16,9 @@
 // under the License.
 package org.apache.cloudstack.api.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.dc.DedicatedResources;
 import com.cloud.event.EventTypes;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -36,6 +30,11 @@ import org.apache.cloudstack.api.response.DedicateClusterResponse;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.dedicated.DedicatedService;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,10 +51,10 @@ public class DedicateClusterCmd extends BaseAsyncCmd {
     private Long clusterId;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               required = true,
-               description = "the ID of the containing domain")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            required = true,
+            description = "the ID of the containing domain")
     private Long domainId;
 
     @Parameter(name = ApiConstants.ACCOUNT, type = CommandType.STRING, description = "the name of the account which needs dedication. Must be used with domainId.")
@@ -65,18 +64,6 @@ public class DedicateClusterCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getClusterId() {
-        return clusterId;
-    }
-
-    public Long getDomainId() {
-        return domainId;
-    }
-
-    public String getAccountName() {
-        return accountName;
-    }
-
     @Override
     public String getEventType() {
         return EventTypes.EVENT_DEDICATE_RESOURCE;
@@ -85,19 +72,6 @@ public class DedicateClusterCmd extends BaseAsyncCmd {
     @Override
     public String getEventDescription() {
         return "dedicating a cluster";
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
     }
 
     @Override
@@ -118,4 +92,28 @@ public class DedicateClusterCmd extends BaseAsyncCmd {
         }
     }
 
+    public Long getClusterId() {
+        return clusterId;
+    }
+
+    public Long getDomainId() {
+        return domainId;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
+    }
 }

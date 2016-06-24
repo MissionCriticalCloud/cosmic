@@ -31,32 +31,32 @@ import org.junit.Test;
 public class PropertiesUtilsTest {
     @Test
     public void findConfigFile() {
-        File configFile = PropertiesUtil.findConfigFile("notexistingresource");
+        final File configFile = PropertiesUtil.findConfigFile("notexistingresource");
         Assert.assertNull(configFile);
     }
 
     @Test
     public void loadFromFile() throws IOException {
-        File file = File.createTempFile("test", ".properties");
+        final File file = File.createTempFile("test", ".properties");
         FileUtils.writeStringToFile(file, "a=b\nc=d\n");
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         PropertiesUtil.loadFromFile(properties, file);
         Assert.assertEquals("b", properties.get("a"));
     }
 
     @Test
     public void loadPropertiesFromFile() throws IOException {
-        File file = File.createTempFile("test", ".properties");
+        final File file = File.createTempFile("test", ".properties");
         FileUtils.writeStringToFile(file, "a=b\nc=d\n");
-        Properties properties = PropertiesUtil.loadFromFile(file);
+        final Properties properties = PropertiesUtil.loadFromFile(file);
         Assert.assertEquals("b", properties.get("a"));
     }
 
     @Test
     public void processConfigFile() throws IOException {
-        File tempFile = File.createTempFile("temp", ".properties");
+        final File tempFile = File.createTempFile("temp", ".properties");
         FileUtils.writeStringToFile(tempFile, "a=b\nc=d\n");
-        Map<String, String> config = PropertiesUtil.processConfigFile(new String[] {tempFile.getAbsolutePath()});
+        final Map<String, String> config = PropertiesUtil.processConfigFile(new String[]{tempFile.getAbsolutePath()});
         Assert.assertEquals("b", config.get("a"));
         Assert.assertEquals("d", config.get("c"));
         tempFile.delete();

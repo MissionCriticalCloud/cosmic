@@ -19,11 +19,11 @@
 
 package com.cloud.agent.api;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.cloud.host.Host;
 import com.cloud.utils.Pair;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class PingRoutingWithNwGroupsCommand extends PingRoutingCommand {
     HashMap<String, Pair<Long, Long>> newGroupStates;
@@ -33,7 +33,7 @@ public class PingRoutingWithNwGroupsCommand extends PingRoutingCommand {
     }
 
     public PingRoutingWithNwGroupsCommand(Host.Type type, long id, Map<String, HostVmStateReportEntry> hostVmStateReport,
-            HashMap<String, Pair<Long, Long>> nwGrpStates) {
+                                          HashMap<String, Pair<Long, Long>> nwGrpStates) {
         super(type, id, hostVmStateReport);
         newGroupStates = nwGrpStates;
     }

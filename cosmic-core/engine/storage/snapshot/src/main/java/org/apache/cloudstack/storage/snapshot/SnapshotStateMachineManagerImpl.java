@@ -17,8 +17,6 @@
 
 package org.apache.cloudstack.storage.snapshot;
 
-import javax.inject.Inject;
-
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Snapshot.Event;
 import com.cloud.storage.Snapshot.State;
@@ -28,13 +26,15 @@ import com.cloud.storage.listener.SnapshotStateListener;
 import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.utils.fsm.StateMachine2;
 
+import javax.inject.Inject;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class SnapshotStateMachineManagerImpl implements SnapshotStateMachineManager {
-    private StateMachine2<State, Event, SnapshotVO> stateMachine = new StateMachine2<State, Event, SnapshotVO>();
     @Inject
     protected SnapshotDao snapshotDao;
+    private StateMachine2<State, Event, SnapshotVO> stateMachine = new StateMachine2<State, Event, SnapshotVO>();
 
     public SnapshotStateMachineManagerImpl() {
         stateMachine.addTransition(Snapshot.State.Allocated, Event.CreateRequested, Snapshot.State.Creating);

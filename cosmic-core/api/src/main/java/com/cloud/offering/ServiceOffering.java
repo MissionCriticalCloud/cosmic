@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.offering;
 
-import java.util.Date;
-
 import org.apache.cloudstack.acl.InfrastructureEntity;
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
+
+import java.util.Date;
 
 /**
  * offered.
@@ -31,31 +31,6 @@ public interface ServiceOffering extends DiskOffering, InfrastructureEntity, Int
     public static final String routerDefaultOffUniqueName = "Cloud.Com-SoftwareRouter";
     public static final String elbVmDefaultOffUniqueName = "Cloud.Com-ElasticLBVm";
     public static final String internalLbVmDefaultOffUniqueName = "Cloud.Com-InternalLBVm";
-
-    public enum StorageType {
-        local, shared
-    }
-
-    @Override
-    String getDisplayText();
-
-    @Override
-    Date getCreated();
-
-    @Override
-    String getTags();
-
-    /**
-     * @return user readable description
-     */
-    @Override
-    String getName();
-
-    /**
-     * @return is this a system service offering
-     */
-    @Override
-    boolean getSystemUse();
 
     /**
      * @return # of cpu.
@@ -107,6 +82,27 @@ public interface ServiceOffering extends DiskOffering, InfrastructureEntity, Int
     Long getDomainId();
 
     /**
+     * @return user readable description
+     */
+    @Override
+    String getName();
+
+    /**
+     * @return is this a system service offering
+     */
+    @Override
+    boolean getSystemUse();
+
+    @Override
+    String getDisplayText();
+
+    @Override
+    String getTags();
+
+    @Override
+    Date getCreated();
+
+    /**
      * @return tag that should be present on the host needed, optional parameter
      */
     String getHostTag();
@@ -118,4 +114,8 @@ public interface ServiceOffering extends DiskOffering, InfrastructureEntity, Int
     String getDeploymentPlanner();
 
     boolean isDynamic();
+
+    public enum StorageType {
+        local, shared
+    }
 }

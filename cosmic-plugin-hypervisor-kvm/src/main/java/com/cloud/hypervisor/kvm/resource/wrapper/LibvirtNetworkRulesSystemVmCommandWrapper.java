@@ -17,23 +17,23 @@ import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = NetworkRulesSystemVmCommand.class)
 public final class LibvirtNetworkRulesSystemVmCommandWrapper
-    extends CommandWrapper<NetworkRulesSystemVmCommand, Answer, LibvirtComputingResource> {
+        extends CommandWrapper<NetworkRulesSystemVmCommand, Answer, LibvirtComputingResource> {
 
-  private static final Logger s_logger = LoggerFactory.getLogger(LibvirtNetworkRulesSystemVmCommandWrapper.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(LibvirtNetworkRulesSystemVmCommandWrapper.class);
 
-  @Override
-  public Answer execute(final NetworkRulesSystemVmCommand command,
-      final LibvirtComputingResource libvirtComputingResource) {
-    boolean success = false;
-    try {
-      final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();
+    @Override
+    public Answer execute(final NetworkRulesSystemVmCommand command,
+                          final LibvirtComputingResource libvirtComputingResource) {
+        boolean success = false;
+        try {
+            final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();
 
-      final Connect conn = libvirtUtilitiesHelper.getConnectionByVmName(command.getVmName());
-      success = libvirtComputingResource.configureDefaultNetworkRulesForSystemVm(conn, command.getVmName());
-    } catch (final LibvirtException e) {
-      s_logger.trace("Ignoring libvirt error.", e);
+            final Connect conn = libvirtUtilitiesHelper.getConnectionByVmName(command.getVmName());
+            success = libvirtComputingResource.configureDefaultNetworkRulesForSystemVm(conn, command.getVmName());
+        } catch (final LibvirtException e) {
+            s_logger.trace("Ignoring libvirt error.", e);
+        }
+
+        return new Answer(command, success, "");
     }
-
-    return new Answer(command, success, "");
-  }
 }

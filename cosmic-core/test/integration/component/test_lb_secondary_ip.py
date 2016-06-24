@@ -29,8 +29,9 @@
 """
 
 # Import Local Modules
-from nose.plugins.attrib import attr
+from marvin.cloudstackAPI import (restartNetwork)
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+from marvin.codes import PASS
 from marvin.lib.base import (
     Account,
     ServiceOffering,
@@ -39,8 +40,6 @@ from marvin.lib.base import (
     NIC,
     PublicIPAddress,
     Router,
-    NetworkOffering,
-    Network,
     FireWallRule,
     NATRule
 )
@@ -50,13 +49,11 @@ from marvin.lib.common import (get_domain,
                                verifyNetworkState,
                                wait_for_cleanup
                                )
-
 from marvin.lib.utils import (validateList,
                               random_gen,
                               cleanup_resources)
-from marvin.cloudstackAPI import (restartNetwork)
 from marvin.sshClient import SshClient
-from marvin.codes import PASS
+from nose.plugins.attrib import attr
 
 
 def IsIpAssignedToLoadBalancerRule(self, lbrule, iplist):
@@ -89,7 +86,6 @@ def IsIpAssignedToLoadBalancerRule(self, lbrule, iplist):
 
 
 class TestAssignLBRule(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cloudstackTestClient = super(TestAssignLBRule,
@@ -187,8 +183,8 @@ class TestAssignLBRule(cloudstackTestCase):
             networkid=self.virtual_machine.nic[0].networkid,
             domainid=self.account.domainid)
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.virtual_machine.nic[0].ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.virtual_machine.nic[0].ipaddress) }]
 
         lb_rule.assign(
             self.apiclient,
@@ -241,8 +237,8 @@ class TestAssignLBRule(cloudstackTestCase):
             networkid=self.virtual_machine.nic[0].networkid,
             domainid=self.account.domainid)
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(secondaryip.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(secondaryip.ipaddress) }]
 
         lb_rule.assign(
             self.apiclient,
@@ -295,10 +291,10 @@ class TestAssignLBRule(cloudstackTestCase):
             networkid=self.virtual_machine.nic[0].networkid,
             domainid=self.account.domainid)
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.virtual_machine.nic[0].ipaddress)},
-                     {"vmid": str(self.virtual_machine.id),
-                      "vmip": str(secondaryip.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.virtual_machine.nic[0].ipaddress) },
+                     { "vmid": str(self.virtual_machine.id),
+                       "vmip": str(secondaryip.ipaddress) }]
 
         lb_rule.assign(
             self.apiclient,
@@ -365,14 +361,14 @@ class TestAssignLBRule(cloudstackTestCase):
             networkid=self.virtual_machine.nic[0].networkid,
             domainid=self.account.domainid)
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.virtual_machine.nic[0].ipaddress)},
-                     {"vmid": str(self.virtual_machine.id),
-                      "vmip": str(secondaryip_vm1.ipaddress)},
-                     {"vmid": str(self.virtual_machine2.id),
-                      "vmip": str(self.virtual_machine2.nic[0].ipaddress)},
-                     {"vmid": str(self.virtual_machine2.id),
-                      "vmip": str(secondaryip_vm2.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.virtual_machine.nic[0].ipaddress) },
+                     { "vmid": str(self.virtual_machine.id),
+                       "vmip": str(secondaryip_vm1.ipaddress) },
+                     { "vmid": str(self.virtual_machine2.id),
+                       "vmip": str(self.virtual_machine2.nic[0].ipaddress) },
+                     { "vmid": str(self.virtual_machine2.id),
+                       "vmip": str(secondaryip_vm2.ipaddress) }]
 
         lb_rule.assign(
             self.apiclient,
@@ -410,7 +406,6 @@ class TestAssignLBRule(cloudstackTestCase):
 
 
 class TestFailureScenarios(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cloudstackTestClient = super(TestFailureScenarios,
@@ -509,8 +504,8 @@ class TestFailureScenarios(cloudstackTestCase):
             networkid=self.virtual_machine.nic[0].networkid,
             domainid=self.account.domainid)
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id) + random_gen(),
-                      "vmip": str(secondaryip.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id) + random_gen(),
+                       "vmip": str(secondaryip.ipaddress) }]
 
         with self.assertRaises(Exception):
             lb_rule.assign(self.apiclient,
@@ -547,8 +542,8 @@ class TestFailureScenarios(cloudstackTestCase):
             networkid=self.virtual_machine.nic[0].networkid,
             domainid=self.account.domainid)
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(secondaryip.ipaddress) + random_gen()}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(secondaryip.ipaddress) + random_gen() }]
 
         with self.assertRaises(Exception):
             lb_rule.assign(self.apiclient,
@@ -603,8 +598,8 @@ class TestFailureScenarios(cloudstackTestCase):
             networkid=self.virtual_machine.nic[0].networkid,
             domainid=self.account.domainid)
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(secondaryip.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(secondaryip.ipaddress) }]
 
         lb_rule1.assign(self.apiclient,
                         vmidipmap=vmidipmap)
@@ -650,8 +645,8 @@ class TestFailureScenarios(cloudstackTestCase):
             networkid=self.virtual_machine.nic[0].networkid,
             domainid=self.account.domainid)
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(secondaryip.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(secondaryip.ipaddress) }]
 
         lb_rule1.assign(self.apiclient,
                         vmidipmap=vmidipmap)
@@ -667,7 +662,6 @@ class TestFailureScenarios(cloudstackTestCase):
 
 
 class TestListLBRuleInstances(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cloudstackTestClient = super(TestListLBRuleInstances,
@@ -767,8 +761,8 @@ class TestListLBRuleInstances(cloudstackTestCase):
             networkid=self.virtual_machine.nic[0].networkid,
             domainid=self.account.domainid)
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(secondaryip.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(secondaryip.ipaddress) }]
 
         lb_rule.assign(self.apiclient,
                        vmidipmap=vmidipmap)
@@ -788,7 +782,7 @@ class TestListLBRuleInstances(cloudstackTestCase):
                          "lbruleinstances list validation failed")
 
         self.assertEqual(str(lbruleinstances[0].lbvmipaddresses[
-                         0]), secondaryip.ipaddress, "IP address in lbruleinstances list not matching\
+                                 0]), secondaryip.ipaddress, "IP address in lbruleinstances list not matching\
                           with secondary ip assigned to lb rule")
 
         return
@@ -825,8 +819,8 @@ class TestListLBRuleInstances(cloudstackTestCase):
             networkid=self.virtual_machine.nic[0].networkid,
             domainid=self.account.domainid)
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(secondaryip.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(secondaryip.ipaddress) }]
 
         lb_rule.assign(self.apiclient,
                        vmidipmap=vmidipmap)
@@ -852,7 +846,6 @@ class TestListLBRuleInstances(cloudstackTestCase):
 
 
 class TestLbRuleFunctioning(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cloudstackTestClient = super(TestLbRuleFunctioning,
@@ -1000,8 +993,8 @@ class TestLbRuleFunctioning(cloudstackTestCase):
         # 4. Assign load balancer rule to secondary IP
         # 5. Try to SSH to VM using the public IP"""
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.secondaryip.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.secondaryip.ipaddress) }]
 
         self.lb_rule.assign(self.apiclient,
                             vmidipmap=vmidipmap)
@@ -1035,8 +1028,8 @@ class TestLbRuleFunctioning(cloudstackTestCase):
         # 7. Try to list load balancer rule, the operation should fail
         # 8. Try to SSH to VM using the public IP, the operation should fail"""
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.secondaryip.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.secondaryip.ipaddress) }]
 
         self.lb_rule.assign(self.apiclient,
                             vmidipmap=vmidipmap)
@@ -1080,8 +1073,8 @@ class TestLbRuleFunctioning(cloudstackTestCase):
         # 6. Delete the LB rule
         # 7. Try to SSH to VM using the public IP, operation should fail"""
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.secondaryip.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.secondaryip.ipaddress) }]
 
         self.lb_rule.assign(self.apiclient,
                             vmidipmap=vmidipmap)
@@ -1122,10 +1115,10 @@ class TestLbRuleFunctioning(cloudstackTestCase):
         # 6. remove the secondary ip of vm from the load balancer rule
         # 7. try to ssh to vm using the public ip, it should succeed"""
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.secondaryip.ipaddress)},
-                     {"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.virtual_machine.nic[0].ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.secondaryip.ipaddress) },
+                     { "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.virtual_machine.nic[0].ipaddress) }]
 
         self.lb_rule.assign(self.apiclient,
                             vmidipmap=vmidipmap)
@@ -1144,8 +1137,8 @@ class TestLbRuleFunctioning(cloudstackTestCase):
         except Exception as e:
             self.fail("Exception during SSH : %s" % e)
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.secondaryip.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.secondaryip.ipaddress) }]
 
         self.lb_rule.remove(self.apiclient,
                             vmidipmap=vmidipmap)
@@ -1173,10 +1166,10 @@ class TestLbRuleFunctioning(cloudstackTestCase):
         # 6. Remove the primary ip of vm from the load balancer rule
         # 7. Try to ssh to vm using the public ip, it should succeed"""
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.secondaryip.ipaddress)},
-                     {"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.virtual_machine.nic[0].ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.secondaryip.ipaddress) },
+                     { "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.virtual_machine.nic[0].ipaddress) }]
 
         self.lb_rule.assign(self.apiclient,
                             vmidipmap=vmidipmap)
@@ -1195,8 +1188,8 @@ class TestLbRuleFunctioning(cloudstackTestCase):
         except Exception as e:
             self.fail("Exception during SSH : %s" % e)
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.virtual_machine.nic[0].ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.virtual_machine.nic[0].ipaddress) }]
 
         self.lb_rule.remove(self.apiclient,
                             vmidipmap=vmidipmap)
@@ -1226,8 +1219,8 @@ class TestLbRuleFunctioning(cloudstackTestCase):
         #    list should be empty
         # 8. Try to SSH to VM using the public IP, the opeation should fail"""
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.secondaryip.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.secondaryip.ipaddress) }]
 
         self.lb_rule.assign(self.apiclient,
                             vmidipmap=vmidipmap)
@@ -1276,8 +1269,8 @@ class TestLbRuleFunctioning(cloudstackTestCase):
         # 7 Recover the VM
         # 8.Try to list the LB rule, it should be present"""
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.secondaryip.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.secondaryip.ipaddress) }]
 
         self.lb_rule.assign(self.apiclient,
                             vmidipmap=vmidipmap)
@@ -1310,7 +1303,7 @@ class TestLbRuleFunctioning(cloudstackTestCase):
                          "lbruleinstances list validation failed")
 
         self.assertEqual(str(lbruleinstances[0].lbvmipaddresses[
-                         0]), self.secondaryip.ipaddress, "IP address in lbruleinstances list not matching\
+                                 0]), self.secondaryip.ipaddress, "IP address in lbruleinstances list not matching\
                           with secondary ip assigned to lb rule")
         return
 
@@ -1327,8 +1320,8 @@ class TestLbRuleFunctioning(cloudstackTestCase):
         # 6. Update the algorithm of LB rule as leastconn
         # 7. Try to SSH to VM, it should succeed"""
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.secondaryip.ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.secondaryip.ipaddress) }]
 
         self.lb_rule.assign(self.apiclient,
                             vmidipmap=vmidipmap)
@@ -1360,7 +1353,6 @@ class TestLbRuleFunctioning(cloudstackTestCase):
 
 
 class TestNetworkOperations(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cloudstackTestClient = super(TestNetworkOperations,
@@ -1510,10 +1502,10 @@ class TestNetworkOperations(cloudstackTestCase):
         # 7. List the LB rule, it should be present
         # 8. Try to SSH to VM, it should succeed"""
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.secondaryip.ipaddress)},
-                     {"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.virtual_machine.nic[0].ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.secondaryip.ipaddress) },
+                     { "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.virtual_machine.nic[0].ipaddress) }]
 
         self.lb_rule.assign(self.apiclient,
                             vmidipmap=vmidipmap)
@@ -1576,10 +1568,10 @@ class TestNetworkOperations(cloudstackTestCase):
         # 7. List the LB rule, it should be present
         # 8. Try to SSH to VM, it should succeed"""
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.secondaryip.ipaddress)},
-                     {"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.virtual_machine.nic[0].ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.secondaryip.ipaddress) },
+                     { "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.virtual_machine.nic[0].ipaddress) }]
 
         self.lb_rule.assign(self.apiclient,
                             vmidipmap=vmidipmap)
@@ -1636,10 +1628,10 @@ class TestNetworkOperations(cloudstackTestCase):
         # 7. List the LB rule, it should be present
         # 8. Try to SSH to VM, it should succeed"""
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.secondaryip.ipaddress)},
-                     {"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.virtual_machine.nic[0].ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.secondaryip.ipaddress) },
+                     { "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.virtual_machine.nic[0].ipaddress) }]
 
         self.lb_rule.assign(self.apiclient,
                             vmidipmap=vmidipmap)
@@ -1701,10 +1693,10 @@ class TestNetworkOperations(cloudstackTestCase):
         # 11.Check the state of the router, it should be running
         # 12.Try to SSH to the VM using public IP, it should be successful"""
 
-        vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.secondaryip.ipaddress)},
-                     {"vmid": str(self.virtual_machine.id),
-                      "vmip": str(self.virtual_machine.nic[0].ipaddress)}]
+        vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.secondaryip.ipaddress) },
+                     { "vmid": str(self.virtual_machine.id),
+                       "vmip": str(self.virtual_machine.nic[0].ipaddress) }]
 
         self.lb_rule.assign(self.apiclient,
                             vmidipmap=vmidipmap)

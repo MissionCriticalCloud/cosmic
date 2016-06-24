@@ -17,12 +17,12 @@
 
 package org.apache.cloudstack.region.gslb;
 
-import java.util.List;
-
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -58,5 +58,4 @@ public class GlobalLoadBalancerLbRuleMapDaoImpl extends GenericDaoBase<GlobalLoa
         sc.setParameters("loadBalancerId", lbRuleId);
         return findOneBy(sc);
     }
-
 }

@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.network.LBHealthCheckPolicyVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface LBHealthCheckPolicyDao extends GenericDao<LBHealthCheckPolicyVO, Long> {
     void remove(long loadBalancerId);

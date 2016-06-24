@@ -44,5 +44,4 @@ public class StopAnswer extends RebootAnswer {
     public String getPlatform() {
         return platform;
     }
-
 }

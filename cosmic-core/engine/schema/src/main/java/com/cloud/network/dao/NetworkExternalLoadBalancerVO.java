@@ -16,8 +16,8 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,38 +25,31 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * NetworkExternalLoadBalancerVO contains mapping of a network and the external load balancer device id assigned to the network
-  */
+ */
 
 @Entity
 @Table(name = "network_external_lb_device_map")
 public class NetworkExternalLoadBalancerVO implements InternalIdentity {
 
+    @Column(name = GenericDao.CREATED_COLUMN)
+    Date created;
+    @Column(name = GenericDao.REMOVED_COLUMN)
+    Date removed;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "network_id")
     private long networkId;
-
     @Column(name = "external_load_balancer_device_id")
     private long externalLBDeviceId;
-
-    @Column(name = GenericDao.CREATED_COLUMN)
-    Date created;
-
-    @Column(name = GenericDao.REMOVED_COLUMN)
-    Date removed;
 
     public NetworkExternalLoadBalancerVO(long networkId, long externalLBDeviceID) {
         this.networkId = networkId;

@@ -19,19 +19,20 @@
 
 package com.cloud.network.resource.wrapper;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CheckHealthCommand;
 import com.cloud.network.nicira.ControlClusterStatus;
 import com.cloud.network.nicira.NiciraNvpApi;
 import com.cloud.network.nicira.NiciraNvpApiException;
 import com.cloud.network.resource.NiciraNvpResource;
+
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class NiciraCheckHealthCommandWrapperTest {
 
@@ -74,5 +75,4 @@ public class NiciraCheckHealthCommandWrapperTest {
 
         assertThat(answer.getResult(), equalTo(true));
     }
-
 }

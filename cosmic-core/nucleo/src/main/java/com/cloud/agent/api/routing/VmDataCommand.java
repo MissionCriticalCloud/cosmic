@@ -19,11 +19,11 @@
 
 package com.cloud.agent.api.routing;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.agent.api.LogLevel;
 import com.cloud.agent.api.LogLevel.Log4jLevel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class VmDataCommand extends NetworkElementCommand {
 
@@ -36,17 +36,8 @@ public class VmDataCommand extends NetworkElementCommand {
     protected VmDataCommand() {
     }
 
-    @Override
-    public boolean executeInSequence() {
-        return executeInSequence;
-    }
-
     public VmDataCommand(String vmIpAddress, boolean executeInSequence) {
         this(vmIpAddress, null, executeInSequence);
-    }
-
-    public String getVmName() {
-        return vmName;
     }
 
     public VmDataCommand(String vmIpAddress, String vmName, boolean executeInSequence) {
@@ -61,6 +52,15 @@ public class VmDataCommand extends NetworkElementCommand {
         this.vmData = new ArrayList<String[]>();
     }
 
+    @Override
+    public boolean executeInSequence() {
+        return executeInSequence;
+    }
+
+    public String getVmName() {
+        return vmName;
+    }
+
     public String getVmIpAddress() {
         return vmIpAddress;
     }
@@ -70,7 +70,6 @@ public class VmDataCommand extends NetworkElementCommand {
     }
 
     public void addVmData(String folder, String file, String contents) {
-        vmData.add(new String[] {folder, file, contents});
+        vmData.add(new String[]{folder, file, contents});
     }
-
 }

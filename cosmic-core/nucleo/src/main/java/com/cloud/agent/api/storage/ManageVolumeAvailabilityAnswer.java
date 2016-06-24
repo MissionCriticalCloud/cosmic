@@ -31,5 +31,4 @@ public class ManageVolumeAvailabilityAnswer extends Answer {
     public ManageVolumeAvailabilityAnswer(Command command, boolean success, String details) {
         super(command, success, details);
     }
-
 }

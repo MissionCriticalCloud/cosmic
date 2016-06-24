@@ -16,23 +16,22 @@
 // under the License.
 package com.cloud.usage.parser;
 
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.usage.UsageIPAddressVO;
 import com.cloud.usage.UsageVO;
 import com.cloud.usage.dao.UsageDao;
 import com.cloud.usage.dao.UsageIPAddressDao;
 import com.cloud.user.AccountVO;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.usage.UsageTypes;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.text.DecimalFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -48,12 +47,6 @@ public class IPAddressUsageParser {
     private UsageDao _usageDao;
     @Inject
     private UsageIPAddressDao _usageIPAddressDao;
-
-    @PostConstruct
-    void init() {
-        s_usageDao = _usageDao;
-        s_usageIPAddressDao = _usageIPAddressDao;
-    }
 
     public static boolean parse(AccountVO account, Date startDate, Date endDate) {
         if (s_logger.isDebugEnabled()) {
@@ -106,7 +99,8 @@ public class IPAddressUsageParser {
                 continue;
             }
 
-            long currentDuration = (IpReleaseDeleteDate.getTime() - IpAssignDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to find total number of millis to charge)
+            long currentDuration = (IpReleaseDeleteDate.getTime() - IpAssignDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to
+            // find total number of millis to charge)
 
             updateIpUsageData(usageMap, key, usageIp.getId(), currentDuration);
         }
@@ -138,7 +132,7 @@ public class IPAddressUsageParser {
     }
 
     private static void createUsageRecord(long zoneId, long runningTime, Date startDate, Date endDate, AccountVO account, long ipId, String ipAddress,
-        boolean isSourceNat, boolean isSystem) {
+                                          boolean isSourceNat, boolean isSystem) {
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Total usage time " + runningTime + "ms");
         }
@@ -150,7 +144,7 @@ public class IPAddressUsageParser {
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Creating IP usage record with id: " + ipId + ", usage: " + usageDisplay + ", startDate: " + startDate + ", endDate: " + endDate +
-                ", for account: " + account.getId());
+                    ", for account: " + account.getId());
         }
 
         String usageDesc = "IPAddress: " + ipAddress;
@@ -158,9 +152,15 @@ public class IPAddressUsageParser {
         // Create the usage record
 
         UsageVO usageRecord =
-            new UsageVO(zoneId, account.getAccountId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", UsageTypes.IP_ADDRESS, new Double(usage), ipId,
-                (isSystem ? 1 : 0), (isSourceNat ? "SourceNat" : ""), startDate, endDate);
+                new UsageVO(zoneId, account.getAccountId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", UsageTypes.IP_ADDRESS, new Double(usage), ipId,
+                        (isSystem ? 1 : 0), (isSourceNat ? "SourceNat" : ""), startDate, endDate);
         s_usageDao.persist(usageRecord);
+    }
+
+    @PostConstruct
+    void init() {
+        s_usageDao = _usageDao;
+        s_usageIPAddressDao = _usageIPAddressDao;
     }
 
     private static class IpInfo {

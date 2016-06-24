@@ -51,20 +51,6 @@ public class Profiler {
         return -1;
     }
 
-    /**
-     * 1 millisecond = 1e+6 nanoseconds
-     * 1 second = 1000 millisecond = 1e+9 nanoseconds
-     *
-     * @return the duration in milliseconds.
-     */
-    public long getDurationInMillis() {
-        if (startTickNanoSeconds != null && stopTickNanoSeconds != null) {
-            return (stopTickNanoSeconds - startTickNanoSeconds) / (long)Math.pow(MILLIS_FACTOR, EXPONENT);
-        }
-
-        return -1;
-    }
-
     public boolean isStarted() {
         return startTickNanoSeconds != null;
     }
@@ -84,5 +70,19 @@ public class Profiler {
         }
 
         return "Done. Duration: " + getDurationInMillis() + "ms";
+    }
+
+    /**
+     * 1 millisecond = 1e+6 nanoseconds
+     * 1 second = 1000 millisecond = 1e+9 nanoseconds
+     *
+     * @return the duration in milliseconds.
+     */
+    public long getDurationInMillis() {
+        if (startTickNanoSeconds != null && stopTickNanoSeconds != null) {
+            return (stopTickNanoSeconds - startTickNanoSeconds) / (long) Math.pow(MILLIS_FACTOR, EXPONENT);
+        }
+
+        return -1;
     }
 }

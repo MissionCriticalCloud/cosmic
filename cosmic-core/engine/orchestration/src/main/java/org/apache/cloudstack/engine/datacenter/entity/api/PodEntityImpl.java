@@ -18,17 +18,16 @@
  */
 package org.apache.cloudstack.engine.datacenter.entity.api;
 
+import com.cloud.org.Cluster;
+import com.cloud.org.Grouping.AllocationState;
+import com.cloud.utils.fsm.NoTransitionException;
+import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
+import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineHostPodVO;
+
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import com.cloud.org.Cluster;
-import com.cloud.org.Grouping.AllocationState;
-import com.cloud.utils.fsm.NoTransitionException;
-
-import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
-import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineHostPodVO;
 
 public class PodEntityImpl implements PodEntity {
 
@@ -87,6 +86,20 @@ public class PodEntityImpl implements PodEntity {
     }
 
     @Override
+    public void persist() {
+        manager.savePod(podVO);
+    }
+
+    @Override
+    public String getName() {
+        return podVO.getName();
+    }
+
+    public void setName(String name) {
+        podVO.setName(name);
+    }
+
+    @Override
     public String getUuid() {
         return podVO.getUuid();
     }
@@ -124,7 +137,39 @@ public class PodEntityImpl implements PodEntity {
     }
 
     @Override
+    public Map<String, String> getDetails() {
+        return null;
+    }
+
+    @Override
+    public void addDetail(String name, String value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void delDetail(String name, String value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void updateDetail(String name, String value) {
+
+    }
+
+    @Override
     public List<Method> getApplicableActions() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void setOwner(String owner) {
+        podVO.setOwner(owner);
+    }
+
+    @Override
+    public List<Cluster> listClusters() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -150,11 +195,6 @@ public class PodEntityImpl implements PodEntity {
     }
 
     @Override
-    public String getName() {
-        return podVO.getName();
-    }
-
-    @Override
     public AllocationState getAllocationState() {
         return podVO.getAllocationState();
     }
@@ -163,47 +203,4 @@ public class PodEntityImpl implements PodEntity {
     public boolean getExternalDhcp() {
         return podVO.getExternalDhcp();
     }
-
-    @Override
-    public List<Cluster> listClusters() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void persist() {
-        manager.savePod(podVO);
-
-    }
-
-    @Override
-    public Map<String, String> getDetails() {
-        return null;
-    }
-
-    @Override
-    public void addDetail(String name, String value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void delDetail(String name, String value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void updateDetail(String name, String value) {
-
-    }
-
-    public void setOwner(String owner) {
-        podVO.setOwner(owner);
-    }
-
-    public void setName(String name) {
-        podVO.setName(name);
-    }
-
 }

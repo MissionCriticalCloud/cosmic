@@ -18,14 +18,14 @@
  */
 package org.apache.cloudstack.api.response;
 
+import com.cloud.serializer.Param;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
+
 import java.net.URL;
 import java.util.UUID;
 
-import com.cloud.serializer.Param;
 import com.google.gson.annotations.SerializedName;
-
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
 
 public class GetUploadParamsResponse extends BaseResponse {
 

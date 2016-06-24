@@ -19,9 +19,8 @@
 
 package com.cloud.utils;
 
-import org.junit.Test;
-
 import junit.framework.Assert;
+import org.junit.Test;
 
 public class UriUtilsTest {
     @Test

@@ -16,13 +16,13 @@
 // under the License.
 package com.cloud.network.security.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.network.security.SecurityGroupWork;
 import com.cloud.network.security.SecurityGroupWork.Step;
 import com.cloud.network.security.SecurityGroupWorkVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Date;
+import java.util.List;
 
 public interface SecurityGroupWorkDao extends GenericDao<SecurityGroupWorkVO, Long> {
     SecurityGroupWork findByVmId(long vmId, boolean taken);
@@ -42,5 +42,4 @@ public interface SecurityGroupWorkDao extends GenericDao<SecurityGroupWorkVO, Lo
     List<SecurityGroupWorkVO> findAndCleanupUnfinishedWork(Date timeBefore);
 
     List<SecurityGroupWorkVO> findScheduledWork();
-
 }

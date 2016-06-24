@@ -22,7 +22,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.GuestVlan;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -33,6 +32,7 @@ import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.GuestVlanRangeResponse;
 import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
 import org.apache.cloudstack.api.response.ProjectResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,17 +57,17 @@ public class DedicateGuestVlanRangeCmd extends BaseCmd {
     private Long projectId;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               required = true,
-               description = "domain ID of the account owning a VLAN")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            required = true,
+            description = "domain ID of the account owning a VLAN")
     private Long domainId;
 
     @Parameter(name = ApiConstants.PHYSICAL_NETWORK_ID,
-               type = CommandType.UUID,
-               entityType = PhysicalNetworkResponse.class,
-               required = true,
-               description = "physical network ID of the vlan")
+            type = CommandType.UUID,
+            entityType = PhysicalNetworkResponse.class,
+            required = true,
+            description = "physical network ID of the vlan")
     private Long physicalNetworkId;
 
     /////////////////////////////////////////////////////
@@ -99,16 +99,6 @@ public class DedicateGuestVlanRangeCmd extends BaseCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
     public void execute() throws ResourceUnavailableException, ResourceAllocationException {
         GuestVlan result = _networkService.dedicateGuestVlanRange(this);
         if (result != null) {
@@ -121,4 +111,13 @@ public class DedicateGuestVlanRangeCmd extends BaseCmd {
         }
     }
 
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
+    }
 }

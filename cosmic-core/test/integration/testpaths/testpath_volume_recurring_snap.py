@@ -16,12 +16,9 @@
 # under the License.
 """ Test cases for VM/Volume recurring snapshot Test Path
 """
-from nose.plugins.attrib import attr
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import (
-    cleanup_resources,
-    validateList
-)
+from marvin.codes import PASS
 from marvin.lib.base import (
     Account,
     ServiceOffering,
@@ -40,14 +37,14 @@ from marvin.lib.common import (
     list_snapshot_policy,
     is_snapshot_on_nfs
 )
-
-from marvin.codes import PASS
-
-import time
+from marvin.lib.utils import (
+    cleanup_resources,
+    validateList
+)
+from nose.plugins.attrib import attr
 
 
 class TestVolumeRecurringSnapshot(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestVolumeRecurringSnapshot, cls).getClsTestClient()
@@ -67,9 +64,9 @@ class TestVolumeRecurringSnapshot(cloudstackTestCase):
         cls._cleanup = []
 
         if cls.hypervisor.lower() not in [
-                "vmware",
-                "kvm",
-                "xenserver"]:
+            "vmware",
+            "kvm",
+            "xenserver"]:
             raise unittest.SkipTest(
                 "Storage migration not supported on %s" %
                 cls.hypervisor)
@@ -150,7 +147,7 @@ class TestVolumeRecurringSnapshot(cloudstackTestCase):
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
-    @attr(tags=["advanced", "basic"],required_hardware="true")
+    @attr(tags=["advanced", "basic"], required_hardware="true")
     def test_01_volume_snapshot(self):
         """ Test Volume (root) Snapshot
         # 1. Create Hourly, Daily,Weekly recurring snapshot policy for ROOT disk and
@@ -895,7 +892,7 @@ class TestVolumeRecurringSnapshot(cloudstackTestCase):
                 self.zone.id,
                 data_snap_to_delete.id))
 
-    @attr(tags=["advanced", "basic"],required_hardware="true")
+    @attr(tags=["advanced", "basic"], required_hardware="true")
     def test_03_volume_rec_snapshot(self):
         """ Test Volume (root) Snapshot
         # 1. For snapshot.delta.max > maxsnaps verify that when number of snapshot exceeds

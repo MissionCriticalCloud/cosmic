@@ -24,24 +24,23 @@ import java.util.HashMap;
 public class ClusterVMMetaDataSyncAnswer extends Answer {
     private long _clusterId;
     private HashMap<String, String> _vmMetaDatum;
-    private boolean _isExecuted=false;
+    private boolean _isExecuted = false;
+
+    public ClusterVMMetaDataSyncAnswer(long clusterId, HashMap<String, String> vmMetaDatum) {
+        _clusterId = clusterId;
+        _vmMetaDatum = vmMetaDatum;
+        result = true;
+    }
 
     // this is here because a cron command answer is being sent twice
     //  AgentAttache.processAnswers
     //  AgentManagerImpl.notifyAnswersToMonitors
-    public boolean isExecuted(){
+    public boolean isExecuted() {
         return _isExecuted;
     }
 
-    public void setExecuted(){
+    public void setExecuted() {
         _isExecuted = true;
-    }
-
-
-    public ClusterVMMetaDataSyncAnswer(long clusterId, HashMap<String, String> vmMetaDatum){
-        _clusterId = clusterId;
-        _vmMetaDatum = vmMetaDatum;
-        result = true;
     }
 
     public long getClusterId() {
@@ -51,5 +50,4 @@ public class ClusterVMMetaDataSyncAnswer extends Answer {
     public HashMap<String, String> getVMMetaDatum() {
         return _vmMetaDatum;
     }
-
 }

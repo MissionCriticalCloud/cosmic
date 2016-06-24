@@ -18,9 +18,8 @@
  */
 package org.apache.cloudstack.engine.subsystem.api.storage;
 
-import org.junit.Test;
-
 import junit.framework.Assert;
+import org.junit.Test;
 
 public class ScopeTest {
 
@@ -54,5 +53,4 @@ public class ScopeTest {
         Assert.assertTrue(hostScope.isSameScope(hostScope2));
         Assert.assertFalse(hostScope.isSameScope(hostScope3));
     }
-
 }

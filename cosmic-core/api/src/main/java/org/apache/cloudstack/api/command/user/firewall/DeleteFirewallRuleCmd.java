@@ -20,7 +20,6 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.rules.FirewallRule;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -34,6 +33,7 @@ import org.apache.cloudstack.api.response.AccountResponse;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,14 +62,6 @@ public class DeleteFirewallRuleCmd extends BaseAsyncCmd {
         return id;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
     @Override
     public String getEventType() {
         return EventTypes.EVENT_FIREWALL_CLOSE;
@@ -81,16 +73,22 @@ public class DeleteFirewallRuleCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public long getEntityOwnerId() {
-        if (ownerId == null) {
-            FirewallRule rule = _entityMgr.findById(FirewallRule.class, id);
-            if (rule == null) {
-                throw new InvalidParameterValueException("Unable to find firewall rule by ID=" + id);
-            } else {
-                ownerId = _entityMgr.findById(FirewallRule.class, id).getAccountId();
-            }
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.FirewallRule;
+    }
+
+    @Override
+    public String getSyncObjType() {
+        return BaseAsyncCmd.networkSyncObject;
+    }
+
+    @Override
+    public Long getSyncObjId() {
+        FirewallRule fwlrule = _firewallService.getFirewallRule(id);
+        if (fwlrule != null) {
+            return fwlrule.getNetworkId();
         }
-        return ownerId;
+        return null;
     }
 
     @Override
@@ -106,21 +104,24 @@ public class DeleteFirewallRuleCmd extends BaseAsyncCmd {
         }
     }
 
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
     @Override
-    public String getSyncObjType() {
-        return BaseAsyncCmd.networkSyncObject;
+    public String getCommandName() {
+        return s_name;
     }
 
     @Override
-    public Long getSyncObjId() {
-        FirewallRule fwlrule = _firewallService.getFirewallRule(id);
-        if (fwlrule != null)
-            return fwlrule.getNetworkId();
-        return null;
-    }
-
-    @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.FirewallRule;
+    public long getEntityOwnerId() {
+        if (ownerId == null) {
+            FirewallRule rule = _entityMgr.findById(FirewallRule.class, id);
+            if (rule == null) {
+                throw new InvalidParameterValueException("Unable to find firewall rule by ID=" + id);
+            } else {
+                ownerId = _entityMgr.findById(FirewallRule.class, id).getAccountId();
+            }
+        }
+        return ownerId;
     }
 }

@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.user.vpn;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.RemoteAccessVpn;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -27,6 +26,7 @@ import org.apache.cloudstack.api.BaseAsyncCustomIdCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.AccountResponse;
 import org.apache.cloudstack.api.response.RemoteAccessVpnResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,8 @@ public class UpdateRemoteAccessVpnCmd extends BaseAsyncCustomIdCmd {
     @Parameter(name = ApiConstants.ACCOUNT_ID, type = CommandType.UUID, entityType = AccountResponse.class, expose = false)
     private Long ownerId;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the vpn to the end user or not", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the vpn to the end user or not", since = "4" +
+            ".4", authorized = {RoleType.Admin})
     private Boolean display;
 
     /////////////////////////////////////////////////////
@@ -60,24 +61,8 @@ public class UpdateRemoteAccessVpnCmd extends BaseAsyncCustomIdCmd {
     }
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public Boolean getDisplay() {
-        return display;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        if (ownerId == null) {
-            RemoteAccessVpn vpnEntity = _ravService.getRemoteAccessVpnById(id);
-            if (vpnEntity != null)
-                return vpnEntity.getAccountId();
-
-            throw new InvalidParameterValueException("The specified id is invalid");
-        }
-        return ownerId;
+    public String getEventType() {
+        return EventTypes.EVENT_REMOTE_ACCESS_VPN_UPDATE;
     }
 
     @Override
@@ -86,21 +71,37 @@ public class UpdateRemoteAccessVpnCmd extends BaseAsyncCustomIdCmd {
     }
 
     @Override
-    public String getEventType() {
-        return EventTypes.EVENT_REMOTE_ACCESS_VPN_UPDATE;
+    public void execute() {
+        RemoteAccessVpn result = _ravService.updateRemoteAccessVpn(id, this.getCustomId(), getDisplay());
+        RemoteAccessVpnResponse response = _responseGenerator.createRemoteAccessVpnResponse(result);
+        response.setResponseName(getCommandName());
+        this.setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        if (ownerId == null) {
+            RemoteAccessVpn vpnEntity = _ravService.getRemoteAccessVpnById(id);
+            if (vpnEntity != null) {
+                return vpnEntity.getAccountId();
+            }
+
+            throw new InvalidParameterValueException("The specified id is invalid");
+        }
+        return ownerId;
     }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
 
-    @Override
-    public void execute() {
-        RemoteAccessVpn result = _ravService.updateRemoteAccessVpn(id, this.getCustomId(), getDisplay());
-        RemoteAccessVpnResponse response = _responseGenerator.createRemoteAccessVpnResponse(result);
-        response.setResponseName(getCommandName());
-        this.setResponseObject(response);
-
+    public Boolean getDisplay() {
+        return display;
     }
 
     @Override

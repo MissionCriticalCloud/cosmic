@@ -17,19 +17,18 @@
 
 package org.apache.cloudstack.engine.datacenter.entity.api;
 
-import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.org.Cluster.ClusterType;
 import com.cloud.org.Grouping.AllocationState;
 import com.cloud.org.Managed.ManagedState;
 import com.cloud.utils.fsm.NoTransitionException;
-
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineClusterVO;
+
+import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class ClusterEntityImpl implements ClusterEntity {
 
@@ -90,6 +89,15 @@ public class ClusterEntityImpl implements ClusterEntity {
     @Override
     public void persist() {
         manager.saveCluster(clusterVO);
+    }
+
+    @Override
+    public String getName() {
+        return clusterVO.getName();
+    }
+
+    public void setName(String name) {
+        clusterVO.setName(name);
     }
 
     @Override
@@ -159,9 +167,8 @@ public class ClusterEntityImpl implements ClusterEntity {
         return null;
     }
 
-    @Override
-    public String getName() {
-        return clusterVO.getName();
+    public void setOwner(String owner) {
+        clusterVO.setOwner(owner);
     }
 
     @Override
@@ -193,13 +200,4 @@ public class ClusterEntityImpl implements ClusterEntity {
     public ManagedState getManagedState() {
         return clusterVO.getManagedState();
     }
-
-    public void setOwner(String owner) {
-        clusterVO.setOwner(owner);
-    }
-
-    public void setName(String name) {
-        clusterVO.setName(name);
-    }
-
 }

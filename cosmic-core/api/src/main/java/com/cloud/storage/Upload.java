@@ -16,12 +16,42 @@
 // under the License.
 package com.cloud.storage;
 
-import java.util.Date;
-
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
 
+import java.util.Date;
+
 public interface Upload extends InternalIdentity, Identity {
+
+    long getDataStoreId();
+
+    Date getCreated();
+
+    void setCreated(Date created);
+
+    Date getLastUpdated();
+
+    String getErrorString();
+
+    String getJobId();
+
+    int getUploadPercent();
+
+    Status getUploadState();
+
+    long getTypeId();
+
+    Type getType();
+
+    Mode getMode();
+
+    String getUploadUrl();
+
+    void setId(Long id);
+
+    String getInstallPath();
+
+    void setInstallPath(String installPath);
 
     public static enum Status {
         UNKNOWN,
@@ -46,35 +76,4 @@ public interface Upload extends InternalIdentity, Identity {
     public static enum Mode {
         FTP_UPLOAD, HTTP_DOWNLOAD
     }
-
-    long getDataStoreId();
-
-    Date getCreated();
-
-    Date getLastUpdated();
-
-    String getErrorString();
-
-    String getJobId();
-
-    int getUploadPercent();
-
-    Status getUploadState();
-
-    long getTypeId();
-
-    Type getType();
-
-    Mode getMode();
-
-    String getUploadUrl();
-
-    void setId(Long id);
-
-    void setCreated(Date created);
-
-    String getInstallPath();
-
-    void setInstallPath(String installPath);
-
 }

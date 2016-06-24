@@ -28,6 +28,7 @@ import com.cloud.network.nicira.NiciraNvpApiException;
 import com.cloud.network.resource.NiciraNvpResource;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,5 +60,4 @@ public class NiciraCheckHealthCommandWrapper extends CommandWrapper<CheckHealthC
     protected boolean clusterIsUnstable(final String clusterStatus) {
         return !CONTROL_CLUSTER_STATUS_IS_STABLE.equals(clusterStatus);
     }
-
 }

@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface LBStickinessPolicyDao extends GenericDao<LBStickinessPolicyVO, Long> {
     void remove(long loadBalancerId);

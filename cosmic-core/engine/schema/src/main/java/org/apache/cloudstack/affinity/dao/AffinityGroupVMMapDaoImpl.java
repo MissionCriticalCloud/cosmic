@@ -16,11 +16,6 @@
 // under the License.
 package org.apache.cloudstack.affinity.dao;
 
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDaoBase;
@@ -30,21 +25,23 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.TransactionLegacy;
-
 import org.apache.cloudstack.affinity.AffinityGroupVMMapVO;
 import org.apache.cloudstack.affinity.AffinityGroupVO;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.List;
+
 public class AffinityGroupVMMapDaoImpl extends GenericDaoBase<AffinityGroupVMMapVO, Long> implements AffinityGroupVMMapDao {
+    protected GenericSearchBuilder<AffinityGroupVMMapVO, Long> CountSGForVm;
+    @Inject
+    protected AffinityGroupDao _affinityGroupDao;
     private SearchBuilder<AffinityGroupVMMapVO> ListByVmId;
     private SearchBuilder<AffinityGroupVMMapVO> ListByVmIdGroupId;
-    protected GenericSearchBuilder<AffinityGroupVMMapVO, Long> CountSGForVm;
     private GenericSearchBuilder<AffinityGroupVMMapVO, Long> ListVmIdByAffinityGroup;
     private SearchBuilder<AffinityGroupVMMapVO> ListByAffinityGroup;
     private SearchBuilder<AffinityGroupVMMapVO> ListByVmIdType;
     private GenericSearchBuilder<AffinityGroupVMMapVO, Long> ListAffinityGroupIdByVm;
-
-    @Inject
-    protected AffinityGroupDao _affinityGroupDao;
 
     public AffinityGroupVMMapDaoImpl() {
     }
@@ -89,13 +86,6 @@ public class AffinityGroupVMMapDaoImpl extends GenericDaoBase<AffinityGroupVMMap
     }
 
     @Override
-    public List<AffinityGroupVMMapVO> listByAffinityGroup(long affinityGroupId) {
-        SearchCriteria<AffinityGroupVMMapVO> sc = ListByAffinityGroup.create();
-        sc.setParameters("affinityGroupId", affinityGroupId);
-        return listBy(sc);
-    }
-
-    @Override
     public List<AffinityGroupVMMapVO> listByInstanceId(long vmId) {
         SearchCriteria<AffinityGroupVMMapVO> sc = ListByVmId.create();
         sc.setParameters("instanceId", vmId);
@@ -110,10 +100,10 @@ public class AffinityGroupVMMapDaoImpl extends GenericDaoBase<AffinityGroupVMMap
     }
 
     @Override
-    public int deleteVM(long instanceId) {
-        SearchCriteria<AffinityGroupVMMapVO> sc = ListByVmId.create();
-        sc.setParameters("instanceId", instanceId);
-        return super.expunge(sc);
+    public List<AffinityGroupVMMapVO> listByAffinityGroup(long affinityGroupId) {
+        SearchCriteria<AffinityGroupVMMapVO> sc = ListByAffinityGroup.create();
+        sc.setParameters("affinityGroupId", affinityGroupId);
+        return listBy(sc);
     }
 
     @Override
@@ -139,18 +129,18 @@ public class AffinityGroupVMMapDaoImpl extends GenericDaoBase<AffinityGroupVMMap
     }
 
     @Override
+    public int deleteVM(long instanceId) {
+        SearchCriteria<AffinityGroupVMMapVO> sc = ListByVmId.create();
+        sc.setParameters("instanceId", instanceId);
+        return super.expunge(sc);
+    }
+
+    @Override
     public List<AffinityGroupVMMapVO> findByVmIdType(long instanceId, String type) {
         SearchCriteria<AffinityGroupVMMapVO> sc = ListByVmIdType.create();
         sc.setParameters("instanceId", instanceId);
         sc.setJoinParameters("groupSearch", "type", type);
         return listBy(sc);
-    }
-
-    @Override
-    public List<Long> listAffinityGroupIdsByVmId(long instanceId) {
-        SearchCriteria<Long> sc = ListAffinityGroupIdByVm.create();
-        sc.setParameters("instanceId", instanceId);
-        return customSearchIncludingRemoved(sc, null);
     }
 
     @Override
@@ -168,6 +158,12 @@ public class AffinityGroupVMMapDaoImpl extends GenericDaoBase<AffinityGroupVMMap
         }
 
         txn.commit();
+    }
 
+    @Override
+    public List<Long> listAffinityGroupIdsByVmId(long instanceId) {
+        SearchCriteria<Long> sc = ListAffinityGroupIdByVm.create();
+        sc.setParameters("instanceId", instanceId);
+        return customSearchIncludingRemoved(sc, null);
     }
 }

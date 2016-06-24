@@ -17,9 +17,9 @@
 package org.apache.cloudstack.framework.config;
 
 import com.cloud.utils.exception.CloudRuntimeException;
-import com.google.common.testing.EqualsTester;
-
 import org.apache.cloudstack.framework.config.ConfigKey.Scope;
+
+import com.google.common.testing.EqualsTester;
 import org.junit.Assert;
 import org.junit.Test;
 

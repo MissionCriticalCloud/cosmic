@@ -1068,7 +1068,7 @@ class TestVolumes(cloudstackTestCase):
         """
         dom = Domain.create(
             self.apiclient,
-            services={},
+            services={ },
             name="NROOT",
             parentdomainid=self.domain.id
         )

@@ -16,23 +16,22 @@
 // under the License.
 package com.cloud.usage.parser;
 
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.usage.UsageLoadBalancerPolicyVO;
 import com.cloud.usage.UsageVO;
 import com.cloud.usage.dao.UsageDao;
 import com.cloud.usage.dao.UsageLoadBalancerPolicyDao;
 import com.cloud.user.AccountVO;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.usage.UsageTypes;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.text.DecimalFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -48,12 +47,6 @@ public class LoadBalancerUsageParser {
     private UsageDao _usageDao;
     @Inject
     private UsageLoadBalancerPolicyDao _usageLoadBalancerPolicyDao;
-
-    @PostConstruct
-    void init() {
-        s_usageDao = _usageDao;
-        s_usageLoadBalancerPolicyDao = _usageLoadBalancerPolicyDao;
-    }
 
     public static boolean parse(AccountVO account, Date startDate, Date endDate) {
         if (s_logger.isDebugEnabled()) {
@@ -103,7 +96,8 @@ public class LoadBalancerUsageParser {
                 continue;
             }
 
-            long currentDuration = (lbDeleteDate.getTime() - lbCreateDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to find total number of millis to charge)
+            long currentDuration = (lbDeleteDate.getTime() - lbCreateDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to find
+            // total number of millis to charge)
 
             updateLBUsageData(usageMap, key, usageLB.getId(), currentDuration);
         }
@@ -147,7 +141,7 @@ public class LoadBalancerUsageParser {
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Creating Volume usage record for load balancer: " + lbId + ", usage: " + usageDisplay + ", startDate: " + startDate + ", endDate: " +
-                endDate + ", for account: " + account.getId());
+                    endDate + ", for account: " + account.getId());
         }
 
         // Create the usage record
@@ -155,9 +149,15 @@ public class LoadBalancerUsageParser {
 
         //ToDo: get zone id
         UsageVO usageRecord =
-            new UsageVO(zoneId, account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", type, new Double(usage), null, null, null, null, lbId, null,
-                startDate, endDate);
+                new UsageVO(zoneId, account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", type, new Double(usage), null, null, null, null, lbId, null,
+                        startDate, endDate);
         s_usageDao.persist(usageRecord);
+    }
+
+    @PostConstruct
+    void init() {
+        s_usageDao = _usageDao;
+        s_usageLoadBalancerPolicyDao = _usageLoadBalancerPolicyDao;
     }
 
     private static class LBInfo {
@@ -177,5 +177,4 @@ public class LoadBalancerUsageParser {
             return id;
         }
     }
-
 }

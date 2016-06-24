@@ -16,14 +16,13 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.JoinBuilder;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import javax.inject.Inject;
+import java.util.List;
 
 public class LoadBalancerCertMapDaoImpl extends GenericDaoBase<LoadBalancerCertMapVO, Long> implements LoadBalancerCertMapDao {
 
@@ -42,7 +41,6 @@ public class LoadBalancerCertMapDaoImpl extends GenericDaoBase<LoadBalancerCertM
         findByLbRuleId = createSearchBuilder();
         findByLbRuleId.and("loadBalancerId", findByLbRuleId.entity().getLbId(), SearchCriteria.Op.EQ);
         findByLbRuleId.done();
-
     }
 
     @Override
@@ -50,13 +48,6 @@ public class LoadBalancerCertMapDaoImpl extends GenericDaoBase<LoadBalancerCertM
         SearchCriteria<LoadBalancerCertMapVO> sc = listByCertId.create();
         sc.setParameters("certificateId", certId);
         return listBy(sc);
-    }
-
-    @Override
-    public LoadBalancerCertMapVO findByLbRuleId(Long lbId) {
-        SearchCriteria<LoadBalancerCertMapVO> sc = findByLbRuleId.create();
-        sc.setParameters("loadBalancerId", lbId);
-        return findOneBy(sc);
     }
 
     @Override
@@ -75,5 +66,12 @@ public class LoadBalancerCertMapDaoImpl extends GenericDaoBase<LoadBalancerCertM
         SearchCriteria<LoadBalancerCertMapVO> sc = listByAccountId.create();
         sc.setParameters("accountId", accountId);
         return listBy(sc);
+    }
+
+    @Override
+    public LoadBalancerCertMapVO findByLbRuleId(Long lbId) {
+        SearchCriteria<LoadBalancerCertMapVO> sc = findByLbRuleId.create();
+        sc.setParameters("loadBalancerId", lbId);
+        return findOneBy(sc);
     }
 }

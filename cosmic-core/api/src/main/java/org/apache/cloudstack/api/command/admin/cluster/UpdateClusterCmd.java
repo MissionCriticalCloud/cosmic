@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.admin.cluster;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.org.Cluster;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -27,6 +26,7 @@ import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ClusterResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,30 +59,32 @@ public class UpdateClusterCmd extends BaseCmd {
         return clusterName;
     }
 
+    @Override
+    public void execute() {
+        Cluster cluster = _resourceService.getCluster(getId());
+        if (cluster == null) {
+            throw new InvalidParameterValueException("Unable to find the cluster by id=" + getId());
+        }
+        Cluster result = _resourceService.updateCluster(cluster, getClusterType(), getHypervisor(), getAllocationState(), getManagedstate());
+        if (result != null) {
+            ClusterResponse clusterResponse = _responseGenerator.createClusterResponse(cluster, false);
+            clusterResponse.setResponseName(getCommandName());
+            this.setResponseObject(clusterResponse);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update cluster");
+        }
+    }
+
     public Long getId() {
         return id;
-    }
-
-    public String getHypervisor() {
-        return hypervisor;
-    }
-
-    @Override
-    public String getCommandName() {
-        return s_name;
     }
 
     public String getClusterType() {
         return clusterType;
     }
 
-    public void setClusterType(String type) {
-        this.clusterType = type;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
+    public String getHypervisor() {
+        return hypervisor;
     }
 
     public String getAllocationState() {
@@ -101,19 +103,17 @@ public class UpdateClusterCmd extends BaseCmd {
         this.managedState = managedstate;
     }
 
+    public void setClusterType(String type) {
+        this.clusterType = type;
+    }
+
     @Override
-    public void execute() {
-        Cluster cluster = _resourceService.getCluster(getId());
-        if (cluster == null) {
-            throw new InvalidParameterValueException("Unable to find the cluster by id=" + getId());
-        }
-        Cluster result = _resourceService.updateCluster(cluster, getClusterType(), getHypervisor(), getAllocationState(), getManagedstate());
-        if (result != null) {
-            ClusterResponse clusterResponse = _responseGenerator.createClusterResponse(cluster, false);
-            clusterResponse.setResponseName(getCommandName());
-            this.setResponseObject(clusterResponse);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update cluster");
-        }
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

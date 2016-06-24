@@ -29,14 +29,14 @@ public class CheckVirtualMachineAnswer extends Answer {
     protected CheckVirtualMachineAnswer() {
     }
 
+    public CheckVirtualMachineAnswer(CheckVirtualMachineCommand cmd, PowerState state, Integer vncPort) {
+        this(cmd, state, vncPort, null);
+    }
+
     public CheckVirtualMachineAnswer(CheckVirtualMachineCommand cmd, PowerState state, Integer vncPort, String detail) {
         super(cmd, true, detail);
         this.state = state;
         this.vncPort = vncPort;
-    }
-
-    public CheckVirtualMachineAnswer(CheckVirtualMachineCommand cmd, PowerState state, Integer vncPort) {
-        this(cmd, state, vncPort, null);
     }
 
     public CheckVirtualMachineAnswer(CheckVirtualMachineCommand cmd, String detail) {

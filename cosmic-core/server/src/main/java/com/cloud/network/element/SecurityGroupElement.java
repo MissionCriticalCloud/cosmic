@@ -16,10 +16,6 @@
 // under the License.
 package com.cloud.network.element;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.IllegalVirtualMachineException;
@@ -37,8 +33,20 @@ import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachineProfile;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 public class SecurityGroupElement extends AdapterBase implements NetworkElement {
     private static final Map<Service, Map<Capability, String>> capabilities = setCapabilities();
+
+    private static Map<Service, Map<Capability, String>> setCapabilities() {
+        Map<Service, Map<Capability, String>> capabilities = new HashMap<Service, Map<Capability, String>>();
+
+        capabilities.put(Service.SecurityGroup, null);
+
+        return capabilities;
+    }
 
     @Override
     public Map<Service, Map<Capability, String>> getCapabilities() {
@@ -50,30 +58,22 @@ public class SecurityGroupElement extends AdapterBase implements NetworkElement 
         return Provider.SecurityGroupProvider;
     }
 
-    private static Map<Service, Map<Capability, String>> setCapabilities() {
-        Map<Service, Map<Capability, String>> capabilities = new HashMap<Service, Map<Capability, String>>();
-
-        capabilities.put(Service.SecurityGroup, null);
-
-        return capabilities;
-    }
-
     @Override
     public boolean implement(Network network, NetworkOffering offering, DeployDestination dest, ReservationContext context) throws ConcurrentOperationException,
-        ResourceUnavailableException, InsufficientCapacityException {
+            ResourceUnavailableException, InsufficientCapacityException {
         return true;
     }
 
     @Override
     @DB
     public boolean prepare(Network network, NicProfile nic, VirtualMachineProfile vm, DeployDestination dest, ReservationContext context)
-        throws ConcurrentOperationException, ResourceUnavailableException, InsufficientCapacityException, IllegalVirtualMachineException {
+            throws ConcurrentOperationException, ResourceUnavailableException, InsufficientCapacityException, IllegalVirtualMachineException {
         return true;
     }
 
     @Override
     public boolean release(Network network, NicProfile nic, VirtualMachineProfile vm, ReservationContext context) throws ConcurrentOperationException,
-        ResourceUnavailableException {
+            ResourceUnavailableException {
         return true;
     }
 
@@ -94,7 +94,7 @@ public class SecurityGroupElement extends AdapterBase implements NetworkElement 
 
     @Override
     public boolean shutdownProviderInstances(PhysicalNetworkServiceProvider provider, ReservationContext context) throws ConcurrentOperationException,
-        ResourceUnavailableException {
+            ResourceUnavailableException {
         return true;
     }
 

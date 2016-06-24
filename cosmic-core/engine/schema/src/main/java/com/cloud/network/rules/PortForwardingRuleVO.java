@@ -16,7 +16,7 @@
 // under the License.
 package com.cloud.network.rules;
 
-import java.util.List;
+import com.cloud.utils.net.Ip;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -25,8 +25,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
-
-import com.cloud.utils.net.Ip;
+import java.util.List;
 
 @Entity
 @Table(name = ("port_forwarding_rules"))
@@ -50,18 +49,18 @@ public class PortForwardingRuleVO extends FirewallRuleVO implements PortForwardi
     public PortForwardingRuleVO() {
     }
 
+    public PortForwardingRuleVO(String xId, long srcIpId, int srcPort, Ip dstIp, int dstPort, String protocol, List<String> sourceCidrs, long networkId, long accountId,
+                                long domainId, long instanceId) {
+        this(xId, srcIpId, srcPort, srcPort, dstIp, dstPort, dstPort, protocol.toLowerCase(), networkId, accountId, domainId, instanceId);
+    }
+
     public PortForwardingRuleVO(String xId, long srcIpId, int srcPortStart, int srcPortEnd, Ip dstIp, int dstPortStart, int dstPortEnd, String protocol, long networkId,
-            long accountId, long domainId, long instanceId) {
+                                long accountId, long domainId, long instanceId) {
         super(xId, srcIpId, srcPortStart, srcPortEnd, protocol, networkId, accountId, domainId, Purpose.PortForwarding, null, null, null, null, null);
         this.destinationIpAddress = dstIp;
         this.virtualMachineId = instanceId;
         this.destinationPortStart = dstPortStart;
         this.destinationPortEnd = dstPortEnd;
-    }
-
-    public PortForwardingRuleVO(String xId, long srcIpId, int srcPort, Ip dstIp, int dstPort, String protocol, List<String> sourceCidrs, long networkId, long accountId,
-            long domainId, long instanceId) {
-        this(xId, srcIpId, srcPort, srcPort, dstIp, dstPort, dstPort, protocol.toLowerCase(), networkId, accountId, domainId, instanceId);
     }
 
     @Override
@@ -105,5 +104,4 @@ public class PortForwardingRuleVO extends FirewallRuleVO implements PortForwardi
     public Long getRelated() {
         return null;
     }
-
 }

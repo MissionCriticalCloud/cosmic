@@ -47,5 +47,4 @@ public abstract class SsCommand extends Command {
     public void setSecUrl(String secUrl) {
         this.secUrl = secUrl;
     }
-
 }

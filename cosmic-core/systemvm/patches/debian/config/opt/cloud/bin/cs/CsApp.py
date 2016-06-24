@@ -16,10 +16,10 @@
 # specific language governing permissions and limitations
 # under the License.
 import os
+
 import CsHelper
 from CsFile import CsFile
 from CsProcess import CsProcess
-import CsHelper
 
 
 class CsApp:

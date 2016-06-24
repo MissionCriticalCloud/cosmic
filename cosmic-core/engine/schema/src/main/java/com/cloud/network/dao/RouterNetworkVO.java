@@ -16,6 +16,10 @@
 // under the License.
 package com.cloud.network.dao;
 
+import com.cloud.network.Network;
+import com.cloud.network.Network.GuestType;
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -24,11 +28,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.network.Network;
-import com.cloud.network.Network.GuestType;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = "router_network_ref")

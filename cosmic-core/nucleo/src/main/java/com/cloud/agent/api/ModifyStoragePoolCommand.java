@@ -19,33 +19,32 @@
 
 package com.cloud.agent.api;
 
-import java.io.File;
-import java.util.UUID;
-
 import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.storage.StoragePool;
 
+import java.io.File;
+import java.util.UUID;
+
 public class ModifyStoragePoolCommand extends Command {
 
+    public static final String LOCAL_PATH_PREFIX = "/mnt/";
     boolean add;
     StorageFilerTO pool;
     String localPath;
     String[] options;
-    public static final String LOCAL_PATH_PREFIX = "/mnt/";
 
     public ModifyStoragePoolCommand() {
 
+    }
+
+    public ModifyStoragePoolCommand(boolean add, StoragePool pool) {
+        this(add, pool, LOCAL_PATH_PREFIX + File.separator + UUID.nameUUIDFromBytes((pool.getHostAddress() + pool.getPath()).getBytes()));
     }
 
     public ModifyStoragePoolCommand(boolean add, StoragePool pool, String localPath) {
         this.add = add;
         this.pool = new StorageFilerTO(pool);
         this.localPath = localPath;
-
-    }
-
-    public ModifyStoragePoolCommand(boolean add, StoragePool pool) {
-        this(add, pool, LOCAL_PATH_PREFIX + File.separator + UUID.nameUUIDFromBytes((pool.getHostAddress() + pool.getPath()).getBytes()));
     }
 
     public StorageFilerTO getPool() {
@@ -72,5 +71,4 @@ public class ModifyStoragePoolCommand extends Command {
     public void setOptions(String[] options) {
         this.options = options;
     }
-
 }

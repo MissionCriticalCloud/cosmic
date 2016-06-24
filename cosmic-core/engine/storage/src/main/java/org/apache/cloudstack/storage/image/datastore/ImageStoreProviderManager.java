@@ -18,12 +18,12 @@
  */
 package org.apache.cloudstack.storage.image.datastore;
 
-import java.util.List;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.Scope;
 import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
 import org.apache.cloudstack.storage.image.ImageStoreDriver;
+
+import java.util.List;
 
 public interface ImageStoreProviderManager {
     ImageStoreEntity getImageStore(long dataStoreId);

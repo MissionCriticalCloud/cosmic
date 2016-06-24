@@ -16,14 +16,6 @@
 // under the License.
 package com.cloud.usage.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-
 import com.cloud.exception.CloudException;
 import com.cloud.usage.UsageStorageVO;
 import com.cloud.utils.DateUtil;
@@ -31,6 +23,14 @@ import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,13 +43,13 @@ public class UsageStorageDaoImpl extends GenericDaoBase<UsageStorageVO, Long> im
     protected static final String REMOVE_BY_USERID_STORAGEID = "DELETE FROM usage_storage WHERE account_id = ? AND id = ? AND storage_type = ?";
     protected static final String UPDATE_DELETED = "UPDATE usage_storage SET deleted = ? WHERE account_id = ? AND id = ? AND storage_type = ? and deleted IS NULL";
     protected static final String GET_USAGE_RECORDS_BY_ACCOUNT =
-        "SELECT id, zone_id, account_id, domain_id, storage_type, source_id, size, created, deleted, virtual_size " + "FROM usage_storage "
-            + "WHERE account_id = ? AND ((deleted IS NULL) OR (created BETWEEN ? AND ?) OR " + "      (deleted BETWEEN ? AND ?) OR ((created <= ?) AND (deleted >= ?)))";
+            "SELECT id, zone_id, account_id, domain_id, storage_type, source_id, size, created, deleted, virtual_size " + "FROM usage_storage "
+                    + "WHERE account_id = ? AND ((deleted IS NULL) OR (created BETWEEN ? AND ?) OR " + "      (deleted BETWEEN ? AND ?) OR ((created <= ?) AND (deleted >= ?)))";
     protected static final String GET_USAGE_RECORDS_BY_DOMAIN =
-        "SELECT id, zone_id, account_id, domain_id, storage_type, source_id, size, created, deleted, virtual_size " + "FROM usage_storage "
-            + "WHERE domain_id = ? AND ((deleted IS NULL) OR (created BETWEEN ? AND ?) OR " + "      (deleted BETWEEN ? AND ?) OR ((created <= ?) AND (deleted >= ?)))";
+            "SELECT id, zone_id, account_id, domain_id, storage_type, source_id, size, created, deleted, virtual_size " + "FROM usage_storage "
+                    + "WHERE domain_id = ? AND ((deleted IS NULL) OR (created BETWEEN ? AND ?) OR " + "      (deleted BETWEEN ? AND ?) OR ((created <= ?) AND (deleted >= ?)))";
     protected static final String GET_ALL_USAGE_RECORDS = "SELECT id, zone_id, account_id, domain_id, storage_type, source_id, size, created, deleted, virtual_size "
-        + "FROM usage_storage " + "WHERE (deleted IS NULL) OR (created BETWEEN ? AND ?) OR " + "      (deleted BETWEEN ? AND ?) OR ((created <= ?) AND (deleted >= ?))";
+            + "FROM usage_storage " + "WHERE (deleted IS NULL) OR (created BETWEEN ? AND ?) OR " + "      (deleted BETWEEN ? AND ?) OR ((created <= ?) AND (deleted >= ?))";
 
     private final SearchBuilder<UsageStorageVO> IdSearch;
     private final SearchBuilder<UsageStorageVO> IdZoneSearch;
@@ -70,38 +70,18 @@ public class UsageStorageDaoImpl extends GenericDaoBase<UsageStorageVO, Long> im
     }
 
     @Override
-    public List<UsageStorageVO> listById(long accountId, long id, int type) {
-        SearchCriteria<UsageStorageVO> sc = IdSearch.create();
-        sc.setParameters("accountId", accountId);
-        sc.setParameters("id", id);
-        sc.setParameters("type", type);
-        return listBy(sc, null);
-    }
-
-    @Override
-    public List<UsageStorageVO> listByIdAndZone(long accountId, long id, int type, long dcId) {
-        SearchCriteria<UsageStorageVO> sc = IdZoneSearch.create();
-        sc.setParameters("accountId", accountId);
-        sc.setParameters("id", id);
-        sc.setParameters("type", type);
-        sc.setParameters("dcId", dcId);
-        return listBy(sc, null);
-    }
-
-    @Override
     public void removeBy(long accountId, long volId, int storageType) {
         TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
         try {
             txn.start();
             String sql = REMOVE_BY_USERID_STORAGEID;
-            try( PreparedStatement pstmt = txn.prepareStatement(sql);) {
+            try (PreparedStatement pstmt = txn.prepareStatement(sql);) {
                 pstmt.setLong(1, accountId);
                 pstmt.setLong(2, volId);
                 pstmt.setInt(3, storageType);
                 pstmt.executeUpdate();
-            }catch(SQLException e)
-            {
-                throw new CloudException("removeBy:Exception:"+e.getMessage(),e);
+            } catch (SQLException e) {
+                throw new CloudException("removeBy:Exception:" + e.getMessage(), e);
             }
             txn.commit();
         } catch (Exception e) {
@@ -118,7 +98,7 @@ public class UsageStorageDaoImpl extends GenericDaoBase<UsageStorageVO, Long> im
         try {
             txn.start();
             if (usage.getDeleted() != null) {
-                try(PreparedStatement pstmt = txn.prepareStatement(UPDATE_DELETED);) {
+                try (PreparedStatement pstmt = txn.prepareStatement(UPDATE_DELETED);) {
                     if (pstmt != null) {
                         pstmt.setString(1, DateUtil.getDateDisplayString(TimeZone.getTimeZone("GMT"), usage.getDeleted()));
                         pstmt.setLong(2, usage.getAccountId());
@@ -126,15 +106,14 @@ public class UsageStorageDaoImpl extends GenericDaoBase<UsageStorageVO, Long> im
                         pstmt.setInt(4, usage.getStorageType());
                         pstmt.executeUpdate();
                     }
-                }catch (SQLException e)
-                {
-                    throw new CloudException("UsageStorageVO update Error:"+e.getMessage(),e);
+                } catch (SQLException e) {
+                    throw new CloudException("UsageStorageVO update Error:" + e.getMessage(), e);
                 }
             }
             txn.commit();
         } catch (Exception e) {
             txn.rollback();
-            s_logger.error("Error updating UsageStorageVO:"+e.getMessage(), e);
+            s_logger.error("Error updating UsageStorageVO:" + e.getMessage(), e);
         } finally {
             txn.close();
         }
@@ -166,7 +145,7 @@ public class UsageStorageDaoImpl extends GenericDaoBase<UsageStorageVO, Long> im
 
         TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
         int i = 1;
-        try (PreparedStatement pstmt = txn.prepareStatement(sql);){
+        try (PreparedStatement pstmt = txn.prepareStatement(sql);) {
             if (param1 != null) {
                 pstmt.setLong(i++, param1);
             }
@@ -177,7 +156,7 @@ public class UsageStorageDaoImpl extends GenericDaoBase<UsageStorageVO, Long> im
             pstmt.setString(i++, DateUtil.getDateDisplayString(TimeZone.getTimeZone("GMT"), startDate));
             pstmt.setString(i++, DateUtil.getDateDisplayString(TimeZone.getTimeZone("GMT"), endDate));
 
-            try(ResultSet rs = pstmt.executeQuery();) {
+            try (ResultSet rs = pstmt.executeQuery();) {
                 while (rs.next()) {
                     //id, zone_id, account_id, domain_id, storage_type, size, created, deleted
                     Long id = Long.valueOf(rs.getLong(1));
@@ -202,16 +181,34 @@ public class UsageStorageDaoImpl extends GenericDaoBase<UsageStorageVO, Long> im
 
                     usageRecords.add(new UsageStorageVO(id, zoneId, acctId, dId, type, sourceId, size, virtualSize, createdDate, deletedDate));
                 }
-            }catch(SQLException e)
-            {
-                throw new CloudException("getUsageRecords:"+e.getMessage(),e);
+            } catch (SQLException e) {
+                throw new CloudException("getUsageRecords:" + e.getMessage(), e);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             txn.rollback();
-            s_logger.error("getUsageRecords:Exception:"+e.getMessage(), e);
+            s_logger.error("getUsageRecords:Exception:" + e.getMessage(), e);
         } finally {
             txn.close();
         }
         return usageRecords;
+    }
+
+    @Override
+    public List<UsageStorageVO> listById(long accountId, long id, int type) {
+        SearchCriteria<UsageStorageVO> sc = IdSearch.create();
+        sc.setParameters("accountId", accountId);
+        sc.setParameters("id", id);
+        sc.setParameters("type", type);
+        return listBy(sc, null);
+    }
+
+    @Override
+    public List<UsageStorageVO> listByIdAndZone(long accountId, long id, int type, long dcId) {
+        SearchCriteria<UsageStorageVO> sc = IdZoneSearch.create();
+        sc.setParameters("accountId", accountId);
+        sc.setParameters("id", id);
+        sc.setParameters("type", type);
+        sc.setParameters("dcId", dcId);
+        return listBy(sc, null);
     }
 }

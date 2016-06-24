@@ -23,10 +23,10 @@ import com.cloud.agent.api.LogLevel.Log4jLevel;
 
 @LogLevel(Log4jLevel.Trace)
 public class NetworkUsageCommand extends Command {
+    boolean forVpc = false;
     private String privateIP;
     private String domRName;
     private String option;
-    boolean forVpc = false;
     private String gatewayIP;
     private String vpcCIDR;
 

@@ -17,7 +17,6 @@
 # under the License.
 import logging
 import re
-import copy
 
 
 class CsFile:
@@ -66,7 +65,6 @@ class CsFile:
         logging.info("Wrote edited file %s" % self.filename)
         self.config = list(self.new_config)
         logging.info("Updated file in-cache configuration")
-        
 
     def dump(self):
         for line in self.new_config:
@@ -134,13 +132,12 @@ class CsFile:
             return True
         return False
 
-
     def searchString(self, search, ignoreLinesStartWith):
         found = False
         logging.debug("Searching for %s string " % search)
 
         for index, line in enumerate(self.new_config):
-            print ' line = ' +line
+            print ' line = ' + line
             if line.lstrip().startswith(ignoreLinesStartWith):
                 continue
             if re.search(search, line):
@@ -148,7 +145,6 @@ class CsFile:
                 break
 
         return found
-
 
     def deleteLine(self, search):
         found = False
@@ -161,7 +157,6 @@ class CsFile:
                 temp_config.append(line)
 
         self.new_config = list(temp_config)
-
 
     def compare(self, o):
         result = (isinstance(o, self.__class__) and set(self.config) == set(o.config))

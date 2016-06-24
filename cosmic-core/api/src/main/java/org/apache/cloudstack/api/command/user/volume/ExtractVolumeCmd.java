@@ -21,7 +21,6 @@ import com.cloud.event.EventTypes;
 import com.cloud.storage.Upload;
 import com.cloud.storage.Volume;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -35,6 +34,7 @@ import org.apache.cloudstack.api.response.ExtractResponse;
 import org.apache.cloudstack.api.response.VolumeResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,18 +50,18 @@ public class ExtractVolumeCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
 
     @ACL(accessType = AccessType.OperateEntry)
-    @Parameter(name=ApiConstants.ID, type=CommandType.UUID, entityType=VolumeResponse.class,
-            required=true, description="the ID of the volume")
+    @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = VolumeResponse.class,
+            required = true, description = "the ID of the volume")
     private Long id;
 
     @Parameter(name = ApiConstants.URL, type = CommandType.STRING, required = false, length = 2048, description = "the url to which the volume would be extracted")
     private String url;
 
     @Parameter(name = ApiConstants.ZONE_ID,
-               type = CommandType.UUID,
-               entityType = ZoneResponse.class,
-               required = true,
-               description = "the ID of the zone where the volume is located")
+            type = CommandType.UUID,
+            entityType = ZoneResponse.class,
+            required = true,
+            description = "the ID of the zone where the volume is located")
     private Long zoneId;
 
     @Parameter(name = ApiConstants.MODE, type = CommandType.STRING, required = true, description = "the mode of extraction - HTTP_DOWNLOAD or FTP_UPLOAD")
@@ -71,8 +71,8 @@ public class ExtractVolumeCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
+    public static String getStaticName() {
+        return s_name;
     }
 
     public String getUrl() {
@@ -92,17 +92,13 @@ public class ExtractVolumeCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public static String getStaticName() {
-        return s_name;
+    public String getEventType() {
+        return EventTypes.EVENT_VOLUME_EXTRACT;
     }
 
     @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.Volume;
+    public String getEventDescription() {
+        return "Extraction job";
     }
 
     @Override
@@ -110,25 +106,13 @@ public class ExtractVolumeCmd extends BaseAsyncCmd {
         return getId();
     }
 
-    @Override
-    public long getEntityOwnerId() {
-        Volume volume = _entityMgr.findById(Volume.class, getId());
-        if (volume != null) {
-            return volume.getAccountId();
-        }
-
-        // invalid id, parent this command to SYSTEM so ERROR events are tracked
-        return Account.ACCOUNT_ID_SYSTEM;
+    public Long getId() {
+        return id;
     }
 
     @Override
-    public String getEventType() {
-        return EventTypes.EVENT_VOLUME_EXTRACT;
-    }
-
-    @Override
-    public String getEventDescription() {
-        return  "Extraction job";
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.Volume;
     }
 
     @Override
@@ -154,5 +138,21 @@ public class ExtractVolumeCmd extends BaseAsyncCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to extract volume");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        Volume volume = _entityMgr.findById(Volume.class, getId());
+        if (volume != null) {
+            return volume.getAccountId();
+        }
+
+        // invalid id, parent this command to SYSTEM so ERROR events are tracked
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

@@ -17,13 +17,10 @@
 """ BVT tests for Service offerings"""
 
 # Import Local Modules
-from marvin.codes import FAILED
-from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.cloudstackAPI import (changeServiceForVirtualMachine,
                                   updateServiceOffering)
-from marvin.lib.utils import (isAlmostEqual,
-                              cleanup_resources,
-                              random_gen)
+from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import FAILED
 from marvin.lib.base import (ServiceOffering,
                              Account,
                              VirtualMachine)
@@ -32,14 +29,15 @@ from marvin.lib.common import (list_service_offering,
                                get_domain,
                                get_zone,
                                get_template)
+from marvin.lib.utils import (isAlmostEqual,
+                              cleanup_resources,
+                              random_gen)
 from nose.plugins.attrib import attr
-
 
 _multiprocess_shared_ = True
 
 
 class TestCreateServiceOffering(cloudstackTestCase):
-
     def setUp(self):
         self.apiclient = self.testClient.getApiClient()
         self.dbclient = self.testClient.getDbConnection()
@@ -128,7 +126,6 @@ class TestCreateServiceOffering(cloudstackTestCase):
 
 
 class TestServiceOfferings(cloudstackTestCase):
-
     def setUp(self):
         self.apiclient = self.testClient.getApiClient()
         self.dbclient = self.testClient.getDbConnection()
@@ -175,7 +172,6 @@ class TestServiceOfferings(cloudstackTestCase):
         # Set Zones and disk offerings
         cls.services["small"]["zoneid"] = cls.zone.id
         cls.services["small"]["template"] = template.id
-
 
         # Create VMs, NAT Rules etc
         cls.account = Account.create(

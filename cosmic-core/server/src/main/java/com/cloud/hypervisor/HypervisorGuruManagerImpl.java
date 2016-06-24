@@ -16,18 +16,17 @@
 // under the License.
 package com.cloud.hypervisor;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.agent.api.Command;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,5 +89,4 @@ public class HypervisorGuruManagerImpl extends ManagerBase implements Hypervisor
     public void setHvGuruList(List<HypervisorGuru> hvGuruList) {
         this._hvGuruList = hvGuruList;
     }
-
 }

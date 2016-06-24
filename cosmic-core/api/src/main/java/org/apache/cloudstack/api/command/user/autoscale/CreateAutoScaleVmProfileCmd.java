@@ -16,16 +16,12 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.autoscale;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.network.as.AutoScaleVmProfile;
 import com.cloud.user.Account;
 import com.cloud.user.User;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
@@ -40,14 +36,18 @@ import org.apache.cloudstack.api.response.TemplateResponse;
 import org.apache.cloudstack.api.response.UserResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "createAutoScaleVmProfile",
-            description = "Creates a profile that contains information about the virtual machine which will be provisioned automatically by autoscale feature.",
+        description = "Creates a profile that contains information about the virtual machine which will be provisioned automatically by autoscale feature.",
         responseObject = AutoScaleVmProfileResponse.class, entityType = {AutoScaleVmProfile.class},
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = false)
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = false)
 @SuppressWarnings("rawtypes")
 public class CreateAutoScaleVmProfileCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateAutoScaleVmProfileCmd.class.getName());
@@ -59,48 +59,49 @@ public class CreateAutoScaleVmProfileCmd extends BaseAsyncCreateCmd {
     // ///////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.ZONE_ID,
-               type = CommandType.UUID,
-               entityType = ZoneResponse.class,
-               required = true,
-               description = "availability zone for the auto deployed virtual machine")
+            type = CommandType.UUID,
+            entityType = ZoneResponse.class,
+            required = true,
+            description = "availability zone for the auto deployed virtual machine")
     private Long zoneId;
 
     @Parameter(name = ApiConstants.SERVICE_OFFERING_ID,
-               type = CommandType.UUID,
-               entityType = ServiceOfferingResponse.class,
-               required = true,
-               description = "the service offering of the auto deployed virtual machine")
+            type = CommandType.UUID,
+            entityType = ServiceOfferingResponse.class,
+            required = true,
+            description = "the service offering of the auto deployed virtual machine")
     private Long serviceOfferingId;
 
     @Parameter(name = ApiConstants.TEMPLATE_ID,
-               type = CommandType.UUID,
-               entityType = TemplateResponse.class,
-               required = true,
-               description = "the template of the auto deployed virtual machine")
+            type = CommandType.UUID,
+            entityType = TemplateResponse.class,
+            required = true,
+            description = "the template of the auto deployed virtual machine")
     private Long templateId;
 
     @Parameter(name = ApiConstants.OTHER_DEPLOY_PARAMS,
-               type = CommandType.STRING,
-               description = "parameters other than zoneId/serviceOfferringId/templateId of the auto deployed virtual machine")
+            type = CommandType.STRING,
+            description = "parameters other than zoneId/serviceOfferringId/templateId of the auto deployed virtual machine")
     private String otherDeployParams;
 
     @Parameter(name = ApiConstants.AUTOSCALE_VM_DESTROY_TIME,
-               type = CommandType.INTEGER,
-               description = "the time allowed for existing connections to get closed before a vm is destroyed")
+            type = CommandType.INTEGER,
+            description = "the time allowed for existing connections to get closed before a vm is destroyed")
     private Integer destroyVmGraceperiod;
 
     @Parameter(name = ApiConstants.COUNTERPARAM_LIST,
-               type = CommandType.MAP,
-               description = "counterparam list. Example: counterparam[0].name=snmpcommunity&counterparam[0].value=public&counterparam[1].name=snmpport&counterparam[1].value=161")
+            type = CommandType.MAP,
+            description = "counterparam list. Example: counterparam[0].name=snmpcommunity&counterparam[0].value=public&counterparam[1].name=snmpport&counterparam[1].value=161")
     private Map counterParamList;
 
     @Parameter(name = ApiConstants.AUTOSCALE_USER_ID,
-               type = CommandType.UUID,
-               entityType = UserResponse.class,
-               description = "the ID of the user used to launch and destroy the VMs")
+            type = CommandType.UUID,
+            entityType = UserResponse.class,
+            description = "the ID of the user used to launch and destroy the VMs")
     private Long autoscaleUserId;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the profile to the end user or not", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the profile to the end user or not", since =
+            "4.4", authorized = {RoleType.Admin})
     private Boolean display;
 
     private Map<String, String> otherDeployParamMap;
@@ -112,11 +113,31 @@ public class CreateAutoScaleVmProfileCmd extends BaseAsyncCreateCmd {
     private Long domainId;
     private Long accountId;
 
+    public static String getResultObjectName() {
+        return "autoscalevmprofile";
+    }
+
     public Long getDomainId() {
         if (domainId == null) {
             getAccountId();
         }
         return domainId;
+    }
+
+    public long getAccountId() {
+        if (accountId != null) {
+            return accountId;
+        }
+        Account account = null;
+        if (autoscaleUserId != null) {
+            User user = _entityMgr.findById(User.class, autoscaleUserId);
+            account = _entityMgr.findById(Account.class, user.getAccountId());
+        } else {
+            account = CallContext.current().getCallingAccount();
+        }
+        accountId = account.getAccountId();
+        domainId = account.getDomainId();
+        return accountId;
     }
 
     public Long getZoneId() {
@@ -134,14 +155,6 @@ public class CreateAutoScaleVmProfileCmd extends BaseAsyncCreateCmd {
     @Deprecated
     public Boolean getDisplay() {
         return display;
-    }
-
-    @Override
-    public boolean isDisplay() {
-        if(display == null)
-            return true;
-        else
-            return display;
     }
 
     public Map getCounterParamList() {
@@ -164,28 +177,23 @@ public class CreateAutoScaleVmProfileCmd extends BaseAsyncCreateCmd {
         return destroyVmGraceperiod;
     }
 
-    public long getAccountId() {
-        if (accountId != null) {
-            return accountId;
-        }
-        Account account = null;
-        if (autoscaleUserId != null) {
-            User user = _entityMgr.findById(User.class, autoscaleUserId);
-            account = _entityMgr.findById(Account.class, user.getAccountId());
-        } else {
-            account = CallContext.current().getCallingAccount();
-        }
-        accountId = account.getAccountId();
-        domainId = account.getDomainId();
-        return accountId;
+    public HashMap<String, String> getDeployParamMap() {
+        createOtherDeployParamMap();
+        HashMap<String, String> deployParams = new HashMap<String, String>(otherDeployParamMap);
+        deployParams.put("command", "deployVirtualMachine");
+        deployParams.put("zoneId", zoneId.toString());
+        deployParams.put("serviceOfferingId", serviceOfferingId.toString());
+        deployParams.put("templateId", templateId.toString());
+        return deployParams;
     }
 
     private void createOtherDeployParamMap() {
         if (otherDeployParamMap == null) {
             otherDeployParamMap = new HashMap<String, String>();
         }
-        if (otherDeployParams == null)
+        if (otherDeployParams == null) {
             return;
+        }
         String[] keyValues = otherDeployParams.split("&"); // hostid=123, hypervisor=xenserver
         for (String keyValue : keyValues) { // keyValue == "hostid=123"
             String[] keyAndValue = keyValue.split("="); // keyValue = hostid, 123
@@ -196,16 +204,6 @@ public class CreateAutoScaleVmProfileCmd extends BaseAsyncCreateCmd {
             String paramValue = keyAndValue[1]; // 123
             otherDeployParamMap.put(paramName, paramValue);
         }
-    }
-
-    public HashMap<String, String> getDeployParamMap() {
-        createOtherDeployParamMap();
-        HashMap<String, String> deployParams = new HashMap<String, String>(otherDeployParamMap);
-        deployParams.put("command", "deployVirtualMachine");
-        deployParams.put("zoneId", zoneId.toString());
-        deployParams.put("serviceOfferingId", serviceOfferingId.toString());
-        deployParams.put("templateId", templateId.toString());
-        return deployParams;
     }
 
     public String getOtherDeployParam(String param) {
@@ -219,20 +217,6 @@ public class CreateAutoScaleVmProfileCmd extends BaseAsyncCreateCmd {
     // ///////////////////////////////////////////////////
     // ///////////// API Implementation///////////////////
     // ///////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public static String getResultObjectName() {
-        return "autoscalevmprofile";
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return getAccountId();
-    }
 
     @Override
     public String getEventType() {
@@ -255,6 +239,25 @@ public class CreateAutoScaleVmProfileCmd extends BaseAsyncCreateCmd {
         AutoScaleVmProfileResponse response = _responseGenerator.createAutoScaleVmProfileResponse(result);
         response.setResponseName(getCommandName());
         setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return getAccountId();
+    }
+
+    @Override
+    public boolean isDisplay() {
+        if (display == null) {
+            return true;
+        } else {
+            return display;
+        }
     }
 
     @Override

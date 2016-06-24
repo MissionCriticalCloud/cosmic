@@ -19,10 +19,16 @@
 
 package com.cloud.network.resource.wrapper;
 
+import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
+
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CreateLogicalSwitchAnswer;
 import com.cloud.agent.api.CreateLogicalSwitchCommand;
-import com.cloud.network.nicira.*;
+import com.cloud.network.nicira.LogicalSwitch;
+import com.cloud.network.nicira.NiciraNvpApi;
+import com.cloud.network.nicira.NiciraNvpApiException;
+import com.cloud.network.nicira.NiciraNvpTag;
+import com.cloud.network.nicira.TransportZoneBinding;
 import com.cloud.network.resource.NiciraNvpResource;
 import com.cloud.network.resource.NiciraNvpUtilities;
 import com.cloud.network.utils.CommandRetryUtility;
@@ -31,8 +37,6 @@ import com.cloud.resource.ResourceWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
 
 @ResourceWrapper(handles = CreateLogicalSwitchCommand.class)
 public final class NiciraNvpCreateLogicalSwitchCommandWrapper extends CommandWrapper<CreateLogicalSwitchCommand, Answer, NiciraNvpResource> {

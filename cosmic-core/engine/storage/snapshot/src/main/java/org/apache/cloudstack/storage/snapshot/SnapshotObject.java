@@ -18,10 +18,6 @@
  */
 package org.apache.cloudstack.storage.snapshot;
 
-import java.util.Date;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.agent.api.to.DataTO;
@@ -37,7 +33,6 @@ import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.fsm.NoTransitionException;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
@@ -54,14 +49,15 @@ import org.apache.cloudstack.storage.datastore.ObjectInDataStoreManager;
 import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreVO;
 import org.apache.cloudstack.storage.to.SnapshotObjectTO;
+
+import javax.inject.Inject;
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SnapshotObject implements SnapshotInfo {
     private static final Logger s_logger = LoggerFactory.getLogger(SnapshotObject.class);
-    private SnapshotVO snapshot;
-    private DataStore store;
-    private Object payload;
     @Inject
     protected SnapshotDao snapshotDao;
     @Inject
@@ -78,21 +74,24 @@ public class SnapshotObject implements SnapshotInfo {
     SnapshotDataStoreDao snapshotStoreDao;
     @Inject
     StorageStrategyFactory storageStrategyFactory;
+    private SnapshotVO snapshot;
+    private DataStore store;
+    private Object payload;
     private String installPath; // temporarily set installPath before passing to resource for entries with empty installPath for object store migration case
 
     public SnapshotObject() {
 
     }
 
-    protected void configure(SnapshotVO snapshot, DataStore store) {
-        this.snapshot = snapshot;
-        this.store = store;
-    }
-
     public static SnapshotObject getSnapshotObject(SnapshotVO snapshot, DataStore store) {
         SnapshotObject snapObj = ComponentContext.inject(SnapshotObject.class);
         snapObj.configure(snapshot, store);
         return snapObj;
+    }
+
+    protected void configure(SnapshotVO snapshot, DataStore store) {
+        this.snapshot = snapshot;
+        this.store = store;
     }
 
     public DataStore getStore() {
@@ -115,6 +114,19 @@ public class SnapshotObject implements SnapshotInfo {
     }
 
     @Override
+    public String getPath() {
+        if (installPath != null) {
+            return installPath;
+        }
+
+        DataObjectInStore objectInStore = objectInStoreMgr.findObject(this, getDataStore());
+        if (objectInStore != null) {
+            return objectInStore.getInstallPath();
+        }
+        return null;
+    }
+
+    @Override
     public SnapshotInfo getChild() {
         QueryBuilder<SnapshotDataStoreVO> sc = QueryBuilder.create(SnapshotDataStoreVO.class);
         sc.and(sc.entity().getDataStoreId(), Op.EQ, store.getId());
@@ -126,6 +138,31 @@ public class SnapshotObject implements SnapshotInfo {
             return null;
         }
         return snapshotFactory.getSnapshot(vo.getId(), store);
+    }
+
+    @Override
+    public VolumeInfo getBaseVolume() {
+        return volFactory.getVolume(snapshot.getVolumeId());
+    }
+
+    @Override
+    public void addPayload(Object data) {
+        payload = data;
+    }
+
+    @Override
+    public Object getPayload() {
+        return payload;
+    }
+
+    @Override
+    public Long getDataCenterId() {
+        return snapshot.getDataCenterId();
+    }
+
+    @Override
+    public ObjectInDataStoreStateMachine.State getStatus() {
+        return objectInStoreMgr.findObject(this, store).getObjectInStoreState();
     }
 
     @Override
@@ -149,11 +186,6 @@ public class SnapshotObject implements SnapshotInfo {
     }
 
     @Override
-    public VolumeInfo getBaseVolume() {
-        return volFactory.getVolume(snapshot.getVolumeId());
-    }
-
-    @Override
     public long getId() {
         return snapshot.getId();
     }
@@ -161,6 +193,15 @@ public class SnapshotObject implements SnapshotInfo {
     @Override
     public String getUri() {
         return snapshot.getUuid();
+    }
+
+    @Override
+    public DataTO getTO() {
+        DataTO to = store.getDriver().getTO(this);
+        if (to == null) {
+            return new SnapshotObjectTO(this);
+        }
+        return to;
     }
 
     @Override
@@ -184,6 +225,14 @@ public class SnapshotObject implements SnapshotInfo {
     }
 
     @Override
+    public boolean delete() {
+        if (store != null) {
+            return store.delete(this);
+        }
+        return true;
+    }
+
+    @Override
     public void processEvent(ObjectInDataStoreStateMachine.Event event) {
         try {
             objectInStoreMgr.update(this, event);
@@ -198,107 +247,19 @@ public class SnapshotObject implements SnapshotInfo {
     }
 
     @Override
-    public long getAccountId() {
-        return snapshot.getAccountId();
-    }
-
-    @Override
-    public long getVolumeId() {
-        return snapshot.getVolumeId();
-    }
-
-    @Override
-    public String getPath() {
-        if (installPath != null)
-            return installPath;
-
-        DataObjectInStore objectInStore = objectInStoreMgr.findObject(this, getDataStore());
-        if (objectInStore != null) {
-            return objectInStore.getInstallPath();
-        }
-        return null;
-    }
-
-    public void setPath(String installPath) {
-        this.installPath = installPath;
-    }
-
-    @Override
-    public String getName() {
-        return snapshot.getName();
-    }
-
-    @Override
-    public Date getCreated() {
-        return snapshot.getCreated();
-    }
-
-    @Override
-    public Type getRecurringType() {
-        return snapshot.getRecurringType();
-    }
-
-    @Override
-    public State getState() {
-        return snapshot.getState();
-    }
-
-    @Override
-    public HypervisorType getHypervisorType() {
-        return snapshot.getHypervisorType();
-    }
-
-    @Override
-    public boolean isRecursive() {
-        return snapshot.isRecursive();
-    }
-
-    @Override
-    public short getsnapshotType() {
-        return snapshot.getsnapshotType();
-    }
-
-    @Override
-    public long getDomainId() {
-        return snapshot.getDomainId();
-    }
-
-    @Override
-    public Long getDataCenterId() {
-        return snapshot.getDataCenterId();
-    }
-
-    public void processEvent(Snapshot.Event event) throws NoTransitionException {
-        stateMachineMgr.processEvent(snapshot, event);
-    }
-
-    public SnapshotVO getSnapshotVO() {
-        return snapshot;
-    }
-
-    @Override
-    public DataTO getTO() {
-        DataTO to = store.getDriver().getTO(this);
-        if (to == null) {
-            return new SnapshotObjectTO(this);
-        }
-        return to;
-    }
-
-    @Override
     public void processEvent(ObjectInDataStoreStateMachine.Event event, Answer answer) {
         try {
             SnapshotDataStoreVO snapshotStore = snapshotStoreDao.findByStoreSnapshot(getDataStore().getRole(), getDataStore().getId(), getId());
             if (answer instanceof CreateObjectAnswer) {
-                SnapshotObjectTO snapshotTO = (SnapshotObjectTO)((CreateObjectAnswer)answer).getData();
+                SnapshotObjectTO snapshotTO = (SnapshotObjectTO) ((CreateObjectAnswer) answer).getData();
                 snapshotStore.setInstallPath(snapshotTO.getPath());
                 snapshotStoreDao.update(snapshotStore.getId(), snapshotStore);
             } else if (answer instanceof CopyCmdAnswer) {
-                SnapshotObjectTO snapshotTO = (SnapshotObjectTO)((CopyCmdAnswer)answer).getNewData();
+                SnapshotObjectTO snapshotTO = (SnapshotObjectTO) ((CopyCmdAnswer) answer).getNewData();
                 snapshotStore.setInstallPath(snapshotTO.getPath());
                 if (snapshotTO.getPhysicalSize() != null) {
                     // For S3 delta snapshot, physical size is currently not set
-                snapshotStore.setPhysicalSize(snapshotTO.getPhysicalSize());
+                    snapshotStore.setPhysicalSize(snapshotTO.getPhysicalSize());
                 }
                 if (snapshotTO.getParentSnapshotPath() == null) {
                     snapshotStore.setParentSnapshotId(0L);
@@ -310,7 +271,7 @@ public class SnapshotObject implements SnapshotInfo {
                     VolumeVO vol = volumeDao.findByUuid(snapshotTO.getVolume().getUuid());
                     if (vol != null) {
                         s_logger.info("Update volume path change due to snapshot operation, volume " + vol.getId() + " path: " + vol.getPath() + "->" +
-                            snapshotTO.getVolume().getPath());
+                                snapshotTO.getVolume().getPath());
                         vol.setPath(snapshotTO.getVolume().getPath());
                         volumeDao.update(vol.getId(), vol);
                     } else {
@@ -368,27 +329,66 @@ public class SnapshotObject implements SnapshotInfo {
         return null;
     }
 
-    @Override
-    public ObjectInDataStoreStateMachine.State getStatus() {
-        return objectInStoreMgr.findObject(this, store).getObjectInStoreState();
+    public void setPath(String installPath) {
+        this.installPath = installPath;
     }
 
     @Override
-    public void addPayload(Object data) {
-        payload = data;
+    public long getAccountId() {
+        return snapshot.getAccountId();
     }
 
     @Override
-    public Object getPayload() {
-        return payload;
+    public long getVolumeId() {
+        return snapshot.getVolumeId();
     }
 
     @Override
-    public boolean delete() {
-        if (store != null) {
-            return store.delete(this);
-        }
-        return true;
+    public String getName() {
+        return snapshot.getName();
+    }
+
+    @Override
+    public Date getCreated() {
+        return snapshot.getCreated();
+    }
+
+    @Override
+    public Type getRecurringType() {
+        return snapshot.getRecurringType();
+    }
+
+    @Override
+    public State getState() {
+        return snapshot.getState();
+    }
+
+    @Override
+    public HypervisorType getHypervisorType() {
+        return snapshot.getHypervisorType();
+    }
+
+    @Override
+    public boolean isRecursive() {
+        return snapshot.isRecursive();
+    }
+
+    @Override
+    public short getsnapshotType() {
+        return snapshot.getsnapshotType();
+    }
+
+    @Override
+    public long getDomainId() {
+        return snapshot.getDomainId();
+    }
+
+    public void processEvent(Snapshot.Event event) throws NoTransitionException {
+        stateMachineMgr.processEvent(snapshot, event);
+    }
+
+    public SnapshotVO getSnapshotVO() {
+        return snapshot;
     }
 
     @Override

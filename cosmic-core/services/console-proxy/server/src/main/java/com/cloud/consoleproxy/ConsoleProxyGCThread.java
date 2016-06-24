@@ -23,7 +23,6 @@ import java.util.Hashtable;
 import org.apache.log4j.Logger;
 
 /**
- *
  * ConsoleProxyGCThread does house-keeping work for the process, it helps cleanup log files,
  * recycle idle client sessions without front-end activities and report client stats to external
  * management software
@@ -36,30 +35,8 @@ public class ConsoleProxyGCThread extends Thread {
     private final Hashtable<String, ConsoleProxyClient> connMap;
     private long lastLogScan = 0;
 
-    public ConsoleProxyGCThread(Hashtable<String, ConsoleProxyClient> connMap) {
+    public ConsoleProxyGCThread(final Hashtable<String, ConsoleProxyClient> connMap) {
         this.connMap = connMap;
-    }
-
-    private void cleanupLogging() {
-        if (lastLogScan != 0 && System.currentTimeMillis() - lastLogScan < 3600000)
-            return;
-
-        lastLogScan = System.currentTimeMillis();
-
-        File logDir = new File("./logs");
-        File files[] = logDir.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (System.currentTimeMillis() - file.lastModified() >= 86400000L) {
-                    try {
-                        file.delete();
-                    } catch (Throwable e) {
-                        s_logger.info("[ignored]"
-                                + "failed to delete file: " + e.getLocalizedMessage());
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -71,19 +48,20 @@ public class ConsoleProxyGCThread extends Thread {
             cleanupLogging();
             bReportLoad = false;
 
-            if (s_logger.isDebugEnabled())
+            if (s_logger.isDebugEnabled()) {
                 s_logger.debug("connMap=" + connMap);
-            Enumeration<String> e = connMap.keys();
+            }
+            final Enumeration<String> e = connMap.keys();
             while (e.hasMoreElements()) {
-                String key;
-                ConsoleProxyClient client;
+                final String key;
+                final ConsoleProxyClient client;
 
                 synchronized (connMap) {
                     key = e.nextElement();
                     client = connMap.get(key);
                 }
 
-                long seconds_unused = (System.currentTimeMillis() - client.getClientLastFrontEndActivityTime()) / 1000;
+                final long seconds_unused = (System.currentTimeMillis() - client.getClientLastFrontEndActivityTime()) / 1000;
                 if (seconds_unused < MAX_SESSION_IDLE_SECONDS) {
                     continue;
                 }
@@ -100,18 +78,42 @@ public class ConsoleProxyGCThread extends Thread {
 
             if (bReportLoad || System.currentTimeMillis() - lastReportTick > 5000) {
                 // report load changes
-                String loadInfo = new ConsoleProxyClientStatsCollector(connMap).getStatsReport();
+                final String loadInfo = new ConsoleProxyClientStatsCollector(connMap).getStatsReport();
                 ConsoleProxy.reportLoadInfo(loadInfo);
                 lastReportTick = System.currentTimeMillis();
 
-                if (s_logger.isDebugEnabled())
+                if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Report load change : " + loadInfo);
+                }
             }
 
             try {
                 Thread.sleep(5000);
-            } catch (InterruptedException ex) {
+            } catch (final InterruptedException ex) {
                 s_logger.debug("[ignored] Console proxy was interupted during GC.");
+            }
+        }
+    }
+
+    private void cleanupLogging() {
+        if (lastLogScan != 0 && System.currentTimeMillis() - lastLogScan < 3600000) {
+            return;
+        }
+
+        lastLogScan = System.currentTimeMillis();
+
+        final File logDir = new File("./logs");
+        final File[] files = logDir.listFiles();
+        if (files != null) {
+            for (final File file : files) {
+                if (System.currentTimeMillis() - file.lastModified() >= 86400000L) {
+                    try {
+                        file.delete();
+                    } catch (final Throwable e) {
+                        s_logger.info("[ignored]"
+                                + "failed to delete file: " + e.getLocalizedMessage());
+                    }
+                }
             }
         }
     }

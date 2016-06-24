@@ -25,17 +25,9 @@ public class CreateVolumeFromVMSnapshotAnswer extends Answer {
     private String path;
     private VolumeTO volumeTo;
 
-    public VolumeTO getVolumeTo() {
-        return volumeTo;
-    }
-
     public CreateVolumeFromVMSnapshotAnswer(CreateVolumeFromVMSnapshotCommand cmd, VolumeTO volumeTo) {
         super(cmd, true, "");
         this.volumeTo = volumeTo;
-    }
-
-    public String getPath() {
-        return path;
     }
 
     protected CreateVolumeFromVMSnapshotAnswer() {
@@ -49,5 +41,13 @@ public class CreateVolumeFromVMSnapshotAnswer extends Answer {
 
     public CreateVolumeFromVMSnapshotAnswer(CreateVolumeFromVMSnapshotCommand cmd, boolean result, String string) {
         super(cmd, result, string);
+    }
+
+    public VolumeTO getVolumeTo() {
+        return volumeTo;
+    }
+
+    public String getPath() {
+        return path;
     }
 }

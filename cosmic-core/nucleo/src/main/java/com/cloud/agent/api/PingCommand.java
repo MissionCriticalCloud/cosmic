@@ -47,24 +47,34 @@ public class PingCommand extends Command {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PingCommand)) return false;
-        if (!super.equals(o)) return false;
-
-        PingCommand that = (PingCommand) o;
-
-        if (hostId != that.hostId) return false;
-        if (hostType != that.hostType) return false;
-
-        return true;
-    }
-
-    @Override
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + (hostType != null ? hostType.hashCode() : 0);
         result = 31 * result + (int) (hostId ^ (hostId >>> 32));
         return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PingCommand)) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        PingCommand that = (PingCommand) o;
+
+        if (hostId != that.hostId) {
+            return false;
+        }
+        if (hostType != that.hostType) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -16,32 +16,34 @@
 // under the License.
 package com.cloud.network.as.dao;
 
-import java.util.List;
-
 import com.cloud.network.as.AutoScalePolicyConditionMapVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
 @Component
 public class AutoScalePolicyConditionMapDaoImpl extends GenericDaoBase<AutoScalePolicyConditionMapVO, Long> implements AutoScalePolicyConditionMapDao {
 
-    private SearchCriteria<AutoScalePolicyConditionMapVO> getSearchCriteria(Long policyId, Long conditionId) {
-        SearchCriteria<AutoScalePolicyConditionMapVO> sc = createSearchCriteria();
-
-        if (policyId != null)
-            sc.addAnd("policyId", SearchCriteria.Op.EQ, policyId);
-
-        if (conditionId != null)
-            sc.addAnd("conditionId", SearchCriteria.Op.EQ, conditionId);
-
-        return sc;
-    }
-
     @Override
     public List<AutoScalePolicyConditionMapVO> listByAll(Long policyId, Long conditionId) {
         return listBy(getSearchCriteria(policyId, conditionId));
+    }
+
+    private SearchCriteria<AutoScalePolicyConditionMapVO> getSearchCriteria(Long policyId, Long conditionId) {
+        SearchCriteria<AutoScalePolicyConditionMapVO> sc = createSearchCriteria();
+
+        if (policyId != null) {
+            sc.addAnd("policyId", SearchCriteria.Op.EQ, policyId);
+        }
+
+        if (conditionId != null) {
+            sc.addAnd("conditionId", SearchCriteria.Op.EQ, conditionId);
+        }
+
+        return sc;
     }
 
     @Override

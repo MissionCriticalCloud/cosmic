@@ -20,18 +20,18 @@ package com.cloud.utils.db;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 
-import org.junit.Test;
+import java.util.ArrayList;
 
+import org.junit.Test;
 
 public class GroupByTest {
 
     protected static final String EXPECTED_QUERY = "BASE GROUP BY FIRST(TEST_TABLE.TEST_COLUMN), MAX(TEST_TABLE.TEST_COLUMN) HAVING COUNT(TEST_TABLE2.TEST_COLUMN2) > ? ";
+
     @Test
     public void testToSql() {
         // Prepare
@@ -67,7 +67,7 @@ class GroupByExtension extends GroupBy<SearchBaseExtension, String, String> {
 }
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-class SearchBaseExtension extends SearchBase<SearchBaseExtension, String, String>{
+class SearchBaseExtension extends SearchBase<SearchBaseExtension, String, String> {
 
     SearchBaseExtension(final Class entityType, final Class resultType) {
         super(entityType, resultType);

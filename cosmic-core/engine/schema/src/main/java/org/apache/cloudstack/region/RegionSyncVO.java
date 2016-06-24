@@ -16,34 +16,29 @@
 // under the License.
 package org.apache.cloudstack.region;
 
-import java.util.Date;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
 
 @Entity
 @Table(name = "region_sync")
 public class RegionSyncVO implements RegionSync {
 
+    @Column(name = "processed")
+    boolean processed;
     @Id
     @Column(name = "id")
     private long id;
-
     @Column(name = "region_id")
     private int regionId;
-
     @Column(name = "api")
     private String api;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date createDate;
-
-    @Column(name = "processed")
-    boolean processed;
 
     public RegionSyncVO() {
     }
@@ -51,6 +46,19 @@ public class RegionSyncVO implements RegionSync {
     public RegionSyncVO(int regionId, String api) {
         this.regionId = regionId;
         this.api = api;
+    }
+
+    public boolean isProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(boolean processed) {
+        this.processed = processed;
+    }
+
+    @Override
+    public long getId() {
+        return id;
     }
 
     @Override
@@ -79,18 +87,4 @@ public class RegionSyncVO implements RegionSync {
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
-
-    public boolean isProcessed() {
-        return processed;
-    }
-
-    public void setProcessed(boolean processed) {
-        this.processed = processed;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
 }

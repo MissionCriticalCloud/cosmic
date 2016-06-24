@@ -18,7 +18,6 @@ package org.apache.cloudstack.api.command.admin.host;
 
 import com.cloud.event.EventTypes;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -29,6 +28,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.HostResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,13 +50,44 @@ public class ReleaseHostReservationCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
+    @Override
+    public String getEventType() {
+        return EventTypes.EVENT_HOST_RESERVATION_RELEASE;
     }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
+
+    @Override
+    public String getEventDescription() {
+        return "releasing reservation for host: " + getId();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public Long getInstanceId() {
+        return getId();
+    }
+
+    @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.Host;
+    }
+
+    @Override
+    public void execute() {
+        boolean result = _resourceService.releaseHostReservation(getId());
+        if (result) {
+            SuccessResponse response = new SuccessResponse(getCommandName());
+            this.setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to release host reservation");
+        }
+    }
 
     @Override
     public String getCommandName() {
@@ -71,36 +102,5 @@ public class ReleaseHostReservationCmd extends BaseAsyncCmd {
         }
 
         return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
-    public String getEventType() {
-        return EventTypes.EVENT_HOST_RESERVATION_RELEASE;
-    }
-
-    @Override
-    public String getEventDescription() {
-        return "releasing reservation for host: " + getId();
-    }
-
-    @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.Host;
-    }
-
-    @Override
-    public Long getInstanceId() {
-        return getId();
-    }
-
-    @Override
-    public void execute() {
-        boolean result = _resourceService.releaseHostReservation(getId());
-        if (result) {
-            SuccessResponse response = new SuccessResponse(getCommandName());
-            this.setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to release host reservation");
-        }
     }
 }

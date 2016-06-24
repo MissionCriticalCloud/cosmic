@@ -101,8 +101,10 @@ public class StringUtilsTest {
 
     @Test
     public void testCleanPasswordFromEncodedRequestString() {
-        final String input = "name=SS1&provider=SMB&zoneid=5a60af2b-3025-4f2a-9ecc-8e33bf2b94e3&url=cifs%3A%2F%2F10.102.192.150%2FSMB-Share%2Fsowmya%2Fsecondary%3Fuser%3Dsowmya%26password%3DXXXXX%40123%26domain%3DBLR";
-        final String expected = "name=SS1&provider=SMB&zoneid=5a60af2b-3025-4f2a-9ecc-8e33bf2b94e3&url=cifs%3A%2F%2F10.102.192.150%2FSMB-Share%2Fsowmya%2Fsecondary%3Fuser%3Dsowmya%26domain%3DBLR";
+        final String input = "name=SS1&provider=SMB&zoneid=5a60af2b-3025-4f2a-9ecc-8e33bf2b94e3&url=cifs%3A%2F%2F10.102.192" +
+                ".150%2FSMB-Share%2Fsowmya%2Fsecondary%3Fuser%3Dsowmya%26password%3DXXXXX%40123%26domain%3DBLR";
+        final String expected = "name=SS1&provider=SMB&zoneid=5a60af2b-3025-4f2a-9ecc-8e33bf2b94e3&url=cifs%3A%2F%2F10.102.192" +
+                ".150%2FSMB-Share%2Fsowmya%2Fsecondary%3Fuser%3Dsowmya%26domain%3DBLR";
         final String result = StringUtils.cleanString(input);
         assertEquals(result, expected);
     }
@@ -247,7 +249,7 @@ public class StringUtilsTest {
 
     @Test
     public void listToCsvTags() {
-        assertEquals("a,b,c", StringUtils.listToCsvTags(Arrays.asList("a","b", "c")));
-        assertEquals("", StringUtils.listToCsvTags(new ArrayList<String>()));
+        assertEquals("a,b,c", StringUtils.listToCsvTags(Arrays.asList("a", "b", "c")));
+        assertEquals("", StringUtils.listToCsvTags(new ArrayList<>()));
     }
 }

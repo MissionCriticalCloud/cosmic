@@ -16,19 +16,19 @@
 # under the License.
 """ Test cases for checking usage events
 """
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources, validateList)
+from marvin.codes import (PASS)
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              VirtualMachine)
 from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template)
-from marvin.codes import (PASS)
+from marvin.lib.utils import (cleanup_resources, validateList)
+from nose.plugins.attrib import attr
+
 
 class TestUsageEvents(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestUsageEvents, cls).getClsTestClient()

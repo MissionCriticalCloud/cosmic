@@ -39,5 +39,4 @@ public class InlineLoadBalancerNicMapDaoImpl extends GenericDaoBase<InlineLoadBa
 
         return findOneBy(sc);
     }
-
 }

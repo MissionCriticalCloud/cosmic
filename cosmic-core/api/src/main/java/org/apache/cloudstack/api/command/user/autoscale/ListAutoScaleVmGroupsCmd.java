@@ -16,12 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.autoscale;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.as.AutoScaleVmGroup;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -33,6 +29,10 @@ import org.apache.cloudstack.api.response.AutoScaleVmProfileResponse;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +62,8 @@ public class ListAutoScaleVmGroupsCmd extends BaseListProjectAndAccountResources
     @Parameter(name = ApiConstants.ZONE_ID, type = CommandType.UUID, entityType = ZoneResponse.class, description = "the availability zone ID")
     private Long zoneId;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "list resources by display flag; only ROOT admin is eligible to pass this parameter", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "list resources by display flag; only ROOT admin is eligible to pass this parameter",
+            since = "4.4", authorized = {RoleType.Admin})
     private Boolean display;
 
     // ///////////////////////////////////////////////////
@@ -102,14 +103,10 @@ public class ListAutoScaleVmGroupsCmd extends BaseListProjectAndAccountResources
     // ///////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
-        if (id != null && (loadBalancerId != null || profileId != null || policyId != null))
+        if (id != null && (loadBalancerId != null || profileId != null || policyId != null)) {
             throw new InvalidParameterValueException("When id is specified other parameters need not be specified");
+        }
 
         List<? extends AutoScaleVmGroup> autoScaleGroups = _autoScaleService.listAutoScaleVmGroups(this);
         ListResponse<AutoScaleVmGroupResponse> response = new ListResponse<AutoScaleVmGroupResponse>();
@@ -124,5 +121,10 @@ public class ListAutoScaleVmGroupsCmd extends BaseListProjectAndAccountResources
         response.setResponses(responses);
         response.setResponseName(getCommandName());
         setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

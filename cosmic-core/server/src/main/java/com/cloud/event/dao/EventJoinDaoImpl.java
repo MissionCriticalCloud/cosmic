@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.event.dao;
 
-import java.util.List;
-
 import com.cloud.api.ApiResponseHelper;
 import com.cloud.api.query.vo.EventJoinVO;
 import com.cloud.event.Event;
@@ -26,8 +24,10 @@ import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.response.EventResponse;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -61,19 +61,6 @@ public class EventJoinDaoImpl extends GenericDaoBase<EventJoinVO, Long> implemen
     }
 
     @Override
-    public List<EventJoinVO> searchAllEvents(SearchCriteria<EventJoinVO> sc, Filter filter) {
-        return listIncludingRemovedBy(sc, filter);
-    }
-
-    @Override
-    public EventJoinVO findCompletedEvent(long startId) {
-        SearchCriteria<EventJoinVO> sc = CompletedEventSearch.create();
-        sc.setParameters("state", State.Completed);
-        sc.setParameters("startId", startId);
-        return findOneIncludingRemovedBy(sc);
-    }
-
-    @Override
     public EventResponse newEventResponse(EventJoinVO event) {
         EventResponse responseEvent = new EventResponse();
         responseEvent.setCreated(event.getCreateDate());
@@ -91,13 +78,6 @@ public class EventJoinDaoImpl extends GenericDaoBase<EventJoinVO, Long> implemen
     }
 
     @Override
-    public List<EventJoinVO> searchByIds(Long... ids) {
-        SearchCriteria<EventJoinVO> sc = vrSearch.create();
-        sc.setParameters("idIN", ids);
-        return searchIncludingRemoved(sc, null, null, false);
-    }
-
-    @Override
     public EventJoinVO newEventView(Event vr) {
 
         SearchCriteria<EventJoinVO> sc = vrIdSearch.create();
@@ -105,7 +85,25 @@ public class EventJoinDaoImpl extends GenericDaoBase<EventJoinVO, Long> implemen
         List<EventJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
         assert vms != null && vms.size() == 1 : "No event found for event id " + vr.getId();
         return vms.get(0);
-
     }
 
+    @Override
+    public List<EventJoinVO> searchByIds(Long... ids) {
+        SearchCriteria<EventJoinVO> sc = vrSearch.create();
+        sc.setParameters("idIN", ids);
+        return searchIncludingRemoved(sc, null, null, false);
+    }
+
+    @Override
+    public List<EventJoinVO> searchAllEvents(SearchCriteria<EventJoinVO> sc, Filter filter) {
+        return listIncludingRemovedBy(sc, filter);
+    }
+
+    @Override
+    public EventJoinVO findCompletedEvent(long startId) {
+        SearchCriteria<EventJoinVO> sc = CompletedEventSearch.create();
+        sc.setParameters("state", State.Completed);
+        sc.setParameters("startId", startId);
+        return findOneIncludingRemovedBy(sc);
+    }
 }

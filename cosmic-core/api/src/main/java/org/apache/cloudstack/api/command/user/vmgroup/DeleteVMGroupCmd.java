@@ -18,7 +18,6 @@ package org.apache.cloudstack.api.command.user.vmgroup;
 
 import com.cloud.user.Account;
 import com.cloud.vm.InstanceGroup;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -29,6 +28,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.InstanceGroupResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +50,15 @@ public class DeleteVMGroupCmd extends BaseCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
+    @Override
+    public void execute() {
+        boolean result = _userVmService.deleteVmGroup(this);
+        if (result) {
+            SuccessResponse response = new SuccessResponse(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete vm group");
+        }
     }
 
     /////////////////////////////////////////////////////
@@ -73,14 +80,7 @@ public class DeleteVMGroupCmd extends BaseCmd {
         return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 
-    @Override
-    public void execute() {
-        boolean result = _userVmService.deleteVmGroup(this);
-        if (result) {
-            SuccessResponse response = new SuccessResponse(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete vm group");
-        }
+    public Long getId() {
+        return id;
     }
 }

@@ -17,9 +17,8 @@
 
 """Test case for checking creation of two VM's with same name on VMWare"""
 
-from nose.plugins.attrib import attr
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources)
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              VirtualMachine,
@@ -29,13 +28,12 @@ from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template,
                                )
-
+from marvin.lib.utils import (cleanup_resources)
 from marvin.sshClient import SshClient
-import time
+from nose.plugins.attrib import attr
 
 
 class TestSameVMName(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestSameVMName, cls).getClsTestClient()

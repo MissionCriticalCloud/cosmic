@@ -16,23 +16,22 @@
 // under the License.
 package com.cloud.usage.parser;
 
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.usage.UsagePortForwardingRuleVO;
 import com.cloud.usage.UsageVO;
 import com.cloud.usage.dao.UsageDao;
 import com.cloud.usage.dao.UsagePortForwardingRuleDao;
 import com.cloud.user.AccountVO;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.usage.UsageTypes;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.text.DecimalFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -48,12 +47,6 @@ public class PortForwardingUsageParser {
     private UsageDao _usageDao;
     @Inject
     private UsagePortForwardingRuleDao _usagePFRuleDao;
-
-    @PostConstruct
-    void init() {
-        s_usageDao = _usageDao;
-        s_usagePFRuleDao = _usagePFRuleDao;
-    }
 
     public static boolean parse(AccountVO account, Date startDate, Date endDate) {
         if (s_logger.isDebugEnabled()) {
@@ -103,7 +96,8 @@ public class PortForwardingUsageParser {
                 continue;
             }
 
-            long currentDuration = (pfDeleteDate.getTime() - pfCreateDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to find total number of millis to charge)
+            long currentDuration = (pfDeleteDate.getTime() - pfCreateDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to find
+            // total number of millis to charge)
 
             updatePFUsageData(usageMap, key, usagePF.getId(), currentDuration);
         }
@@ -147,7 +141,7 @@ public class PortForwardingUsageParser {
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Creating usage record for port forwarding rule: " + pfId + ", usage: " + usageDisplay + ", startDate: " + startDate + ", endDate: " +
-                endDate + ", for account: " + account.getId());
+                    endDate + ", for account: " + account.getId());
         }
 
         // Create the usage record
@@ -155,9 +149,15 @@ public class PortForwardingUsageParser {
 
         //ToDo: get zone id
         UsageVO usageRecord =
-            new UsageVO(zoneId, account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", type, new Double(usage), null, null, null, null, pfId, null,
-                startDate, endDate);
+                new UsageVO(zoneId, account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", type, new Double(usage), null, null, null, null, pfId, null,
+                        startDate, endDate);
         s_usageDao.persist(usageRecord);
+    }
+
+    @PostConstruct
+    void init() {
+        s_usageDao = _usageDao;
+        s_usagePFRuleDao = _usagePFRuleDao;
     }
 
     private static class PFInfo {
@@ -177,5 +177,4 @@ public class PortForwardingUsageParser {
             return id;
         }
     }
-
 }

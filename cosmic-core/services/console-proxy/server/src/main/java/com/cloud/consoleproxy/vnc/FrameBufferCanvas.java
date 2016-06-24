@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.consoleproxy.vnc;
 
+import com.cloud.consoleproxy.util.TileInfo;
+
 import java.awt.Image;
 import java.util.List;
-
-import com.cloud.consoleproxy.util.TileInfo;
 
 public interface FrameBufferCanvas {
     Image getFrameBufferScaledImage(int width, int height);

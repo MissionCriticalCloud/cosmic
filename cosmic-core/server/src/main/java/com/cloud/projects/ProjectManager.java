@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.projects;
 
-import java.util.List;
-
 import com.cloud.user.Account;
+
+import java.util.List;
 
 public interface ProjectManager extends ProjectService {
     boolean canAccessProjectAccount(Account caller, long accountId);
@@ -36,5 +36,4 @@ public interface ProjectManager extends ProjectService {
     boolean deleteProject(Account caller, long callerUserId, ProjectVO project);
 
     long getInvitationTimeout();
-
 }

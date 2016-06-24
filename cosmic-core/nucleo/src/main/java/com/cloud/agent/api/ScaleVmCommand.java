@@ -31,18 +31,6 @@ public class ScaleVmCommand extends Command {
     long minRam;
     long maxRam;
 
-    public VirtualMachineTO getVm() {
-        return vm;
-    }
-
-    public void setVm(VirtualMachineTO vm) {
-        this.vm = vm;
-    }
-
-    public int getCpus() {
-        return cpus;
-    }
-
     public ScaleVmCommand(String vmName, int cpus, Integer minSpeed, Integer maxSpeed, long minRam, long maxRam, boolean limitCpuUse) {
         super();
         this.vmName = vmName;
@@ -55,6 +43,25 @@ public class ScaleVmCommand extends Command {
         /*vm.setName(vmName);
         vm.setCpus(cpus);
         vm.setRam(minRam, maxRam);*/
+    }
+
+    protected ScaleVmCommand() {
+    }
+
+    public ScaleVmCommand(VirtualMachineTO vm) {
+        this.vm = vm;
+    }
+
+    public VirtualMachineTO getVm() {
+        return vm;
+    }
+
+    public void setVm(VirtualMachineTO vm) {
+        this.vm = vm;
+    }
+
+    public int getCpus() {
+        return cpus;
     }
 
     public void setCpus(int cpus) {
@@ -110,16 +117,8 @@ public class ScaleVmCommand extends Command {
         return true;
     }
 
-    protected ScaleVmCommand() {
-    }
-
-    public ScaleVmCommand(VirtualMachineTO vm) {
-        this.vm = vm;
-    }
-
     public boolean getLimitCpuUse() {
         // TODO Auto-generated method stub
         return false;
     }
-
 }

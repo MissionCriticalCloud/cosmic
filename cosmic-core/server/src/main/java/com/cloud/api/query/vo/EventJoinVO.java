@@ -16,7 +16,9 @@
 // under the License.
 package com.cloud.api.query.vo;
 
-import java.util.Date;
+import com.cloud.event.Event;
+import com.cloud.event.Event.State;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,91 +26,64 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.event.Event;
-import com.cloud.event.Event.State;
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
 
 @Entity
 @Table(name = "event_view")
 public class EventJoinVO extends BaseViewVO implements ControlledViewEntity {
 
+    @Column(name = "display")
+    protected boolean display = true;
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "type")
     private String type;
-
     @Enumerated(value = EnumType.STRING)
     @Column(name = "state")
     private State state;
-
     @Column(name = "description")
     private String description;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date createDate;
-
     @Column(name = "user_id")
     private long userId;
-
     @Column(name = "user_name")
     private String userName;
-
     @Column(name = "level")
     private String level;
-
     @Column(name = "start_id")
     private long startId;
-
     @Column(name = "start_uuid")
     private String startUuid;
-
     @Column(name = "parameters", length = 1024)
     private String parameters;
-
     @Column(name = "account_id")
     private long accountId;
-
     @Column(name = "account_uuid")
     private String accountUuid;
-
     @Column(name = "account_name")
     private String accountName = null;
-
     @Column(name = "account_type")
     private short accountType;
-
     @Column(name = "domain_id")
     private long domainId;
-
     @Column(name = "domain_uuid")
     private String domainUuid;
-
     @Column(name = "domain_name")
     private String domainName = null;
-
     @Column(name = "domain_path")
     private String domainPath = null;
-
     @Column(name = "project_id")
     private long projectId;
-
     @Column(name = "project_uuid")
     private String projectUuid;
-
     @Column(name = "project_name")
     private String projectName;
-
     @Column(name = "archived")
     private boolean archived;
-
-    @Column(name = "display")
-    protected boolean display = true;
 
     public EventJoinVO() {
     }
@@ -129,13 +104,13 @@ public class EventJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     @Override
-    public String getAccountUuid() {
-        return accountUuid;
+    public long getDomainId() {
+        return domainId;
     }
 
     @Override
-    public String getAccountName() {
-        return accountName;
+    public String getDomainPath() {
+        return domainPath;
     }
 
     @Override
@@ -144,8 +119,13 @@ public class EventJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     @Override
-    public long getDomainId() {
-        return domainId;
+    public String getAccountUuid() {
+        return accountUuid;
+    }
+
+    @Override
+    public String getAccountName() {
+        return accountName;
     }
 
     @Override
@@ -159,15 +139,6 @@ public class EventJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     @Override
-    public String getDomainPath() {
-        return domainPath;
-    }
-
-    public long getProjectId() {
-        return projectId;
-    }
-
-    @Override
     public String getProjectUuid() {
         return projectUuid;
     }
@@ -175,6 +146,10 @@ public class EventJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Override
     public String getProjectName() {
         return projectName;
+    }
+
+    public long getProjectId() {
+        return projectId;
     }
 
     public String getType() {

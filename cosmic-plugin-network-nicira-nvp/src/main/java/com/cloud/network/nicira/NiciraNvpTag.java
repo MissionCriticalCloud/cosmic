@@ -31,7 +31,7 @@ public class NiciraNvpTag {
     public NiciraNvpTag() {
     }
 
-    public NiciraNvpTag(String scope, String tag) {
+    public NiciraNvpTag(final String scope, final String tag) {
         this.scope = scope;
         if (tag.length() > 40) {
             s_logger.warn("tag \"" + tag + "\" too long, truncating to 40 characters");
@@ -45,7 +45,7 @@ public class NiciraNvpTag {
         return scope;
     }
 
-    public void setScope(String scope) {
+    public void setScope(final String scope) {
         this.scope = scope;
     }
 
@@ -53,7 +53,7 @@ public class NiciraNvpTag {
         return tag;
     }
 
-    public void setTag(String tag) {
+    public void setTag(final String tag) {
         if (tag.length() > 40) {
             s_logger.warn("tag \"" + tag + "\" too long, truncating to 40 characters");
             this.tag = tag.substring(0, 40);
@@ -61,5 +61,4 @@ public class NiciraNvpTag {
             this.tag = tag;
         }
     }
-
 }

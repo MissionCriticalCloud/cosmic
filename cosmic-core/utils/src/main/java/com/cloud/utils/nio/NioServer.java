@@ -34,9 +34,8 @@ public class NioServer extends NioConnection {
     private final static Logger s_logger = LoggerFactory.getLogger(NioServer.class);
 
     protected InetSocketAddress _localAddr;
-    private ServerSocketChannel _serverSocket;
-
     protected WeakHashMap<InetSocketAddress, Link> _links;
+    private ServerSocketChannel _serverSocket;
 
     public NioServer(final String name, final int port, final int workers, final HandlerFactory factory) {
         super(name, port, workers, factory);
@@ -60,15 +59,6 @@ public class NioServer extends NioConnection {
     }
 
     @Override
-    public void cleanUp() throws IOException {
-        super.cleanUp();
-        if (_serverSocket != null) {
-            _serverSocket.close();
-        }
-        s_logger.info("NioConnection stopped on " + _localAddr.toString());
-    }
-
-    @Override
     protected void registerLink(final InetSocketAddress addr, final Link link) {
         _links.put(addr, link);
     }
@@ -78,11 +68,21 @@ public class NioServer extends NioConnection {
         _links.remove(saddr);
     }
 
+    @Override
+    public void cleanUp() throws IOException {
+        super.cleanUp();
+        if (_serverSocket != null) {
+            _serverSocket.close();
+        }
+        s_logger.info("NioConnection stopped on " + _localAddr.toString());
+    }
+
     /**
      * Sends the data to the address specified.  If address is not already
      * connected, this does nothing and returns null.  If address is already
      * connected, then it returns the attached object so the caller can
      * prepare for any responses.
+     *
      * @param saddr
      * @param data
      * @return null if not sent.  attach object in link if sent.

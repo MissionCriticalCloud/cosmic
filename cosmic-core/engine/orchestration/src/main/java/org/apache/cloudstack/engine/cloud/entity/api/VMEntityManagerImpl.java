@@ -16,12 +16,6 @@
 // under the License.
 package org.apache.cloudstack.engine.cloud.entity.api;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.dao.ClusterDao;
@@ -55,7 +49,6 @@ import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.VirtualMachineProfileImpl;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.affinity.dao.AffinityGroupVMMapDao;
 import org.apache.cloudstack.engine.cloud.entity.api.db.VMEntityVO;
 import org.apache.cloudstack.engine.cloud.entity.api.db.VMReservationVO;
@@ -63,6 +56,12 @@ import org.apache.cloudstack.engine.cloud.entity.api.db.dao.VMEntityDao;
 import org.apache.cloudstack.engine.cloud.entity.api.db.dao.VMReservationDao;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -112,13 +111,11 @@ public class VMEntityManagerImpl implements VMEntityManager {
     @Inject
     protected PrimaryDataStoreDao _storagePoolDao;
     @Inject
+    protected AffinityGroupVMMapDao _affinityGroupVMMapDao;
+    @Inject
     DataStoreManager dataStoreMgr;
-
     @Inject
     DeploymentPlanningManager _dpMgr;
-
-    @Inject
-    protected AffinityGroupVMMapDao _affinityGroupVMMapDao;
     @Inject
     DeploymentPlanningManager _planningMgr;
 
@@ -131,22 +128,11 @@ public class VMEntityManagerImpl implements VMEntityManager {
     @Override
     public void saveVirtualMachine(VMEntityVO entity) {
         _vmEntityDao.persist(entity);
-
-    }
-
-    protected boolean areAffinityGroupsAssociated(VirtualMachineProfile vmProfile) {
-        VirtualMachine vm = vmProfile.getVirtualMachine();
-        long vmGroupCount = _affinityGroupVMMapDao.countAffinityGroupsForVm(vm.getId());
-
-        if (vmGroupCount > 0) {
-            return true;
-        }
-        return false;
     }
 
     @Override
     public String reserveVirtualMachine(VMEntityVO vmEntityVO, DeploymentPlanner plannerToUse, DeploymentPlan planToDeploy, ExcludeList exclude)
-        throws InsufficientCapacityException, ResourceUnavailableException {
+            throws InsufficientCapacityException, ResourceUnavailableException {
 
         //call planner and get the deployDestination.
         //load vm instance and offerings and call virtualMachineManagerImpl
@@ -157,15 +143,15 @@ public class VMEntityManagerImpl implements VMEntityManager {
         DataCenterDeployment plan = new DataCenterDeployment(vm.getDataCenterId(), vm.getPodIdToDeployIn(), null, null, null, null);
         if (planToDeploy != null && planToDeploy.getDataCenterId() != 0) {
             plan =
-                new DataCenterDeployment(planToDeploy.getDataCenterId(), planToDeploy.getPodId(), planToDeploy.getClusterId(), planToDeploy.getHostId(),
-                    planToDeploy.getPoolId(), planToDeploy.getPhysicalNetworkId());
+                    new DataCenterDeployment(planToDeploy.getDataCenterId(), planToDeploy.getPodId(), planToDeploy.getClusterId(), planToDeploy.getHostId(),
+                            planToDeploy.getPoolId(), planToDeploy.getPhysicalNetworkId());
         }
 
         boolean planChangedByReadyVolume = false;
         List<VolumeVO> vols = _volsDao.findReadyRootVolumesByInstance(vm.getId());
         if (!vols.isEmpty()) {
             VolumeVO vol = vols.get(0);
-            StoragePool pool = (StoragePool)dataStoreMgr.getPrimaryDataStore(vol.getPoolId());
+            StoragePool pool = (StoragePool) dataStoreMgr.getPrimaryDataStore(vol.getPoolId());
 
             if (!pool.isInMaintenance()) {
                 long rootVolDcId = pool.getDataCenterId();
@@ -177,14 +163,13 @@ public class VMEntityManagerImpl implements VMEntityManager {
                         checkIfPlanIsDeployable(vm, rootVolClusterId, clusterIdSpecified);
                     }
                     plan =
-                        new DataCenterDeployment(planToDeploy.getDataCenterId(), planToDeploy.getPodId(), planToDeploy.getClusterId(), planToDeploy.getHostId(),
-                            vol.getPoolId(), null, null);
+                            new DataCenterDeployment(planToDeploy.getDataCenterId(), planToDeploy.getPodId(), planToDeploy.getClusterId(), planToDeploy.getHostId(),
+                                    vol.getPoolId(), null, null);
                 } else {
                     plan = new DataCenterDeployment(rootVolDcId, rootVolPodId, rootVolClusterId, null, vol.getPoolId(), null, null);
                     planChangedByReadyVolume = true;
                 }
             }
-
         }
 
         while (true) {
@@ -212,7 +197,7 @@ public class VMEntityManagerImpl implements VMEntityManager {
                 return UUID.randomUUID().toString();
             } else {
                 throw new InsufficientServerCapacityException("Unable to create a deployment for " + vmProfile, DataCenter.class, plan.getDataCenterId(),
-                    areAffinityGroupsAssociated(vmProfile));
+                        areAffinityGroupsAssociated(vmProfile));
             }
         }
     }
@@ -234,9 +219,19 @@ public class VMEntityManagerImpl implements VMEntityManager {
         }
     }
 
+    protected boolean areAffinityGroupsAssociated(VirtualMachineProfile vmProfile) {
+        VirtualMachine vm = vmProfile.getVirtualMachine();
+        long vmGroupCount = _affinityGroupVMMapDao.countAffinityGroupsForVm(vm.getId());
+
+        if (vmGroupCount > 0) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void deployVirtualMachine(String reservationId, VMEntityVO vmEntityVO, String caller, Map<VirtualMachineProfile.Param, Object> params)
-        throws InsufficientCapacityException, ResourceUnavailableException {
+            throws InsufficientCapacityException, ResourceUnavailableException {
         //grab the VM Id and destination using the reservationId.
 
         VMInstanceVO vm = _vmDao.findByUuid(vmEntityVO.getUuid());
@@ -245,7 +240,7 @@ public class VMEntityManagerImpl implements VMEntityManager {
         if (vmReservation != null) {
 
             DataCenterDeployment reservedPlan =
-                new DataCenterDeployment(vm.getDataCenterId(), vmReservation.getPodId(), vmReservation.getClusterId(), vmReservation.getHostId(), null, null);
+                    new DataCenterDeployment(vm.getDataCenterId(), vmReservation.getPodId(), vmReservation.getClusterId(), vmReservation.getHostId(), null, null);
             try {
                 _itMgr.start(vm.getUuid(), params, reservedPlan, _planningMgr.getDeploymentPlannerByName(vmReservation.getDeploymentPlanner()));
             } catch (Exception ex) {
@@ -262,7 +257,6 @@ public class VMEntityManagerImpl implements VMEntityManager {
             // no reservation found. Let VirtualMachineManager retry
             _itMgr.start(vm.getUuid(), params, null, null);
         }
-
     }
 
     @Override
@@ -287,5 +281,4 @@ public class VMEntityManagerImpl implements VMEntityManager {
     public void setPlanners(List<DeploymentPlanner> planners) {
         this._planners = planners;
     }
-
 }

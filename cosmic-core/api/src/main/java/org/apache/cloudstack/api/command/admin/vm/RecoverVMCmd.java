@@ -20,7 +20,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -29,6 +28,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.UserVmResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +50,16 @@ public class RecoverVMCmd extends BaseCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
+    @Override
+    public void execute() throws ResourceAllocationException {
+        UserVm result = _userVmService.recoverVirtualMachine(this);
+        if (result != null) {
+            UserVmResponse recoverVmResponse = _responseGenerator.createUserVmResponse(ResponseView.Full, "virtualmachine", result).get(0);
+            recoverVmResponse.setResponseName(getCommandName());
+            setResponseObject(recoverVmResponse);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to recover vm");
+        }
     }
 
     /////////////////////////////////////////////////////
@@ -73,16 +81,7 @@ public class RecoverVMCmd extends BaseCmd {
         return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 
-    @Override
-    public void execute() throws ResourceAllocationException {
-        UserVm result = _userVmService.recoverVirtualMachine(this);
-        if (result != null){
-            UserVmResponse recoverVmResponse = _responseGenerator.createUserVmResponse(ResponseView.Full, "virtualmachine", result).get(0);
-            recoverVmResponse.setResponseName(getCommandName());
-            setResponseObject(recoverVmResponse);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to recover vm");
-        }
-
+    public Long getId() {
+        return id;
     }
 }

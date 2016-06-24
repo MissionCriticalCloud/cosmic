@@ -23,12 +23,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.apache.cloudstack.managed.context.ManagedContextListener;
+import org.apache.cloudstack.managed.threadlocal.ManagedThreadLocal;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.apache.cloudstack.managed.context.ManagedContextListener;
-import org.apache.cloudstack.managed.threadlocal.ManagedThreadLocal;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -40,5 +40,4 @@ public class ConfigureStaticNatRulesOnLogicalRouterAnswer extends Answer {
     public ConfigureStaticNatRulesOnLogicalRouterAnswer(final Command command, final Exception e) {
         super(command, e);
     }
-
 }

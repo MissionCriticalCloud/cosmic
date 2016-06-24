@@ -27,5 +27,4 @@ public abstract class TransactionCallbackNoReturn implements TransactionCallback
     }
 
     public abstract void doInTransactionWithoutResult(TransactionStatus status);
-
 }

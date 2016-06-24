@@ -43,5 +43,4 @@ public interface Pod extends InfrastructureEntity, Grouping, Identity, InternalI
     boolean getExternalDhcp();
 
     boolean belongsToDataCenter(final long dataCenterId);
-
 }

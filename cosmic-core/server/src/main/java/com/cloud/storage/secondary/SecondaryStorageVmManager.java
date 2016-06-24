@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.storage.secondary;
 
-import java.util.List;
-
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.host.HostVO;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.Manager;
 import com.cloud.vm.SecondaryStorageVmVO;
+
+import java.util.List;
 
 public interface SecondaryStorageVmManager extends Manager {
 

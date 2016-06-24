@@ -109,22 +109,22 @@ class LdapAuthenticatorSpec extends spock.lang.Specification {
         result == "password"
     }
 
-    def "test authentication when ldap is disabled"(){
+    def "test authentication when ldap is disabled"() {
         LdapManager ldapManager = Mock(LdapManager)
         UserAccountDao userAccountDao = Mock(UserAccountDao)
         def ldapAuthenticator = new LdapAuthenticator(ldapManager, userAccountDao)
         ldapManager.isLdapEnabled() >> false
 
         when:
-            Pair<Boolean, UserAuthenticator.ActionOnFailedAuthentication> result = ldapAuthenticator.authenticate("rajanik", "password", 1, null)
+        Pair<Boolean, UserAuthenticator.ActionOnFailedAuthentication> result = ldapAuthenticator.authenticate("rajanik", "password", 1, null)
         then:
-            result.first() == false
-            result.second() == null
+        result.first() == false
+        result.second() == null
 
     }
 
     // tests when domain is linked to LDAP
-    def "test authentication when domain is linked and user disabled in ldap"(){
+    def "test authentication when domain is linked and user disabled in ldap"() {
         LdapManager ldapManager = Mock(LdapManager)
         UserAccountDao userAccountDao = Mock(UserAccountDao)
         AccountManager accountManager = Mock(AccountManager)
@@ -143,19 +143,19 @@ class LdapAuthenticatorSpec extends spock.lang.Specification {
         UserAccount userAccount = Mock(UserAccount)
         userAccountDao.getUserAccount(username, domainId) >> userAccount
         userAccount.getId() >> 1
-        ldapManager.getDomainLinkedToLdap(domainId) >> new LdapTrustMapVO(domainId, type, name, (short)2)
+        ldapManager.getDomainLinkedToLdap(domainId) >> new LdapTrustMapVO(domainId, type, name, (short) 2)
         ldapManager.getUser(username, type.toString(), name) >> new LdapUser(username, "email", "firstname", "lastname", "principal", "domain", true)
         //user should be disabled in cloudstack
         accountManager.disableUser(1) >> userAccount
 
         when:
-            Pair<Boolean, UserAuthenticator.ActionOnFailedAuthentication> result = ldapAuthenticator.authenticate(username, "password", domainId, null)
+        Pair<Boolean, UserAuthenticator.ActionOnFailedAuthentication> result = ldapAuthenticator.authenticate(username, "password", domainId, null)
         then:
-            result.first() == false
-            result.second() == UserAuthenticator.ActionOnFailedAuthentication.INCREMENT_INCORRECT_LOGIN_ATTEMPT_COUNT
+        result.first() == false
+        result.second() == UserAuthenticator.ActionOnFailedAuthentication.INCREMENT_INCORRECT_LOGIN_ATTEMPT_COUNT
     }
 
-    def "test authentication when domain is linked and first time user can authenticate in ldap"(){
+    def "test authentication when domain is linked and first time user can authenticate in ldap"() {
         LdapManager ldapManager = Mock(LdapManager)
         UserAccountDao userAccountDao = Mock(UserAccountDao)
         AccountManager accountManager = Mock(AccountManager)
@@ -172,20 +172,20 @@ class LdapAuthenticatorSpec extends spock.lang.Specification {
 
         ldapManager.isLdapEnabled() >> true
         userAccountDao.getUserAccount(username, domainId) >> null
-        ldapManager.getDomainLinkedToLdap(domainId) >> new LdapTrustMapVO(domainId, type, name, (short)0)
+        ldapManager.getDomainLinkedToLdap(domainId) >> new LdapTrustMapVO(domainId, type, name, (short) 0)
         ldapManager.getUser(username, type.toString(), name) >> new LdapUser(username, "email", "firstname", "lastname", "principal", "domain", false)
-        ldapManager.canAuthenticate(_,_) >> true
+        ldapManager.canAuthenticate(_, _) >> true
         //user should be created in cloudstack
         accountManager.createUserAccount(username, "", "firstname", "lastname", "email", null, username, (short) 2, domainId, username, null, _, _, User.Source.LDAP) >> Mock(UserAccount)
 
         when:
-            Pair<Boolean, UserAuthenticator.ActionOnFailedAuthentication> result = ldapAuthenticator.authenticate(username, "password", domainId, null)
+        Pair<Boolean, UserAuthenticator.ActionOnFailedAuthentication> result = ldapAuthenticator.authenticate(username, "password", domainId, null)
         then:
-            result.first() == true
-            result.second() == null
+        result.first() == true
+        result.second() == null
     }
 
-    def "test authentication when domain is linked and existing user can authenticate in ldap"(){
+    def "test authentication when domain is linked and existing user can authenticate in ldap"() {
         LdapManager ldapManager = Mock(LdapManager)
         UserAccountDao userAccountDao = Mock(UserAccountDao)
         AccountManager accountManager = Mock(AccountManager)
@@ -205,9 +205,9 @@ class LdapAuthenticatorSpec extends spock.lang.Specification {
         userAccountDao.getUserAccount(username, domainId) >> userAccount
         userAccount.getId() >> 1
         userAccount.getState() >> Account.State.disabled.toString()
-        ldapManager.getDomainLinkedToLdap(domainId) >> new LdapTrustMapVO(domainId, type, name, (short)2)
+        ldapManager.getDomainLinkedToLdap(domainId) >> new LdapTrustMapVO(domainId, type, name, (short) 2)
         ldapManager.getUser(username, type.toString(), name) >> new LdapUser(username, "email", "firstname", "lastname", "principal", "domain", false)
-        ldapManager.canAuthenticate(_,_) >> true
+        ldapManager.canAuthenticate(_, _) >> true
         //user should be enabled in cloudstack if disabled
         accountManager.enableUser(1) >> userAccount
 
@@ -218,7 +218,7 @@ class LdapAuthenticatorSpec extends spock.lang.Specification {
         result.second() == null
     }
 
-    def "test authentication when domain is linked and user cannot authenticate in ldap"(){
+    def "test authentication when domain is linked and user cannot authenticate in ldap"() {
         LdapManager ldapManager = Mock(LdapManager)
         UserAccountDao userAccountDao = Mock(UserAccountDao)
         AccountManager accountManager = Mock(AccountManager)
@@ -236,14 +236,14 @@ class LdapAuthenticatorSpec extends spock.lang.Specification {
         ldapManager.isLdapEnabled() >> true
         UserAccount userAccount = Mock(UserAccount)
         userAccountDao.getUserAccount(username, domainId) >> userAccount
-        ldapManager.getDomainLinkedToLdap(domainId) >> new LdapTrustMapVO(domainId, type, name, (short)2)
+        ldapManager.getDomainLinkedToLdap(domainId) >> new LdapTrustMapVO(domainId, type, name, (short) 2)
         ldapManager.getUser(username, type.toString(), name) >> new LdapUser(username, "email", "firstname", "lastname", "principal", "domain", false)
-        ldapManager.canAuthenticate(_,_) >> false
+        ldapManager.canAuthenticate(_, _) >> false
 
         when:
         Pair<Boolean, UserAuthenticator.ActionOnFailedAuthentication> result = ldapAuthenticator.authenticate(username, "password", domainId, null)
         then:
-            result.first() == false
-            result.second() == UserAuthenticator.ActionOnFailedAuthentication.INCREMENT_INCORRECT_LOGIN_ATTEMPT_COUNT
+        result.first() == false
+        result.second() == UserAuthenticator.ActionOnFailedAuthentication.INCREMENT_INCORRECT_LOGIN_ATTEMPT_COUNT
     }
 }

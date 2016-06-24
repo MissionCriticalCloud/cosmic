@@ -21,13 +21,12 @@ package com.cloud.utils.log;
 
 import java.lang.reflect.Method;
 
-import org.apache.commons.lang.StringUtils;
-import org.junit.Assert;
-import org.junit.Test;
-
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import org.apache.commons.lang.StringUtils;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class CglibThrowableRendererTest {
 
@@ -35,7 +34,7 @@ public class CglibThrowableRendererTest {
 
     @Test
     public void testDoRendere() {
-        SampleClass sampleClass = (SampleClass)Enhancer.create(SampleClass.class, new MyInvocationHandler());
+        SampleClass sampleClass = (SampleClass) Enhancer.create(SampleClass.class, new MyInvocationHandler());
         try {
             sampleClass.theFirstMethodThatCapturesAnException();
         } catch (Exception e) {

@@ -22,12 +22,7 @@ import org.apache.cloudstack.api.InternalIdentity;
 
 public interface Vpc extends ControlledEntity, Identity, InternalIdentity {
 
-    public enum State {
-        Enabled, Inactive
-    }
-
     /**
-     *
      * @return VPC name
      */
     String getName();
@@ -43,31 +38,26 @@ public interface Vpc extends ControlledEntity, Identity, InternalIdentity {
     String getCidr();
 
     /**
-     *
      * @return VPC state
      */
     State getState();
 
     /**
-     *
      * @return VPC offering id - the offering that VPC is created from
      */
     long getVpcOfferingId();
 
     /**
-     *
      * @return VPC display text
      */
     String getDisplayText();
 
     /**
-     *
      * @return VPC network domain. All networks participating in the VPC, become the part of the same network domain
      */
     String getNetworkDomain();
 
     /**
-     *
      * @return true if restart is required for the VPC; false otherwise
      */
     boolean isRestartRequired();
@@ -77,14 +67,16 @@ public interface Vpc extends ControlledEntity, Identity, InternalIdentity {
     boolean isRedundant();
 
     /**
-     *
      * @return true if VPC is configured to use distributed router to provides one-hop forwarding and hypervisor based ACL
      */
     boolean usesDistributedRouter();
 
     /**
-     *
      * @return true if VPC spans multiple zones in the region
      */
     boolean isRegionLevelVpc();
+
+    public enum State {
+        Enabled, Inactive
+    }
 }

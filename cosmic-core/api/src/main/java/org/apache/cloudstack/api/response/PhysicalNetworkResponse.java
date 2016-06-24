@@ -16,15 +16,15 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.List;
-
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = PhysicalNetwork.class)
 @SuppressWarnings("unused")
@@ -73,7 +73,6 @@ public class PhysicalNetworkResponse extends BaseResponse {
     @Override
     public String getObjectId() {
         return this.id;
-
     }
 
     public void setId(String uuid) {

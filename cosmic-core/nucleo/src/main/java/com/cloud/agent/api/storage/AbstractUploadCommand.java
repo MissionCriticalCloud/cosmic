@@ -31,19 +31,23 @@ public class AbstractUploadCommand extends StorageCommand {
     protected AbstractUploadCommand() {
     }
 
-    protected AbstractUploadCommand(String name, String url, ImageFormat format, long accountId) {
+    protected AbstractUploadCommand(final AbstractUploadCommand that) {
+        this(that.name, that.url, that.format, that.accountId);
+    }
+
+    protected AbstractUploadCommand(final String name, final String url, final ImageFormat format, final long accountId) {
         this.url = url;
         this.format = format;
         this.accountId = accountId;
         this.name = name;
     }
 
-    protected AbstractUploadCommand(AbstractUploadCommand that) {
-        this(that.name, that.url, that.format, that.accountId);
-    }
-
     public String getUrl() {
         return url;
+    }
+
+    public void setUrl(final String url) {
+        this.url = url;
     }
 
     public String getName() {
@@ -62,9 +66,4 @@ public class AbstractUploadCommand extends StorageCommand {
     public boolean executeInSequence() {
         return true;
     }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
 }

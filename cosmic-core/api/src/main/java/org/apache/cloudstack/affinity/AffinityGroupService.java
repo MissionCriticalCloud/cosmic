@@ -16,11 +16,10 @@
 // under the License.
 package org.apache.cloudstack.affinity;
 
-import java.util.List;
-
 import com.cloud.uservm.UserVm;
-
 import org.apache.cloudstack.api.command.user.affinitygroup.CreateAffinityGroupCmd;
+
+import java.util.List;
 
 public interface AffinityGroupService {
 
@@ -65,6 +64,4 @@ public interface AffinityGroupService {
     boolean isAdminControlledGroup(AffinityGroup group);
 
     boolean isAffinityGroupAvailableInDomain(long affinityGroupId, long domainId);
-
-
 }

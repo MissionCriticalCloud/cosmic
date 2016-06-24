@@ -20,7 +20,6 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.host.Host;
 import com.cloud.user.Account;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -29,6 +28,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.TrafficMonitorResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,10 +43,10 @@ public class AddTrafficMonitorCmd extends BaseCmd {
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.ZONE_ID,
-               type = CommandType.UUID,
-               entityType = ZoneResponse.class,
-               required = true,
-               description = "Zone in which to add the external firewall appliance.")
+            type = CommandType.UUID,
+            entityType = ZoneResponse.class,
+            required = true,
+            description = "Zone in which to add the external firewall appliance.")
     private Long zoneId;
 
     @Parameter(name = ApiConstants.URL, type = CommandType.STRING, required = true, description = "URL of the traffic monitor Host")
@@ -83,16 +83,6 @@ public class AddTrafficMonitorCmd extends BaseCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
     public void execute() {
         try {
             Host trafficMonitor = _networkUsageService.addTrafficMonitor(this);
@@ -105,5 +95,15 @@ public class AddTrafficMonitorCmd extends BaseCmd {
         } catch (CloudRuntimeException cre) {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, cre.getMessage());
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

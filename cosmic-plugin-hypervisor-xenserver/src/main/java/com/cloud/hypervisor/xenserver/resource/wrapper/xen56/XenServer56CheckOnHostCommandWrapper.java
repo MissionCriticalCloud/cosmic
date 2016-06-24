@@ -29,7 +29,7 @@ import com.cloud.resource.ResourceWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  CheckOnHostCommand.class)
+@ResourceWrapper(handles = CheckOnHostCommand.class)
 public final class XenServer56CheckOnHostCommandWrapper extends CommandWrapper<CheckOnHostCommand, Answer, XenServer56Resource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(XenServer56CheckOnHostCommandWrapper.class);
@@ -40,7 +40,7 @@ public final class XenServer56CheckOnHostCommandWrapper extends CommandWrapper<C
         String msg = "";
         if (alive == null) {
             msg = " cannot determine ";
-        } else if ( alive == true) {
+        } else if (alive == true) {
             msg = "Heart beat is still going";
         } else {
             msg = "Heart beat is gone so dead.";

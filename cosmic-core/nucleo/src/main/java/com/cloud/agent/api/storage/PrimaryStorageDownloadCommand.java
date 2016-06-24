@@ -59,28 +59,28 @@ public class PrimaryStorageDownloadCommand extends AbstractDownloadCommand {
         return primaryPool;
     }
 
-    public void setLocalPath(final String path) {
-        localPath = path;
-    }
-
     public String getLocalPath() {
         return localPath;
     }
 
-    public void setSecondaryStorageUrl(final String url) {
-        secondaryStorageUrl = url;
+    public void setLocalPath(final String path) {
+        localPath = path;
     }
 
     public String getSecondaryStorageUrl() {
         return secondaryStorageUrl;
     }
 
-    public void setPrimaryStorageUrl(final String url) {
-        primaryStorageUrl = url;
+    public void setSecondaryStorageUrl(final String url) {
+        secondaryStorageUrl = url;
     }
 
     public String getPrimaryStorageUrl() {
         return primaryStorageUrl;
+    }
+
+    public void setPrimaryStorageUrl(final String url) {
+        primaryStorageUrl = url;
     }
 
     @Override

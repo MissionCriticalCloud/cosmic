@@ -20,20 +20,15 @@ public class ClusterServicePdu {
     public final static int PDU_TYPE_MESSAGE = 0;
     public final static int PDU_TYPE_REQUEST = 1;
     public final static int PDU_TYPE_RESPONSE = 2;
-
+    private static long s_nextPduSequenceId = 1;
     private long sequenceId;
     private long ackSequenceId;
-
     private String sourcePeer;
     private String destPeer;
-
     private long agentId;
     private boolean stopOnError;
     private String jsonPackage;
-
     private int pduType = PDU_TYPE_MESSAGE;
-
-    private static long s_nextPduSequenceId = 1;
 
     public ClusterServicePdu() {
         sequenceId = getNextPduSequenceId();

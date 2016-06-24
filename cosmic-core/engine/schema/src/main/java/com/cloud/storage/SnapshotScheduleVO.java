@@ -16,8 +16,7 @@
 // under the License.
 package com.cloud.storage;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.storage.snapshot.SnapshotSchedule;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,8 +26,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.storage.snapshot.SnapshotSchedule;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "snapshot_schedule")
@@ -63,7 +62,7 @@ public class SnapshotScheduleVO implements SnapshotSchedule {
     public SnapshotScheduleVO() {
     }
 
-    public SnapshotScheduleVO(long volumeId, long policyId, Date scheduledTimestamp) {
+    public SnapshotScheduleVO(final long volumeId, final long policyId, final Date scheduledTimestamp) {
         this.volumeId = volumeId;
         this.policyId = policyId;
         this.scheduledTimestamp = scheduledTimestamp;
@@ -87,7 +86,7 @@ public class SnapshotScheduleVO implements SnapshotSchedule {
     }
 
     @Override
-    public void setPolicyId(long policyId) {
+    public void setPolicyId(final long policyId) {
         this.policyId = policyId;
     }
 
@@ -100,7 +99,7 @@ public class SnapshotScheduleVO implements SnapshotSchedule {
     }
 
     @Override
-    public void setScheduledTimestamp(Date scheduledTimestamp) {
+    public void setScheduledTimestamp(final Date scheduledTimestamp) {
         this.scheduledTimestamp = scheduledTimestamp;
     }
 
@@ -110,7 +109,7 @@ public class SnapshotScheduleVO implements SnapshotSchedule {
     }
 
     @Override
-    public void setAsyncJobId(Long asyncJobId) {
+    public void setAsyncJobId(final Long asyncJobId) {
         this.asyncJobId = asyncJobId;
     }
 
@@ -120,7 +119,7 @@ public class SnapshotScheduleVO implements SnapshotSchedule {
     }
 
     @Override
-    public void setSnapshotId(Long snapshotId) {
+    public void setSnapshotId(final Long snapshotId) {
         this.snapshotId = snapshotId;
     }
 
@@ -129,7 +128,7 @@ public class SnapshotScheduleVO implements SnapshotSchedule {
         return this.uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(final String uuid) {
         this.uuid = uuid;
     }
 }

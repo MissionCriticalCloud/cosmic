@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.projects.dao;
 
-import java.util.List;
-
 import com.cloud.projects.ProjectAccount;
 import com.cloud.projects.ProjectAccountVO;
 import com.cloud.utils.db.GenericDaoBase;
@@ -27,17 +25,19 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProjectAccountDaoImpl extends GenericDaoBase<ProjectAccountVO, Long> implements ProjectAccountDao {
+    public static final Logger s_logger = LoggerFactory.getLogger(ProjectAccountDaoImpl.class.getName());
     protected final SearchBuilder<ProjectAccountVO> AllFieldsSearch;
     final GenericSearchBuilder<ProjectAccountVO, Long> AdminSearch;
     final GenericSearchBuilder<ProjectAccountVO, Long> ProjectAccountSearch;
     final GenericSearchBuilder<ProjectAccountVO, Long> CountByRoleSearch;
-    public static final Logger s_logger = LoggerFactory.getLogger(ProjectAccountDaoImpl.class.getName());
 
     protected ProjectAccountDaoImpl() {
         AllFieldsSearch = createSearchBuilder();
@@ -151,5 +151,4 @@ public class ProjectAccountDaoImpl extends GenericDaoBase<ProjectAccountVO, Long
             s_logger.debug("Removed account id=" + accountId + " from " + rowsRemoved + " projects");
         }
     }
-
 }

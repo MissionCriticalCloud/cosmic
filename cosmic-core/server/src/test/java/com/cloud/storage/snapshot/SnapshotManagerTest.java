@@ -22,9 +22,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
-import java.util.UUID;
-
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
@@ -53,7 +50,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.context.CallContext;
@@ -67,6 +63,10 @@ import org.apache.cloudstack.engine.subsystem.api.storage.VolumeDataFactory;
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import java.util.List;
+import java.util.UUID;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -77,6 +77,10 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
 public class SnapshotManagerTest {
+    private static final long TEST_SNAPSHOT_ID = 3L;
+    private static final long TEST_VOLUME_ID = 4L;
+    private static final long TEST_VM_ID = 5L;
+    private static final long TEST_STORAGE_POOL_ID = 6L;
     @Spy
     SnapshotManagerImpl _snapshotMgr = new SnapshotManagerImpl();
     @Mock
@@ -120,11 +124,6 @@ public class SnapshotManagerTest {
     @Mock
     DataStore storeMock;
 
-    private static final long TEST_SNAPSHOT_ID = 3L;
-    private static final long TEST_VOLUME_ID = 4L;
-    private static final long TEST_VM_ID = 5L;
-    private static final long TEST_STORAGE_POOL_ID = 6L;
-
     @Before
     public void setup() throws ResourceAllocationException {
         MockitoAnnotations.initMocks(this);
@@ -161,7 +160,7 @@ public class SnapshotManagerTest {
         doNothing().when(_snapshotMgr._resourceLimitMgr).incrementResourceCount(anyLong(), any(ResourceType.class));
         doNothing().when(_snapshotMgr._resourceLimitMgr).incrementResourceCount(anyLong(), any(ResourceType.class), anyLong());
 
-        Account account = new AccountVO("testaccount", 1L, "networkdomain", (short)0, "uuid");
+        Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
         UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
         CallContext.register(user, account);
         when(_accountMgr.getAccount(anyLong())).thenReturn(account);
@@ -243,7 +242,7 @@ public class SnapshotManagerTest {
         when(snapshotMock.getState()).thenReturn(Snapshot.State.Destroyed);
         when(snapshotMock.getAccountId()).thenReturn(2L);
         when(snapshotMock.getDataCenterId()).thenReturn(2L);
-        boolean result =_snapshotMgr.deleteSnapshot(TEST_SNAPSHOT_ID);
+        boolean result = _snapshotMgr.deleteSnapshot(TEST_SNAPSHOT_ID);
         Assert.assertTrue(result);
     }
 
@@ -274,7 +273,7 @@ public class SnapshotManagerTest {
         when(vmMock.getState()).thenReturn(State.Stopped);
         when(vmMock.getHypervisorType()).thenReturn(Hypervisor.HypervisorType.KVM);
         when(volumeMock.getFormat()).thenReturn(ImageFormat.QCOW2);
-        when (snapshotStrategy.revertSnapshot(Mockito.any(SnapshotInfo.class))).thenReturn(true);
+        when(snapshotStrategy.revertSnapshot(Mockito.any(SnapshotInfo.class))).thenReturn(true);
         when(_volumeDao.update(anyLong(), any(VolumeVO.class))).thenReturn(true);
         Snapshot snapshot = _snapshotMgr.revertSnapshot(TEST_SNAPSHOT_ID);
         Assert.assertNotNull(snapshot);

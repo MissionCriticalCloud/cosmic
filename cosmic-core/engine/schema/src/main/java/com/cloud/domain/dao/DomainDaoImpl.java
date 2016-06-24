@@ -16,13 +16,6 @@
 // under the License.
 package com.cloud.domain.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
 import com.cloud.utils.db.DB;
@@ -31,6 +24,13 @@ import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,12 +83,6 @@ public class DomainDaoImpl extends GenericDaoBase<DomainVO, Long> implements Dom
         AllFieldsSearch.and("path", AllFieldsSearch.entity().getPath(), SearchCriteria.Op.EQ);
         AllFieldsSearch.and("parent", AllFieldsSearch.entity().getParent(), SearchCriteria.Op.EQ);
         AllFieldsSearch.done();
-
-    }
-
-    private static String allocPath(DomainVO parentDomain, String name) {
-        String parentPath = parentDomain.getPath();
-        return parentPath + name + "/";
     }
 
     @Override
@@ -141,6 +135,100 @@ public class DomainDaoImpl extends GenericDaoBase<DomainVO, Long> implements Dom
         }
     }
 
+    private static String allocPath(DomainVO parentDomain, String name) {
+        String parentPath = parentDomain.getPath();
+        return parentPath + name + "/";
+    }
+
+    @Override
+    public DomainVO findDomainByPath(String domainPath) {
+        SearchCriteria<DomainVO> sc = createSearchCriteria();
+        sc.addAnd("path", SearchCriteria.Op.EQ, domainPath);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public boolean isChildDomain(Long parentId, Long childId) {
+        if ((parentId == null) || (childId == null)) {
+            return false;
+        }
+
+        if (parentId.equals(childId)) {
+            return true;
+        }
+
+        boolean result = false;
+        SearchCriteria<DomainVO> sc = DomainPairSearch.create();
+        sc.setParameters("id", parentId, childId);
+
+        List<DomainVO> domainPair = listBy(sc);
+
+        if ((domainPair != null) && (domainPair.size() == 2)) {
+            DomainVO d1 = domainPair.get(0);
+            DomainVO d2 = domainPair.get(1);
+
+            if (d1.getId() == parentId) {
+                result = d2.getPath().startsWith(d1.getPath());
+            } else {
+                result = d1.getPath().startsWith(d2.getPath());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public DomainVO findImmediateChildForParent(Long parentId) {
+        SearchCriteria<DomainVO> sc = ImmediateChildDomainSearch.create();
+        sc.setParameters("parent", parentId);
+        return (listBy(sc).size() > 0 ? listBy(sc).get(0) : null);//may need to revisit for multiple children case
+    }
+
+    @Override
+    public List<DomainVO> findImmediateChildrenForParent(Long parentId) {
+        SearchCriteria<DomainVO> sc = ImmediateChildDomainSearch.create();
+        sc.setParameters("parent", parentId);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<DomainVO> findAllChildren(String path, Long parentId) {
+        SearchCriteria<DomainVO> sc = FindAllChildrenSearch.create();
+        sc.setParameters("path", path + "%");
+        sc.setParameters("id", parentId);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<DomainVO> findInactiveDomains() {
+        SearchCriteria<DomainVO> sc = AllFieldsSearch.create();
+        sc.setParameters("state", Domain.State.Inactive);
+        return listBy(sc);
+    }
+
+    @Override
+    public Set<Long> getDomainParentIds(long domainId) {
+        Set<Long> parentDomains = new HashSet<Long>();
+        Domain domain = findById(domainId);
+
+        if (domain != null) {
+            parentDomains.add(domain.getId());
+
+            while (domain.getParent() != null) {
+                domain = findById(domain.getParent());
+                parentDomains.add(domain.getId());
+            }
+        }
+
+        return parentDomains;
+    }
+
+    @Override
+    public List<Long> getDomainChildrenIds(String path) {
+        SearchCriteria<Long> sc = FindIdsOfAllChildrenSearch.create();
+        sc.setParameters("path", path + "%");
+        return customSearch(sc, null);
+    }
+
     @Override
     @DB
     public boolean remove(Long id) {
@@ -149,7 +237,7 @@ public class DomainDaoImpl extends GenericDaoBase<DomainVO, Long> implements Dom
             s_logger.error("Can not remove domain " + id + " as it is ROOT domain");
             return false;
         } else {
-            if(id == null) {
+            if (id == null) {
                 s_logger.error("Can not remove domain without id.");
                 return false;
             }
@@ -201,94 +289,4 @@ public class DomainDaoImpl extends GenericDaoBase<DomainVO, Long> implements Dom
         }
         return success;
     }
-
-    @Override
-    public DomainVO findDomainByPath(String domainPath) {
-        SearchCriteria<DomainVO> sc = createSearchCriteria();
-        sc.addAnd("path", SearchCriteria.Op.EQ, domainPath);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public DomainVO findImmediateChildForParent(Long parentId) {
-        SearchCriteria<DomainVO> sc = ImmediateChildDomainSearch.create();
-        sc.setParameters("parent", parentId);
-        return (listBy(sc).size() > 0 ? listBy(sc).get(0) : null);//may need to revisit for multiple children case
-    }
-
-    @Override
-    public List<DomainVO> findImmediateChildrenForParent(Long parentId) {
-        SearchCriteria<DomainVO> sc = ImmediateChildDomainSearch.create();
-        sc.setParameters("parent", parentId);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<DomainVO> findAllChildren(String path, Long parentId) {
-        SearchCriteria<DomainVO> sc = FindAllChildrenSearch.create();
-        sc.setParameters("path", path + "%");
-        sc.setParameters("id", parentId);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<Long> getDomainChildrenIds(String path) {
-        SearchCriteria<Long> sc = FindIdsOfAllChildrenSearch.create();
-        sc.setParameters("path", path + "%");
-        return customSearch(sc, null);
-    }
-
-    @Override
-    public boolean isChildDomain(Long parentId, Long childId) {
-        if ((parentId == null) || (childId == null)) {
-            return false;
-        }
-
-        if (parentId.equals(childId)) {
-            return true;
-        }
-
-        boolean result = false;
-        SearchCriteria<DomainVO> sc = DomainPairSearch.create();
-        sc.setParameters("id", parentId, childId);
-
-        List<DomainVO> domainPair = listBy(sc);
-
-        if ((domainPair != null) && (domainPair.size() == 2)) {
-            DomainVO d1 = domainPair.get(0);
-            DomainVO d2 = domainPair.get(1);
-
-            if (d1.getId() == parentId) {
-                result = d2.getPath().startsWith(d1.getPath());
-            } else {
-                result = d1.getPath().startsWith(d2.getPath());
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<DomainVO> findInactiveDomains() {
-        SearchCriteria<DomainVO> sc = AllFieldsSearch.create();
-        sc.setParameters("state", Domain.State.Inactive);
-        return listBy(sc);
-    }
-
-    @Override
-    public Set<Long> getDomainParentIds(long domainId) {
-        Set<Long> parentDomains = new HashSet<Long>();
-        Domain domain = findById(domainId);
-
-        if (domain != null) {
-            parentDomains.add(domain.getId());
-
-            while (domain.getParent() != null) {
-                domain = findById(domain.getParent());
-                parentDomains.add(domain.getId());
-            }
-        }
-
-        return parentDomains;
-    }
-
 }

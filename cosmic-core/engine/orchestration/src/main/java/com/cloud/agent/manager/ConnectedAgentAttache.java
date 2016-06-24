@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.agent.manager;
 
-import java.nio.channels.ClosedChannelException;
-
 import com.cloud.agent.transport.Request;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.host.Status;
 import com.cloud.utils.nio.Link;
+
+import java.nio.channels.ClosedChannelException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +49,23 @@ public class ConnectedAgentAttache extends AgentAttache {
     }
 
     @Override
-    public synchronized boolean isClosed() {
-        return _link == null;
+    public boolean equals(final Object obj) {
+        // Return false straight away.
+        if (obj == null) {
+            return false;
+        }
+        // No need to handle a ClassCastException. If the classes are different, then equals can return false straight ahead.
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        // This should not be part of the equals() method, but I'm keeping it because it is expected behaviour based
+        // on the previous implementation. The link attribute of the other object should be checked here as well
+        // to verify if it's not null whilst the this is null.
+        if (_link == null) {
+            return false;
+        }
+        ConnectedAgentAttache that = (ConnectedAgentAttache) obj;
+        return super.equals(obj) && _link == that._link;
     }
 
     @Override
@@ -68,31 +83,16 @@ public class ConnectedAgentAttache extends AgentAttache {
     }
 
     @Override
+    public synchronized boolean isClosed() {
+        return _link == null;
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((_link == null) ? 0 : _link.hashCode());
         return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        // Return false straight away.
-        if (obj == null) {
-            return false;
-        }
-        // No need to handle a ClassCastException. If the classes are different, then equals can return false straight ahead.
-        if (this.getClass() != obj.getClass()) {
-            return false;
-        }
-        // This should not be part of the equals() method, but I'm keeping it because it is expected behaviour based
-        // on the previous implementation. The link attribute of the other object should be checked here as well
-        // to verify if it's not null whilst the this is null.
-        if (_link == null) {
-            return false;
-        }
-        ConnectedAgentAttache that = (ConnectedAgentAttache)obj;
-        return super.equals(obj) && _link == that._link;
     }
 
     @Override
@@ -109,5 +109,4 @@ public class ConnectedAgentAttache extends AgentAttache {
             super.finalize();
         }
     }
-
 }

@@ -17,11 +17,7 @@
 
 package org.apache.cloudstack.api.command.user.autoscale;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.network.as.Condition;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListAccountResourcesCmd;
@@ -30,6 +26,10 @@ import org.apache.cloudstack.api.response.AutoScalePolicyResponse;
 import org.apache.cloudstack.api.response.ConditionResponse;
 import org.apache.cloudstack.api.response.CounterResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,10 +47,10 @@ public class ListConditionsCmd extends BaseListAccountResourcesCmd {
     private Long id;
 
     @Parameter(name = ApiConstants.COUNTER_ID,
-               type = CommandType.UUID,
-               entityType = CounterResponse.class,
-               required = false,
-               description = "Counter-id of the condition.")
+            type = CommandType.UUID,
+            entityType = CounterResponse.class,
+            required = false,
+            description = "Counter-id of the condition.")
     private Long counterId;
 
     @Parameter(name = ApiConstants.POLICY_ID, type = CommandType.UUID, entityType = AutoScalePolicyResponse.class, description = "the ID of the policy")
@@ -80,6 +80,11 @@ public class ListConditionsCmd extends BaseListAccountResourcesCmd {
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
 
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
     public Long getId() {
         return id;
     }
@@ -91,10 +96,4 @@ public class ListConditionsCmd extends BaseListAccountResourcesCmd {
     public Long getPolicyId() {
         return policyId;
     }
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
 }

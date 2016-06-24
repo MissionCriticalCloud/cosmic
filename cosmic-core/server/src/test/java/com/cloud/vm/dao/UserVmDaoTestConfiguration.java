@@ -17,9 +17,10 @@
 
 package com.cloud.vm.dao;
 
+import org.apache.cloudstack.test.utils.SpringUtils;
+
 import java.io.IOException;
 
-import org.apache.cloudstack.test.utils.SpringUtils;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
@@ -30,8 +31,8 @@ import org.springframework.core.type.filter.TypeFilter;
 
 @Configuration
 @ComponentScan(basePackageClasses = {UserVmDaoImpl.class},
-               includeFilters = {@Filter(value = UserVmDaoTestConfiguration.Library.class, type = FilterType.CUSTOM)},
-               useDefaultFilters = false)
+        includeFilters = {@Filter(value = UserVmDaoTestConfiguration.Library.class, type = FilterType.CUSTOM)},
+        useDefaultFilters = false)
 public class UserVmDaoTestConfiguration {
     public static class Library implements TypeFilter {
 
@@ -41,6 +42,5 @@ public class UserVmDaoTestConfiguration {
             ComponentScan cs = UserVmDaoTestConfiguration.class.getAnnotation(ComponentScan.class);
             return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);
         }
-
     }
 }

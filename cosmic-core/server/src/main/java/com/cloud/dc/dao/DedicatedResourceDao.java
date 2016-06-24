@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.util.List;
-
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface DedicatedResourceDao extends GenericDao<DedicatedResourceVO, Long> {
 
@@ -53,5 +53,4 @@ public interface DedicatedResourceDao extends GenericDao<DedicatedResourceVO, Lo
     List<Long> listAllHosts();
 
     List<DedicatedResourceVO> listByAffinityGroupId(Long affinityGroupId);
-
 }

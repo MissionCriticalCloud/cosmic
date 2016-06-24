@@ -16,9 +16,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from CsDatabag import CsCmdLine
 from CsAddress import CsAddress
-import logging
+from CsDatabag import CsCmdLine
 
 
 class CsConfig(object):

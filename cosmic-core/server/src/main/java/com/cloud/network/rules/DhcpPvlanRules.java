@@ -24,7 +24,6 @@ import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.vm.NicProfile;
-
 import org.apache.cloudstack.network.topology.NetworkTopologyVisitor;
 
 public class DhcpPvlanRules extends RuleApplier {
@@ -50,10 +49,10 @@ public class DhcpPvlanRules extends RuleApplier {
             op = "delete";
         }
 
-        NetworkDao networkDao = visitor.getVirtualNetworkApplianceFactory().getNetworkDao();
+        final NetworkDao networkDao = visitor.getVirtualNetworkApplianceFactory().getNetworkDao();
         final Network network = networkDao.findById(_nic.getNetworkId());
 
-        NetworkModel networkModel = visitor.getVirtualNetworkApplianceFactory().getNetworkModel();
+        final NetworkModel networkModel = visitor.getVirtualNetworkApplianceFactory().getNetworkModel();
         final String networkTag = networkModel.getNetworkTag(_router.getHypervisorType(), network);
 
         _setupCommand = PvlanSetupCommand.createDhcpSetup(op, _nic.getBroadCastUri(), networkTag, _router.getInstanceName(), _nic.getMacAddress(), _nic.getIPv4Address());

@@ -19,6 +19,9 @@
 
 package com.cloud.utils.security;
 
+import com.cloud.utils.Ternary;
+import com.cloud.utils.exception.CloudRuntimeException;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,15 +43,12 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cloud.utils.Ternary;
-import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.openssl.PEMReader;
 
 public class CertificateHelper {
     public static byte[] buildAndSaveKeystore(String alias, String cert, String privateKey, String storePassword) throws KeyStoreException, CertificateException,
-        NoSuchAlgorithmException, InvalidKeySpecException, IOException {
+            NoSuchAlgorithmException, InvalidKeySpecException, IOException {
         KeyStore ks = buildKeystore(alias, cert, privateKey, storePassword);
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -57,8 +57,33 @@ public class CertificateHelper {
         return os.toByteArray();
     }
 
+    public static KeyStore buildKeystore(String alias, String cert, String privateKey, String storePassword) throws KeyStoreException, CertificateException,
+            NoSuchAlgorithmException, InvalidKeySpecException, IOException {
+
+        KeyStore ks = KeyStore.getInstance("JKS");
+        ks.load(null, storePassword != null ? storePassword.toCharArray() : null);
+        Certificate[] certs = new Certificate[1];
+        certs[0] = buildCertificate(cert);
+        ks.setKeyEntry(alias, buildPrivateKey(privateKey), storePassword != null ? storePassword.toCharArray() : null, certs);
+        return ks;
+    }
+
+    public static Certificate buildCertificate(String content) throws CertificateException {
+        assert (content != null);
+
+        BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(content.getBytes()));
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        return cf.generateCertificate(bis);
+    }
+
+    public static Key buildPrivateKey(String base64EncodedKeyContent) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        PKCS8EncodedKeySpec keysp = new PKCS8EncodedKeySpec(Base64.decodeBase64(base64EncodedKeyContent));
+        return kf.generatePrivate(keysp);
+    }
+
     public static byte[] buildAndSaveKeystore(List<Ternary<String, String, String>> certs, String storePassword) throws KeyStoreException, NoSuchAlgorithmException,
-        CertificateException, IOException, InvalidKeySpecException {
+            CertificateException, IOException, InvalidKeySpecException {
         KeyStore ks = KeyStore.getInstance("JKS");
         ks.load(null, storePassword != null ? storePassword.toCharArray() : null);
 
@@ -92,31 +117,6 @@ public class CertificateHelper {
         return ks;
     }
 
-    public static KeyStore buildKeystore(String alias, String cert, String privateKey, String storePassword) throws KeyStoreException, CertificateException,
-        NoSuchAlgorithmException, InvalidKeySpecException, IOException {
-
-        KeyStore ks = KeyStore.getInstance("JKS");
-        ks.load(null, storePassword != null ? storePassword.toCharArray() : null);
-        Certificate[] certs = new Certificate[1];
-        certs[0] = buildCertificate(cert);
-        ks.setKeyEntry(alias, buildPrivateKey(privateKey), storePassword != null ? storePassword.toCharArray() : null, certs);
-        return ks;
-    }
-
-    public static Certificate buildCertificate(String content) throws CertificateException {
-        assert (content != null);
-
-        BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(content.getBytes()));
-        CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        return cf.generateCertificate(bis);
-    }
-
-    public static Key buildPrivateKey(String base64EncodedKeyContent) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec keysp = new PKCS8EncodedKeySpec(Base64.decodeBase64(base64EncodedKeyContent));
-        return kf.generatePrivate(keysp);
-    }
-
     public static List<Certificate> parseChain(String chain) throws IOException {
 
         List<Certificate> certs = new ArrayList<Certificate>();
@@ -124,13 +124,14 @@ public class CertificateHelper {
 
         Certificate crt = null;
 
-        while ((crt = (Certificate)reader.readObject()) != null) {
+        while ((crt = (Certificate) reader.readObject()) != null) {
             if (crt instanceof X509Certificate) {
                 certs.add(crt);
             }
         }
-        if (certs.size() == 0)
+        if (certs.size() == 0) {
             throw new IllegalArgumentException("Unable to decode certificate chain");
+        }
 
         return certs;
     }
@@ -153,7 +154,6 @@ public class CertificateHelper {
                 buffer.append(HEX[(0xF0 & data[i]) >>> 4]);
                 buffer.append(HEX[0x0F & data[i]]);
             }
-
         } catch (CertificateEncodingException e) {
             throw new CloudRuntimeException("Bad certificate encoding");
         } catch (NoSuchAlgorithmException e) {
@@ -162,5 +162,4 @@ public class CertificateHelper {
 
         return buffer.toString();
     }
-
 }

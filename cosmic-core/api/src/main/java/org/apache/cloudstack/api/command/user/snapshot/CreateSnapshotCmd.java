@@ -24,7 +24,6 @@ import com.cloud.projects.Project;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Volume;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -38,6 +37,7 @@ import org.apache.cloudstack.api.response.SnapshotPolicyResponse;
 import org.apache.cloudstack.api.response.SnapshotResponse;
 import org.apache.cloudstack.api.response.VolumeResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,13 +52,13 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
     // ///////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.ACCOUNT,
-               type = CommandType.STRING,
-               description = "The account of the snapshot. The account parameter must be used with the domainId parameter.")
+            type = CommandType.STRING,
+            description = "The account of the snapshot. The account parameter must be used with the domainId parameter.")
     private String accountName;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
             description = "The domain ID of the snapshot. If used with the account parameter, specifies a domain for the account associated with the disk volume.")
     private Long domainId;
 
@@ -66,8 +66,8 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
     private Long volumeId;
 
     @Parameter(name = ApiConstants.POLICY_ID,
-               type = CommandType.UUID,
-               entityType = SnapshotPolicyResponse.class,
+            type = CommandType.UUID,
+            entityType = SnapshotPolicyResponse.class,
             description = "policy id of the snapshot, if this is null, then use MANUAL_POLICY.")
     private Long policyId;
 
@@ -83,12 +83,8 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
 
-    public Boolean getQuiescevm() {
-        if (quiescevm == null) {
-            return false;
-        } else {
-            return quiescevm;
-        }
+    public static String getResultObjectName() {
+        return "snapshot";
     }
 
     public String getAccountName() {
@@ -99,28 +95,43 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
         return domainId;
     }
 
-    public Long getVolumeId() {
-        return volumeId;
+    @Override
+    public String getEventType() {
+        return EventTypes.EVENT_SNAPSHOT_CREATE;
     }
 
-    public String getSnapshotName() {
-        return snapshotName;
+    @Override
+    public String getEventDescription() {
+        return "creating snapshot for volume: " + getVolumeUuid();
     }
 
     public String getVolumeUuid() {
-        Volume volume = (Volume)this._entityMgr.findById(Volume.class, getVolumeId());
+        Volume volume = (Volume) this._entityMgr.findById(Volume.class, getVolumeId());
         if (volume == null) {
             throw new InvalidParameterValueException("Unable to find volume's UUID");
         }
         return volume.getUuid();
     }
 
-    public Long getPolicyId() {
-        if (policyId != null) {
-            return policyId;
-        } else {
-            return Snapshot.MANUAL_POLICY_ID;
+    public Long getVolumeId() {
+        return volumeId;
+    }
+
+    @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.Snapshot;
+    }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
+
+    @Override
+    public String getSyncObjType() {
+        if (getSyncObjId() != null) {
+            return syncObjectType;
         }
+        return null;
     }
 
     private Long getHostId() {
@@ -131,17 +142,68 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
         return _snapshotService.getHostIdForSnapshotOperation(volume);
     }
 
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
+    @Override
+    public Long getSyncObjId() {
+        if (getHostId() != null) {
+            return getHostId();
+        }
+        return null;
+    }
+
+    @Override
+    public void create() throws ResourceAllocationException {
+        Snapshot snapshot = _volumeService.allocSnapshot(getVolumeId(), getPolicyId(), getSnapshotName());
+        if (snapshot != null) {
+            setEntityId(snapshot.getId());
+            setEntityUuid(snapshot.getUuid());
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create snapshot");
+        }
+    }
+
+    public Long getPolicyId() {
+        if (policyId != null) {
+            return policyId;
+        } else {
+            return Snapshot.MANUAL_POLICY_ID;
+        }
+    }
+
+    public String getSnapshotName() {
+        return snapshotName;
+    }
+
+    @Override
+    public void execute() {
+        s_logger.info("VOLSS: createSnapshotCmd starts:" + System.currentTimeMillis());
+        CallContext.current().setEventDetails("Volume Id: " + getVolumeUuid());
+        Snapshot snapshot;
+        try {
+            snapshot =
+                    _volumeService.takeSnapshot(getVolumeId(), getPolicyId(), getEntityId(), _accountService.getAccount(getEntityOwnerId()), getQuiescevm());
+            if (snapshot != null) {
+                SnapshotResponse response = _responseGenerator.createSnapshotResponse(snapshot);
+                response.setResponseName(getCommandName());
+                setResponseObject(response);
+            } else {
+                throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create snapshot due to an internal error creating snapshot for volume " + volumeId);
+            }
+        } catch (Exception e) {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create snapshot due to an internal error creating snapshot for volume " + volumeId);
+        }
+    }
+
+    public Boolean getQuiescevm() {
+        if (quiescevm == null) {
+            return false;
+        } else {
+            return quiescevm;
+        }
+    }
 
     @Override
     public String getCommandName() {
         return s_name;
-    }
-
-    public static String getResultObjectName() {
-        return "snapshot";
     }
 
     @Override
@@ -158,74 +220,12 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
             Project project = _projectService.findByProjectAccountId(volume.getAccountId());
             if (project.getState() != Project.State.Active) {
                 throw new PermissionDeniedException("Can't add resources to the project id=" + project.getId() + " in state=" + project.getState() +
-                    " as it's no longer active");
+                        " as it's no longer active");
             }
         } else if (account.getState() == Account.State.disabled) {
             throw new PermissionDeniedException("The owner of template is disabled: " + account);
         }
 
         return volume.getAccountId();
-    }
-
-    @Override
-    public String getEventType() {
-        return EventTypes.EVENT_SNAPSHOT_CREATE;
-    }
-
-    @Override
-    public String getEventDescription() {
-        return "creating snapshot for volume: " + getVolumeUuid();
-    }
-
-    @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.Snapshot;
-    }
-
-    @Override
-    public void create() throws ResourceAllocationException {
-        Snapshot snapshot = _volumeService.allocSnapshot(getVolumeId(), getPolicyId(), getSnapshotName());
-        if (snapshot != null) {
-            setEntityId(snapshot.getId());
-            setEntityUuid(snapshot.getUuid());
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create snapshot");
-        }
-    }
-
-    @Override
-    public void execute() {
-        s_logger.info("VOLSS: createSnapshotCmd starts:" + System.currentTimeMillis());
-        CallContext.current().setEventDetails("Volume Id: " + getVolumeUuid());
-        Snapshot snapshot;
-        try {
-            snapshot =
-                _volumeService.takeSnapshot(getVolumeId(), getPolicyId(), getEntityId(), _accountService.getAccount(getEntityOwnerId()), getQuiescevm());
-            if (snapshot != null) {
-                SnapshotResponse response = _responseGenerator.createSnapshotResponse(snapshot);
-                response.setResponseName(getCommandName());
-                setResponseObject(response);
-            } else {
-                throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create snapshot due to an internal error creating snapshot for volume " + volumeId);
-            }
-        } catch (Exception e) {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create snapshot due to an internal error creating snapshot for volume " + volumeId);
-        }
-    }
-
-    @Override
-    public String getSyncObjType() {
-        if (getSyncObjId() != null) {
-            return syncObjectType;
-        }
-        return null;
-    }
-
-    @Override
-    public Long getSyncObjId() {
-        if (getHostId() != null) {
-            return getHostId();
-        }
-        return null;
     }
 }

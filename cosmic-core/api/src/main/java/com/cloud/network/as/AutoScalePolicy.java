@@ -17,10 +17,10 @@
 
 package com.cloud.network.as;
 
-import java.util.Date;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.api.InternalIdentity;
+
+import java.util.Date;
 
 public interface AutoScalePolicy extends ControlledEntity, InternalIdentity {
 
@@ -36,5 +36,4 @@ public interface AutoScalePolicy extends ControlledEntity, InternalIdentity {
     public Date getLastQuiteTime();
 
     public String getAction();
-
 }

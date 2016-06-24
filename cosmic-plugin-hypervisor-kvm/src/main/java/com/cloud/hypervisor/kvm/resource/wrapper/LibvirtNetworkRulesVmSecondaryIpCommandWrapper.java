@@ -17,24 +17,24 @@ import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = NetworkRulesVmSecondaryIpCommand.class)
 public final class LibvirtNetworkRulesVmSecondaryIpCommandWrapper
-    extends CommandWrapper<NetworkRulesVmSecondaryIpCommand, Answer, LibvirtComputingResource> {
+        extends CommandWrapper<NetworkRulesVmSecondaryIpCommand, Answer, LibvirtComputingResource> {
 
-  private static final Logger s_logger = LoggerFactory.getLogger(LibvirtNetworkRulesVmSecondaryIpCommandWrapper.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(LibvirtNetworkRulesVmSecondaryIpCommandWrapper.class);
 
-  @Override
-  public Answer execute(final NetworkRulesVmSecondaryIpCommand command,
-      final LibvirtComputingResource libvirtComputingResource) {
-    boolean result = false;
-    try {
-      final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();
+    @Override
+    public Answer execute(final NetworkRulesVmSecondaryIpCommand command,
+                          final LibvirtComputingResource libvirtComputingResource) {
+        boolean result = false;
+        try {
+            final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();
 
-      final Connect conn = libvirtUtilitiesHelper.getConnectionByVmName(command.getVmName());
-      result = libvirtComputingResource.configureNetworkRulesVmSecondaryIp(conn, command.getVmName(),
-          command.getVmSecIp(), command.getAction());
-    } catch (final LibvirtException e) {
-      s_logger.debug("Could not configure VM secondary IP! => " + e.getLocalizedMessage());
+            final Connect conn = libvirtUtilitiesHelper.getConnectionByVmName(command.getVmName());
+            result = libvirtComputingResource.configureNetworkRulesVmSecondaryIp(conn, command.getVmName(),
+                    command.getVmSecIp(), command.getAction());
+        } catch (final LibvirtException e) {
+            s_logger.debug("Could not configure VM secondary IP! => " + e.getLocalizedMessage());
+        }
+
+        return new Answer(command, result, "");
     }
-
-    return new Answer(command, result, "");
-  }
 }

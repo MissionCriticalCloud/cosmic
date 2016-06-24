@@ -21,16 +21,15 @@ package org.apache.cloudstack.storage.to;
 
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.storage.DataStoreRole;
-
 import org.apache.cloudstack.storage.image.datastore.ImageStoreInfo;
 
 public class ImageStoreTO implements DataStoreTO {
+    private static final String pathSeparator = "/";
     private String type;
     private String uri;
     private String providerName;
     private DataStoreRole role;
     private String uuid;
-    private static final String pathSeparator = "/";
 
     public ImageStoreTO() {
 
@@ -47,28 +46,16 @@ public class ImageStoreTO implements DataStoreTO {
         return this.type;
     }
 
-    public String getUri() {
-        return this.uri;
-    }
-
     public String getProviderName() {
         return providerName;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setUri(String uri) {
-        this.uri = uri;
     }
 
     public void setProviderName(String providerName) {
         this.providerName = providerName;
     }
 
-    public void setRole(DataStoreRole role) {
-        this.role = role;
+    public void setType(String type) {
+        this.type = type;
     }
 
     @Override
@@ -76,17 +63,8 @@ public class ImageStoreTO implements DataStoreTO {
         return this.role;
     }
 
-    @Override
-    public String toString() {
-        return new StringBuilder("ImageStoreTO[type=").append(type)
-            .append("|provider=")
-            .append(providerName)
-            .append("|role=")
-            .append(role)
-            .append("|uri=")
-            .append(uri)
-            .append("]")
-            .toString();
+    public void setRole(DataStoreRole role) {
+        this.role = role;
     }
 
     @Override
@@ -99,12 +77,33 @@ public class ImageStoreTO implements DataStoreTO {
         return getUri();
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public String getUri() {
+        return this.uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
     @Override
     public String getPathSeparator() {
         return pathSeparator;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("ImageStoreTO[type=").append(type)
+                                                      .append("|provider=")
+                                                      .append(providerName)
+                                                      .append("|role=")
+                                                      .append(role)
+                                                      .append("|uri=")
+                                                      .append(uri)
+                                                      .append("]")
+                                                      .toString();
     }
 }

@@ -18,7 +18,8 @@
  */
 package org.apache.cloudstack.engine.rest.service.api;
 
-import java.util.List;
+import org.apache.cloudstack.engine.datacenter.entity.api.ClusterEntity;
+import org.apache.cloudstack.engine.service.api.ProvisioningService;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -27,13 +28,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-
-import org.apache.cloudstack.engine.datacenter.entity.api.ClusterEntity;
-import org.apache.cloudstack.engine.service.api.ProvisioningService;
+import java.util.List;
 
 @Produces("application/json")
 public class ClusterRestService {
-//    @Inject
+    //    @Inject
     ProvisioningService _provisioningService;
 
     @GET

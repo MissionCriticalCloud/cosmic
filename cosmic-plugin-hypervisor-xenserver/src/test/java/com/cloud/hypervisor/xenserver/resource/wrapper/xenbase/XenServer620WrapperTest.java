@@ -18,13 +18,13 @@ package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CheckNetworkCommand;
 import com.cloud.hypervisor.xenserver.resource.XenServer620Resource;
 import com.cloud.network.PhysicalNetworkSetupInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,7 +39,7 @@ public class XenServer620WrapperTest {
 
         final PhysicalNetworkSetupInfo info = new PhysicalNetworkSetupInfo();
 
-        final List<PhysicalNetworkSetupInfo> setupInfos = new ArrayList<PhysicalNetworkSetupInfo>();
+        final List<PhysicalNetworkSetupInfo> setupInfos = new ArrayList<>();
         setupInfos.add(info);
 
         final CheckNetworkCommand checkNet = new CheckNetworkCommand(setupInfos);

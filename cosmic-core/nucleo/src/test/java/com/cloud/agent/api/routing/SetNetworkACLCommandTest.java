@@ -21,17 +21,17 @@ package com.cloud.agent.api.routing;
 
 import static org.junit.Assert.assertEquals;
 
+import com.cloud.agent.api.to.NetworkACLTO;
+
 import java.util.List;
 
-import com.cloud.agent.api.to.NetworkACLTO;
 import com.google.common.collect.Lists;
-
 import org.junit.Test;
 
 public class SetNetworkACLCommandTest {
 
     @Test
-    public void testNetworkAclRuleOrdering(){
+    public void testNetworkAclRuleOrdering() {
 
         //given
         List<NetworkACLTO> aclList = Lists.newArrayList();
@@ -46,8 +46,8 @@ public class SetNetworkACLCommandTest {
         cmd.orderNetworkAclRulesByRuleNumber(aclList);
 
         //then
-        for(int i=0; i< aclList.size();i++){
-            assertEquals(aclList.get(i).getNumber(), i+1);
+        for (int i = 0; i < aclList.size(); i++) {
+            assertEquals(aclList.get(i).getNumber(), i + 1);
         }
     }
 }

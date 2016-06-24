@@ -16,16 +16,6 @@
 // under the License.
 package com.cloud.agent.manager.allocator.impl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
@@ -47,8 +37,17 @@ import com.cloud.storage.dao.VolumeDao;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
-
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -71,6 +70,10 @@ public class RecreateHostAllocator extends FirstFitRoutingAllocator {
     HostDao _hostDao;
     @Inject
     ResourceManager _resourceMgr;
+
+    protected RecreateHostAllocator() {
+        super();
+    }
 
     @Override
     public List<Host> allocateTo(VirtualMachineProfile vm, DeploymentPlan plan, Type type, ExcludeList avoid, int returnUpTo) {
@@ -125,7 +128,7 @@ public class RecreateHostAllocator extends FirstFitRoutingAllocator {
             if (p.getPod().getAllocationState() != Grouping.AllocationState.Enabled) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Pod name: " + p.getPod().getName() + ", podId: " + p.getPod().getId() + " is in " + p.getPod().getAllocationState().name() +
-                        " state, skipping this and trying other pods");
+                            " state, skipping this and trying other pods");
                 }
                 continue;
             }
@@ -133,7 +136,7 @@ public class RecreateHostAllocator extends FirstFitRoutingAllocator {
             if (p.getCluster() != null && p.getCluster().getAllocationState() != Grouping.AllocationState.Enabled) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Cluster name: " + p.getCluster().getName() + ", clusterId: " + clusterId + " is in " + p.getCluster().getAllocationState().name() +
-                        " state, skipping this and trying other pod-clusters");
+                            " state, skipping this and trying other pod-clusters");
                 }
                 continue;
             }
@@ -142,7 +145,6 @@ public class RecreateHostAllocator extends FirstFitRoutingAllocator {
             if (hosts != null && !hosts.isEmpty()) {
                 return hosts;
             }
-
         }
 
         s_logger.debug("Unable to find any available pods at all!");
@@ -154,9 +156,5 @@ public class RecreateHostAllocator extends FirstFitRoutingAllocator {
         super.configure(name, params);
 
         return true;
-    }
-
-    protected RecreateHostAllocator() {
-        super();
     }
 }

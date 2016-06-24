@@ -16,13 +16,13 @@
 // under the License.
 package com.cloud.vpc.dao;
 
-import java.util.List;
-
 import com.cloud.network.Network.Service;
 import com.cloud.network.vpc.VpcOfferingServiceMapVO;
 import com.cloud.network.vpc.dao.VpcOfferingServiceMapDao;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
+
+import java.util.List;
 
 @DB()
 public class MockVpcOfferingServiceMapDaoImpl extends GenericDaoBase<VpcOfferingServiceMapVO, Long> implements VpcOfferingServiceMapDao {
@@ -66,5 +66,4 @@ public class MockVpcOfferingServiceMapDaoImpl extends GenericDaoBase<VpcOffering
     public VpcOfferingServiceMapVO persist(VpcOfferingServiceMapVO vo) {
         return vo;
     }
-
 }

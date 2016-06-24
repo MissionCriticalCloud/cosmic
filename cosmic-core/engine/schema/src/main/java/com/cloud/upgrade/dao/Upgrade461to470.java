@@ -17,13 +17,13 @@
 
 package com.cloud.upgrade.dao;
 
+import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.script.Script;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.script.Script;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ public class Upgrade461to470 implements DbUpgrade {
 
     @Override
     public String[] getUpgradableVersionRange() {
-        return new String[] {"4.6.1", "4.7.0"};
+        return new String[]{"4.6.1", "4.7.0"};
     }
 
     @Override
@@ -52,7 +52,12 @@ public class Upgrade461to470 implements DbUpgrade {
         if (script == null) {
             throw new CloudRuntimeException("Unable to find db/schema-461to470.sql");
         }
-        return new File[] {new File(script)};
+        return new File[]{new File(script)};
+    }
+
+    @Override
+    public void performDataMigration(Connection conn) {
+        alterAddColumnToCloudUsage(conn);
     }
 
     public void alterAddColumnToCloudUsage(final Connection conn) {
@@ -70,17 +75,12 @@ public class Upgrade461to470 implements DbUpgrade {
     }
 
     @Override
-    public void performDataMigration(Connection conn) {
-        alterAddColumnToCloudUsage(conn);
-    }
-
-    @Override
     public File[] getCleanupScripts() {
         String script = Script.findScript("", "db/schema-461to470-cleanup.sql");
         if (script == null) {
             throw new CloudRuntimeException("Unable to find db/schema-461to470-cleanup.sql");
         }
 
-        return new File[] {new File(script)};
+        return new File[]{new File(script)};
     }
 }

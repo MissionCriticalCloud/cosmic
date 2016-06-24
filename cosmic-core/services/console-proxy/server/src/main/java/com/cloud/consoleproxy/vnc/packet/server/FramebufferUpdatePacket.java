@@ -16,13 +16,13 @@
 // under the License.
 package com.cloud.consoleproxy.vnc.packet.server;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-
 import com.cloud.consoleproxy.ConsoleProxyClientListener;
 import com.cloud.consoleproxy.vnc.BufferedImageCanvas;
 import com.cloud.consoleproxy.vnc.RfbConstants;
 import com.cloud.consoleproxy.vnc.VncScreenDescription;
+
+import java.io.DataInputStream;
+import java.io.IOException;
 
 public class FramebufferUpdatePacket {
 
@@ -72,8 +72,9 @@ public class FramebufferUpdatePacket {
 
                 case RfbConstants.ENCODING_DESKTOP_SIZE: {
                     rect = new FrameBufferSizeChangeRequest(canvas, width, height);
-                    if (this.clientListener != null)
+                    if (this.clientListener != null) {
                         this.clientListener.onFramebufferSizeChange(width, height);
+                    }
                     break;
                 }
 
@@ -83,10 +84,10 @@ public class FramebufferUpdatePacket {
 
             paint(rect, canvas);
 
-            if (this.clientListener != null)
+            if (this.clientListener != null) {
                 this.clientListener.onFramebufferUpdate(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+            }
         }
-
     }
 
     public void paint(Rect rect, BufferedImageCanvas canvas) {
@@ -96,5 +97,4 @@ public class FramebufferUpdatePacket {
         // Request update of repainted area
         canvas.repaint(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
     }
-
 }

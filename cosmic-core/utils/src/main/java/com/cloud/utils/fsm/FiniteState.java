@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
  * @param <S> State
  * @param <E> Event
  */
@@ -35,6 +34,7 @@ public interface FiniteState<S, E> {
 
     /**
      * get next state based on the event.
+     *
      * @param event
      * @return next State
      */
@@ -43,6 +43,7 @@ public interface FiniteState<S, E> {
     /**
      * Get the states that could have traveled to the current state
      * via this event.
+     *
      * @param event
      * @return array of states
      */
@@ -50,6 +51,7 @@ public interface FiniteState<S, E> {
 
     /**
      * Get the possible events that can happen from the current state.
+     *
      * @return array of events.
      */
     Set<E> getPossibleEvents();

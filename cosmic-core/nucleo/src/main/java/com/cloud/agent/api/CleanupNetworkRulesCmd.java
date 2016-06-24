@@ -23,11 +23,6 @@ public class CleanupNetworkRulesCmd extends Command implements CronCommand {
 
     private int interval = 10 * 60;
 
-    @Override
-    public boolean executeInSequence() {
-        return false;
-    }
-
     public CleanupNetworkRulesCmd(int intervalSecs) {
         super();
         interval = intervalSecs;
@@ -38,8 +33,12 @@ public class CleanupNetworkRulesCmd extends Command implements CronCommand {
     }
 
     @Override
+    public boolean executeInSequence() {
+        return false;
+    }
+
+    @Override
     public int getInterval() {
         return interval;
     }
-
 }

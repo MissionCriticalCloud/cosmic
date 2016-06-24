@@ -16,17 +16,17 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.network.IpAddress;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.Date;
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = IpAddress.class)
 @SuppressWarnings("unused")
@@ -151,7 +151,8 @@ public class IPAddressResponse extends BaseResponse implements ControlledEntityR
     private Boolean forDisplay;
 
     /*
-        @SerializedName(ApiConstants.JOB_ID) @Param(description="shows the current pending asynchronous job ID. This tag is not returned if no current pending jobs are acting on the volume")
+        @SerializedName(ApiConstants.JOB_ID) @Param(description="shows the current pending asynchronous job ID. This tag is not returned if no current pending jobs are acting on
+         the volume")
         private IdentityProxy jobId = new IdentityProxy("async_job");
     */
 
@@ -162,6 +163,14 @@ public class IPAddressResponse extends BaseResponse implements ControlledEntityR
     @Override
     public String getObjectId() {
         return this.getId();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setAllocated(Date allocated) {
@@ -183,6 +192,16 @@ public class IPAddressResponse extends BaseResponse implements ControlledEntityR
     @Override
     public void setAccountName(String accountName) {
         this.accountName = accountName;
+    }
+
+    @Override
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 
     @Override
@@ -235,26 +254,8 @@ public class IPAddressResponse extends BaseResponse implements ControlledEntityR
         this.virtualMachineDisplayName = virtualMachineDisplayName;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public void setState(String state) {
         this.state = state;
-    }
-
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
     }
 
     public void setPhysicalNetworkId(String physicalNetworkId) {

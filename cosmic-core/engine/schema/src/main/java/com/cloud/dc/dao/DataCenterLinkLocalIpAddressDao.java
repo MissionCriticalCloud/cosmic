@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.util.List;
-
 import com.cloud.dc.DataCenterLinkLocalIpAddressVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface DataCenterLinkLocalIpAddressDao extends GenericDao<DataCenterLinkLocalIpAddressVO, Long> {
     public DataCenterLinkLocalIpAddressVO takeIpAddress(long dcId, long podId, long instanceId, String reservationId);

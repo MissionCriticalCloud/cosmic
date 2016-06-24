@@ -17,11 +17,11 @@
 package org.apache.cloudstack.affinity;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import com.google.gson.annotations.SerializedName;
 
 @SuppressWarnings("unused")
 @EntityReference(value = AffinityGroup.class)
@@ -37,5 +37,4 @@ public class AffinityGroupTypeResponse extends BaseResponse {
     public void setType(String type) {
         this.type = type;
     }
-
 }

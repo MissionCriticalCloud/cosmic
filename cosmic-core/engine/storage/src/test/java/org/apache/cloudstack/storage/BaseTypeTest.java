@@ -17,7 +17,6 @@
 package org.apache.cloudstack.storage;
 
 import com.google.common.testing.EqualsTester;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,11 +34,14 @@ public class BaseTypeTest {
         Assert.assertTrue("'a' and 'A' should be considdered the same type", new TestType("a").isSameTypeAs("A"));
         Assert.assertTrue("'B' and 'b' should be considdered the same address", new TestType("B").isSameTypeAs(new TestType("b")));
     }
+
     class TestType extends BaseType {
         String content;
-        public TestType(String t) {
+
+        public TestType(final String t) {
             content = t;
         }
+
         @Override
         public String toString() {
             return content;

@@ -16,16 +16,16 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.util.List;
-
 import com.cloud.api.query.vo.UserAccountJoinVO;
 import com.cloud.user.User;
 import com.cloud.user.UserAccount;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.response.UserResponse;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -106,5 +106,4 @@ public class UserAccountJoinDaoImpl extends GenericDaoBase<UserAccountJoinVO, Lo
         sc.setParameters("accountId", accountId);
         return search(sc, null, null, false);
     }
-
 }

@@ -37,5 +37,4 @@ public class TransactionContextListener implements ManagedContextListener<Transa
             data.close();
         }
     }
-
 }

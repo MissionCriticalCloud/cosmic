@@ -16,16 +16,16 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.event;
 
-import java.util.Date;
-
 import com.cloud.event.Event;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.EventResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +47,8 @@ public class ListEventsCmd extends BaseListProjectAndAccountResourcesCmd {
     private Integer duration;
 
     @Parameter(name = ApiConstants.END_DATE,
-               type = CommandType.DATE,
-               description = "the end date range of the list you want to retrieve (use format \"yyyy-MM-dd\" or the new format \"yyyy-MM-dd HH:mm:ss\")")
+            type = CommandType.DATE,
+            description = "the end date range of the list you want to retrieve (use format \"yyyy-MM-dd\" or the new format \"yyyy-MM-dd HH:mm:ss\")")
     private Date endDate;
 
     @Parameter(name = ApiConstants.ENTRY_TIME, type = CommandType.INTEGER, description = "the time the event was entered")
@@ -58,8 +58,8 @@ public class ListEventsCmd extends BaseListProjectAndAccountResourcesCmd {
     private String level;
 
     @Parameter(name = ApiConstants.START_DATE,
-               type = CommandType.DATE,
-               description = "the start date range of the list you want to retrieve (use format \"yyyy-MM-dd\" or the new format \"yyyy-MM-dd HH:mm:ss\")")
+            type = CommandType.DATE,
+            description = "the start date range of the list you want to retrieve (use format \"yyyy-MM-dd\" or the new format \"yyyy-MM-dd HH:mm:ss\")")
     private Date startDate;
 
     @Parameter(name = ApiConstants.TYPE, type = CommandType.STRING, description = "the event type (see event types)")
@@ -102,15 +102,15 @@ public class ListEventsCmd extends BaseListProjectAndAccountResourcesCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
 
         ListResponse<EventResponse> response = _queryService.searchForEvents(this);
         response.setResponseName(getCommandName());
         setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

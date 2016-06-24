@@ -21,8 +21,8 @@
 """
 
 # Import Local Modules
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+from marvin.codes import PASS
 from marvin.lib.base import (
     Account,
     ServiceOffering,
@@ -41,11 +41,10 @@ from marvin.lib.utils import (
     cleanup_resources,
     validateList
 )
-from marvin.codes import PASS
+from nose.plugins.attrib import attr
 
 
 class TestAdapterTypeForNic(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestAdapterTypeForNic, cls).getClsTestClient()
@@ -137,7 +136,7 @@ class TestAdapterTypeForNic(cloudstackTestCase):
             zoneid=self.zone.id,
             account=self.account.name,
             domainid=self.account.domainid,
-            details=[{"nicAdapter": self.testdata["configurableData"]["vmxnet3template"]["nicadapter"]}]
+            details=[{ "nicAdapter": self.testdata["configurableData"]["vmxnet3template"]["nicadapter"] }]
         )
         self.cleanup.append(template)
         template.download(self.apiclient)

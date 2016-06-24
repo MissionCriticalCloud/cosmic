@@ -16,30 +16,23 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs.impl;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import com.cloud.utils.Predicate;
-
 import org.apache.cloudstack.framework.jobs.AsyncJob;
 import org.apache.cloudstack.framework.jobs.AsyncJobExecutionContext;
 import org.apache.cloudstack.framework.jobs.Outcome;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 public class OutcomeImpl<T> implements Outcome<T> {
+    private static AsyncJobManagerImpl s_jobMgr;
     protected AsyncJob _job;
     protected Class<T> _clazz;
     protected String[] _topics;
     protected Predicate _predicate;
     protected long _checkIntervalInMs;
-
     protected T _result;
-
-    private static AsyncJobManagerImpl s_jobMgr;
-
-    public static void init(AsyncJobManagerImpl jobMgr) {
-        s_jobMgr = jobMgr;
-    }
 
     public OutcomeImpl(Class<T> clazz, AsyncJob job, long checkIntervalInMs, Predicate predicate, String... topics) {
         _clazz = clazz;
@@ -49,15 +42,24 @@ public class OutcomeImpl<T> implements Outcome<T> {
         _checkIntervalInMs = checkIntervalInMs;
     }
 
-    @Override
-    public AsyncJob getJob() {
-        // always reload job so that we retrieve the latest job result
-        AsyncJob job = s_jobMgr.getAsyncJob(_job.getId());
-        return job;
+    public static void init(AsyncJobManagerImpl jobMgr) {
+        s_jobMgr = jobMgr;
     }
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
+        return false;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean isDone() {
+        // TODO Auto-generated method stub
         return false;
     }
 
@@ -74,14 +76,10 @@ public class OutcomeImpl<T> implements Outcome<T> {
     }
 
     @Override
-    public T get(long timeToWait, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        s_jobMgr.waitAndCheck(getJob(), _topics, _checkIntervalInMs, unit.toMillis(timeToWait), _predicate);
-        try {
-            AsyncJobExecutionContext.getCurrentExecutionContext().disjoinJob(_job.getId());
-        } catch (Throwable e) {
-            throw new ExecutionException("Job task has trouble executing", e);
-        }
-        return retrieve();
+    public AsyncJob getJob() {
+        // always reload job so that we retrieve the latest job result
+        AsyncJob job = s_jobMgr.getAsyncJob(_job.getId());
+        return job;
     }
 
     /**
@@ -92,23 +90,6 @@ public class OutcomeImpl<T> implements Outcome<T> {
         return _result;
     }
 
-    protected Outcome<T> set(T result) {
-        _result = result;
-        return this;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean isDone() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
     @Override
     public void execute(Task<T> task) {
         // TODO Auto-generated method stub
@@ -117,6 +98,22 @@ public class OutcomeImpl<T> implements Outcome<T> {
     @Override
     public void execute(Task<T> task, long wait, TimeUnit unit) {
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public T get(long timeToWait, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        s_jobMgr.waitAndCheck(getJob(), _topics, _checkIntervalInMs, unit.toMillis(timeToWait), _predicate);
+        try {
+            AsyncJobExecutionContext.getCurrentExecutionContext().disjoinJob(_job.getId());
+        } catch (Throwable e) {
+            throw new ExecutionException("Job task has trouble executing", e);
+        }
+        return retrieve();
+    }
+
+    protected Outcome<T> set(T result) {
+        _result = result;
+        return this;
     }
 
     public Predicate getPredicate() {

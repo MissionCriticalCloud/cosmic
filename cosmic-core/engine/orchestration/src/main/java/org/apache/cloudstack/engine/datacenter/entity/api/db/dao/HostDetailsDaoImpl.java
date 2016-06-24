@@ -16,12 +16,6 @@
 // under the License.
 package org.apache.cloudstack.engine.datacenter.entity.api.db.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.host.DetailVO;
 import com.cloud.utils.crypt.DBEncryptionUtil;
 import com.cloud.utils.db.GenericDaoBase;
@@ -29,6 +23,12 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -49,19 +49,6 @@ public class HostDetailsDaoImpl extends GenericDaoBase<DetailVO, Long> implement
     }
 
     @Override
-    public DetailVO findDetail(long hostId, String name) {
-        SearchCriteria<DetailVO> sc = DetailSearch.create();
-        sc.setParameters("hostId", hostId);
-        sc.setParameters("name", name);
-
-        DetailVO detail = findOneIncludingRemovedBy(sc);
-        if ("password".equals(name) && detail != null) {
-            detail.setValue(DBEncryptionUtil.decrypt(detail.getValue()));
-        }
-        return detail;
-    }
-
-    @Override
     public Map<String, String> findDetails(long hostId) {
         SearchCriteria<DetailVO> sc = HostSearch.create();
         sc.setParameters("hostId", hostId);
@@ -76,17 +63,6 @@ public class HostDetailsDaoImpl extends GenericDaoBase<DetailVO, Long> implement
             }
         }
         return details;
-    }
-
-    @Override
-    public void deleteDetails(long hostId) {
-        SearchCriteria sc = HostSearch.create();
-        sc.setParameters("hostId", hostId);
-
-        List<DetailVO> results = search(sc, null);
-        for (DetailVO result : results) {
-            remove(result.getId());
-        }
     }
 
     @Override
@@ -113,5 +89,29 @@ public class HostDetailsDaoImpl extends GenericDaoBase<DetailVO, Long> implement
             }
         }
         txn.commit();
+    }
+
+    @Override
+    public DetailVO findDetail(long hostId, String name) {
+        SearchCriteria<DetailVO> sc = DetailSearch.create();
+        sc.setParameters("hostId", hostId);
+        sc.setParameters("name", name);
+
+        DetailVO detail = findOneIncludingRemovedBy(sc);
+        if ("password".equals(name) && detail != null) {
+            detail.setValue(DBEncryptionUtil.decrypt(detail.getValue()));
+        }
+        return detail;
+    }
+
+    @Override
+    public void deleteDetails(long hostId) {
+        SearchCriteria sc = HostSearch.create();
+        sc.setParameters("hostId", hostId);
+
+        List<DetailVO> results = search(sc, null);
+        for (DetailVO result : results) {
+            remove(result.getId());
+        }
     }
 }

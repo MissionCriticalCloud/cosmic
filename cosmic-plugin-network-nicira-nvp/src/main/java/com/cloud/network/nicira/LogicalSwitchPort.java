@@ -22,12 +22,12 @@ package com.cloud.network.nicira;
 import java.util.List;
 
 public class LogicalSwitchPort extends BaseNiciraNamedEntity {
+    private final String type = "LogicalSwitchPortConfig";
     private Integer portno;
     private boolean adminStatusEnabled;
     private String queueUuid;
     private List<String> securityProfiles;
     private List<String> mirrorTargets;
-    private final String type = "LogicalSwitchPortConfig";
 
     public LogicalSwitchPort() {
         super();

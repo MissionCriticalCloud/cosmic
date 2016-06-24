@@ -24,7 +24,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -33,6 +32,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,15 +45,15 @@ public class RemoveCertFromLoadBalancerCmd extends BaseAsyncCmd {
     private static final String s_name = "removecertfromloadbalancerresponse";
 
     @Parameter(name = ApiConstants.LBID,
-               type = CommandType.UUID,
-               entityType = FirewallRuleResponse.class,
-               required = true,
-               description = "the ID of the load balancer rule")
+            type = CommandType.UUID,
+            entityType = FirewallRuleResponse.class,
+            required = true,
+            description = "the ID of the load balancer rule")
     Long lbRuleId;
 
     @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException, NetworkRuleConflictException {
+            ResourceAllocationException, NetworkRuleConflictException {
         boolean result = _lbService.removeCertFromLoadBalancer(getLbRuleId());
         if (result) {
             SuccessResponse response = new SuccessResponse(getCommandName());
@@ -64,18 +64,8 @@ public class RemoveCertFromLoadBalancerCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public String getEventType() {
-        return EventTypes.EVENT_LB_CERT_REMOVE;
-    }
-
-    @Override
     public String getCommandName() {
         return s_name;
-    }
-
-    @Override
-    public String getEventDescription() {
-        return "Removing a certificate from a load balancer with ID " + getLbRuleId();
     }
 
     @Override
@@ -89,5 +79,15 @@ public class RemoveCertFromLoadBalancerCmd extends BaseAsyncCmd {
 
     public Long getLbRuleId() {
         return this.lbRuleId;
+    }
+
+    @Override
+    public String getEventType() {
+        return EventTypes.EVENT_LB_CERT_REMOVE;
+    }
+
+    @Override
+    public String getEventDescription() {
+        return "Removing a certificate from a load balancer with ID " + getLbRuleId();
     }
 }

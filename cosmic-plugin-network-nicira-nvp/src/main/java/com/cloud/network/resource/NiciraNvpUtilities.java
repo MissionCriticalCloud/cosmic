@@ -19,18 +19,18 @@
 
 package com.cloud.network.resource;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.agent.api.CreateLogicalSwitchPortCommand;
 import com.cloud.network.nicira.LogicalSwitch;
 import com.cloud.network.nicira.LogicalSwitchPort;
 import com.cloud.network.nicira.NiciraNvpTag;
 import com.cloud.network.nicira.VifAttachment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NiciraNvpUtilities {
 
-    private static NiciraNvpUtilities instance;
+    private static final NiciraNvpUtilities instance;
 
     static {
         instance = new NiciraNvpUtilities();
@@ -52,7 +52,7 @@ public class NiciraNvpUtilities {
         final String attachmentUuid = command.getAttachmentUuid();
 
         // Tags set to scope cs_account and account name
-        final List<NiciraNvpTag> tags = new ArrayList<NiciraNvpTag>();
+        final List<NiciraNvpTag> tags = new ArrayList<>();
         tags.add(new NiciraNvpTag("cs_account", command.getOwnerName()));
 
         final LogicalSwitchPort logicalSwitchPort = new LogicalSwitchPort(attachmentUuid, tags, true);

@@ -16,15 +16,6 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.dc.DataCenterVnetVO;
 import com.cloud.network.dao.AccountGuestVlanMapDao;
 import com.cloud.network.dao.AccountGuestVlanMapVO;
@@ -38,6 +29,14 @@ import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -67,18 +66,88 @@ public class DataCenterVnetDaoImpl extends GenericDaoBase<DataCenterVnetVO, Long
     @Inject
     protected AccountGuestVlanMapDao _accountGuestVlanMapDao;
 
+    public DataCenterVnetDaoImpl() {
+        super();
+        DcSearchAllocated = createSearchBuilder();
+        DcSearchAllocated.and("dc", DcSearchAllocated.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        DcSearchAllocated.and("physicalNetworkId", DcSearchAllocated.entity().getPhysicalNetworkId(), SearchCriteria.Op.EQ);
+        DcSearchAllocated.and("allocated", DcSearchAllocated.entity().getTakenAt(), SearchCriteria.Op.NNULL);
+        DcSearchAllocated.done();
+
+        DcSearchAllocatedInRange = createSearchBuilder();
+        DcSearchAllocatedInRange.and("dc", DcSearchAllocatedInRange.entity().getDataCenterId(), Op.EQ);
+        DcSearchAllocatedInRange.and("physicalNetworkId", DcSearchAllocatedInRange.entity().getPhysicalNetworkId(), Op.EQ);
+        DcSearchAllocatedInRange.and("allocated", DcSearchAllocatedInRange.entity().getTakenAt(), Op.NNULL);
+        DcSearchAllocatedInRange.and("vnetRange", DcSearchAllocatedInRange.entity().getVnet(), Op.BETWEEN);
+        DcSearchAllocatedInRange.done();
+
+        SearchRange = createSearchBuilder();
+        SearchRange.and("dc", SearchRange.entity().getDataCenterId(), Op.EQ);
+        SearchRange.and("physicalNetworkId", SearchRange.entity().getPhysicalNetworkId(), Op.EQ);
+        SearchRange.and("vnetRange", SearchRange.entity().getVnet(), Op.BETWEEN);
+
+        FreeVnetSearch = createSearchBuilder();
+        FreeVnetSearch.and("dc", FreeVnetSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        FreeVnetSearch.and("physicalNetworkId", FreeVnetSearch.entity().getPhysicalNetworkId(), SearchCriteria.Op.EQ);
+        FreeVnetSearch.and("taken", FreeVnetSearch.entity().getTakenAt(), SearchCriteria.Op.NULL);
+        FreeVnetSearch.and("accountGuestVlanMapId", FreeVnetSearch.entity().getAccountGuestVlanMapId(), SearchCriteria.Op.NULL);
+        FreeVnetSearch.done();
+
+        FreeDedicatedVnetSearch = createSearchBuilder();
+        FreeDedicatedVnetSearch.and("dc", FreeDedicatedVnetSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        FreeDedicatedVnetSearch.and("physicalNetworkId", FreeDedicatedVnetSearch.entity().getPhysicalNetworkId(), SearchCriteria.Op.EQ);
+        FreeDedicatedVnetSearch.and("taken", FreeDedicatedVnetSearch.entity().getTakenAt(), SearchCriteria.Op.NULL);
+        FreeDedicatedVnetSearch.and("accountGuestVlanMapId", FreeDedicatedVnetSearch.entity().getAccountGuestVlanMapId(), SearchCriteria.Op.IN);
+        FreeDedicatedVnetSearch.done();
+
+        VnetDcSearch = createSearchBuilder();
+        VnetDcSearch.and("vnet", VnetDcSearch.entity().getVnet(), SearchCriteria.Op.EQ);
+        VnetDcSearch.and("dc", VnetDcSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        VnetDcSearch.and("physicalNetworkId", VnetDcSearch.entity().getPhysicalNetworkId(), SearchCriteria.Op.EQ);
+        VnetDcSearch.done();
+
+        countZoneVlans = createSearchBuilder(Integer.class);
+        countZoneVlans.select(null, Func.COUNT, countZoneVlans.entity().getId());
+        countZoneVlans.and("dc", countZoneVlans.entity().getDataCenterId(), Op.EQ);
+        countZoneVlans.done();
+
+        countAllocatedZoneVlans = createSearchBuilder(Integer.class);
+        countAllocatedZoneVlans.select(null, Func.COUNT, countAllocatedZoneVlans.entity().getId());
+        countAllocatedZoneVlans.and("dc", countAllocatedZoneVlans.entity().getDataCenterId(), Op.EQ);
+        countAllocatedZoneVlans.and("allocated", countAllocatedZoneVlans.entity().getTakenAt(), SearchCriteria.Op.NNULL);
+        countAllocatedZoneVlans.done();
+
+        VnetDcSearchAllocated = createSearchBuilder();
+        VnetDcSearchAllocated.and("vnet", VnetDcSearchAllocated.entity().getVnet(), SearchCriteria.Op.EQ);
+        VnetDcSearchAllocated.and("dc", VnetDcSearchAllocated.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        VnetDcSearchAllocated.and("physicalNetworkId", VnetDcSearchAllocated.entity().getPhysicalNetworkId(), SearchCriteria.Op.EQ);
+        VnetDcSearchAllocated.and("taken", VnetDcSearchAllocated.entity().getTakenAt(), SearchCriteria.Op.NNULL);
+        VnetDcSearchAllocated.and("account", VnetDcSearchAllocated.entity().getAccountId(), SearchCriteria.Op.EQ);
+        VnetDcSearchAllocated.and("reservation", VnetDcSearchAllocated.entity().getReservationId(), SearchCriteria.Op.EQ);
+        VnetDcSearchAllocated.done();
+
+        DedicatedGuestVlanRangeSearch = createSearchBuilder();
+        DedicatedGuestVlanRangeSearch.and("dedicatedGuestVlanRangeId", DedicatedGuestVlanRangeSearch.entity().getAccountGuestVlanMapId(), SearchCriteria.Op.EQ);
+        DedicatedGuestVlanRangeSearch.done();
+
+        countVnetsAllocatedToAccount = createSearchBuilder(Integer.class);
+        countVnetsAllocatedToAccount.and("dc", countVnetsAllocatedToAccount.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        countVnetsAllocatedToAccount.and("accountId", countVnetsAllocatedToAccount.entity().getAccountId(), SearchCriteria.Op.EQ);
+        countVnetsAllocatedToAccount.select(null, Func.COUNT, countVnetsAllocatedToAccount.entity().getId());
+        countVnetsAllocatedToAccount.done();
+
+        ListAllVnetSearch = createSearchBuilder(String.class);
+        ListAllVnetSearch.select(null, Func.NATIVE, ListAllVnetSearch.entity().getVnet());
+        ListAllVnetSearch.and("dc", ListAllVnetSearch.entity().getDataCenterId(), Op.EQ);
+        ListAllVnetSearch.and("physicalNetworkId", ListAllVnetSearch.entity().getPhysicalNetworkId(), Op.EQ);
+        ListAllVnetSearch.done();
+    }
+
     @Override
     public List<DataCenterVnetVO> listAllocatedVnets(long physicalNetworkId) {
         SearchCriteria<DataCenterVnetVO> sc = DcSearchAllocated.create();
         sc.setParameters("physicalNetworkId", physicalNetworkId);
         return listBy(sc);
-    }
-
-    @Override
-    public int countAllocatedVnets(long physicalNetworkId) {
-        SearchCriteria<DataCenterVnetVO> sc = DcSearchAllocated.create();
-        sc.setParameters("physicalNetworkId", physicalNetworkId);
-        return listBy(sc).size();
     }
 
     @Override
@@ -88,15 +157,6 @@ public class DataCenterVnetDaoImpl extends GenericDaoBase<DataCenterVnetVO, Long
         sc.setParameters("physicalNetworkId", physicalNetworkId);
         sc.setParameters("vnetRange", start.toString(), end.toString());
         return listBy(sc);
-    }
-
-    @Override
-    public void lockRange(long dcId, long physicalNetworkId, Integer start, Integer end) {
-        SearchCriteria<DataCenterVnetVO> sc = SearchRange.create();
-        sc.setParameters("dc", dcId);
-        sc.setParameters("physicalNetworkId", physicalNetworkId);
-        sc.setParameters("vnetRange", start.toString(), end.toString());
-        lockRows(sc, null, true);
     }
 
     @Override
@@ -128,8 +188,7 @@ public class DataCenterVnetDaoImpl extends GenericDaoBase<DataCenterVnetVO, Long
     @Override
     @DB
     //In the List<string> argument each string is a vlan. not a vlanRange.
-        public
-        void add(long dcId, long physicalNetworkId, List<String> vnets) {
+    public void add(long dcId, long physicalNetworkId, List<String> vnets) {
         String insertVnet = "INSERT INTO `cloud`.`op_dc_vnet_alloc` (vnet, data_center_id, physical_network_id) VALUES ( ?, ?, ?)";
 
         TransactionLegacy txn = TransactionLegacy.currentTxn();
@@ -147,6 +206,13 @@ public class DataCenterVnetDaoImpl extends GenericDaoBase<DataCenterVnetVO, Long
         } catch (SQLException e) {
             throw new CloudRuntimeException(e.getMessage());
         }
+    }
+
+    @Override
+    public void delete(long physicalNetworkId) {
+        SearchCriteria<DataCenterVnetVO> sc = VnetDcSearch.create();
+        sc.setParameters("physicalNetworkId", physicalNetworkId);
+        remove(sc);
     }
 
     //In the List<string> argument each string is a vlan. not a vlanRange.
@@ -168,10 +234,12 @@ public class DataCenterVnetDaoImpl extends GenericDaoBase<DataCenterVnetVO, Long
     }
 
     @Override
-    public void delete(long physicalNetworkId) {
-        SearchCriteria<DataCenterVnetVO> sc = VnetDcSearch.create();
+    public void lockRange(long dcId, long physicalNetworkId, Integer start, Integer end) {
+        SearchCriteria<DataCenterVnetVO> sc = SearchRange.create();
+        sc.setParameters("dc", dcId);
         sc.setParameters("physicalNetworkId", physicalNetworkId);
-        remove(sc);
+        sc.setParameters("vnetRange", start.toString(), end.toString());
+        lockRows(sc, null, true);
     }
 
     @Override
@@ -256,6 +324,13 @@ public class DataCenterVnetDaoImpl extends GenericDaoBase<DataCenterVnetVO, Long
     }
 
     @Override
+    public int countAllocatedVnets(long physicalNetworkId) {
+        SearchCriteria<DataCenterVnetVO> sc = DcSearchAllocated.create();
+        sc.setParameters("physicalNetworkId", physicalNetworkId);
+        return listBy(sc).size();
+    }
+
+    @Override
     public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
         boolean result = super.configure(name, params);
 
@@ -265,89 +340,11 @@ public class DataCenterVnetDaoImpl extends GenericDaoBase<DataCenterVnetVO, Long
         AccountGuestVlanMapSearch = _accountGuestVlanMapDao.createSearchBuilder();
         AccountGuestVlanMapSearch.and("accountId", AccountGuestVlanMapSearch.entity().getAccountId(), SearchCriteria.Op.EQ);
         countVnetsDedicatedToAccount.join("AccountGuestVlanMapSearch", AccountGuestVlanMapSearch, countVnetsDedicatedToAccount.entity().getAccountGuestVlanMapId(),
-            AccountGuestVlanMapSearch.entity().getId(), JoinBuilder.JoinType.INNER);
+                AccountGuestVlanMapSearch.entity().getId(), JoinBuilder.JoinType.INNER);
         countVnetsDedicatedToAccount.select(null, Func.COUNT, countVnetsDedicatedToAccount.entity().getId());
         countVnetsDedicatedToAccount.done();
         AccountGuestVlanMapSearch.done();
 
         return result;
-    }
-
-    public DataCenterVnetDaoImpl() {
-        super();
-        DcSearchAllocated = createSearchBuilder();
-        DcSearchAllocated.and("dc", DcSearchAllocated.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        DcSearchAllocated.and("physicalNetworkId", DcSearchAllocated.entity().getPhysicalNetworkId(), SearchCriteria.Op.EQ);
-        DcSearchAllocated.and("allocated", DcSearchAllocated.entity().getTakenAt(), SearchCriteria.Op.NNULL);
-        DcSearchAllocated.done();
-
-        DcSearchAllocatedInRange = createSearchBuilder();
-        DcSearchAllocatedInRange.and("dc", DcSearchAllocatedInRange.entity().getDataCenterId(), Op.EQ);
-        DcSearchAllocatedInRange.and("physicalNetworkId", DcSearchAllocatedInRange.entity().getPhysicalNetworkId(), Op.EQ);
-        DcSearchAllocatedInRange.and("allocated", DcSearchAllocatedInRange.entity().getTakenAt(), Op.NNULL);
-        DcSearchAllocatedInRange.and("vnetRange", DcSearchAllocatedInRange.entity().getVnet(), Op.BETWEEN);
-        DcSearchAllocatedInRange.done();
-
-        SearchRange = createSearchBuilder();
-        SearchRange.and("dc", SearchRange.entity().getDataCenterId(), Op.EQ);
-        SearchRange.and("physicalNetworkId", SearchRange.entity().getPhysicalNetworkId(), Op.EQ);
-        SearchRange.and("vnetRange", SearchRange.entity().getVnet(), Op.BETWEEN);
-
-        FreeVnetSearch = createSearchBuilder();
-        FreeVnetSearch.and("dc", FreeVnetSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        FreeVnetSearch.and("physicalNetworkId", FreeVnetSearch.entity().getPhysicalNetworkId(), SearchCriteria.Op.EQ);
-        FreeVnetSearch.and("taken", FreeVnetSearch.entity().getTakenAt(), SearchCriteria.Op.NULL);
-        FreeVnetSearch.and("accountGuestVlanMapId", FreeVnetSearch.entity().getAccountGuestVlanMapId(), SearchCriteria.Op.NULL);
-        FreeVnetSearch.done();
-
-        FreeDedicatedVnetSearch = createSearchBuilder();
-        FreeDedicatedVnetSearch.and("dc", FreeDedicatedVnetSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        FreeDedicatedVnetSearch.and("physicalNetworkId", FreeDedicatedVnetSearch.entity().getPhysicalNetworkId(), SearchCriteria.Op.EQ);
-        FreeDedicatedVnetSearch.and("taken", FreeDedicatedVnetSearch.entity().getTakenAt(), SearchCriteria.Op.NULL);
-        FreeDedicatedVnetSearch.and("accountGuestVlanMapId", FreeDedicatedVnetSearch.entity().getAccountGuestVlanMapId(), SearchCriteria.Op.IN);
-        FreeDedicatedVnetSearch.done();
-
-        VnetDcSearch = createSearchBuilder();
-        VnetDcSearch.and("vnet", VnetDcSearch.entity().getVnet(), SearchCriteria.Op.EQ);
-        VnetDcSearch.and("dc", VnetDcSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        VnetDcSearch.and("physicalNetworkId", VnetDcSearch.entity().getPhysicalNetworkId(), SearchCriteria.Op.EQ);
-        VnetDcSearch.done();
-
-        countZoneVlans = createSearchBuilder(Integer.class);
-        countZoneVlans.select(null, Func.COUNT, countZoneVlans.entity().getId());
-        countZoneVlans.and("dc", countZoneVlans.entity().getDataCenterId(), Op.EQ);
-        countZoneVlans.done();
-
-        countAllocatedZoneVlans = createSearchBuilder(Integer.class);
-        countAllocatedZoneVlans.select(null, Func.COUNT, countAllocatedZoneVlans.entity().getId());
-        countAllocatedZoneVlans.and("dc", countAllocatedZoneVlans.entity().getDataCenterId(), Op.EQ);
-        countAllocatedZoneVlans.and("allocated", countAllocatedZoneVlans.entity().getTakenAt(), SearchCriteria.Op.NNULL);
-        countAllocatedZoneVlans.done();
-
-        VnetDcSearchAllocated = createSearchBuilder();
-        VnetDcSearchAllocated.and("vnet", VnetDcSearchAllocated.entity().getVnet(), SearchCriteria.Op.EQ);
-        VnetDcSearchAllocated.and("dc", VnetDcSearchAllocated.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        VnetDcSearchAllocated.and("physicalNetworkId", VnetDcSearchAllocated.entity().getPhysicalNetworkId(), SearchCriteria.Op.EQ);
-        VnetDcSearchAllocated.and("taken", VnetDcSearchAllocated.entity().getTakenAt(), SearchCriteria.Op.NNULL);
-        VnetDcSearchAllocated.and("account", VnetDcSearchAllocated.entity().getAccountId(), SearchCriteria.Op.EQ);
-        VnetDcSearchAllocated.and("reservation", VnetDcSearchAllocated.entity().getReservationId(), SearchCriteria.Op.EQ);
-        VnetDcSearchAllocated.done();
-
-        DedicatedGuestVlanRangeSearch = createSearchBuilder();
-        DedicatedGuestVlanRangeSearch.and("dedicatedGuestVlanRangeId", DedicatedGuestVlanRangeSearch.entity().getAccountGuestVlanMapId(), SearchCriteria.Op.EQ);
-        DedicatedGuestVlanRangeSearch.done();
-
-        countVnetsAllocatedToAccount = createSearchBuilder(Integer.class);
-        countVnetsAllocatedToAccount.and("dc", countVnetsAllocatedToAccount.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        countVnetsAllocatedToAccount.and("accountId", countVnetsAllocatedToAccount.entity().getAccountId(), SearchCriteria.Op.EQ);
-        countVnetsAllocatedToAccount.select(null, Func.COUNT, countVnetsAllocatedToAccount.entity().getId());
-        countVnetsAllocatedToAccount.done();
-
-        ListAllVnetSearch = createSearchBuilder(String.class);
-        ListAllVnetSearch.select(null, Func.NATIVE, ListAllVnetSearch.entity().getVnet());
-        ListAllVnetSearch.and("dc", ListAllVnetSearch.entity().getDataCenterId(), Op.EQ);
-        ListAllVnetSearch.and("physicalNetworkId", ListAllVnetSearch.entity().getPhysicalNetworkId(), Op.EQ);
-        ListAllVnetSearch.done();
-
     }
 }

@@ -24,11 +24,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpSession;
@@ -62,7 +61,7 @@ public class HttpUtilsTest {
 
         // session and sessionKeyString null test
         assertFalse(HttpUtils.validateSessionKey(session, params, cookies, sessionKeyString));
-        sessionKeyString =  "sessionkey";
+        sessionKeyString = "sessionkey";
         assertFalse(HttpUtils.validateSessionKey(session, params, cookies, sessionKeyString));
 
         // param and cookie null test
@@ -77,7 +76,7 @@ public class HttpUtilsTest {
         assertTrue(HttpUtils.validateSessionKey(session, params, cookies, sessionKeyString));
 
         // param not null, cookies null test
-        params = new HashMap<String, Object[]>();
+        params = new HashMap<>();
         params.put(sessionKeyString, new String[]{"randomString"});
         cookies = null;
         assertFalse(HttpUtils.validateSessionKey(session, params, cookies, sessionKeyString));
@@ -85,7 +84,7 @@ public class HttpUtilsTest {
         assertTrue(HttpUtils.validateSessionKey(session, params, cookies, sessionKeyString));
 
         // both param and cookies not null test
-        params = new HashMap<String, Object[]>();
+        params = new HashMap<>();
         cookies = new Cookie[]{new Cookie(sessionKeyString, sessionKeyValue)};
         params.put(sessionKeyString, new String[]{"incorrectValue"});
         assertFalse(HttpUtils.validateSessionKey(session, params, cookies, sessionKeyString));

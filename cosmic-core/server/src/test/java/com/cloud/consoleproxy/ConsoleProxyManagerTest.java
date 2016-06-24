@@ -24,8 +24,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
-
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
@@ -36,6 +34,8 @@ import com.cloud.network.dao.NetworkVO;
 import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.ConsoleProxyVO;
+
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -127,13 +127,13 @@ public class ConsoleProxyManagerTest {
         NetworkVO network = Mockito.mock(NetworkVO.class);
         NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
         when(_networkDao.listByZoneAndTrafficType(anyLong(), eq(TrafficType.Public)))
-                    .thenReturn(Collections.singletonList(network));
+                .thenReturn(Collections.singletonList(network));
 
         when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Public))))
-        .thenReturn(Collections.singletonList(badNetwork));
+                .thenReturn(Collections.singletonList(badNetwork));
 
         when(_networkDao.listByZoneSecurityGroup(anyLong()))
-                    .thenReturn(Collections.singletonList(badNetwork));
+                .thenReturn(Collections.singletonList(badNetwork));
 
         NetworkVO returnedNetwork = cpvmManager.getDefaultNetworkForAdvancedZone(dc);
 
@@ -153,10 +153,10 @@ public class ConsoleProxyManagerTest {
         NetworkVO network = Mockito.mock(NetworkVO.class);
         NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
         when(_networkDao.listByZoneAndTrafficType(anyLong(), any(TrafficType.class)))
-                    .thenReturn(Collections.singletonList(badNetwork));
+                .thenReturn(Collections.singletonList(badNetwork));
 
         when(_networkDao.listByZoneSecurityGroup(anyLong()))
-                    .thenReturn(Collections.singletonList(network));
+                .thenReturn(Collections.singletonList(network));
 
         NetworkVO returnedNetwork = cpvmManager.getDefaultNetworkForAdvancedZone(dc);
 
@@ -175,10 +175,10 @@ public class ConsoleProxyManagerTest {
         NetworkVO network = Mockito.mock(NetworkVO.class);
         NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
         when(_networkDao.listByZoneAndTrafficType(anyLong(), eq(TrafficType.Guest)))
-                    .thenReturn(Collections.singletonList(network));
+                .thenReturn(Collections.singletonList(network));
 
         when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Guest))))
-                    .thenReturn(Collections.singletonList(badNetwork));
+                .thenReturn(Collections.singletonList(badNetwork));
 
         NetworkVO returnedNetwork = cpvmManager.getDefaultNetworkForBasicZone(dc);
         Assert.assertNotNull(returnedNetwork);
@@ -197,10 +197,10 @@ public class ConsoleProxyManagerTest {
         NetworkVO network = Mockito.mock(NetworkVO.class);
         NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
         when(_networkDao.listByZoneAndTrafficType(anyLong(), eq(TrafficType.Guest)))
-                    .thenReturn(Collections.singletonList(network));
+                .thenReturn(Collections.singletonList(network));
 
         when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Guest))))
-                    .thenReturn(Collections.singletonList(badNetwork));
+                .thenReturn(Collections.singletonList(badNetwork));
 
         NetworkVO returnedNetwork = cpvmManager.getDefaultNetworkForBasicZone(dc);
 
@@ -210,7 +210,7 @@ public class ConsoleProxyManagerTest {
     }
 
     //also test invalid input
-    @Test(expected=CloudRuntimeException.class)
+    @Test(expected = CloudRuntimeException.class)
     public void getDefaultNetworkForBasicSGWrongZoneType() {
         DataCenterVO dc = Mockito.mock(DataCenterVO.class);
         when(dc.getNetworkType()).thenReturn(NetworkType.Advanced);
@@ -221,15 +221,15 @@ public class ConsoleProxyManagerTest {
         NetworkVO network = Mockito.mock(NetworkVO.class);
         NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
         when(_networkDao.listByZoneAndTrafficType(anyLong(), eq(TrafficType.Guest)))
-                    .thenReturn(Collections.singletonList(network));
+                .thenReturn(Collections.singletonList(network));
 
         when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Guest))))
-                    .thenReturn(Collections.singletonList(badNetwork));
+                .thenReturn(Collections.singletonList(badNetwork));
 
         cpvmManager.getDefaultNetworkForBasicZone(dc);
     }
 
-    @Test(expected=CloudRuntimeException.class)
+    @Test(expected = CloudRuntimeException.class)
     public void getDefaultNetworkForAdvancedWrongZoneType() {
         DataCenterVO dc = Mockito.mock(DataCenterVO.class);
         when(dc.getNetworkType()).thenReturn(NetworkType.Basic);
@@ -240,10 +240,10 @@ public class ConsoleProxyManagerTest {
         NetworkVO network = Mockito.mock(NetworkVO.class);
         NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
         when(_networkDao.listByZoneAndTrafficType(anyLong(), any(TrafficType.class)))
-                    .thenReturn(Collections.singletonList(badNetwork));
+                .thenReturn(Collections.singletonList(badNetwork));
 
         when(_networkDao.listByZoneSecurityGroup(anyLong()))
-                    .thenReturn(Collections.singletonList(network));
+                .thenReturn(Collections.singletonList(network));
 
         cpvmManager.getDefaultNetworkForAdvancedZone(dc);
     }

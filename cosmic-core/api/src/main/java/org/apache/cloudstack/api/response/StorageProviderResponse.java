@@ -19,9 +19,9 @@
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 public class StorageProviderResponse extends BaseResponse {
     @SerializedName("name")
@@ -42,7 +42,7 @@ public class StorageProviderResponse extends BaseResponse {
     /**
      * @param type the type to set
      */
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -56,8 +56,7 @@ public class StorageProviderResponse extends BaseResponse {
     /**
      * @param name the name to set
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
-
 }

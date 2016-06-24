@@ -24,21 +24,21 @@ public interface SnapshotPolicy extends Identity, InternalIdentity, Displayable 
 
     long getVolumeId();
 
-    void setSchedule(String schedule);
-
     String getSchedule();
 
-    void setInterval(short interval);
-
-    void setTimezone(String timezone);
+    void setSchedule(String schedule);
 
     String getTimezone();
 
+    void setTimezone(String timezone);
+
     short getInterval();
 
-    void setMaxSnaps(int maxSnaps);
+    void setInterval(short interval);
 
     int getMaxSnaps();
+
+    void setMaxSnaps(int maxSnaps);
 
     boolean isActive();
 

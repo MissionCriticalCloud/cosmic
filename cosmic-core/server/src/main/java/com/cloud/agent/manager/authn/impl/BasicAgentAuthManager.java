@@ -16,11 +16,6 @@
 // under the License.
 package com.cloud.agent.manager.authn.impl;
 
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.StartupCommandProcessor;
 import com.cloud.agent.api.StartupCommand;
@@ -29,8 +24,12 @@ import com.cloud.agent.manager.authn.AgentAuthorizer;
 import com.cloud.exception.ConnectionException;
 import com.cloud.host.dao.HostDao;
 import com.cloud.utils.component.AdapterBase;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -46,10 +45,10 @@ public class BasicAgentAuthManager extends AdapterBase implements AgentAuthorize
     AgentManager _agentManager = null;
 
     @Override
-    public boolean processInitialConnect(StartupCommand[] cmd) throws ConnectionException {
+    public boolean processInitialConnect(final StartupCommand[] cmd) throws ConnectionException {
         try {
             authorizeAgent(cmd);
-        } catch (AgentAuthnException e) {
+        } catch (final AgentAuthnException e) {
             throw new ConnectionException(true, "Failed to authenticate/authorize", e);
         }
         s_logger.debug("Authorized agent with guid " + cmd[0].getGuid());
@@ -57,12 +56,12 @@ public class BasicAgentAuthManager extends AdapterBase implements AgentAuthorize
     }
 
     @Override
-    public boolean authorizeAgent(StartupCommand[] cmd) throws AgentAuthnException {
+    public boolean authorizeAgent(final StartupCommand[] cmd) throws AgentAuthnException {
         return true;
     }
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         _agentManager.registerForInitialConnects(this, true);
         return true;
     }

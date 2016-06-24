@@ -17,7 +17,6 @@
 package com.cloud.storage.download;
 
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
-
 import org.apache.cloudstack.storage.command.DownloadProgressCommand.RequestType;
 
 public class NotDownloadedState extends DownloadActiveState {
@@ -36,5 +35,4 @@ public class NotDownloadedState extends DownloadActiveState {
         super.onEntry(prevState, event, evtObj);
         getDownloadListener().scheduleStatusCheck(RequestType.GET_STATUS);
     }
-
 }

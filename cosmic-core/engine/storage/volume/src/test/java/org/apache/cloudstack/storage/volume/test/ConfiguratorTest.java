@@ -20,13 +20,12 @@ package org.apache.cloudstack.storage.volume.test;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
+import com.cloud.dc.dao.ClusterDao;
+import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreProvider;
 
 import javax.inject.Inject;
+import java.util.List;
 
-import com.cloud.dc.dao.ClusterDao;
-
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

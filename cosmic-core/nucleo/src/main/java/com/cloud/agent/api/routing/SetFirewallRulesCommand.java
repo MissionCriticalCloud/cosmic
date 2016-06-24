@@ -19,14 +19,13 @@
 
 package com.cloud.agent.api.routing;
 
+import com.cloud.agent.api.to.FirewallRuleTO;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.cloud.agent.api.to.FirewallRuleTO;
-
 /**
- *
  * AccessDetails allow different components to put in information about
  * how to access the components inside the command.
  */
@@ -67,11 +66,11 @@ public class SetFirewallRulesCommand extends NetworkElementCommand {
             sb.append(fwTO.getSrcIp()).append(":").append(fwTO.getProtocol()).append(":");
             if ("icmp".compareTo(fwTO.getProtocol()) == 0) {
                 sb.append(fwTO.getIcmpType()).append(":").append(fwTO.getIcmpCode()).append(":");
-
-            } else if (fwTO.getStringSrcPortRange() == null)
+            } else if (fwTO.getStringSrcPortRange() == null) {
                 sb.append("0:0").append(":");
-            else
+            } else {
                 sb.append(fwTO.getStringSrcPortRange()).append(":");
+            }
 
             cidr = fwTO.getSourceCidrList();
             if (cidr == null || cidr.isEmpty()) {
@@ -79,8 +78,9 @@ public class SetFirewallRulesCommand extends NetworkElementCommand {
             } else {
                 boolean firstEntry = true;
                 for (String tag : cidr) {
-                    if (!firstEntry)
+                    if (!firstEntry) {
                         sb.append("-");
+                    }
                     sb.append(tag);
                     firstEntry = false;
                 }
@@ -89,7 +89,6 @@ public class SetFirewallRulesCommand extends NetworkElementCommand {
             String fwRuleEntry = sb.toString();
 
             toAdd.add(fwRuleEntry);
-
         }
         result[0] = toAdd.toArray(new String[toAdd.size()]);
 

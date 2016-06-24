@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.serializer;
 
+import org.apache.cloudstack.acl.RoleType;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
-import org.apache.cloudstack.acl.RoleType;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Param {

@@ -16,27 +16,26 @@
 // under the License.
 package org.apache.cloudstack.api.command.test;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.UserVmService;
-
 import org.apache.cloudstack.api.ResponseGenerator;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.vm.UpdateVmNicIpCmd;
 import org.apache.cloudstack.api.response.UserVmResponse;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 public class UpdateVmNicIpTest extends TestCase {
 
@@ -52,17 +51,17 @@ public class UpdateVmNicIpTest extends TestCase {
     @Test
     public void testSuccess() throws ResourceAllocationException, ResourceUnavailableException, ConcurrentOperationException, InsufficientCapacityException {
 
-        UserVmService userVmService = Mockito.mock(UserVmService.class);
+        final UserVmService userVmService = Mockito.mock(UserVmService.class);
         updateVmNicIpCmd = Mockito.mock(UpdateVmNicIpCmd.class);
-        UserVm userVm = Mockito.mock(UserVm.class);
+        final UserVm userVm = Mockito.mock(UserVm.class);
 
         Mockito.when(userVmService.updateNicIpForVirtualMachine(Mockito.any(UpdateVmNicIpCmd.class))).thenReturn(userVm);
 
         updateVmNicIpCmd._userVmService = userVmService;
         responseGenerator = Mockito.mock(ResponseGenerator.class);
 
-        List<UserVmResponse> list = new LinkedList<UserVmResponse>();
-        UserVmResponse userVmResponse = Mockito.mock(UserVmResponse.class);
+        final List<UserVmResponse> list = new LinkedList<>();
+        final UserVmResponse userVmResponse = Mockito.mock(UserVmResponse.class);
         list.add(userVmResponse);
         Mockito.when(responseGenerator.createUserVmResponse(ResponseView.Restricted, "virtualmachine", userVm)).thenReturn(list);
 
@@ -72,7 +71,7 @@ public class UpdateVmNicIpTest extends TestCase {
 
     @Test
     public void testFailure() throws ResourceAllocationException, ResourceUnavailableException, ConcurrentOperationException, InsufficientCapacityException {
-        UserVmService userVmService = Mockito.mock(UserVmService.class);
+        final UserVmService userVmService = Mockito.mock(UserVmService.class);
         updateVmNicIpCmd = Mockito.mock(UpdateVmNicIpCmd.class);
 
         Mockito.when(userVmService.updateNicIpForVirtualMachine(Mockito.any(UpdateVmNicIpCmd.class))).thenReturn(null);
@@ -82,9 +81,8 @@ public class UpdateVmNicIpTest extends TestCase {
         updateVmNicIpCmd._responseGenerator = responseGenerator;
         try {
             updateVmNicIpCmd.execute();
-        } catch (ServerApiException exception) {
+        } catch (final ServerApiException exception) {
             Assert.assertEquals("Failed to update ip address on vm NIC. Refer to server logs for details.", exception.getDescription());
         }
     }
-
 }

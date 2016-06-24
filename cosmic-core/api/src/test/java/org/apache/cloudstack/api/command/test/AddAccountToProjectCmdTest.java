@@ -20,8 +20,10 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectService;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.command.user.account.AddAccountToProjectCmd;
+
+import junit.framework.Assert;
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,15 +31,11 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 public class AddAccountToProjectCmdTest extends TestCase {
-
-    private AddAccountToProjectCmd addAccountToProjectCmd;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+    private AddAccountToProjectCmd addAccountToProjectCmd;
 
     @Override
     @Before
@@ -65,13 +63,11 @@ public class AddAccountToProjectCmdTest extends TestCase {
                 // return "customer@abc.com";
                 return null;
             }
-
         };
     }
 
     /****
      * Condition not handled in the code
-     *
      *****/
 
     /*
@@ -89,15 +85,14 @@ public class AddAccountToProjectCmdTest extends TestCase {
      *
      * }
      */
-
     @Test
     public void testGetEntityOwnerIdForProject() {
 
-        Project project = Mockito.mock(Project.class);
+        final Project project = Mockito.mock(Project.class);
         Mockito.when(project.getId()).thenReturn(2L);
 
-        ProjectService projectService = Mockito.mock(ProjectService.class);
-        Account account = Mockito.mock(Account.class);
+        final ProjectService projectService = Mockito.mock(ProjectService.class);
+        final Account account = Mockito.mock(Account.class);
 
         Mockito.when(account.getId()).thenReturn(2L);
         Mockito.when(projectService.getProject(Matchers.anyLong())).thenReturn(project);
@@ -106,7 +101,6 @@ public class AddAccountToProjectCmdTest extends TestCase {
         addAccountToProjectCmd._projectService = projectService;
 
         Assert.assertEquals(2L, addAccountToProjectCmd.getEntityOwnerId());
-
     }
 
     /**
@@ -140,16 +134,14 @@ public class AddAccountToProjectCmdTest extends TestCase {
      *
      * }
      */
-
     @Test
     public void testExecuteForNullAccountNameEmail() {
 
         try {
             addAccountToProjectCmd.execute();
-        } catch (InvalidParameterValueException exception) {
+        } catch (final InvalidParameterValueException exception) {
             Assert.assertEquals("Either accountName or email is required", exception.getLocalizedMessage());
         }
-
     }
 
     /*
@@ -170,5 +162,4 @@ public class AddAccountToProjectCmdTest extends TestCase {
      *
      * }
      */
-
 }

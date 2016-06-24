@@ -50,8 +50,9 @@ public class SynchronizationEvent {
 
     public boolean waitEvent() throws InterruptedException {
         synchronized (this) {
-            if (signalled)
+            if (signalled) {
                 return true;
+            }
 
             while (true) {
                 try {
@@ -68,8 +69,9 @@ public class SynchronizationEvent {
 
     public boolean waitEvent(long timeOutMiliseconds) throws InterruptedException {
         synchronized (this) {
-            if (signalled)
+            if (signalled) {
                 return true;
+            }
 
             try {
                 wait(timeOutMiliseconds);

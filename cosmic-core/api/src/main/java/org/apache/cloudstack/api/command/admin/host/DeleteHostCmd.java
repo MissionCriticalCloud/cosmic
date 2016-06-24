@@ -17,7 +17,6 @@
 package org.apache.cloudstack.api.command.admin.host;
 
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -26,6 +25,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.HostResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,44 +44,18 @@ public class DeleteHostCmd extends BaseCmd {
     private Long id;
 
     @Parameter(name = ApiConstants.FORCED,
-               type = CommandType.BOOLEAN,
-               description = "Force delete the host. All HA enabled vms running on the host will be put to HA; HA disabled ones will be stopped")
+            type = CommandType.BOOLEAN,
+            description = "Force delete the host. All HA enabled vms running on the host will be put to HA; HA disabled ones will be stopped")
     private Boolean forced;
 
     @Parameter(name = ApiConstants.FORCED_DESTROY_LOCAL_STORAGE,
-               type = CommandType.BOOLEAN,
-               description = "Force destroy local storage on this host. All VMs created on this local storage will be destroyed")
+            type = CommandType.BOOLEAN,
+            description = "Force destroy local storage on this host. All VMs created on this local storage will be destroyed")
     private Boolean forceDestroyLocalStorage;
 
     // ///////////////////////////////////////////////////
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
-
-    public Long getId() {
-        return id;
-    }
-
-    public boolean isForced() {
-        return (forced != null) ? forced : false;
-    }
-
-    public boolean isForceDestoryLocalStorage() {
-        return (forceDestroyLocalStorage != null) ? forceDestroyLocalStorage : true;
-    }
-
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
 
     @Override
     public void execute() {
@@ -92,5 +66,31 @@ public class DeleteHostCmd extends BaseCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete host");
         }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public boolean isForced() {
+        return (forced != null) ? forced : false;
+    }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
+
+    public boolean isForceDestoryLocalStorage() {
+        return (forceDestroyLocalStorage != null) ? forceDestroyLocalStorage : true;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

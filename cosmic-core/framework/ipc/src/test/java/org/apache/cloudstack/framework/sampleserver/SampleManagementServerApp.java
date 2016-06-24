@@ -28,6 +28,14 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SampleManagementServerApp {
 
+    public static void main(String args[]) {
+        setupLog4j();
+
+        ApplicationContext context = new ClassPathXmlApplicationContext("/resources/SampleManagementServerAppContext.xml");
+        SampleManagementServer server = context.getBean(SampleManagementServer.class);
+        server.mainLoop();
+    }
+
     private static void setupLog4j() {
         URL configUrl = System.class.getResource("/resources/log4j-cloud.xml");
         if (configUrl != null) {
@@ -44,13 +52,5 @@ public class SampleManagementServerApp {
         } else {
             System.out.println("Configure log4j with default properties");
         }
-    }
-
-    public static void main(String args[]) {
-        setupLog4j();
-
-        ApplicationContext context = new ClassPathXmlApplicationContext("/resources/SampleManagementServerAppContext.xml");
-        SampleManagementServer server = context.getBean(SampleManagementServer.class);
-        server.mainLoop();
     }
 }

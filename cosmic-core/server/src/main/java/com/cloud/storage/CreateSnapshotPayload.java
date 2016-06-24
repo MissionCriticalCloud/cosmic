@@ -48,12 +48,11 @@ public class CreateSnapshotPayload {
         this.account = account;
     }
 
-    public void setQuiescevm(boolean quiescevm) {
-        this.quiescevm = quiescevm;
-    }
-
     public boolean getQuiescevm() {
         return this.quiescevm;
     }
 
+    public void setQuiescevm(boolean quiescevm) {
+        this.quiescevm = quiescevm;
+    }
 }

@@ -46,7 +46,7 @@ public class DirectNetworkUsageAnswer extends Answer {
     public long[] get(String ip) {
         long[] entry = ipBytesSentAndReceived.get(ip);
         if (entry == null) {
-            ipBytesSentAndReceived.put(ip, new long[] {0, 0});
+            ipBytesSentAndReceived.put(ip, new long[]{0, 0});
             return ipBytesSentAndReceived.get(ip);
         } else {
             return entry;

@@ -22,10 +22,10 @@ package org.apache.cloudstack.api.agent.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
-
 import com.cloud.agent.api.CheckNetworkCommand;
 import com.cloud.network.PhysicalNetworkSetupInfo;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;

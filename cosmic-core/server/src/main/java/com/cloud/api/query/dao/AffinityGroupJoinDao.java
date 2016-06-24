@@ -16,13 +16,12 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.util.List;
-
 import com.cloud.api.query.vo.AffinityGroupJoinVO;
 import com.cloud.utils.db.GenericDao;
-
 import org.apache.cloudstack.affinity.AffinityGroup;
 import org.apache.cloudstack.affinity.AffinityGroupResponse;
+
+import java.util.List;
 
 public interface AffinityGroupJoinDao extends GenericDao<AffinityGroupJoinVO, Long> {
 

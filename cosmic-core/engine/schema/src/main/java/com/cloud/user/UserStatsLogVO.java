@@ -16,14 +16,13 @@
 // under the License.
 package com.cloud.user;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.Date;
 
 @Entity
 @Table(name = "op_user_stats_log")
@@ -58,7 +57,7 @@ public class UserStatsLogVO {
     }
 
     public UserStatsLogVO(long userStatsId, long netBytesReceived, long netBytesSent, long currentBytesReceived, long currentBytesSent, long aggBytesReceived,
-            long aggBytesSent, Date updatedTime) {
+                          long aggBytesSent, Date updatedTime) {
         this.userStatsId = userStatsId;
         this.netBytesReceived = netBytesReceived;
         this.netBytesSent = netBytesSent;
@@ -93,12 +92,12 @@ public class UserStatsLogVO {
         return netBytesReceived;
     }
 
-    public long getNetBytesSent() {
-        return netBytesSent;
-    }
-
     public void setNetBytesReceived(long netBytesReceived) {
         this.netBytesReceived = netBytesReceived;
+    }
+
+    public long getNetBytesSent() {
+        return netBytesSent;
     }
 
     public void setNetBytesSent(long netBytesSent) {
@@ -128,5 +127,4 @@ public class UserStatsLogVO {
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
     }
-
 }

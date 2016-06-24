@@ -16,15 +16,15 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.Date;
-
 import com.cloud.network.Site2SiteCustomerGateway;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.Date;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = Site2SiteCustomerGateway.class)
 @SuppressWarnings("unused")
@@ -145,7 +145,9 @@ public class Site2SiteCustomerGatewayResponse extends BaseResponse implements Co
         this.dpd = dpd;
     }
 
-    public void setEncap(Boolean encap) { this.encap = encap; }
+    public void setEncap(Boolean encap) {
+        this.encap = encap;
+    }
 
     public void setRemoved(Date removed) {
         this.removed = removed;
@@ -175,5 +177,4 @@ public class Site2SiteCustomerGatewayResponse extends BaseResponse implements Co
     public void setDomainName(String domainName) {
         this.domain = domainName;
     }
-
 }

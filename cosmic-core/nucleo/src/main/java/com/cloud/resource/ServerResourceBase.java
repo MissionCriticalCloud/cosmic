@@ -19,6 +19,14 @@
 
 package com.cloud.resource;
 
+import com.cloud.agent.IAgentControl;
+import com.cloud.agent.api.Answer;
+import com.cloud.agent.api.Command;
+import com.cloud.agent.api.StartupCommand;
+import com.cloud.utils.net.NetUtils;
+import com.cloud.utils.script.Script;
+
+import javax.naming.ConfigurationException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.NetworkInterface;
@@ -30,54 +38,39 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.ConfigurationException;
-
-import com.cloud.agent.IAgentControl;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.utils.net.NetUtils;
-import com.cloud.utils.script.Script;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class ServerResourceBase implements ServerResource {
     private static final Logger s_logger = LoggerFactory.getLogger(ServerResourceBase.class);
     protected String _name;
-    private ArrayList<String> _warnings = new ArrayList<String>();
-    private ArrayList<String> _errors = new ArrayList<String>();
     protected NetworkInterface _publicNic;
     protected NetworkInterface _privateNic;
     protected NetworkInterface _storageNic;
     protected NetworkInterface _storageNic2;
     protected IAgentControl _agentControl;
+    private ArrayList<String> _warnings = new ArrayList<String>();
+    private ArrayList<String> _errors = new ArrayList<String>();
 
     @Override
     public String getName() {
         return _name;
     }
 
-    protected String findScript(String script) {
-        return Script.findScript(getDefaultScriptsDir(), script);
-    }
-
-    protected abstract String getDefaultScriptsDir();
-
     @Override
     public boolean configure(final String name, Map<String, Object> params) throws ConfigurationException {
         _name = name;
 
-        String publicNic = (String)params.get("public.network.device");
+        String publicNic = (String) params.get("public.network.device");
         if (publicNic == null) {
             publicNic = "xenbr1";
         }
-        String privateNic = (String)params.get("private.network.device");
+        String privateNic = (String) params.get("private.network.device");
         if (privateNic == null) {
             privateNic = "xenbr0";
         }
-        final String storageNic = (String)params.get("storage.network.device");
-        final String storageNic2 = (String)params.get("storage.network.device.2");
+        final String storageNic = (String) params.get("storage.network.device");
+        final String storageNic2 = (String) params.get("storage.network.device.2");
 
         _privateNic = getNetworkInterface(privateNic);
         _publicNic = getNetworkInterface(publicNic);
@@ -102,9 +95,9 @@ public abstract class ServerResourceBase implements ServerResource {
                 final String nicName = nic.getName();
                 //  try {
                 if (//!nic.isLoopback() &&
-                        //nic.isUp() &&
+                    //nic.isUp() &&
                         !nic.isVirtual() && !nicName.startsWith("vnif") && !nicName.startsWith("vnbr") && !nicName.startsWith("peth") && !nicName.startsWith("vif") &&
-                        !nicName.startsWith("virbr") && !nicName.contains(":")) {
+                                !nicName.startsWith("virbr") && !nicName.contains(":")) {
                     final String[] info = NetUtils.getNicParams(nicName);
                     if (info != null && info[0] != null) {
                         _privateNic = nic;
@@ -159,6 +152,22 @@ public abstract class ServerResourceBase implements ServerResource {
             return null;
         }
     }
+
+    @Override
+    public boolean start() {
+        return true;
+    }
+
+    @Override
+    public boolean stop() {
+        return true;
+    }
+
+    protected String findScript(String script) {
+        return Script.findScript(getDefaultScriptsDir(), script);
+    }
+
+    protected abstract String getDefaultScriptsDir();
 
     protected void fillNetworkInformation(final StartupCommand cmd) {
         String[] info = null;
@@ -230,6 +239,10 @@ public abstract class ServerResourceBase implements ServerResource {
         _agentControl = agentControl;
     }
 
+    protected void recordWarning(final String msg) {
+        recordWarning(msg, null);
+    }
+
     protected void recordWarning(final String msg, final Throwable th) {
         final String str = getLogStr(msg, th);
         synchronized (_warnings) {
@@ -237,8 +250,14 @@ public abstract class ServerResourceBase implements ServerResource {
         }
     }
 
-    protected void recordWarning(final String msg) {
-        recordWarning(msg, null);
+    protected String getLogStr(final String msg, final Throwable th) {
+        final StringWriter writer = new StringWriter();
+        writer.append(new Date().toString()).append(": ").append(msg);
+        if (th != null) {
+            writer.append("\n  Exception: ");
+            th.printStackTrace(new PrintWriter(writer));
+        }
+        return writer.toString();
     }
 
     protected List<String> getWarnings() {
@@ -257,15 +276,15 @@ public abstract class ServerResourceBase implements ServerResource {
         }
     }
 
+    protected void recordError(final String msg) {
+        recordError(msg, null);
+    }
+
     protected void recordError(final String msg, final Throwable th) {
         final String str = getLogStr(msg, th);
         synchronized (_errors) {
             _errors.add(str);
         }
-    }
-
-    protected void recordError(final String msg) {
-        recordError(msg, null);
     }
 
     protected Answer createErrorAnswer(final Command cmd, final String msg, final Throwable th) {
@@ -286,25 +305,5 @@ public abstract class ServerResourceBase implements ServerResource {
         writer.append("===>Stack<===");
         th.printStackTrace(new PrintWriter(writer));
         return writer.toString();
-    }
-
-    protected String getLogStr(final String msg, final Throwable th) {
-        final StringWriter writer = new StringWriter();
-        writer.append(new Date().toString()).append(": ").append(msg);
-        if (th != null) {
-            writer.append("\n  Exception: ");
-            th.printStackTrace(new PrintWriter(writer));
-        }
-        return writer.toString();
-    }
-
-    @Override
-    public boolean start() {
-        return true;
-    }
-
-    @Override
-    public boolean stop() {
-        return true;
     }
 }

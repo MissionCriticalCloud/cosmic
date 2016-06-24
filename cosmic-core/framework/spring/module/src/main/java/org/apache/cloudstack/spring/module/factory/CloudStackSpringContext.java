@@ -18,16 +18,17 @@
  */
 package org.apache.cloudstack.spring.module.factory;
 
+import org.apache.cloudstack.spring.module.locator.ModuleDefinitionLocator;
+import org.apache.cloudstack.spring.module.locator.impl.ClasspathModuleDefinitionLocator;
+import org.apache.cloudstack.spring.module.model.ModuleDefinition;
+import org.apache.cloudstack.spring.module.model.ModuleDefinitionSet;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cloudstack.spring.module.locator.ModuleDefinitionLocator;
-import org.apache.cloudstack.spring.module.locator.impl.ClasspathModuleDefinitionLocator;
-import org.apache.cloudstack.spring.module.model.ModuleDefinition;
-import org.apache.cloudstack.spring.module.model.ModuleDefinitionSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -36,17 +37,19 @@ import org.springframework.core.io.Resource;
 
 public class CloudStackSpringContext {
 
-    private static final Logger log = LoggerFactory.getLogger(CloudStackSpringContext.class);
-
     public static final String CLOUDSTACK_CONTEXT_SERVLET_KEY = CloudStackSpringContext.class.getSimpleName();
     public static final String CLOUDSTACK_CONTEXT = "META-INF/cloudstack";
     public static final String CLOUDSTACK_BASE = "bootstrap";
-
+    private static final Logger log = LoggerFactory.getLogger(CloudStackSpringContext.class);
     ModuleBasedContextFactory factory = new ModuleBasedContextFactory();
     ModuleDefinitionLocator loader = new ClasspathModuleDefinitionLocator();
     ModuleDefinitionSet moduleDefinitionSet;
     String baseName;
     String contextName;
+
+    public CloudStackSpringContext() throws IOException {
+        this(CLOUDSTACK_CONTEXT, CLOUDSTACK_BASE);
+    }
 
     public CloudStackSpringContext(String context, String base) throws IOException {
         this.baseName = base;
@@ -57,29 +60,32 @@ public class CloudStackSpringContext {
         init();
     }
 
-    public CloudStackSpringContext() throws IOException {
-        this(CLOUDSTACK_CONTEXT, CLOUDSTACK_BASE);
-    }
-
     public void init() throws IOException {
         Collection<ModuleDefinition> defs = loader.locateModules(contextName);
 
-        if (defs.size() == 0)
+        if (defs.size() == 0) {
             throw new RuntimeException("No modules found to load for Spring");
+        }
 
         moduleDefinitionSet = factory.loadModules(defs, baseName);
     }
 
     public void registerShutdownHook() {
-        Map<String, ApplicationContext> contextMap= moduleDefinitionSet.getContextMap();
+        Map<String, ApplicationContext> contextMap = moduleDefinitionSet.getContextMap();
 
         for (String appName : contextMap.keySet()) {
             ApplicationContext contex = contextMap.get(appName);
             if (contex instanceof ConfigurableApplicationContext) {
-                log.trace("registering shutdown hook for bean "+ appName);
-                ((ConfigurableApplicationContext)contex).registerShutdownHook();
+                log.trace("registering shutdown hook for bean " + appName);
+                ((ConfigurableApplicationContext) contex).registerShutdownHook();
             }
         }
+    }
+
+    public ApplicationContext getApplicationContextForWeb(String name) {
+        ModuleDefinition def = getModuleDefinitionForWeb(name);
+
+        return moduleDefinitionSet.getApplicationContext(def.getName());
     }
 
     public ModuleDefinition getModuleDefinitionForWeb(String name) {
@@ -103,15 +109,10 @@ public class CloudStackSpringContext {
         return def;
     }
 
-    public ApplicationContext getApplicationContextForWeb(String name) {
-        ModuleDefinition def = getModuleDefinitionForWeb(name);
-
-        return moduleDefinitionSet.getApplicationContext(def.getName());
-    }
-
     public String[] getConfigLocationsForWeb(String name, String[] configured) {
-        if (configured == null)
-            configured = new String[] {};
+        if (configured == null) {
+            configured = new String[]{};
+        }
 
         ModuleDefinition def = getModuleDefinitionForWeb(name);
 

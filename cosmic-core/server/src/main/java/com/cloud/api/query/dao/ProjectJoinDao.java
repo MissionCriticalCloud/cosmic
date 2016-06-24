@@ -16,13 +16,12 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.util.List;
-
 import com.cloud.api.query.vo.ProjectJoinVO;
 import com.cloud.projects.Project;
 import com.cloud.utils.db.GenericDao;
-
 import org.apache.cloudstack.api.response.ProjectResponse;
+
+import java.util.List;
 
 public interface ProjectJoinDao extends GenericDao<ProjectJoinVO, Long> {
 
@@ -33,5 +32,4 @@ public interface ProjectJoinDao extends GenericDao<ProjectJoinVO, Long> {
     List<ProjectJoinVO> newProjectView(Project proj);
 
     List<ProjectJoinVO> searchByIds(Long... ids);
-
 }

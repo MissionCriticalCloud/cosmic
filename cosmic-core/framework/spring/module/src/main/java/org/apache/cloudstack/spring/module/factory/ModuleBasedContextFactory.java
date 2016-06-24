@@ -18,14 +18,14 @@
  */
 package org.apache.cloudstack.spring.module.factory;
 
+import org.apache.cloudstack.spring.module.model.ModuleDefinition;
+import org.apache.cloudstack.spring.module.model.ModuleDefinitionSet;
+import org.apache.cloudstack.spring.module.model.impl.DefaultModuleDefinitionSet;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.cloudstack.spring.module.model.ModuleDefinition;
-import org.apache.cloudstack.spring.module.model.ModuleDefinitionSet;
-import org.apache.cloudstack.spring.module.model.impl.DefaultModuleDefinitionSet;
 
 public class ModuleBasedContextFactory {
 
@@ -57,8 +57,9 @@ public class ModuleBasedContextFactory {
             if (def.getParentName() != null) {
                 ModuleDefinition parentDef = modules.get(def.getParentName());
 
-                if (parentDef != null)
+                if (parentDef != null) {
                     parentDef.addChild(def);
+                }
             }
         }
 
@@ -66,8 +67,9 @@ public class ModuleBasedContextFactory {
     }
 
     protected Map<String, ModuleDefinition> traverse(ModuleDefinition base, Map<String, ModuleDefinition> result) {
-        if (base == null)
+        if (base == null) {
             return result;
+        }
 
         if (result.containsKey(base.getName())) {
             throw new RuntimeException("Circular dependency to [" + base.getName() + "] from current set " + result.keySet());
@@ -75,8 +77,9 @@ public class ModuleBasedContextFactory {
 
         result.put(base.getName(), base);
 
-        for (ModuleDefinition childDef : base.getChildren())
+        for (ModuleDefinition childDef : base.getChildren()) {
             traverse(childDef, result);
+        }
 
         return result;
     }

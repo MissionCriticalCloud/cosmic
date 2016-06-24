@@ -16,18 +16,18 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
+import com.cloud.serializer.Param;
+import com.cloud.vm.VirtualMachine;
+import com.cloud.vm.VirtualMachine.State;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
+import org.apache.cloudstack.api.EntityReference;
+
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.cloud.serializer.Param;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.google.gson.annotations.SerializedName;
-
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.EntityReference;
 
 @EntityReference(value = VirtualMachine.class)
 @SuppressWarnings("unused")
@@ -323,6 +323,16 @@ public class DomainRouterResponse extends BaseResponse implements ControlledView
     }
 
     @Override
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    @Override
     public void setDomainId(String domainId) {
         this.domainId = domainId;
     }
@@ -390,16 +400,6 @@ public class DomainRouterResponse extends BaseResponse implements ControlledView
 
     public void setScriptsVersion(String scriptsVersion) {
         this.scriptsVersion = scriptsVersion;
-    }
-
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
     }
 
     public void setVpcId(String vpcId) {

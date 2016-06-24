@@ -16,19 +16,17 @@
 // under the License.
 package com.cloud.ha;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.alert.AlertManager;
 import com.cloud.usage.dao.UsageJobDao;
 import com.cloud.utils.db.TransactionLegacy;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class HighAvailabilityManagerExtImpl extends HighAvailabilityManagerImpl {
 
@@ -91,7 +89,7 @@ public class HighAvailabilityManagerExtImpl extends HighAvailabilityManagerImpl 
 
                 if (!isRunning) {
                     _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_USAGE_SERVER, 0, new Long(0), "No usage server process running",
-                        "No usage server process has been detected, some attention is required");
+                            "No usage server process has been detected, some attention is required");
                 } else {
                     _alertMgr.clearAlert(AlertManager.AlertType.ALERT_TYPE_USAGE_SERVER, 0, 0);
                 }

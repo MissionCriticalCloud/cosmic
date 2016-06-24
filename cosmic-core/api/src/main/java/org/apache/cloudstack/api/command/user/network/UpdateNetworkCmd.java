@@ -24,7 +24,6 @@ import com.cloud.network.Network;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.user.Account;
 import com.cloud.user.User;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
@@ -39,6 +38,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.NetworkOfferingResponse;
 import org.apache.cloudstack.api.response.NetworkResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,8 +53,8 @@ public class UpdateNetworkCmd extends BaseAsyncCustomIdCmd {
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
     @ACL(accessType = AccessType.OperateEntry)
-    @Parameter(name=ApiConstants.ID, type=CommandType.UUID, entityType = NetworkResponse.class,
-            required=true, description="the ID of the network")
+    @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = NetworkResponse.class,
+            required = true, description = "the ID of the network")
     protected Long id;
 
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "the new name for the network")
@@ -76,13 +76,35 @@ public class UpdateNetworkCmd extends BaseAsyncCustomIdCmd {
     private String guestVmCidr;
 
     @Parameter(name = ApiConstants.DISPLAY_NETWORK,
-               type = CommandType.BOOLEAN,
- description = "an optional field, whether to the display the network to the end user or not.", authorized = {RoleType.Admin})
+            type = CommandType.BOOLEAN,
+            description = "an optional field, whether to the display the network to the end user or not.", authorized = {RoleType.Admin})
     private Boolean displayNetwork;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
+
+    @Override
+    public void execute() throws InsufficientCapacityException, ConcurrentOperationException {
+        User callerUser = _accountService.getActiveUser(CallContext.current().getCallingUserId());
+        Account callerAccount = _accountService.getActiveAccountById(callerUser.getAccountId());
+        Network network = _networkService.getNetwork(id);
+        if (network == null) {
+            throw new InvalidParameterValueException("Couldn't find network by ID");
+        }
+
+        Network result =
+                _networkService.updateGuestNetwork(getId(), getNetworkName(), getDisplayText(), callerAccount, callerUser, getNetworkDomain(), getNetworkOfferingId(),
+                        getChangeCidr(), getGuestVmCidr(), getDisplayNetwork(), getCustomId());
+
+        if (result != null) {
+            NetworkResponse response = _responseGenerator.createNetworkResponse(ResponseView.Restricted, result);
+            response.setResponseName(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update network");
+        }
+    }
 
     public Long getId() {
         return id;
@@ -115,13 +137,13 @@ public class UpdateNetworkCmd extends BaseAsyncCustomIdCmd {
         return guestVmCidr;
     }
 
-    public Boolean getDisplayNetwork() {
-        return displayNetwork;
-    }
-
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
+
+    public Boolean getDisplayNetwork() {
+        return displayNetwork;
+    }
 
     @Override
     public String getCommandName() {
@@ -139,25 +161,8 @@ public class UpdateNetworkCmd extends BaseAsyncCustomIdCmd {
     }
 
     @Override
-    public void execute() throws InsufficientCapacityException, ConcurrentOperationException {
-        User callerUser = _accountService.getActiveUser(CallContext.current().getCallingUserId());
-        Account callerAccount = _accountService.getActiveAccountById(callerUser.getAccountId());
-        Network network = _networkService.getNetwork(id);
-        if (network == null) {
-            throw new InvalidParameterValueException("Couldn't find network by ID");
-        }
-
-        Network result =
-            _networkService.updateGuestNetwork(getId(), getNetworkName(), getDisplayText(), callerAccount, callerUser, getNetworkDomain(), getNetworkOfferingId(),
-                getChangeCidr(), getGuestVmCidr(), getDisplayNetwork(), getCustomId());
-
-        if (result != null) {
-            NetworkResponse response = _responseGenerator.createNetworkResponse(ResponseView.Restricted, result);
-            response.setResponseName(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update network");
-        }
+    public String getEventType() {
+        return EventTypes.EVENT_NETWORK_UPDATE;
     }
 
     @Override
@@ -180,11 +185,6 @@ public class UpdateNetworkCmd extends BaseAsyncCustomIdCmd {
         }
 
         return eventMsg.toString();
-    }
-
-    @Override
-    public String getEventType() {
-        return EventTypes.EVENT_NETWORK_UPDATE;
     }
 
     @Override

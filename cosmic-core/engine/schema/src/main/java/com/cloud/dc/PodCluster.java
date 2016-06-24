@@ -48,7 +48,7 @@ public class PodCluster {
             return false;
         }
 
-        PodCluster that = (PodCluster)obj;
+        PodCluster that = (PodCluster) obj;
         if (!this._pod.equals(that._pod)) {
             return false;
         }

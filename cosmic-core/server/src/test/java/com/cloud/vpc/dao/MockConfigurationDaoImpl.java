@@ -16,13 +16,12 @@
 // under the License.
 package com.cloud.vpc.dao;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.cloud.utils.db.GenericDaoBase;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.config.impl.ConfigurationVO;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MockConfigurationDaoImpl extends GenericDaoBase<ConfigurationVO, String> implements ConfigurationDao {
 
@@ -73,7 +72,7 @@ public class MockConfigurationDaoImpl extends GenericDaoBase<ConfigurationVO, St
      * @see com.cloud.configuration.dao.ConfigurationDao#getValueAndInitIfNotExist(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public String getValueAndInitIfNotExist(String name, String category, String initValue, String desc) {
+    public String getValueAndInitIfNotExist(String name, String category, String initValue) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -82,7 +81,7 @@ public class MockConfigurationDaoImpl extends GenericDaoBase<ConfigurationVO, St
      * @see com.cloud.configuration.dao.ConfigurationDao#getValueAndInitIfNotExist(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public String getValueAndInitIfNotExist(String name, String category, String initValue) {
+    public String getValueAndInitIfNotExist(String name, String category, String initValue, String desc) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -117,5 +116,4 @@ public class MockConfigurationDaoImpl extends GenericDaoBase<ConfigurationVO, St
     @Override
     public void invalidateCache() {
     }
-
 }

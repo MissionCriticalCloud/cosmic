@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.vm.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface NicSecondaryIpDao extends GenericDao<NicSecondaryIpVO, Long> {
     List<NicSecondaryIpVO> listByVmId(long instanceId);

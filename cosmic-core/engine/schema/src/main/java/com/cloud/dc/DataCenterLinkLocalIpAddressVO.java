@@ -16,7 +16,7 @@
 // under the License.
 package com.cloud.dc;
 
-import java.util.Date;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,8 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "op_dc_link_local_ip_address_alloc")
@@ -83,16 +82,12 @@ public class DataCenterLinkLocalIpAddressVO implements InternalIdentity {
         return podId;
     }
 
-    public void setTakenAt(Date takenDate) {
-        this.takenAt = takenDate;
+    public String getReservationId() {
+        return reservationId;
     }
 
     public void setReservationId(String reservationId) {
         this.reservationId = reservationId;
-    }
-
-    public String getReservationId() {
-        return reservationId;
     }
 
     public String getIpAddress() {
@@ -105,5 +100,9 @@ public class DataCenterLinkLocalIpAddressVO implements InternalIdentity {
 
     public Date getTakenAt() {
         return takenAt;
+    }
+
+    public void setTakenAt(Date takenDate) {
+        this.takenAt = takenDate;
     }
 }

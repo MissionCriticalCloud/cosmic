@@ -39,5 +39,4 @@ public class Server {
          * callback.getResult(); System.out.println(result);
          */
     }
-
 }

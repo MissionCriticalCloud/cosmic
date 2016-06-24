@@ -25,16 +25,16 @@ import java.util.Map;
 
 public class RpcServiceDispatcher implements RpcServiceEndpoint {
 
-    private static Map<Class<?>, Map<String, Method>> s_handlerCache = new HashMap<Class<?>, Map<String, Method>>();
+    private static final Map<Class<?>, Map<String, Method>> s_handlerCache = new HashMap<>();
 
-    private static Map<Object, RpcServiceDispatcher> s_targetMap = new HashMap<Object, RpcServiceDispatcher>();
-    private Object _targetObject;
+    private static final Map<Object, RpcServiceDispatcher> s_targetMap = new HashMap<>();
+    private final Object _targetObject;
 
-    public RpcServiceDispatcher(Object targetObject) {
+    public RpcServiceDispatcher(final Object targetObject) {
         _targetObject = targetObject;
     }
 
-    public static RpcServiceDispatcher getDispatcher(Object targetObject) {
+    public static RpcServiceDispatcher getDispatcher(final Object targetObject) {
         RpcServiceDispatcher dispatcher;
         synchronized (s_targetMap) {
             dispatcher = s_targetMap.get(targetObject);
@@ -46,43 +46,23 @@ public class RpcServiceDispatcher implements RpcServiceEndpoint {
         return dispatcher;
     }
 
-    public static void removeDispatcher(Object targetObject) {
+    public static void removeDispatcher(final Object targetObject) {
         synchronized (s_targetMap) {
             s_targetMap.remove(targetObject);
         }
     }
 
-    public static boolean dispatch(Object target, RpcServerCall serviceCall) {
-        assert (serviceCall != null);
-        assert (target != null);
-
-        Method handler = resolveHandler(target.getClass(), serviceCall.getCommand());
-        if (handler == null)
-            return false;
-
-        try {
-            handler.invoke(target, serviceCall);
-        } catch (IllegalArgumentException e) {
-            throw new RpcException("IllegalArgumentException when invoking RPC service command: " + serviceCall.getCommand());
-        } catch (IllegalAccessException e) {
-            throw new RpcException("IllegalAccessException when invoking RPC service command: " + serviceCall.getCommand());
-        } catch (InvocationTargetException e) {
-            throw new RpcException("InvocationTargetException when invoking RPC service command: " + serviceCall.getCommand());
-        }
-
-        return true;
-    }
-
-    public static Method resolveHandler(Class<?> handlerClz, String command) {
+    public static Method resolveHandler(final Class<?> handlerClz, final String command) {
         synchronized (s_handlerCache) {
-            Map<String, Method> handlerMap = getAndSetHandlerMap(handlerClz);
+            final Map<String, Method> handlerMap = getAndSetHandlerMap(handlerClz);
 
-            Method handler = handlerMap.get(command);
-            if (handler != null)
+            final Method handler = handlerMap.get(command);
+            if (handler != null) {
                 return handler;
+            }
 
-            for (Method method : handlerClz.getDeclaredMethods()) {
-                RpcServiceHandler annotation = method.getAnnotation(RpcServiceHandler.class);
+            for (final Method method : handlerClz.getDeclaredMethods()) {
+                final RpcServiceHandler annotation = method.getAnnotation(RpcServiceHandler.class);
                 if (annotation != null) {
                     if (annotation.command().equals(command)) {
                         method.setAccessible(true);
@@ -96,13 +76,13 @@ public class RpcServiceDispatcher implements RpcServiceEndpoint {
         return null;
     }
 
-    private static Map<String, Method> getAndSetHandlerMap(Class<?> handlerClz) {
+    private static Map<String, Method> getAndSetHandlerMap(final Class<?> handlerClz) {
         Map<String, Method> handlerMap;
         synchronized (s_handlerCache) {
             handlerMap = s_handlerCache.get(handlerClz);
 
             if (handlerMap == null) {
-                handlerMap = new HashMap<String, Method>();
+                handlerMap = new HashMap<>();
                 s_handlerCache.put(handlerClz, handlerMap);
             }
         }
@@ -110,8 +90,54 @@ public class RpcServiceDispatcher implements RpcServiceEndpoint {
         return handlerMap;
     }
 
+    public static Method resolveHandler(final Class<?> handlerClz, final String command) {
+        synchronized (s_handlerCache) {
+            final Map<String, Method> handlerMap = getAndSetHandlerMap(handlerClz);
+
+            final Method handler = handlerMap.get(command);
+            if (handler != null) {
+                return handler;
+            }
+
+            for (final Method method : handlerClz.getDeclaredMethods()) {
+                final RpcServiceHandler annotation = method.getAnnotation(RpcServiceHandler.class);
+                if (annotation != null) {
+                    if (annotation.command().equals(command)) {
+                        method.setAccessible(true);
+                        handlerMap.put(command, method);
+                        return method;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     @Override
-    public boolean onCallReceive(RpcServerCall call) {
+    public boolean onCallReceive(final RpcServerCall call) {
         return dispatch(_targetObject, call);
+    }
+
+    public static boolean dispatch(final Object target, final RpcServerCall serviceCall) {
+        assert (serviceCall != null);
+        assert (target != null);
+
+        final Method handler = resolveHandler(target.getClass(), serviceCall.getCommand());
+        if (handler == null) {
+            return false;
+        }
+
+        try {
+            handler.invoke(target, serviceCall);
+        } catch (final IllegalArgumentException e) {
+            throw new RpcException("IllegalArgumentException when invoking RPC service command: " + serviceCall.getCommand());
+        } catch (final IllegalAccessException e) {
+            throw new RpcException("IllegalAccessException when invoking RPC service command: " + serviceCall.getCommand());
+        } catch (final InvocationTargetException e) {
+            throw new RpcException("InvocationTargetException when invoking RPC service command: " + serviceCall.getCommand());
+        }
+
+        return true;
     }
 }

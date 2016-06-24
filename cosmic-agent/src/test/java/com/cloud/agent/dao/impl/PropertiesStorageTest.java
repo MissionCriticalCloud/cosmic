@@ -22,19 +22,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
+import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 public class PropertiesStorageTest {
     @Test
     public void configureWithNotExistingFile() {
-        String fileName = "target/notyetexistingfile" + System.currentTimeMillis();
-        File file = new File(fileName);
+        final String fileName = "target/notyetexistingfile" + System.currentTimeMillis();
+        final File file = new File(fileName);
 
-        PropertiesStorage storage = new PropertiesStorage();
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        final PropertiesStorage storage = new PropertiesStorage();
+        final HashMap<String, Object> params = new HashMap<>();
         params.put("path", fileName);
         Assert.assertTrue(storage.configure("test", params));
         Assert.assertTrue(file.exists());
@@ -47,13 +46,13 @@ public class PropertiesStorageTest {
 
     @Test
     public void configureWithExistingFile() throws IOException {
-        String fileName = "target/existingfile" + System.currentTimeMillis();
-        File file = new File(fileName);
+        final String fileName = "target/existingfile" + System.currentTimeMillis();
+        final File file = new File(fileName);
 
         FileUtils.writeStringToFile(file, "a=b\n\n");
 
-        PropertiesStorage storage = new PropertiesStorage();
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        final PropertiesStorage storage = new PropertiesStorage();
+        final HashMap<String, Object> params = new HashMap<>();
         params.put("path", fileName);
         Assert.assertTrue(storage.configure("test", params));
         Assert.assertEquals("b", storage.get("a"));

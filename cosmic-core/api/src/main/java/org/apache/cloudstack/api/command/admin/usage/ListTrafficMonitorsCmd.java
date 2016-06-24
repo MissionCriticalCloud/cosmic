@@ -16,11 +16,7 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.usage;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.host.Host;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
@@ -29,6 +25,10 @@ import org.apache.cloudstack.api.command.user.offering.ListServiceOfferingsCmd;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.TrafficMonitorResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,11 +58,6 @@ public class ListTrafficMonitorsCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
         List<? extends Host> trafficMonitors = _networkUsageService.listTrafficMonitors(this);
 
@@ -78,5 +73,10 @@ public class ListTrafficMonitorsCmd extends BaseListCmd {
         listResponse.setResponses(responses);
         listResponse.setResponseName(getCommandName());
         this.setResponseObject(listResponse);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

@@ -31,17 +31,17 @@ public class UserDataCommand extends NetworkElementCommand {
 
     }
 
-    @Override
-    public boolean executeInSequence() {
-        return executeInSequence;
-    }
-
     public UserDataCommand(String userData, String vmIpAddress, String routerPrivateIpAddress, String vmName, boolean executeInSequence) {
         this.userData = userData;
         this.vmIpAddress = vmIpAddress;
         this.routerPrivateIpAddress = routerPrivateIpAddress;
         this.vmName = vmName;
         this.executeInSequence = executeInSequence;
+    }
+
+    @Override
+    public boolean executeInSequence() {
+        return executeInSequence;
     }
 
     public String getRouterPrivateIpAddress() {
@@ -63,5 +63,4 @@ public class UserDataCommand extends NetworkElementCommand {
     public void setUserData(String userData) {
         this.userData = userData;
     }
-
 }

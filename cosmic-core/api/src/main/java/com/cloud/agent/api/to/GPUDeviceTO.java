@@ -16,17 +16,17 @@
 // under the License.
 package com.cloud.agent.api.to;
 
-import java.util.HashMap;
-
 import com.cloud.agent.api.VgpuTypesInfo;
+
+import java.util.HashMap;
 
 public class GPUDeviceTO {
 
     private String gpuGroup;
     private String vgpuType;
-    private HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails = new HashMap<String, HashMap<String, VgpuTypesInfo>>();
+    private HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails = new HashMap<>();
 
-    public GPUDeviceTO( String gpuGroup, String vgpuType, HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails) {
+    public GPUDeviceTO(final String gpuGroup, final String vgpuType, final HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails) {
         this.gpuGroup = gpuGroup;
         this.vgpuType = vgpuType;
         this.groupDetails = groupDetails;
@@ -36,15 +36,15 @@ public class GPUDeviceTO {
         return gpuGroup;
     }
 
+    public void setGpuGroup(final String gpuGroup) {
+        this.gpuGroup = gpuGroup;
+    }
+
     public String getVgpuType() {
         return vgpuType;
     }
 
-    public void setGpuGroup(String gpuGroup) {
-        this.gpuGroup = gpuGroup;
-    }
-
-    public void setVgpuType(String vgpuType) {
+    public void setVgpuType(final String vgpuType) {
         this.vgpuType = vgpuType;
     }
 
@@ -52,8 +52,7 @@ public class GPUDeviceTO {
         return groupDetails;
     }
 
-    public void setGroupDetails(HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails) {
+    public void setGroupDetails(final HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails) {
         this.groupDetails = groupDetails;
     }
-
 }

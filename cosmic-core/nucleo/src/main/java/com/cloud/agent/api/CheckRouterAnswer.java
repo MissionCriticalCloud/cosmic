@@ -39,10 +39,6 @@ public class CheckRouterAnswer extends Answer {
         }
     }
 
-    public CheckRouterAnswer(final CheckRouterCommand cmd, final String details) {
-        super(cmd, false, details);
-    }
-
     protected boolean parseDetails(final String details) {
         if (details == null || "".equals(details.trim())) {
             state = RedundantState.UNKNOWN;
@@ -60,11 +56,15 @@ public class CheckRouterAnswer extends Answer {
         return true;
     }
 
-    public void setState(final RedundantState state) {
-        this.state = state;
+    public CheckRouterAnswer(final CheckRouterCommand cmd, final String details) {
+        super(cmd, false, details);
     }
 
     public RedundantState getState() {
         return state;
+    }
+
+    public void setState(final RedundantState state) {
+        this.state = state;
     }
 }

@@ -18,14 +18,14 @@
  */
 package org.apache.cloudstack.ldap;
 
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = "ldap_trust_map")
@@ -48,11 +48,10 @@ public class LdapTrustMapVO implements InternalIdentity {
     @Column(name = "account_type")
     private short accountType;
 
-
     public LdapTrustMapVO() {
     }
 
-    public LdapTrustMapVO(long domainId, LdapManager.LinkType type, String name, short accountType) {
+    public LdapTrustMapVO(final long domainId, final LdapManager.LinkType type, final String name, final short accountType) {
         this.domainId = domainId;
         this.type = type;
         this.name = name;
@@ -81,7 +80,16 @@ public class LdapTrustMapVO implements InternalIdentity {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + (int) (domainId ^ (domainId >>> 32));
+        result = 31 * result + (int) accountType;
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
@@ -89,7 +97,7 @@ public class LdapTrustMapVO implements InternalIdentity {
             return false;
         }
 
-        LdapTrustMapVO that = (LdapTrustMapVO) o;
+        final LdapTrustMapVO that = (LdapTrustMapVO) o;
 
         if (domainId != that.domainId) {
             return false;
@@ -101,15 +109,5 @@ public class LdapTrustMapVO implements InternalIdentity {
             return false;
         }
         return name.equals(that.name);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = type.hashCode();
-        result = 31 * result + name.hashCode();
-        result = 31 * result + (int) (domainId ^ (domainId >>> 32));
-        result = 31 * result + (int) accountType;
-        return result;
     }
 }

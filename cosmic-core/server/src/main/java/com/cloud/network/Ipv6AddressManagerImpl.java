@@ -17,12 +17,6 @@
 
 package com.cloud.network;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.configuration.Config;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
@@ -38,8 +32,13 @@ import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +85,7 @@ public class Ipv6AddressManagerImpl extends ManagerBase implements Ipv6AddressMa
         if (requestedIp6 == null) {
             if (!_networkModel.isIP6AddressAvailableInNetwork(networkId)) {
                 throw new InsufficientAddressCapacityException("There is no more address available in the network " + network.getName(), DataCenter.class,
-                    network.getDataCenterId());
+                        network.getDataCenterId());
             }
             for (Vlan vlan : vlans) {
                 if (!_networkModel.isIP6AddressAvailableInVlan(vlan.getId())) {
@@ -109,7 +108,7 @@ public class Ipv6AddressManagerImpl extends ManagerBase implements Ipv6AddressMa
             }
             if (ip == null) {
                 throw new InsufficientAddressCapacityException("Cannot find a usable IP in the network " + network.getName() + " after " + _ipv6RetryMax +
-                    "(network.ipv6.search.retry.max) times retry!", DataCenter.class, network.getDataCenterId());
+                        "(network.ipv6.search.retry.max) times retry!", DataCenter.class, network.getDataCenterId());
             }
         } else {
             for (Vlan vlan : vlans) {

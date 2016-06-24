@@ -16,15 +16,14 @@
 // under the License.
 package org.apache.cloudstack.engine.cloud.entity.api.db.dao;
 
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.engine.cloud.entity.api.db.VolumeReservationVO;
+
+import javax.annotation.PostConstruct;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -58,5 +57,4 @@ public class VolumeReservationDaoImpl extends GenericDaoBase<VolumeReservationVO
         SearchCriteria<VolumeReservationVO> sc = VmReservationIdSearch.create("vmReservationId", vmReservationId);
         return listBy(sc);
     }
-
 }

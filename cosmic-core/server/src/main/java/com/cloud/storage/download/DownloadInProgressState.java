@@ -25,15 +25,15 @@ public class DownloadInProgressState extends DownloadActiveState {
     }
 
     @Override
-    public String getName() {
-        return Status.DOWNLOAD_IN_PROGRESS.toString();
+    public void onEntry(String prevState, DownloadEvent event, Object evtObj) {
+        super.onEntry(prevState, event, evtObj);
+        if (!prevState.equals(getName())) {
+            getDownloadListener().logDownloadStart();
+        }
     }
 
     @Override
-    public void onEntry(String prevState, DownloadEvent event, Object evtObj) {
-        super.onEntry(prevState, event, evtObj);
-        if (!prevState.equals(getName()))
-            getDownloadListener().logDownloadStart();
+    public String getName() {
+        return Status.DOWNLOAD_IN_PROGRESS.toString();
     }
-
 }

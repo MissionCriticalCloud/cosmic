@@ -15,9 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from nose.plugins.attrib import attr
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import cleanup_resources
 from marvin.lib.base import (Account,
                              Host,
                              VPC,
@@ -25,10 +24,11 @@ from marvin.lib.base import (Account,
 from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template)
-import time
+from marvin.lib.utils import cleanup_resources
+from nose.plugins.attrib import attr
+
 
 class TestVPCHostMaintenance(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestVPCHostMaintenance, cls).getClsTestClient()
@@ -78,7 +78,7 @@ class TestVPCHostMaintenance(cloudstackTestCase):
                         listall=True
                     )
                     if hosts_states[
-                            0].resourcestate == 'PrepareForMaintenance':
+                        0].resourcestate == 'PrepareForMaintenance':
                         # Wait for sometimetill host goes in maintenance state
                         time.sleep(cls.services["sleep"])
                     elif hosts_states[0].resourcestate == 'Maintenance':

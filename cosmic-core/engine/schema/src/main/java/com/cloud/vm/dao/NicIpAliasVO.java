@@ -16,8 +16,9 @@
 // under the License.
 package com.cloud.vm.dao;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
+import com.cloud.utils.net.NetUtils;
+import com.cloud.vm.NicIpAlias;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,14 +28,46 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
-import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.NicIpAlias;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "nic_ip_alias")
-public class NicIpAliasVO implements NicIpAlias  {
+public class NicIpAliasVO implements NicIpAlias {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    long id;
+    @Column(name = "nic_Id")
+    long nicId;
+    @Column(name = "domain_id", updatable = false)
+    long domainId;
+    @Column(name = "ip4_address")
+    String ip4Address;
+    @Column(name = "ip6_address")
+    String ip6Address;
+    @Column(name = "netmask")
+    String netmask;
+    @Column(name = "network_id")
+    long networkId;
+    @Column(name = GenericDao.CREATED_COLUMN)
+    Date created;
+    @Column(name = "uuid")
+    String uuid = UUID.randomUUID().toString();
+    @Column(name = "vmId")
+    Long vmId;
+    @Column(name = "alias_count")
+    Long aliasCount;
+    @Column(name = "gateway")
+    String gateway;
+    @Column(name = "state")
+    @Enumerated(value = EnumType.STRING)
+    NicIpAlias.State state;
+    @Column(name = "start_ip_of_subnet")
+    String startIpOfSubnet;
+    @Column(name = "account_id", updatable = false)
+    private Long accountId;
 
     public NicIpAliasVO(Long nicId, String ipaddr, Long vmId, Long accountId, Long domainId, Long networkId, String gateway, String netmask) {
         this.nicId = nicId;
@@ -56,54 +89,6 @@ public class NicIpAliasVO implements NicIpAlias  {
     protected NicIpAliasVO() {
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    long id;
-
-    @Column(name = "nic_Id")
-    long nicId;
-
-    @Column(name = "domain_id", updatable = false)
-    long domainId;
-
-    @Column(name = "account_id", updatable = false)
-    private Long accountId;
-
-    @Column(name = "ip4_address")
-    String ip4Address;
-
-    @Column(name = "ip6_address")
-    String ip6Address;
-
-    @Column(name = "netmask")
-    String netmask;
-
-    @Column(name = "network_id")
-    long networkId;
-
-    @Column(name = GenericDao.CREATED_COLUMN)
-    Date created;
-
-    @Column(name = "uuid")
-    String uuid = UUID.randomUUID().toString();
-
-    @Column(name = "vmId")
-    Long vmId;
-
-    @Column(name = "alias_count")
-    Long aliasCount;
-
-    @Column(name = "gateway")
-    String gateway;
-
-    @Column(name = "state")
-    @Enumerated(value = EnumType.STRING)
-    NicIpAlias.State state;
-
-    @Column(name = "start_ip_of_subnet")
-    String startIpOfSubnet;
-
     @Override
     public long getId() {
         return id;
@@ -120,24 +105,6 @@ public class NicIpAliasVO implements NicIpAlias  {
 
     public void setNicId(long nicId) {
         this.nicId = nicId;
-    }
-
-    @Override
-    public long getDomainId() {
-        return domainId;
-    }
-
-    public void setDomainId(Long domainId) {
-        this.domainId = domainId;
-    }
-
-    @Override
-    public long getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
     }
 
     @Override
@@ -167,23 +134,6 @@ public class NicIpAliasVO implements NicIpAlias  {
         this.networkId = networkId;
     }
 
-    public Date getCreated() {
-        return created;
-    }
-
-    public void setCreated(Date created) {
-        this.created = created;
-    }
-
-    @Override
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     @Override
     public long getVmId() {
         return vmId;
@@ -202,22 +152,57 @@ public class NicIpAliasVO implements NicIpAlias  {
         aliasCount = count;
     }
 
+    @Override
+    public String getNetmask() {
+        return netmask;
+    }
+
     public void setNetmask(String netmask) {
         this.netmask = netmask;
     }
 
     @Override
-    public  String getNetmask() {
-        return netmask;
-    }
-
-    @Override
-    public  String getGateway() {
-        return  gateway;
+    public String getGateway() {
+        return gateway;
     }
 
     public void setGateway(String gateway) {
-          this.gateway = gateway;
+        this.gateway = gateway;
+    }
+
+    @Override
+    public long getDomainId() {
+        return domainId;
+    }
+
+    public void setDomainId(Long domainId) {
+        this.domainId = domainId;
+    }
+
+    @Override
+    public long getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(Long accountId) {
+        this.accountId = accountId;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    @Override
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public NicIpAlias.State getState() {

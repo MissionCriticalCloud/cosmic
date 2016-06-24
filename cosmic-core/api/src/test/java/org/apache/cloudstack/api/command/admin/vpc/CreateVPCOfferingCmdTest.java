@@ -16,12 +16,13 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.vpc;
 
+import org.apache.cloudstack.api.ApiCmdTestUtil;
+import org.apache.cloudstack.api.ApiConstants;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cloudstack.api.ApiCmdTestUtil;
-import org.apache.cloudstack.api.ApiConstants;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -59,5 +60,4 @@ public class CreateVPCOfferingCmdTest {
         ApiCmdTestUtil.set(cmd, ApiConstants.SERVICE_PROVIDER_LIST, null);
         Assert.assertNull(cmd.getServiceProviders());
     }
-
 }

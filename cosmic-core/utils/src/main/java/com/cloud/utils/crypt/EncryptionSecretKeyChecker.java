@@ -19,6 +19,10 @@
 
 package com.cloud.utils.crypt;
 
+import com.cloud.utils.db.DbProperties;
+import com.cloud.utils.exception.CloudRuntimeException;
+
+import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,11 +31,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
-
-import javax.annotation.PostConstruct;
-
-import com.cloud.utils.db.DbProperties;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
@@ -48,6 +47,23 @@ public class EncryptionSecretKeyChecker {
     private static final String s_envKey = "CLOUD_SECRET_KEY";
     private static StandardPBEStringEncryptor s_encryptor = new StandardPBEStringEncryptor();
     private static boolean s_useEncryption = false;
+
+    public static StandardPBEStringEncryptor getEncryptor() {
+        return s_encryptor;
+    }
+
+    public static boolean useEncryption() {
+        return s_useEncryption;
+    }
+
+    //Initialize encryptor for migration during secret key change
+    public static void initEncryptorForMigration(String secretKey) {
+        s_encryptor.setAlgorithm("PBEWithMD5AndDES");
+        SimpleStringPBEConfig stringConfig = new SimpleStringPBEConfig();
+        stringConfig.setPassword(secretKey);
+        s_encryptor.setConfig(stringConfig);
+        s_useEncryption = true;
+    }
 
     @PostConstruct
     public void init() {
@@ -78,10 +94,10 @@ public class EncryptionSecretKeyChecker {
         if (encryptionType.equals("file")) {
             InputStream is = this.getClass().getClassLoader().getResourceAsStream(s_keyFile);
             if (is == null) {
-              is = this.getClass().getClassLoader().getResourceAsStream(s_altKeyFile);
+                is = this.getClass().getClassLoader().getResourceAsStream(s_altKeyFile);
             }
-            if(is == null) {  //This is means we are not able to load key file from the classpath.
-              throw new CloudRuntimeException(s_keyFile + " File containing secret key not found in the classpath: ");
+            if (is == null) {  //This is means we are not able to load key file from the classpath.
+                throw new CloudRuntimeException(s_keyFile + " File containing secret key not found in the classpath: ");
             }
 
             try (BufferedReader in = new BufferedReader(new InputStreamReader(is));) {
@@ -94,7 +110,6 @@ public class EncryptionSecretKeyChecker {
             if (secretKey == null || secretKey.isEmpty()) {
                 throw new CloudRuntimeException("Secret key is null or empty in file " + s_keyFile);
             }
-
         } else if (encryptionType.equals("env")) {
             secretKey = System.getenv(s_envKey);
             if (secretKey == null || secretKey.isEmpty()) {
@@ -108,7 +123,7 @@ public class EncryptionSecretKeyChecker {
                         Socket clientSocket = serverSocket.accept();
                         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                    ) {
+                ) {
                     String inputLine;
                     if ((inputLine = in.readLine()) != null) {
                         secretKey = inputLine;
@@ -123,23 +138,6 @@ public class EncryptionSecretKeyChecker {
             throw new CloudRuntimeException("Invalid encryption type: " + encryptionType);
         }
 
-        stringConfig.setPassword(secretKey);
-        s_encryptor.setConfig(stringConfig);
-        s_useEncryption = true;
-    }
-
-    public static StandardPBEStringEncryptor getEncryptor() {
-        return s_encryptor;
-    }
-
-    public static boolean useEncryption() {
-        return s_useEncryption;
-    }
-
-    //Initialize encryptor for migration during secret key change
-    public static void initEncryptorForMigration(String secretKey) {
-        s_encryptor.setAlgorithm("PBEWithMD5AndDES");
-        SimpleStringPBEConfig stringConfig = new SimpleStringPBEConfig();
         stringConfig.setPassword(secretKey);
         s_encryptor.setConfig(stringConfig);
         s_useEncryption = true;

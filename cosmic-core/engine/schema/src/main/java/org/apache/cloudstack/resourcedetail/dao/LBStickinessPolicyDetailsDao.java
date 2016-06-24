@@ -13,10 +13,9 @@
 package org.apache.cloudstack.resourcedetail.dao;
 
 import com.cloud.utils.db.GenericDao;
-
 import org.apache.cloudstack.resourcedetail.LBStickinessPolicyDetailVO;
 import org.apache.cloudstack.resourcedetail.ResourceDetailsDao;
 
-public interface LBStickinessPolicyDetailsDao extends GenericDao<LBStickinessPolicyDetailVO, Long>, ResourceDetailsDao<LBStickinessPolicyDetailVO>{
+public interface LBStickinessPolicyDetailsDao extends GenericDao<LBStickinessPolicyDetailVO, Long>, ResourceDetailsDao<LBStickinessPolicyDetailVO> {
 
 }

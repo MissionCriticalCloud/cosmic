@@ -28,7 +28,7 @@ public class StorageFilerTO {
     int port;
     StoragePoolType type;
 
-    public StorageFilerTO(StoragePool pool) {
+    public StorageFilerTO(final StoragePool pool) {
         this.id = pool.getId();
         this.host = pool.getHostAddress();
         this.port = pool.getPort();
@@ -36,6 +36,9 @@ public class StorageFilerTO {
         this.type = pool.getPoolType();
         this.uuid = pool.getUuid();
         this.userInfo = pool.getUserInfo();
+    }
+
+    protected StorageFilerTO() {
     }
 
     public long getId() {
@@ -64,9 +67,6 @@ public class StorageFilerTO {
 
     public StoragePoolType getType() {
         return type;
-    }
-
-    protected StorageFilerTO() {
     }
 
     @Override

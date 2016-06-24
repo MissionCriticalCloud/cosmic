@@ -36,8 +36,9 @@ public class IpAddressTO {
     private Integer nicDevId;
     private boolean newNic;
 
-    public IpAddressTO(long accountId, String ipAddress, boolean add, boolean firstIP, boolean sourceNat, String broadcastUri, String vlanGateway, String vlanNetmask,
-            String vifMacAddress, Integer networkRate, boolean isOneToOneNat) {
+    public IpAddressTO(final long accountId, final String ipAddress, final boolean add, final boolean firstIP, final boolean sourceNat, final String broadcastUri, final String
+            vlanGateway, final String vlanNetmask,
+                       final String vifMacAddress, final Integer networkRate, final boolean isOneToOneNat) {
         this.accountId = accountId;
         this.publicIp = ipAddress;
         this.add = add;
@@ -66,16 +67,16 @@ public class IpAddressTO {
         return trafficType;
     }
 
-    public void setNetworkName(String name) {
-        this.networkName = name;
+    public void setTrafficType(final TrafficType trafficType) {
+        this.trafficType = trafficType;
     }
 
     public String getNetworkName() {
         return networkName;
     }
 
-    public void setTrafficType(TrafficType trafficType) {
-        this.trafficType = trafficType;
+    public void setNetworkName(final String name) {
+        this.networkName = name;
     }
 
     public boolean isAdd() {
@@ -90,12 +91,12 @@ public class IpAddressTO {
         return firstIP;
     }
 
-    public void setSourceNat(boolean sourceNat) {
-        this.sourceNat = sourceNat;
-    }
-
     public boolean isSourceNat() {
         return sourceNat;
+    }
+
+    public void setSourceNat(final boolean sourceNat) {
+        this.sourceNat = sourceNat;
     }
 
     public String getBroadcastUri() {
@@ -122,7 +123,7 @@ public class IpAddressTO {
         return nicDevId;
     }
 
-    public void setNicDevId(Integer nicDevId) {
+    public void setNicDevId(final Integer nicDevId) {
         this.nicDevId = nicDevId;
     }
 
@@ -130,7 +131,7 @@ public class IpAddressTO {
         return newNic;
     }
 
-    public void setNewNic(boolean newNic) {
+    public void setNewNic(final boolean newNic) {
         this.newNic = newNic;
     }
 }

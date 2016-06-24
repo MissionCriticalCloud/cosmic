@@ -35,7 +35,7 @@ public class VmDhcpConfig extends ConfigBase {
     }
 
     public VmDhcpConfig(String hostName, String macAddress, String ipv4Adress, String ipv6Address, String ipv6Duid, String dnsAdresses, String defaultGateway,
-            String staticRoutes, boolean defaultEntry) {
+                        String staticRoutes, boolean defaultEntry) {
         super(VM_DHCP);
         this.hostName = hostName;
         this.macAddress = macAddress;
@@ -119,5 +119,4 @@ public class VmDhcpConfig extends ConfigBase {
     public void setDefaultEntry(boolean defaultEntry) {
         this.defaultEntry = defaultEntry;
     }
-
 }

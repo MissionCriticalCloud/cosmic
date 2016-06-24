@@ -17,7 +17,6 @@
 package org.apache.cloudstack.api.command.admin.volume;
 
 import com.cloud.storage.Volume;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
@@ -31,8 +30,8 @@ import org.apache.cloudstack.context.CallContext;
 public class UpdateVolumeCmdByAdmin extends UpdateVolumeCmd {
 
     @Override
-    public void execute(){
-        CallContext.current().setEventDetails("Volume Id: "+getId());
+    public void execute() {
+        CallContext.current().setEventDetails("Volume Id: " + getId());
         Volume result = _volumeService.updateVolume(getId(), getPath(), getState(), getStorageId(), getDisplayVolume(),
                 getCustomId(), getEntityOwnerId(), getChainInfo());
         if (result != null) {

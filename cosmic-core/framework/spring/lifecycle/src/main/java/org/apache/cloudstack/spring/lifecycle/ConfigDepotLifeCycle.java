@@ -18,10 +18,11 @@
  */
 package org.apache.cloudstack.spring.lifecycle;
 
-import javax.inject.Inject;
-
 import org.apache.cloudstack.framework.config.ConfigDepotAdmin;
 import org.apache.cloudstack.framework.config.Configurable;
+
+import javax.inject.Inject;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
@@ -33,7 +34,7 @@ public class ConfigDepotLifeCycle implements BeanPostProcessor {
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         if (bean instanceof Configurable) {
-            configDepotAdmin.populateConfiguration((Configurable)bean);
+            configDepotAdmin.populateConfiguration((Configurable) bean);
         }
 
         return bean;
@@ -43,5 +44,4 @@ public class ConfigDepotLifeCycle implements BeanPostProcessor {
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         return bean;
     }
-
 }

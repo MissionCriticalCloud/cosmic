@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.network.guru;
 
-import javax.inject.Inject;
-
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.dao.DataCenterDao;
@@ -53,14 +51,16 @@ import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
-
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PublicNetworkGuru extends AdapterBase implements NetworkGuru {
     private static final Logger s_logger = LoggerFactory.getLogger(PublicNetworkGuru.class);
-
+    private static final TrafficType[] TrafficTypes = {TrafficType.Public};
     @Inject
     DataCenterDao _dcDao;
     @Inject
@@ -72,25 +72,8 @@ public class PublicNetworkGuru extends AdapterBase implements NetworkGuru {
     @Inject
     IpAddressManager _ipAddrMgr;
 
-    private static final TrafficType[] TrafficTypes = {TrafficType.Public};
-
-    @Override
-    public boolean isMyTrafficType(TrafficType type) {
-        for (TrafficType t : TrafficTypes) {
-            if (t == type) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public TrafficType[] getSupportedTrafficType() {
-        return TrafficTypes;
-    }
-
-    protected boolean canHandle(NetworkOffering offering) {
-        return isMyTrafficType(offering.getTrafficType()) && offering.isSystemOnly();
+    protected PublicNetworkGuru() {
+        super();
     }
 
     @Override
@@ -101,55 +84,27 @@ public class PublicNetworkGuru extends AdapterBase implements NetworkGuru {
 
         if (offering.getTrafficType() == TrafficType.Public) {
             NetworkVO ntwk =
-                new NetworkVO(offering.getTrafficType(), Mode.Static, network.getBroadcastDomainType(), offering.getId(), State.Setup, plan.getDataCenterId(),
-                    plan.getPhysicalNetworkId(), offering.getRedundantRouter());
+                    new NetworkVO(offering.getTrafficType(), Mode.Static, network.getBroadcastDomainType(), offering.getId(), State.Setup, plan.getDataCenterId(),
+                            plan.getPhysicalNetworkId(), offering.getRedundantRouter());
             return ntwk;
         } else {
             return null;
         }
     }
 
-    protected PublicNetworkGuru() {
-        super();
-    }
-
-    protected void getIp(NicProfile nic, DataCenter dc, VirtualMachineProfile vm, Network network) throws InsufficientVirtualNetworkCapacityException,
-        InsufficientAddressCapacityException, ConcurrentOperationException {
-        if (nic.getIPv4Address() == null) {
-            PublicIp ip = _ipAddrMgr.assignPublicIpAddress(dc.getId(), null, vm.getOwner(), VlanType.VirtualNetwork, null, null, false);
-            nic.setIPv4Address(ip.getAddress().toString());
-            nic.setIPv4Gateway(ip.getGateway());
-            nic.setIPv4Netmask(ip.getNetmask());
-            if (network.getBroadcastDomainType() == BroadcastDomainType.Vxlan) {
-                nic.setIsolationUri(BroadcastDomainType.Vxlan.toUri(ip.getVlanTag()));
-                nic.setBroadcastUri(BroadcastDomainType.Vxlan.toUri(ip.getVlanTag()));
-                nic.setBroadcastType(BroadcastDomainType.Vxlan);
-            } else {
-                nic.setIsolationUri(IsolationType.Vlan.toUri(ip.getVlanTag()));
-                nic.setBroadcastUri(BroadcastDomainType.Vlan.toUri(ip.getVlanTag()));
-                nic.setBroadcastType(BroadcastDomainType.Vlan);
-            }
-            nic.setFormat(AddressFormat.Ip4);
-            nic.setReservationId(String.valueOf(ip.getVlanTag()));
-            nic.setMacAddress(ip.getMacAddress());
-        }
-
-        nic.setIPv4Dns1(dc.getDns1());
-        nic.setIPv4Dns2(dc.getDns2());
+    protected boolean canHandle(NetworkOffering offering) {
+        return isMyTrafficType(offering.getTrafficType()) && offering.isSystemOnly();
     }
 
     @Override
-    public void updateNicProfile(NicProfile profile, Network network) {
-        DataCenter dc = _dcDao.findById(network.getDataCenterId());
-        if (profile != null) {
-            profile.setIPv4Dns1(dc.getDns1());
-            profile.setIPv4Dns2(dc.getDns2());
-        }
+    public Network implement(Network network, NetworkOffering offering, DeployDestination destination, ReservationContext context)
+            throws InsufficientVirtualNetworkCapacityException {
+        return network;
     }
 
     @Override
     public NicProfile allocate(Network network, NicProfile nic, VirtualMachineProfile vm) throws InsufficientVirtualNetworkCapacityException,
-        InsufficientAddressCapacityException, ConcurrentOperationException {
+            InsufficientAddressCapacityException, ConcurrentOperationException {
 
         DataCenter dc = _dcDao.findById(network.getDataCenterId());
 
@@ -174,9 +129,34 @@ public class PublicNetworkGuru extends AdapterBase implements NetworkGuru {
         return nic;
     }
 
+    protected void getIp(NicProfile nic, DataCenter dc, VirtualMachineProfile vm, Network network) throws InsufficientVirtualNetworkCapacityException,
+            InsufficientAddressCapacityException, ConcurrentOperationException {
+        if (nic.getIPv4Address() == null) {
+            PublicIp ip = _ipAddrMgr.assignPublicIpAddress(dc.getId(), null, vm.getOwner(), VlanType.VirtualNetwork, null, null, false);
+            nic.setIPv4Address(ip.getAddress().toString());
+            nic.setIPv4Gateway(ip.getGateway());
+            nic.setIPv4Netmask(ip.getNetmask());
+            if (network.getBroadcastDomainType() == BroadcastDomainType.Vxlan) {
+                nic.setIsolationUri(BroadcastDomainType.Vxlan.toUri(ip.getVlanTag()));
+                nic.setBroadcastUri(BroadcastDomainType.Vxlan.toUri(ip.getVlanTag()));
+                nic.setBroadcastType(BroadcastDomainType.Vxlan);
+            } else {
+                nic.setIsolationUri(IsolationType.Vlan.toUri(ip.getVlanTag()));
+                nic.setBroadcastUri(BroadcastDomainType.Vlan.toUri(ip.getVlanTag()));
+                nic.setBroadcastType(BroadcastDomainType.Vlan);
+            }
+            nic.setFormat(AddressFormat.Ip4);
+            nic.setReservationId(String.valueOf(ip.getVlanTag()));
+            nic.setMacAddress(ip.getMacAddress());
+        }
+
+        nic.setIPv4Dns1(dc.getDns1());
+        nic.setIPv4Dns2(dc.getDns2());
+    }
+
     @Override
     public void reserve(NicProfile nic, Network network, VirtualMachineProfile vm, DeployDestination dest, ReservationContext context)
-        throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException, ConcurrentOperationException {
+            throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException, ConcurrentOperationException {
         if (nic.getIPv4Address() == null) {
             getIp(nic, dest.getDataCenter(), vm, network);
         }
@@ -185,12 +165,6 @@ public class PublicNetworkGuru extends AdapterBase implements NetworkGuru {
     @Override
     public boolean release(NicProfile nic, VirtualMachineProfile vm, String reservationId) {
         return true;
-    }
-
-    @Override
-    public Network implement(Network network, NetworkOffering offering, DeployDestination destination, ReservationContext context)
-        throws InsufficientVirtualNetworkCapacityException {
-        return network;
     }
 
     @Override
@@ -218,6 +192,15 @@ public class PublicNetworkGuru extends AdapterBase implements NetworkGuru {
     }
 
     @Override
+    public void updateNicProfile(NicProfile profile, Network network) {
+        DataCenter dc = _dcDao.findById(network.getDataCenterId());
+        if (profile != null) {
+            profile.setIPv4Dns1(dc.getDns1());
+            profile.setIPv4Dns2(dc.getDns2());
+        }
+    }
+
+    @Override
     public void shutdown(NetworkProfile network, NetworkOffering offering) {
     }
 
@@ -233,4 +216,18 @@ public class PublicNetworkGuru extends AdapterBase implements NetworkGuru {
         networkProfile.setDns2(dc.getDns2());
     }
 
+    @Override
+    public TrafficType[] getSupportedTrafficType() {
+        return TrafficTypes;
+    }
+
+    @Override
+    public boolean isMyTrafficType(TrafficType type) {
+        for (TrafficType t : TrafficTypes) {
+            if (t == type) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

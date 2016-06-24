@@ -17,10 +17,10 @@
 package com.cloud.server.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.response.NetworkDeviceResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 public class NwDevicePxeServerResponse extends NetworkDeviceResponse {
 
@@ -40,35 +40,35 @@ public class NwDevicePxeServerResponse extends NetworkDeviceResponse {
     @Param(description = "Type of add PXE server")
     private String type;
 
-    public void setZoneId(String zoneId) {
-        this.zoneId = zoneId;
-    }
-
     public String getZoneId() {
         return zoneId;
     }
 
-    public void setPodId(String podId) {
-        this.podId = podId;
+    public void setZoneId(String zoneId) {
+        this.zoneId = zoneId;
     }
 
     public String getPodId() {
         return podId;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setPodId(String podId) {
+        this.podId = podId;
     }
 
     public String getUrl() {
         return url;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getType() {
         return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

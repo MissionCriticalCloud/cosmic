@@ -18,12 +18,12 @@
  */
 package org.apache.cloudstack.spring.module.web;
 
-import java.io.IOException;
+import org.apache.cloudstack.spring.module.factory.CloudStackSpringContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+import java.io.IOException;
 
-import org.apache.cloudstack.spring.module.factory.CloudStackSpringContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -39,11 +39,6 @@ public class CloudStackContextLoaderListener extends ContextLoaderListener {
 
     CloudStackSpringContext cloudStackContext;
     String configuredParentName;
-
-    @Override
-    protected ApplicationContext loadParentContext(ServletContext servletContext) {
-        return cloudStackContext.getApplicationContextForWeb(configuredParentName);
-    }
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
@@ -73,4 +68,8 @@ public class CloudStackContextLoaderListener extends ContextLoaderListener {
         applicationContext.setConfigLocations(newLocations);
     }
 
+    @Override
+    protected ApplicationContext loadParentContext(ServletContext servletContext) {
+        return cloudStackContext.getApplicationContextForWeb(configuredParentName);
+    }
 }

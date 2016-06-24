@@ -20,7 +20,6 @@
 package com.cloud.storage.resource;
 
 import com.cloud.agent.api.Answer;
-
 import org.apache.cloudstack.storage.command.AttachCommand;
 import org.apache.cloudstack.storage.command.CopyCommand;
 import org.apache.cloudstack.storage.command.CreateObjectCommand;

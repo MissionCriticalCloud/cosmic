@@ -33,7 +33,7 @@ public class CreateLoadBalancerApplianceAnswer extends Answer {
     String privateInterface;
 
     public CreateLoadBalancerApplianceAnswer(Command cmd, boolean success, String details, String deviceName, String providerName, ServerResource serverResource,
-            String publicInterface, String privateInterface, String username, String password) {
+                                             String publicInterface, String privateInterface, String username, String password) {
         this.deviceName = deviceName;
         this.providerName = providerName;
         this.serverResource = serverResource;

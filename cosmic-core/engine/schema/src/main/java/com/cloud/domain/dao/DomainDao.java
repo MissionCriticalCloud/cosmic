@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.domain.dao;
 
-import java.util.List;
-import java.util.Set;
-
 import com.cloud.domain.DomainVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
+import java.util.Set;
 
 public interface DomainDao extends GenericDao<DomainVO, Long> {
     public DomainVO create(DomainVO domain);

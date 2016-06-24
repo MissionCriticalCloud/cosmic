@@ -16,6 +16,10 @@
 // under the License.
 package com.cloud.network.dao;
 
+import com.cloud.network.rules.FirewallRuleVO;
+import com.cloud.network.rules.LoadBalancer;
+import com.cloud.utils.net.NetUtils;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -24,15 +28,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
-import com.cloud.network.rules.FirewallRuleVO;
-import com.cloud.network.rules.LoadBalancer;
-import com.cloud.utils.net.NetUtils;
-
 /**
  * This VO represent Public Load Balancer
  * It references source ip address by its Id.
  * To get the VO for Internal Load Balancer rule, please refer to LoadBalancerRuleVO
- *
  */
 @Entity
 @Table(name = ("load_balancing_rules"))
@@ -40,33 +39,27 @@ import com.cloud.utils.net.NetUtils;
 @PrimaryKeyJoinColumn(name = "id")
 public class LoadBalancerVO extends FirewallRuleVO implements LoadBalancer {
 
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "description", length = 4096)
-    private String description;
-
-    @Column(name = "algorithm")
-    private String algorithm;
-
-    @Column(name = "default_port_start")
-    private int defaultPortStart;
-
-    @Column(name = "default_port_end")
-    private int defaultPortEnd;
-
     @Enumerated(value = EnumType.STRING)
     @Column(name = "scheme")
     Scheme scheme = Scheme.Public;
-
     @Column(name = "lb_protocol")
     String lbProtocol;
+    @Column(name = "name")
+    private String name;
+    @Column(name = "description", length = 4096)
+    private String description;
+    @Column(name = "algorithm")
+    private String algorithm;
+    @Column(name = "default_port_start")
+    private int defaultPortStart;
+    @Column(name = "default_port_end")
+    private int defaultPortEnd;
 
     public LoadBalancerVO() {
     }
 
     public LoadBalancerVO(String xId, String name, String description, long srcIpId, int srcPort, int dstPort, String algorithm, long networkId, long accountId,
-            long domainId, String lbProtocol) {
+                          long domainId, String lbProtocol) {
         super(xId, srcIpId, srcPort, NetUtils.TCP_PROTO, networkId, accountId, domainId, Purpose.LoadBalancing, null, null, null, null);
         this.name = name;
         this.description = description;
@@ -93,26 +86,17 @@ public class LoadBalancerVO extends FirewallRuleVO implements LoadBalancer {
     }
 
     @Override
-    public int getDefaultPortStart() {
-        return defaultPortStart;
-    }
-
-    @Override
-    public int getDefaultPortEnd() {
-        return defaultPortEnd;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
     public String getLbProtocol() {
         return lbProtocol;
     }
 
     public void setLbProtocol(String lbProtocol) {
         this.lbProtocol = lbProtocol;
+    }
+
+    @Override
+    public Scheme getScheme() {
+        return scheme;
     }
 
     public void setAlgorithm(String algorithm) {
@@ -123,8 +107,17 @@ public class LoadBalancerVO extends FirewallRuleVO implements LoadBalancer {
         this.description = description;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
-    public Scheme getScheme() {
-        return scheme;
+    public int getDefaultPortStart() {
+        return defaultPortStart;
+    }
+
+    @Override
+    public int getDefaultPortEnd() {
+        return defaultPortEnd;
     }
 }

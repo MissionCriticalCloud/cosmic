@@ -17,7 +17,6 @@
 package org.apache.cloudstack.api.command.admin.network;
 
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -26,6 +25,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.NetworkOfferingResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,10 +40,10 @@ public class DeleteNetworkOfferingCmd extends BaseCmd {
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.ID,
-               type = CommandType.UUID,
-               entityType = NetworkOfferingResponse.class,
-               required = true,
-               description = "the ID of the network offering")
+            type = CommandType.UUID,
+            entityType = NetworkOfferingResponse.class,
+            required = true,
+            description = "the ID of the network offering")
     private Long id;
 
     /////////////////////////////////////////////////////
@@ -59,16 +59,6 @@ public class DeleteNetworkOfferingCmd extends BaseCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
     public void execute() {
         boolean result = _configService.deleteNetworkOffering(this);
         if (result) {
@@ -77,5 +67,15 @@ public class DeleteNetworkOfferingCmd extends BaseCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete service offering");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

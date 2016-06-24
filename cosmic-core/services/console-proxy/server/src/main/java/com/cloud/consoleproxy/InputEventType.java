@@ -25,10 +25,6 @@ public enum InputEventType {
         this.eventCode = eventCode;
     }
 
-    public int getEventCode() {
-        return eventCode;
-    }
-
     public static InputEventType fromEventCode(int eventCode) {
         switch (eventCode) {
             case 1:
@@ -49,5 +45,9 @@ public enum InputEventType {
                 break;
         }
         throw new IllegalArgumentException("Unsupport event code: " + eventCode);
+    }
+
+    public int getEventCode() {
+        return eventCode;
     }
 }

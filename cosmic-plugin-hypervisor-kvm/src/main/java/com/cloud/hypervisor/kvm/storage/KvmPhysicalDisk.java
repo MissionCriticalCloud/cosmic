@@ -3,82 +3,80 @@ package com.cloud.hypervisor.kvm.storage;
 import org.apache.cloudstack.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 public class KvmPhysicalDisk {
-  private String path;
-  private final String name;
-  private final KvmStoragePool pool;
+    private final String name;
+    private final KvmStoragePool pool;
+    private String path;
+    private PhysicalDiskFormat format;
+    private long size;
+    private long virtualSize;
 
-  public static String rbdStringBuilder(String monHost, int monPort, String authUserName, String authSecret,
-      String image) {
-    String rbdOpts;
-
-    rbdOpts = "rbd:" + image;
-    rbdOpts += ":mon_host=" + monHost;
-    if (monPort != 6789) {
-      rbdOpts += "\\\\:" + monPort;
+    public KvmPhysicalDisk(final String path, final String name, final KvmStoragePool pool) {
+        this.path = path;
+        this.name = name;
+        this.pool = pool;
     }
 
-    if (authUserName == null) {
-      rbdOpts += ":auth_supported=none";
-    } else {
-      rbdOpts += ":auth_supported=cephx";
-      rbdOpts += ":id=" + authUserName;
-      rbdOpts += ":key=" + authSecret;
+    public static String rbdStringBuilder(final String monHost, final int monPort, final String authUserName, final String authSecret,
+                                          final String image) {
+        String rbdOpts;
+
+        rbdOpts = "rbd:" + image;
+        rbdOpts += ":mon_host=" + monHost;
+        if (monPort != 6789) {
+            rbdOpts += "\\\\:" + monPort;
+        }
+
+        if (authUserName == null) {
+            rbdOpts += ":auth_supported=none";
+        } else {
+            rbdOpts += ":auth_supported=cephx";
+            rbdOpts += ":id=" + authUserName;
+            rbdOpts += ":key=" + authSecret;
+        }
+
+        rbdOpts += ":rbd_default_format=2";
+        rbdOpts += ":client_mount_timeout=30";
+
+        return rbdOpts;
     }
 
-    rbdOpts += ":rbd_default_format=2";
-    rbdOpts += ":client_mount_timeout=30";
+    public PhysicalDiskFormat getFormat() {
+        return format;
+    }
 
-    return rbdOpts;
-  }
+    public void setFormat(final PhysicalDiskFormat format) {
+        this.format = format;
+    }
 
-  private PhysicalDiskFormat format;
-  private long size;
-  private long virtualSize;
+    public long getSize() {
+        return size;
+    }
 
-  public KvmPhysicalDisk(String path, String name, KvmStoragePool pool) {
-    this.path = path;
-    this.name = name;
-    this.pool = pool;
-  }
+    public void setSize(final long size) {
+        this.size = size;
+    }
 
-  public void setFormat(PhysicalDiskFormat format) {
-    this.format = format;
-  }
+    public long getVirtualSize() {
+        return virtualSize;
+    }
 
-  public PhysicalDiskFormat getFormat() {
-    return format;
-  }
+    public void setVirtualSize(final long size) {
+        virtualSize = size;
+    }
 
-  public void setSize(long size) {
-    this.size = size;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public long getSize() {
-    return size;
-  }
+    public String getPath() {
+        return path;
+    }
 
-  public void setVirtualSize(long size) {
-    virtualSize = size;
-  }
+    public void setPath(final String path) {
+        this.path = path;
+    }
 
-  public long getVirtualSize() {
-    return virtualSize;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getPath() {
-    return path;
-  }
-
-  public KvmStoragePool getPool() {
-    return pool;
-  }
-
-  public void setPath(String path) {
-    this.path = path;
-  }
-
+    public KvmStoragePool getPool() {
+        return pool;
+    }
 }

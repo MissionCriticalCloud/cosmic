@@ -19,12 +19,45 @@
 
 package com.cloud.info;
 
+import com.cloud.host.Host;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import com.cloud.host.Host;
-
 public class RunningHostInfoAgregator {
+
+    private final Map<Long, ZoneHostInfo> zoneHostInfoMap = new HashMap<>();
+
+    public RunningHostInfoAgregator() {
+    }
+
+    public void aggregate(final RunningHostCountInfo countInfo) {
+        if (countInfo.getCount() > 0) {
+            final ZoneHostInfo zoneInfo = getZoneHostInfo(countInfo.getDcId());
+
+            final Host.Type type = Enum.valueOf(Host.Type.class, countInfo.getHostType());
+            if (type == Host.Type.Routing) {
+                zoneInfo.setFlag(ZoneHostInfo.ROUTING_HOST_MASK);
+            } else if (type == Host.Type.Storage || type == Host.Type.SecondaryStorage) {
+                zoneInfo.setFlag(ZoneHostInfo.STORAGE_HOST_MASK);
+            }
+        }
+    }
+
+    private ZoneHostInfo getZoneHostInfo(final long dcId) {
+        if (zoneHostInfoMap.containsKey(dcId)) {
+            return zoneHostInfoMap.get(dcId);
+        }
+
+        final ZoneHostInfo info = new ZoneHostInfo();
+        info.setDcId(dcId);
+        zoneHostInfoMap.put(dcId, info);
+        return info;
+    }
+
+    public Map<Long, ZoneHostInfo> getZoneHostInfoMap() {
+        return zoneHostInfoMap;
+    }
 
     public static class ZoneHostInfo {
         public static final int ROUTING_HOST_MASK = 2;
@@ -41,48 +74,16 @@ public class RunningHostInfoAgregator {
             return dcId;
         }
 
-        public void setDcId(long dcId) {
+        public void setDcId(final long dcId) {
             this.dcId = dcId;
         }
 
-        public void setFlag(int flagMask) {
+        public void setFlag(final int flagMask) {
             flags |= flagMask;
         }
 
         public int getFlags() {
             return flags;
         }
-    }
-
-    private final Map<Long, ZoneHostInfo> zoneHostInfoMap = new HashMap<Long, ZoneHostInfo>();
-
-    public RunningHostInfoAgregator() {
-    }
-
-    public void aggregate(RunningHostCountInfo countInfo) {
-        if (countInfo.getCount() > 0) {
-            ZoneHostInfo zoneInfo = getZoneHostInfo(countInfo.getDcId());
-
-            Host.Type type = Enum.valueOf(Host.Type.class, countInfo.getHostType());
-            if (type == Host.Type.Routing) {
-                zoneInfo.setFlag(ZoneHostInfo.ROUTING_HOST_MASK);
-            } else if (type == Host.Type.Storage || type == Host.Type.SecondaryStorage) {
-                zoneInfo.setFlag(ZoneHostInfo.STORAGE_HOST_MASK);
-            }
-        }
-    }
-
-    public Map<Long, ZoneHostInfo> getZoneHostInfoMap() {
-        return zoneHostInfoMap;
-    }
-
-    private ZoneHostInfo getZoneHostInfo(long dcId) {
-        if (zoneHostInfoMap.containsKey(dcId))
-            return zoneHostInfoMap.get(dcId);
-
-        ZoneHostInfo info = new ZoneHostInfo();
-        info.setDcId(dcId);
-        zoneHostInfoMap.put(dcId, info);
-        return info;
     }
 }

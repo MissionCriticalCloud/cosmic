@@ -16,13 +16,13 @@
 // under the License.
 package com.cloud.capacity.dao;
 
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.capacity.CapacityVO;
 import com.cloud.capacity.dao.CapacityDaoImpl.SummedCapacity;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
+import java.util.Map;
 
 public interface CapacityDao extends GenericDao<CapacityVO, Long> {
     CapacityVO findByHostIdType(Long hostId, short capacityType);
@@ -46,12 +46,12 @@ public interface CapacityDao extends GenericDao<CapacityVO, Long> {
     Pair<List<Long>, Map<Long, Double>> orderPodsByAggregateCapacity(long zoneId, short capacityType);
 
     List<SummedCapacity> findCapacityBy(Integer capacityType, Long zoneId,
-        Long podId, Long clusterId, String resourceState);
+                                        Long podId, Long clusterId, String resourceState);
 
     List<SummedCapacity> listCapacitiesGroupedByLevelAndType(Integer capacityType, Long zoneId, Long podId, Long clusterId, int level, Long limit);
 
     void updateCapacityState(Long dcId, Long podId, Long clusterId,
-        Long hostId, String capacityState);
+                             Long hostId, String capacityState);
 
     List<Long> listClustersCrossingThreshold(short capacityType, Long zoneId, String configName, long computeRequested);
 

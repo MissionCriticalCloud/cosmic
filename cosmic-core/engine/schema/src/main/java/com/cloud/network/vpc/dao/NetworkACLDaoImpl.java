@@ -28,5 +28,4 @@ public class NetworkACLDaoImpl extends GenericDaoBase<NetworkACLVO, Long> implem
 
     protected NetworkACLDaoImpl() {
     }
-
 }

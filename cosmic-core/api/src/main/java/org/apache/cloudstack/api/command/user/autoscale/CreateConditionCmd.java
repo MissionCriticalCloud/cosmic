@@ -20,7 +20,6 @@ package org.apache.cloudstack.api.command.user.autoscale;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.network.as.Condition;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -32,6 +31,7 @@ import org.apache.cloudstack.api.response.ConditionResponse;
 import org.apache.cloudstack.api.response.CounterResponse;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +94,16 @@ public class CreateConditionCmd extends BaseAsyncCreateCmd {
         return s_name;
     }
 
+    @Override
+    public long getEntityOwnerId() {
+        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, null, true);
+        if (accountId == null) {
+            return CallContext.current().getCallingAccount().getId();
+        }
+
+        return accountId;
+    }
+
     public Long getCounterId() {
         return counterId;
     }
@@ -122,8 +132,8 @@ public class CreateConditionCmd extends BaseAsyncCreateCmd {
     }
 
     @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.Condition;
+    public String getEventType() {
+        return EventTypes.EVENT_CONDITION_CREATE;
     }
 
     @Override
@@ -132,18 +142,7 @@ public class CreateConditionCmd extends BaseAsyncCreateCmd {
     }
 
     @Override
-    public String getEventType() {
-        return EventTypes.EVENT_CONDITION_CREATE;
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.Condition;
     }
-
-    @Override
-    public long getEntityOwnerId() {
-        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, null, true);
-        if (accountId == null) {
-            return CallContext.current().getCallingAccount().getId();
-        }
-
-        return accountId;
-    }
-
 }

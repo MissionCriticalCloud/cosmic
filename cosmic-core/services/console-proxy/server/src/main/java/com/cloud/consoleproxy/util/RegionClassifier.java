@@ -41,8 +41,9 @@ public class RegionClassifier {
             regionList.add(new Region(rect));
         } else {
             for (Region region : regionList) {
-                if (region.add(rect))
+                if (region.add(rect)) {
                     return;
+                }
             }
             regionList.add(new Region(rect));
         }

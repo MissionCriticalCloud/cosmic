@@ -28,53 +28,50 @@ public class Transaction {
 
     private static final Logger s_logger = LoggerFactory.getLogger(Transaction.class);
 
-    @SuppressWarnings("deprecation")
-    public static <T, E extends Throwable> T execute(TransactionCallbackWithException<T, E> callback) throws E {
-        String name = "tx-" + counter.incrementAndGet();
-        short databaseId = TransactionLegacy.CLOUD_DB;
-        TransactionLegacy currentTxn = TransactionLegacy.currentTxn(false);
-        if (currentTxn != null) {
-            databaseId = currentTxn.getDatabaseId();
-        }
-        try (final TransactionLegacy txn = TransactionLegacy.open(name, databaseId, false)) {
-            txn.start();
-            T result = callback.doInTransaction(STATUS);
-            txn.commit();
-            return result;
-        }
-    }
-
     public static <T> T execute(final TransactionCallback<T> callback) {
         return execute(new TransactionCallbackWithException<T, RuntimeException>() {
             @Override
-            public T doInTransaction(TransactionStatus status) throws RuntimeException {
+            public T doInTransaction(final TransactionStatus status) throws RuntimeException {
                 return callback.doInTransaction(status);
             }
         });
     }
 
-    @SuppressWarnings("deprecation")
-    public static <T, E extends Throwable> T execute(final short databaseId, TransactionCallbackWithException<T, E> callback) throws E {
-        String name = "tx-" + counter.incrementAndGet();
-        TransactionLegacy currentTxn = TransactionLegacy.currentTxn(false);
-        short outer_txn_databaseId = (currentTxn != null ? currentTxn.getDatabaseId() : databaseId);
-        try (final TransactionLegacy txn = TransactionLegacy.open(name, databaseId, true)) {
+    public static <T, E extends Throwable> T execute(final TransactionCallbackWithException<T, E> callback) throws E {
+        final String name = "tx-" + counter.incrementAndGet();
+        short databaseId = TransactionLegacy.CLOUD_DB;
+        final TransactionLegacy currentTxn = TransactionLegacy.currentTxn(false);
+        if (currentTxn != null) {
+            databaseId = currentTxn.getDatabaseId();
+        }
+        try (final TransactionLegacy txn = TransactionLegacy.open(name, databaseId, false)) {
             txn.start();
-            T result = callback.doInTransaction(STATUS);
+            final T result = callback.doInTransaction(STATUS);
             txn.commit();
             return result;
-        } finally {
-            TransactionLegacy.open(outer_txn_databaseId).close();
         }
     }
 
     public static <T> T execute(final short databaseId, final TransactionCallback<T> callback) {
         return execute(databaseId, new TransactionCallbackWithException<T, RuntimeException>() {
             @Override
-            public T doInTransaction(TransactionStatus status) throws RuntimeException {
+            public T doInTransaction(final TransactionStatus status) throws RuntimeException {
                 return callback.doInTransaction(status);
             }
         });
     }
 
+    public static <T, E extends Throwable> T execute(final short databaseId, final TransactionCallbackWithException<T, E> callback) throws E {
+        final String name = "tx-" + counter.incrementAndGet();
+        final TransactionLegacy currentTxn = TransactionLegacy.currentTxn(false);
+        final short outer_txn_databaseId = (currentTxn != null ? currentTxn.getDatabaseId() : databaseId);
+        try (final TransactionLegacy txn = TransactionLegacy.open(name, databaseId, true)) {
+            txn.start();
+            final T result = callback.doInTransaction(STATUS);
+            txn.commit();
+            return result;
+        } finally {
+            TransactionLegacy.open(outer_txn_databaseId).close();
+        }
+    }
 }

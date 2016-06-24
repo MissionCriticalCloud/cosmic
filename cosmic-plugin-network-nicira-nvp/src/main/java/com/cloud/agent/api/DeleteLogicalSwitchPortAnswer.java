@@ -28,5 +28,4 @@ public class DeleteLogicalSwitchPortAnswer extends Answer {
     public DeleteLogicalSwitchPortAnswer(final Command command, final Exception e) {
         super(command, e);
     }
-
 }

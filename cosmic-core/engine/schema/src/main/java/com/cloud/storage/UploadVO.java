@@ -16,8 +16,8 @@
 // under the License.
 package com.cloud.storage;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.NumbersUtil;
+import com.cloud.utils.db.GenericDaoBase;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,9 +29,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.db.GenericDaoBase;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "upload")
@@ -83,39 +82,6 @@ public class UploadVO implements Upload {
     @Column(name = "install_path")
     private String installPath;
 
-    @Override
-    public long getDataStoreId() {
-        return dataStoreId;
-    }
-
-    public void setDataStoreId(long hostId) {
-        this.dataStoreId = hostId;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public String getUuid() {
-        return uuid;
-    }
-
-    @Override
-    public Date getCreated() {
-        return created;
-    }
-
-    @Override
-    public Date getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(Date date) {
-        lastUpdated = date;
-    }
-
     public UploadVO(long hostId, long templateId) {
         super();
         this.dataStoreId = hostId;
@@ -145,7 +111,6 @@ public class UploadVO implements Upload {
         this.type = type;
         this.mode = mode;
         this.uuid = UUID.randomUUID().toString();
-
     }
 
     protected UploadVO() {
@@ -155,8 +120,71 @@ public class UploadVO implements Upload {
         this.id = uploadId;
     }
 
-    public void setErrorString(String errorString) {
-        this.errorString = errorString;
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getInstallPath() {
+        return installPath;
+    }
+
+    @Override
+    public void setInstallPath(String installPath) {
+        this.installPath = installPath;
+    }
+
+    @Override
+    public String getUuid() {
+        return uuid;
+    }
+
+    @Override
+    public int hashCode() {
+        return NumbersUtil.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof UploadVO) {
+            UploadVO other = (UploadVO) obj;
+            return (this.typeId == other.getTypeId() && this.dataStoreId == other.getDataStoreId() && this.type == other.getType());
+        }
+        return false;
+    }
+
+    @Override
+    public long getDataStoreId() {
+        return dataStoreId;
+    }
+
+    public void setDataStoreId(long hostId) {
+        this.dataStoreId = hostId;
+    }
+
+    @Override
+    public Date getCreated() {
+        return created;
+    }
+
+    @Override
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    @Override
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date date) {
+        lastUpdated = date;
     }
 
     @Override
@@ -164,8 +192,8 @@ public class UploadVO implements Upload {
         return errorString;
     }
 
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
+    public void setErrorString(String errorString) {
+        this.errorString = errorString;
     }
 
     @Override
@@ -173,18 +201,8 @@ public class UploadVO implements Upload {
         return jobId;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof UploadVO) {
-            UploadVO other = (UploadVO)obj;
-            return (this.typeId == other.getTypeId() && this.dataStoreId == other.getDataStoreId() && this.type == other.getType());
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return NumbersUtil.hash(id);
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
     }
 
     @Override
@@ -239,25 +257,5 @@ public class UploadVO implements Upload {
 
     public void setUploadUrl(String uploadUrl) {
         this.uploadUrl = uploadUrl;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public void setCreated(Date created) {
-        this.created = created;
-    }
-
-    @Override
-    public String getInstallPath() {
-        return installPath;
-    }
-
-    @Override
-    public void setInstallPath(String installPath) {
-        this.installPath = installPath;
     }
 }

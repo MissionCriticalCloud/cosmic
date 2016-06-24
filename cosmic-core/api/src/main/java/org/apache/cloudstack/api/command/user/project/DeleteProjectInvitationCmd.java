@@ -18,7 +18,6 @@ package org.apache.cloudstack.api.command.user.project;
 
 import com.cloud.event.EventTypes;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -28,6 +27,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ProjectInvitationResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,21 +51,6 @@ public class DeleteProjectInvitationCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-    @Override
-    public long getEntityOwnerId() {
-        // TODO - return project entity ownerId
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are
-// tracked
-    }
-
-    @Override
     public void execute() {
         CallContext.current().setEventDetails("Project invitation id " + id);
         boolean result = _projectService.deleteProjectInvitation(id);
@@ -78,6 +63,21 @@ public class DeleteProjectInvitationCmd extends BaseAsyncCmd {
     }
 
     @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
+    @Override
+    public long getEntityOwnerId() {
+        // TODO - return project entity ownerId
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are
+        // tracked
+    }
+
+    @Override
     public String getEventType() {
         return EventTypes.EVENT_PROJECT_INVITATION_REMOVE;
     }
@@ -86,5 +86,4 @@ public class DeleteProjectInvitationCmd extends BaseAsyncCmd {
     public String getEventDescription() {
         return "Project invitatino id " + id + " is being removed";
     }
-
 }

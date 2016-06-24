@@ -38,5 +38,4 @@ public class FirewallRules extends ConfigBase {
     public void setRules(FirewallRule[] rules) {
         this.rules = rules;
     }
-
 }

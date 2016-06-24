@@ -16,7 +16,7 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs.impl;
 
-import java.util.Date;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,8 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "sync_queue_item")
@@ -59,6 +58,20 @@ public class SyncQueueItemVO implements SyncQueueItem, InternalIdentity {
 
     @Column(name = "created")
     private Date created;
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("SyncQueueItemVO {id:").append(getId()).append(", queueId: ").append(getQueueId());
+        sb.append(", contentType: ").append(getContentType());
+        sb.append(", contentId: ").append(getContentId());
+        sb.append(", lastProcessMsid: ").append(getLastProcessMsid());
+        sb.append(", lastprocessNumber: ").append(getLastProcessNumber());
+        sb.append(", lastProcessTime: ").append(getLastProcessTime());
+        sb.append(", created: ").append(getCreated());
+        sb.append("}");
+        return sb.toString();
+    }
 
     @Override
     public long getId() {
@@ -112,30 +125,16 @@ public class SyncQueueItemVO implements SyncQueueItem, InternalIdentity {
         this.lastProcessNumber = lastProcessNumber;
     }
 
+    public Date getLastProcessTime() {
+        return lastProcessTime;
+    }
+
     public Date getCreated() {
         return created;
     }
 
     public void setCreated(Date created) {
         this.created = created;
-    }
-
-    @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("SyncQueueItemVO {id:").append(getId()).append(", queueId: ").append(getQueueId());
-        sb.append(", contentType: ").append(getContentType());
-        sb.append(", contentId: ").append(getContentId());
-        sb.append(", lastProcessMsid: ").append(getLastProcessMsid());
-        sb.append(", lastprocessNumber: ").append(getLastProcessNumber());
-        sb.append(", lastProcessTime: ").append(getLastProcessTime());
-        sb.append(", created: ").append(getCreated());
-        sb.append("}");
-        return sb.toString();
-    }
-
-    public Date getLastProcessTime() {
-        return lastProcessTime;
     }
 
     public void setLastProcessTime(Date lastProcessTime) {

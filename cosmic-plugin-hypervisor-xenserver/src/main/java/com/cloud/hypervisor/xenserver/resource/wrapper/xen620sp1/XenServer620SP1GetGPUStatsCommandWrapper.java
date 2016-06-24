@@ -19,8 +19,6 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xen620sp1;
 
-import java.util.HashMap;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.GetGPUStatsAnswer;
 import com.cloud.agent.api.GetGPUStatsCommand;
@@ -28,12 +26,14 @@ import com.cloud.agent.api.VgpuTypesInfo;
 import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.xensource.xenapi.Connection;
 
+import java.util.HashMap;
+
+import com.xensource.xenapi.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  GetGPUStatsCommand.class)
+@ResourceWrapper(handles = GetGPUStatsCommand.class)
 public final class XenServer620SP1GetGPUStatsCommandWrapper extends CommandWrapper<GetGPUStatsCommand, Answer, XenServer620SP1Resource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(XenServer620SP1GetGPUStatsCommandWrapper.class);
@@ -41,7 +41,7 @@ public final class XenServer620SP1GetGPUStatsCommandWrapper extends CommandWrapp
     @Override
     public Answer execute(final GetGPUStatsCommand command, final XenServer620SP1Resource xenServer620SP1Resource) {
         final Connection conn = xenServer620SP1Resource.getConnection();
-        HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails = new HashMap<String, HashMap<String, VgpuTypesInfo>>();
+        HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails = new HashMap<>();
         try {
             groupDetails = xenServer620SP1Resource.getGPUGroupDetails(conn);
         } catch (final Exception e) {

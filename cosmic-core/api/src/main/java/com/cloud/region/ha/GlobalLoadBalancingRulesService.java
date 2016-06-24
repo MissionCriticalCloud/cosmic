@@ -17,16 +17,15 @@
 
 package com.cloud.region.ha;
 
-import java.util.List;
-
 import com.cloud.network.rules.LoadBalancer;
-
 import org.apache.cloudstack.api.command.user.region.ha.gslb.AssignToGlobalLoadBalancerRuleCmd;
 import org.apache.cloudstack.api.command.user.region.ha.gslb.CreateGlobalLoadBalancerRuleCmd;
 import org.apache.cloudstack.api.command.user.region.ha.gslb.DeleteGlobalLoadBalancerRuleCmd;
 import org.apache.cloudstack.api.command.user.region.ha.gslb.ListGlobalLoadBalancerRuleCmd;
 import org.apache.cloudstack.api.command.user.region.ha.gslb.RemoveFromGlobalLoadBalancerRuleCmd;
 import org.apache.cloudstack.api.command.user.region.ha.gslb.UpdateGlobalLoadBalancerRuleCmd;
+
+import java.util.List;
 
 public interface GlobalLoadBalancingRulesService {
 
@@ -53,5 +52,4 @@ public interface GlobalLoadBalancingRulesService {
     List<GlobalLoadBalancerRule> listGlobalLoadBalancerRule(ListGlobalLoadBalancerRuleCmd listGslbCmd);
 
     List<LoadBalancer> listSiteLoadBalancers(long gslbRuleId);
-
 }

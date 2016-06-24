@@ -31,42 +31,42 @@ public class GetStorageStatsCommand extends Command {
     private String secUrl;
     private DataStoreTO store;
 
+    public GetStorageStatsCommand() {
+    }
+
+    public GetStorageStatsCommand(final DataStoreTO store) {
+        this.store = store;
+    }
+
+    public GetStorageStatsCommand(final String secUrl) {
+        this.secUrl = secUrl;
+    }
+
+    public GetStorageStatsCommand(final String id, final StoragePoolType pooltype) {
+        this.id = id;
+        this.pooltype = pooltype;
+    }
+
+    public GetStorageStatsCommand(final String id, final StoragePoolType pooltype, final String localPath) {
+        this.id = id;
+        this.pooltype = pooltype;
+        this.localPath = localPath;
+    }
+
     public String getSecUrl() {
         return secUrl;
     }
 
-    public void setSecUrl(String secUrl) {
+    public void setSecUrl(final String secUrl) {
         this.secUrl = secUrl;
-    }
-
-    public GetStorageStatsCommand() {
     }
 
     public StoragePoolType getPooltype() {
         return pooltype;
     }
 
-    public void setPooltype(StoragePoolType pooltype) {
+    public void setPooltype(final StoragePoolType pooltype) {
         this.pooltype = pooltype;
-    }
-
-    public GetStorageStatsCommand(DataStoreTO store) {
-        this.store = store;
-    }
-
-    public GetStorageStatsCommand(String secUrl) {
-        this.secUrl = secUrl;
-    }
-
-    public GetStorageStatsCommand(String id, StoragePoolType pooltype) {
-        this.id = id;
-        this.pooltype = pooltype;
-    }
-
-    public GetStorageStatsCommand(String id, StoragePoolType pooltype, String localPath) {
-        this.id = id;
-        this.pooltype = pooltype;
-        this.localPath = localPath;
     }
 
     public String getStorageId() {

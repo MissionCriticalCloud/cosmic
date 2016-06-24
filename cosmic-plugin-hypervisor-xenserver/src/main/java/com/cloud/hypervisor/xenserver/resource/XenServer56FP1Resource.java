@@ -16,15 +16,14 @@
 // under the License.
 package com.cloud.hypervisor.xenserver.resource;
 
-import java.util.Map;
+import com.cloud.resource.ServerResource;
 
 import javax.ejb.Local;
+import java.util.Map;
 
-import com.cloud.resource.ServerResource;
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Host;
 import com.xensource.xenapi.Types.XenAPIException;
-
 import org.apache.xmlrpc.XmlRpcException;
 
 @Local(value = ServerResource.class)
@@ -38,7 +37,7 @@ public class XenServer56FP1Resource extends XenServer56Resource {
     /**
      * When Dynamic Memory Control (DMC) is enabled -
      * xenserver allows scaling the guest memory while the guest is running
-     *
+     * <p>
      * This is determined by the 'restrict_dmc' option on the host.
      * When false, scaling is allowed hence DMC is enabled
      */

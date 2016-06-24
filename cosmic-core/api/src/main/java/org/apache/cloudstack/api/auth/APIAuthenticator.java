@@ -16,15 +16,14 @@
 // under the License.
 package org.apache.cloudstack.api.auth;
 
-import java.net.InetAddress;
-import java.util.List;
-import java.util.Map;
+import org.apache.cloudstack.api.ServerApiException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.apache.cloudstack.api.ServerApiException;
+import java.net.InetAddress;
+import java.util.List;
+import java.util.Map;
 
 /*
 * APIAuthenticator is an interface that defines method that

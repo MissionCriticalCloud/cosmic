@@ -16,15 +16,14 @@
 // under the License.
 package com.cloud.server;
 
-import java.util.List;
-
 import com.cloud.cluster.ClusterManagerListener;
 import com.cloud.cluster.ManagementServerHost;
 import com.cloud.utils.db.Merovingian2;
 
+import java.util.List;
+
 /**
  * when a management server is down.
- *
  */
 public class LockMasterListener implements ClusterManagerListener {
     Merovingian2 _lockMaster;
@@ -47,5 +46,4 @@ public class LockMasterListener implements ClusterManagerListener {
     @Override
     public void onManagementNodeIsolated() {
     }
-
 }

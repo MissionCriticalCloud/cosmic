@@ -40,11 +40,11 @@ public class MigrateVolumeAnswer extends Answer {
         return volumePath;
     }
 
-    public void setVolumeChainInfo(String chainInfo) {
-        this.volumeChain = chainInfo;
-    }
-
     public String getVolumeChainInfo() {
         return volumeChain;
+    }
+
+    public void setVolumeChainInfo(String chainInfo) {
+        this.volumeChain = chainInfo;
     }
 }

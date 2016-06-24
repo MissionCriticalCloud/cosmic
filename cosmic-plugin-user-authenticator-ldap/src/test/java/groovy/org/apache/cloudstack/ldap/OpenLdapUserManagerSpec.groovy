@@ -17,14 +17,12 @@
 package groovy.org.apache.cloudstack.ldap
 
 import org.apache.cloudstack.ldap.LdapConfiguration
-import org.apache.cloudstack.ldap.LdapUserManager
 import org.apache.cloudstack.ldap.OpenLdapUserManagerImpl
 import spock.lang.Shared
 
 import javax.naming.NamingException
 import javax.naming.directory.Attribute
 import javax.naming.directory.Attributes
-import javax.naming.directory.InitialDirContext
 import javax.naming.directory.SearchControls
 import javax.naming.directory.SearchResult
 import javax.naming.ldap.InitialLdapContext

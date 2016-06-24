@@ -24,7 +24,6 @@ import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.user.Account;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -34,6 +33,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.DomainRouterResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,13 +57,53 @@ public class StopRouterCmd extends BaseAsyncCmd {
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
+    @Override
+    public String getEventType() {
+        return EventTypes.EVENT_ROUTER_STOP;
     }
 
     // ///////////////////////////////////////////////////
     // ///////////// API Implementation///////////////////
     // ///////////////////////////////////////////////////
+
+    @Override
+    public String getEventDescription() {
+        return "stopping router: " + getId();
+    }
+
+    @Override
+    public Long getInstanceId() {
+        return getId();
+    }
+
+    @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.DomainRouter;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void execute() throws ConcurrentOperationException, ResourceUnavailableException {
+        CallContext.current().setEventDetails("Router Id: " + getId());
+        VirtualRouter result = null;
+        final VirtualRouter router = _routerService.findRouter(getId());
+        if (router == null || router.getRole() != Role.VIRTUAL_ROUTER) {
+            throw new InvalidParameterValueException("Can't find router by id");
+        } else {
+            result = _routerService.stopRouter(getId(), isForced());
+        }
+
+        if (result != null) {
+            final DomainRouterResponse response = _responseGenerator.createDomainRouterResponse(result);
+            response.setResponseName(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to stop router");
+        }
+    }
 
     @Override
     public String getCommandName() {
@@ -72,7 +112,7 @@ public class StopRouterCmd extends BaseAsyncCmd {
 
     @Override
     public long getEntityOwnerId() {
-        VirtualRouter router = _entityMgr.findById(VirtualRouter.class, getId());
+        final VirtualRouter router = _entityMgr.findById(VirtualRouter.class, getId());
         if (router != null) {
             return router.getAccountId();
         }
@@ -80,47 +120,7 @@ public class StopRouterCmd extends BaseAsyncCmd {
         return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 
-    @Override
-    public String getEventType() {
-        return EventTypes.EVENT_ROUTER_STOP;
-    }
-
-    @Override
-    public String getEventDescription() {
-        return "stopping router: " + getId();
-    }
-
-    @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.DomainRouter;
-    }
-
-    @Override
-    public Long getInstanceId() {
-        return getId();
-    }
-
     public boolean isForced() {
         return (forced != null) ? forced : false;
-    }
-
-    @Override
-    public void execute() throws ConcurrentOperationException, ResourceUnavailableException {
-        CallContext.current().setEventDetails("Router Id: " + getId());
-        VirtualRouter result = null;
-        VirtualRouter router = _routerService.findRouter(getId());
-        if (router == null || router.getRole() != Role.VIRTUAL_ROUTER) {
-            throw new InvalidParameterValueException("Can't find router by id");
-        } else {
-            result = _routerService.stopRouter(getId(), isForced());
-        }
-
-        if (result != null) {
-            DomainRouterResponse response = _responseGenerator.createDomainRouterResponse(result);
-            response.setResponseName(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to stop router");
-        }
     }
 }

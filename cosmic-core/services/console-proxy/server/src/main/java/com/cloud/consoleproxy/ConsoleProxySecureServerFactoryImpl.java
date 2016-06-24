@@ -16,10 +16,7 @@
 // under the License.
 package com.cloud.consoleproxy;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.security.KeyStore;
+import org.apache.cloudstack.utils.security.SSLUtils;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -27,13 +24,15 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.security.KeyStore;
 
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
-
-import org.apache.cloudstack.utils.security.SSLUtils;
 import org.apache.log4j.Logger;
 
 public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFactory {
@@ -74,7 +73,6 @@ public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFa
                 s_logger.error("Unable to init factory due to exception ", e);
             }
         }
-
     }
 
     @Override
@@ -111,7 +109,7 @@ public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFa
         try {
             SSLServerSocket srvSock = null;
             SSLServerSocketFactory ssf = sslContext.getServerSocketFactory();
-            srvSock = (SSLServerSocket)ssf.createServerSocket(port);
+            srvSock = (SSLServerSocket) ssf.createServerSocket(port);
             srvSock.setEnabledProtocols(SSLUtils.getSupportedProtocols(srvSock.getEnabledProtocols()));
 
             s_logger.info("create SSL server socket on port: " + port);

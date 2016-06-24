@@ -22,6 +22,38 @@ import org.apache.cloudstack.api.InternalIdentity;
 
 public interface ResourceTag extends ControlledEntity, Identity, InternalIdentity {
 
+    /**
+     * @return
+     */
+    String getKey();
+
+    /**
+     * @return
+     */
+    String getValue();
+
+    /**
+     * @return
+     */
+    long getResourceId();
+
+    void setResourceId(long resourceId);
+
+    /**
+     * @return
+     */
+    ResourceObjectType getResourceType();
+
+    /**
+     * @return
+     */
+    String getCustomer();
+
+    /**
+     * @return
+     */
+    String getResourceUuid();
+
     // FIXME - extract enum to another interface as its used both by resourceTags and resourceMetaData code
     public enum ResourceObjectType {
         UserVm(true, true),
@@ -59,14 +91,13 @@ public interface ResourceTag extends ControlledEntity, Identity, InternalIdentit
         LBHealthCheckPolicy(false, true),
         SnapshotPolicy(false, true);
 
+        private final boolean resourceTagsSupport;
+        private final boolean metadataSupport;
 
-        ResourceObjectType(boolean resourceTagsSupport, boolean resourceMetadataSupport) {
+        ResourceObjectType(final boolean resourceTagsSupport, final boolean resourceMetadataSupport) {
             this.resourceTagsSupport = resourceTagsSupport;
             metadataSupport = resourceMetadataSupport;
         }
-
-        private final boolean resourceTagsSupport;
-        private final boolean metadataSupport;
 
         public boolean resourceTagsSupport() {
             return resourceTagsSupport;
@@ -76,37 +107,4 @@ public interface ResourceTag extends ControlledEntity, Identity, InternalIdentit
             return metadataSupport;
         }
     }
-
-    /**
-     * @return
-     */
-    String getKey();
-
-    /**
-     * @return
-     */
-    String getValue();
-
-    /**
-     * @return
-     */
-    long getResourceId();
-
-    void setResourceId(long resourceId);
-
-    /**
-     * @return
-     */
-    ResourceObjectType getResourceType();
-
-    /**
-     * @return
-     */
-    String getCustomer();
-
-    /**
-     * @return
-     */
-    String getResourceUuid();
-
 }

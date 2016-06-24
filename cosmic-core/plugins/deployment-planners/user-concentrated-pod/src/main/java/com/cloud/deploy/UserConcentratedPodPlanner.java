@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.deploy;
 
+import com.cloud.utils.Pair;
+import com.cloud.vm.VirtualMachineProfile;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import com.cloud.utils.Pair;
-import com.cloud.vm.VirtualMachineProfile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +35,12 @@ public class UserConcentratedPodPlanner extends FirstFitPlanner implements Deplo
      * for this planner
      * For UserConcentratedPodPlanner we need to order the clusters in a zone across pods, by considering those pods first which have more number of VMs for this account
      * This reordering is not done incase the clusters within single pod are passed when the allocation is applied at pod-level.
+     *
      * @return List<Long> ordered list of Cluster Ids
      */
     @Override
     protected List<Long> reorderClusters(long id, boolean isZone, Pair<List<Long>, Map<Long, Double>> clusterCapacityInfo, VirtualMachineProfile vmProfile,
-        DeploymentPlan plan) {
+                                         DeploymentPlan plan) {
         List<Long> clusterIdsByCapacity = clusterCapacityInfo.first();
         if (vmProfile.getOwner() == null || !isZone) {
             return clusterIdsByCapacity;
@@ -58,6 +59,21 @@ public class UserConcentratedPodPlanner extends FirstFitPlanner implements Deplo
             clusterList = prioritizedClusterIds;
         }
         return clusterList;
+    }
+
+    protected List<Long> listPodsByUserConcentration(long zoneId, long accountId) {
+
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("Applying UserConcentratedPod heuristic for account: " + accountId);
+        }
+
+        List<Long> prioritizedPods = vmDao.listPodIdsHavingVmsforAccount(zoneId, accountId);
+
+        if (s_logger.isTraceEnabled()) {
+            s_logger.trace("List of pods to be considered, after applying UserConcentratedPod heuristic: " + prioritizedPods);
+        }
+
+        return prioritizedPods;
     }
 
     private List<Long> reorderClustersByPods(List<Long> clusterIds, List<Long> podIds) {
@@ -94,25 +110,11 @@ public class UserConcentratedPodPlanner extends FirstFitPlanner implements Deplo
         return reorderedClusters;
     }
 
-    protected List<Long> listPodsByUserConcentration(long zoneId, long accountId) {
-
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Applying UserConcentratedPod heuristic for account: " + accountId);
-        }
-
-        List<Long> prioritizedPods = vmDao.listPodIdsHavingVmsforAccount(zoneId, accountId);
-
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("List of pods to be considered, after applying UserConcentratedPod heuristic: " + prioritizedPods);
-        }
-
-        return prioritizedPods;
-    }
-
     /**
      * This method should reorder the given list of Pod Ids by applying any necessary heuristic
      * for this planner
      * For UserConcentratedPodPlanner we need to order the pods by considering those pods first which have more number of VMs for this account
+     *
      * @return List<Long> ordered list of Pod Ids
      */
     @Override
@@ -135,7 +137,5 @@ public class UserConcentratedPodPlanner extends FirstFitPlanner implements Deplo
         } else {
             return podIdsByCapacity;
         }
-
     }
-
 }

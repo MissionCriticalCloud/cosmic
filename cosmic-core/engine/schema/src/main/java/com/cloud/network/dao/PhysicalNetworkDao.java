@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface PhysicalNetworkDao extends GenericDao<PhysicalNetworkVO, Long> {
     List<PhysicalNetworkVO> listByZone(long zoneId);

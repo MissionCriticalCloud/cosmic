@@ -18,7 +18,6 @@ package org.apache.cloudstack.api.command.admin.network;
 
 import com.cloud.event.EventTypes;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -29,6 +28,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,33 +43,15 @@ public class DeletePhysicalNetworkCmd extends BaseAsyncCmd {
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
     @Parameter(name = ApiConstants.ID,
-               type = CommandType.UUID,
-               entityType = PhysicalNetworkResponse.class,
-               required = true,
-               description = "the ID of the Physical network")
+            type = CommandType.UUID,
+            entityType = PhysicalNetworkResponse.class,
+            required = true,
+            description = "the ID of the Physical network")
     private Long id;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public Long getId() {
-        return id;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
 
     @Override
     public void execute() {
@@ -83,14 +65,32 @@ public class DeletePhysicalNetworkCmd extends BaseAsyncCmd {
         }
     }
 
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public Long getId() {
+        return id;
+    }
+
     @Override
-    public String getEventDescription() {
-        return "Deleting Physical network: " + getId();
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 
     @Override
     public String getEventType() {
         return EventTypes.EVENT_PHYSICAL_NETWORK_DELETE;
+    }
+
+    @Override
+    public String getEventDescription() {
+        return "Deleting Physical network: " + getId();
     }
 
     @Override

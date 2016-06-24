@@ -16,9 +16,6 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.exception.UnsupportedServiceException;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
@@ -27,6 +24,9 @@ import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -73,7 +73,7 @@ public class NetworkServiceMapDaoImpl extends GenericDaoBase<NetworkServiceMapVO
                 i++;
             }
 
-            sc.setParameters("service", (Object[])servicesStr);
+            sc.setParameters("service", (Object[]) servicesStr);
         }
 
         List<NetworkServiceMapVO> networkServices = listBy(sc);
@@ -102,17 +102,11 @@ public class NetworkServiceMapDaoImpl extends GenericDaoBase<NetworkServiceMapVO
         }
     }
 
-    protected List<String> getServicesForProviderInNetwork(long networkId, Provider provider) {
-        List<String> services = new ArrayList<String>();
+    @Override
+    public List<NetworkServiceMapVO> getServicesInNetwork(long networkId) {
         SearchCriteria<NetworkServiceMapVO> sc = AllFieldsSearch.create();
         sc.setParameters("networkId", networkId);
-        sc.setParameters("provider", provider.getName());
-        List<NetworkServiceMapVO> map = listBy(sc);
-        for (NetworkServiceMapVO instance : map) {
-            services.add(instance.getService());
-        }
-
-        return services;
+        return listBy(sc);
     }
 
     @Override
@@ -126,13 +120,6 @@ public class NetworkServiceMapDaoImpl extends GenericDaoBase<NetworkServiceMapVO
         }
 
         return ntwkSvc.getProvider();
-    }
-
-    @Override
-    public List<NetworkServiceMapVO> getServicesInNetwork(long networkId) {
-        SearchCriteria<NetworkServiceMapVO> sc = AllFieldsSearch.create();
-        sc.setParameters("networkId", networkId);
-        return listBy(sc);
     }
 
     @Override
@@ -171,4 +158,16 @@ public class NetworkServiceMapDaoImpl extends GenericDaoBase<NetworkServiceMapVO
         return customSearch(sc, null);
     }
 
+    protected List<String> getServicesForProviderInNetwork(long networkId, Provider provider) {
+        List<String> services = new ArrayList<String>();
+        SearchCriteria<NetworkServiceMapVO> sc = AllFieldsSearch.create();
+        sc.setParameters("networkId", networkId);
+        sc.setParameters("provider", provider.getName());
+        List<NetworkServiceMapVO> map = listBy(sc);
+        for (NetworkServiceMapVO instance : map) {
+            services.add(instance.getService());
+        }
+
+        return services;
+    }
 }

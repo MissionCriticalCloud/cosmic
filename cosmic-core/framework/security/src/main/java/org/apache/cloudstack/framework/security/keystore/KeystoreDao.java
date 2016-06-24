@@ -16,9 +16,9 @@
 // under the License.
 package org.apache.cloudstack.framework.security.keystore;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface KeystoreDao extends GenericDao<KeystoreVO, Long> {
     KeystoreVO findByName(String name);

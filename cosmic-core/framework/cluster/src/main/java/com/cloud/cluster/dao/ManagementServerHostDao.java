@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.cluster.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.cluster.ManagementServerHost;
 import com.cloud.cluster.ManagementServerHost.State;
 import com.cloud.cluster.ManagementServerHostVO;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Date;
+import java.util.List;
 
 public interface ManagementServerHostDao extends GenericDao<ManagementServerHostVO, Long> {
     @Override

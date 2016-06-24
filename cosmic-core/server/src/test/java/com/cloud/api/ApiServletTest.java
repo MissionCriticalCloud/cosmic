@@ -16,6 +16,18 @@
 // under the License.
 package com.cloud.api;
 
+import com.cloud.server.ManagementServer;
+import com.cloud.user.Account;
+import com.cloud.user.AccountService;
+import com.cloud.user.User;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.auth.APIAuthenticationManager;
+import org.apache.cloudstack.api.auth.APIAuthenticationType;
+import org.apache.cloudstack.api.auth.APIAuthenticator;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -26,19 +38,6 @@ import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import com.cloud.server.ManagementServer;
-import com.cloud.user.Account;
-import com.cloud.user.AccountService;
-import com.cloud.user.User;
-
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.auth.APIAuthenticationManager;
-import org.apache.cloudstack.api.auth.APIAuthenticationType;
-import org.apache.cloudstack.api.auth.APIAuthenticator;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -104,7 +103,8 @@ public class ApiServletTest {
 
         Mockito.when(authManager.getAPIAuthenticator(Mockito.anyString())).thenReturn(authenticator);
         Mockito.when(authenticator.authenticate(Mockito.anyString(), Mockito.anyMap(), Mockito.isA(HttpSession.class),
-                Mockito.same(InetAddress.getByName("127.0.0.1")), Mockito.anyString(), Mockito.isA(StringBuilder.class), Mockito.isA(HttpServletRequest.class), Mockito.isA(HttpServletResponse.class))).thenReturn("{\"loginresponse\":{}");
+                Mockito.same(InetAddress.getByName("127.0.0.1")), Mockito.anyString(), Mockito.isA(StringBuilder.class), Mockito.isA(HttpServletRequest.class), Mockito.isA
+                        (HttpServletResponse.class))).thenReturn("{\"loginresponse\":{}");
 
         Field authManagerField = ApiServlet.class.getDeclaredField("_authManager");
         authManagerField.setAccessible(true);
@@ -175,7 +175,7 @@ public class ApiServletTest {
         Mockito.when(request.getMethod()).thenReturn("GET");
         Mockito.when(
                 apiServer.verifyRequest(Mockito.anyMap(), Mockito.anyLong()))
-                .thenReturn(false);
+               .thenReturn(false);
         servlet.processRequestInContext(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         Mockito.verify(apiServer, Mockito.never()).handleRequest(
@@ -189,7 +189,7 @@ public class ApiServletTest {
         Mockito.when(request.getMethod()).thenReturn("GET");
         Mockito.when(
                 apiServer.verifyRequest(Mockito.anyMap(), Mockito.anyLong()))
-                .thenReturn(true);
+               .thenReturn(true);
         servlet.processRequestInContext(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
         Mockito.verify(apiServer, Mockito.times(1)).handleRequest(
@@ -206,17 +206,17 @@ public class ApiServletTest {
         Mockito.when(session.getAttribute("userid")).thenReturn(1l);
         Mockito.when(session.getAttribute("accountobj")).thenReturn(account);
         HashMap<String, String[]> params = new HashMap<String, String[]>();
-        params.put(ApiConstants.COMMAND, new String[] { "logout" });
+        params.put(ApiConstants.COMMAND, new String[]{"logout"});
         Mockito.when(request.getParameterMap()).thenReturn(params);
 
         Mockito.when(authenticator.getAPIType()).thenReturn(APIAuthenticationType.LOGOUT_API);
 
         servlet.processRequestInContext(request, response);
 
-
         Mockito.verify(authManager).getAPIAuthenticator("logout");
         Mockito.verify(authenticator).authenticate(Mockito.anyString(), Mockito.anyMap(), Mockito.isA(HttpSession.class),
-                Mockito.eq(InetAddress.getByName("127.0.0.1")), Mockito.anyString(), Mockito.isA(StringBuilder.class), Mockito.isA(HttpServletRequest.class), Mockito.isA(HttpServletResponse.class));
+                Mockito.eq(InetAddress.getByName("127.0.0.1")), Mockito.anyString(), Mockito.isA(StringBuilder.class), Mockito.isA(HttpServletRequest.class), Mockito.isA
+                        (HttpServletResponse.class));
         Mockito.verify(session).invalidate();
     }
 
@@ -227,18 +227,19 @@ public class ApiServletTest {
         Mockito.when(request.getSession(Mockito.anyBoolean())).thenReturn(
                 session);
         HashMap<String, String[]> params = new HashMap<String, String[]>();
-        params.put(ApiConstants.COMMAND, new String[] { "login" });
-        params.put(ApiConstants.USERNAME, new String[] { "TEST" });
-        params.put(ApiConstants.PASSWORD, new String[] { "TEST-PWD" });
-        params.put(ApiConstants.DOMAIN_ID, new String[] { "42" });
-        params.put(ApiConstants.DOMAIN, new String[] { "TEST-DOMAIN" });
+        params.put(ApiConstants.COMMAND, new String[]{"login"});
+        params.put(ApiConstants.USERNAME, new String[]{"TEST"});
+        params.put(ApiConstants.PASSWORD, new String[]{"TEST-PWD"});
+        params.put(ApiConstants.DOMAIN_ID, new String[]{"42"});
+        params.put(ApiConstants.DOMAIN, new String[]{"TEST-DOMAIN"});
         Mockito.when(request.getParameterMap()).thenReturn(params);
 
         servlet.processRequestInContext(request, response);
 
         Mockito.verify(authManager).getAPIAuthenticator("login");
         Mockito.verify(authenticator).authenticate(Mockito.anyString(), Mockito.anyMap(), Mockito.isA(HttpSession.class),
-                Mockito.eq(InetAddress.getByName("127.0.0.1")), Mockito.anyString(), Mockito.isA(StringBuilder.class), Mockito.isA(HttpServletRequest.class), Mockito.isA(HttpServletResponse.class));
+                Mockito.eq(InetAddress.getByName("127.0.0.1")), Mockito.anyString(), Mockito.isA(StringBuilder.class), Mockito.isA(HttpServletRequest.class), Mockito.isA
+                        (HttpServletResponse.class));
     }
 
     @Test
@@ -270,5 +271,4 @@ public class ApiServletTest {
         Mockito.when(request.getRemoteAddr()).thenReturn("127.0.0.1");
         Assert.assertEquals("127.0.0.1", ApiServlet.getClientAddress(request));
     }
-
 }

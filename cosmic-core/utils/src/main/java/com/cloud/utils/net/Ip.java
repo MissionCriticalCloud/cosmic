@@ -19,14 +19,13 @@
 
 package com.cloud.utils.net;
 
-import java.io.Serializable;
-
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.SerialVersionUID;
 
+import java.io.Serializable;
+
 /**
  * Simple Ip implementation class that works with both ip4 and ip6.
- *
  */
 public class Ip implements Serializable, Comparable<Ip> {
 
@@ -53,11 +52,6 @@ public class Ip implements Serializable, Comparable<Ip> {
         return ip;
     }
 
-    @Override
-    public String toString() {
-        return NetUtils.long2Ip(ip);
-    }
-
     public boolean isIp4() {
         return ip <= 2L * Integer.MAX_VALUE + 1;
     }
@@ -74,18 +68,23 @@ public class Ip implements Serializable, Comparable<Ip> {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Ip) {
-            return ip == ((Ip)obj).ip;
+            return ip == ((Ip) obj).ip;
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return NetUtils.long2Ip(ip);
     }
 
     public boolean isSameAddressAs(Object obj) {
         if (this.equals(obj)) {
             return true;
         } else if (obj instanceof String) {
-            return ip == NetUtils.ip2Long((String)obj);
+            return ip == NetUtils.ip2Long((String) obj);
         } else if (obj instanceof Long) {
-            return ip == (Long)obj;
+            return ip == (Long) obj;
         } else {
             return false;
         }
@@ -93,6 +92,6 @@ public class Ip implements Serializable, Comparable<Ip> {
 
     @Override
     public int compareTo(Ip that) {
-        return (int)(this.ip - that.ip);
+        return (int) (this.ip - that.ip);
     }
 }

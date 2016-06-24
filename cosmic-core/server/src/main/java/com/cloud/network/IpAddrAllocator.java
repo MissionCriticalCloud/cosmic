@@ -19,6 +19,16 @@ package com.cloud.network;
 import com.cloud.utils.component.Adapter;
 
 public interface IpAddrAllocator extends Adapter {
+    public IpAddr getPublicIpAddress(String macAddr, long dcId, long podId);
+
+    public IpAddr getPrivateIpAddress(String macAddr, long dcId, long podId);
+
+    public boolean releasePublicIpAddress(String ip, long dcId, long podId);
+
+    public boolean releasePrivateIpAddress(String ip, long dcId, long podId);
+
+    public boolean externalIpAddressAllocatorEnabled();
+
     public class IpAddr {
         public String ipaddr;
         public String netMask;
@@ -52,14 +62,4 @@ public interface IpAddrAllocator extends Adapter {
             _vlanid = vlanId;
         }
     }
-
-    public IpAddr getPublicIpAddress(String macAddr, long dcId, long podId);
-
-    public IpAddr getPrivateIpAddress(String macAddr, long dcId, long podId);
-
-    public boolean releasePublicIpAddress(String ip, long dcId, long podId);
-
-    public boolean releasePrivateIpAddress(String ip, long dcId, long podId);
-
-    public boolean externalIpAddressAllocatorEnabled();
 }

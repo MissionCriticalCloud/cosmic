@@ -16,6 +16,12 @@
 // under the License.
 package com.cloud.usage.dao;
 
+import com.cloud.exception.CloudException;
+import com.cloud.usage.UsageNetworkOfferingVO;
+import com.cloud.utils.DateUtil;
+import com.cloud.utils.db.GenericDaoBase;
+import com.cloud.utils.db.TransactionLegacy;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,12 +29,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-
-import com.cloud.exception.CloudException;
-import com.cloud.usage.UsageNetworkOfferingVO;
-import com.cloud.utils.DateUtil;
-import com.cloud.utils.db.GenericDaoBase;
-import com.cloud.utils.db.TransactionLegacy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,16 +39,16 @@ public class UsageNetworkOfferingDaoImpl extends GenericDaoBase<UsageNetworkOffe
     public static final Logger s_logger = LoggerFactory.getLogger(UsageNetworkOfferingDaoImpl.class.getName());
 
     protected static final String UPDATE_DELETED =
-        "UPDATE usage_network_offering SET deleted = ? WHERE account_id = ? AND vm_instance_id = ? AND network_offering_id = ? and deleted IS NULL";
+            "UPDATE usage_network_offering SET deleted = ? WHERE account_id = ? AND vm_instance_id = ? AND network_offering_id = ? and deleted IS NULL";
     protected static final String GET_USAGE_RECORDS_BY_ACCOUNT =
-        "SELECT zone_id, account_id, domain_id, vm_instance_id, network_offering_id, nic_id, is_default, created, deleted " + "FROM usage_network_offering "
-            + "WHERE account_id = ? AND ((deleted IS NULL) OR (created BETWEEN ? AND ?) OR " + "      (deleted BETWEEN ? AND ?) OR ((created <= ?) AND (deleted >= ?)))";
+            "SELECT zone_id, account_id, domain_id, vm_instance_id, network_offering_id, nic_id, is_default, created, deleted " + "FROM usage_network_offering "
+                    + "WHERE account_id = ? AND ((deleted IS NULL) OR (created BETWEEN ? AND ?) OR " + "      (deleted BETWEEN ? AND ?) OR ((created <= ?) AND (deleted >= ?)))";
     protected static final String GET_USAGE_RECORDS_BY_DOMAIN =
-        "SELECT zone_id, account_id, domain_id, vm_instance_id, network_offering_id, nic_id, is_default, created, deleted " + "FROM usage_network_offering "
-            + "WHERE domain_id = ? AND ((deleted IS NULL) OR (created BETWEEN ? AND ?) OR " + "      (deleted BETWEEN ? AND ?) OR ((created <= ?) AND (deleted >= ?)))";
+            "SELECT zone_id, account_id, domain_id, vm_instance_id, network_offering_id, nic_id, is_default, created, deleted " + "FROM usage_network_offering "
+                    + "WHERE domain_id = ? AND ((deleted IS NULL) OR (created BETWEEN ? AND ?) OR " + "      (deleted BETWEEN ? AND ?) OR ((created <= ?) AND (deleted >= ?)))";
     protected static final String GET_ALL_USAGE_RECORDS =
-        "SELECT zone_id, account_id, domain_id, vm_instance_id, network_offering_id, nic_id, is_default, created, deleted " + "FROM usage_network_offering "
-            + "WHERE (deleted IS NULL) OR (created BETWEEN ? AND ?) OR " + "      (deleted BETWEEN ? AND ?) OR ((created <= ?) AND (deleted >= ?))";
+            "SELECT zone_id, account_id, domain_id, vm_instance_id, network_offering_id, nic_id, is_default, created, deleted " + "FROM usage_network_offering "
+                    + "WHERE (deleted IS NULL) OR (created BETWEEN ? AND ?) OR " + "      (deleted BETWEEN ? AND ?) OR ((created <= ?) AND (deleted >= ?))";
 
     public UsageNetworkOfferingDaoImpl() {
     }
@@ -59,7 +59,7 @@ public class UsageNetworkOfferingDaoImpl extends GenericDaoBase<UsageNetworkOffe
         try {
             txn.start();
             if (usage.getDeleted() != null) {
-                try(PreparedStatement pstmt = txn.prepareStatement(UPDATE_DELETED);) {
+                try (PreparedStatement pstmt = txn.prepareStatement(UPDATE_DELETED);) {
                     if (pstmt != null) {
                         pstmt.setString(1, DateUtil.getDateDisplayString(TimeZone.getTimeZone("GMT"), usage.getDeleted()));
                         pstmt.setLong(2, usage.getAccountId());
@@ -67,14 +67,14 @@ public class UsageNetworkOfferingDaoImpl extends GenericDaoBase<UsageNetworkOffe
                         pstmt.setLong(4, usage.getNetworkOfferingId());
                         pstmt.executeUpdate();
                     }
-                  }catch (SQLException e) {
-                    throw new CloudException("Error updating UsageNetworkOfferingVO:"+e.getMessage(), e);
+                } catch (SQLException e) {
+                    throw new CloudException("Error updating UsageNetworkOfferingVO:" + e.getMessage(), e);
                 }
             }
             txn.commit();
         } catch (Exception e) {
             txn.rollback();
-            s_logger.warn("Error updating UsageNetworkOfferingVO:"+e.getMessage(), e);
+            s_logger.warn("Error updating UsageNetworkOfferingVO:" + e.getMessage(), e);
         } finally {
             txn.close();
         }

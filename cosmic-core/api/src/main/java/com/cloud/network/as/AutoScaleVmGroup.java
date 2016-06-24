@@ -17,11 +17,11 @@
 
 package com.cloud.network.as;
 
-import java.util.Date;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.api.Displayable;
 import org.apache.cloudstack.api.InternalIdentity;
+
+import java.util.Date;
 
 public interface AutoScaleVmGroup extends ControlledEntity, InternalIdentity, Displayable {
 
@@ -56,5 +56,4 @@ public interface AutoScaleVmGroup extends ControlledEntity, InternalIdentity, Di
 
     @Override
     boolean isDisplay();
-
 }

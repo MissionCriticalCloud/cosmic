@@ -16,13 +16,6 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.ApiResponseHelper;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
@@ -38,11 +31,17 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
-
 import org.apache.cloudstack.api.response.ResourceTagResponse;
 import org.apache.cloudstack.api.response.SecurityGroupResponse;
 import org.apache.cloudstack.api.response.SecurityGroupRuleResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -50,7 +49,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SecurityGroupJoinDaoImpl extends GenericDaoBase<SecurityGroupJoinVO, Long> implements SecurityGroupJoinDao {
     public static final Logger s_logger = LoggerFactory.getLogger(SecurityGroupJoinDaoImpl.class);
-
+    private final SearchBuilder<SecurityGroupJoinVO> sgSearch;
+    private final SearchBuilder<SecurityGroupJoinVO> sgIdSearch;
     @Inject
     private ConfigurationDao _configDao;
     @Inject
@@ -59,10 +59,6 @@ public class SecurityGroupJoinDaoImpl extends GenericDaoBase<SecurityGroupJoinVO
     private SecurityGroupVMMapDao _securityGroupVMMapDao;
     @Inject
     private UserVmDao _userVmDao;
-
-    private final SearchBuilder<SecurityGroupJoinVO> sgSearch;
-
-    private final SearchBuilder<SecurityGroupJoinVO> sgIdSearch;
 
     protected SecurityGroupJoinDaoImpl() {
 
@@ -114,7 +110,7 @@ public class SecurityGroupJoinDaoImpl extends GenericDaoBase<SecurityGroupJoinVO
             // list the tags by rule uuid
             List<ResourceTagJoinVO> tags = _resourceTagJoinDao.listBy(vsg.getRuleUuid(), ResourceTag.ResourceObjectType.SecurityGroupRule);
             Set<ResourceTagResponse> tagResponse = new HashSet<ResourceTagResponse>();
-            for (ResourceTagJoinVO tag: tags) {
+            for (ResourceTagJoinVO tag : tags) {
                 tagResponse.add(ApiDBUtils.newResourceTagResponse(tag, false));
             }
 
@@ -134,7 +130,7 @@ public class SecurityGroupJoinDaoImpl extends GenericDaoBase<SecurityGroupJoinVO
         s_logger.debug("newSecurityGroupResponse() -> virtualmachine count: " + securityGroupVmMap.size());
         sgResponse.setVirtualMachineCount(securityGroupVmMap.size());
 
-        for(SecurityGroupVMMapVO securityGroupVMMapVO : securityGroupVmMap) {
+        for (SecurityGroupVMMapVO securityGroupVMMapVO : securityGroupVmMap) {
             final UserVmVO userVmVO = _userVmDao.findById(securityGroupVMMapVO.getInstanceId());
             if (userVmVO != null) {
                 sgResponse.addVirtualMachineId(userVmVO.getUuid());
@@ -191,7 +187,7 @@ public class SecurityGroupJoinDaoImpl extends GenericDaoBase<SecurityGroupJoinVO
             // add the tags to the rule data
             List<ResourceTagJoinVO> tags = _resourceTagJoinDao.listBy(vsg.getRuleUuid(), ResourceTag.ResourceObjectType.SecurityGroupRule);
             Set<ResourceTagResponse> tagResponse = new HashSet<ResourceTagResponse>();
-            for (ResourceTagJoinVO tag: tags) {
+            for (ResourceTagJoinVO tag : tags) {
                 tagResponse.add(ApiDBUtils.newResourceTagResponse(tag, false));
             }
 

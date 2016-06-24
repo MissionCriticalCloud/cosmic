@@ -16,16 +16,6 @@
 // under the License.
 package com.cloud.agent.manager.allocator.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.agent.manager.allocator.PodAllocator;
 import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityVO;
@@ -52,8 +42,17 @@ import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,7 +106,7 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
                     // some extra padding for xen overhead
                     long[] hostCandiates = new long[1];
                     boolean enoughCapacity =
-                        dataCenterAndPodHasEnoughCapacity(zoneId, podId, (offering.getRamSize()) * 1024L * 1024L, Capacity.CAPACITY_TYPE_MEMORY, hostCandiates);
+                            dataCenterAndPodHasEnoughCapacity(zoneId, podId, (offering.getRamSize()) * 1024L * 1024L, Capacity.CAPACITY_TYPE_MEMORY, hostCandiates);
 
                     if (!enoughCapacity) {
                         if (s_logger.isDebugEnabled()) {
@@ -118,7 +117,7 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
 
                     // test for enough CPU in the pod
                     enoughCapacity =
-                        dataCenterAndPodHasEnoughCapacity(zoneId, podId, ((long)offering.getCpu() * offering.getSpeed()), Capacity.CAPACITY_TYPE_CPU, hostCandiates);
+                            dataCenterAndPodHasEnoughCapacity(zoneId, podId, ((long) offering.getCpu() * offering.getSpeed()), Capacity.CAPACITY_TYPE_CPU, hostCandiates);
                     if (!enoughCapacity) {
                         if (s_logger.isDebugEnabled()) {
                             s_logger.debug("Not enough cpu available in zone/pod to allocate storage for user VM (zone: " + zoneId + ", pod: " + podId + ")");
@@ -154,6 +153,21 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
             s_logger.debug("Found pod " + selectedPod.getName() + " in zone " + zone.getName());
             return new Pair<Pod, Long>(selectedPod, podHostCandidates.get(selectedPod.getId()));
         }
+    }
+
+    private boolean templateAvailableInPod(long templateId, long dcId, long podId) {
+        return true;
+        /*
+         * List<VMTemplateHostVO> thvoList = _templateHostDao.listByTemplateStatus(templateId, dcId, podId, Status.DOWNLOADED);
+         * List<VMTemplateStoragePoolVO> tpvoList = _templatePoolDao.listByTemplateStatus(templateId, dcId, podId,
+         * Status.DOWNLOADED);
+         *
+         * if (thvoList != null && thvoList.size() > 0) { if (s_logger.isDebugEnabled()) { s_logger.debug("Found " +
+         * thvoList.size() + " storage hosts in pod " + podId + " with template " + templateId); } return true; } else if
+         * (tpvoList != null && tpvoList.size() > 0) { if (s_logger.isDebugEnabled()) { s_logger.debug("Found " +
+         * tpvoList.size() + " storage pools in pod " + podId + " with template " + templateId); } return true; }else { return
+         * false; }
+         */
     }
 
     private boolean dataCenterAndPodHasEnoughCapacity(long dataCenterId, long podId, long capacityNeeded, short capacityType, long[] hostCandidate) {
@@ -192,47 +206,10 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
         return enoughCapacity;
     }
 
-    private boolean skipCalculation(VMInstanceVO vm) {
-        if (vm.getState() == State.Expunging) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Skip counting capacity for Expunging VM : " + vm.getInstanceName());
-            }
-            return true;
-        }
-
-        if (vm.getState() == State.Destroyed && vm.getType() != VirtualMachine.Type.User) {
-            return true;
-        }
-
-        if (vm.getState() == State.Stopped || vm.getState() == State.Destroyed) {
-            // for Stopped/Destroyed VMs, we will skip counting it if it hasn't
-            // been used for a while
-            int secondsToSkipVMs = _secondsToSkipStoppedVMs;
-
-            if (vm.getState() == State.Destroyed) {
-                secondsToSkipVMs = _secondsToSkipDestroyedVMs;
-            }
-
-            long millisecondsSinceLastUpdate = DateUtil.currentGMTTime().getTime() - vm.getUpdateTime().getTime();
-            if (millisecondsSinceLastUpdate > secondsToSkipVMs * 1000L) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Skip counting " + vm.getState().toString() + " vm " + vm.getInstanceName() + " in capacity allocation as it has been " +
-                        vm.getState().toString().toLowerCase() + " for " + millisecondsSinceLastUpdate / 60000 + " minutes");
-                }
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     /**
-     *
-     * @param hostId
-     *            Host id to calculate against
-     * @param capacityType
-     *            CapacityVO.CAPACITY_TYPE_MEMORY or
-     *            CapacityVO.CAPACITY_TYPE_CPU
+     * @param hostId       Host id to calculate against
+     * @param capacityType CapacityVO.CAPACITY_TYPE_MEMORY or
+     *                     CapacityVO.CAPACITY_TYPE_CPU
      * @return
      */
     private long calcHostAllocatedCpuMemoryCapacity(long hostId, short capacityType) {
@@ -278,29 +255,43 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
         return usedCapacity;
     }
 
-    private boolean templateAvailableInPod(long templateId, long dcId, long podId) {
-        return true;
-        /*
-         * List<VMTemplateHostVO> thvoList = _templateHostDao.listByTemplateStatus(templateId, dcId, podId, Status.DOWNLOADED);
-         * List<VMTemplateStoragePoolVO> tpvoList = _templatePoolDao.listByTemplateStatus(templateId, dcId, podId,
-         * Status.DOWNLOADED);
-         *
-         * if (thvoList != null && thvoList.size() > 0) { if (s_logger.isDebugEnabled()) { s_logger.debug("Found " +
-         * thvoList.size() + " storage hosts in pod " + podId + " with template " + templateId); } return true; } else if
-         * (tpvoList != null && tpvoList.size() > 0) { if (s_logger.isDebugEnabled()) { s_logger.debug("Found " +
-         * tpvoList.size() + " storage pools in pod " + podId + " with template " + templateId); } return true; }else { return
-         * false; }
-         */
+    private boolean skipCalculation(VMInstanceVO vm) {
+        if (vm.getState() == State.Expunging) {
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("Skip counting capacity for Expunging VM : " + vm.getInstanceName());
+            }
+            return true;
+        }
+
+        if (vm.getState() == State.Destroyed && vm.getType() != VirtualMachine.Type.User) {
+            return true;
+        }
+
+        if (vm.getState() == State.Stopped || vm.getState() == State.Destroyed) {
+            // for Stopped/Destroyed VMs, we will skip counting it if it hasn't
+            // been used for a while
+            int secondsToSkipVMs = _secondsToSkipStoppedVMs;
+
+            if (vm.getState() == State.Destroyed) {
+                secondsToSkipVMs = _secondsToSkipDestroyedVMs;
+            }
+
+            long millisecondsSinceLastUpdate = DateUtil.currentGMTTime().getTime() - vm.getUpdateTime().getTime();
+            if (millisecondsSinceLastUpdate > secondsToSkipVMs * 1000L) {
+                if (s_logger.isDebugEnabled()) {
+                    s_logger.debug("Skip counting " + vm.getState().toString() + " vm " + vm.getInstanceName() + " in capacity allocation as it has been " +
+                            vm.getState().toString().toLowerCase() + " for " + millisecondsSinceLastUpdate / 60000 + " minutes");
+                }
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
-    public boolean start() {
-        return true;
-    }
-
-    @Override
-    public boolean stop() {
-        return true;
+    public Pod allocateTo(VirtualMachineProfile vm, DataCenter dc, Set<? extends Pod> avoids) {
+        return null;
     }
 
     @Override
@@ -317,7 +308,12 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
     }
 
     @Override
-    public Pod allocateTo(VirtualMachineProfile vm, DataCenter dc, Set<? extends Pod> avoids) {
-        return null;
+    public boolean start() {
+        return true;
+    }
+
+    @Override
+    public boolean stop() {
+        return true;
     }
 }

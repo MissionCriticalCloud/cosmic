@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.user.loadbalancer;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.rules.FirewallRule;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -29,6 +28,7 @@ import org.apache.cloudstack.api.response.ApplicationLoadBalancerResponse;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.network.lb.ApplicationLoadBalancerRule;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,34 +45,9 @@ public class UpdateApplicationLoadBalancerCmd extends BaseAsyncCustomIdCmd {
     @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = FirewallRuleResponse.class, required = true, description = "the ID of the load balancer")
     private Long id;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4" +
+            ".4", authorized = {RoleType.Admin})
     private Boolean display;
-
-    /////////////////////////////////////////////////////
-    /////////////////// Accessors ///////////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Boolean getDisplay() {
-        return display;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        ApplicationLoadBalancerRule lb = _entityMgr.findById(ApplicationLoadBalancerRule.class, getId());
-        if (lb != null) {
-            return lb.getAccountId();
-        } else {
-            throw new InvalidParameterValueException("Can't find load balancer by ID specified");
-        }
-    }
 
     @Override
     public String getEventType() {
@@ -84,6 +59,9 @@ public class UpdateApplicationLoadBalancerCmd extends BaseAsyncCustomIdCmd {
         return "updating load balancer: " + getId();
     }
 
+    public Long getId() {
+        return id;
+    }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
@@ -91,10 +69,32 @@ public class UpdateApplicationLoadBalancerCmd extends BaseAsyncCustomIdCmd {
     @Override
     public void execute() {
         CallContext.current().setEventDetails("Load balancer ID: " + getId());
-        ApplicationLoadBalancerRule rule = _appLbService.updateApplicationLoadBalancer(getId(), this.getCustomId(), getDisplay());
-        ApplicationLoadBalancerResponse lbResponse = _responseGenerator.createLoadBalancerContainerReponse(rule, _lbService.getLbInstances(getId()));
+        final ApplicationLoadBalancerRule rule = _appLbService.updateApplicationLoadBalancer(getId(), this.getCustomId(), getDisplay());
+        final ApplicationLoadBalancerResponse lbResponse = _responseGenerator.createLoadBalancerContainerReponse(rule, _lbService.getLbInstances(getId()));
         setResponseObject(lbResponse);
         lbResponse.setResponseName(getCommandName());
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////////// Accessors ///////////////////////
+    /////////////////////////////////////////////////////
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final ApplicationLoadBalancerRule lb = _entityMgr.findById(ApplicationLoadBalancerRule.class, getId());
+        if (lb != null) {
+            return lb.getAccountId();
+        } else {
+            throw new InvalidParameterValueException("Can't find load balancer by ID specified");
+        }
+    }
+
+    public Boolean getDisplay() {
+        return display;
     }
 
     @Override

@@ -16,16 +16,15 @@
 // under the License.
 package com.cloud.consoleproxy;
 
+import com.cloud.utils.component.AdapterBase;
+import com.cloud.vm.ConsoleProxy;
+
+import javax.naming.ConfigurationException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
-import com.cloud.utils.component.AdapterBase;
-import com.cloud.vm.ConsoleProxy;
 
 public class ConsoleProxyBalanceAllocator extends AdapterBase implements ConsoleProxyAllocator {
 
@@ -40,16 +39,18 @@ public class ConsoleProxyBalanceAllocator extends AdapterBase implements Console
                 Integer loadOfY = loadInfo.get(y.getId());
 
                 if (loadOfX != null && loadOfY != null) {
-                    if (loadOfX < loadOfY)
+                    if (loadOfX < loadOfY) {
                         return -1;
-                    else if (loadOfX > loadOfY)
+                    } else if (loadOfX > loadOfY) {
                         return 1;
+                    }
                     return 0;
                 } else if (loadOfX == null && loadOfY == null) {
                     return 0;
                 } else {
-                    if (loadOfX == null)
+                    if (loadOfX == null) {
                         return -1;
+                    }
                     return 1;
                 }
             }

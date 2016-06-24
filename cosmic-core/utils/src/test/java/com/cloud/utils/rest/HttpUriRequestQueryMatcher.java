@@ -29,16 +29,16 @@ import org.hamcrest.Matcher;
 
 public class HttpUriRequestQueryMatcher extends FeatureMatcher<HttpUriRequest, String> {
 
+    public HttpUriRequestQueryMatcher(final Matcher<? super String> subMatcher, final String featureDescription, final String featureName) {
+        super(subMatcher, featureDescription, featureName);
+    }
+
     public static HttpUriRequest aQuery(final String query) {
         return argThat(new HttpUriRequestQueryMatcher(equalTo(query), "query", "query"));
     }
 
     public static HttpUriRequest aQueryThatContains(final String query) {
         return argThat(new HttpUriRequestQueryMatcher(containsString(query), "query", "query"));
-    }
-
-    public HttpUriRequestQueryMatcher(final Matcher<? super String> subMatcher, final String featureDescription, final String featureName) {
-        super(subMatcher, featureDescription, featureName);
     }
 
     @Override

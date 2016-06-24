@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.user;
 
-import java.util.Map;
-
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Map;
 
 public interface AccountDetailsDao extends GenericDao<AccountDetailVO, Long> {
     Map<String, String> findDetails(long accountId);

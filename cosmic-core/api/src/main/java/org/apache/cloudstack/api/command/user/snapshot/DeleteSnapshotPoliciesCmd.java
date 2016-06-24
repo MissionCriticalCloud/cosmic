@@ -16,10 +16,7 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.snapshot;
 
-import java.util.List;
-
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -28,6 +25,9 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.SnapshotPolicyResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,10 +46,10 @@ public class DeleteSnapshotPoliciesCmd extends BaseCmd {
     private Long id;
 
     @Parameter(name = ApiConstants.IDS,
-               type = CommandType.LIST,
-               collectionType = CommandType.UUID,
-               entityType = SnapshotPolicyResponse.class,
-               description = "list of snapshots policy IDs separated by comma")
+            type = CommandType.LIST,
+            collectionType = CommandType.UUID,
+            entityType = SnapshotPolicyResponse.class,
+            description = "list of snapshots policy IDs separated by comma")
     private List<Long> ids;
 
     /////////////////////////////////////////////////////
@@ -69,16 +69,6 @@ public class DeleteSnapshotPoliciesCmd extends BaseCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
     public void execute() {
         boolean result = _snapshotService.deleteSnapshotPolicies(this);
         if (result) {
@@ -87,5 +77,15 @@ public class DeleteSnapshotPoliciesCmd extends BaseCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete snapshot policy");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

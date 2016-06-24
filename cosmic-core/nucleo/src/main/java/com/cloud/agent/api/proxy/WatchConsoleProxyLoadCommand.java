@@ -23,11 +23,11 @@ import com.cloud.agent.api.CronCommand;
 
 public class WatchConsoleProxyLoadCommand extends ProxyCommand implements CronCommand {
 
+    int interval;
     private long proxyVmId;
     private String proxyVmName;
     private String proxyManagementIp;
     private int proxyCmdPort;
-    int interval;
 
     public WatchConsoleProxyLoadCommand(int interval, long proxyVmId, String proxyVmName, String proxyManagementIp, int proxyCmdPort) {
         this.interval = interval;

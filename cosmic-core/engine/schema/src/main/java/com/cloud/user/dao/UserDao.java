@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.user.dao;
 
-import java.util.List;
-
 import com.cloud.user.UserVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 /*
  * Data Access Object for user table
@@ -37,6 +37,7 @@ public interface UserDao extends GenericDao<UserVO, Long> {
 
     /**
      * Finds a user based on the secret key provided.
+     *
      * @param secretKey
      * @return
      */
@@ -44,11 +45,11 @@ public interface UserDao extends GenericDao<UserVO, Long> {
 
     /**
      * Finds a user based on the registration token provided.
+     *
      * @param registrationToken
      * @return
      */
     UserVO findUserByRegistrationToken(String registrationToken);
 
     List<UserVO> findUsersByName(String username);
-
 }

@@ -16,15 +16,15 @@
 // under the License.
 package com.cloud.consoleproxy.vnc.packet.server;
 
+import com.cloud.consoleproxy.util.Logger;
+import com.cloud.consoleproxy.vnc.VncScreenDescription;
+
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferInt;
 import java.io.DataInputStream;
 import java.io.IOException;
-
-import com.cloud.consoleproxy.util.Logger;
-import com.cloud.consoleproxy.vnc.VncScreenDescription;
 
 public class RawRect extends AbstractRect {
     private static final Logger s_logger = Logger.getLogger(RawRect.class);
@@ -42,7 +42,6 @@ public class RawRect extends AbstractRect {
         for (int i = 0, j = 0; i < size; i++, j += 4) {
             buf[i] = (bbuf[j + 0] & 0xFF) | ((bbuf[j + 1] & 0xFF) << 8) | ((bbuf[j + 2] & 0xFF) << 16) | ((bbuf[j + 3] & 0xFF) << 24);
         }
-
     }
 
     @Override
@@ -52,28 +51,28 @@ public class RawRect extends AbstractRect {
 
         switch (dataBuf.getDataType()) {
 
-        case DataBuffer.TYPE_INT: {
-            // We chose RGB888 model, so Raster will use DataBufferInt type
-            DataBufferInt dataBuffer = (DataBufferInt)dataBuf;
+            case DataBuffer.TYPE_INT: {
+                // We chose RGB888 model, so Raster will use DataBufferInt type
+                DataBufferInt dataBuffer = (DataBufferInt) dataBuf;
 
-            int imageWidth = image.getWidth();
-            int imageHeight = image.getHeight();
+                int imageWidth = image.getWidth();
+                int imageHeight = image.getHeight();
 
-            // Paint rectangle directly on buffer, line by line
-            int[] imageBuffer = dataBuffer.getData();
-            for (int srcLine = 0, dstLine = y; srcLine < height && dstLine < imageHeight; srcLine++, dstLine++) {
-                try {
-                    System.arraycopy(buf, srcLine * width, imageBuffer, x + dstLine * imageWidth, width);
-                } catch (IndexOutOfBoundsException e) {
-                    s_logger.info("[ignored] buffer overflow!?!", e);
+                // Paint rectangle directly on buffer, line by line
+                int[] imageBuffer = dataBuffer.getData();
+                for (int srcLine = 0, dstLine = y; srcLine < height && dstLine < imageHeight; srcLine++, dstLine++) {
+                    try {
+                        System.arraycopy(buf, srcLine * width, imageBuffer, x + dstLine * imageWidth, width);
+                    } catch (IndexOutOfBoundsException e) {
+                        s_logger.info("[ignored] buffer overflow!?!", e);
+                    }
                 }
+                break;
             }
-            break;
-        }
 
-        default:
-            throw new RuntimeException("Unsupported data buffer in buffered image: expected data buffer of type int (DataBufferInt). Actual data buffer type: " +
-                    dataBuf.getClass().getSimpleName());
+            default:
+                throw new RuntimeException("Unsupported data buffer in buffered image: expected data buffer of type int (DataBufferInt). Actual data buffer type: " +
+                        dataBuf.getClass().getSimpleName());
         }
     }
 }

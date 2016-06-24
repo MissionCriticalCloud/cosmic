@@ -34,5 +34,4 @@ public class RebootRouterCommand extends RebootCommand {
     public String getPrivateIpAddress() {
         return privateIp;
     }
-
 }

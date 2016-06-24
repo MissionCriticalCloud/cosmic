@@ -38,5 +38,4 @@ public class NiciraConstants {
     public static final String WILDCARD_QUERY_PARAMETER = "*";
     public static final String UUID_QUERY_PARAMETER = "uuid";
     public static final String FIELDS_QUERY_PARAMETER = "fields";
-
 }

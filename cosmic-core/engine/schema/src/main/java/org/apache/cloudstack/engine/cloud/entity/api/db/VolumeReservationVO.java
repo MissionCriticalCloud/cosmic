@@ -16,14 +16,14 @@
 // under the License.
 package org.apache.cloudstack.engine.cloud.entity.api.db;
 
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = "volume_reservation")
@@ -80,5 +80,4 @@ public class VolumeReservationVO implements InternalIdentity {
     public Long getPoolId() {
         return poolId;
     }
-
 }

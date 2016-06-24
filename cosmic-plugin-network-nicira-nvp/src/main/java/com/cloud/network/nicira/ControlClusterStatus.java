@@ -87,18 +87,17 @@ public class ControlClusterStatus {
         public int getActiveCount() {
             return activeCount;
         }
-
     }
 
     public class ClusterRoleConfig {
         public String majorityVersion;
         public String role;
 
-        public String getMajorityVersion(){
+        public String getMajorityVersion() {
             return majorityVersion;
         }
 
-        public String getRole(){
+        public String getRole() {
             return role;
         }
     }

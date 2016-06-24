@@ -17,7 +17,7 @@
 
 package org.apache.cloudstack.framework.jobs.impl;
 
-import java.util.Date;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,8 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "sync_queue")
@@ -63,6 +62,20 @@ public class SyncQueueVO implements InternalIdentity {
     private long queueSizeLimit = 0;
 
     @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("SyncQueueVO {id:").append(getId());
+        sb.append(", syncObjType: ").append(getSyncObjType());
+        sb.append(", syncObjId: ").append(getSyncObjId());
+        sb.append(", lastProcessNumber: ").append(getLastProcessNumber());
+        sb.append(", lastUpdated: ").append(getLastUpdated());
+        sb.append(", created: ").append(getCreated());
+        sb.append(", count: ").append(getQueueSize());
+        sb.append("}");
+        return sb.toString();
+    }
+
+    @Override
     public long getId() {
         return id;
     }
@@ -91,6 +104,10 @@ public class SyncQueueVO implements InternalIdentity {
         lastProcessNumber = number;
     }
 
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
     public Date getCreated() {
         return created;
     }
@@ -99,34 +116,16 @@ public class SyncQueueVO implements InternalIdentity {
         this.created = created;
     }
 
-    public Date getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(Date lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
-
-    @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("SyncQueueVO {id:").append(getId());
-        sb.append(", syncObjType: ").append(getSyncObjType());
-        sb.append(", syncObjId: ").append(getSyncObjId());
-        sb.append(", lastProcessNumber: ").append(getLastProcessNumber());
-        sb.append(", lastUpdated: ").append(getLastUpdated());
-        sb.append(", created: ").append(getCreated());
-        sb.append(", count: ").append(getQueueSize());
-        sb.append("}");
-        return sb.toString();
-    }
-
     public long getQueueSize() {
         return queueSize;
     }
 
     public void setQueueSize(long queueSize) {
         this.queueSize = queueSize;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 
     public long getQueueSizeLimit() {

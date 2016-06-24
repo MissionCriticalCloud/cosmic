@@ -16,19 +16,18 @@
 // under the License.
 package org.apache.cloudstack.engine.cloud.entity.api.db.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-
 import org.apache.cloudstack.engine.cloud.entity.api.db.VMNetworkMapVO;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -53,7 +52,6 @@ public class VMNetworkMapDaoImpl extends GenericDaoBase<VMNetworkMapVO, Long> im
         VmNetworkSearch.and("vmId", VmNetworkSearch.entity().getVmId(), SearchCriteria.Op.EQ);
         VmNetworkSearch.and("networkId", VmNetworkSearch.entity().getNetworkId(), SearchCriteria.Op.EQ);
         VmNetworkSearch.done();
-
     }
 
     @Override

@@ -29,6 +29,10 @@ public class TemplateProp {
 
     }
 
+    public TemplateProp(String templateName, String installPath, boolean isPublic, boolean isCorrupted) {
+        this(templateName, installPath, 0, 0, isPublic, isCorrupted);
+    }
+
     public TemplateProp(String templateName, String installPath, long size, long physicalSize, boolean isPublic, boolean isCorrupted) {
         this.templateName = templateName;
         this.installPath = installPath;
@@ -36,10 +40,6 @@ public class TemplateProp {
         this.physicalSize = physicalSize;
         this.isPublic = isPublic;
         this.isCorrupted = isCorrupted;
-    }
-
-    public TemplateProp(String templateName, String installPath, boolean isPublic, boolean isCorrupted) {
-        this(templateName, installPath, 0, 0, isPublic, isCorrupted);
     }
 
     public long getId() {
@@ -54,6 +54,10 @@ public class TemplateProp {
         return installPath;
     }
 
+    public void setInstallPath(String installPath) {
+        this.installPath = installPath;
+    }
+
     public boolean isPublic() {
         return isPublic;
     }
@@ -62,20 +66,15 @@ public class TemplateProp {
         return isCorrupted;
     }
 
-    public void setInstallPath(String installPath) {
-        this.installPath = installPath;
-    }
-
     public long getSize() {
         return size;
-    }
-
-    public long getPhysicalSize() {
-        return physicalSize;
     }
 
     public void setSize(long size) {
         this.size = size;
     }
 
+    public long getPhysicalSize() {
+        return physicalSize;
+    }
 }

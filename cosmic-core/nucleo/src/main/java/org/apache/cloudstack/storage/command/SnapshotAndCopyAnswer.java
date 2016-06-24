@@ -31,11 +31,11 @@ public class SnapshotAndCopyAnswer extends Answer {
         super(null, false, errMsg);
     }
 
-    public void setPath(String path) {
-        _path = path;
-    }
-
     public String getPath() {
         return _path;
+    }
+
+    public void setPath(String path) {
+        _path = path;
     }
 }

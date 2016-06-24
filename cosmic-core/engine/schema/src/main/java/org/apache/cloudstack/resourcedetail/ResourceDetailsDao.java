@@ -16,16 +16,16 @@
 // under the License.
 package org.apache.cloudstack.resourcedetail;
 
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.ResourceDetail;
+
 import java.util.List;
 import java.util.Map;
-
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.ResourceDetail;
 
 public interface ResourceDetailsDao<R extends ResourceDetail> extends GenericDao<R, Long> {
     /**
      * Finds detail by resourceId and key
+     *
      * @param resourceId
      * @param name
      * @return
@@ -34,6 +34,7 @@ public interface ResourceDetailsDao<R extends ResourceDetail> extends GenericDao
 
     /**
      * Find details by key,value pair
+     *
      * @param key
      * @param value
      * @param display
@@ -43,12 +44,14 @@ public interface ResourceDetailsDao<R extends ResourceDetail> extends GenericDao
 
     /**
      * Removes all details for the resource specified
+     *
      * @param resourceId
      */
     public void removeDetails(long resourceId);
 
     /**
      * Removes detail having resourceId and key specified (unique combination)
+     *
      * @param resourceId
      * @param key
      */
@@ -56,6 +59,7 @@ public interface ResourceDetailsDao<R extends ResourceDetail> extends GenericDao
 
     /**
      * Lists all details for the resourceId
+     *
      * @param resourceId
      * @return list of details each implementing ResourceDetail interface
      */
@@ -63,6 +67,7 @@ public interface ResourceDetailsDao<R extends ResourceDetail> extends GenericDao
 
     /**
      * List details for resourceId having display field = forDisplay value passed in
+     *
      * @param resourceId
      * @param forDisplay
      * @return
@@ -76,5 +81,4 @@ public interface ResourceDetailsDao<R extends ResourceDetail> extends GenericDao
     public void saveDetails(List<R> details);
 
     public void addDetail(long resourceId, String key, String value, boolean display);
-
 }

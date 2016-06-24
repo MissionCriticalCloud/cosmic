@@ -29,5 +29,4 @@ public interface ManagedContext {
     public void runWithContext(Runnable run);
 
     public <T> T callWithContext(Callable<T> callable) throws Exception;
-
 }

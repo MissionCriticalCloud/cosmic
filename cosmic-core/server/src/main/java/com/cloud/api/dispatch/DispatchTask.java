@@ -17,9 +17,9 @@
 
 package com.cloud.api.dispatch;
 
-import java.util.Map;
-
 import org.apache.cloudstack.api.BaseCmd;
+
+import java.util.Map;
 
 /**
  * This class wraps all the data that any worker could need. If we don't wrap it this

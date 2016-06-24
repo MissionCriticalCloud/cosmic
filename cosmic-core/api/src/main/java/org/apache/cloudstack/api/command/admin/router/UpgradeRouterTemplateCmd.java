@@ -16,13 +16,10 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.router;
 
-import java.util.List;
-
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -38,6 +35,9 @@ import org.apache.cloudstack.api.response.PodResponse;
 import org.apache.cloudstack.api.response.UpgradeRouterTemplateResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,9 +55,9 @@ public class UpgradeRouterTemplateCmd extends org.apache.cloudstack.api.BaseCmd 
     private Long id;
 
     @Parameter(name = ApiConstants.CLUSTER_ID,
-               type = CommandType.UUID,
-               entityType = ClusterResponse.class,
-               description = "upgrades all routers within the specified cluster")
+            type = CommandType.UUID,
+            entityType = ClusterResponse.class,
+            description = "upgrades all routers within the specified cluster")
     private Long clusterId;
 
     @Parameter(name = ApiConstants.POD_ID, type = CommandType.UUID, entityType = PodResponse.class, description = "upgrades all routers within the specified pod")
@@ -66,23 +66,19 @@ public class UpgradeRouterTemplateCmd extends org.apache.cloudstack.api.BaseCmd 
     @Parameter(name = ApiConstants.ZONE_ID, type = CommandType.UUID, entityType = ZoneResponse.class, description = "upgrades all routers within the specified zone")
     private Long zoneId;
 
-    @Parameter(name=ApiConstants.ACCOUNT, type=CommandType.STRING,
-            description="upgrades all routers owned by the specified account")
+    @Parameter(name = ApiConstants.ACCOUNT, type = CommandType.STRING,
+            description = "upgrades all routers owned by the specified account")
     private String account;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               description = "upgrades all routers owned by the specified domain")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            description = "upgrades all routers owned by the specified domain")
     private Long domainId;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public Long getId() {
-        return id;
-    }
 
     public Long getClusterId() {
         return clusterId;
@@ -104,26 +100,20 @@ public class UpgradeRouterTemplateCmd extends org.apache.cloudstack.api.BaseCmd 
         return domainId;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
-
     public ApiCommandJobType getInstanceType() {
         return ApiCommandJobType.DomainRouter;
     }
 
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
     public Long getInstanceId() {
         return getId();
+    }
+
+    public Long getId() {
+        return id;
     }
 
     @Override
@@ -137,5 +127,15 @@ public class UpgradeRouterTemplateCmd extends org.apache.cloudstack.api.BaseCmd 
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to upgrade router template");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 }

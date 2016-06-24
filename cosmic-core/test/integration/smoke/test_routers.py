@@ -17,15 +17,12 @@
 """ BVT tests for routers
 """
 # Import Local Modules
-from marvin.codes import FAILED
-from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.cloudstackAPI import (stopRouter,
                                   restartNetwork,
                                   startRouter,
                                   rebootRouter)
-from marvin.lib.utils import (cleanup_resources,
-                              get_process_status,
-                              get_host_credentials)
+from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import FAILED
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              VirtualMachine)
@@ -37,16 +34,18 @@ from marvin.lib.common import (get_domain,
                                list_networks,
                                list_zones,
                                list_vlan_ipranges)
+from marvin.lib.utils import (cleanup_resources,
+                              get_process_status,
+                              get_host_credentials)
 from nose.plugins.attrib import attr
+
 # Import System modules
 import time
-
 
 _multiprocess_shared_ = True
 
 
 class TestRouterServices(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
 
@@ -747,8 +746,8 @@ class TestRouterServices(cloudstackTestCase):
 
     def verifyRouterResponse(self, router_response, ip):
         if (router_response) and (isinstance(router_response, list)) and \
-           (router_response[0].state == "Running") and \
-           (router_response[0].publicip == ip):
+                (router_response[0].state == "Running") and \
+                (router_response[0].publicip == ip):
             return True
         return False
 

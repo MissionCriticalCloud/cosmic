@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.vm;
 
-import java.net.URI;
-
 import com.cloud.network.Network;
+
+import java.net.URI;
 
 public class VmWorkRemoveVmFromNetwork extends VmWork {
     private static final long serialVersionUID = -5070392905642149925L;

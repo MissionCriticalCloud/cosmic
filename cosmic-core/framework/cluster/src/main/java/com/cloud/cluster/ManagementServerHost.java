@@ -19,10 +19,6 @@ package com.cloud.cluster;
 public interface ManagementServerHost {
     long getId();
 
-    public static enum State {
-        Up, Starting, Down
-    };
-
     long getMsid();
 
     State getState();
@@ -30,4 +26,8 @@ public interface ManagementServerHost {
     String getVersion();
 
     String getServiceIP();
+
+    public static enum State {
+        Up, Starting, Down
+    }
 }

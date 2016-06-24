@@ -16,22 +16,20 @@
 // under the License.
 package com.cloud.utils.db;
 
-import java.lang.reflect.Field;
-
-import javax.persistence.Column;
-
 import com.cloud.utils.Pair;
 import com.cloud.utils.ReflectUtil;
 
+import javax.persistence.Column;
+import java.lang.reflect.Field;
+
 /**
- *  Try to use static initialization to help you in finding incorrect
- *  field names being passed in early.
- *
- *  Something like the following:
- *  protected static final Filter s_NameFilter = new Filter(VMInstanceVO, name, true, null, null);
- *
- *  Filter nameFilter = new Filter(s_nameFilter);
- *
+ * Try to use static initialization to help you in finding incorrect
+ * field names being passed in early.
+ * <p>
+ * Something like the following:
+ * protected static final Filter s_NameFilter = new Filter(VMInstanceVO, name, true, null, null);
+ * <p>
+ * Filter nameFilter = new Filter(s_nameFilter);
  */
 public class Filter {
     Long _offset;
@@ -39,8 +37,8 @@ public class Filter {
     String _orderBy;
 
     /**
-     * @param clazz the VO object type
-     * @param field name of the field
+     * @param clazz  the VO object type
+     * @param field  name of the field
      * @param offset
      * @param limit
      */
@@ -49,20 +47,6 @@ public class Filter {
         _limit = limit;
 
         addOrderBy(clazz, field, ascending);
-    }
-
-    public Filter(long limit) {
-        _orderBy = " ORDER BY RAND() LIMIT " + limit;
-    }
-
-    /**
-     * Note that this copy constructor does not copy offset and limit.
-     * @param that filter
-     */
-    public Filter(Filter that) {
-        this._orderBy = that._orderBy;
-        this._limit = null;
-        that._limit = null;
     }
 
     public void addOrderBy(Class<?> clazz, String field, boolean ascending) {
@@ -93,16 +77,31 @@ public class Filter {
         }
     }
 
+    public Filter(long limit) {
+        _orderBy = " ORDER BY RAND() LIMIT " + limit;
+    }
+
+    /**
+     * Note that this copy constructor does not copy offset and limit.
+     *
+     * @param that filter
+     */
+    public Filter(Filter that) {
+        this._orderBy = that._orderBy;
+        this._limit = null;
+        that._limit = null;
+    }
+
     public String getOrderBy() {
         return _orderBy;
     }
 
-    public void setOffset(Long offset) {
-        _offset = offset;
-    }
-
     public Long getOffset() {
         return _offset;
+    }
+
+    public void setOffset(Long offset) {
+        _offset = offset;
     }
 
     public Long getLimit() {

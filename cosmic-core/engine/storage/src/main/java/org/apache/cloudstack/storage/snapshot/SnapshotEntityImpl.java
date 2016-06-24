@@ -16,15 +16,14 @@
 // under the License.
 package org.apache.cloudstack.storage.snapshot;
 
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.storage.Snapshot;
+import org.apache.cloudstack.engine.cloud.entity.api.SnapshotEntity;
+
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.storage.Snapshot;
-
-import org.apache.cloudstack.engine.cloud.entity.api.SnapshotEntity;
 
 public class SnapshotEntityImpl implements SnapshotEntity {
 
@@ -71,6 +70,30 @@ public class SnapshotEntityImpl implements SnapshotEntity {
     }
 
     @Override
+    public Map<String, String> getDetails() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void addDetail(String name, String value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void delDetail(String name, String value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void updateDetail(String name, String value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
     public List<Method> getApplicableActions() {
         // TODO Auto-generated method stub
         return null;
@@ -96,6 +119,18 @@ public class SnapshotEntityImpl implements SnapshotEntity {
 
     @Override
     public Date getCreated() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Type getRecurringType() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public State getState() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -146,42 +181,6 @@ public class SnapshotEntityImpl implements SnapshotEntity {
     public void destroy() {
         // TODO Auto-generated method stub
 
-    }
-
-    @Override
-    public Map<String, String> getDetails() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void addDetail(String name, String value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void delDetail(String name, String value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void updateDetail(String name, String value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public State getState() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Type getRecurringType() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

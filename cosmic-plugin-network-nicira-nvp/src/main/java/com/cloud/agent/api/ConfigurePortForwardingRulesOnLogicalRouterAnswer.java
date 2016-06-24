@@ -31,5 +31,4 @@ public class ConfigurePortForwardingRulesOnLogicalRouterAnswer extends Answer {
     public ConfigurePortForwardingRulesOnLogicalRouterAnswer(final Command command, final Exception e) {
         super(command, e);
     }
-
 }

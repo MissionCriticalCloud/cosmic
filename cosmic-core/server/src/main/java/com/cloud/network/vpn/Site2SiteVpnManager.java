@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.network.vpn;
 
-import java.util.List;
-
 import com.cloud.network.dao.Site2SiteVpnConnectionVO;
 import com.cloud.vm.DomainRouterVO;
+
+import java.util.List;
 
 public interface Site2SiteVpnManager extends Site2SiteVpnService {
     boolean cleanupVpnConnectionByVpc(long vpcId);

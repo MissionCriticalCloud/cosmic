@@ -16,8 +16,6 @@
 // under the License.
 package org.apache.cloudstack.region;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,6 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.Date;
 
 @Entity
 @Table(name = "portable_ip_address")
@@ -38,32 +37,23 @@ public class PortableIpVO implements PortableIp {
 
     @Column(name = "region_id")
     int regionId;
-
+    @Column(name = "vlan")
+    String vlan;
+    @Column(name = "gateway")
+    String gateway;
+    @Column(name = "netmask")
+    String netmask;
+    @Column(name = "portable_ip_address")
+    String address;
     @Column(name = "allocated")
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date allocatedTime;
-
     @Column(name = "account_id")
     private Long allocatedToAccountId = null;
-
     @Column(name = "domain_id")
     private Long allocatedInDomainId = null;
-
     @Column(name = "state")
     private State state;
-
-    @Column(name = "vlan")
-    String vlan;
-
-    @Column(name = "gateway")
-    String gateway;
-
-    @Column(name = "netmask")
-    String netmask;
-
-    @Column(name = "portable_ip_address")
-    String address;
-
     @Column(name = "portable_ip_range_id")
     private long rangeId;
 

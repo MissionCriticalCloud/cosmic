@@ -25,6 +25,7 @@ import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.UserVmResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,9 +44,9 @@ public class ListAffinityGroupsCmd extends BaseListProjectAndAccountResourcesCmd
     private String affinityGroupName;
 
     @Parameter(name = ApiConstants.VIRTUAL_MACHINE_ID,
-               type = CommandType.UUID,
-               description = "lists affinity groups by virtual machine ID",
-               entityType = UserVmResponse.class)
+            type = CommandType.UUID,
+            description = "lists affinity groups by virtual machine ID",
+            entityType = UserVmResponse.class)
     private Long virtualMachineId;
 
     @Parameter(name = ApiConstants.ID, type = CommandType.UUID, description = "list the affinity group by the ID provided", entityType = AffinityGroupResponse.class)
@@ -78,15 +79,15 @@ public class ListAffinityGroupsCmd extends BaseListProjectAndAccountResourcesCmd
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
         ListResponse<AffinityGroupResponse> response = _queryService.searchForAffinityGroups(this);
         response.setResponseName(getCommandName());
         setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 
     @Override

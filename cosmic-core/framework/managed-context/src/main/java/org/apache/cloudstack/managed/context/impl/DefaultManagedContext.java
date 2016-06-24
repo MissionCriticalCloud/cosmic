@@ -18,15 +18,16 @@
  */
 package org.apache.cloudstack.managed.context.impl;
 
+import org.apache.cloudstack.managed.context.ManagedContext;
+import org.apache.cloudstack.managed.context.ManagedContextListener;
+import org.apache.cloudstack.managed.context.ManagedContextUtils;
+import org.apache.cloudstack.managed.threadlocal.ManagedThreadLocal;
+
 import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.cloudstack.managed.context.ManagedContext;
-import org.apache.cloudstack.managed.context.ManagedContextListener;
-import org.apache.cloudstack.managed.context.ManagedContextUtils;
-import org.apache.cloudstack.managed.threadlocal.ManagedThreadLocal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +94,7 @@ public class DefaultManagedContext implements ManagedContext {
                 /* Stack data structure is used because in between onEnter and onLeave
                  * the listeners list could have changed
                  */
-                invocations.push(new ListenerInvocation((ManagedContextListener<Object>)listener, data));
+                invocations.push(new ListenerInvocation((ManagedContextListener<Object>) listener, data));
             }
 
             try {
@@ -122,15 +123,18 @@ public class DefaultManagedContext implements ManagedContext {
                 }
             }
         } finally {
-            if (ManagedContextUtils.clearOwner(owner))
+            if (ManagedContextUtils.clearOwner(owner)) {
                 ManagedThreadLocal.reset();
+            }
         }
-    };
+    }
+
+    ;
 
     protected void throwException(Throwable t) throws Exception {
         ManagedContextUtils.rethrowException(t);
         if (t instanceof Exception) {
-            throw (Exception)t;
+            throw (Exception) t;
         }
     }
 

@@ -30,15 +30,15 @@ public class Response extends Request {
     }
 
     public Response(Request request, Answer answer) {
-        this(request, new Answer[] {answer});
-    }
-
-    public Response(Request request, Answer answer, long mgmtId, long agentId) {
-        this(request, new Answer[] {answer}, mgmtId, agentId);
+        this(request, new Answer[]{answer});
     }
 
     public Response(Request request, Answer[] answers) {
         super(request, answers);
+    }
+
+    public Response(Request request, Answer answer, long mgmtId, long agentId) {
+        this(request, new Answer[]{answer}, mgmtId, agentId);
     }
 
     public Response(Request request, Answer[] answers, long mgmtId, long agentId) {
@@ -51,6 +51,10 @@ public class Response extends Request {
         super(ver, seq, agentId, mgmtId, via, flags, ans);
     }
 
+    public static Response parse(byte[] bytes) throws ClassNotFoundException, UnsupportedVersionException {
+        return (Response) Request.parse(bytes);
+    }
+
     public Answer getAnswer() {
         Answer[] answers = getAnswers();
         return answers[0];
@@ -60,15 +64,11 @@ public class Response extends Request {
         if (_cmds == null) {
             _cmds = s_gson.fromJson(_content, Answer[].class);
         }
-        return (Answer[])_cmds;
+        return (Answer[]) _cmds;
     }
 
     @Override
     protected String getType() {
         return "Ans: ";
-    }
-
-    public static Response parse(byte[] bytes) throws ClassNotFoundException, UnsupportedVersionException {
-        return (Response)Request.parse(bytes);
     }
 }

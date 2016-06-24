@@ -22,6 +22,9 @@ import org.apache.cloudstack.api.command.admin.region.AddRegionCmd;
 import org.apache.cloudstack.api.response.RegionResponse;
 import org.apache.cloudstack.region.Region;
 import org.apache.cloudstack.region.RegionService;
+
+import junit.framework.Assert;
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,16 +32,12 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 public class RegionCmdTest extends TestCase {
-
-    private AddRegionCmd addRegionCmd;
-    private ResponseGenerator responseGenerator;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+    private AddRegionCmd addRegionCmd;
+    private ResponseGenerator responseGenerator;
 
     @Override
     @Before
@@ -55,7 +54,6 @@ public class RegionCmdTest extends TestCase {
             public String getRegionName() {
                 return "APAC";
             }
-
         };
     }
 
@@ -76,7 +74,6 @@ public class RegionCmdTest extends TestCase {
 
         addRegionCmd._responseGenerator = responseGenerator;
         addRegionCmd.execute();
-
     }
 
     @Test
@@ -94,7 +91,5 @@ public class RegionCmdTest extends TestCase {
         } catch (ServerApiException exception) {
             Assert.assertEquals("Failed to add Region", exception.getDescription());
         }
-
     }
-
 }

@@ -42,5 +42,4 @@ public interface HealthCheckPolicy extends InternalIdentity, Identity, Displayab
 
     @Override
     boolean isDisplay();
-
 }

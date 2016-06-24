@@ -64,56 +64,73 @@ public class SourceNatRule extends NatRule {
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (!super.equals(obj))
+        }
+        if (!super.equals(obj)) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        SourceNatRule other = (SourceNatRule)obj;
+        }
+        final SourceNatRule other = (SourceNatRule) obj;
         if (toSourceIpAddressMax == null) {
-            if (other.toSourceIpAddressMax != null)
+            if (other.toSourceIpAddressMax != null) {
                 return false;
-        } else if (!toSourceIpAddressMax.equals(other.toSourceIpAddressMax))
+            }
+        } else if (!toSourceIpAddressMax.equals(other.toSourceIpAddressMax)) {
             return false;
+        }
         if (toSourceIpAddressMin == null) {
-            if (other.toSourceIpAddressMin != null)
+            if (other.toSourceIpAddressMin != null) {
                 return false;
-        } else if (!toSourceIpAddressMin.equals(other.toSourceIpAddressMin))
+            }
+        } else if (!toSourceIpAddressMin.equals(other.toSourceIpAddressMin)) {
             return false;
+        }
         if (toSourcePort == null) {
-            if (other.toSourcePort != null)
+            if (other.toSourcePort != null) {
                 return false;
-        } else if (!toSourcePort.equals(other.toSourcePort))
+            }
+        } else if (!toSourcePort.equals(other.toSourcePort)) {
             return false;
+        }
         return true;
     }
 
     @Override
     public boolean equalsIgnoreUuid(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (!super.equalsIgnoreUuid(obj))
+        }
+        if (!super.equalsIgnoreUuid(obj)) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        SourceNatRule other = (SourceNatRule)obj;
+        }
+        final SourceNatRule other = (SourceNatRule) obj;
         if (toSourceIpAddressMax == null) {
-            if (other.toSourceIpAddressMax != null)
+            if (other.toSourceIpAddressMax != null) {
                 return false;
-        } else if (!toSourceIpAddressMax.equals(other.toSourceIpAddressMax))
+            }
+        } else if (!toSourceIpAddressMax.equals(other.toSourceIpAddressMax)) {
             return false;
+        }
         if (toSourceIpAddressMin == null) {
-            if (other.toSourceIpAddressMin != null)
+            if (other.toSourceIpAddressMin != null) {
                 return false;
-        } else if (!toSourceIpAddressMin.equals(other.toSourceIpAddressMin))
+            }
+        } else if (!toSourceIpAddressMin.equals(other.toSourceIpAddressMin)) {
             return false;
+        }
         if (toSourcePort == null) {
-            if (other.toSourcePort != null)
+            if (other.toSourcePort != null) {
                 return false;
-        } else if (!toSourcePort.equals(other.toSourcePort))
+            }
+        } else if (!toSourcePort.equals(other.toSourcePort)) {
             return false;
+        }
         return true;
     }
-
 }

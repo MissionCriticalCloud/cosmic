@@ -53,21 +53,22 @@ class LinkDomainToLdapCmdSpec extends Specification {
     }
 
     def "test invalid params"() {
-        _ldapManager.linkDomainToLdap(_,_,_,_) >> {throw new InvalidParameterValueException("invalid param")}
+        _ldapManager.linkDomainToLdap(_, _, _, _) >> { throw new InvalidParameterValueException("invalid param") }
         when:
-            linkDomainToLdapCmd.execute();
+        linkDomainToLdapCmd.execute();
         then:
-            thrown(ServerApiException)
+        thrown(ServerApiException)
     }
-    def "test valid params without admin"(){
-        LinkDomainToLdapResponse response = new LinkDomainToLdapResponse(1, "GROUP", "CN=test,DC=ccp,DC=citrix,DC=com", (short)2)
-        _ldapManager.linkDomainToLdap(_,_,_,_) >> response
+
+    def "test valid params without admin"() {
+        LinkDomainToLdapResponse response = new LinkDomainToLdapResponse(1, "GROUP", "CN=test,DC=ccp,DC=citrix,DC=com", (short) 2)
+        _ldapManager.linkDomainToLdap(_, _, _, _) >> response
         when:
-            linkDomainToLdapCmd.execute()
+        linkDomainToLdapCmd.execute()
         then:
-            LinkDomainToLdapResponse result = (LinkDomainToLdapResponse)linkDomainToLdapCmd.getResponseObject()
-            result.getObjectName() == "LinkDomainToLdap"
-            result.getResponseName() == linkDomainToLdapCmd.getCommandName()
+        LinkDomainToLdapResponse result = (LinkDomainToLdapResponse) linkDomainToLdapCmd.getResponseObject()
+        result.getObjectName() == "LinkDomainToLdap"
+        result.getResponseName() == linkDomainToLdapCmd.getCommandName()
     }
 
     def "test with valid params and with disabled admin"() {
@@ -77,8 +78,8 @@ class LinkDomainToLdapCmdSpec extends Specification {
         def accountType = 2;
         def username = "admin"
 
-        LinkDomainToLdapResponse response = new LinkDomainToLdapResponse(domainId, type, name, (short)accountType)
-        _ldapManager.linkDomainToLdap(_,_,_,_) >> response
+        LinkDomainToLdapResponse response = new LinkDomainToLdapResponse(domainId, type, name, (short) accountType)
+        _ldapManager.linkDomainToLdap(_, _, _, _) >> response
         _ldapManager.getUser(username, type, name) >> new LdapUser(username, "admin@ccp.citrix.com", "Admin", "Admin", name, "ccp", true)
 
         linkDomainToLdapCmd.admin = username
@@ -89,7 +90,7 @@ class LinkDomainToLdapCmdSpec extends Specification {
         when:
         linkDomainToLdapCmd.execute()
         then:
-        LinkDomainToLdapResponse result = (LinkDomainToLdapResponse)linkDomainToLdapCmd.getResponseObject()
+        LinkDomainToLdapResponse result = (LinkDomainToLdapResponse) linkDomainToLdapCmd.getResponseObject()
         result.getObjectName() == "LinkDomainToLdap"
         result.getResponseName() == linkDomainToLdapCmd.getCommandName()
         result.getDomainId() == domainId
@@ -105,8 +106,8 @@ class LinkDomainToLdapCmdSpec extends Specification {
         def accountType = 2;
         def username = "admin"
 
-        LinkDomainToLdapResponse response = new LinkDomainToLdapResponse(domainId, type, name, (short)accountType)
-        _ldapManager.linkDomainToLdap(_,_,_,_) >> response
+        LinkDomainToLdapResponse response = new LinkDomainToLdapResponse(domainId, type, name, (short) accountType)
+        _ldapManager.linkDomainToLdap(_, _, _, _) >> response
         _ldapManager.getUser(username, type, name) >> new LdapUser(username, "admin@ccp.citrix.com", "Admin", "Admin", name, "ccp", false)
 
         _accountService.getActiveAccountByName(username, domainId) >> Mock(Account)
@@ -119,7 +120,7 @@ class LinkDomainToLdapCmdSpec extends Specification {
         when:
         linkDomainToLdapCmd.execute()
         then:
-        LinkDomainToLdapResponse result = (LinkDomainToLdapResponse)linkDomainToLdapCmd.getResponseObject()
+        LinkDomainToLdapResponse result = (LinkDomainToLdapResponse) linkDomainToLdapCmd.getResponseObject()
         result.getObjectName() == "LinkDomainToLdap"
         result.getResponseName() == linkDomainToLdapCmd.getCommandName()
         result.getDomainId() == domainId
@@ -136,8 +137,8 @@ class LinkDomainToLdapCmdSpec extends Specification {
         def username = "admin"
         def accountId = 24
 
-        LinkDomainToLdapResponse response = new LinkDomainToLdapResponse(domainId, type, name, (short)accountType)
-        _ldapManager.linkDomainToLdap(_,_,_,_) >> response
+        LinkDomainToLdapResponse response = new LinkDomainToLdapResponse(domainId, type, name, (short) accountType)
+        _ldapManager.linkDomainToLdap(_, _, _, _) >> response
         _ldapManager.getUser(username, type, name) >> new LdapUser(username, "admin@ccp.citrix.com", "Admin", "Admin", name, "ccp", false)
 
         _accountService.getActiveAccountByName(username, domainId) >> null
@@ -154,7 +155,7 @@ class LinkDomainToLdapCmdSpec extends Specification {
         when:
         linkDomainToLdapCmd.execute()
         then:
-        LinkDomainToLdapResponse result = (LinkDomainToLdapResponse)linkDomainToLdapCmd.getResponseObject()
+        LinkDomainToLdapResponse result = (LinkDomainToLdapResponse) linkDomainToLdapCmd.getResponseObject()
         result.getObjectName() == "LinkDomainToLdap"
         result.getResponseName() == linkDomainToLdapCmd.getCommandName()
         result.getDomainId() == domainId
@@ -170,9 +171,9 @@ class LinkDomainToLdapCmdSpec extends Specification {
         def accountType = 2;
         def username = "admin"
 
-        LinkDomainToLdapResponse response = new LinkDomainToLdapResponse(domainId, type, name, (short)accountType)
-        _ldapManager.linkDomainToLdap(_,_,_,_) >> response
-        _ldapManager.getUser(username, type, name) >> {throw new NoLdapUserMatchingQueryException("get ldap user failed from mock")}
+        LinkDomainToLdapResponse response = new LinkDomainToLdapResponse(domainId, type, name, (short) accountType)
+        _ldapManager.linkDomainToLdap(_, _, _, _) >> response
+        _ldapManager.getUser(username, type, name) >> { throw new NoLdapUserMatchingQueryException("get ldap user failed from mock") }
 
         linkDomainToLdapCmd.admin = username
         linkDomainToLdapCmd.type = type
@@ -182,7 +183,7 @@ class LinkDomainToLdapCmdSpec extends Specification {
         when:
         linkDomainToLdapCmd.execute()
         then:
-        LinkDomainToLdapResponse result = (LinkDomainToLdapResponse)linkDomainToLdapCmd.getResponseObject()
+        LinkDomainToLdapResponse result = (LinkDomainToLdapResponse) linkDomainToLdapCmd.getResponseObject()
         result.getObjectName() == "LinkDomainToLdap"
         result.getResponseName() == linkDomainToLdapCmd.getCommandName()
         result.getDomainId() == domainId
@@ -202,8 +203,8 @@ class LinkDomainToLdapCmdSpec extends Specification {
         def username = "admin"
         def accountId = 24
 
-        LinkDomainToLdapResponse response = new LinkDomainToLdapResponse(domainId, type, name, (short)accountType)
-        _ldapManager.linkDomainToLdap(_,_,_,_) >> response
+        LinkDomainToLdapResponse response = new LinkDomainToLdapResponse(domainId, type, name, (short) accountType)
+        _ldapManager.linkDomainToLdap(_, _, _, _) >> response
         _ldapManager.getUser(username, type, name) >> new LdapUser(username, "admin@ccp.citrix.com", "Admin", "Admin", name, "ccp", false)
 
         _accountService.getActiveAccountByName(username, domainId) >> null
@@ -220,7 +221,7 @@ class LinkDomainToLdapCmdSpec extends Specification {
         when:
         linkDomainToLdapCmd.execute()
         then:
-        LinkDomainToLdapResponse result = (LinkDomainToLdapResponse)linkDomainToLdapCmd.getResponseObject()
+        LinkDomainToLdapResponse result = (LinkDomainToLdapResponse) linkDomainToLdapCmd.getResponseObject()
         result.getObjectName() == "LinkDomainToLdap"
         result.getResponseName() == linkDomainToLdapCmd.getCommandName()
         result.getDomainId() == domainId

@@ -18,11 +18,11 @@ package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
 import com.cloud.vm.NicSecondaryIp;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = NicSecondaryIp.class)
 @SuppressWarnings("unused")
@@ -57,6 +57,10 @@ public class NicSecondaryIpResponse extends BaseResponse {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getIpAddr() {
         return ipAddr;
     }
@@ -88,9 +92,4 @@ public class NicSecondaryIpResponse extends BaseResponse {
     public void setVmId(String vmId) {
         this.vmId = vmId;
     }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
 }

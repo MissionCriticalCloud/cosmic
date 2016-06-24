@@ -18,7 +18,11 @@
  */
 package org.apache.cloudstack.storage.datastore.db;
 
-import java.util.Date;
+import com.cloud.storage.DataStoreRole;
+import com.cloud.storage.ImageStore;
+import com.cloud.storage.ScopeType;
+import com.cloud.utils.UriUtils;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,12 +31,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-
-import com.cloud.storage.DataStoreRole;
-import com.cloud.storage.ImageStore;
-import com.cloud.storage.ScopeType;
-import com.cloud.utils.UriUtils;
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
 
 @Entity
 @Table(name = "image_store")
@@ -101,21 +100,22 @@ public class ImageStoreVO implements ImageStore {
         return this.name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public Long getDataCenterId() {
+        return this.dcId;
+    }
+
     @Override
     public String getProviderName() {
         return this.providerName;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public void setProviderName(String provider) {
         this.providerName = provider;
-    }
-
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
     }
 
     @Override
@@ -123,13 +123,12 @@ public class ImageStoreVO implements ImageStore {
         return this.protocol;
     }
 
-    public void setDataCenterId(Long dcId) {
-        this.dcId = dcId;
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 
-    @Override
-    public Long getDataCenterId() {
-        return this.dcId;
+    public void setDataCenterId(Long dcId) {
+        this.dcId = dcId;
     }
 
     public ScopeType getScope() {
@@ -140,13 +139,13 @@ public class ImageStoreVO implements ImageStore {
         this.scope = scope;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     @Override
     public String getUuid() {
         return this.uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getUrl() {

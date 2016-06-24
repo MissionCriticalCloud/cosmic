@@ -16,15 +16,15 @@
 // under the License.
 package com.cloud.user.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.user.Account;
 import com.cloud.user.AccountVO;
 import com.cloud.user.User;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Date;
+import java.util.List;
 
 public interface AccountDao extends GenericDao<AccountVO, Long> {
     Pair<User, Account> findUserAccountByApiKey(String apiKey);
@@ -71,5 +71,4 @@ public interface AccountDao extends GenericDao<AccountVO, Long> {
              in case of no match;
      */
     long getDomainIdForGivenAccountId(long id);
-
 }

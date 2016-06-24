@@ -16,12 +16,6 @@
 // under the License.
 package org.apache.cloudstack.region;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
@@ -29,7 +23,6 @@ import com.cloud.user.Account;
 import com.cloud.user.UserAccount;
 import com.cloud.utils.component.Manager;
 import com.cloud.utils.component.ManagerBase;
-
 import org.apache.cloudstack.api.command.admin.account.DeleteAccountCmd;
 import org.apache.cloudstack.api.command.admin.account.DisableAccountCmd;
 import org.apache.cloudstack.api.command.admin.account.EnableAccountCmd;
@@ -41,6 +34,12 @@ import org.apache.cloudstack.api.command.admin.user.DisableUserCmd;
 import org.apache.cloudstack.api.command.admin.user.EnableUserCmd;
 import org.apache.cloudstack.api.command.admin.user.UpdateUserCmd;
 import org.apache.cloudstack.api.command.user.region.ListRegionsCmd;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -53,6 +52,11 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
     private RegionManager _regionMgr;
 
     private String _name;
+
+    @Override
+    public String getName() {
+        return _name;
+    }
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
@@ -68,11 +72,6 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
     @Override
     public boolean stop() {
         return true;
-    }
-
-    @Override
-    public String getName() {
-        return _name;
     }
 
     /**
@@ -190,5 +189,4 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
     public UserAccount enableUser(EnableUserCmd cmd) {
         return _regionMgr.enableUser(cmd.getId());
     }
-
 }

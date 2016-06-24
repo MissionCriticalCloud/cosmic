@@ -21,9 +21,9 @@ package org.apache.cloudstack.framework.transport;
 import org.apache.cloudstack.framework.serializer.MessageSerializer;
 
 public interface TransportProvider {
-    void setMessageSerializer(MessageSerializer messageSerializer);
-
     MessageSerializer getMessageSerializer();
+
+    void setMessageSerializer(MessageSerializer messageSerializer);
 
     TransportEndpointSite attach(TransportEndpoint endpoint, String predefinedAddress);
 

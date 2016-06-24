@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.acl;
 
-import javax.inject.Inject;
-
 import com.cloud.domain.DomainVO;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.projects.ProjectVO;
@@ -26,12 +24,14 @@ import com.cloud.projects.dao.ProjectDao;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.ControlledEntity.ACLType;
 import org.apache.cloudstack.affinity.AffinityGroup;
 import org.apache.cloudstack.affinity.AffinityGroupService;
 import org.apache.cloudstack.affinity.dao.AffinityGroupDomainMapDao;
+
+import javax.inject.Inject;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -51,7 +51,7 @@ public class AffinityGroupAccessChecker extends DomainChecker {
     @Override
     public boolean checkAccess(Account caller, ControlledEntity entity, AccessType accessType) throws PermissionDeniedException {
         if (entity instanceof AffinityGroup) {
-            AffinityGroup group = (AffinityGroup)entity;
+            AffinityGroup group = (AffinityGroup) entity;
 
             if (_affinityGroupService.isAdminControlledGroup(group)) {
                 if (accessType == AccessType.OperateEntry && !_accountMgr.isRootAdmin(caller.getId())) {
@@ -74,7 +74,7 @@ public class AffinityGroupAccessChecker extends DomainChecker {
             } else {
                 //acl_type account
                 if (caller.getId() != group.getAccountId()) {
-                  //check if the group belongs to a project
+                    //check if the group belongs to a project
                     ProjectVO project = _projectDao.findByProjectAccountId(group.getAccountId());
                     if (project != null) {
                         if (AccessType.ModifyProject.equals(accessType) && _projectAccountDao.canModifyProjectAccount(caller.getId(), group.getAccountId())) {
@@ -87,9 +87,7 @@ public class AffinityGroupAccessChecker extends DomainChecker {
                 } else {
                     return true;
                 }
-
             }
-
         }
 
         return false;

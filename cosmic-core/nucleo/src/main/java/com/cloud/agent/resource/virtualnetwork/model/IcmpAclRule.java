@@ -28,7 +28,7 @@ public class IcmpAclRule extends AclRule {
         // Empty constructor for (de)serialization
     }
 
-    public IcmpAclRule(String cidr, boolean allowed, int icmpType, int icmpCode) {
+    public IcmpAclRule(final String cidr, final boolean allowed, final int icmpType, final int icmpCode) {
         super(cidr, allowed);
         this.icmpType = icmpType;
         this.icmpCode = icmpCode;
@@ -38,7 +38,7 @@ public class IcmpAclRule extends AclRule {
         return icmpType;
     }
 
-    public void setIcmpType(int icmpType) {
+    public void setIcmpType(final int icmpType) {
         this.icmpType = icmpType;
     }
 
@@ -46,8 +46,7 @@ public class IcmpAclRule extends AclRule {
         return icmpCode;
     }
 
-    public void setIcmpCode(int icmpCode) {
+    public void setIcmpCode(final int icmpCode) {
         this.icmpCode = icmpCode;
     }
-
 }

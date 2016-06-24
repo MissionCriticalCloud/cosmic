@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.host.dao;
 
-import java.util.Map;
-
 import com.cloud.host.DetailVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Map;
 
 public interface HostDetailsDao extends GenericDao<DetailVO, Long> {
     Map<String, String> findDetails(long hostId);

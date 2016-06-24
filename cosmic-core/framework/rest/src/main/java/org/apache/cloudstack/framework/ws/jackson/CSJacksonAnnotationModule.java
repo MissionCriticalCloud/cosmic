@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.Module;
 
 /**
  * This module extends SimpleModle so that our annotations can be processed.
- *
  */
 public class CSJacksonAnnotationModule extends Module {
 
@@ -33,13 +32,12 @@ public class CSJacksonAnnotationModule extends Module {
     }
 
     @Override
-    public void setupModule(SetupContext ctx) {
-        ctx.appendAnnotationIntrospector(new CSJacksonAnnotationIntrospector());
-    }
-
-    @Override
     public Version version() {
         return new Version(1, 0, 0, "", "org.apache.cloudstack", "cloudstack-framework-rest");
     }
 
+    @Override
+    public void setupModule(SetupContext ctx) {
+        ctx.appendAnnotationIntrospector(new CSJacksonAnnotationIntrospector());
+    }
 }

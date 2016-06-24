@@ -16,6 +16,26 @@
 // under the License.
 package com.cloud.test;
 
+import com.cloud.host.Status;
+import com.cloud.service.ServiceOfferingVO;
+import com.cloud.service.dao.ServiceOfferingDaoImpl;
+import com.cloud.storage.DiskOfferingVO;
+import com.cloud.storage.Storage.ProvisioningType;
+import com.cloud.storage.dao.DiskOfferingDaoImpl;
+import com.cloud.utils.PropertiesUtil;
+import com.cloud.utils.component.ComponentContext;
+import com.cloud.utils.db.DB;
+import com.cloud.utils.db.Transaction;
+import com.cloud.utils.db.TransactionCallbackWithExceptionNoReturn;
+import com.cloud.utils.db.TransactionLegacy;
+import com.cloud.utils.db.TransactionStatus;
+import com.cloud.utils.net.NfsUtils;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -33,27 +53,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import com.cloud.host.Status;
-import com.cloud.service.ServiceOfferingVO;
-import com.cloud.service.dao.ServiceOfferingDaoImpl;
-import com.cloud.storage.DiskOfferingVO;
-import com.cloud.storage.Storage.ProvisioningType;
-import com.cloud.storage.dao.DiskOfferingDaoImpl;
-import com.cloud.utils.PropertiesUtil;
-import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.db.DB;
-import com.cloud.utils.db.Transaction;
-import com.cloud.utils.db.TransactionCallbackWithExceptionNoReturn;
-import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.net.NfsUtils;
-
 import org.apache.log4j.xml.DOMConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,30 +65,12 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class DatabaseConfig {
     private static final Logger s_logger = LoggerFactory.getLogger(DatabaseConfig.class.getName());
-
-    private String _configFileName = null;
-    private String _currentObjectName = null;
-    private String _currentFieldName = null;
-    private Map<String, String> _currentObjectParams = null;
-
     private static Map<String, String> s_configurationDescriptions = new HashMap<String, String>();
     private static Map<String, String> s_configurationComponents = new HashMap<String, String>();
     private static Map<String, String> s_defaultConfigurationValues = new HashMap<String, String>();
-
     // Change to HashSet
     private static HashSet<String> objectNames = new HashSet<String>();
     private static HashSet<String> fieldNames = new HashSet<String>();
-
-    // Maintain an IPRangeConfig object to handle IP related logic
-    private final IPRangeConfig iprc = ComponentContext.inject(IPRangeConfig.class);
-
-    // Maintain a PodZoneConfig object to handle Pod/Zone related logic
-    private final PodZoneConfig pzc = ComponentContext.inject(PodZoneConfig.class);
-
-    // Global variables to store network.throttling.rate and multicast.throttling.rate from the configuration table
-    // Will be changed from null to a non-null value if the value existed in the configuration table
-    private String _networkThrottlingRate = null;
-    private String _multicastThrottlingRate = null;
 
     static {
         // initialize the objectNames ArrayList
@@ -186,9 +167,9 @@ public class DatabaseConfig {
         s_configurationDescriptions.put("retries.per.host", "The number of times each command sent to a host should be retried in case of failure.");
         s_configurationDescriptions.put("integration.api.port", "internal port used by the management server for servicing Integration API requests");
         s_configurationDescriptions.put("usage.stats.job.exec.time",
-            "the time at which the usage statistics aggregation job will run as an HH24:MM time, e.g. 00:30 to run at 12:30am");
+                "the time at which the usage statistics aggregation job will run as an HH24:MM time, e.g. 00:30 to run at 12:30am");
         s_configurationDescriptions.put("usage.stats.job.aggregation.range",
-            "the range of time for aggregating the user statistics specified in minutes (e.g. 1440 for daily, 60 for hourly)");
+                "the range of time for aggregating the user statistics specified in minutes (e.g. 1440 for daily, 60 for hourly)");
         s_configurationDescriptions.put("consoleproxy.domP.enable", "Obsolete");
         s_configurationDescriptions.put("consoleproxy.port", "Obsolete");
         s_configurationDescriptions.put("consoleproxy.url.port", "Console proxy port for AJAX viewer");
@@ -196,27 +177,27 @@ public class DatabaseConfig {
         s_configurationDescriptions.put("consoleproxy.cmd.port", "Console proxy command port that is used to communicate with management server");
         s_configurationDescriptions.put("consoleproxy.loadscan.interval", "The time interval(in milliseconds) to scan console proxy working-load info");
         s_configurationDescriptions.put("consoleproxy.capacityscan.interval",
-            "The time interval(in millisecond) to scan whether or not system needs more console proxy to ensure minimal standby capacity");
+                "The time interval(in millisecond) to scan whether or not system needs more console proxy to ensure minimal standby capacity");
         s_configurationDescriptions.put("consoleproxy.capacity.standby",
-            "The minimal number of console proxy viewer sessions that system is able to serve immediately(standby capacity)");
+                "The minimal number of console proxy viewer sessions that system is able to serve immediately(standby capacity)");
         s_configurationDescriptions.put("alert.email.addresses", "comma seperated list of email addresses used for sending alerts");
         s_configurationDescriptions.put("alert.smtp.host", "SMTP hostname used for sending out email alerts");
         s_configurationDescriptions.put("alert.smtp.port", "port the SMTP server is listening on (default is 25)");
         s_configurationDescriptions.put("alert.smtp.useAuth",
-            "If true, use SMTP authentication when sending emails.  If false, do not use SMTP authentication when sending emails.");
+                "If true, use SMTP authentication when sending emails.  If false, do not use SMTP authentication when sending emails.");
         s_configurationDescriptions.put("alert.smtp.username", "username for SMTP authentication (applies only if alert.smtp.useAuth is true)");
         s_configurationDescriptions.put("alert.smtp.password", "password for SMTP authentication (applies only if alert.smtp.useAuth is true)");
         s_configurationDescriptions.put("alert.email.sender", "sender of alert email (will be in the From header of the email)");
         s_configurationDescriptions.put("memory.capacity.threshold",
-            "percentage (as a value between 0 and 1) of memory utilization above which alerts will be sent about low memory available");
+                "percentage (as a value between 0 and 1) of memory utilization above which alerts will be sent about low memory available");
         s_configurationDescriptions.put("cpu.capacity.threshold",
-            "percentage (as a value between 0 and 1) of cpu utilization above which alerts will be sent about low cpu available");
+                "percentage (as a value between 0 and 1) of cpu utilization above which alerts will be sent about low cpu available");
         s_configurationDescriptions.put("storage.capacity.threshold",
-            "percentage (as a value between 0 and 1) of storage utilization above which alerts will be sent about low storage available");
+                "percentage (as a value between 0 and 1) of storage utilization above which alerts will be sent about low storage available");
         s_configurationDescriptions.put("public.ip.capacity.threshold",
-            "percentage (as a value between 0 and 1) of public IP address space utilization above which alerts will be sent");
+                "percentage (as a value between 0 and 1) of public IP address space utilization above which alerts will be sent");
         s_configurationDescriptions.put("private.ip.capacity.threshold",
-            "percentage (as a value between 0 and 1) of private IP address space utilization above which alerts will be sent");
+                "percentage (as a value between 0 and 1) of private IP address space utilization above which alerts will be sent");
         s_configurationDescriptions.put("expunge.interval", "the interval to wait before running the expunge thread");
         s_configurationDescriptions.put("network.throttling.rate", "default data transfer rate in megabits per second allowed per user");
         s_configurationDescriptions.put("multicast.throttling.rate", "default multicast rate in megabits per second allowed");
@@ -365,7 +346,24 @@ public class DatabaseConfig {
         s_defaultConfigurationValues.put("publish.async.job.events", "true");
     }
 
+    // Maintain an IPRangeConfig object to handle IP related logic
+    private final IPRangeConfig iprc = ComponentContext.inject(IPRangeConfig.class);
+    // Maintain a PodZoneConfig object to handle Pod/Zone related logic
+    private final PodZoneConfig pzc = ComponentContext.inject(PodZoneConfig.class);
+    private String _configFileName = null;
+    private String _currentObjectName = null;
+    private String _currentFieldName = null;
+    private Map<String, String> _currentObjectParams = null;
+    // Global variables to store network.throttling.rate and multicast.throttling.rate from the configuration table
+    // Will be changed from null to a non-null value if the value existed in the configuration table
+    private String _networkThrottlingRate = null;
+    private String _multicastThrottlingRate = null;
+
     protected DatabaseConfig() {
+    }
+
+    public DatabaseConfig(String configFileName) {
+        _configFileName = configFileName;
     }
 
     /**
@@ -399,10 +397,6 @@ public class DatabaseConfig {
         }
     }
 
-    public DatabaseConfig(String configFileName) {
-        _configFileName = configFileName;
-    }
-
     private void doVersionCheck() {
         try {
             String warningMsg = "\nYou are using an outdated format for server-setup.xml. Please switch to the new format.\n";
@@ -423,7 +417,6 @@ public class DatabaseConfig {
             if (!version.equals("2.0")) {
                 System.out.println(warningMsg);
             }
-
         } catch (ParserConfigurationException parserException) {
             parserException.printStackTrace();
         } catch (IOException ioException) {
@@ -464,6 +457,224 @@ public class DatabaseConfig {
         }
     }
 
+    // no configurable values for VM Template, hard-code the defaults for now
+    private void saveVMTemplate() {
+        /*
+        long id = 1;
+        String uniqueName = "routing";
+        String name = "DomR Template";
+        int isPublic = 0;
+        String path = "template/private/u000000/os/routing";
+        String type = "ext3";
+        int requiresHvm = 0;
+        int bits = 64;
+        long createdByUserId = 1;
+        int isReady = 1;
+
+        String insertSql = "INSERT INTO `cloud`.`vm_template` (id, unique_name, name, public, path, created, type, hvm, bits, created_by, ready) " +
+                "VALUES (" + id + ",'" + uniqueName + "','" + name + "'," + isPublic + ",'" + path + "',now(),'" + type + "'," +
+                requiresHvm + "," + bits + "," + createdByUserId + "," + isReady + ")";
+
+        Transaction txn = Transaction.open();
+        try {
+            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            s_logger.error("error creating vm template: " + ex);
+        } finally {
+            txn.close();
+        }
+         */
+        /*
+        // do it again for console proxy template
+        id = 2;
+        uniqueName = "consoleproxy";
+        name = "Console Proxy Template";
+        isPublic = 0;
+        path = "template/private/u000000/os/consoleproxy";
+        type = "ext3";
+
+        insertSql = "INSERT INTO `cloud`.`vm_template` (id, unique_name, name, public, path, created, type, hvm, bits, created_by, ready) " +
+        "VALUES (" + id + ",'" + uniqueName + "','" + name + "'," + isPublic + ",'" + path + "',now(),'" + type + "'," +
+        requiresHvm + "," + bits + "," + createdByUserId + "," + isReady + ")";
+
+        Transaction txn = Transaction.currentTxn();
+        try {
+            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            s_logger.error("error creating vm template: " + ex);
+        } finally {
+            txn.close();
+        }
+         */
+    }
+
+    @DB
+    protected void saveRootDomain() {
+        String insertSql = "insert into `cloud`.`domain` (id, name, parent, owner, path, level) values (1, 'ROOT', NULL, 2, '/', 0)";
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        try {
+            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            s_logger.error("error creating ROOT domain", ex);
+        }
+
+        /*
+        String updateSql = "update account set domain_id = 1 where id = 2";
+        Transaction txn = Transaction.currentTxn();
+        try {
+            PreparedStatement stmt = txn.prepareStatement(updateSql);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            s_logger.error("error updating admin user", ex);
+        } finally {
+            txn.close();
+        }
+
+        updateSql = "update account set domain_id = 1 where id = 1";
+        Transaction txn = Transaction.currentTxn();
+        try {
+            PreparedStatement stmt = txn.prepareStatement(updateSql);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            s_logger.error("error updating system user", ex);
+        } finally {
+            txn.close();
+        }
+         */
+    }
+
+    private void saveDefaultConfiguations() {
+        for (String name : s_defaultConfigurationValues.keySet()) {
+            String value = s_defaultConfigurationValues.get(name);
+            saveConfiguration(name, value, null);
+        }
+    }
+
+    @DB
+    protected void saveConfiguration(String name, String value, String category) {
+        String instance = "DEFAULT";
+        String description = s_configurationDescriptions.get(name);
+        String component = s_configurationComponents.get(name);
+        if (category == null) {
+            category = "Advanced";
+        }
+
+        String instanceNameError = "Please enter a non-blank value for the field: ";
+        if (name.equals("instance.name")) {
+            if (value == null || value.isEmpty() || !value.matches("^[A-Za-z0-9]{1,8}$")) {
+                printError(instanceNameError + "configuration: instance.name can not be empty and can only contain numbers and alphabets up to 8 characters long");
+            }
+        }
+
+        if (name.equals("network.throttling.rate")) {
+            if (value != null && !value.isEmpty()) {
+                _networkThrottlingRate = value;
+            }
+        }
+
+        if (name.equals("multicast.throttling.rate")) {
+            if (value != null && !value.isEmpty()) {
+                _multicastThrottlingRate = value;
+            }
+        }
+
+        String insertSql =
+                "INSERT INTO `cloud`.`configuration` (instance, component, name, value, description, category) " +
+                        "VALUES (?,?,?,?,?,?)";
+        String selectSql = "SELECT name FROM cloud.configuration WHERE name = ?";
+
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        try {
+            PreparedStatement stmt = txn.prepareAutoCloseStatement(selectSql);
+            stmt.setString(1, name);
+            ResultSet result = stmt.executeQuery();
+            Boolean hasRow = result.next();
+            if (!hasRow) {
+                stmt = txn.prepareAutoCloseStatement(insertSql);
+                stmt.setString(1, instance);
+                stmt.setString(2, component);
+                stmt.setString(3, name);
+                stmt.setString(4, value);
+                stmt.setString(5, description);
+                stmt.setString(6, category);
+                stmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            s_logger.error("error creating configuration", ex);
+        }
+    }
+
+    public static void printError(String message) {
+        System.out.println(message);
+        System.exit(1);
+    }
+
+    public static List<String> genReturnList(String success, String message) {
+        List<String> returnList = new ArrayList<String>(2);
+        returnList.add(0, success);
+        returnList.add(1, message);
+        return returnList;
+    }
+
+    public static String getDatabaseValueString(String selectSql, String name, String errorMsg) {
+        TransactionLegacy txn = TransactionLegacy.open("getDatabaseValueString");
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = txn.prepareAutoCloseStatement(selectSql);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                String value = rs.getString(name);
+                return value;
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception: " + e.getMessage());
+            printError(errorMsg);
+        } finally {
+            txn.close();
+        }
+        return null;
+    }
+
+    public static long getDatabaseValueLong(String selectSql, String name, String errorMsg) {
+        TransactionLegacy txn = TransactionLegacy.open("getDatabaseValueLong");
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = txn.prepareAutoCloseStatement(selectSql);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getLong(name);
+            } else {
+                return -1;
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception: " + e.getMessage());
+            printError(errorMsg);
+        } finally {
+            txn.close();
+        }
+        return -1;
+    }
+
+    public static void saveSQL(String sql, String errorMsg) {
+        TransactionLegacy txn = TransactionLegacy.open("saveSQL");
+        try {
+            PreparedStatement stmt = txn.prepareAutoCloseStatement(sql);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("SQL Exception: " + ex.getMessage());
+            printError(errorMsg);
+        } finally {
+            txn.close();
+        }
+    }
+
     private void setCurrentObjectName(String name) {
         _currentObjectName = name;
     }
@@ -499,6 +710,459 @@ public class DatabaseConfig {
         _currentObjectParams = null;
     }
 
+    private void saveZone() {
+        long id = Long.parseLong(_currentObjectParams.get("id"));
+        String name = _currentObjectParams.get("name");
+        //String description = _currentObjectParams.get("description");
+        String dns1 = _currentObjectParams.get("dns1");
+        String dns2 = _currentObjectParams.get("dns2");
+        String internalDns1 = _currentObjectParams.get("internalDns1");
+        String internalDns2 = _currentObjectParams.get("internalDns2");
+        //String vnetRange = _currentObjectParams.get("vnet");
+        String guestNetworkCidr = _currentObjectParams.get("guestNetworkCidr");
+        String networkType = _currentObjectParams.get("networktype");
+
+        // Check that all IPs are valid
+        String ipError = "Please enter a valid IP address for the field: ";
+        if (!IPRangeConfig.validOrBlankIP(dns1)) {
+            printError(ipError + "dns1");
+        }
+        if (!IPRangeConfig.validOrBlankIP(dns2)) {
+            printError(ipError + "dns2");
+        }
+        if (!IPRangeConfig.validOrBlankIP(internalDns1)) {
+            printError(ipError + "internalDns1");
+        }
+        if (!IPRangeConfig.validOrBlankIP(internalDns2)) {
+            printError(ipError + "internalDns2");
+        }
+        if (!IPRangeConfig.validCIDR(guestNetworkCidr)) {
+            printError("Please enter a valid value for guestNetworkCidr");
+        }
+
+        pzc.saveZone(false, id, name, dns1, dns2, internalDns1, internalDns2, guestNetworkCidr, networkType);
+    }
+
+    private void savePhysicalNetwork() {
+        long id = Long.parseLong(_currentObjectParams.get("id"));
+        String zoneId = _currentObjectParams.get("zoneId");
+        String vnetRange = _currentObjectParams.get("vnet");
+
+        int vnetStart = -1;
+        int vnetEnd = -1;
+        if (vnetRange != null) {
+            String[] tokens = vnetRange.split("-");
+            vnetStart = Integer.parseInt(tokens[0]);
+            vnetEnd = Integer.parseInt(tokens[1]);
+        }
+        long zoneDbId = Long.parseLong(zoneId);
+        pzc.savePhysicalNetwork(false, id, zoneDbId, vnetStart, vnetEnd);
+    }
+
+    private void saveVlan() {
+        String zoneId = _currentObjectParams.get("zoneId");
+        String physicalNetworkIdStr = _currentObjectParams.get("physicalNetworkId");
+        String vlanId = _currentObjectParams.get("vlanId");
+        String gateway = _currentObjectParams.get("gateway");
+        String netmask = _currentObjectParams.get("netmask");
+        String publicIpRange = _currentObjectParams.get("ipAddressRange");
+        String vlanType = _currentObjectParams.get("vlanType");
+        String vlanPodName = _currentObjectParams.get("podName");
+
+        String ipError = "Please enter a valid IP address for the field: ";
+        if (!IPRangeConfig.validOrBlankIP(gateway)) {
+            printError(ipError + "gateway");
+        }
+        if (!IPRangeConfig.validOrBlankIP(netmask)) {
+            printError(ipError + "netmask");
+        }
+
+        // Check that the given IP address range was valid
+        if (!checkIpAddressRange(publicIpRange)) {
+            printError("Please enter a valid public IP range.");
+        }
+
+        // Split the IP address range
+        String[] ipAddressRangeArray = publicIpRange.split("\\-");
+        String startIP = ipAddressRangeArray[0];
+        String endIP = null;
+        if (ipAddressRangeArray.length > 1) {
+            endIP = ipAddressRangeArray[1];
+        }
+
+        // If a netmask was provided, check that the startIP, endIP, and gateway all belong to the same subnet
+        if (netmask != null && !netmask.equals("")) {
+            if (endIP != null) {
+                if (!IPRangeConfig.sameSubnet(startIP, endIP, netmask)) {
+                    printError("Start and end IPs for the public IP range must be in the same subnet, as per the provided netmask.");
+                }
+            }
+
+            if (gateway != null && !gateway.equals("")) {
+                if (!IPRangeConfig.sameSubnet(startIP, gateway, netmask)) {
+                    printError("The start IP for the public IP range must be in the same subnet as the gateway, as per the provided netmask.");
+                }
+                if (endIP != null) {
+                    if (!IPRangeConfig.sameSubnet(endIP, gateway, netmask)) {
+                        printError("The end IP for the public IP range must be in the same subnet as the gateway, as per the provided netmask.");
+                    }
+                }
+            }
+        }
+
+        long zoneDbId = Long.parseLong(zoneId);
+        String zoneName = PodZoneConfig.getZoneName(zoneDbId);
+
+        long physicalNetworkId = Long.parseLong(physicalNetworkIdStr);
+
+        //Set networkId to be 0, the value will be updated after management server starts up
+        pzc.modifyVlan(zoneName, true, vlanId, gateway, netmask, vlanPodName, vlanType, publicIpRange, 0, physicalNetworkId);
+
+        long vlanDbId = pzc.getVlanDbId(zoneName, vlanId);
+        iprc.saveIPRange("public", -1, zoneDbId, vlanDbId, startIP, endIP, null, physicalNetworkId);
+    }
+
+    private void savePod() {
+        long id = Long.parseLong(_currentObjectParams.get("id"));
+        String name = _currentObjectParams.get("name");
+        long dataCenterId = Long.parseLong(_currentObjectParams.get("zoneId"));
+        String privateIpRange = _currentObjectParams.get("ipAddressRange");
+        String gateway = _currentObjectParams.get("gateway");
+        String cidr = _currentObjectParams.get("cidr");
+        String zoneName = PodZoneConfig.getZoneName(dataCenterId);
+        String startIP = null;
+        String endIP = null;
+        String vlanRange = _currentObjectParams.get("vnet");
+
+        int vlanStart = -1;
+        int vlanEnd = -1;
+        if (vlanRange != null) {
+            String[] tokens = vlanRange.split("-");
+            vlanStart = Integer.parseInt(tokens[0]);
+            vlanEnd = Integer.parseInt(tokens[1]);
+        }
+
+        // Get the individual cidrAddress and cidrSize values
+        String[] cidrPair = cidr.split("\\/");
+        String cidrAddress = cidrPair[0];
+        String cidrSize = cidrPair[1];
+        long cidrSizeNum = Long.parseLong(cidrSize);
+
+        // Check that the gateway is in the same subnet as the CIDR
+        if (!IPRangeConfig.sameSubnetCIDR(gateway, cidrAddress, cidrSizeNum)) {
+            printError("For pod " + name + " in zone " + zoneName + " , please ensure that your gateway is in the same subnet as the  pod's CIDR address.");
+        }
+
+        pzc.savePod(false, id, name, dataCenterId, gateway, cidr, vlanStart, vlanEnd);
+
+        if (privateIpRange != null) {
+            // Check that the given IP address range was valid
+            if (!checkIpAddressRange(privateIpRange)) {
+                printError("Please enter a valid private IP range.");
+            }
+
+            String[] ipAddressRangeArray = privateIpRange.split("\\-");
+            startIP = ipAddressRangeArray[0];
+            endIP = null;
+            if (ipAddressRangeArray.length > 1) {
+                endIP = ipAddressRangeArray[1];
+            }
+        }
+
+        // Check that the start IP and end IP match up with the CIDR
+        if (!IPRangeConfig.sameSubnetCIDR(startIP, endIP, cidrSizeNum)) {
+            printError("For pod " + name + " in zone " + zoneName + ", please ensure that your start IP and end IP are in the same subnet, as per the pod's CIDR size.");
+        }
+
+        if (!IPRangeConfig.sameSubnetCIDR(startIP, cidrAddress, cidrSizeNum)) {
+            printError("For pod " + name + " in zone " + zoneName + ", please ensure that your start IP is in the same subnet as the pod's CIDR address.");
+        }
+
+        if (!IPRangeConfig.sameSubnetCIDR(endIP, cidrAddress, cidrSizeNum)) {
+            printError("For pod " + name + " in zone " + zoneName + ", please ensure that your end IP is in the same subnet as the pod's CIDR address.");
+        }
+
+        if (privateIpRange != null) {
+            // Save the IP address range
+            iprc.saveIPRange("private", id, dataCenterId, -1, startIP, endIP, null, -1);
+        }
+    }
+
+    @DB
+    protected void saveServiceOffering() {
+        long id = Long.parseLong(_currentObjectParams.get("id"));
+        String name = _currentObjectParams.get("name");
+        String displayText = _currentObjectParams.get("displayText");
+        ProvisioningType provisioningType = ProvisioningType.valueOf(_currentObjectParams.get("provisioningType"));
+        int cpu = Integer.parseInt(_currentObjectParams.get("cpu"));
+        int ramSize = Integer.parseInt(_currentObjectParams.get("ramSize"));
+        int speed = Integer.parseInt(_currentObjectParams.get("speed"));
+        String useLocalStorageValue = _currentObjectParams.get("useLocalStorage");
+
+        //        int nwRate = Integer.parseInt(_currentObjectParams.get("nwRate"));
+        //        int mcRate = Integer.parseInt(_currentObjectParams.get("mcRate"));
+        boolean ha = Boolean.parseBoolean(_currentObjectParams.get("enableHA"));
+        boolean mirroring = Boolean.parseBoolean(_currentObjectParams.get("mirrored"));
+
+        boolean useLocalStorage;
+        if (useLocalStorageValue != null) {
+            if (Boolean.parseBoolean(useLocalStorageValue)) {
+                useLocalStorage = true;
+            } else {
+                useLocalStorage = false;
+            }
+        } else {
+            useLocalStorage = false;
+        }
+
+        ServiceOfferingVO serviceOffering =
+                new ServiceOfferingVO(name, cpu, ramSize, speed, null, null, ha, displayText,
+                        provisioningType, useLocalStorage, false, null, false, null, false);
+
+        Long bytesReadRate = Long.parseLong(_currentObjectParams.get("bytesReadRate"));
+        if ((bytesReadRate != null) && (bytesReadRate > 0)) {
+            serviceOffering.setBytesReadRate(bytesReadRate);
+        }
+        Long bytesWriteRate = Long.parseLong(_currentObjectParams.get("bytesWriteRate"));
+        if ((bytesWriteRate != null) && (bytesWriteRate > 0)) {
+            serviceOffering.setBytesWriteRate(bytesWriteRate);
+        }
+        Long iopsReadRate = Long.parseLong(_currentObjectParams.get("iopsReadRate"));
+        if ((iopsReadRate != null) && (iopsReadRate > 0)) {
+            serviceOffering.setIopsReadRate(iopsReadRate);
+        }
+        Long iopsWriteRate = Long.parseLong(_currentObjectParams.get("iopsWriteRate"));
+        if ((iopsWriteRate != null) && (iopsWriteRate > 0)) {
+            serviceOffering.setIopsWriteRate(iopsWriteRate);
+        }
+
+        ServiceOfferingDaoImpl dao = ComponentContext.inject(ServiceOfferingDaoImpl.class);
+        try {
+            dao.persist(serviceOffering);
+        } catch (Exception e) {
+            s_logger.error("error creating service offering", e);
+        }
+        /*
+        String insertSql = "INSERT INTO `cloud`.`service_offering` (id, name, cpu, ram_size, speed, nw_rate, mc_rate, created, ha_enabled, mirrored, display_text, guest_ip_type,
+         use_local_storage) " +
+                "VALUES (" + id + ",'" + name + "'," + cpu + "," + ramSize + "," + speed + "," + nwRate + "," + mcRate + ",now()," + ha + "," + mirroring + ",'" + displayText +
+                "','" + guestIpType + "','" + useLocalStorage + "')";
+
+        Transaction txn = Transaction.currentTxn();
+        try {
+            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            s_logger.error("error creating service offering", ex);
+            return;
+        }
+         */
+    }
+
+    @DB
+    protected void saveDiskOffering() {
+        long id = Long.parseLong(_currentObjectParams.get("id"));
+        long domainId = Long.parseLong(_currentObjectParams.get("domainId"));
+        String name = _currentObjectParams.get("name");
+        String displayText = _currentObjectParams.get("displayText");
+        ProvisioningType provisioningType = ProvisioningType.valueOf(_currentObjectParams.get("provisioningtype"));
+        long diskSpace = Long.parseLong(_currentObjectParams.get("diskSpace"));
+        diskSpace = diskSpace * 1024 * 1024;
+        //        boolean mirroring = Boolean.parseBoolean(_currentObjectParams.get("mirrored"));
+        String tags = _currentObjectParams.get("tags");
+        String useLocal = _currentObjectParams.get("useLocal");
+        boolean local = false;
+        if (useLocal != null) {
+            local = Boolean.parseBoolean(useLocal);
+        }
+
+        if (tags != null && tags.length() > 0) {
+            String[] tokens = tags.split(",");
+            StringBuilder newTags = new StringBuilder();
+            for (String token : tokens) {
+                newTags.append(token.trim()).append(",");
+            }
+            newTags.delete(newTags.length() - 1, newTags.length());
+            tags = newTags.toString();
+        }
+        DiskOfferingVO diskOffering = new DiskOfferingVO(domainId, name, displayText, provisioningType, diskSpace, tags, false, null, null, null);
+        diskOffering.setUseLocalStorage(local);
+
+        Long bytesReadRate = Long.parseLong(_currentObjectParams.get("bytesReadRate"));
+        if (bytesReadRate != null && (bytesReadRate > 0)) {
+            diskOffering.setBytesReadRate(bytesReadRate);
+        }
+        Long bytesWriteRate = Long.parseLong(_currentObjectParams.get("bytesWriteRate"));
+        if (bytesWriteRate != null && (bytesWriteRate > 0)) {
+            diskOffering.setBytesWriteRate(bytesWriteRate);
+        }
+        Long iopsReadRate = Long.parseLong(_currentObjectParams.get("iopsReadRate"));
+        if (iopsReadRate != null && (iopsReadRate > 0)) {
+            diskOffering.setIopsReadRate(iopsReadRate);
+        }
+        Long iopsWriteRate = Long.parseLong(_currentObjectParams.get("iopsWriteRate"));
+        if (iopsWriteRate != null && (iopsWriteRate > 0)) {
+            diskOffering.setIopsWriteRate(iopsWriteRate);
+        }
+
+        DiskOfferingDaoImpl offering = ComponentContext.inject(DiskOfferingDaoImpl.class);
+        try {
+            offering.persist(diskOffering);
+        } catch (Exception e) {
+            s_logger.error("error creating disk offering", e);
+        }
+        /*
+        String insertSql = "INSERT INTO `cloud`.`disk_offering` (id, domain_id, name, display_text, disk_size, mirrored, tags) " +
+                "VALUES (" + id + "," + domainId + ",'" + name + "','" + displayText + "'," + diskSpace + "," + mirroring + ", ? )";
+
+        Transaction txn = Transaction.currentTxn();
+        try {
+            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
+            stmt.setString(1, tags);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            s_logger.error("error creating disk offering", ex);
+            return;
+        }
+         */
+    }
+
+    @DB
+    protected void saveUser() {
+        // insert system account
+        final String insertSystemAccount = "INSERT INTO `cloud`.`account` (id, account_name, type, domain_id) VALUES (1, 'system', '1', '1')";
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        try {
+            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSystemAccount);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            s_logger.error("error creating system account", ex);
+        }
+
+        // insert system user
+        final String insertSystemUser =
+                "INSERT INTO `cloud`.`user` (id, username, password, account_id, firstname, lastname, created)"
+                        + " VALUES (1, 'system', RAND(), 1, 'system', 'cloud', now())";
+        txn = TransactionLegacy.currentTxn();
+        try {
+            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSystemUser);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            s_logger.error("error creating system user", ex);
+        }
+
+        // insert admin user
+        long id = Long.parseLong(_currentObjectParams.get("id"));
+        String username = _currentObjectParams.get("username");
+        String firstname = _currentObjectParams.get("firstname");
+        String lastname = _currentObjectParams.get("lastname");
+        String password = _currentObjectParams.get("password");
+        String email = _currentObjectParams.get("email");
+
+        if (email == null || email.equals("")) {
+            printError("An email address for each user is required.");
+        }
+
+        MessageDigest md5 = null;
+        try {
+            md5 = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            s_logger.error("error saving user", e);
+            return;
+        }
+        md5.reset();
+        BigInteger pwInt = new BigInteger(1, md5.digest(password.getBytes()));
+        String pwStr = pwInt.toString(16);
+        int padding = 32 - pwStr.length();
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < padding; i++) {
+            sb.append('0'); // make sure the MD5 password is 32 digits long
+        }
+        sb.append(pwStr);
+
+        // create an account for the admin user first
+        final String insertAdminAccount = "INSERT INTO `cloud`.`account` (id, account_name, type, domain_id) VALUES (?, ?, '1', '1')";
+        txn = TransactionLegacy.currentTxn();
+        try {
+            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertAdminAccount);
+            stmt.setLong(1, id);
+            stmt.setString(2, username);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            s_logger.error("error creating account", ex);
+        }
+
+        // now insert the user
+        final String insertUser =
+                "INSERT INTO `cloud`.`user` (id, username, password, account_id, firstname, lastname, email, created) " + "VALUES (?,?,?, 2, ?,?,?,now())";
+        txn = TransactionLegacy.currentTxn();
+        try {
+            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertUser);
+            stmt.setLong(1, id);
+            stmt.setString(2, username);
+            stmt.setString(3, sb.toString());
+            stmt.setString(4, firstname);
+            stmt.setString(5, lastname);
+            stmt.setString(6, email);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            s_logger.error("error creating user", ex);
+        }
+    }
+
+    private void saveConfiguration() {
+        String name = _currentObjectParams.get("name");
+        String value = _currentObjectParams.get("value");
+        String category = _currentObjectParams.get("category");
+        saveConfiguration(name, value, category);
+    }
+
+    @DB
+    public void saveStoragePool() {
+        String name = _currentObjectParams.get("name");
+        long id = Long.parseLong(_currentObjectParams.get("id"));
+        long dataCenterId = Long.parseLong(_currentObjectParams.get("zoneId"));
+        long podId = Long.parseLong(_currentObjectParams.get("podId"));
+        long clusterId = Long.parseLong(_currentObjectParams.get("clusterId"));
+        String hostAddress = _currentObjectParams.get("hostAddress");
+        String hostPath = _currentObjectParams.get("hostPath");
+        String storageType = _currentObjectParams.get("storageType");
+        String uuid = UUID.nameUUIDFromBytes(new String(hostAddress + hostPath).getBytes()).toString();
+
+        String insertSql1 =
+                "INSERT INTO `storage_pool` (`id`, `name`, `uuid` , `pool_type` , `port`, `data_center_id` ,`available_bytes` , `capacity_bytes` ,`host_address`, `path`, " +
+                        "`created`, `pod_id`,`status` , `cluster_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        // String insertSql2 = "INSERT INTO `netfs_storage_pool` VALUES (?,?,?)";
+
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        try {
+            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql1);
+            stmt.setLong(1, id);
+            stmt.setString(2, name);
+            stmt.setString(3, uuid);
+            if (storageType == null) {
+                stmt.setString(4, "NetworkFileSystem");
+            } else {
+                stmt.setString(4, storageType);
+            }
+            stmt.setLong(5, 111);
+            stmt.setLong(6, dataCenterId);
+            stmt.setLong(7, 0);
+            stmt.setLong(8, 0);
+            stmt.setString(9, hostAddress);
+            stmt.setString(10, hostPath);
+            stmt.setDate(11, new Date(new java.util.Date().getTime()));
+            stmt.setLong(12, podId);
+            stmt.setString(13, Status.Up.toString());
+            stmt.setLong(14, clusterId);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("Error creating storage pool: " + ex.getMessage());
+            s_logger.error("error creating storage pool ", ex);
+            return;
+        }
+    }
+
     @DB
     public void saveSecondaryStorage() {
         long dataCenterId = Long.parseLong(_currentObjectParams.get("zoneId"));
@@ -510,7 +1174,9 @@ public class DatabaseConfig {
             return;
         }
         String insertSql1 =
-            "INSERT INTO `host` (`id`, `name`, `status` , `type` , `private_ip_address`, `private_netmask` ,`private_mac_address` , `storage_ip_address` ,`storage_netmask`, `storage_mac_address`, `data_center_id`, `version`, `dom0_memory`, `last_ping`, `resource`, `guid`, `hypervisor_type`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "INSERT INTO `host` (`id`, `name`, `status` , `type` , `private_ip_address`, `private_netmask` ,`private_mac_address` , `storage_ip_address` ,`storage_netmask`, " +
+                        "`storage_mac_address`, `data_center_id`, `version`, `dom0_memory`, `last_ping`, `resource`, `guid`, `hypervisor_type`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?," +
+                        "?,?,?,?,?)";
         String insertSqlHostDetails = "INSERT INTO `host_details` (`id`, `host_id`, `name`, `value`) VALUES(?,?,?,?)";
         String insertSql2 = "INSERT INTO `op_host` (`id`, `sequence`) VALUES(?, ?)";
         TransactionLegacy txn = TransactionLegacy.currentTxn();
@@ -589,7 +1255,7 @@ public class DatabaseConfig {
         long podId = Long.parseLong(_currentObjectParams.get("podId"));
         String hypervisor = _currentObjectParams.get("hypervisorType");
         String insertSql1 =
-            "INSERT INTO `cluster` (`id`, `name`, `data_center_id` , `pod_id`, `hypervisor_type` , `cluster_type`, `allocation_state`) VALUES (?,?,?,?,?,?,?)";
+                "INSERT INTO `cluster` (`id`, `name`, `data_center_id` , `pod_id`, `hypervisor_type` , `cluster_type`, `allocation_state`) VALUES (?,?,?,?,?,?,?)";
 
         TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
@@ -602,110 +1268,11 @@ public class DatabaseConfig {
             stmt.setString(6, "CloudManaged");
             stmt.setString(7, "Enabled");
             stmt.executeUpdate();
-
         } catch (SQLException ex) {
             System.out.println("Error creating cluster: " + ex.getMessage());
             s_logger.error("error creating cluster", ex);
             return;
         }
-
-    }
-
-    @DB
-    public void saveStoragePool() {
-        String name = _currentObjectParams.get("name");
-        long id = Long.parseLong(_currentObjectParams.get("id"));
-        long dataCenterId = Long.parseLong(_currentObjectParams.get("zoneId"));
-        long podId = Long.parseLong(_currentObjectParams.get("podId"));
-        long clusterId = Long.parseLong(_currentObjectParams.get("clusterId"));
-        String hostAddress = _currentObjectParams.get("hostAddress");
-        String hostPath = _currentObjectParams.get("hostPath");
-        String storageType = _currentObjectParams.get("storageType");
-        String uuid = UUID.nameUUIDFromBytes(new String(hostAddress + hostPath).getBytes()).toString();
-
-        String insertSql1 =
-            "INSERT INTO `storage_pool` (`id`, `name`, `uuid` , `pool_type` , `port`, `data_center_id` ,`available_bytes` , `capacity_bytes` ,`host_address`, `path`, `created`, `pod_id`,`status` , `cluster_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        // String insertSql2 = "INSERT INTO `netfs_storage_pool` VALUES (?,?,?)";
-
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql1);
-            stmt.setLong(1, id);
-            stmt.setString(2, name);
-            stmt.setString(3, uuid);
-            if (storageType == null) {
-                stmt.setString(4, "NetworkFileSystem");
-            } else {
-                stmt.setString(4, storageType);
-            }
-            stmt.setLong(5, 111);
-            stmt.setLong(6, dataCenterId);
-            stmt.setLong(7, 0);
-            stmt.setLong(8, 0);
-            stmt.setString(9, hostAddress);
-            stmt.setString(10, hostPath);
-            stmt.setDate(11, new Date(new java.util.Date().getTime()));
-            stmt.setLong(12, podId);
-            stmt.setString(13, Status.Up.toString());
-            stmt.setLong(14, clusterId);
-            stmt.executeUpdate();
-
-        } catch (SQLException ex) {
-            System.out.println("Error creating storage pool: " + ex.getMessage());
-            s_logger.error("error creating storage pool ", ex);
-            return;
-        }
-
-    }
-
-    private void saveZone() {
-        long id = Long.parseLong(_currentObjectParams.get("id"));
-        String name = _currentObjectParams.get("name");
-        //String description = _currentObjectParams.get("description");
-        String dns1 = _currentObjectParams.get("dns1");
-        String dns2 = _currentObjectParams.get("dns2");
-        String internalDns1 = _currentObjectParams.get("internalDns1");
-        String internalDns2 = _currentObjectParams.get("internalDns2");
-        //String vnetRange = _currentObjectParams.get("vnet");
-        String guestNetworkCidr = _currentObjectParams.get("guestNetworkCidr");
-        String networkType = _currentObjectParams.get("networktype");
-
-        // Check that all IPs are valid
-        String ipError = "Please enter a valid IP address for the field: ";
-        if (!IPRangeConfig.validOrBlankIP(dns1)) {
-            printError(ipError + "dns1");
-        }
-        if (!IPRangeConfig.validOrBlankIP(dns2)) {
-            printError(ipError + "dns2");
-        }
-        if (!IPRangeConfig.validOrBlankIP(internalDns1)) {
-            printError(ipError + "internalDns1");
-        }
-        if (!IPRangeConfig.validOrBlankIP(internalDns2)) {
-            printError(ipError + "internalDns2");
-        }
-        if (!IPRangeConfig.validCIDR(guestNetworkCidr)) {
-            printError("Please enter a valid value for guestNetworkCidr");
-        }
-
-        pzc.saveZone(false, id, name, dns1, dns2, internalDns1, internalDns2, guestNetworkCidr, networkType);
-    }
-
-    private void savePhysicalNetwork() {
-        long id = Long.parseLong(_currentObjectParams.get("id"));
-        String zoneId = _currentObjectParams.get("zoneId");
-        String vnetRange = _currentObjectParams.get("vnet");
-
-        int vnetStart = -1;
-        int vnetEnd = -1;
-        if (vnetRange != null) {
-            String[] tokens = vnetRange.split("-");
-            vnetStart = Integer.parseInt(tokens[0]);
-            vnetEnd = Integer.parseInt(tokens[1]);
-        }
-        long zoneDbId = Long.parseLong(zoneId);
-        pzc.savePhysicalNetwork(false, id, zoneDbId, vnetStart, vnetEnd);
-
     }
 
     private void savePhysicalNetworkServiceProvider() {
@@ -728,10 +1295,10 @@ public class DatabaseConfig {
         int securityGroup = Integer.parseInt(_currentObjectParams.get("securityGroup"));
 
         String insertSql1 =
-            "INSERT INTO `physical_network_service_providers` (`id`, `uuid`, `physical_network_id` , `provider_name`, `state` ,"
-                + "`destination_physical_network_id`, `vpn_service_provided`, `dhcp_service_provided`, `dns_service_provided`, `gateway_service_provided`,"
-                + "`firewall_service_provided`, `source_nat_service_provided`, `load_balance_service_provided`, `static_nat_service_provided`,"
-                + "`port_forwarding_service_provided`, `user_data_service_provided`, `security_group_service_provided`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "INSERT INTO `physical_network_service_providers` (`id`, `uuid`, `physical_network_id` , `provider_name`, `state` ,"
+                        + "`destination_physical_network_id`, `vpn_service_provided`, `dhcp_service_provided`, `dns_service_provided`, `gateway_service_provided`,"
+                        + "`firewall_service_provided`, `source_nat_service_provided`, `load_balance_service_provided`, `static_nat_service_provided`,"
+                        + "`port_forwarding_service_provided`, `user_data_service_provided`, `security_group_service_provided`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
@@ -759,7 +1326,6 @@ public class DatabaseConfig {
             s_logger.error("error creating physical network service provider", ex);
             return;
         }
-
     }
 
     private void saveVirtualRouterProvider() {
@@ -783,507 +1349,6 @@ public class DatabaseConfig {
             System.out.println("Error creating virtual router provider: " + ex.getMessage());
             s_logger.error("error creating virtual router provider ", ex);
             return;
-        }
-
-    }
-
-    private void saveVlan() {
-        String zoneId = _currentObjectParams.get("zoneId");
-        String physicalNetworkIdStr = _currentObjectParams.get("physicalNetworkId");
-        String vlanId = _currentObjectParams.get("vlanId");
-        String gateway = _currentObjectParams.get("gateway");
-        String netmask = _currentObjectParams.get("netmask");
-        String publicIpRange = _currentObjectParams.get("ipAddressRange");
-        String vlanType = _currentObjectParams.get("vlanType");
-        String vlanPodName = _currentObjectParams.get("podName");
-
-        String ipError = "Please enter a valid IP address for the field: ";
-        if (!IPRangeConfig.validOrBlankIP(gateway)) {
-            printError(ipError + "gateway");
-        }
-        if (!IPRangeConfig.validOrBlankIP(netmask)) {
-            printError(ipError + "netmask");
-        }
-
-        // Check that the given IP address range was valid
-        if (!checkIpAddressRange(publicIpRange)) {
-            printError("Please enter a valid public IP range.");
-        }
-
-        // Split the IP address range
-        String[] ipAddressRangeArray = publicIpRange.split("\\-");
-        String startIP = ipAddressRangeArray[0];
-        String endIP = null;
-        if (ipAddressRangeArray.length > 1) {
-            endIP = ipAddressRangeArray[1];
-        }
-
-        // If a netmask was provided, check that the startIP, endIP, and gateway all belong to the same subnet
-        if (netmask != null && !netmask.equals("")) {
-            if (endIP != null) {
-                if (!IPRangeConfig.sameSubnet(startIP, endIP, netmask)) {
-                    printError("Start and end IPs for the public IP range must be in the same subnet, as per the provided netmask.");
-                }
-            }
-
-            if (gateway != null && !gateway.equals("")) {
-                if (!IPRangeConfig.sameSubnet(startIP, gateway, netmask)) {
-                    printError("The start IP for the public IP range must be in the same subnet as the gateway, as per the provided netmask.");
-                }
-                if (endIP != null) {
-                    if (!IPRangeConfig.sameSubnet(endIP, gateway, netmask)) {
-                        printError("The end IP for the public IP range must be in the same subnet as the gateway, as per the provided netmask.");
-                    }
-                }
-            }
-        }
-
-        long zoneDbId = Long.parseLong(zoneId);
-        String zoneName = PodZoneConfig.getZoneName(zoneDbId);
-
-        long physicalNetworkId = Long.parseLong(physicalNetworkIdStr);
-
-        //Set networkId to be 0, the value will be updated after management server starts up
-        pzc.modifyVlan(zoneName, true, vlanId, gateway, netmask, vlanPodName, vlanType, publicIpRange, 0, physicalNetworkId);
-
-        long vlanDbId = pzc.getVlanDbId(zoneName, vlanId);
-        iprc.saveIPRange("public", -1, zoneDbId, vlanDbId, startIP, endIP, null, physicalNetworkId);
-
-    }
-
-    private void savePod() {
-        long id = Long.parseLong(_currentObjectParams.get("id"));
-        String name = _currentObjectParams.get("name");
-        long dataCenterId = Long.parseLong(_currentObjectParams.get("zoneId"));
-        String privateIpRange = _currentObjectParams.get("ipAddressRange");
-        String gateway = _currentObjectParams.get("gateway");
-        String cidr = _currentObjectParams.get("cidr");
-        String zoneName = PodZoneConfig.getZoneName(dataCenterId);
-        String startIP = null;
-        String endIP = null;
-        String vlanRange = _currentObjectParams.get("vnet");
-
-        int vlanStart = -1;
-        int vlanEnd = -1;
-        if (vlanRange != null) {
-            String[] tokens = vlanRange.split("-");
-            vlanStart = Integer.parseInt(tokens[0]);
-            vlanEnd = Integer.parseInt(tokens[1]);
-        }
-
-        // Get the individual cidrAddress and cidrSize values
-        String[] cidrPair = cidr.split("\\/");
-        String cidrAddress = cidrPair[0];
-        String cidrSize = cidrPair[1];
-        long cidrSizeNum = Long.parseLong(cidrSize);
-
-        // Check that the gateway is in the same subnet as the CIDR
-        if (!IPRangeConfig.sameSubnetCIDR(gateway, cidrAddress, cidrSizeNum)) {
-            printError("For pod " + name + " in zone " + zoneName + " , please ensure that your gateway is in the same subnet as the  pod's CIDR address.");
-        }
-
-        pzc.savePod(false, id, name, dataCenterId, gateway, cidr, vlanStart, vlanEnd);
-
-        if (privateIpRange != null) {
-            // Check that the given IP address range was valid
-            if (!checkIpAddressRange(privateIpRange)) {
-                printError("Please enter a valid private IP range.");
-            }
-
-            String[] ipAddressRangeArray = privateIpRange.split("\\-");
-            startIP = ipAddressRangeArray[0];
-            endIP = null;
-            if (ipAddressRangeArray.length > 1) {
-                endIP = ipAddressRangeArray[1];
-            }
-        }
-
-        // Check that the start IP and end IP match up with the CIDR
-        if (!IPRangeConfig.sameSubnetCIDR(startIP, endIP, cidrSizeNum)) {
-            printError("For pod " + name + " in zone " + zoneName + ", please ensure that your start IP and end IP are in the same subnet, as per the pod's CIDR size.");
-        }
-
-        if (!IPRangeConfig.sameSubnetCIDR(startIP, cidrAddress, cidrSizeNum)) {
-            printError("For pod " + name + " in zone " + zoneName + ", please ensure that your start IP is in the same subnet as the pod's CIDR address.");
-        }
-
-        if (!IPRangeConfig.sameSubnetCIDR(endIP, cidrAddress, cidrSizeNum)) {
-            printError("For pod " + name + " in zone " + zoneName + ", please ensure that your end IP is in the same subnet as the pod's CIDR address.");
-        }
-
-        if (privateIpRange != null) {
-            // Save the IP address range
-            iprc.saveIPRange("private", id, dataCenterId, -1, startIP, endIP, null, -1);
-        }
-
-    }
-
-    @DB
-    protected void saveServiceOffering() {
-        long id = Long.parseLong(_currentObjectParams.get("id"));
-        String name = _currentObjectParams.get("name");
-        String displayText = _currentObjectParams.get("displayText");
-        ProvisioningType provisioningType = ProvisioningType.valueOf(_currentObjectParams.get("provisioningType"));
-        int cpu = Integer.parseInt(_currentObjectParams.get("cpu"));
-        int ramSize = Integer.parseInt(_currentObjectParams.get("ramSize"));
-        int speed = Integer.parseInt(_currentObjectParams.get("speed"));
-        String useLocalStorageValue = _currentObjectParams.get("useLocalStorage");
-
-//        int nwRate = Integer.parseInt(_currentObjectParams.get("nwRate"));
-//        int mcRate = Integer.parseInt(_currentObjectParams.get("mcRate"));
-        boolean ha = Boolean.parseBoolean(_currentObjectParams.get("enableHA"));
-        boolean mirroring = Boolean.parseBoolean(_currentObjectParams.get("mirrored"));
-
-        boolean useLocalStorage;
-        if (useLocalStorageValue != null) {
-            if (Boolean.parseBoolean(useLocalStorageValue)) {
-                useLocalStorage = true;
-            } else {
-                useLocalStorage = false;
-            }
-        } else {
-            useLocalStorage = false;
-        }
-
-        ServiceOfferingVO serviceOffering =
-            new ServiceOfferingVO(name, cpu, ramSize, speed, null, null, ha, displayText,
-                    provisioningType, useLocalStorage, false, null, false, null, false);
-
-        Long bytesReadRate = Long.parseLong(_currentObjectParams.get("bytesReadRate"));
-        if ((bytesReadRate != null) && (bytesReadRate > 0))
-            serviceOffering.setBytesReadRate(bytesReadRate);
-        Long bytesWriteRate = Long.parseLong(_currentObjectParams.get("bytesWriteRate"));
-        if ((bytesWriteRate != null) && (bytesWriteRate > 0))
-            serviceOffering.setBytesWriteRate(bytesWriteRate);
-        Long iopsReadRate = Long.parseLong(_currentObjectParams.get("iopsReadRate"));
-        if ((iopsReadRate != null) && (iopsReadRate > 0))
-            serviceOffering.setIopsReadRate(iopsReadRate);
-        Long iopsWriteRate = Long.parseLong(_currentObjectParams.get("iopsWriteRate"));
-        if ((iopsWriteRate != null) && (iopsWriteRate > 0))
-            serviceOffering.setIopsWriteRate(iopsWriteRate);
-
-        ServiceOfferingDaoImpl dao = ComponentContext.inject(ServiceOfferingDaoImpl.class);
-        try {
-            dao.persist(serviceOffering);
-        } catch (Exception e) {
-            s_logger.error("error creating service offering", e);
-
-        }
-        /*
-        String insertSql = "INSERT INTO `cloud`.`service_offering` (id, name, cpu, ram_size, speed, nw_rate, mc_rate, created, ha_enabled, mirrored, display_text, guest_ip_type, use_local_storage) " +
-                "VALUES (" + id + ",'" + name + "'," + cpu + "," + ramSize + "," + speed + "," + nwRate + "," + mcRate + ",now()," + ha + "," + mirroring + ",'" + displayText + "','" + guestIpType + "','" + useLocalStorage + "')";
-
-        Transaction txn = Transaction.currentTxn();
-        try {
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            s_logger.error("error creating service offering", ex);
-            return;
-        }
-         */
-    }
-
-    @DB
-    protected void saveDiskOffering() {
-        long id = Long.parseLong(_currentObjectParams.get("id"));
-        long domainId = Long.parseLong(_currentObjectParams.get("domainId"));
-        String name = _currentObjectParams.get("name");
-        String displayText = _currentObjectParams.get("displayText");
-        ProvisioningType provisioningType = ProvisioningType.valueOf(_currentObjectParams.get("provisioningtype"));
-        long diskSpace = Long.parseLong(_currentObjectParams.get("diskSpace"));
-        diskSpace = diskSpace * 1024 * 1024;
-//        boolean mirroring = Boolean.parseBoolean(_currentObjectParams.get("mirrored"));
-        String tags = _currentObjectParams.get("tags");
-        String useLocal = _currentObjectParams.get("useLocal");
-        boolean local = false;
-        if (useLocal != null) {
-            local = Boolean.parseBoolean(useLocal);
-        }
-
-        if (tags != null && tags.length() > 0) {
-            String[] tokens = tags.split(",");
-            StringBuilder newTags = new StringBuilder();
-            for (String token : tokens) {
-                newTags.append(token.trim()).append(",");
-            }
-            newTags.delete(newTags.length() - 1, newTags.length());
-            tags = newTags.toString();
-        }
-        DiskOfferingVO diskOffering = new DiskOfferingVO(domainId, name, displayText, provisioningType, diskSpace, tags, false, null, null, null);
-        diskOffering.setUseLocalStorage(local);
-
-        Long bytesReadRate = Long.parseLong(_currentObjectParams.get("bytesReadRate"));
-        if (bytesReadRate != null && (bytesReadRate > 0))
-            diskOffering.setBytesReadRate(bytesReadRate);
-        Long bytesWriteRate = Long.parseLong(_currentObjectParams.get("bytesWriteRate"));
-        if (bytesWriteRate != null && (bytesWriteRate > 0))
-            diskOffering.setBytesWriteRate(bytesWriteRate);
-        Long iopsReadRate = Long.parseLong(_currentObjectParams.get("iopsReadRate"));
-        if (iopsReadRate != null && (iopsReadRate > 0))
-            diskOffering.setIopsReadRate(iopsReadRate);
-        Long iopsWriteRate = Long.parseLong(_currentObjectParams.get("iopsWriteRate"));
-        if (iopsWriteRate != null && (iopsWriteRate > 0))
-            diskOffering.setIopsWriteRate(iopsWriteRate);
-
-        DiskOfferingDaoImpl offering = ComponentContext.inject(DiskOfferingDaoImpl.class);
-        try {
-            offering.persist(diskOffering);
-        } catch (Exception e) {
-            s_logger.error("error creating disk offering", e);
-
-        }
-        /*
-        String insertSql = "INSERT INTO `cloud`.`disk_offering` (id, domain_id, name, display_text, disk_size, mirrored, tags) " +
-                "VALUES (" + id + "," + domainId + ",'" + name + "','" + displayText + "'," + diskSpace + "," + mirroring + ", ? )";
-
-        Transaction txn = Transaction.currentTxn();
-        try {
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
-            stmt.setString(1, tags);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            s_logger.error("error creating disk offering", ex);
-            return;
-        }
-         */
-    }
-
-    @DB
-    protected void saveThrottlingRates() {
-        boolean saveNetworkThrottlingRate = (_networkThrottlingRate != null);
-        boolean saveMulticastThrottlingRate = (_multicastThrottlingRate != null);
-
-        if (!saveNetworkThrottlingRate && !saveMulticastThrottlingRate) {
-            return;
-        }
-
-        String insertNWRateSql = "UPDATE `cloud`.`service_offering` SET `nw_rate` = ?";
-        String insertMCRateSql = "UPDATE `cloud`.`service_offering` SET `mc_rate` = ?";
-
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
-            PreparedStatement stmt;
-
-            if (saveNetworkThrottlingRate) {
-                stmt = txn.prepareAutoCloseStatement(insertNWRateSql);
-                stmt.setString(1, _networkThrottlingRate);
-                stmt.executeUpdate();
-            }
-
-            if (saveMulticastThrottlingRate) {
-                stmt = txn.prepareAutoCloseStatement(insertMCRateSql);
-                stmt.setString(1, _multicastThrottlingRate);
-                stmt.executeUpdate();
-            }
-
-        } catch (SQLException ex) {
-            s_logger.error("error saving network and multicast throttling rates to all service offerings", ex);
-            return;
-        }
-    }
-
-    // no configurable values for VM Template, hard-code the defaults for now
-    private void saveVMTemplate() {
-        /*
-        long id = 1;
-        String uniqueName = "routing";
-        String name = "DomR Template";
-        int isPublic = 0;
-        String path = "template/private/u000000/os/routing";
-        String type = "ext3";
-        int requiresHvm = 0;
-        int bits = 64;
-        long createdByUserId = 1;
-        int isReady = 1;
-
-        String insertSql = "INSERT INTO `cloud`.`vm_template` (id, unique_name, name, public, path, created, type, hvm, bits, created_by, ready) " +
-                "VALUES (" + id + ",'" + uniqueName + "','" + name + "'," + isPublic + ",'" + path + "',now(),'" + type + "'," +
-                requiresHvm + "," + bits + "," + createdByUserId + "," + isReady + ")";
-
-        Transaction txn = Transaction.open();
-        try {
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            s_logger.error("error creating vm template: " + ex);
-        } finally {
-            txn.close();
-        }
-         */
-        /*
-        // do it again for console proxy template
-        id = 2;
-        uniqueName = "consoleproxy";
-        name = "Console Proxy Template";
-        isPublic = 0;
-        path = "template/private/u000000/os/consoleproxy";
-        type = "ext3";
-
-        insertSql = "INSERT INTO `cloud`.`vm_template` (id, unique_name, name, public, path, created, type, hvm, bits, created_by, ready) " +
-        "VALUES (" + id + ",'" + uniqueName + "','" + name + "'," + isPublic + ",'" + path + "',now(),'" + type + "'," +
-        requiresHvm + "," + bits + "," + createdByUserId + "," + isReady + ")";
-
-        Transaction txn = Transaction.currentTxn();
-        try {
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            s_logger.error("error creating vm template: " + ex);
-        } finally {
-            txn.close();
-        }
-         */
-    }
-
-    @DB
-    protected void saveUser() {
-        // insert system account
-        final String insertSystemAccount = "INSERT INTO `cloud`.`account` (id, account_name, type, domain_id) VALUES (1, 'system', '1', '1')";
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSystemAccount);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            s_logger.error("error creating system account", ex);
-        }
-
-        // insert system user
-        final String insertSystemUser =
-            "INSERT INTO `cloud`.`user` (id, username, password, account_id, firstname, lastname, created)"
-                + " VALUES (1, 'system', RAND(), 1, 'system', 'cloud', now())";
-        txn = TransactionLegacy.currentTxn();
-        try {
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSystemUser);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            s_logger.error("error creating system user", ex);
-        }
-
-        // insert admin user
-        long id = Long.parseLong(_currentObjectParams.get("id"));
-        String username = _currentObjectParams.get("username");
-        String firstname = _currentObjectParams.get("firstname");
-        String lastname = _currentObjectParams.get("lastname");
-        String password = _currentObjectParams.get("password");
-        String email = _currentObjectParams.get("email");
-
-        if (email == null || email.equals("")) {
-            printError("An email address for each user is required.");
-        }
-
-        MessageDigest md5 = null;
-        try {
-            md5 = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            s_logger.error("error saving user", e);
-            return;
-        }
-        md5.reset();
-        BigInteger pwInt = new BigInteger(1, md5.digest(password.getBytes()));
-        String pwStr = pwInt.toString(16);
-        int padding = 32 - pwStr.length();
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < padding; i++) {
-            sb.append('0'); // make sure the MD5 password is 32 digits long
-        }
-        sb.append(pwStr);
-
-        // create an account for the admin user first
-        final String insertAdminAccount = "INSERT INTO `cloud`.`account` (id, account_name, type, domain_id) VALUES (?, ?, '1', '1')";
-        txn = TransactionLegacy.currentTxn();
-        try {
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertAdminAccount);
-            stmt.setLong(1, id);
-            stmt.setString(2, username);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            s_logger.error("error creating account", ex);
-        }
-
-        // now insert the user
-        final String insertUser =
-                "INSERT INTO `cloud`.`user` (id, username, password, account_id, firstname, lastname, email, created) " + "VALUES (?,?,?, 2, ?,?,?,now())";
-        txn = TransactionLegacy.currentTxn();
-        try {
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertUser);
-            stmt.setLong(1, id);
-            stmt.setString(2, username);
-            stmt.setString(3, sb.toString());
-            stmt.setString(4, firstname);
-            stmt.setString(5, lastname);
-            stmt.setString(6, email);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            s_logger.error("error creating user", ex);
-        }
-    }
-
-    private void saveDefaultConfiguations() {
-        for (String name : s_defaultConfigurationValues.keySet()) {
-            String value = s_defaultConfigurationValues.get(name);
-            saveConfiguration(name, value, null);
-        }
-    }
-
-    private void saveConfiguration() {
-        String name = _currentObjectParams.get("name");
-        String value = _currentObjectParams.get("value");
-        String category = _currentObjectParams.get("category");
-        saveConfiguration(name, value, category);
-    }
-
-    @DB
-    protected void saveConfiguration(String name, String value, String category) {
-        String instance = "DEFAULT";
-        String description = s_configurationDescriptions.get(name);
-        String component = s_configurationComponents.get(name);
-        if (category == null) {
-            category = "Advanced";
-        }
-
-        String instanceNameError = "Please enter a non-blank value for the field: ";
-        if (name.equals("instance.name")) {
-            if (value == null || value.isEmpty() || !value.matches("^[A-Za-z0-9]{1,8}$")) {
-                printError(instanceNameError + "configuration: instance.name can not be empty and can only contain numbers and alphabets up to 8 characters long");
-            }
-        }
-
-        if (name.equals("network.throttling.rate")) {
-            if (value != null && !value.isEmpty()) {
-                _networkThrottlingRate = value;
-            }
-        }
-
-        if (name.equals("multicast.throttling.rate")) {
-            if (value != null && !value.isEmpty()) {
-                _multicastThrottlingRate = value;
-            }
-        }
-
-        String insertSql =
-                "INSERT INTO `cloud`.`configuration` (instance, component, name, value, description, category) " +
-                "VALUES (?,?,?,?,?,?)";
-        String selectSql = "SELECT name FROM cloud.configuration WHERE name = ?";
-
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(selectSql);
-            stmt.setString(1, name);
-            ResultSet result = stmt.executeQuery();
-            Boolean hasRow = result.next();
-            if (!hasRow) {
-                stmt = txn.prepareAutoCloseStatement(insertSql);
-                stmt.setString(1, instance);
-                stmt.setString(2, component);
-                stmt.setString(3, name);
-                stmt.setString(4, value);
-                stmt.setString(5, description);
-                stmt.setString(6, category);
-                stmt.executeUpdate();
-            }
-        } catch (SQLException ex) {
-            s_logger.error("error creating configuration", ex);
         }
     }
 
@@ -1314,39 +1379,36 @@ public class DatabaseConfig {
     }
 
     @DB
-    protected void saveRootDomain() {
-        String insertSql = "insert into `cloud`.`domain` (id, name, parent, owner, path, level) values (1, 'ROOT', NULL, 2, '/', 0)";
+    protected void saveThrottlingRates() {
+        boolean saveNetworkThrottlingRate = (_networkThrottlingRate != null);
+        boolean saveMulticastThrottlingRate = (_multicastThrottlingRate != null);
+
+        if (!saveNetworkThrottlingRate && !saveMulticastThrottlingRate) {
+            return;
+        }
+
+        String insertNWRateSql = "UPDATE `cloud`.`service_offering` SET `nw_rate` = ?";
+        String insertMCRateSql = "UPDATE `cloud`.`service_offering` SET `mc_rate` = ?";
+
         TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            s_logger.error("error creating ROOT domain", ex);
-        }
+            PreparedStatement stmt;
 
-        /*
-        String updateSql = "update account set domain_id = 1 where id = 2";
-        Transaction txn = Transaction.currentTxn();
-        try {
-            PreparedStatement stmt = txn.prepareStatement(updateSql);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            s_logger.error("error updating admin user", ex);
-        } finally {
-            txn.close();
-        }
+            if (saveNetworkThrottlingRate) {
+                stmt = txn.prepareAutoCloseStatement(insertNWRateSql);
+                stmt.setString(1, _networkThrottlingRate);
+                stmt.executeUpdate();
+            }
 
-        updateSql = "update account set domain_id = 1 where id = 1";
-        Transaction txn = Transaction.currentTxn();
-        try {
-            PreparedStatement stmt = txn.prepareStatement(updateSql);
-            stmt.executeUpdate();
+            if (saveMulticastThrottlingRate) {
+                stmt = txn.prepareAutoCloseStatement(insertMCRateSql);
+                stmt.setString(1, _multicastThrottlingRate);
+                stmt.executeUpdate();
+            }
         } catch (SQLException ex) {
-            s_logger.error("error updating system user", ex);
-        } finally {
-            txn.close();
+            s_logger.error("error saving network and multicast throttling rates to all service offerings", ex);
+            return;
         }
-         */
     }
 
     class DbConfigXMLHandler extends DefaultHandler {
@@ -1354,15 +1416,6 @@ public class DatabaseConfig {
 
         public void setParent(DatabaseConfig parent) {
             _parent = parent;
-        }
-
-        @Override
-        public void endElement(String s, String s1, String s2) throws SAXException {
-            if (DatabaseConfig.objectNames.contains(s2) || "object".equals(s2)) {
-                _parent.saveCurrentObject();
-            } else if (DatabaseConfig.fieldNames.contains(s2) || "field".equals(s2)) {
-                _currentFieldName = null;
-            }
         }
 
         @Override
@@ -1381,6 +1434,15 @@ public class DatabaseConfig {
                     _currentObjectParams = new HashMap<String, String>();
                 }
                 _currentFieldName = s2;
+            }
+        }
+
+        @Override
+        public void endElement(String s, String s1, String s2) throws SAXException {
+            if (DatabaseConfig.objectNames.contains(s2) || "object".equals(s2)) {
+                _parent.saveCurrentObject();
+            } else if (DatabaseConfig.fieldNames.contains(s2) || "field".equals(s2)) {
+                _currentFieldName = null;
             }
         }
 
@@ -1407,73 +1469,4 @@ public class DatabaseConfig {
             return name;
         }
     }
-
-    public static List<String> genReturnList(String success, String message) {
-        List<String> returnList = new ArrayList<String>(2);
-        returnList.add(0, success);
-        returnList.add(1, message);
-        return returnList;
-    }
-
-    public static void printError(String message) {
-        System.out.println(message);
-        System.exit(1);
-    }
-
-    public static String getDatabaseValueString(String selectSql, String name, String errorMsg) {
-        TransactionLegacy txn = TransactionLegacy.open("getDatabaseValueString");
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = txn.prepareAutoCloseStatement(selectSql);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                String value = rs.getString(name);
-                return value;
-            } else {
-                return null;
-            }
-        } catch (SQLException e) {
-            System.out.println("Exception: " + e.getMessage());
-            printError(errorMsg);
-        } finally {
-            txn.close();
-        }
-        return null;
-    }
-
-    public static long getDatabaseValueLong(String selectSql, String name, String errorMsg) {
-        TransactionLegacy txn = TransactionLegacy.open("getDatabaseValueLong");
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = txn.prepareAutoCloseStatement(selectSql);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getLong(name);
-            } else {
-                return -1;
-            }
-        } catch (SQLException e) {
-            System.out.println("Exception: " + e.getMessage());
-            printError(errorMsg);
-        } finally {
-            txn.close();
-        }
-        return -1;
-    }
-
-    public static void saveSQL(String sql, String errorMsg) {
-        TransactionLegacy txn = TransactionLegacy.open("saveSQL");
-        try {
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(sql);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            System.out.println("SQL Exception: " + ex.getMessage());
-            printError(errorMsg);
-        } finally {
-            txn.close();
-        }
-    }
-
 }

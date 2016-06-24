@@ -32,18 +32,6 @@ public class CreateVolumeFromVMSnapshotCommand extends Command {
     private DiskProfile diskProfile;
     private Long volumeId;
 
-    public DiskProfile getDskch() {
-        return diskProfile;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public Long getVolumeId() {
-        return volumeId;
-    }
-
     protected CreateVolumeFromVMSnapshotCommand() {
 
     }
@@ -56,7 +44,7 @@ public class CreateVolumeFromVMSnapshotCommand extends Command {
     }
 
     public CreateVolumeFromVMSnapshotCommand(String path, String name, Boolean fullClone, String storagePoolUuid, StorageFilerTO pool, DiskProfile diskProfile,
-            Long volumeId) {
+                                             Long volumeId) {
         this.path = path;
         this.name = name;
         this.fullClone = fullClone;
@@ -64,6 +52,18 @@ public class CreateVolumeFromVMSnapshotCommand extends Command {
         this.pool = pool;
         this.diskProfile = diskProfile;
         this.volumeId = volumeId;
+    }
+
+    public DiskProfile getDskch() {
+        return diskProfile;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public Long getVolumeId() {
+        return volumeId;
     }
 
     @Override

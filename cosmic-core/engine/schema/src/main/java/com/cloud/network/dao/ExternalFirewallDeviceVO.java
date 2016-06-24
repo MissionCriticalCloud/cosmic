@@ -16,7 +16,8 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.UUID;
+import org.apache.cloudstack.api.Identity;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,41 +27,32 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.UUID;
 
 /**
  * ExternalFirewallDeviceVO contains information of a external firewall device (Juniper SRX) added into a deployment
-  */
+ */
 
 @Entity
 @Table(name = "external_firewall_devices")
 public class ExternalFirewallDeviceVO implements InternalIdentity, Identity {
+    @Column(name = "device_state")
+    @Enumerated(value = EnumType.STRING)
+    FirewallDeviceState deviceState;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "host_id")
     private long hostId;
-
     @Column(name = "physical_network_id")
     private long physicalNetworkId;
-
     @Column(name = "provider_name")
     private String providerName;
-
     @Column(name = "device_name")
     private String deviceName;
-
-    @Column(name = "device_state")
-    @Enumerated(value = EnumType.STRING)
-    FirewallDeviceState deviceState;
-
     @Column(name = "is_dedicated")
     private boolean isDedicatedDevice;
 
@@ -71,16 +63,8 @@ public class ExternalFirewallDeviceVO implements InternalIdentity, Identity {
     @Enumerated(value = EnumType.STRING)
     private FirewallDeviceAllocationState allocationState;
 
-    //keeping it enum for future possible states Maintenance, Shutdown
-    public enum FirewallDeviceState {
-        Enabled, Disabled
-    }
-
-    public enum FirewallDeviceAllocationState {
-        Free, Allocated
-    }
-
-    public ExternalFirewallDeviceVO(long hostId, long physicalNetworkId, String providerName, String deviceName, long capacity, boolean dedicated) {
+    public ExternalFirewallDeviceVO(final long hostId, final long physicalNetworkId, final String providerName, final String deviceName, final long capacity, final boolean
+            dedicated) {
         this.physicalNetworkId = physicalNetworkId;
         this.providerName = providerName;
         this.deviceName = deviceName;
@@ -122,7 +106,7 @@ public class ExternalFirewallDeviceVO implements InternalIdentity, Identity {
         return capacity;
     }
 
-    public void setCapacity(long capacity) {
+    public void setCapacity(final long capacity) {
         this.capacity = capacity;
     }
 
@@ -130,7 +114,7 @@ public class ExternalFirewallDeviceVO implements InternalIdentity, Identity {
         return deviceState;
     }
 
-    public void setDeviceState(FirewallDeviceState state) {
+    public void setDeviceState(final FirewallDeviceState state) {
         this.deviceState = state;
     }
 
@@ -138,7 +122,7 @@ public class ExternalFirewallDeviceVO implements InternalIdentity, Identity {
         return allocationState;
     }
 
-    public void setAllocationState(FirewallDeviceAllocationState allocationState) {
+    public void setAllocationState(final FirewallDeviceAllocationState allocationState) {
         this.allocationState = allocationState;
     }
 
@@ -146,7 +130,7 @@ public class ExternalFirewallDeviceVO implements InternalIdentity, Identity {
         return isDedicatedDevice;
     }
 
-    public void setIsDedicatedDevice(boolean isDedicated) {
+    public void setIsDedicatedDevice(final boolean isDedicated) {
         isDedicatedDevice = isDedicated;
     }
 
@@ -155,7 +139,16 @@ public class ExternalFirewallDeviceVO implements InternalIdentity, Identity {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(final String uuid) {
         this.uuid = uuid;
+    }
+
+    //keeping it enum for future possible states Maintenance, Shutdown
+    public enum FirewallDeviceState {
+        Enabled, Disabled
+    }
+
+    public enum FirewallDeviceAllocationState {
+        Free, Allocated
     }
 }

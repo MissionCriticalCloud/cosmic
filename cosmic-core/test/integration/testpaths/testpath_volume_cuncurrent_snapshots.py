@@ -18,12 +18,9 @@
     Snapshot Test cases related to handling concurrent snapshots at host level.
 """
 
-from nose.plugins.attrib import attr
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import (
-    cleanup_resources,
-    validateList
-)
+from marvin.codes import PASS
 from marvin.lib.base import (
     Account,
     StoragePool,
@@ -45,11 +42,13 @@ from marvin.lib.common import (
     is_snapshot_on_nfs,
     createChecksum
 )
+from marvin.lib.utils import (
+    cleanup_resources,
+    validateList
+)
 from marvin.sshClient import SshClient
-import time
-
+from nose.plugins.attrib import attr
 from threading import Thread
-from marvin.codes import PASS
 
 
 def MigrateRootVolume(self,
@@ -135,7 +134,6 @@ def CreateSnapshot(self, root_volume, is_recurring):
 
 
 class TestConcurrentSnapshots(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestConcurrentSnapshots, cls).getClsTestClient()
@@ -718,7 +716,7 @@ class TestConcurrentSnapshots(cloudstackTestCase):
 
         # Step 1
         if not self.testdata["configurableData"][
-                "restartManagementServerThroughTestCase"]:
+            "restartManagementServerThroughTestCase"]:
             self.skipTest(
                 "Skip test if restartManagementServerThroughTestCase \
                         is not provided")

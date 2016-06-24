@@ -56,12 +56,12 @@ public class MigrateCommand extends Command {
         return vmName;
     }
 
-    public void setHostGuid(String guid) {
-        this.hostGuid = guid;
-    }
-
     public String getHostGuid() {
         return this.hostGuid;
+    }
+
+    public void setHostGuid(String guid) {
+        this.hostGuid = guid;
     }
 
     @Override

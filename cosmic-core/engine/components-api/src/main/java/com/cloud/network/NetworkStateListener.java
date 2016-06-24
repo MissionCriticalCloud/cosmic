@@ -17,13 +17,6 @@
 
 package com.cloud.network;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.event.EventCategory;
 import com.cloud.event.dao.UsageEventDao;
 import com.cloud.network.Network.Event;
@@ -32,26 +25,30 @@ import com.cloud.network.dao.NetworkDao;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.fsm.StateListener;
 import com.cloud.utils.fsm.StateMachine2;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.events.EventBus;
 import org.apache.cloudstack.framework.events.EventBusException;
+
+import javax.inject.Inject;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 public class NetworkStateListener implements StateListener<State, Event, Network> {
 
+    private static final Logger s_logger = LoggerFactory.getLogger(NetworkStateListener.class);
+    protected static EventBus s_eventBus = null;
     @Inject
     protected UsageEventDao _usageEventDao;
     @Inject
     protected NetworkDao _networkDao;
     @Inject
     protected ConfigurationDao _configDao;
-
-    protected static EventBus s_eventBus = null;
-
-    private static final Logger s_logger = LoggerFactory.getLogger(NetworkStateListener.class);
 
     public NetworkStateListener(UsageEventDao usageEventDao, NetworkDao networkDao, ConfigurationDao configDao) {
         _usageEventDao = usageEventDao;
@@ -67,20 +64,21 @@ public class NetworkStateListener implements StateListener<State, Event, Network
 
     @Override
     public boolean postStateTransitionEvent(StateMachine2.Transition<State, Event> transition, Network vo, boolean status, Object opaque) {
-      State oldState = transition.getCurrentState();
-      State newState = transition.getToState();
-      Event event = transition.getEvent();
-      pubishOnEventBus(event.name(), "postStateTransitionEvent", vo, oldState, newState);
-      return true;
+        State oldState = transition.getCurrentState();
+        State newState = transition.getToState();
+        Event event = transition.getEvent();
+        pubishOnEventBus(event.name(), "postStateTransitionEvent", vo, oldState, newState);
+        return true;
     }
 
-  private void pubishOnEventBus(String event, String status, Network vo, State oldState, State newState) {
+    private void pubishOnEventBus(String event, String status, Network vo, State oldState, State newState) {
 
         String configKey = "publish.resource.state.events";
         String value = _configDao.getValue(configKey);
         boolean configValue = Boolean.parseBoolean(value);
-        if(!configValue)
+        if (!configValue) {
             return;
+        }
         try {
             s_eventBus = ComponentContext.getComponent(EventBus.class);
         } catch (NoSuchBeanDefinitionException nbe) {
@@ -89,7 +87,7 @@ public class NetworkStateListener implements StateListener<State, Event, Network
 
         String resourceName = getEntityFromClassName(Network.class.getName());
         org.apache.cloudstack.framework.events.Event eventMsg =
-            new org.apache.cloudstack.framework.events.Event("management-server", EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName, vo.getUuid());
+                new org.apache.cloudstack.framework.events.Event("management-server", EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName, vo.getUuid());
         Map<String, String> eventDescription = new HashMap<String, String>();
         eventDescription.put("resource", resourceName);
         eventDescription.put("id", vo.getUuid());

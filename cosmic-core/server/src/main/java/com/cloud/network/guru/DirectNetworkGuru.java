@@ -16,10 +16,6 @@
 // under the License.
 package com.cloud.network.guru;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.dao.DataCenterDao;
@@ -67,15 +63,17 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
-
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
+
+import javax.inject.Inject;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
     private static final Logger s_logger = LoggerFactory.getLogger(DirectNetworkGuru.class);
-
+    private static final TrafficType[] TrafficTypes = {TrafficType.Guest};
     @Inject
     DataCenterDao _dcDao;
     @Inject
@@ -101,32 +99,8 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
     @Inject
     NetworkOfferingServiceMapDao _ntwkOfferingSrvcDao;
 
-    private static final TrafficType[] TrafficTypes = {TrafficType.Guest};
-
-    @Override
-    public boolean isMyTrafficType(TrafficType type) {
-        for (TrafficType t : TrafficTypes) {
-            if (t == type) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public TrafficType[] getSupportedTrafficType() {
-        return TrafficTypes;
-    }
-
-    protected boolean canHandle(NetworkOffering offering, DataCenter dc) {
-        // this guru handles only Guest networks in Advance zone with source nat service disabled
-        if (dc.getNetworkType() == NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() == GuestType.Shared
-                && !_ntwkOfferingSrvcDao.isProviderForNetworkOffering(offering.getId(), Network.Provider.NuageVsp)) {
-            return true;
-        } else {
-            s_logger.trace("We only take care of Guest networks of type " + GuestType.Shared);
-            return false;
-        }
+    protected DirectNetworkGuru() {
+        super();
     }
 
     @Override
@@ -143,8 +117,8 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
         }
 
         NetworkVO config =
-            new NetworkVO(offering.getTrafficType(), Mode.Dhcp, BroadcastDomainType.Vlan, offering.getId(), state, plan.getDataCenterId(),
-                    plan.getPhysicalNetworkId(), offering.getRedundantRouter());
+                new NetworkVO(offering.getTrafficType(), Mode.Dhcp, BroadcastDomainType.Vlan, offering.getId(), state, plan.getDataCenterId(),
+                        plan.getPhysicalNetworkId(), offering.getRedundantRouter());
 
         if (userSpecified != null) {
             if ((userSpecified.getCidr() == null && userSpecified.getGateway() != null) || (userSpecified.getCidr() != null && userSpecified.getGateway() == null)) {
@@ -152,7 +126,7 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
             }
 
             if ((userSpecified.getIp6Cidr() == null && userSpecified.getIp6Gateway() != null) ||
-                (userSpecified.getIp6Cidr() != null && userSpecified.getIp6Gateway() == null)) {
+                    (userSpecified.getIp6Cidr() != null && userSpecified.getIp6Gateway() == null)) {
                 throw new InvalidParameterValueException("cidrv6 and gatewayv6 must be specified together.");
             }
 
@@ -188,24 +162,26 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
         return config;
     }
 
-    protected DirectNetworkGuru() {
-        super();
-    }
-
-    @Override
-    public void updateNicProfile(NicProfile profile, Network network) {
-        DataCenter dc = _dcDao.findById(network.getDataCenterId());
-        if (profile != null) {
-            profile.setIPv4Dns1(dc.getDns1());
-            profile.setIPv4Dns2(dc.getDns2());
-            profile.setIPv6Dns1(dc.getIp6Dns1());
-            profile.setIPv6Dns2(dc.getIp6Dns2());
+    protected boolean canHandle(NetworkOffering offering, DataCenter dc) {
+        // this guru handles only Guest networks in Advance zone with source nat service disabled
+        if (dc.getNetworkType() == NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() == GuestType.Shared
+                && !_ntwkOfferingSrvcDao.isProviderForNetworkOffering(offering.getId(), Network.Provider.NuageVsp)) {
+            return true;
+        } else {
+            s_logger.trace("We only take care of Guest networks of type " + GuestType.Shared);
+            return false;
         }
     }
 
     @Override
+    public Network implement(Network network, NetworkOffering offering, DeployDestination destination, ReservationContext context)
+            throws InsufficientVirtualNetworkCapacityException {
+        return network;
+    }
+
+    @Override
     public NicProfile allocate(Network network, NicProfile nic, VirtualMachineProfile vm) throws InsufficientVirtualNetworkCapacityException,
-        InsufficientAddressCapacityException, ConcurrentOperationException {
+            InsufficientAddressCapacityException, ConcurrentOperationException {
 
         DataCenter dc = _dcDao.findById(network.getDataCenterId());
 
@@ -232,54 +208,16 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
 
     @Override
     public void reserve(NicProfile nic, Network network, VirtualMachineProfile vm, DeployDestination dest, ReservationContext context)
-        throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException, ConcurrentOperationException {
+            throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException, ConcurrentOperationException {
         if (nic.getIPv4Address() == null && nic.getIPv6Address() == null) {
             allocateDirectIp(nic, network, vm, dest.getDataCenter(), null, null);
             nic.setReservationStrategy(ReservationStrategy.Create);
         }
     }
 
-    @DB
-    protected void allocateDirectIp(final NicProfile nic, final Network network, final VirtualMachineProfile vm, final DataCenter dc, final String requestedIp4Addr,
-        final String requestedIp6Addr) throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
-
-        try {
-            Transaction.execute(new TransactionCallbackWithExceptionNoReturn<InsufficientCapacityException>() {
-                @Override
-                public void doInTransactionWithoutResult(TransactionStatus status) throws InsufficientVirtualNetworkCapacityException,
-                        InsufficientAddressCapacityException {
-                    if (_networkModel.isSharedNetworkWithoutServices(network.getId())) {
-                        _ipAddrMgr.allocateNicValues(nic, dc, vm, network, requestedIp4Addr, requestedIp6Addr);
-                    } else {
-                        _ipAddrMgr.allocateDirectIp(nic, dc, vm, network, requestedIp4Addr, requestedIp6Addr);
-                        //save the placeholder nic if the vm is the Virtual router
-                        if (vm.getType() == VirtualMachine.Type.DomainRouter) {
-                            Nic placeholderNic = _networkModel.getPlaceholderNicForRouter(network, null);
-                            if (placeholderNic == null) {
-                                s_logger.debug("Saving placeholder nic with ip4 address " + nic.getIPv4Address() + " and ipv6 address " + nic.getIPv6Address() +
-                                        " for the network " + network);
-                                _networkMgr.savePlaceholderNic(network, nic.getIPv4Address(), nic.getIPv6Address(), VirtualMachine.Type.DomainRouter);
-                            }
-                        }
-                    }
-                }
-            });
-        } catch (InsufficientCapacityException e) {
-            ExceptionUtil.rethrow(e, InsufficientVirtualNetworkCapacityException.class);
-            ExceptionUtil.rethrow(e, InsufficientAddressCapacityException.class);
-            throw new IllegalStateException(e);
-        }
-    }
-
     @Override
     public boolean release(NicProfile nic, VirtualMachineProfile vm, String reservationId) {
         return true;
-    }
-
-    @Override
-    public Network implement(Network network, NetworkOffering offering, DeployDestination destination, ReservationContext context)
-        throws InsufficientVirtualNetworkCapacityException {
-        return network;
     }
 
     @Override
@@ -325,6 +263,17 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
     }
 
     @Override
+    public void updateNicProfile(NicProfile profile, Network network) {
+        DataCenter dc = _dcDao.findById(network.getDataCenterId());
+        if (profile != null) {
+            profile.setIPv4Dns1(dc.getDns1());
+            profile.setIPv4Dns2(dc.getDns2());
+            profile.setIPv6Dns1(dc.getIp6Dns1());
+            profile.setIPv6Dns2(dc.getIp6Dns2());
+        }
+    }
+
+    @Override
     public void shutdown(NetworkProfile network, NetworkOffering offering) {
     }
 
@@ -355,9 +304,9 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
                 });
             }
             return true;
-        }catch (Exception e) {
+        } catch (Exception e) {
             s_logger.error("trash. Exception:" + e.getMessage());
-            throw new CloudRuntimeException("trash. Exception:" + e.getMessage(),e);
+            throw new CloudRuntimeException("trash. Exception:" + e.getMessage(), e);
         }
     }
 
@@ -366,5 +315,52 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
         DataCenter dc = _dcDao.findById(networkProfile.getDataCenterId());
         networkProfile.setDns1(dc.getDns1());
         networkProfile.setDns2(dc.getDns2());
+    }
+
+    @Override
+    public TrafficType[] getSupportedTrafficType() {
+        return TrafficTypes;
+    }
+
+    @Override
+    public boolean isMyTrafficType(TrafficType type) {
+        for (TrafficType t : TrafficTypes) {
+            if (t == type) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @DB
+    protected void allocateDirectIp(final NicProfile nic, final Network network, final VirtualMachineProfile vm, final DataCenter dc, final String requestedIp4Addr,
+                                    final String requestedIp6Addr) throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
+
+        try {
+            Transaction.execute(new TransactionCallbackWithExceptionNoReturn<InsufficientCapacityException>() {
+                @Override
+                public void doInTransactionWithoutResult(TransactionStatus status) throws InsufficientVirtualNetworkCapacityException,
+                        InsufficientAddressCapacityException {
+                    if (_networkModel.isSharedNetworkWithoutServices(network.getId())) {
+                        _ipAddrMgr.allocateNicValues(nic, dc, vm, network, requestedIp4Addr, requestedIp6Addr);
+                    } else {
+                        _ipAddrMgr.allocateDirectIp(nic, dc, vm, network, requestedIp4Addr, requestedIp6Addr);
+                        //save the placeholder nic if the vm is the Virtual router
+                        if (vm.getType() == VirtualMachine.Type.DomainRouter) {
+                            Nic placeholderNic = _networkModel.getPlaceholderNicForRouter(network, null);
+                            if (placeholderNic == null) {
+                                s_logger.debug("Saving placeholder nic with ip4 address " + nic.getIPv4Address() + " and ipv6 address " + nic.getIPv6Address() +
+                                        " for the network " + network);
+                                _networkMgr.savePlaceholderNic(network, nic.getIPv4Address(), nic.getIPv6Address(), VirtualMachine.Type.DomainRouter);
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (InsufficientCapacityException e) {
+            ExceptionUtil.rethrow(e, InsufficientVirtualNetworkCapacityException.class);
+            ExceptionUtil.rethrow(e, InsufficientAddressCapacityException.class);
+            throw new IllegalStateException(e);
+        }
     }
 }

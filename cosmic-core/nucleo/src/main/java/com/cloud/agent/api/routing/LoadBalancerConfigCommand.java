@@ -26,7 +26,6 @@ import com.cloud.agent.api.to.NicTO;
  * LoadBalancerConfigCommand sends the load balancer configuration
  */
 public class LoadBalancerConfigCommand extends NetworkElementCommand {
-    LoadBalancerTO[] loadBalancers;
     public String lbStatsVisibility = "guest-network";
     public String lbStatsPublicIP; /* load balancer listen on this ips for stats */
     public String lbStatsPrivateIP; /* load balancer listen on this ips for stats */
@@ -38,6 +37,7 @@ public class LoadBalancerConfigCommand extends NetworkElementCommand {
     public String maxconn = "";
     public String lbProtocol;
     public boolean keepAliveEnabled = false;
+    LoadBalancerTO[] loadBalancers;
     NicTO nic;
     Long vpcId;
 
@@ -50,7 +50,7 @@ public class LoadBalancerConfigCommand extends NetworkElementCommand {
     }
 
     public LoadBalancerConfigCommand(LoadBalancerTO[] loadBalancers, String publicIp, String guestIp, String privateIp, NicTO nic, Long vpcId, String maxconn,
-            boolean keepAliveEnabled) {
+                                     boolean keepAliveEnabled) {
         this.loadBalancers = loadBalancers;
         this.lbStatsPublicIP = publicIp;
         this.lbStatsPrivateIP = privateIp;

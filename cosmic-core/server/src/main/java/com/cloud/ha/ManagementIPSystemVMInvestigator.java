@@ -16,10 +16,6 @@
 // under the License.
 package com.cloud.ha;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
@@ -28,6 +24,9 @@ import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.vm.Nic;
 import com.cloud.vm.VirtualMachine;
+
+import javax.inject.Inject;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +91,7 @@ public class ManagementIPSystemVMInvestigator extends AbstractInvestigatorImpl {
                     if (vmHostState == Status.Up) {
                         if (s_logger.isDebugEnabled()) {
                             s_logger.debug("successfully pinged vm's host IP (" + vmHost.getPrivateIpAddress() +
-                                "), but could not ping VM, returning that the VM is down");
+                                    "), but could not ping VM, returning that the VM is down");
                         }
                         return Boolean.FALSE;
                     }
@@ -120,5 +119,4 @@ public class ManagementIPSystemVMInvestigator extends AbstractInvestigatorImpl {
     public boolean stop() {
         return true;
     }
-
 }

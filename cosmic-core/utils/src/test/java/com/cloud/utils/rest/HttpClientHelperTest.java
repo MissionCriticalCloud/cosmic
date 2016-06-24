@@ -34,5 +34,4 @@ public class HttpClientHelperTest {
 
         assertThat(client, notNullValue());
     }
-
 }

@@ -16,7 +16,8 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.UUID;
+import com.cloud.network.Networks.TrafficType;
+import com.cloud.network.PhysicalNetworkTrafficType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,28 +27,22 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.network.Networks.TrafficType;
-import com.cloud.network.PhysicalNetworkTrafficType;
+import java.util.UUID;
 
 @Entity
 @Table(name = "physical_network_traffic_types")
 public class PhysicalNetworkTrafficTypeVO implements PhysicalNetworkTrafficType {
+    @Column(name = "traffic_type")
+    @Enumerated(value = EnumType.STRING)
+    TrafficType trafficType;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "physical_network_id")
     private long physicalNetworkId;
-
-    @Column(name = "traffic_type")
-    @Enumerated(value = EnumType.STRING)
-    TrafficType trafficType;
-
     @Column(name = "xenserver_network_label")
     private String xenNetworkLabel;
 
@@ -89,17 +84,13 @@ public class PhysicalNetworkTrafficTypeVO implements PhysicalNetworkTrafficType 
         return trafficType;
     }
 
-    public void setXenNetworkLabel(final String xenNetworkLabel) {
-        this.xenNetworkLabel = xenNetworkLabel;
-    }
-
     @Override
     public String getXenNetworkLabel() {
         return xenNetworkLabel;
     }
 
-    public void setKvmNetworkLabel(final String kvmNetworkLabel) {
-        this.kvmNetworkLabel = kvmNetworkLabel;
+    public void setXenNetworkLabel(final String xenNetworkLabel) {
+        this.xenNetworkLabel = xenNetworkLabel;
     }
 
     @Override
@@ -107,12 +98,25 @@ public class PhysicalNetworkTrafficTypeVO implements PhysicalNetworkTrafficType 
         return kvmNetworkLabel;
     }
 
-    public void setVlan(final String vlan) {
-        this.vlan = vlan;
+    public void setKvmNetworkLabel(final String kvmNetworkLabel) {
+        this.kvmNetworkLabel = kvmNetworkLabel;
+    }
+
+    @Override
+    public String getOvm3NetworkLabel() {
+        return ovm3NetworkLabel;
+    }
+
+    public void setOvm3NetworkLabel(final String ovm3NetworkLabel) {
+        this.ovm3NetworkLabel = ovm3NetworkLabel;
     }
 
     public String getVlan() {
         return vlan;
+    }
+
+    public void setVlan(final String vlan) {
+        this.vlan = vlan;
     }
 
     @Override
@@ -122,14 +126,5 @@ public class PhysicalNetworkTrafficTypeVO implements PhysicalNetworkTrafficType 
 
     public void setUuid(final String uuid) {
         this.uuid = uuid;
-    }
-
-    public void setOvm3NetworkLabel(final String ovm3NetworkLabel) {
-        this.ovm3NetworkLabel = ovm3NetworkLabel;
-    }
-
-    @Override
-    public String getOvm3NetworkLabel() {
-        return ovm3NetworkLabel;
     }
 }

@@ -20,7 +20,6 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.projects.Project;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -29,6 +28,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,38 +56,6 @@ public class UpdateProjectCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public String getAccountName() {
-        return accountName;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getDisplayText() {
-        return displayText;
-    }
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Project project = _projectService.getProject(id);
-        //verify input parameters
-        if (project == null) {
-            throw new InvalidParameterValueException("Unable to find project by id " + id);
-        }
-
-        return _projectService.getProjectOwner(id).getId();
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
     @Override
     public void execute() throws ResourceAllocationException {
         CallContext.current().setEventDetails("Project id: " + getId());
@@ -99,6 +67,38 @@ public class UpdateProjectCmd extends BaseAsyncCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update a project");
         }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getDisplayText() {
+        return displayText;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    @Override
+    public long getEntityOwnerId() {
+        Project project = _projectService.getProject(id);
+        //verify input parameters
+        if (project == null) {
+            throw new InvalidParameterValueException("Unable to find project by id " + id);
+        }
+
+        return _projectService.getProjectOwner(id).getId();
     }
 
     @Override

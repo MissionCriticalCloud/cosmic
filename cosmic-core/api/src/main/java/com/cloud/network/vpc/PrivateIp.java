@@ -46,5 +46,4 @@ public interface PrivateIp {
     long getNetworkId();
 
     boolean getSourceNat();
-
 }

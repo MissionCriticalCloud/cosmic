@@ -24,11 +24,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CheckNetworkCommand;
 import com.cloud.agent.api.MigrateWithStorageCommand;
@@ -49,6 +44,12 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetworkSetupInfo;
 import com.cloud.storage.StoragePool;
 import com.cloud.utils.Pair;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.google.gson.Gson;
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Network;
@@ -58,7 +59,6 @@ import com.xensource.xenapi.Types.BadServerResponse;
 import com.xensource.xenapi.Types.XenAPIException;
 import com.xensource.xenapi.VDI;
 import com.xensource.xenapi.VIF;
-
 import org.apache.xmlrpc.XmlRpcException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -78,7 +78,7 @@ public class XenServer610WrapperTest {
 
         final PhysicalNetworkSetupInfo info = new PhysicalNetworkSetupInfo();
 
-        final List<PhysicalNetworkSetupInfo> setupInfos = new ArrayList<PhysicalNetworkSetupInfo>();
+        final List<PhysicalNetworkSetupInfo> setupInfos = new ArrayList<>();
         setupInfos.add(info);
 
         final CheckNetworkCommand checkNet = new CheckNetworkCommand(setupInfos);
@@ -115,14 +115,14 @@ public class XenServer610WrapperTest {
         final StorageFilerTO storage1 = Mockito.mock(StorageFilerTO.class);
         final StorageFilerTO storage2 = Mockito.mock(StorageFilerTO.class);
 
-        final Map<VolumeTO, StorageFilerTO> volumeToFiler = new  HashMap<VolumeTO, StorageFilerTO>();
+        final Map<VolumeTO, StorageFilerTO> volumeToFiler = new HashMap<>();
         volumeToFiler.put(vol1, storage1);
         volumeToFiler.put(vol2, storage2);
 
         final NicTO nicTO1 = Mockito.mock(NicTO.class);
         final NicTO nicTO2 = Mockito.mock(NicTO.class);
         final NicTO nicTO3 = Mockito.mock(NicTO.class);
-        final NicTO [] nicTOs = {nicTO1, nicTO2, nicTO3};
+        final NicTO[] nicTOs = {nicTO1, nicTO2, nicTO3};
 
         final XsLocalNetwork nativeNetworkForTraffic = Mockito.mock(XsLocalNetwork.class);
         final Network networkForSm = Mockito.mock(Network.class);
@@ -204,14 +204,14 @@ public class XenServer610WrapperTest {
         final StorageFilerTO storage1 = Mockito.mock(StorageFilerTO.class);
         final StorageFilerTO storage2 = Mockito.mock(StorageFilerTO.class);
 
-        final List<Pair<VolumeTO, StorageFilerTO>> volumeToFiler = new ArrayList<Pair<VolumeTO, StorageFilerTO>>();
-        volumeToFiler.add(new Pair<VolumeTO, StorageFilerTO>(vol1, storage1));
-        volumeToFiler.add(new Pair<VolumeTO, StorageFilerTO>(vol2, storage2));
+        final List<Pair<VolumeTO, StorageFilerTO>> volumeToFiler = new ArrayList<>();
+        volumeToFiler.add(new Pair<>(vol1, storage1));
+        volumeToFiler.add(new Pair<>(vol2, storage2));
 
         final NicTO nicTO1 = Mockito.mock(NicTO.class);
         final NicTO nicTO2 = Mockito.mock(NicTO.class);
         final NicTO nicTO3 = Mockito.mock(NicTO.class);
-        final NicTO [] nicTOs = {nicTO1, nicTO2, nicTO3};
+        final NicTO[] nicTOs = {nicTO1, nicTO2, nicTO3};
 
         final XsLocalNetwork nativeNetworkForTraffic = Mockito.mock(XsLocalNetwork.class);
         final Network network = Mockito.mock(Network.class);
@@ -303,15 +303,15 @@ public class XenServer610WrapperTest {
         final Network network1 = Mockito.mock(Network.class);
         final Network network2 = Mockito.mock(Network.class);
 
-        final List<Pair<VolumeTO, Object>> volumeToSr = new ArrayList<Pair<VolumeTO, Object>>();
-        volumeToSr.add(new Pair<VolumeTO, Object>(volume1, sr1));
-        volumeToSr.add(new Pair<VolumeTO, Object>(volume2, sr2));
+        final List<Pair<VolumeTO, Object>> volumeToSr = new ArrayList<>();
+        volumeToSr.add(new Pair<>(volume1, sr1));
+        volumeToSr.add(new Pair<>(volume2, sr2));
 
-        final List<Pair<NicTO, Object>> nicToNetwork = new ArrayList<Pair<NicTO, Object>>();
-        nicToNetwork.add(new Pair<NicTO, Object>(nic1, network1));
-        nicToNetwork.add(new Pair<NicTO, Object>(nic2, network2));
+        final List<Pair<NicTO, Object>> nicToNetwork = new ArrayList<>();
+        nicToNetwork.add(new Pair<>(nic1, network1));
+        nicToNetwork.add(new Pair<>(nic2, network2));
 
-        final Map<String, String> token = new HashMap<String, String>();
+        final Map<String, String> token = new HashMap<>();
 
         final VIF vif1 = Mockito.mock(VIF.class);
         final VIF vif2 = Mockito.mock(VIF.class);
@@ -368,12 +368,12 @@ public class XenServer610WrapperTest {
         final VolumeTO volume1 = Mockito.mock(VolumeTO.class);
         final VolumeTO volume2 = Mockito.mock(VolumeTO.class);
 
-        final List<Pair<VolumeTO, Object>> volumeToSr = new ArrayList<Pair<VolumeTO, Object>>();
-        volumeToSr.add(new Pair<VolumeTO, Object>(volume1, new String("a")));
-        volumeToSr.add(new Pair<VolumeTO, Object>(volume2, new String("b")));
+        final List<Pair<VolumeTO, Object>> volumeToSr = new ArrayList<>();
+        volumeToSr.add(new Pair<>(volume1, new String("a")));
+        volumeToSr.add(new Pair<>(volume2, new String("b")));
 
-        final List<Pair<NicTO, Object>> nicToNetwork = new ArrayList<Pair<NicTO, Object>>();
-        final Map<String, String> token = new HashMap<String, String>();
+        final List<Pair<NicTO, Object>> nicToNetwork = new ArrayList<>();
+        final Map<String, String> token = new HashMap<>();
 
         final MigrateWithStorageSendCommand migrateStorageCommand = new MigrateWithStorageSendCommand(vmSpec, volumeToSr, nicToNetwork, token);
 
@@ -410,16 +410,16 @@ public class XenServer610WrapperTest {
         final NicTO nic1 = Mockito.mock(NicTO.class);
         final NicTO nic2 = Mockito.mock(NicTO.class);
 
-        Gson gson = new Gson();
-        final List<Pair<VolumeTO, Object>> volumeToSr = new ArrayList<Pair<VolumeTO, Object>>();
-        volumeToSr.add(new Pair<VolumeTO, Object>(volume1, sr1));
-        volumeToSr.add(new Pair<VolumeTO, Object>(volume2, sr2));
+        final Gson gson = new Gson();
+        final List<Pair<VolumeTO, Object>> volumeToSr = new ArrayList<>();
+        volumeToSr.add(new Pair<>(volume1, sr1));
+        volumeToSr.add(new Pair<>(volume2, sr2));
 
-        final List<Pair<NicTO, Object>> nicToNetwork = new ArrayList<Pair<NicTO, Object>>();
-        nicToNetwork.add(new Pair<NicTO, Object>(nic1, new String("a")));
-        nicToNetwork.add(new Pair<NicTO, Object>(nic2, new String("b")));
+        final List<Pair<NicTO, Object>> nicToNetwork = new ArrayList<>();
+        nicToNetwork.add(new Pair<>(nic1, new String("a")));
+        nicToNetwork.add(new Pair<>(nic2, new String("b")));
 
-        final Map<String, String> token = new HashMap<String, String>();
+        final Map<String, String> token = new HashMap<>();
 
         final MigrateWithStorageSendCommand migrateStorageCommand = new MigrateWithStorageSendCommand(vmSpec, volumeToSr, nicToNetwork, token);
 
@@ -483,7 +483,7 @@ public class XenServer610WrapperTest {
         final StoragePool pool = Mockito.mock(StoragePool.class);
         final int timeout = 120;
 
-        final Map<String, String> other = new HashMap<String, String>();
+        final Map<String, String> other = new HashMap<>();
         other.put("live", "true");
 
         final MigrateVolumeCommand createStorageCommand = new MigrateVolumeCommand(volumeId, volumePath, pool, timeout);

@@ -16,21 +16,16 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:aop="http://www.springframework.org/schema/aop"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-                      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
-                      http://www.springframework.org/schema/context
-                      http://www.springframework.org/schema/context/spring-context-3.0.xsd"
-                      >
+                      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+>
 
     <bean id="clusterRestService"
-        class="org.apache.cloudstack.engine.rest.service.api.ClusterRestService" />
+          class="org.apache.cloudstack.engine.rest.service.api.ClusterRestService" />
     <bean id="dataDisk"
-        class="org.apache.cloudstack.engine.subsystem.api.storage.type.DataDisk" />
+          class="org.apache.cloudstack.engine.subsystem.api.storage.type.DataDisk" />
     <bean id="podRestService" class="org.apache.cloudstack.engine.rest.service.api.PodRestService" />
     <bean id="iso" class="org.apache.cloudstack.engine.subsystem.api.storage.type.Iso" />
     <bean id="networkRestService" class="org.apache.cloudstack.engine.rest.service.api.NetworkRestService" />
@@ -40,5 +35,5 @@
     <bean id="volumeRestService" class="org.apache.cloudstack.engine.rest.service.api.VolumeRestService" />
     <bean id="volumeTypeHelper" class="org.apache.cloudstack.engine.subsystem.api.storage.type.VolumeTypeHelper" />
     <bean id="zoneRestService" class="org.apache.cloudstack.engine.rest.service.api.ZoneRestService" />
-    
+
 </beans>

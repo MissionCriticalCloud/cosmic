@@ -18,18 +18,17 @@ package org.apache.cloudstack.api.command.test;
 
 import com.cloud.configuration.ConfigurationService;
 import com.cloud.exception.InvalidParameterValueException;
-
 import org.apache.cloudstack.api.ResponseGenerator;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.admin.config.UpdateCfgCmd;
 import org.apache.cloudstack.api.response.ConfigurationResponse;
 import org.apache.cloudstack.config.Configuration;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 public class UpdateCfgCmdTest extends TestCase {
 
@@ -54,7 +53,6 @@ public class UpdateCfgCmdTest extends TestCase {
         } catch (ServerApiException exception) {
             Assert.assertEquals("Failed to update config", exception.getDescription());
         }
-
     }
 
     @Test
@@ -76,7 +74,6 @@ public class UpdateCfgCmdTest extends TestCase {
         } catch (ServerApiException exception) {
             Assert.assertEquals("Failed to update config", exception.getDescription());
         }
-
     }
 
     @Test
@@ -98,9 +95,8 @@ public class UpdateCfgCmdTest extends TestCase {
 
         updateCfgCmd.execute();
         Mockito.verify(responseGenerator).createConfigurationResponse(cfg);
-        ConfigurationResponse actualResponse = (ConfigurationResponse)updateCfgCmd.getResponseObject();
+        ConfigurationResponse actualResponse = (ConfigurationResponse) updateCfgCmd.getResponseObject();
         Assert.assertEquals(response, actualResponse);
         Assert.assertEquals("updateconfigurationresponse", response.getResponseName());
     }
-
 }

@@ -16,11 +16,6 @@
 // under the License.
 package com.cloud.vpc;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.configuration.ResourceCount;
 import com.cloud.configuration.ResourceLimit;
@@ -29,6 +24,10 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.user.Account;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.utils.component.ManagerBase;
+
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -114,30 +113,6 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.user.ResourceLimitService#countCpusForAccount(long)
-     */
-    public long countCpusForAccount(long accountId) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.user.ResourceLimitService#calculateRAMForAccount(long)
-     */
-    public long calculateMemoryForAccount(long accountId) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.user.ResourceLimitService#calculateSecondaryStorageForAccount(long)
-     */
-    public long calculateSecondaryStorageForAccount(long accountId) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    /* (non-Javadoc)
      * @see com.cloud.user.ResourceLimitService#getResourceCount(com.cloud.user.Account, com.cloud.configuration.Resource.ResourceType)
      */
     @Override
@@ -167,6 +142,39 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
     }
 
     /* (non-Javadoc)
+     * @see com.cloud.user.ResourceLimitService#countCpusForAccount(long)
+     */
+    public long countCpusForAccount(long accountId) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    /* (non-Javadoc)
+     * @see com.cloud.user.ResourceLimitService#calculateRAMForAccount(long)
+     */
+    public long calculateMemoryForAccount(long accountId) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    /* (non-Javadoc)
+     * @see com.cloud.user.ResourceLimitService#calculateSecondaryStorageForAccount(long)
+     */
+    public long calculateSecondaryStorageForAccount(long accountId) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    /* (non-Javadoc)
+     * @see com.cloud.utils.component.Manager#getName()
+     */
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /* (non-Javadoc)
      * @see com.cloud.utils.component.Manager#configure(java.lang.String, java.util.Map)
      */
     @Override
@@ -192,14 +200,4 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
         // TODO Auto-generated method stub
         return true;
     }
-
-    /* (non-Javadoc)
-     * @see com.cloud.utils.component.Manager#getName()
-     */
-    @Override
-    public String getName() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

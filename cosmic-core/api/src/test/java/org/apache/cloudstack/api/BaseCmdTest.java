@@ -28,14 +28,14 @@ import org.junit.Test;
 
 public class BaseCmdTest {
 
-    private static final String NON_EXPECTED_COMMAND_NAME = "Non expected command name";
     protected static final String CMD1_NAME = "Cmd1Name";
     protected static final String CMD2_NAME = "Cmd2Name";
     protected static final String CMD1_RESPONSE = "cmd1response";
     protected static final String CMD2_RESPONSE = "cmd2response";
+    private static final String NON_EXPECTED_COMMAND_NAME = "Non expected command name";
 
     @Test
-    public void testGetActualCommandName(){
+    public void testGetActualCommandName() {
         BaseCmd cmd1 = new Cmd1();
         BaseCmd cmd2 = new Cmd2();
 
@@ -44,23 +44,25 @@ public class BaseCmdTest {
     }
 }
 
-@APICommand(name=BaseCmdTest.CMD1_NAME, responseObject=BaseResponse.class)
+@APICommand(name = BaseCmdTest.CMD1_NAME, responseObject = BaseResponse.class)
 class Cmd1 extends BaseCmd {
     @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException, ResourceAllocationException,
             NetworkRuleConflictException {
     }
+
     @Override
     public String getCommandName() {
         return BaseCmdTest.CMD1_RESPONSE;
     }
+
     @Override
     public long getEntityOwnerId() {
         return 0;
     }
 }
 
-@APICommand(name=BaseCmdTest.CMD2_NAME, responseObject=BaseResponse.class)
+@APICommand(name = BaseCmdTest.CMD2_NAME, responseObject = BaseResponse.class)
 class Cmd2 extends Cmd1 {
     @Override
     public String getCommandName() {

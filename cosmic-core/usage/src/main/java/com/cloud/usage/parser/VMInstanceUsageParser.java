@@ -16,15 +16,6 @@
 // under the License.
 package com.cloud.usage.parser;
 
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.usage.UsageVMInstanceVO;
 import com.cloud.usage.UsageVO;
 import com.cloud.usage.dao.UsageDao;
@@ -32,8 +23,16 @@ import com.cloud.usage.dao.UsageVMInstanceDao;
 import com.cloud.user.AccountVO;
 import com.cloud.utils.Pair;
 import com.cloud.utils.StringUtils;
-
 import org.apache.cloudstack.usage.UsageTypes;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.text.DecimalFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -46,15 +45,10 @@ public class VMInstanceUsageParser {
     private static UsageVMInstanceDao s_usageInstanceDao;
 
     @Inject
-    private UsageDao _usageDao;;
+    private UsageDao _usageDao;
+    ;
     @Inject
     private UsageVMInstanceDao _usageInstanceDao;
-
-    @PostConstruct
-    void init() {
-        s_usageDao = _usageDao;
-        s_usageInstanceDao = _usageInstanceDao;
-    }
 
     public static boolean parse(AccountVO account, Date startDate, Date endDate) {
         if (s_logger.isDebugEnabled()) {
@@ -70,7 +64,7 @@ public class VMInstanceUsageParser {
         //     - look for an entry for accountId with end date null (currently running vm or owned IP)
         //     - look for an entry for accountId with start date before given range *and* end date after given range
         List<UsageVMInstanceVO> usageInstances = s_usageInstanceDao.getUsageRecords(account.getId(), startDate, endDate);
-//ToDo: Add domainID for getting usage records
+        //ToDo: Add domainID for getting usage records
 
         // This map has both the running time *and* the usage amount.
         Map<String, Pair<String, Long>> usageVMUptimeMap = new HashMap<String, Pair<String, Long>>();
@@ -110,7 +104,8 @@ public class VMInstanceUsageParser {
                 continue;
             }
 
-            long currentDuration = (vmEndDate.getTime() - vmStartDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to find total number of millis to charge)
+            long currentDuration = (vmEndDate.getTime() - vmStartDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to find total
+            // number of millis to charge)
 
             switch (usageType) {
                 case UsageTypes.ALLOCATED_VM:
@@ -130,7 +125,7 @@ public class VMInstanceUsageParser {
             if (runningTime > 0L) {
                 VMInfo info = vmInfosMap.get(vmIdKey);
                 createUsageRecord(UsageTypes.RUNNING_VM, runningTime, startDate, endDate, account, info.getVirtualMachineId(), vmUptimeInfo.first(), info.getZoneId(),
-                    info.getServiceOfferingId(), info.getTemplateId(), info.getHypervisorType(), info.getCpuCores(), info.getCpuSpeed(), info.getMemory());
+                        info.getServiceOfferingId(), info.getTemplateId(), info.getHypervisorType(), info.getCpuCores(), info.getCpuSpeed(), info.getMemory());
             }
         }
 
@@ -142,7 +137,7 @@ public class VMInstanceUsageParser {
             if (allocatedTime > 0L) {
                 VMInfo info = vmInfosMap.get(vmIdKey);
                 createUsageRecord(UsageTypes.ALLOCATED_VM, allocatedTime, startDate, endDate, account, info.getVirtualMachineId(), vmAllocInfo.first(), info.getZoneId(),
-                    info.getServiceOfferingId(), info.getTemplateId(), info.getHypervisorType(), info.getCpuCores(), info.getCpuSpeed(), info.getMemory());
+                        info.getServiceOfferingId(), info.getTemplateId(), info.getHypervisorType(), info.getCpuCores(), info.getCpuSpeed(), info.getMemory());
             }
         }
 
@@ -162,7 +157,7 @@ public class VMInstanceUsageParser {
     }
 
     private static void createUsageRecord(int type, long runningTime, Date startDate, Date endDate, AccountVO account, long vmId, String vmName, long zoneId,
-        long serviceOfferingId, long templateId, String hypervisorType, Long cpuCores, Long cpuSpeed, Long memory) {
+                                          long serviceOfferingId, long templateId, String hypervisorType, Long cpuCores, Long cpuSpeed, Long memory) {
         // Our smallest increment is hourly for now
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Total running time " + runningTime + "ms");
@@ -175,7 +170,7 @@ public class VMInstanceUsageParser {
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Creating VM usage record for vm: " + vmName + ", type: " + type + ", usage: " + usageDisplay + ", startDate: " + startDate + ", endDate: " +
-                endDate + ", for account: " + account.getId());
+                    endDate + ", for account: " + account.getId());
         }
 
         // Create the usage record
@@ -187,9 +182,15 @@ public class VMInstanceUsageParser {
         }
         usageDesc += " (ServiceOffering: " + serviceOfferingId + ") (Template: " + templateId + ")";
         UsageVO usageRecord =
-            new UsageVO(Long.valueOf(zoneId), account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", type, new Double(usage), Long.valueOf(vmId),
-                vmName, cpuCores, cpuSpeed, memory, Long.valueOf(serviceOfferingId), Long.valueOf(templateId), Long.valueOf(vmId), startDate, endDate, hypervisorType);
+                new UsageVO(Long.valueOf(zoneId), account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", type, new Double(usage), Long.valueOf(vmId),
+                        vmName, cpuCores, cpuSpeed, memory, Long.valueOf(serviceOfferingId), Long.valueOf(templateId), Long.valueOf(vmId), startDate, endDate, hypervisorType);
         s_usageDao.persist(usageRecord);
+    }
+
+    @PostConstruct
+    void init() {
+        s_usageDao = _usageDao;
+        s_usageInstanceDao = _usageInstanceDao;
     }
 
     private static class VMInfo {

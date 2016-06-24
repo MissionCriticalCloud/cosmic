@@ -16,28 +16,37 @@
 // under the License.
 package com.cloud.agent.manager;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.Command.OnError;
 import com.cloud.utils.exception.CloudRuntimeException;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 public class Commands implements Iterable<Command> {
-    OnError _handler;
     private final ArrayList<String> _ids = new ArrayList<String>();
     private final ArrayList<Command> _cmds = new ArrayList<Command>();
+    OnError _handler;
     private Answer[] _answers;
+
+    public Commands(Command cmd) {
+        this(OnError.Stop);
+        addCommand(cmd);
+    }
 
     public Commands(OnError handler) {
         _handler = handler;
     }
 
-    public Commands(Command cmd) {
-        this(OnError.Stop);
-        addCommand(cmd);
+    public void addCommand(Command cmd) {
+        addCommand(null, cmd);
+    }
+
+    public void addCommand(String id, Command cmd) {
+        _ids.add(id);
+        _cmds.add(cmd);
     }
 
     public void addCommands(List<Command> cmds) {
@@ -49,15 +58,6 @@ public class Commands implements Iterable<Command> {
 
     public int size() {
         return _cmds.size();
-    }
-
-    public void addCommand(String id, Command cmd) {
-        _ids.add(id);
-        _cmds.add(cmd);
-    }
-
-    public void addCommand(Command cmd) {
-        addCommand(null, cmd);
     }
 
     public void addCommand(int index, Command cmd) {
@@ -74,7 +74,7 @@ public class Commands implements Iterable<Command> {
         assert (clazz != Answer.class) : "How do you expect to get a unique answer in this case?  huh?  How? How? How?....one more time....How?";
         for (Answer answer : _answers) {
             if (answer.getClass() == clazz) {
-                return (T)answer;
+                return (T) answer;
             }
         }
         throw new CloudRuntimeException("Unable to get answer that is of " + clazz);
@@ -99,10 +99,6 @@ public class Commands implements Iterable<Command> {
         return _cmds.toArray(new Command[_cmds.size()]);
     }
 
-    public void setAnswers(Answer[] answers) {
-        _answers = answers;
-    }
-
     public OnError getErrorHandling() {
         return _handler;
     }
@@ -115,11 +111,15 @@ public class Commands implements Iterable<Command> {
         return _answers;
     }
 
+    public void setAnswers(Answer[] answers) {
+        _answers = answers;
+    }
+
     @SuppressWarnings("unchecked")
     public <T extends Command> T getCommand(Class<T> clazz) {
         for (Command cmd : _cmds) {
             if (cmd.getClass() == clazz) {
-                return (T)cmd;
+                return (T) cmd;
             }
         }
         return null;

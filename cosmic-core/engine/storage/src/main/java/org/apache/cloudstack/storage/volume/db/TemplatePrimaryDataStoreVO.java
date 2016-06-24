@@ -18,7 +18,10 @@
  */
 package org.apache.cloudstack.storage.volume.db;
 
-import java.util.Date;
+import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.utils.db.GenericDaoBase;
+import com.cloud.utils.fsm.StateObject;
+import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,23 +33,16 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
-import com.cloud.utils.db.GenericDaoBase;
-import com.cloud.utils.fsm.StateObject;
-
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
+import java.util.Date;
 
 @Entity
 @Table(name = "template_spool_ref")
 public class TemplatePrimaryDataStoreVO implements StateObject<ObjectInDataStoreStateMachine.State> {
+    @Column(name = "update_count", updatable = true, nullable = false)
+    protected long updatedCount;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
-
-    @Column(name = "pool_id")
-    private long poolId;
-
     @Column(name = "template_id")
     long templateId;
 
@@ -85,9 +81,36 @@ public class TemplatePrimaryDataStoreVO implements StateObject<ObjectInDataStore
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     ObjectInDataStoreStateMachine.State state;
+    @Column(name = "pool_id")
+    private long poolId;
 
-    @Column(name = "update_count", updatable = true, nullable = false)
-    protected long updatedCount;
+    public TemplatePrimaryDataStoreVO(long poolId, long templateId) {
+        super();
+        this.poolId = poolId;
+        this.templateId = templateId;
+        this.downloadState = Status.NOT_DOWNLOADED;
+        this.state = ObjectInDataStoreStateMachine.State.Allocated;
+        this.markedForGC = false;
+    }
+
+    public TemplatePrimaryDataStoreVO(long poolId, long templateId, Date lastUpdated, int downloadPercent, Status downloadState, String localDownloadPath,
+                                      String errorString, String jobId, String installPath, long templateSize) {
+        super();
+        this.poolId = poolId;
+        this.templateId = templateId;
+        this.lastUpdated = lastUpdated;
+        this.downloadPercent = downloadPercent;
+        this.downloadState = downloadState;
+        this.localDownloadPath = localDownloadPath;
+        this.errorString = errorString;
+        this.jobId = jobId;
+        this.installPath = installPath;
+        this.templateSize = templateSize;
+    }
+
+    protected TemplatePrimaryDataStoreVO() {
+
+    }
 
     public long getUpdatedCount() {
         return this.updatedCount;
@@ -105,24 +128,20 @@ public class TemplatePrimaryDataStoreVO implements StateObject<ObjectInDataStore
         return installPath;
     }
 
+    public void setInstallPath(String installPath) {
+        this.installPath = installPath;
+    }
+
     public long getTemplateSize() {
         return templateSize;
     }
 
-    public long getPoolId() {
-        return poolId;
+    public void setTemplateSize(long templateSize) {
+        this.templateSize = templateSize;
     }
 
     public void setpoolId(long poolId) {
         this.poolId = poolId;
-    }
-
-    public long getTemplateId() {
-        return templateId;
-    }
-
-    public void setTemplateId(long templateId) {
-        this.templateId = templateId;
     }
 
     public int getDownloadPercent() {
@@ -131,10 +150,6 @@ public class TemplatePrimaryDataStoreVO implements StateObject<ObjectInDataStore
 
     public void setDownloadPercent(int downloadPercent) {
         this.downloadPercent = downloadPercent;
-    }
-
-    public void setDownloadState(Status downloadState) {
-        this.downloadState = downloadState;
     }
 
     public long getId() {
@@ -153,68 +168,36 @@ public class TemplatePrimaryDataStoreVO implements StateObject<ObjectInDataStore
         lastUpdated = date;
     }
 
-    public void setInstallPath(String installPath) {
-        this.installPath = installPath;
-    }
-
     public Status getDownloadState() {
         return downloadState;
     }
 
-    public TemplatePrimaryDataStoreVO(long poolId, long templateId) {
-        super();
-        this.poolId = poolId;
-        this.templateId = templateId;
-        this.downloadState = Status.NOT_DOWNLOADED;
-        this.state = ObjectInDataStoreStateMachine.State.Allocated;
-        this.markedForGC = false;
-    }
-
-    public TemplatePrimaryDataStoreVO(long poolId, long templateId, Date lastUpdated, int downloadPercent, Status downloadState, String localDownloadPath,
-            String errorString, String jobId, String installPath, long templateSize) {
-        super();
-        this.poolId = poolId;
-        this.templateId = templateId;
-        this.lastUpdated = lastUpdated;
-        this.downloadPercent = downloadPercent;
+    public void setDownloadState(Status downloadState) {
         this.downloadState = downloadState;
-        this.localDownloadPath = localDownloadPath;
-        this.errorString = errorString;
-        this.jobId = jobId;
-        this.installPath = installPath;
-        this.templateSize = templateSize;
-    }
-
-    protected TemplatePrimaryDataStoreVO() {
-
-    }
-
-    public void setLocalDownloadPath(String localPath) {
-        this.localDownloadPath = localPath;
     }
 
     public String getLocalDownloadPath() {
         return localDownloadPath;
     }
 
-    public void setErrorString(String errorString) {
-        this.errorString = errorString;
+    public void setLocalDownloadPath(String localPath) {
+        this.localDownloadPath = localPath;
     }
 
     public String getErrorString() {
         return errorString;
     }
 
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
+    public void setErrorString(String errorString) {
+        this.errorString = errorString;
     }
 
     public String getJobId() {
         return jobId;
     }
 
-    public void setTemplateSize(long templateSize) {
-        this.templateSize = templateSize;
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
     }
 
     public boolean getMarkedForGC() {
@@ -226,15 +209,6 @@ public class TemplatePrimaryDataStoreVO implements StateObject<ObjectInDataStore
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof TemplatePrimaryDataStoreVO) {
-            TemplatePrimaryDataStoreVO other = (TemplatePrimaryDataStoreVO)obj;
-            return (this.templateId == other.getTemplateId() && this.poolId == other.getPoolId());
-        }
-        return false;
-    }
-
-    @Override
     public int hashCode() {
         Long tid = new Long(templateId);
         Long hid = new Long(poolId);
@@ -242,21 +216,41 @@ public class TemplatePrimaryDataStoreVO implements StateObject<ObjectInDataStore
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof TemplatePrimaryDataStoreVO) {
+            TemplatePrimaryDataStoreVO other = (TemplatePrimaryDataStoreVO) obj;
+            return (this.templateId == other.getTemplateId() && this.poolId == other.getPoolId());
+        }
+        return false;
+    }
+
+    public long getPoolId() {
+        return poolId;
+    }
+
+    public long getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(long templateId) {
+        this.templateId = templateId;
+    }
+
+    @Override
     public String toString() {
         return new StringBuilder("TmplPool[").append(id)
-            .append("-")
-            .append(templateId)
-            .append("-")
-            .append("poolId")
-            .append("-")
-            .append(installPath)
-            .append("]")
-            .toString();
+                                             .append("-")
+                                             .append(templateId)
+                                             .append("-")
+                                             .append("poolId")
+                                             .append("-")
+                                             .append(installPath)
+                                             .append("]")
+                                             .toString();
     }
 
     @Override
     public ObjectInDataStoreStateMachine.State getState() {
         return this.state;
     }
-
 }

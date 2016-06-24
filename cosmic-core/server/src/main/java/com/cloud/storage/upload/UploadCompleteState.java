@@ -28,7 +28,6 @@ public class UploadCompleteState extends UploadInactiveState {
     @Override
     public String getName() {
         return Status.UPLOADED.toString();
-
     }
 
     @Override
@@ -40,6 +39,5 @@ public class UploadCompleteState extends UploadInactiveState {
             }
             getUploadListener().setUploadInactive(Status.UPLOADED);
         }
-
     }
 }

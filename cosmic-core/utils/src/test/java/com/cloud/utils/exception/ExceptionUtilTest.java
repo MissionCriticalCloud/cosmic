@@ -48,5 +48,4 @@ public class ExceptionUtilTest {
             assertTrue("we won !?!", true);
         }
     }
-
 }

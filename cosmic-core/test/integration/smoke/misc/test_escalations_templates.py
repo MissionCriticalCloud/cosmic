@@ -15,27 +15,27 @@
 # specific language governing permissions and limitations
 # under the License.
 
-#Test from the Marvin - Testing in Python wiki
+# Test from the Marvin - Testing in Python wiki
 
-#All tests inherit from cloudstackTestCase
+# All tests inherit from cloudstackTestCase
 from marvin.cloudstackTestCase import cloudstackTestCase
 
-#Import Integration Libraries
+# Import Integration Libraries
 
-#base - contains all resources as entities and defines create, delete, list operations on them
+# base - contains all resources as entities and defines create, delete, list operations on them
 from marvin.lib.base import (
-                             Account,
-                             VirtualMachine,
-                             Volume,
-                             ServiceOffering,
-                             Configurations,
-                             DiskOffering,
-                             Template)
+    Account,
+    VirtualMachine,
+    Volume,
+    ServiceOffering,
+    Configurations,
+    DiskOffering,
+    Template)
 
-#utils - utility classes for common cleanup, external library wrappers etc
+# utils - utility classes for common cleanup, external library wrappers etc
 from marvin.lib.utils import cleanup_resources, validateList
 
-#common - commonly used methods for all tests are listed here
+# common - commonly used methods for all tests are listed here
 from marvin.lib.common import get_zone, get_domain, get_template
 from marvin.codes import PASS
 
@@ -44,7 +44,6 @@ import time
 
 
 class TestTemplates(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         try:
@@ -119,7 +118,7 @@ class TestTemplates(cloudstackTestCase):
         return
 
     def tearDown(self):
-        #Clean up, terminate the created volumes
+        # Clean up, terminate the created volumes
         cleanup_resources(self.apiClient, self.cleanup)
         return
 
@@ -140,9 +139,9 @@ class TestTemplates(cloudstackTestCase):
             config = Configurations.list(
                 self.apiClient,
                 name=param,
-                )
+            )
             self.assertEqual(validateList(config)[0], PASS, "Config list returned invalid response")
-            wait_time = wait_time+int(config[0].value)
+            wait_time = wait_time + int(config[0].value)
         self.debug("Total wait time for url expiry: %s" % wait_time)
         # Creating Virtual Machine
         self.virtual_machine = VirtualMachine.create(
@@ -151,10 +150,10 @@ class TestTemplates(cloudstackTestCase):
             accountid=self.account.name,
             domainid=self.account.domainid,
             serviceofferingid=self.service_offering.id,
-            )
+        )
         self.assertIsNotNone(self.virtual_machine, "Virtual Machine creation failed")
         self.cleanup.append(self.virtual_machine)
-        #Stop virtual machine
+        # Stop virtual machine
         self.virtual_machine.stop(self.userapiclient)
         list_volume = Volume.list(
             self.userapiclient,
@@ -165,7 +164,7 @@ class TestTemplates(cloudstackTestCase):
         self.assertEqual(validateList(list_volume)[0],
                          PASS,
                          "list volumes with type ROOT returned invalid list"
-        )
+                         )
         self.volume = list_volume[0]
         self.create_template = Template.create(
             self.userapiclient,
@@ -188,9 +187,9 @@ class TestTemplates(cloudstackTestCase):
             )
         except Exception as e:
             self.fail("Extract template failed with error %s" % e)
-        self.debug("Waiting for %s seconds for url to expire" % repr(wait_time+20))
-        time.sleep(wait_time+20)
-        self.debug("Waited for %s seconds for url to expire" % repr(wait_time+20))
+        self.debug("Waiting for %s seconds for url to expire" % repr(wait_time + 20))
+        time.sleep(wait_time + 20)
+        self.debug("Waited for %s seconds for url to expire" % repr(wait_time + 20))
         """
         Deploy vm with the template created from the volume. After url expiration interval only
         url should be deleted not the template. To validate this deploy vm with the template

@@ -26,5 +26,4 @@ public interface ClusteredAgentRebalanceService {
     void scheduleRebalanceAgents();
 
     boolean executeRebalanceRequest(long agentId, long currentOwnerId, long futureOwnerId, Event event) throws AgentUnavailableException, OperationTimedoutException;
-
 }

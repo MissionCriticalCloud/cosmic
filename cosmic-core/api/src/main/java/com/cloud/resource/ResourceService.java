@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.resource;
 
-import java.util.List;
-
 import com.cloud.exception.DiscoveryException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceInUseException;
@@ -25,7 +23,6 @@ import com.cloud.host.Host;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.org.Cluster;
 import com.cloud.utils.fsm.NoTransitionException;
-
 import org.apache.cloudstack.api.command.admin.cluster.AddClusterCmd;
 import org.apache.cloudstack.api.command.admin.cluster.DeleteClusterCmd;
 import org.apache.cloudstack.api.command.admin.host.AddHostCmd;
@@ -36,12 +33,13 @@ import org.apache.cloudstack.api.command.admin.host.ReconnectHostCmd;
 import org.apache.cloudstack.api.command.admin.host.UpdateHostCmd;
 import org.apache.cloudstack.api.command.admin.host.UpdateHostPasswordCmd;
 
+import java.util.List;
+
 public interface ResourceService {
     /**
      * Updates a host
      *
-     * @param cmd
-     *            - the command specifying hostId
+     * @param cmd - the command specifying hostId
      * @return hostObject
      * @throws NoTransitionException
      */
@@ -75,12 +73,9 @@ public interface ResourceService {
     /**
      * Deletes a host
      *
-     * @param hostId
-     *            TODO
-     * @param isForced
-     *            TODO
-     *
-     * @param true if deleted, false otherwise
+     * @param hostId   TODO
+     * @param isForced TODO
+     * @param true     if deleted, false otherwise
      */
     boolean deleteHost(long hostId, boolean isForced, boolean isForceDeleteStorage);
 
@@ -95,5 +90,4 @@ public interface ResourceService {
     List<HypervisorType> getSupportedHypervisorTypes(long zoneId, boolean forVirtualRouter, Long podId);
 
     boolean releaseHostReservation(Long hostId);
-
 }

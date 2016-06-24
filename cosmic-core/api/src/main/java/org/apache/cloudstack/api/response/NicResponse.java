@@ -16,15 +16,15 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.List;
-
 import com.cloud.serializer.Param;
 import com.cloud.vm.Nic;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
 
 @SuppressWarnings("unused")
 @EntityReference(value = Nic.class)
@@ -106,14 +106,6 @@ public class NicResponse extends BaseResponse {
         this.vmId = vmId;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public void setNetworkid(String networkid) {
         this.networkId = networkid;
     }
@@ -183,26 +175,38 @@ public class NicResponse extends BaseResponse {
         return result;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        NicResponse other = (NicResponse)obj;
+        }
+        NicResponse other = (NicResponse) obj;
         String oid = this.getId();
         if (oid == null) {
-            if (other.getId() != null)
+            if (other.getId() != null) {
                 return false;
-        } else if (!oid.equals(other.getId()))
+            }
+        } else if (!oid.equals(other.getId())) {
             return false;
+        }
         return true;
     }
 
     public void setSecondaryIps(List<NicSecondaryIpResponse> ipList) {
         this.secondaryIps = ipList;
     }
-
 }

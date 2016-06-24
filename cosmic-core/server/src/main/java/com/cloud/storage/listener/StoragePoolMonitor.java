@@ -16,10 +16,6 @@
 // under the License.
 package com.cloud.storage.listener;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.Listener;
 import com.cloud.agent.api.AgentControlAnswer;
 import com.cloud.agent.api.AgentControlCommand;
@@ -36,9 +32,12 @@ import com.cloud.storage.ScopeType;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StorageManagerImpl;
 import com.cloud.storage.StoragePoolStatus;
-
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import javax.inject.Inject;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,12 +52,6 @@ public class StoragePoolMonitor implements Listener {
     public StoragePoolMonitor(final StorageManagerImpl mgr, final PrimaryDataStoreDao poolDao) {
         _storageManager = mgr;
         _poolDao = poolDao;
-
-    }
-
-    @Override
-    public boolean isRecurring() {
-        return false;
     }
 
     @Override
@@ -67,8 +60,13 @@ public class StoragePoolMonitor implements Listener {
     }
 
     @Override
-    public synchronized boolean processDisconnect(final long agentId, final Status state) {
-        return true;
+    public boolean processCommands(final long agentId, final long seq, final Command[] req) {
+        return false;
+    }
+
+    @Override
+    public AgentControlAnswer processControlCommand(final long agentId, final AgentControlCommand cmd) {
+        return null;
     }
 
     @Override
@@ -110,22 +108,22 @@ public class StoragePoolMonitor implements Listener {
     }
 
     @Override
-    public boolean processCommands(final long agentId, final long seq, final Command[] req) {
-        return false;
-    }
-
-    @Override
-    public AgentControlAnswer processControlCommand(final long agentId, final AgentControlCommand cmd) {
-        return null;
-    }
-
-    @Override
-    public boolean processTimeout(final long agentId, final long seq) {
+    public synchronized boolean processDisconnect(final long agentId, final Status state) {
         return true;
+    }
+
+    @Override
+    public boolean isRecurring() {
+        return false;
     }
 
     @Override
     public int getTimeout() {
         return -1;
+    }
+
+    @Override
+    public boolean processTimeout(final long agentId, final long seq) {
+        return true;
     }
 }

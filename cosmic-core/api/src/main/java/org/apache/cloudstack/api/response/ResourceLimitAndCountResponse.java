@@ -15,8 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-/**This interface is implemented by AccountResponse and ProjectResponse as both of them
-have limits and resource count **/
+/**
+ * This interface is implemented by AccountResponse and ProjectResponse as both of them
+ * have limits and resource count
+ **/
 
 package org.apache.cloudstack.api.response;
 
@@ -91,5 +93,4 @@ public interface ResourceLimitAndCountResponse {
     public void setVmStopped(Integer vmStopped);
 
     public void setVmRunning(Integer vmRunning);
-
 }

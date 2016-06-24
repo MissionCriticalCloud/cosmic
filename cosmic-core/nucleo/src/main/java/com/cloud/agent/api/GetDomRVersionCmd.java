@@ -22,13 +22,13 @@ package com.cloud.agent.api;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 
 public class GetDomRVersionCmd extends NetworkElementCommand {
+    public GetDomRVersionCmd() {
+        super();
+    }
+
     @Override
     public boolean executeInSequence() {
         return false;
-    }
-
-    public GetDomRVersionCmd() {
-        super();
     }
 
     @Override

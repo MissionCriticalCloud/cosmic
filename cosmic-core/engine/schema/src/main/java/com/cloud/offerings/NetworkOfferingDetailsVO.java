@@ -16,6 +16,10 @@
 // under the License.
 package com.cloud.offerings;
 
+import com.cloud.offering.NetworkOffering;
+import com.cloud.offering.NetworkOffering.Detail;
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -24,11 +28,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.offering.NetworkOffering;
-import com.cloud.offering.NetworkOffering.Detail;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = "network_offering_details")
@@ -62,28 +61,28 @@ public class NetworkOfferingDetailsVO implements InternalIdentity {
         return id;
     }
 
-    public long getOfferingId() {
-        return offeringId;
-    }
-
-    public NetworkOffering.Detail getName() {
-        return name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getOfferingId() {
+        return offeringId;
     }
 
     public void setOfferingId(long offeringId) {
         this.offeringId = offeringId;
     }
 
+    public NetworkOffering.Detail getName() {
+        return name;
+    }
+
     public void setName(NetworkOffering.Detail name) {
         this.name = name;
+    }
+
+    public String getValue() {
+        return value;
     }
 
     public void setValue(String value) {

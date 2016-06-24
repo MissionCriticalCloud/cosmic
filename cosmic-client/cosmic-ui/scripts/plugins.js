@@ -14,12 +14,12 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-(function($, cloudStack, require) {
+(function ($, cloudStack, require) {
     if (!cloudStack.pluginAPI) {
         cloudStack.pluginAPI = {};
     }
 
-    var loadCSS = function(path) {
+    var loadCSS = function (path) {
         if (document.createStyleSheet) {
             // IE-compatible CSS loading
             document.createStyleSheet(path);
@@ -39,23 +39,23 @@
     $.extend(cloudStack.pluginAPI, {
         ui: {
             pollAsyncJob: pollAsyncJobResult,
-            apiCall: function(command, args) {
+            apiCall: function (command, args) {
                 $.ajax({
                     url: createURL(command),
                     data: args.data,
                     success: args.success,
-                    error: function(json) {
+                    error: function (json) {
                         args.error(parseXMLHttpResponse(json));
                     }
                 });
             },
-            addSection: function(section) {
+            addSection: function (section) {
                 cloudStack.sections[section.id] = $.extend(section, {
                     customIcon: 'plugins/' + section.id + '/icon.png',
                     isPlugin: true
                 });
             },
-            extend: function(obj) {
+            extend: function (obj) {
                 $.extend(true, cloudStack, obj);
             }
         }
@@ -70,17 +70,17 @@
     var pluginTotal = cloudStack.plugins.length + cloudStack.modules.length;
 
     // Load
-    $(['modules', 'plugins']).each(function() {
+    $(['modules', 'plugins']).each(function () {
         var type = this;
-        var paths = $(cloudStack[type]).map(function(index, id) {
+        var paths = $(cloudStack[type]).map(function (index, id) {
             return type + '/' + id + '/' + id;
         }).toArray();
 
         // Load modules
         require(
             paths,
-            function() {
-                $(cloudStack[type]).map(function(index, id) {
+            function () {
+                $(cloudStack[type]).map(function (index, id) {
                     var basePath = type + '/' + id + '/';
                     var css = basePath + id + '.css';
                     var configJS = type == 'plugins' ? basePath + 'config' : null;
@@ -103,15 +103,15 @@
                     if ($.isArray(target)) { // Load additional JS includes
                         pluginTotal += target[0].length;
                         require(
-                            $(target[0]).map(function(index, val) {
+                            $(target[0]).map(function (index, val) {
                                 return basePath + val;
                             }).toArray(),
-                            function() {
+                            function () {
                                 loadedPlugins = loadedPlugins + target[0].length;
                                 target[1](
                                     $.extend(true, {}, cloudStack.pluginAPI, {
                                         pluginAPI: {
-                                            extend: function(api) {
+                                            extend: function (api) {
                                                 cloudStack.pluginAPI[id] = api;
                                             }
                                         }
@@ -122,7 +122,7 @@
                         target(
                             $.extend(true, {}, cloudStack.pluginAPI, {
                                 pluginAPI: {
-                                    extend: function(api) {
+                                    extend: function (api) {
                                         cloudStack.pluginAPI[id] = api;
                                     }
                                 }
@@ -132,7 +132,7 @@
 
                     if (pluginDictionary) {
                         // Callback for extending the dictionary with new entries
-                        var addToDictionary = function() {
+                        var addToDictionary = function () {
                             var additions = cloudStack[type][id].dictionary;
                             $.extend(dictionary, additions);
                         };
@@ -140,10 +140,10 @@
                         // Only add a suffix if the locale is defined and not english/US
                         var suffix = '';
                         if (locale && (locale != '' && locale != 'en' & locale != 'en_US'))
-                            suffix = '_'+locale;
+                            suffix = '_' + locale;
 
                         // Attempt to load the locale's dictionary
-                        require([pluginDictionary+suffix], addToDictionary, function() {
+                        require([pluginDictionary + suffix], addToDictionary, function () {
                             // If the load failed and there was no suffix, don't try again
                             if (!suffix)
                                 return;
@@ -161,7 +161,7 @@
         );
     });
 
-    var loadTimer = setInterval(function() {
+    var loadTimer = setInterval(function () {
         if (loadedPlugins === pluginTotal) {
             clearInterval(loadTimer);
             $(window).trigger('cloudStack.pluginReady');

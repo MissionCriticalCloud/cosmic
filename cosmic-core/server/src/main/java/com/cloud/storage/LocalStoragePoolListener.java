@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.storage;
 
-import javax.inject.Inject;
-
 import com.cloud.agent.Listener;
 import com.cloud.agent.api.AgentControlAnswer;
 import com.cloud.agent.api.AgentControlCommand;
@@ -33,8 +31,10 @@ import com.cloud.host.Host;
 import com.cloud.host.Status;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.utils.db.DB;
-
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,16 +52,6 @@ public class LocalStoragePoolListener implements Listener {
     DataCenterDao _dcDao;
 
     @Override
-    public int getTimeout() {
-        return 0;
-    }
-
-    @Override
-    public boolean isRecurring() {
-        return false;
-    }
-
-    @Override
     public boolean processAnswers(long agentId, long seq, Answer[] answers) {
         return false;
     }
@@ -72,13 +62,18 @@ public class LocalStoragePoolListener implements Listener {
     }
 
     @Override
+    public AgentControlAnswer processControlCommand(long agentId, AgentControlCommand cmd) {
+        return null;
+    }
+
+    @Override
     @DB
     public void processConnect(Host host, StartupCommand cmd, boolean forRebalance) throws ConnectionException {
         if (!(cmd instanceof StartupStorageCommand)) {
             return;
         }
 
-        StartupStorageCommand ssCmd = (StartupStorageCommand)cmd;
+        StartupStorageCommand ssCmd = (StartupStorageCommand) cmd;
 
         if (ssCmd.getResourceType() != Storage.StorageResourceType.STORAGE_POOL) {
             return;
@@ -93,13 +88,18 @@ public class LocalStoragePoolListener implements Listener {
     }
 
     @Override
-    public AgentControlAnswer processControlCommand(long agentId, AgentControlCommand cmd) {
-        return null;
+    public boolean processDisconnect(long agentId, Status state) {
+        return false;
     }
 
     @Override
-    public boolean processDisconnect(long agentId, Status state) {
+    public boolean isRecurring() {
         return false;
+    }
+
+    @Override
+    public int getTimeout() {
+        return 0;
     }
 
     @Override

@@ -17,7 +17,6 @@
 package com.cloud.utils.net;
 
 import com.google.common.testing.EqualsTester;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,5 +35,4 @@ public class Ip4AddressTest {
         Assert.assertTrue("1 and one should be considdered the same address", new Ip4Address(1L, 5L).isSameAddressAs("0.0.0.1"));
         Assert.assertFalse("zero and 0L should be considdered the same address but a Long won't be accepted", new Ip4Address("0.0.0.0", "00:00:00:00:00:08").isSameAddressAs(0L));
     }
-
 }

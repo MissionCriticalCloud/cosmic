@@ -56,9 +56,17 @@ public class SSHKeyPairVO implements SSHKeyPair {
         return id;
     }
 
+    public void setId(final Long id) {
+        this.id = id;
+    }
+
     @Override
     public long getAccountId() {
         return accountId;
+    }
+
+    public void setAccountId(final long accountId) {
+        this.accountId = accountId;
     }
 
     @Override
@@ -66,14 +74,18 @@ public class SSHKeyPairVO implements SSHKeyPair {
         return domainId;
     }
 
-    @Override
-    public String getFingerprint() {
-        return fingerprint;
+    public void setDomainId(final long domainId) {
+        this.domainId = domainId;
     }
 
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getFingerprint() {
+        return fingerprint;
     }
 
     @Override
@@ -86,32 +98,20 @@ public class SSHKeyPairVO implements SSHKeyPair {
         return privateKey;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPrivateKey(final String privateKey) {
+        this.privateKey = privateKey;
     }
 
-    public void setAccountId(long accountId) {
-        this.accountId = accountId;
-    }
-
-    public void setDomainId(long domainId) {
-        this.domainId = domainId;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setFingerprint(String fingerprint) {
-        this.fingerprint = fingerprint;
-    }
-
-    public void setPublicKey(String publicKey) {
+    public void setPublicKey(final String publicKey) {
         this.publicKey = publicKey;
     }
 
-    public void setPrivateKey(String privateKey) {
-        this.privateKey = privateKey;
+    public void setFingerprint(final String fingerprint) {
+        this.fingerprint = fingerprint;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
     }
 
     @Override

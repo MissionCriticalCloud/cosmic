@@ -16,14 +16,13 @@
 // under the License.
 package com.cloud.user;
 
-import java.util.List;
-
 import com.cloud.domain.Domain;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.command.admin.domain.ListDomainChildrenCmd;
 import org.apache.cloudstack.api.command.admin.domain.ListDomainsCmd;
+
+import java.util.List;
 
 public interface DomainService {
 
@@ -50,10 +49,8 @@ public interface DomainService {
     /**
      * find the domain by its path
      *
-     * @param domainPath
-     *            the path to use to lookup a domain
+     * @param domainPath the path to use to lookup a domain
      * @return domainVO the domain with the matching path, or null if no domain with the given path exists
      */
     Domain findDomainByPath(String domainPath);
-
 }

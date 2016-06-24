@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.user.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.user.VmDiskStatisticsVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Date;
+import java.util.List;
 
 public interface VmDiskStatisticsDao extends GenericDao<VmDiskStatisticsVO, Long> {
     VmDiskStatisticsVO findBy(long accountId, long dcId, long vmId, long volumeId);

@@ -33,5 +33,4 @@ public class SecStorageSetupAnswer extends Answer {
     public String get_dir() {
         return _dir;
     }
-
 }

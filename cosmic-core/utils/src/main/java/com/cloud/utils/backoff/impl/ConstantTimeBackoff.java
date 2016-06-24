@@ -19,13 +19,13 @@
 
 package com.cloud.utils.backoff.impl;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.backoff.BackoffAlgorithm;
 import com.cloud.utils.component.AdapterBase;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,16 +34,15 @@ import org.apache.commons.logging.LogFactory;
  * An implementation of BackoffAlgorithm that waits for some seconds.
  * After the time the client can try to perform the operation again.
  *
- * @config
- * {@table
- *    || Param Name | Description | Values | Default ||
- *    || seconds    | seconds to sleep | integer | 5 ||
- *  }
+ * @config {@table
+ * || Param Name | Description | Values | Default ||
+ * || seconds    | seconds to sleep | integer | 5 ||
+ * }
  **/
 public class ConstantTimeBackoff extends AdapterBase implements BackoffAlgorithm, ConstantTimeBackoffMBean {
-    long _time;
-    private final Map<String, Thread> _asleep = new ConcurrentHashMap<String, Thread>();
     private final static Log LOG = LogFactory.getLog(ConstantTimeBackoff.class);
+    private final Map<String, Thread> _asleep = new ConcurrentHashMap<String, Thread>();
+    long _time;
 
     @Override
     public void waitBeforeRetry() {
@@ -67,8 +66,18 @@ public class ConstantTimeBackoff extends AdapterBase implements BackoffAlgorithm
 
     @Override
     public boolean configure(String name, Map<String, Object> params) {
-        _time = NumbersUtil.parseLong((String)params.get("seconds"), 5) * 1000;
+        _time = NumbersUtil.parseLong((String) params.get("seconds"), 5) * 1000;
         return true;
+    }
+
+    @Override
+    public long getTimeToWait() {
+        return _time;
+    }
+
+    @Override
+    public void setTimeToWait(long seconds) {
+        _time = seconds * 1000;
     }
 
     @Override
@@ -85,15 +94,5 @@ public class ConstantTimeBackoff extends AdapterBase implements BackoffAlgorithm
         }
 
         return false;
-    }
-
-    @Override
-    public long getTimeToWait() {
-        return _time;
-    }
-
-    @Override
-    public void setTimeToWait(long seconds) {
-        _time = seconds * 1000;
     }
 }

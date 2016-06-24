@@ -31,27 +31,27 @@ public class AttachPrimaryDataStoreAnswer extends Answer {
         super(cmd);
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     public String getUuid() {
         return uuid;
     }
 
-    public void setCapacity(long capacity) {
-        this.capacity = capacity;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public long getCapacity() {
         return capacity;
     }
 
-    public void setAvailable(long avail) {
-        this.avail = avail;
+    public void setCapacity(long capacity) {
+        this.capacity = capacity;
     }
 
     public long getAvailable() {
         return avail;
+    }
+
+    public void setAvailable(long avail) {
+        this.avail = avail;
     }
 }

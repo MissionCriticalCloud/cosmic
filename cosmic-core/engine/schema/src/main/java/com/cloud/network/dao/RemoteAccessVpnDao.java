@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface RemoteAccessVpnDao extends GenericDao<RemoteAccessVpnVO, Long> {
     RemoteAccessVpnVO findByPublicIpAddress(long ipAddressId);

@@ -25,13 +25,6 @@ import org.apache.cloudstack.api.InternalIdentity;
  * Nic represents one nic on the VM.
  */
 public interface MonitoringService extends ControlledEntity, Identity, InternalIdentity {
-    /**
-     * @return id in the CloudStack database
-     */
-    enum Service {
-        Dhcp, LoadBalancing, Ssh, Webserver,
-    }
-
     @Override
     long getId();
 
@@ -42,4 +35,11 @@ public interface MonitoringService extends ControlledEntity, Identity, InternalI
     String getServicePidFile();
 
     String getServicePath();
+
+    /**
+     * @return id in the CloudStack database
+     */
+    enum Service {
+        Dhcp, LoadBalancing, Ssh, Webserver,
+    }
 }

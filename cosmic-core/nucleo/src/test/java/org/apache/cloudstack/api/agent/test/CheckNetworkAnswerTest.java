@@ -23,10 +23,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.cloud.agent.api.CheckNetworkAnswer;
 import com.cloud.agent.api.CheckNetworkCommand;
 import com.cloud.agent.api.storage.ResizeVolumeCommand;
@@ -35,6 +31,10 @@ import com.cloud.hypervisor.Hypervisor;
 import com.cloud.storage.Storage;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.StoragePoolStatus;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -80,22 +80,23 @@ public class CheckNetworkAnswerTest {
             @Override
             public long getId() {
                 return 1L;
-            };
+            }
+
+            ;
 
             @Override
             public String getName() {
                 return "name";
-            };
+            }
 
-            @Override
-            public String getUuid() {
-                return "bed9f83e-cac3-11e1-ac8a-0050568b007e";
-            };
+            ;
 
             @Override
             public Storage.StoragePoolType getPoolType() {
                 return Storage.StoragePoolType.Filesystem;
-            };
+            }
+
+            ;
 
             @Override
             public Date getCreated() {
@@ -108,75 +109,103 @@ public class CheckNetworkAnswerTest {
                 return date;
             }
 
+            ;
+
             @Override
             public Date getUpdateTime() {
                 return new Date();
-            };
+            }
 
             @Override
             public long getDataCenterId() {
                 return 0L;
-            };
+            }
+
+            ;
 
             @Override
             public long getCapacityBytes() {
                 return 0L;
-            };
+            }
+
+            ;
 
             @Override
             public long getUsedBytes() {
                 return 0L;
-            };
+            }
+
+            ;
 
             @Override
             public Long getCapacityIops() {
                 return 0L;
-            };
+            }
+
+            ;
 
             @Override
             public Long getClusterId() {
                 return 0L;
-            };
+            }
+
+            ;
 
             @Override
             public String getHostAddress() {
                 return "hostAddress";
-            };
+            }
+
+            ;
 
             @Override
             public String getPath() {
                 return "path";
-            };
+            }
+
+            ;
 
             @Override
             public String getUserInfo() {
                 return "userInfo";
-            };
+            }
+
+            ;
 
             @Override
             public boolean isShared() {
                 return false;
-            };
+            }
+
+            ;
 
             @Override
             public boolean isLocal() {
                 return false;
-            };
+            }
+
+            ;
 
             @Override
             public StoragePoolStatus getStatus() {
                 return StoragePoolStatus.Up;
-            };
+            }
+
+            ;
 
             @Override
             public int getPort() {
                 return 25;
-            };
+            }
+
+            ;
 
             @Override
             public Long getPodId() {
                 return 0L;
             }
+
+            ;
 
             @Override
             public String getStorageProviderName() {
@@ -193,6 +222,11 @@ public class CheckNetworkAnswerTest {
             @Override
             public Hypervisor.HypervisorType getHypervisor() {
                 return null;  //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public String getUuid() {
+                return "bed9f83e-cac3-11e1-ac8a-0050568b007e";
             }
 
             ;
@@ -274,6 +308,5 @@ public class CheckNetworkAnswerTest {
             String vmName = rv.getInstanceName();
             assertTrue(vmName.equals("vmName"));
         }
-
     }
 }

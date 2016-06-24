@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.google.common.base.Optional;
-
 import org.apache.http.Consts;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -42,12 +41,11 @@ public class HttpUriRequestBuilder {
     private static final String JSON_CONTENT_TYPE = HttpConstants.JSON_CONTENT_TYPE;
 
     private static final Optional<String> ABSENT = Optional.absent();
-
+    private final Map<String, String> parameters = new HashMap<String, String>();
+    private final Map<String, String> methodParameters = new HashMap<String, String>();
     private HttpMethods method;
     private String path;
     private Optional<String> jsonPayload = ABSENT;
-    private final Map<String, String> parameters = new HashMap<String, String>();
-    private final Map<String, String> methodParameters = new HashMap<String, String>();
 
     private HttpUriRequestBuilder() {
 
@@ -94,7 +92,7 @@ public class HttpUriRequestBuilder {
         }
         if (jsonPayload.isPresent()) {
             builder.addHeader(new BasicHeader(CONTENT_TYPE, JSON_CONTENT_TYPE))
-                .setEntity(new StringEntity(jsonPayload.get(), ContentType.create(JSON_CONTENT_TYPE, Consts.UTF_8)));
+                   .setEntity(new StringEntity(jsonPayload.get(), ContentType.create(JSON_CONTENT_TYPE, Consts.UTF_8)));
         }
         return builder.build();
     }

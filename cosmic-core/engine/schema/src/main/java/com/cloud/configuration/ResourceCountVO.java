@@ -80,38 +80,6 @@ public class ResourceCountVO implements ResourceCount {
     }
 
     @Override
-    public long getCount() {
-        return count;
-    }
-
-    @Override
-    public void setCount(long count) {
-        this.count = count;
-    }
-
-    public Long getDomainId() {
-        return domainId;
-    }
-
-    public Long getAccountId() {
-        return accountId;
-    }
-
-    @Override
-    public String toString() {
-        return new StringBuilder("REsourceCount[").append("-")
-            .append(id)
-            .append("-")
-            .append(type)
-            .append("-")
-            .append(accountId)
-            .append("-")
-            .append(domainId)
-            .append("]")
-            .toString();
-    }
-
-    @Override
     public long getOwnerId() {
         if (accountId != null) {
             return accountId;
@@ -129,11 +97,43 @@ public class ResourceCountVO implements ResourceCount {
         }
     }
 
+    @Override
+    public long getCount() {
+        return count;
+    }
+
+    @Override
+    public void setCount(long count) {
+        this.count = count;
+    }
+
+    public Long getDomainId() {
+        return domainId;
+    }
+
     public void setDomainId(Long domainId) {
         this.domainId = domainId;
     }
 
+    public Long getAccountId() {
+        return accountId;
+    }
+
     public void setAccountId(Long accountId) {
         this.accountId = accountId;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("REsourceCount[").append("-")
+                                                  .append(id)
+                                                  .append("-")
+                                                  .append(type)
+                                                  .append("-")
+                                                  .append(accountId)
+                                                  .append("-")
+                                                  .append(domainId)
+                                                  .append("]")
+                                                  .toString();
     }
 }

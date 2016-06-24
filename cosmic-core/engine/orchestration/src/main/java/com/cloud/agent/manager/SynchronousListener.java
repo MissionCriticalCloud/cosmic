@@ -41,21 +41,16 @@ public class SynchronousListener implements Listener {
         _peer = null;
     }
 
-    public void setPeer(String peer) {
-        _peer = peer;
-    }
-
     public String getPeer() {
         return _peer;
     }
 
-    public synchronized Answer[] getAnswers() {
-        return _answers;
+    public void setPeer(String peer) {
+        _peer = peer;
     }
 
-    @Override
-    public boolean isRecurring() {
-        return false;
+    public synchronized Answer[] getAnswers() {
+        return _answers;
     }
 
     public synchronized boolean isDisconnected() {
@@ -70,20 +65,6 @@ public class SynchronousListener implements Listener {
     }
 
     @Override
-    public synchronized boolean processDisconnect(long agentId, Status state) {
-        if (s_logger.isTraceEnabled())
-            s_logger.trace("Agent disconnected, agent id: " + agentId + ", state: " + state + ". Will notify waiters");
-
-        _disconnected = true;
-        notifyAll();
-        return true;
-    }
-
-    @Override
-    public void processConnect(Host agent, StartupCommand cmd, boolean forRebalance) {
-    }
-
-    @Override
     public boolean processCommands(long agentId, long seq, Command[] req) {
         return false;
     }
@@ -91,6 +72,36 @@ public class SynchronousListener implements Listener {
     @Override
     public AgentControlAnswer processControlCommand(long agentId, AgentControlCommand cmd) {
         return null;
+    }
+
+    @Override
+    public void processConnect(Host agent, StartupCommand cmd, boolean forRebalance) {
+    }
+
+    @Override
+    public synchronized boolean processDisconnect(long agentId, Status state) {
+        if (s_logger.isTraceEnabled()) {
+            s_logger.trace("Agent disconnected, agent id: " + agentId + ", state: " + state + ". Will notify waiters");
+        }
+
+        _disconnected = true;
+        notifyAll();
+        return true;
+    }
+
+    @Override
+    public boolean isRecurring() {
+        return false;
+    }
+
+    @Override
+    public int getTimeout() {
+        return -1;
+    }
+
+    @Override
+    public boolean processTimeout(long agentId, long seq) {
+        return true;
     }
 
     public Answer[] waitFor() throws InterruptedException {
@@ -118,19 +129,8 @@ public class SynchronousListener implements Listener {
 
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("Synchronized command - sending completed, time: " + profiler.getDurationInMillis() + ", answer: " +
-                (_answers != null ? _answers[0].toString() : "null"));
+                    (_answers != null ? _answers[0].toString() : "null"));
         }
         return _answers;
     }
-
-    @Override
-    public boolean processTimeout(long agentId, long seq) {
-        return true;
-    }
-
-    @Override
-    public int getTimeout() {
-        return -1;
-    }
-
 }

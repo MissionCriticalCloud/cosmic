@@ -38,5 +38,4 @@ public class IpAssociation extends ConfigBase {
     public void setIpAddress(IpAddress[] ipAddress) {
         this.ipAddress = ipAddress;
     }
-
 }

@@ -16,12 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.snapshot;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.storage.snapshot.SnapshotPolicy;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -30,6 +26,10 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.SnapshotPolicyResponse;
 import org.apache.cloudstack.api.response.VolumeResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,8 @@ public class ListSnapshotPoliciesCmd extends BaseListCmd {
     @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = SnapshotPolicyResponse.class, description = "the ID of the snapshot policy")
     private Long id;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "list resources by display flag; only ROOT admin is eligible to pass this parameter", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "list resources by display flag; only ROOT admin is eligible to pass this parameter",
+            since = "4.4", authorized = {RoleType.Admin})
     private Boolean display;
 
     /////////////////////////////////////////////////////
@@ -61,24 +62,8 @@ public class ListSnapshotPoliciesCmd extends BaseListCmd {
         return volumeId;
     }
 
-    @Override
-    public boolean isDisplay() {
-        if (display != null) {
-            return display;
-        }
-        return true;
-    }
-
     public Long getId() {
         return id;
-    }
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
     }
 
     @Override
@@ -94,5 +79,21 @@ public class ListSnapshotPoliciesCmd extends BaseListCmd {
         response.setResponses(policyResponses, result.second());
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public boolean isDisplay() {
+        if (display != null) {
+            return display;
+        }
+        return true;
     }
 }

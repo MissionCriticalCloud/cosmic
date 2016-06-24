@@ -28,7 +28,7 @@ public class VpnUserList extends ConfigBase {
         super(ConfigBase.VPN_USER_LIST);
     }
 
-    public VpnUserList(List<VpnUser> vpnUsers) {
+    public VpnUserList(final List<VpnUser> vpnUsers) {
         super(ConfigBase.VPN_USER_LIST);
         this.vpnUsers = vpnUsers;
     }
@@ -37,8 +37,7 @@ public class VpnUserList extends ConfigBase {
         return vpnUsers;
     }
 
-    public void setVpnUsers(List<VpnUser> vpnUsers) {
+    public void setVpnUsers(final List<VpnUser> vpnUsers) {
         this.vpnUsers = vpnUsers;
     }
-
 }

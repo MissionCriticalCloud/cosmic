@@ -24,5 +24,4 @@ public interface ApplicationLoadBalancerContainer extends LoadBalancerContainer 
     public Long getSourceIpNetworkId();
 
     public Ip getSourceIp();
-
 }

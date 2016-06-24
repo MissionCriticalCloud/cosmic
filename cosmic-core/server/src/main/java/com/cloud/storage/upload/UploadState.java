@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.storage.upload;
 
-import java.util.Date;
-
 import com.cloud.agent.api.storage.UploadAnswer;
+
+import java.util.Date;
 
 import org.apache.log4j.Level;
 import org.slf4j.Logger;
@@ -26,20 +26,13 @@ import org.slf4j.LoggerFactory;
 
 public abstract class UploadState {
 
-    public static enum UploadEvent {
-        UPLOAD_ANSWER, ABANDON_UPLOAD, TIMEOUT_CHECK, DISCONNECT
-    };
-
     protected static final Logger s_logger = LoggerFactory.getLogger(UploadListener.class.getName());
 
+    ;
     private UploadListener ul;
 
     public UploadState(UploadListener ul) {
         this.ul = ul;
-    }
-
-    protected UploadListener getUploadListener() {
-        return ul;
     }
 
     public String handleEvent(UploadEvent event, Object eventObj) {
@@ -48,7 +41,7 @@ public abstract class UploadState {
         }
         switch (event) {
             case UPLOAD_ANSWER:
-                UploadAnswer answer = (UploadAnswer)eventObj;
+                UploadAnswer answer = (UploadAnswer) eventObj;
                 return handleAnswer(answer);
             case ABANDON_UPLOAD:
                 return handleAbort();
@@ -62,12 +55,26 @@ public abstract class UploadState {
         return null;
     }
 
+    protected UploadListener getUploadListener() {
+        return ul;
+    }
+
+    public abstract String getName();
+
+    public abstract String handleAnswer(UploadAnswer answer);
+
+    public abstract String handleAbort();
+
+    public abstract String handleTimeout(long updateMs);
+
+    public abstract String handleDisconnect();
+
     public void onEntry(String prevState, UploadEvent event, Object evtObj) {
         if (s_logger.isTraceEnabled()) {
             getUploadListener().log("onEntry, event type=" + event + ", curr state=" + getName(), Level.TRACE);
         }
         if (event == UploadEvent.UPLOAD_ANSWER) {
-            getUploadListener().updateDatabase((UploadAnswer)evtObj);
+            getUploadListener().updateDatabase((UploadAnswer) evtObj);
         }
     }
 
@@ -75,14 +82,7 @@ public abstract class UploadState {
 
     }
 
-    public abstract String handleTimeout(long updateMs);
-
-    public abstract String handleAbort();
-
-    public abstract String handleDisconnect();
-
-    public abstract String handleAnswer(UploadAnswer answer);
-
-    public abstract String getName();
-
+    public static enum UploadEvent {
+        UPLOAD_ANSWER, ABANDON_UPLOAD, TIMEOUT_CHECK, DISCONNECT
+    }
 }

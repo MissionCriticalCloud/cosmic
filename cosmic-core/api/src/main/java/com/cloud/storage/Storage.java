@@ -22,6 +22,16 @@ import java.util.List;
 import org.apache.commons.lang.NotImplementedException;
 
 public class Storage {
+    public static List<StoragePoolType> getNonSharedStoragePoolTypes() {
+        final List<StoragePoolType> nonSharedStoragePoolTypes = new ArrayList<>();
+        for (final StoragePoolType storagePoolType : StoragePoolType.values()) {
+            if (!storagePoolType.isShared()) {
+                nonSharedStoragePoolTypes.add(storagePoolType);
+            }
+        }
+        return nonSharedStoragePoolTypes;
+    }
+
     public static enum ImageFormat {
         QCOW2(true, true, false, "qcow2"),
         RAW(false, false, false, "raw"),
@@ -86,11 +96,6 @@ public class Storage {
             this.provisionType = provisionType;
         }
 
-        @Override
-        public String toString() {
-            return provisionType;
-        }
-
         public static ProvisioningType getProvisioningType(final String provisioningType) {
 
             if (provisioningType.equals(THIN.provisionType)) {
@@ -102,6 +107,11 @@ public class Storage {
             } else {
                 throw new NotImplementedException();
             }
+        }
+
+        @Override
+        public String toString() {
+            return provisionType;
         }
     }
 
@@ -143,17 +153,6 @@ public class Storage {
         public boolean isShared() {
             return shared;
         }
-    }
-
-    public static List<StoragePoolType> getNonSharedStoragePoolTypes() {
-        final List<StoragePoolType> nonSharedStoragePoolTypes = new ArrayList<>();
-        for (final StoragePoolType storagePoolType : StoragePoolType.values()) {
-            if (!storagePoolType.isShared()) {
-                nonSharedStoragePoolTypes.add(storagePoolType);
-            }
-        }
-        return nonSharedStoragePoolTypes;
-
     }
 
     public static enum StorageResourceType {

@@ -21,7 +21,6 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -32,15 +31,16 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.PortableIpRangeResponse;
 import org.apache.cloudstack.api.response.RegionResponse;
 import org.apache.cloudstack.region.PortableIpRange;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "createPortableIpRange",
-            responseObject = PortableIpRangeResponse.class,
-            description = "adds a range of portable public IP's to a region",
-            since = "4.2.0",
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = false)
+        responseObject = PortableIpRangeResponse.class,
+        description = "adds a range of portable public IP's to a region",
+        since = "4.2.0",
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = false)
 public class CreatePortableIpRangeCmd extends BaseAsyncCreateCmd {
 
     public static final Logger s_logger = LoggerFactory.getLogger(CreatePortableIpRangeCmd.class.getName());
@@ -73,10 +73,6 @@ public class CreatePortableIpRangeCmd extends BaseAsyncCreateCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Integer getRegionId() {
-        return regionId;
-    }
-
     public String getStartIp() {
         return startIp;
     }
@@ -97,6 +93,16 @@ public class CreatePortableIpRangeCmd extends BaseAsyncCreateCmd {
         return netmask;
     }
 
+    @Override
+    public void execute() {
+        PortableIpRange portableIpRange = _entityMgr.findById(PortableIpRange.class, getEntityId());
+        if (portableIpRange != null) {
+            PortableIpRangeResponse response = _responseGenerator.createPortableIPRangeResponse(portableIpRange);
+            response.setResponseName(getCommandName());
+            this.setResponseObject(response);
+        }
+    }
+
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
@@ -109,16 +115,6 @@ public class CreatePortableIpRangeCmd extends BaseAsyncCreateCmd {
     @Override
     public long getEntityOwnerId() {
         return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
-    public void execute() {
-        PortableIpRange portableIpRange = _entityMgr.findById(PortableIpRange.class, getEntityId());
-        if (portableIpRange != null) {
-            PortableIpRangeResponse response = _responseGenerator.createPortableIPRangeResponse(portableIpRange);
-            response.setResponseName(getCommandName());
-            this.setResponseObject(response);
-        }
     }
 
     @Override
@@ -145,6 +141,10 @@ public class CreatePortableIpRangeCmd extends BaseAsyncCreateCmd {
     @Override
     public String getEventDescription() {
         return "creating a portable public ip range in region: " + getRegionId();
+    }
+
+    public Integer getRegionId() {
+        return regionId;
     }
 
     @Override

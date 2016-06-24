@@ -18,11 +18,12 @@
  */
 package org.apache.cloudstack.spring.module.web;
 
+import org.apache.cloudstack.spring.module.factory.CloudStackSpringContext;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 
-import org.apache.cloudstack.spring.module.factory.CloudStackSpringContext;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 
@@ -33,10 +34,11 @@ public abstract class ModuleBasedFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         String module = filterConfig.getInitParameter("module");
-        CloudStackSpringContext context = (CloudStackSpringContext)filterConfig.getServletContext().getAttribute(CloudStackSpringContext.CLOUDSTACK_CONTEXT_SERVLET_KEY);
+        CloudStackSpringContext context = (CloudStackSpringContext) filterConfig.getServletContext().getAttribute(CloudStackSpringContext.CLOUDSTACK_CONTEXT_SERVLET_KEY);
 
-        if (context == null)
+        if (context == null) {
             return;
+        }
 
         ApplicationContext applicationContext = context.getApplicationContextForWeb(module);
         if (applicationContext != null) {
@@ -56,5 +58,4 @@ public abstract class ModuleBasedFilter implements Filter {
     public boolean isEnabled() {
         return enabled;
     }
-
 }

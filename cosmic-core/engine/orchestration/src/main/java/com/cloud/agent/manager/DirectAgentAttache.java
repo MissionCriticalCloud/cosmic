@@ -16,13 +16,6 @@
 // under the License.
 package com.cloud.agent.manager;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.CronCommand;
@@ -33,9 +26,16 @@ import com.cloud.agent.transport.Response;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.host.Status;
 import com.cloud.resource.ServerResource;
-
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -62,6 +62,47 @@ public class DirectAgentAttache extends AgentAttache {
     }
 
     @Override
+    public void send(Request req) throws AgentUnavailableException {
+        req.logD("Executing: ", true);
+        if (req instanceof Response) {
+            Response resp = (Response) req;
+            Answer[] answers = resp.getAnswers();
+            if (answers != null && answers[0] instanceof StartupAnswer) {
+                StartupAnswer startup = (StartupAnswer) answers[0];
+                int interval = startup.getPingInterval();
+                _futures.add(_agentMgr.getCronJobPool().scheduleAtFixedRate(new PingTask(), interval, interval, TimeUnit.SECONDS));
+            }
+        } else {
+            Command[] cmds = req.getCommands();
+            if (cmds.length > 0 && !(cmds[0] instanceof CronCommand)) {
+                queueTask(new Task(req));
+                scheduleFromQueue();
+            } else {
+                CronCommand cmd = (CronCommand) cmds[0];
+                _futures.add(_agentMgr.getCronJobPool().scheduleAtFixedRate(new CronTask(req), cmd.getInterval(), cmd.getInterval(), TimeUnit.SECONDS));
+            }
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof DirectAgentAttache)) {
+            return false;
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public void process(Answer[] answers) {
+        if (answers != null && answers[0] instanceof StartupAnswer) {
+            StartupAnswer startup = (StartupAnswer) answers[0];
+            int interval = startup.getPingInterval();
+            s_logger.info("StartupAnswer received " + startup.getHostId() + " Interval = " + interval);
+            _futures.add(_agentMgr.getCronJobPool().scheduleAtFixedRate(new PingTask(), interval, interval, TimeUnit.SECONDS));
+        }
+    }
+
+    @Override
     public void disconnect(Status state) {
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Processing disconnect " + _id + "(" + _name + ")");
@@ -80,64 +121,8 @@ public class DirectAgentAttache extends AgentAttache {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof DirectAgentAttache)) {
-            return false;
-        }
-        return super.equals(obj);
-    }
-
-    @Override
     public synchronized boolean isClosed() {
         return _resource == null;
-    }
-
-    @Override
-    public void send(Request req) throws AgentUnavailableException {
-        req.logD("Executing: ", true);
-        if (req instanceof Response) {
-            Response resp = (Response)req;
-            Answer[] answers = resp.getAnswers();
-            if (answers != null && answers[0] instanceof StartupAnswer) {
-                StartupAnswer startup = (StartupAnswer)answers[0];
-                int interval = startup.getPingInterval();
-                _futures.add(_agentMgr.getCronJobPool().scheduleAtFixedRate(new PingTask(), interval, interval, TimeUnit.SECONDS));
-            }
-        } else {
-            Command[] cmds = req.getCommands();
-            if (cmds.length > 0 && !(cmds[0] instanceof CronCommand)) {
-                queueTask(new Task(req));
-                scheduleFromQueue();
-            } else {
-                CronCommand cmd = (CronCommand)cmds[0];
-                _futures.add(_agentMgr.getCronJobPool().scheduleAtFixedRate(new CronTask(req), cmd.getInterval(), cmd.getInterval(), TimeUnit.SECONDS));
-            }
-        }
-    }
-
-    @Override
-    public void process(Answer[] answers) {
-        if (answers != null && answers[0] instanceof StartupAnswer) {
-            StartupAnswer startup = (StartupAnswer)answers[0];
-            int interval = startup.getPingInterval();
-            s_logger.info("StartupAnswer received " + startup.getHostId() + " Interval = " + interval);
-            _futures.add(_agentMgr.getCronJobPool().scheduleAtFixedRate(new PingTask(), interval, interval, TimeUnit.SECONDS));
-        }
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            assert _resource == null : "Come on now....If you're going to dabble in agent code, you better know how to close out our resources. Ever considered why there's a method called disconnect()?";
-            synchronized (this) {
-                if (_resource != null) {
-                    s_logger.warn("Lost attache for " + _id + "(" + _name + ")");
-                    disconnect(Status.Alert);
-                }
-            }
-        } finally {
-            super.finalize();
-        }
     }
 
     private synchronized void queueTask(Task task) {
@@ -154,12 +139,29 @@ public class DirectAgentAttache extends AgentAttache {
         }
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        try {
+            assert _resource == null : "Come on now....If you're going to dabble in agent code, you better know how to close out our resources. Ever considered why there's a " +
+                    "method called disconnect()?";
+            synchronized (this) {
+                if (_resource != null) {
+                    s_logger.warn("Lost attache for " + _id + "(" + _name + ")");
+                    disconnect(Status.Alert);
+                }
+            }
+        } finally {
+            super.finalize();
+        }
+    }
+
     protected class PingTask extends ManagedContextRunnable {
         @Override
         protected synchronized void runInContext() {
             try {
                 if (_outstandingCronTaskCount.incrementAndGet() >= _agentMgr.getDirectAgentThreadCap()) {
-                    s_logger.warn("PingTask execution for direct attache(" + _id + ") has reached maximum outstanding limit(" + _agentMgr.getDirectAgentThreadCap() + "), bailing out");
+                    s_logger.warn("PingTask execution for direct attache(" + _id + ") has reached maximum outstanding limit(" + _agentMgr.getDirectAgentThreadCap() + "), bailing" +
+                            " out");
                     return;
                 }
 
@@ -169,7 +171,7 @@ public class DirectAgentAttache extends AgentAttache {
                     PingCommand cmd = resource.getCurrentStatus(_id);
                     int retried = 0;
                     while (cmd == null && ++retried <= _HostPingRetryCount.value()) {
-                        Thread.sleep(1000*_HostPingRetryTimer.value());
+                        Thread.sleep(1000 * _HostPingRetryTimer.value());
                         cmd = resource.getCurrentStatus(_id);
                     }
 
@@ -190,7 +192,7 @@ public class DirectAgentAttache extends AgentAttache {
                         s_logger.trace("SeqA " + _id + "-" + seq + ": " + new Request(_id, -1, cmd, false).toString());
                     }
 
-                    _agentMgr.handleCommands(DirectAgentAttache.this, seq, new Command[] {cmd});
+                    _agentMgr.handleCommands(DirectAgentAttache.this, seq, new Command[]{cmd});
                 } else {
                     s_logger.debug("Unable to send ping because agent is disconnected " + _id + "(" + _name + ")");
                 }
@@ -230,7 +232,8 @@ public class DirectAgentAttache extends AgentAttache {
             long seq = _req.getSequence();
             try {
                 if (_outstandingCronTaskCount.incrementAndGet() >= _agentMgr.getDirectAgentThreadCap()) {
-                    s_logger.warn("CronTask execution for direct attache(" + _id + ") has reached maximum outstanding limit(" + _agentMgr.getDirectAgentThreadCap() + "), bailing out");
+                    s_logger.warn("CronTask execution for direct attache(" + _id + ") has reached maximum outstanding limit(" + _agentMgr.getDirectAgentThreadCap() + "), bailing" +
+                            " out");
                     bailout();
                     return;
                 }

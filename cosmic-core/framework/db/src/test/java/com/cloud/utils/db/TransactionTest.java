@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.utils.db;
 
+import com.cloud.utils.component.ComponentContext;
+import com.cloud.utils.exception.CloudRuntimeException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -32,7 +32,6 @@ import org.junit.Test;
 /**
  * A test fixture to test APIs or bugs found for Transaction class. This test fixture will do one time setup before
  * all its testcases to set up a test db table, and then tear down these test db artifacts after all testcases are run.
- *
  */
 public class TransactionTest {
 
@@ -41,12 +40,23 @@ public class TransactionTest {
         try (
                 Connection conn = TransactionLegacy.getStandaloneConnection();
                 PreparedStatement pstmt =
-                    conn.prepareStatement("CREATE TABLE `cloud`.`test` (" + "`id` bigint unsigned NOT NULL UNIQUE AUTO_INCREMENT," + "`fld_int` int unsigned,"
-                        + "`fld_long` bigint unsigned," + "`fld_string` varchar(255)," + "PRIMARY KEY (`id`)" + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-            ) {
+                        conn.prepareStatement("CREATE TABLE `cloud`.`test` (" + "`id` bigint unsigned NOT NULL UNIQUE AUTO_INCREMENT," + "`fld_int` int unsigned,"
+                                + "`fld_long` bigint unsigned," + "`fld_string` varchar(255)," + "PRIMARY KEY (`id`)" + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        ) {
 
             pstmt.execute();
+        } catch (SQLException e) {
+            throw new CloudRuntimeException("Problem with sql", e);
+        }
+    }
 
+    @AfterClass
+    public static void oneTimeTearDown() {
+        try (
+                Connection conn = TransactionLegacy.getStandaloneConnection();
+                PreparedStatement pstmt = conn.prepareStatement("DROP TABLE IF EXISTS `cloud`.`test`");
+        ) {
+            pstmt.execute();
         } catch (SQLException e) {
             throw new CloudRuntimeException("Problem with sql", e);
         }
@@ -145,19 +155,7 @@ public class TransactionTest {
         try (
                 Connection conn = TransactionLegacy.getStandaloneConnection();
                 PreparedStatement pstmt = conn.prepareStatement("truncate table `cloud`.`test`");
-            ) {
-            pstmt.execute();
-        } catch (SQLException e) {
-            throw new CloudRuntimeException("Problem with sql", e);
-        }
-    }
-
-    @AfterClass
-    public static void oneTimeTearDown() {
-        try (
-                Connection conn = TransactionLegacy.getStandaloneConnection();
-                PreparedStatement pstmt = conn.prepareStatement("DROP TABLE IF EXISTS `cloud`.`test`");
-            ) {
+        ) {
             pstmt.execute();
         } catch (SQLException e) {
             throw new CloudRuntimeException("Problem with sql", e);

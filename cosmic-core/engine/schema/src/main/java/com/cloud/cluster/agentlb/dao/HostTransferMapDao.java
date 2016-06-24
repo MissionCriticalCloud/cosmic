@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.cluster.agentlb.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.cluster.agentlb.HostTransferMapVO;
 import com.cloud.cluster.agentlb.HostTransferMapVO.HostTransferState;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Date;
+import java.util.List;
 
 public interface HostTransferMapDao extends GenericDao<HostTransferMapVO, Long> {
 

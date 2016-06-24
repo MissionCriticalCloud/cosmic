@@ -17,13 +17,10 @@
 """ P1 tests for routers
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.cloudstackAPI import (stopVirtualMachine,
                                   stopRouter,
                                   startRouter)
-from marvin.lib.utils import (cleanup_resources,
-                              get_process_status)
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (ServiceOffering,
                              VirtualMachine,
                              Account,
@@ -42,12 +39,15 @@ from marvin.lib.common import (get_zone,
                                list_lb_rules,
                                list_firewall_rules,
                                list_hosts)
+from marvin.lib.utils import (cleanup_resources,
+                              get_process_status)
+from nose.plugins.attrib import attr
 
 # Import System modules
 import time
 
-class TestRouterServices(cloudstackTestCase):
 
+class TestRouterServices(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
 
@@ -596,7 +596,6 @@ class TestRouterServices(cloudstackTestCase):
 
 
 class TestRouterStopCreatePF(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
 
@@ -814,7 +813,6 @@ class TestRouterStopCreatePF(cloudstackTestCase):
 
 
 class TestRouterStopCreateLB(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
 
@@ -1030,7 +1028,6 @@ class TestRouterStopCreateLB(cloudstackTestCase):
 
 
 class TestRouterStopCreateFW(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
 

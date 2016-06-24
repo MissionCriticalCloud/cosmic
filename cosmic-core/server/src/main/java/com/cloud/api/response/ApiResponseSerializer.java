@@ -16,16 +16,6 @@
 // under the License.
 package com.cloud.api.response;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.ApiResponseGsonHelper;
 import com.cloud.api.ApiServer;
@@ -35,9 +25,6 @@ import com.cloud.utils.HttpUtils;
 import com.cloud.utils.encoding.URLEncoder;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionProxyObject;
-import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
@@ -49,11 +36,25 @@ import org.apache.cloudstack.api.response.ExceptionResponse;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ApiResponseSerializer {
     private static final Logger s_logger = LoggerFactory.getLogger(ApiResponseSerializer.class.getName());
+    private static final Pattern s_unicodeEscapePattern = Pattern.compile("\\\\u([0-9A-Fa-f]{4})");
 
     public static String toSerializedString(ResponseObject result, String responseType) {
         s_logger.trace("===Serializing Response===");
@@ -73,13 +74,11 @@ public class ApiResponseSerializer {
         }
     }
 
-    private static final Pattern s_unicodeEscapePattern = Pattern.compile("\\\\u([0-9A-Fa-f]{4})");
-
     public static String unescape(String escaped) {
         String str = escaped;
         Matcher matcher = s_unicodeEscapePattern.matcher(str);
         while (matcher.find()) {
-            str = str.replaceAll("\\" + matcher.group(0), Character.toString((char)Integer.parseInt(matcher.group(1), 16)));
+            str = str.replaceAll("\\" + matcher.group(0), Character.toString((char) Integer.parseInt(matcher.group(1), 16)));
         }
         return str;
     }
@@ -94,8 +93,8 @@ public class ApiResponseSerializer {
             sb.append("{\"").append(result.getResponseName()).append("\":");
             log.append("{\"").append(result.getResponseName()).append("\":");
             if (result instanceof ListResponse) {
-                List<? extends ResponseObject> responses = ((ListResponse)result).getResponses();
-                Integer count = ((ListResponse)result).getCount();
+                List<? extends ResponseObject> responses = ((ListResponse) result).getResponses();
+                Integer count = ((ListResponse) result).getCount();
                 boolean nonZeroCount = (count != null && count.longValue() != 0);
                 if (nonZeroCount) {
                     sb.append("{\"").append(ApiConstants.COUNT).append("\":").append(count);
@@ -113,7 +112,7 @@ public class ApiResponseSerializer {
                         log.append(",\"").append(responses.get(0).getObjectName()).append("\":[").append(logStr);
                     }
 
-                    for (int i = 1; i < ((ListResponse)result).getResponses().size(); i++) {
+                    for (int i = 1; i < ((ListResponse) result).getResponses().size(); i++) {
                         jsonStr = responseBuilder.toJson(responses.get(i));
                         jsonStr = unescape(jsonStr);
                         logStr = logBuilder.toJson(responses.get(i));
@@ -123,7 +122,7 @@ public class ApiResponseSerializer {
                     }
                     sb.append("]}");
                     log.append("]}");
-                } else  {
+                } else {
                     if (!nonZeroCount) {
                         sb.append("{");
                         log.append("{");
@@ -133,8 +132,8 @@ public class ApiResponseSerializer {
                     log.append("}");
                 }
             } else if (result instanceof SuccessResponse) {
-                sb.append("{\"success\":\"").append(((SuccessResponse)result).getSuccess()).append("\"}");
-                log.append("{\"success\":\"").append(((SuccessResponse)result).getSuccess()).append("\"}");
+                sb.append("{\"success\":\"").append(((SuccessResponse) result).getSuccess()).append("\"}");
+                log.append("{\"success\":\"").append(((SuccessResponse) result).getSuccess()).append("\"}");
             } else if (result instanceof ExceptionResponse) {
                 String jsonErrorText = responseBuilder.toJson(result);
                 jsonErrorText = unescape(jsonErrorText);
@@ -180,13 +179,13 @@ public class ApiResponseSerializer {
             log.append("<").append(result.getResponseName()).append(" cloud-stack-version=\"").append(ApiDBUtils.getVersion()).append("\">");
 
             if (result instanceof ListResponse) {
-                Integer count = ((ListResponse)result).getCount();
+                Integer count = ((ListResponse) result).getCount();
 
                 if (count != null && count != 0) {
-                    sb.append("<").append(ApiConstants.COUNT).append(">").append(((ListResponse)result).getCount()).append("</").append(ApiConstants.COUNT).append(">");
-                    log.append("<").append(ApiConstants.COUNT).append(">").append(((ListResponse)result).getCount()).append("</").append(ApiConstants.COUNT).append(">");
+                    sb.append("<").append(ApiConstants.COUNT).append(">").append(((ListResponse) result).getCount()).append("</").append(ApiConstants.COUNT).append(">");
+                    log.append("<").append(ApiConstants.COUNT).append(">").append(((ListResponse) result).getCount()).append("</").append(ApiConstants.COUNT).append(">");
                 }
-                List<? extends ResponseObject> responses = ((ListResponse)result).getResponses();
+                List<? extends ResponseObject> responses = ((ListResponse) result).getResponses();
                 if ((responses != null) && !responses.isEmpty()) {
                     for (ResponseObject obj : responses) {
                         serializeResponseObjXML(sb, log, obj);
@@ -225,13 +224,14 @@ public class ApiResponseSerializer {
         if (clz.getSuperclass() != null) {
             fields.addAll(Arrays.asList(getFlattenFields(clz.getSuperclass())));
         }
-        return fields.toArray(new Field[] {});
+        return fields.toArray(new Field[]{});
     }
 
     private static void serializeResponseObjFieldsXML(StringBuilder sb, StringBuilder log, ResponseObject obj) {
         boolean isAsync = false;
-        if (obj instanceof AsyncJobResponse)
+        if (obj instanceof AsyncJobResponse) {
             isAsync = true;
+        }
 
         Field[] fields = getFlattenFields(obj.getClass());
         for (Field field : fields) {
@@ -278,7 +278,7 @@ public class ApiResponseSerializer {
             }
             if (fieldValue != null) {
                 if (fieldValue instanceof ResponseObject) {
-                    ResponseObject subObj = (ResponseObject)fieldValue;
+                    ResponseObject subObj = (ResponseObject) fieldValue;
                     if (isAsync) {
                         sb.append("<jobresult>");
                         log.append("<jobresult>");
@@ -289,11 +289,11 @@ public class ApiResponseSerializer {
                         log.append("</jobresult>");
                     }
                 } else if (fieldValue instanceof Collection<?>) {
-                    Collection<?> subResponseList = (Collection<?>)fieldValue;
+                    Collection<?> subResponseList = (Collection<?>) fieldValue;
                     boolean usedUuidList = false;
                     for (Object value : subResponseList) {
                         if (value instanceof ResponseObject) {
-                            ResponseObject subObj = (ResponseObject)value;
+                            ResponseObject subObj = (ResponseObject) value;
                             if (serializedName != null) {
                                 subObj.setObjectName(serializedName.value());
                             }
@@ -301,7 +301,7 @@ public class ApiResponseSerializer {
                         } else if (value instanceof ExceptionProxyObject) {
                             // Only exception reponses carry a list of
                             // ExceptionProxyObject objects.
-                            ExceptionProxyObject idProxy = (ExceptionProxyObject)value;
+                            ExceptionProxyObject idProxy = (ExceptionProxyObject) value;
                             // If this is the first IdentityProxy field
                             // encountered, put in a uuidList tag.
                             if (!usedUuidList) {
@@ -330,8 +330,10 @@ public class ApiResponseSerializer {
                         log.append("</").append(serializedName.value()).append(">");
                     }
                 } else if (fieldValue instanceof Date) {
-                    sb.append("<").append(serializedName.value()).append(">").append(BaseCmd.getDateString((Date)fieldValue)).append("</").append(serializedName.value()).append(">");
-                    log.append("<").append(serializedName.value()).append(">").append(BaseCmd.getDateString((Date)fieldValue)).append("</").append(serializedName.value()).append(">");
+                    sb.append("<").append(serializedName.value()).append(">").append(BaseCmd.getDateString((Date) fieldValue)).append("</").append(serializedName.value()).append
+                            (">");
+                    log.append("<").append(serializedName.value()).append(">").append(BaseCmd.getDateString((Date) fieldValue)).append("</").append(serializedName.value())
+                       .append(">");
                 } else {
                     String resultString = escapeSpecialXmlChars(fieldValue.toString());
                     if (!(obj instanceof ExceptionResponse)) {
@@ -381,5 +383,4 @@ public class ApiResponseSerializer {
         }
         return value;
     }
-
 }

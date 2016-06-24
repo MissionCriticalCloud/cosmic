@@ -22,5 +22,4 @@ import com.cloud.utils.db.GenericDao;
 public interface GuestOSDao extends GenericDao<GuestOSVO, Long> {
 
     GuestOSVO listByDisplayName(String displayName);
-
 }

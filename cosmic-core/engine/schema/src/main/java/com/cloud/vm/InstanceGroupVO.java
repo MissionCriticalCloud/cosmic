@@ -16,8 +16,7 @@
 // under the License.
 package com.cloud.vm;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,21 +26,19 @@ import javax.persistence.Id;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "instance_group")
 @SecondaryTable(name = "account", pkJoinColumns = {@PrimaryKeyJoinColumn(name = "account_id", referencedColumnName = "id")})
 public class InstanceGroupVO implements InstanceGroup {
+    @Column(name = "name")
+    String name;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
-    @Column(name = "name")
-    String name;
-
     @Column(name = "account_id")
     private long accountId;
 
@@ -81,6 +78,20 @@ public class InstanceGroupVO implements InstanceGroup {
     }
 
     @Override
+    public Date getCreated() {
+        return created;
+    }
+
+    @Override
+    public Short getAccountType() {
+        return accountType;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
     public long getAccountId() {
         return accountId;
     }
@@ -95,26 +106,12 @@ public class InstanceGroupVO implements InstanceGroup {
     }
 
     @Override
-    public Date getCreated() {
-        return created;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
     public String getUuid() {
         return uuid;
     }
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    @Override
-    public Short getAccountType() {
-        return accountType;
     }
 
     @Override

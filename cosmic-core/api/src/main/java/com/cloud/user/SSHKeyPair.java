@@ -40,5 +40,4 @@ public interface SSHKeyPair extends ControlledEntity, InternalIdentity {
      * @return The private key of the key pair.
      */
     public String getPrivateKey();
-
 }

@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.util.List;
-
 import com.cloud.dc.DataCenterVnetVO;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.util.List;
 
 public interface DataCenterVnetDao extends GenericDao<DataCenterVnetVO, Long> {
     public List<DataCenterVnetVO> listAllocatedVnets(long physicalNetworkId);

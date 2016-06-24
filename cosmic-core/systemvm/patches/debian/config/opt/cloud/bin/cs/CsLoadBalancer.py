@@ -15,12 +15,11 @@
 # specific language governing permissions and limitations
 # under the License.
 import logging
-import os.path
-import re
 from cs.CsDatabag import CsDataBag
-from CsProcess import CsProcess
-from CsFile import CsFile
+
 import CsHelper
+from CsFile import CsFile
+from CsProcess import CsProcess
 
 HAPROXY_CONF_T = "/etc/haproxy/haproxy.cfg.new"
 HAPROXY_CONF_P = "/etc/haproxy/haproxy.cfg"
@@ -83,4 +82,3 @@ class CsLoadBalancer(CsDataBag):
             port = path[1]
             if ["filter", "", "-A INPUT -p tcp -m tcp -d %s --dport %s -m state --state NEW -j ACCEPT" % (ip, port)] in firewall:
                 firewall.remove(["filter", "", "-A INPUT -p tcp -m tcp -d %s --dport %s -m state --state NEW -j ACCEPT" % (ip, port)])
-

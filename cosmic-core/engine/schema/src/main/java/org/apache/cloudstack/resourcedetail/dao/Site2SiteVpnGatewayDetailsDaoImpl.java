@@ -18,6 +18,7 @@ package org.apache.cloudstack.resourcedetail.dao;
 
 import org.apache.cloudstack.resourcedetail.ResourceDetailsDaoBase;
 import org.apache.cloudstack.resourcedetail.Site2SiteVpnGatewayDetailVO;
+
 import org.springframework.stereotype.Component;
 
 @Component

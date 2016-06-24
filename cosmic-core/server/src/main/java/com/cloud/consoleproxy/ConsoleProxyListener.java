@@ -36,11 +36,6 @@ public class ConsoleProxyListener implements Listener {
     }
 
     @Override
-    public boolean isRecurring() {
-        return true;
-    }
-
-    @Override
     public boolean processAnswers(long agentId, long seq, Answer[] answers) {
         return true;
     }
@@ -53,12 +48,12 @@ public class ConsoleProxyListener implements Listener {
     @Override
     public AgentControlAnswer processControlCommand(long agentId, AgentControlCommand cmd) {
         if (cmd instanceof ConsoleProxyLoadReportCommand) {
-            _proxyMgr.onLoadReport((ConsoleProxyLoadReportCommand)cmd);
+            _proxyMgr.onLoadReport((ConsoleProxyLoadReportCommand) cmd);
 
             // return dummy answer
             return new AgentControlAnswer(cmd);
         } else if (cmd instanceof ConsoleAccessAuthenticationCommand) {
-            return _proxyMgr.onConsoleAccessAuthentication((ConsoleAccessAuthenticationCommand)cmd);
+            return _proxyMgr.onConsoleAccessAuthentication((ConsoleAccessAuthenticationCommand) cmd);
         }
         return null;
     }
@@ -68,7 +63,7 @@ public class ConsoleProxyListener implements Listener {
         _proxyMgr.onAgentConnect(host, cmd);
 
         if (cmd instanceof StartupProxyCommand) {
-            _proxyMgr.startAgentHttpHandlerInVM((StartupProxyCommand)cmd);
+            _proxyMgr.startAgentHttpHandlerInVM((StartupProxyCommand) cmd);
         }
     }
 
@@ -79,7 +74,7 @@ public class ConsoleProxyListener implements Listener {
     }
 
     @Override
-    public boolean processTimeout(long agentId, long seq) {
+    public boolean isRecurring() {
         return true;
     }
 
@@ -88,4 +83,8 @@ public class ConsoleProxyListener implements Listener {
         return -1;
     }
 
+    @Override
+    public boolean processTimeout(long agentId, long seq) {
+        return true;
+    }
 }

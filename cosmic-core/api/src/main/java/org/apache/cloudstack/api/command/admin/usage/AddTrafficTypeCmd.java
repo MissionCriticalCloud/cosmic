@@ -20,7 +20,6 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.network.PhysicalNetworkTrafficType;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -31,6 +30,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
 import org.apache.cloudstack.api.response.TrafficTypeResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,56 +81,6 @@ public class AddTrafficTypeCmd extends BaseAsyncCreateCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getPhysicalNetworkId() {
-        return physicalNetworkId;
-    }
-
-    public String getTrafficType() {
-        return trafficType;
-    }
-
-    public String getXenLabel() {
-        return xenLabel;
-    }
-
-    public String getKvmLabel() {
-        return kvmLabel;
-    }
-
-    public String getOvm3Label() {
-        return ovm3Label;
-    }
-
-    public void setVlan(final String vlan) {
-        this.vlan = vlan;
-    }
-
-    public String getVlan() {
-        return vlan;
-    }
-
-    public String getIsolationMethod() {
-        if (isolationMethod != null && !isolationMethod.isEmpty()) {
-            return isolationMethod;
-        } else {
-            return "vlan";
-        }
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
     @Override
     public void execute() {
         CallContext.current().setEventDetails("TrafficType Id: " + getEntityId());
@@ -145,6 +95,16 @@ public class AddTrafficTypeCmd extends BaseAsyncCreateCmd {
     }
 
     @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
+    }
+
+    @Override
     public void create() throws ResourceAllocationException {
         final PhysicalNetworkTrafficType result =
                 _networkService.addTrafficTypeToPhysicalNetwork(getPhysicalNetworkId(), getTrafficType(), getIsolationMethod(), getXenLabel(), getKvmLabel(),
@@ -155,6 +115,46 @@ public class AddTrafficTypeCmd extends BaseAsyncCreateCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to add traffic type to physical network");
         }
+    }
+
+    public Long getPhysicalNetworkId() {
+        return physicalNetworkId;
+    }
+
+    public String getTrafficType() {
+        return trafficType;
+    }
+
+    public String getIsolationMethod() {
+        if (isolationMethod != null && !isolationMethod.isEmpty()) {
+            return isolationMethod;
+        } else {
+            return "vlan";
+        }
+    }
+
+    public String getXenLabel() {
+        return xenLabel;
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public String getKvmLabel() {
+        return kvmLabel;
+    }
+
+    public String getVlan() {
+        return vlan;
+    }
+
+    public String getOvm3Label() {
+        return ovm3Label;
+    }
+
+    public void setVlan(final String vlan) {
+        this.vlan = vlan;
     }
 
     @Override

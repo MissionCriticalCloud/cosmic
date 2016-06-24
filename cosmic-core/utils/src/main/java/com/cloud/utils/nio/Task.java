@@ -19,24 +19,17 @@
 
 package com.cloud.utils.nio;
 
-import java.util.concurrent.Callable;
-
 import com.cloud.utils.exception.TaskExecutionException;
+
+import java.util.concurrent.Callable;
 
 /**
  * Task represents one todo item for the AgentManager or the AgentManager
  */
 public abstract class Task implements Callable<Boolean> {
 
-    public enum Type {
-        CONNECT,     // Process a new connection.
-        DISCONNECT,  // Process an existing connection disconnecting.
-        DATA,        // data incoming.
-        CONNECT_FAILED, // Connection failed.
-        OTHER        // Allows other tasks to be defined by the caller.
-    };
-
     Object _data;
+
     Type _type;
     Link _link;
 
@@ -64,7 +57,7 @@ public abstract class Task implements Callable<Boolean> {
     }
 
     public byte[] getData() {
-        return (byte[])_data;
+        return (byte[]) _data;
     }
 
     public Object get() {
@@ -76,11 +69,19 @@ public abstract class Task implements Callable<Boolean> {
         return _type.toString();
     }
 
-    abstract protected void doTask(Task task) throws TaskExecutionException;
-
     @Override
     public Boolean call() throws TaskExecutionException {
         doTask(this);
         return true;
+    }
+
+    abstract protected void doTask(Task task) throws TaskExecutionException;
+
+    public enum Type {
+        CONNECT,     // Process a new connection.
+        DISCONNECT,  // Process an existing connection disconnecting.
+        DATA,        // data incoming.
+        CONNECT_FAILED, // Connection failed.
+        OTHER        // Allows other tasks to be defined by the caller.
     }
 }

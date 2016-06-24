@@ -47,5 +47,4 @@ public class CheckOnHostAnswer extends Answer {
     public boolean isAlive() {
         return alive;
     }
-
 }

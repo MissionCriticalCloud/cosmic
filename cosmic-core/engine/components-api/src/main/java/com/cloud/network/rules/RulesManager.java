@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.network.rules;
 
-import java.util.List;
-
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
@@ -26,6 +24,8 @@ import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.Nic;
 import com.cloud.vm.VirtualMachine;
+
+import java.util.List;
 
 /**
  * Rules Manager manages the network rules created for different networks.
@@ -45,7 +45,7 @@ public interface RulesManager extends RulesService {
     boolean revokePortForwardingRulesForVm(long vmId);
 
     FirewallRule[] reservePorts(IpAddress ip, String protocol, FirewallRule.Purpose purpose, boolean openFirewall, Account caller, int... ports)
-        throws NetworkRuleConflictException;
+            throws NetworkRuleConflictException;
 
     boolean applyStaticNatsForNetwork(long networkId, boolean continueOnError, Account caller);
 
@@ -63,5 +63,4 @@ public interface RulesManager extends RulesService {
     boolean applyStaticNatForNetwork(long networkId, boolean continueOnError, Account caller, boolean forRevoke);
 
     List<FirewallRuleVO> listAssociatedRulesForGuestNic(Nic nic);
-
 }

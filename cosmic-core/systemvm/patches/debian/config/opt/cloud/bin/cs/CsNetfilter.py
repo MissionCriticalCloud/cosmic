@@ -17,18 +17,18 @@
 # under the License.
 from __future__ import print_function
 
-import CsHelper
-from CsDatabag import CsCmdLine
 import logging
 from cs_iptables_save import Tables
 
+import CsHelper
+from CsDatabag import CsCmdLine
+
 
 class CsChain(object):
-
     def __init__(self):
-        self.chain = {}
+        self.chain = { }
         self.last_added = ''
-        self.count = {}
+        self.count = { }
 
     def add(self, table, chain):
         if table not in self.chain.keys():
@@ -44,7 +44,7 @@ class CsChain(object):
 
     def get(self, table):
         if table not in self.chain.keys():
-            return {}
+            return { }
         return self.chain[table]
 
     def get_count(self, chain):
@@ -62,7 +62,6 @@ class CsChain(object):
 
 
 class CsTable(object):
-
     def __init__(self):
         self.table = []
         self.last_added = ''
@@ -80,7 +79,6 @@ class CsTable(object):
 
 
 class CsNetfilters(object):
-
     def __init__(self, load=True):
         self.rules = []
         self.iptablerules = []
@@ -217,9 +215,8 @@ class CsNetfilters(object):
 
 
 class CsNetfilter(object):
-
     def __init__(self):
-        self.rule = {}
+        self.rule = { }
         self.table = ''
         self.chain = ''
         self.seen = False

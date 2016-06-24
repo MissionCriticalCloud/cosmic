@@ -16,15 +16,15 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.Set;
-
 import com.cloud.network.security.SecurityRule;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.Set;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = SecurityRule.class)
 public class SecurityGroupRuleResponse extends BaseResponse {
@@ -67,14 +67,6 @@ public class SecurityGroupRuleResponse extends BaseResponse {
     @SerializedName(ApiConstants.TAGS)
     @Param(description = "the list of resource tags associated with the rule", responseObject = ResourceTagResponse.class)
     private java.util.Set<ResourceTagResponse> tags;
-
-    public String getRuleId() {
-        return ruleId;
-    }
-
-    public void setRuleId(String ruleId) {
-        this.ruleId = ruleId;
-    }
 
     public String getProtocol() {
         return protocol;
@@ -149,21 +141,34 @@ public class SecurityGroupRuleResponse extends BaseResponse {
         return result;
     }
 
+    public String getRuleId() {
+        return ruleId;
+    }
+
+    public void setRuleId(String ruleId) {
+        this.ruleId = ruleId;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        SecurityGroupRuleResponse other = (SecurityGroupRuleResponse)obj;
+        }
+        SecurityGroupRuleResponse other = (SecurityGroupRuleResponse) obj;
         String oid = this.getRuleId();
         if (oid == null) {
-            if (other.getRuleId() != null)
+            if (other.getRuleId() != null) {
                 return false;
-        } else if (!oid.equals(other.getRuleId()))
+            }
+        } else if (!oid.equals(other.getRuleId())) {
             return false;
+        }
         return true;
     }
 

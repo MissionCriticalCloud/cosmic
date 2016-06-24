@@ -16,22 +16,25 @@
 // under the License.
 package org.apache.cloudstack.framework.config.impl;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.cloud.dao.EntityManager;
-import junit.framework.TestCase;
 import org.apache.cloudstack.framework.config.ConfigDepot;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
 import org.apache.cloudstack.framework.config.ScopedConfigStorage;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import java.util.ArrayList;
+
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.ArrayList;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
 
 public class ConfigDepotAdminTest extends TestCase {
     private final static ConfigKey<Integer> DynamicIntCK = new ConfigKey<>(Integer.class, "dynIntKey", "Advance", "10", "Test Key", true);

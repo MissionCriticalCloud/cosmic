@@ -19,15 +19,15 @@
 
 package com.cloud.utils.ssh;
 
+import com.cloud.utils.Pair;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.cloud.utils.Pair;
 import com.trilead.ssh2.ChannelCondition;
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.Session;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,92 +48,9 @@ public class SshHelper {
         return sshExecute(host, port, user, pemKeyFile, password, command, DEFAULT_CONNECT_TIMEOUT, DEFAULT_KEX_TIMEOUT, 120000);
     }
 
-    public static void scpTo(String host, int port, String user, File pemKeyFile, String password, String remoteTargetDirectory, String localFile, String fileMode)
-            throws Exception {
-
-        scpTo(host, port, user, pemKeyFile, password, remoteTargetDirectory, localFile, fileMode, DEFAULT_CONNECT_TIMEOUT, DEFAULT_KEX_TIMEOUT);
-    }
-
-    public static void scpTo(String host, int port, String user, File pemKeyFile, String password, String remoteTargetDirectory, byte[] data, String remoteFileName,
-            String fileMode) throws Exception {
-
-        scpTo(host, port, user, pemKeyFile, password, remoteTargetDirectory, data, remoteFileName, fileMode, DEFAULT_CONNECT_TIMEOUT, DEFAULT_KEX_TIMEOUT);
-    }
-
-    public static void scpTo(String host, int port, String user, File pemKeyFile, String password, String remoteTargetDirectory, String localFile, String fileMode,
-            int connectTimeoutInMs, int kexTimeoutInMs) throws Exception {
-
-        com.trilead.ssh2.Connection conn = null;
-        com.trilead.ssh2.SCPClient scpClient = null;
-
-        try {
-            conn = new com.trilead.ssh2.Connection(host, port);
-            conn.connect(null, connectTimeoutInMs, kexTimeoutInMs);
-
-            if (pemKeyFile == null) {
-                if (!conn.authenticateWithPassword(user, password)) {
-                    String msg = "Failed to authentication SSH user " + user + " on host " + host;
-                    s_logger.error(msg);
-                    throw new Exception(msg);
-                }
-            } else {
-                if (!conn.authenticateWithPublicKey(user, pemKeyFile, password)) {
-                    String msg = "Failed to authentication SSH user " + user + " on host " + host;
-                    s_logger.error(msg);
-                    throw new Exception(msg);
-                }
-            }
-
-            scpClient = conn.createSCPClient();
-
-            if (fileMode != null)
-                scpClient.put(localFile, remoteTargetDirectory, fileMode);
-            else
-                scpClient.put(localFile, remoteTargetDirectory);
-        } finally {
-            if (conn != null)
-                conn.close();
-        }
-    }
-
-    public static void scpTo(String host, int port, String user, File pemKeyFile, String password, String remoteTargetDirectory, byte[] data, String remoteFileName,
-            String fileMode, int connectTimeoutInMs, int kexTimeoutInMs) throws Exception {
-
-        com.trilead.ssh2.Connection conn = null;
-        com.trilead.ssh2.SCPClient scpClient = null;
-
-        try {
-            conn = new com.trilead.ssh2.Connection(host, port);
-            conn.connect(null, connectTimeoutInMs, kexTimeoutInMs);
-
-            if (pemKeyFile == null) {
-                if (!conn.authenticateWithPassword(user, password)) {
-                    String msg = "Failed to authentication SSH user " + user + " on host " + host;
-                    s_logger.error(msg);
-                    throw new Exception(msg);
-                }
-            } else {
-                if (!conn.authenticateWithPublicKey(user, pemKeyFile, password)) {
-                    String msg = "Failed to authentication SSH user " + user + " on host " + host;
-                    s_logger.error(msg);
-                    throw new Exception(msg);
-                }
-            }
-
-            scpClient = conn.createSCPClient();
-            if (fileMode != null)
-                scpClient.put(data, remoteFileName, remoteTargetDirectory, fileMode);
-            else
-                scpClient.put(data, remoteFileName, remoteTargetDirectory);
-        } finally {
-            if (conn != null)
-                conn.close();
-        }
-    }
-
     public static Pair<Boolean, String> sshExecute(String host, int port, String user, File pemKeyFile, String password, String command, int connectTimeoutInMs,
-            int kexTimeoutInMs,
-            int waitResultTimeoutInMs) throws Exception {
+                                                   int kexTimeoutInMs,
+                                                   int waitResultTimeoutInMs) throws Exception {
 
         com.trilead.ssh2.Connection conn = null;
         com.trilead.ssh2.Session sess = null;
@@ -181,7 +98,6 @@ public class SshHelper {
                     if (canEndTheSshConnection(waitResultTimeoutInMs, sess, conditions)) {
                         break;
                     }
-
                 }
 
                 while (stdout.available() > 0) {
@@ -210,11 +126,13 @@ public class SshHelper {
 
             return new Pair<Boolean, String>(true, result);
         } finally {
-            if (sess != null)
+            if (sess != null) {
                 sess.close();
+            }
 
-            if (conn != null)
+            if (conn != null) {
                 conn.close();
+            }
         }
     }
 
@@ -227,6 +145,29 @@ public class SshHelper {
         Session sess = conn.openSession();
         Thread.sleep(WAITING_OPEN_SSH_SESSION);
         return sess;
+    }
+
+    /**
+     * Checks if the SSH session {@link com.trilead.ssh2.Session#getStdout()} or
+     * {@link com.trilead.ssh2.Session#getStderr()} is null.
+     */
+    protected static void throwSshExceptionIfStdoutOrStdeerIsNull(InputStream stdout, InputStream stderr) throws SshException {
+        if (stdout == null || stderr == null) {
+            String msg = "Stdout or Stderr of SSH session is null";
+            s_logger.error(msg);
+            throw new SshException(msg);
+        }
+    }
+
+    /**
+     * It throws a {@link SshException} if the channel condition is {@link ChannelCondition#TIMEOUT}
+     */
+    protected static void throwSshExceptionIfConditionsTimeout(int conditions) throws SshException {
+        if ((conditions & ChannelCondition.TIMEOUT) != 0) {
+            String msg = "Timed out in waiting for SSH execution exit status";
+            s_logger.error(msg);
+            throw new SshException(msg);
+        }
     }
 
     /**
@@ -247,17 +188,6 @@ public class SshHelper {
     }
 
     /**
-     * It throws a {@link SshException} if the channel condition is {@link ChannelCondition#TIMEOUT}
-     */
-    protected static void throwSshExceptionIfConditionsTimeout(int conditions) throws SshException {
-        if ((conditions & ChannelCondition.TIMEOUT) != 0) {
-            String msg = "Timed out in waiting for SSH execution exit status";
-            s_logger.error(msg);
-            throw new SshException(msg);
-        }
-    }
-
-    /**
      * Checks if the channel condition mask is of {@link ChannelCondition#EOF} and not
      * {@link ChannelCondition#STDERR_DATA} or {@link ChannelCondition#STDOUT_DATA}.
      */
@@ -268,15 +198,90 @@ public class SshHelper {
         return false;
     }
 
-    /**
-     * Checks if the SSH session {@link com.trilead.ssh2.Session#getStdout()} or
-     * {@link com.trilead.ssh2.Session#getStderr()} is null.
-     */
-    protected static void throwSshExceptionIfStdoutOrStdeerIsNull(InputStream stdout, InputStream stderr) throws SshException {
-        if (stdout == null || stderr == null) {
-            String msg = "Stdout or Stderr of SSH session is null";
-            s_logger.error(msg);
-            throw new SshException(msg);
+    public static void scpTo(String host, int port, String user, File pemKeyFile, String password, String remoteTargetDirectory, String localFile, String fileMode)
+            throws Exception {
+
+        scpTo(host, port, user, pemKeyFile, password, remoteTargetDirectory, localFile, fileMode, DEFAULT_CONNECT_TIMEOUT, DEFAULT_KEX_TIMEOUT);
+    }
+
+    public static void scpTo(String host, int port, String user, File pemKeyFile, String password, String remoteTargetDirectory, String localFile, String fileMode,
+                             int connectTimeoutInMs, int kexTimeoutInMs) throws Exception {
+
+        com.trilead.ssh2.Connection conn = null;
+        com.trilead.ssh2.SCPClient scpClient = null;
+
+        try {
+            conn = new com.trilead.ssh2.Connection(host, port);
+            conn.connect(null, connectTimeoutInMs, kexTimeoutInMs);
+
+            if (pemKeyFile == null) {
+                if (!conn.authenticateWithPassword(user, password)) {
+                    String msg = "Failed to authentication SSH user " + user + " on host " + host;
+                    s_logger.error(msg);
+                    throw new Exception(msg);
+                }
+            } else {
+                if (!conn.authenticateWithPublicKey(user, pemKeyFile, password)) {
+                    String msg = "Failed to authentication SSH user " + user + " on host " + host;
+                    s_logger.error(msg);
+                    throw new Exception(msg);
+                }
+            }
+
+            scpClient = conn.createSCPClient();
+
+            if (fileMode != null) {
+                scpClient.put(localFile, remoteTargetDirectory, fileMode);
+            } else {
+                scpClient.put(localFile, remoteTargetDirectory);
+            }
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
+        }
+    }
+
+    public static void scpTo(String host, int port, String user, File pemKeyFile, String password, String remoteTargetDirectory, byte[] data, String remoteFileName,
+                             String fileMode) throws Exception {
+
+        scpTo(host, port, user, pemKeyFile, password, remoteTargetDirectory, data, remoteFileName, fileMode, DEFAULT_CONNECT_TIMEOUT, DEFAULT_KEX_TIMEOUT);
+    }
+
+    public static void scpTo(String host, int port, String user, File pemKeyFile, String password, String remoteTargetDirectory, byte[] data, String remoteFileName,
+                             String fileMode, int connectTimeoutInMs, int kexTimeoutInMs) throws Exception {
+
+        com.trilead.ssh2.Connection conn = null;
+        com.trilead.ssh2.SCPClient scpClient = null;
+
+        try {
+            conn = new com.trilead.ssh2.Connection(host, port);
+            conn.connect(null, connectTimeoutInMs, kexTimeoutInMs);
+
+            if (pemKeyFile == null) {
+                if (!conn.authenticateWithPassword(user, password)) {
+                    String msg = "Failed to authentication SSH user " + user + " on host " + host;
+                    s_logger.error(msg);
+                    throw new Exception(msg);
+                }
+            } else {
+                if (!conn.authenticateWithPublicKey(user, pemKeyFile, password)) {
+                    String msg = "Failed to authentication SSH user " + user + " on host " + host;
+                    s_logger.error(msg);
+                    throw new Exception(msg);
+                }
+            }
+
+            scpClient = conn.createSCPClient();
+            if (fileMode != null) {
+                scpClient.put(data, remoteFileName, remoteTargetDirectory, fileMode);
+            } else {
+                scpClient.put(data, remoteFileName, remoteTargetDirectory);
+            }
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
         }
     }
 }

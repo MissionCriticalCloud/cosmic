@@ -20,13 +20,13 @@ package org.apache.cloudstack.api.command.admin.vm;
 
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.api.response.VMUserDataResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,14 +47,6 @@ public class GetVMUserDataCmd extends BaseCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public long getId() {
-        return vmId;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
     @Override
     public void execute() {
         String userData = _userVmService.getVmUserData(getId());
@@ -66,6 +58,19 @@ public class GetVMUserDataCmd extends BaseCmd {
         this.setResponseObject(resp);
     }
 
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public long getId() {
+        return vmId;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
     @Override
     public long getEntityOwnerId() {
         UserVm userVm = _entityMgr.findById(UserVm.class, getId());
@@ -74,10 +79,5 @@ public class GetVMUserDataCmd extends BaseCmd {
         }
 
         return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
-
-    @Override
-    public String getCommandName() {
-        return s_name;
     }
 }

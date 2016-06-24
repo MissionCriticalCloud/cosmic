@@ -18,7 +18,6 @@ package org.apache.cloudstack.api.command.user.vmgroup;
 
 import com.cloud.user.Account;
 import com.cloud.vm.InstanceGroup;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -28,6 +27,7 @@ import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.InstanceGroupResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +35,8 @@ import org.slf4j.LoggerFactory;
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateVMGroupCmd extends BaseCmd {
 
-    private static final String s_name = "updateinstancegroupresponse";
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateVMGroupCmd.class.getName());
-
+    private static final String s_name = "updateinstancegroupresponse";
     /////////////////////////////////////////////////////
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
@@ -52,12 +51,20 @@ public class UpdateVMGroupCmd extends BaseCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
-    }
-
     public String getGroupName() {
         return groupName;
+    }
+
+    @Override
+    public void execute() {
+        InstanceGroup result = _mgr.updateVmGroup(this);
+        if (result != null) {
+            InstanceGroupResponse response = _responseGenerator.createInstanceGroupResponse(result);
+            response.setResponseName(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update vm instance group");
+        }
     }
 
     /////////////////////////////////////////////////////
@@ -79,15 +86,7 @@ public class UpdateVMGroupCmd extends BaseCmd {
         return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 
-    @Override
-    public void execute() {
-        InstanceGroup result = _mgr.updateVmGroup(this);
-        if (result != null) {
-            InstanceGroupResponse response = _responseGenerator.createInstanceGroupResponse(result);
-            response.setResponseName(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update vm instance group");
-        }
+    public Long getId() {
+        return id;
     }
 }

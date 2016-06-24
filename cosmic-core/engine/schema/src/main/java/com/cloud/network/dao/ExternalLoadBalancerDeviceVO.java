@@ -16,7 +16,8 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.UUID;
+import org.apache.cloudstack.api.Identity;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,13 +27,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.UUID;
 
 /**
  * ExternalLoadBalancerDeviceVO contains information on external load balancer devices (VPX,MPX,SDX) added into a deployment
-  */
+ */
 
 @Entity
 @Table(name = "external_load_balancer_devices")
@@ -90,20 +89,15 @@ public class ExternalLoadBalancerDeviceVO implements InternalIdentity, Identity 
     @Column(name = "capacity")
     private long capacity;
 
-    //keeping it enum for future possible states Maintenance, Shutdown
-    public enum LBDeviceState {
-        Enabled, Disabled
-    }
-
-    public enum LBDeviceAllocationState {
-        Free,      // In this state no networks are using this device for load balancing
-        Shared,    // In this state one or more networks will be using this device for load balancing
-        Dedicated, // In this state this device is dedicated for a single network
-        Provider   // This state is set only for device that can dynamically provision LB appliances
+    public ExternalLoadBalancerDeviceVO(long hostId, long physicalNetworkId, String providerName, String deviceName, long capacity, boolean dedicated, boolean managed,
+                                        long parentHostId) {
+        this(hostId, physicalNetworkId, providerName, deviceName, capacity, dedicated, false);
+        this.isManagedDevice = managed;
+        this.parentHostId = parentHostId;
     }
 
     public ExternalLoadBalancerDeviceVO(long hostId, long physicalNetworkId, String providerName, String deviceName, long capacity, boolean dedicated,
-            boolean gslbProvider) {
+                                        boolean gslbProvider) {
         this.physicalNetworkId = physicalNetworkId;
         this.providerName = providerName;
         this.deviceName = deviceName;
@@ -118,13 +112,6 @@ public class ExternalLoadBalancerDeviceVO implements InternalIdentity, Identity 
         this.gslbProvider = gslbProvider;
         this.gslbSitePublicIP = null;
         this.gslbSitePrivateIP = null;
-    }
-
-    public ExternalLoadBalancerDeviceVO(long hostId, long physicalNetworkId, String providerName, String deviceName, long capacity, boolean dedicated, boolean managed,
-            long parentHostId) {
-        this(hostId, physicalNetworkId, providerName, deviceName, capacity, dedicated, false);
-        this.isManagedDevice = managed;
-        this.parentHostId = parentHostId;
     }
 
     public ExternalLoadBalancerDeviceVO() {
@@ -216,20 +203,20 @@ public class ExternalLoadBalancerDeviceVO implements InternalIdentity, Identity 
         this.exclusiveGslbProvider = exclusiveGslbProvider;
     }
 
-    public void setGslbSitePublicIP(String gslbSitePublicIP) {
-        this.gslbSitePublicIP = gslbSitePublicIP;
-    }
-
     public String getGslbSitePublicIP() {
         return gslbSitePublicIP;
     }
 
-    public void setGslbSitePrivateIP(String gslbSitePrivateIP) {
-        this.gslbSitePrivateIP = gslbSitePrivateIP;
+    public void setGslbSitePublicIP(String gslbSitePublicIP) {
+        this.gslbSitePublicIP = gslbSitePublicIP;
     }
 
     public String getGslbSitePrivateIP() {
         return gslbSitePrivateIP;
+    }
+
+    public void setGslbSitePrivateIP(String gslbSitePrivateIP) {
+        this.gslbSitePrivateIP = gslbSitePrivateIP;
     }
 
     @Override
@@ -239,5 +226,17 @@ public class ExternalLoadBalancerDeviceVO implements InternalIdentity, Identity 
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    //keeping it enum for future possible states Maintenance, Shutdown
+    public enum LBDeviceState {
+        Enabled, Disabled
+    }
+
+    public enum LBDeviceAllocationState {
+        Free,      // In this state no networks are using this device for load balancing
+        Shared,    // In this state one or more networks will be using this device for load balancing
+        Dedicated, // In this state this device is dedicated for a single network
+        Provider   // This state is set only for device that can dynamically provision LB appliances
     }
 }

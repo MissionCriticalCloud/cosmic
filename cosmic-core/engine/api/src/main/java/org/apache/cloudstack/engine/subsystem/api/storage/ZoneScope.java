@@ -38,5 +38,4 @@ public class ZoneScope extends AbstractScope {
     public Long getScopeId() {
         return this.zoneId;
     }
-
 }

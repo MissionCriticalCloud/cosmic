@@ -17,7 +17,9 @@
 // under the License.
 //
 
-/** NetworkElementCommand to destroy a VPX instance on the Netscaler SDX load balancer appliance */
+/**
+ * NetworkElementCommand to destroy a VPX instance on the Netscaler SDX load balancer appliance
+ */
 //TODO: fill in the Nitro API parameters required
 package com.cloud.agent.api.routing;
 

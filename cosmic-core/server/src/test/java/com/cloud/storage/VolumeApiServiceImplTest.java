@@ -21,13 +21,6 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
@@ -44,7 +37,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.command.user.volume.CreateVolumeCmd;
@@ -60,6 +52,14 @@ import org.apache.cloudstack.framework.jobs.dao.AsyncJobJoinMapDao;
 import org.apache.cloudstack.framework.jobs.impl.AsyncJobVO;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import javax.inject.Inject;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -69,9 +69,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import junit.framework.Assert;
-
 public class VolumeApiServiceImplTest {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
     @Inject
     VolumeApiServiceImpl _svc = new VolumeApiServiceImpl();
     @Mock
@@ -90,7 +90,6 @@ public class VolumeApiServiceImplTest {
     AsyncJobJoinMapDao _joinMapDao;
     @Mock
     VolumeDataFactory _volFactory;
-
     @Mock
     VMInstanceDao _vmInstanceDao;
     @Mock
@@ -101,10 +100,8 @@ public class VolumeApiServiceImplTest {
     VolumeService volService;
     @Mock
     CreateVolumeCmd createVol;
-
     DetachVolumeCmd detachCmd = new DetachVolumeCmd();
     Class<?> _detachCmdClass = detachCmd.getClass();
-
 
     @Before
     public void setup() throws Exception {
@@ -230,7 +227,6 @@ public class VolumeApiServiceImplTest {
             // helper dao methods mock
             when(_svc._vmSnapshotDao.findByVm(any(Long.class))).thenReturn(new ArrayList<VMSnapshotVO>());
             when(_svc._vmInstanceDao.findById(any(Long.class))).thenReturn(stoppedVm);
-
         } finally {
             txn.close("runVolumeDaoImplTest");
         }
@@ -243,6 +239,7 @@ public class VolumeApiServiceImplTest {
 
     /**
      * TESTS FOR DETACH ROOT VOLUME, COUNT=4
+     *
      * @throws Exception
      */
 
@@ -261,9 +258,6 @@ public class VolumeApiServiceImplTest {
         dedicateIdField.set(detachCmd, 4L);
         _svc.detachVolumeFromVM(detachCmd);
     }
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void testDetachVolumeFromStoppedXenVm() throws NoSuchFieldException, IllegalAccessException {
@@ -328,7 +322,7 @@ public class VolumeApiServiceImplTest {
         when(_volFactory.getVolume(anyLong())).thenReturn(volumeInfoMock);
         when(volumeInfoMock.getState()).thenReturn(Volume.State.Ready);
         when(volumeInfoMock.getInstanceId()).thenReturn(null);
-        when (volService.takeSnapshot(Mockito.any(VolumeInfo.class))).thenReturn(snapshotInfoMock);
+        when(volService.takeSnapshot(Mockito.any(VolumeInfo.class))).thenReturn(snapshotInfoMock);
         _svc.takeSnapshot(5L, Snapshot.MANUAL_POLICY_ID, 3L, null, false);
     }
 

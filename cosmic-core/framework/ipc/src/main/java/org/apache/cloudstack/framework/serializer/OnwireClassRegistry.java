@@ -35,16 +35,14 @@ import java.util.jar.JarInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 //
 // Finding classes in a given package code is taken and modified from
 // Credit: http://internna.blogspot.com/2007/11/java-5-retrieving-all-classes-from.html
 //
 public class OnwireClassRegistry {
     private static final Logger s_logger = LoggerFactory.getLogger(OnwireClassRegistry.class);
-
-    private List<String> packages = new ArrayList<String>();
     private final Map<String, Class<?>> registry = new HashMap<String, Class<?>>();
+    private List<String> packages = new ArrayList<String>();
 
     public OnwireClassRegistry() {
         registry.put("Object", Object.class);
@@ -54,40 +52,12 @@ public class OnwireClassRegistry {
         addPackage(packageName);
     }
 
-    public OnwireClassRegistry(List<String> packages) {
-        packages.addAll(packages);
-    }
-
-    public List<String> getPackages() {
-        return packages;
-    }
-
-    public void setPackages(List<String> packages) {
-        this.packages = packages;
-    }
-
     public void addPackage(String packageName) {
         packages.add(packageName);
     }
 
-    public void scan() {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
-        for (String pkg : packages) {
-            classes.addAll(getClasses(pkg));
-        }
-
-        for (Class<?> clz : classes) {
-            OnwireName onwire = clz.getAnnotation(OnwireName.class);
-            if (onwire != null) {
-                assert (onwire.name() != null);
-
-                registry.put(onwire.name(), clz);
-            }
-        }
-    }
-
-    public Class<?> getOnwireClass(String onwireName) {
-        return registry.get(onwireName);
+    public OnwireClassRegistry(List<String> packages) {
+        packages.addAll(packages);
     }
 
     static Set<Class<?>> getClasses(String packageName) {
@@ -109,13 +79,15 @@ public class OnwireClassRegistry {
                     String filePath = resources.nextElement().getFile();
                     if (filePath != null) {
                         // WINDOWS HACK
-                        if (filePath.indexOf("%20") > 0)
+                        if (filePath.indexOf("%20") > 0) {
                             filePath = filePath.replaceAll("%20", " ");
+                        }
                         if ((filePath.indexOf("!") > 0) && (filePath.indexOf(".jar") > 0)) {
                             String jarPath = filePath.substring(0, filePath.indexOf("!")).substring(filePath.indexOf(":") + 1);
                             // WINDOWS HACK
-                            if (jarPath.indexOf(":") >= 0)
+                            if (jarPath.indexOf(":") >= 0) {
                                 jarPath = jarPath.substring(1);
+                            }
                             classes.addAll(getFromJARFile(jarPath, path));
                         } else {
                             classes.addAll(getFromDirectory(new File(filePath), packageName));
@@ -183,5 +155,33 @@ public class OnwireClassRegistry {
 
     static String stripFilenameExtension(String file) {
         return file.substring(0, file.lastIndexOf('.'));
+    }
+
+    public List<String> getPackages() {
+        return packages;
+    }
+
+    public void setPackages(List<String> packages) {
+        this.packages = packages;
+    }
+
+    public void scan() {
+        Set<Class<?>> classes = new HashSet<Class<?>>();
+        for (String pkg : packages) {
+            classes.addAll(getClasses(pkg));
+        }
+
+        for (Class<?> clz : classes) {
+            OnwireName onwire = clz.getAnnotation(OnwireName.class);
+            if (onwire != null) {
+                assert (onwire.name() != null);
+
+                registry.put(onwire.name(), clz);
+            }
+        }
+    }
+
+    public Class<?> getOnwireClass(String onwireName) {
+        return registry.get(onwireName);
     }
 }

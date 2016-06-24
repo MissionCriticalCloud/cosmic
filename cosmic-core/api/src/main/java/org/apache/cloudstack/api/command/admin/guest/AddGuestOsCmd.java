@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.admin.guest;
 import com.cloud.event.EventTypes;
 import com.cloud.storage.GuestOS;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -30,6 +29,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.GuestOSCategoryResponse;
 import org.apache.cloudstack.api.response.GuestOSResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,8 +53,7 @@ public class AddGuestOsCmd extends BaseAsyncCreateCmd {
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, required = false, description = "Optional name for Guest OS")
     private String osName;
 
-
-/////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
@@ -75,16 +74,6 @@ public class AddGuestOsCmd extends BaseAsyncCreateCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
     public void create() {
         GuestOS guestOs = _mgr.addGuestOs(this);
         if (guestOs != null) {
@@ -93,6 +82,16 @@ public class AddGuestOsCmd extends BaseAsyncCreateCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to add new guest OS type entity");
         }
+    }
+
+    @Override
+    public String getCreateEventType() {
+        return EventTypes.EVENT_GUEST_OS_ADD;
+    }
+
+    @Override
+    public String getCreateEventDescription() {
+        return "adding new guest OS type";
     }
 
     @Override
@@ -109,6 +108,16 @@ public class AddGuestOsCmd extends BaseAsyncCreateCmd {
     }
 
     @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
+    }
+
+    @Override
     public String getEventType() {
         return EventTypes.EVENT_GUEST_OS_ADD;
     }
@@ -122,15 +131,4 @@ public class AddGuestOsCmd extends BaseAsyncCreateCmd {
     public ApiCommandJobType getInstanceType() {
         return ApiCommandJobType.GuestOs;
     }
-
-    @Override
-    public String getCreateEventType() {
-        return EventTypes.EVENT_GUEST_OS_ADD;
-    }
-
-    @Override
-    public String getCreateEventDescription() {
-        return "adding new guest OS type";
-    }
-
 }

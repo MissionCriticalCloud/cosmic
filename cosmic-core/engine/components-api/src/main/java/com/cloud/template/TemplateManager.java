@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.template;
 
-import java.util.List;
-
 import com.cloud.dc.DataCenterVO;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.StorageUnavailableException;
@@ -27,11 +25,12 @@ import com.cloud.storage.VMTemplateStoragePoolVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachineProfile;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.TemplateInfo;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import java.util.List;
 
 /**
  * TemplateManager manages the templates stored on secondary storage. It is responsible for creating private/public templates.
@@ -39,15 +38,15 @@ import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 public interface TemplateManager {
     static final String AllowPublicUserTemplatesCK = "allow.public.user.templates";
     static final ConfigKey<Boolean> AllowPublicUserTemplates = new ConfigKey<Boolean>("Advanced", Boolean.class, AllowPublicUserTemplatesCK, "true",
-        "If false, users will not be able to create public templates.", true, ConfigKey.Scope.Account);
+            "If false, users will not be able to create public templates.", true, ConfigKey.Scope.Account);
+    public static final String MESSAGE_REGISTER_PUBLIC_TEMPLATE_EVENT = "Message.RegisterPublicTemplate.Event";
+    public static final String MESSAGE_RESET_TEMPLATE_PERMISSION_EVENT = "Message.ResetTemplatePermission.Event";
 
     /**
      * Prepares a template for vm creation for a certain storage pool.
      *
-     * @param template
-     *            template to prepare
-     * @param pool
-     *            pool to make sure the template is ready in.
+     * @param template template to prepare
+     * @param pool     pool to make sure the template is ready in.
      * @return VMTemplateStoragePoolVO if preparation is complete; null if not.
      */
     VMTemplateStoragePoolVO prepareTemplateForCreate(VMTemplateVO template, StoragePool pool);
@@ -71,8 +70,7 @@ public interface TemplateManager {
      *
      * @param userId
      * @param templateId
-     * @param zoneId
-     *            - optional. If specified, will only delete the template from the specified zone's secondary storage server.
+     * @param zoneId     - optional. If specified, will only delete the template from the specified zone's secondary storage server.
      * @return true if success
      */
     boolean delete(long userId, long templateId, Long zoneId);
@@ -114,15 +112,10 @@ public interface TemplateManager {
 
     TemplateInfo prepareIso(long isoId, long dcId);
 
-
     /**
      * Adds ISO definition to given vm profile
      *
      * @param VirtualMachineProfile
      */
     void prepareIsoForVmProfile(VirtualMachineProfile profile);
-
-    public static final String MESSAGE_REGISTER_PUBLIC_TEMPLATE_EVENT = "Message.RegisterPublicTemplate.Event";
-    public static final String MESSAGE_RESET_TEMPLATE_PERMISSION_EVENT = "Message.ResetTemplatePermission.Event";
-
 }

@@ -19,7 +19,6 @@
 package org.apache.cloudstack.api.command.admin.storage;
 
 import static com.cloud.user.Account.ACCOUNT_ID_SYSTEM;
-
 import static org.apache.cloudstack.api.ApiConstants.S3_ACCESS_KEY;
 import static org.apache.cloudstack.api.ApiConstants.S3_BUCKET_NAME;
 import static org.apache.cloudstack.api.ApiConstants.S3_CONNECTION_TIMEOUT;
@@ -35,9 +34,6 @@ import static org.apache.cloudstack.api.BaseCmd.CommandType.BOOLEAN;
 import static org.apache.cloudstack.api.BaseCmd.CommandType.INTEGER;
 import static org.apache.cloudstack.api.BaseCmd.CommandType.STRING;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.DiscoveryException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -46,7 +42,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.storage.ImageStore;
 import com.cloud.utils.storage.S3.ClientOptions;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -54,6 +49,10 @@ import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ImageStoreResponse;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,7 +98,7 @@ public final class AddImageStoreS3CMD extends BaseCmd implements ClientOptions {
 
     @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException, NetworkRuleConflictException {
+            ResourceAllocationException, NetworkRuleConflictException {
 
         Map<String, String> dm = new HashMap();
 
@@ -130,7 +129,7 @@ public final class AddImageStoreS3CMD extends BaseCmd implements ClientOptions {
             dm.put(ApiConstants.S3_USE_TCP_KEEPALIVE, getUseTCPKeepAlive().toString());
         }
 
-        try{
+        try {
             ImageStore result = _storageService.discoverImageStore(null, null, "S3", null, dm);
             ImageStoreResponse storeResponse;
             if (result != null) {
@@ -169,10 +168,6 @@ public final class AddImageStoreS3CMD extends BaseCmd implements ClientOptions {
         return endPoint;
     }
 
-    public String getBucketName() {
-        return bucketName;
-    }
-
     public String getSigner() {
         return signer;
     }
@@ -193,12 +188,34 @@ public final class AddImageStoreS3CMD extends BaseCmd implements ClientOptions {
         return socketTimeout;
     }
 
+    public Boolean getUseTCPKeepAlive() {
+        return useTCPKeepAlive;
+    }
+
     public Integer getConnectionTtl() {
         return connectionTtl;
     }
 
-    public Boolean getUseTCPKeepAlive() {
-        return useTCPKeepAlive;
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    @Override
+    public int hashCode() {
+
+        int result = accessKey != null ? accessKey.hashCode() : 0;
+        result = 31 * result + (secretKey != null ? secretKey.hashCode() : 0);
+        result = 31 * result + (endPoint != null ? endPoint.hashCode() : 0);
+        result = 31 * result + (bucketName != null ? bucketName.hashCode() : 0);
+        result = 31 * result + (signer != null ? signer.hashCode() : 0);
+        result = 31 * result + (httpsFlag != null && httpsFlag ? 1 : 0);
+        result = 31 * result + (connectionTimeout != null ? connectionTimeout.hashCode() : 0);
+        result = 31 * result + (maxErrorRetry != null ? maxErrorRetry.hashCode() : 0);
+        result = 31 * result + (socketTimeout != null ? socketTimeout.hashCode() : 0);
+        result = 31 * result + (connectionTtl != null ? connectionTtl.hashCode() : 0);
+        result = 31 * result + (useTCPKeepAlive != null && useTCPKeepAlive ? 1 : 0);
+
+        return result;
     }
 
     @Override
@@ -212,7 +229,7 @@ public final class AddImageStoreS3CMD extends BaseCmd implements ClientOptions {
             return false;
         }
 
-        final AddImageStoreS3CMD thatAddS3Cmd = (AddImageStoreS3CMD)thatObject;
+        final AddImageStoreS3CMD thatAddS3Cmd = (AddImageStoreS3CMD) thatObject;
 
         if (httpsFlag != null ? !httpsFlag.equals(thatAddS3Cmd.httpsFlag) : thatAddS3Cmd.httpsFlag != null) {
             return false;
@@ -255,23 +272,5 @@ public final class AddImageStoreS3CMD extends BaseCmd implements ClientOptions {
         }
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-
-        int result = accessKey != null ? accessKey.hashCode() : 0;
-        result = 31 * result + (secretKey != null ? secretKey.hashCode() : 0);
-        result = 31 * result + (endPoint != null ? endPoint.hashCode() : 0);
-        result = 31 * result + (bucketName != null ? bucketName.hashCode() : 0);
-        result = 31 * result + (signer != null ? signer.hashCode() : 0);
-        result = 31 * result + (httpsFlag != null && httpsFlag ? 1 : 0);
-        result = 31 * result + (connectionTimeout != null ? connectionTimeout.hashCode() : 0);
-        result = 31 * result + (maxErrorRetry != null ? maxErrorRetry.hashCode() : 0);
-        result = 31 * result + (socketTimeout != null ? socketTimeout.hashCode() : 0);
-        result = 31 * result + (connectionTtl != null ? connectionTtl.hashCode() : 0);
-        result = 31 * result + (useTCPKeepAlive != null && useTCPKeepAlive ? 1 : 0);
-
-        return result;
     }
 }

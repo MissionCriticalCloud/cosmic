@@ -26,7 +26,7 @@ public class PatchAttachment extends Attachment {
     private final String type = "PatchAttachment";
     private String peerPortUuid;
 
-    public PatchAttachment(String peerPortUuid) {
+    public PatchAttachment(final String peerPortUuid) {
         this.peerPortUuid = peerPortUuid;
     }
 
@@ -34,8 +34,7 @@ public class PatchAttachment extends Attachment {
         return peerPortUuid;
     }
 
-    public void setPeerPortUuid(String peerPortUuid) {
+    public void setPeerPortUuid(final String peerPortUuid) {
         this.peerPortUuid = peerPortUuid;
     }
-
 }

@@ -18,7 +18,7 @@
  */
 package org.apache.cloudstack.engine.rest.service.api;
 
-import java.util.List;
+import org.apache.cloudstack.engine.cloud.entity.api.VolumeEntity;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -28,8 +28,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-
-import org.apache.cloudstack.engine.cloud.entity.api.VolumeEntity;
+import java.util.List;
 
 @Produces("application/json")
 public class VolumeRestService {
@@ -69,5 +68,4 @@ public class VolumeRestService {
     public String detach(@QueryParam("volid") String volumeId) {
         return null;
     }
-
 }

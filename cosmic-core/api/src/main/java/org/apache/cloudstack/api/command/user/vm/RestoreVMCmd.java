@@ -24,7 +24,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -37,25 +36,27 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.TemplateResponse;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "restoreVirtualMachine", description = "Restore a VM to original template/ISO or new template/ISO", responseObject = UserVmResponse.class, since = "3.0.0", responseView = ResponseView.Restricted, entityType = {VirtualMachine.class},
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = true)
+@APICommand(name = "restoreVirtualMachine", description = "Restore a VM to original template/ISO or new template/ISO", responseObject = UserVmResponse.class, since = "3.0.0",
+        responseView = ResponseView.Restricted, entityType = {VirtualMachine.class},
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = true)
 public class RestoreVMCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RestoreVMCmd.class);
     private static final String s_name = "restorevmresponse";
 
     @ACL(accessType = AccessType.OperateEntry)
-    @Parameter(name=ApiConstants.VIRTUAL_MACHINE_ID, type=CommandType.UUID, entityType=UserVmResponse.class,
-            required=true, description="Virtual Machine ID")
+    @Parameter(name = ApiConstants.VIRTUAL_MACHINE_ID, type = CommandType.UUID, entityType = UserVmResponse.class,
+            required = true, description = "Virtual Machine ID")
     private Long vmId;
 
     @Parameter(name = ApiConstants.TEMPLATE_ID,
-               type = CommandType.UUID,
-               entityType = TemplateResponse.class,
-               description = "an optional template Id to restore vm from the new template. This can be an ISO id in case of restore vm deployed using ISO")
+            type = CommandType.UUID,
+            entityType = TemplateResponse.class,
+            description = "an optional template Id to restore vm from the new template. This can be an ISO id in case of restore vm deployed using ISO")
     private Long templateId;
 
     @Override
@@ -92,7 +93,7 @@ public class RestoreVMCmd extends BaseAsyncCmd {
     public long getEntityOwnerId() {
         UserVm vm = _responseGenerator.findUserVmById(getVmId());
         if (vm == null) {
-             return Account.ACCOUNT_ID_SYSTEM; // bad id given, parent this command to SYSTEM so ERROR events are tracked
+            return Account.ACCOUNT_ID_SYSTEM; // bad id given, parent this command to SYSTEM so ERROR events are tracked
         }
         return vm.getAccountId();
     }

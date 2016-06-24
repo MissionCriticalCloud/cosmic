@@ -19,23 +19,23 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import java.util.Set;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.GetStorageStatsAnswer;
 import com.cloud.agent.api.GetStorageStatsCommand;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
+
+import java.util.Set;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.SR;
 import com.xensource.xenapi.Types.XenAPIException;
-
 import org.apache.xmlrpc.XmlRpcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  GetStorageStatsCommand.class)
+@ResourceWrapper(handles = GetStorageStatsCommand.class)
 public final class CitrixGetStorageStatsCommandWrapper extends CommandWrapper<GetStorageStatsCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixGetStorageStatsCommandWrapper.class);
@@ -63,7 +63,7 @@ public final class CitrixGetStorageStatsCommandWrapper extends CommandWrapper<Ge
             final String msg = "GetStorageStats Exception:" + e.getMessage() + "host:" + citrixResourceBase.getHost().getUuid() + "storageid: " + command.getStorageId();
             s_logger.warn(msg);
             return new GetStorageStatsAnswer(command, msg);
-        }  catch (final Exception e) {
+        } catch (final Exception e) {
             final String msg = "GetStorageStats Exception:" + e.getMessage() + "host:" + citrixResourceBase.getHost().getUuid() + "storageid: " + command.getStorageId();
             s_logger.warn(msg);
             return new GetStorageStatsAnswer(command, msg);

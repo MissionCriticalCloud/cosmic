@@ -19,24 +19,25 @@
 
 package com.cloud.storage.template;
 
+import com.cloud.storage.StorageLayer;
+import com.cloud.utils.exception.CloudRuntimeException;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import com.cloud.storage.StorageLayer;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.trilead.ssh2.SCPClient;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ScpTemplateDownloader extends TemplateDownloaderBase implements TemplateDownloader {
     private static final Logger s_logger = LoggerFactory.getLogger(ScpTemplateDownloader.class);
 
-    public ScpTemplateDownloader(StorageLayer storageLayer, String downloadUrl, String toDir, long maxTemplateSizeInBytes, DownloadCompleteCallback callback) {
+    public ScpTemplateDownloader(final StorageLayer storageLayer, final String downloadUrl, final String toDir, final long maxTemplateSizeInBytes, final DownloadCompleteCallback
+            callback) {
         super(storageLayer, downloadUrl, toDir, maxTemplateSizeInBytes, callback);
 
-        URI uri;
+        final URI uri;
         try {
             uri = new URI(_downloadUrl);
         } catch (final URISyntaxException e) {
@@ -51,7 +52,7 @@ public class ScpTemplateDownloader extends TemplateDownloaderBase implements Tem
     }
 
     @Override
-    public long download(boolean resume, DownloadCompleteCallback callback) {
+    public long download(final boolean resume, final DownloadCompleteCallback callback) {
         if (_status == Status.ABORTED || _status == Status.UNRECOVERABLE_ERROR || _status == Status.DOWNLOAD_FINISHED) {
             return 0;
         }
@@ -60,7 +61,7 @@ public class ScpTemplateDownloader extends TemplateDownloaderBase implements Tem
 
         _start = System.currentTimeMillis();
 
-        URI uri;
+        final URI uri;
         try {
             uri = new URI(_downloadUrl);
         } catch (final URISyntaxException e1) {
@@ -121,7 +122,6 @@ public class ScpTemplateDownloader extends TemplateDownloaderBase implements Tem
             _errorString = "Downloaded " + _remoteSize + " bytes " + downloaded;
             _downloadTime += System.currentTimeMillis() - _start;
             return _totalBytes;
-
         } catch (final Exception e) {
             s_logger.warn("Unable to download " + _downloadUrl, e);
             _status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;

@@ -147,5 +147,4 @@ public class GenericDaoBaseTest {
                 resultSet, 1));
         Mockito.verify(resultSet).getByte(1);
     }
-
 }

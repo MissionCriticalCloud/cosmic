@@ -16,19 +16,18 @@
 // under the License.
 package com.cloud.api.response;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.api.ApiDBUtils;
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.network.security.SecurityGroupRules;
 import com.cloud.serializer.Param;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.api.InternalIdentity;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SecurityGroupResultObject implements ControlledEntity, InternalIdentity {
     @Param(name = "id")
@@ -56,7 +55,7 @@ public class SecurityGroupResultObject implements ControlledEntity, InternalIden
     }
 
     public SecurityGroupResultObject(Long id, String name, String description, long domainId, long accountId, String accountName,
-            List<SecurityGroupRuleResultObject> ingressRules) {
+                                     List<SecurityGroupRuleResultObject> ingressRules) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -64,65 +63,6 @@ public class SecurityGroupResultObject implements ControlledEntity, InternalIden
         this.accountId = accountId;
         this.accountName = accountName;
         securityGroupRules = ingressRules;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Override
-    public long getDomainId() {
-        return domainId;
-    }
-
-    public void setDomainId(Long domainId) {
-        this.domainId = domainId;
-    }
-
-    @Override
-    public long getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getAccountName() {
-        return accountName;
-    }
-
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-    }
-
-    public List<SecurityGroupRuleResultObject> getSecurityGroupRules() {
-        return securityGroupRules;
-    }
-
-    public void setSecurityGroupRules(List<SecurityGroupRuleResultObject> securityGroupRules) {
-        this.securityGroupRules = securityGroupRules;
     }
 
     public static List<SecurityGroupResultObject> transposeNetworkGroups(List<? extends SecurityGroupRules> groups) {
@@ -208,6 +148,65 @@ public class SecurityGroupResultObject implements ControlledEntity, InternalIden
             }
         }
         return resultObjects;
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public long getDomainId() {
+        return domainId;
+    }
+
+    public void setDomainId(Long domainId) {
+        this.domainId = domainId;
+    }
+
+    @Override
+    public long getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(Long accountId) {
+        this.accountId = accountId;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    public List<SecurityGroupRuleResultObject> getSecurityGroupRules() {
+        return securityGroupRules;
+    }
+
+    public void setSecurityGroupRules(List<SecurityGroupRuleResultObject> securityGroupRules) {
+        this.securityGroupRules = securityGroupRules;
     }
 
     @Override

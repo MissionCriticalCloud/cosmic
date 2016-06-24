@@ -18,12 +18,11 @@
  */
 package org.apache.cloudstack.engine.entity.api;
 
+import javax.ws.rs.GET;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import javax.ws.rs.GET;
 
 /**
  * All entities returned by the Cloud Orchestration Platform must implement
@@ -91,5 +90,4 @@ public interface CloudStackEntity {
      * @return list of actions that can be performed on the object in its current state
      */
     List<Method> getApplicableActions();
-
 }

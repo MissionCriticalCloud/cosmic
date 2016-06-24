@@ -14,7 +14,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-(function(cloudStack) {
+(function (cloudStack) {
     cloudStack.sections.affinityGroups = {
         title: 'label.affinity.groups',
         listView: {
@@ -27,7 +27,7 @@
                     label: 'label.type'
                 }
             },
-            dataProvider: function(args) {
+            dataProvider: function (args) {
                 var data = {};
                 listViewDataProvider(args, data);
                 if (args.context != null) {
@@ -40,7 +40,7 @@
                 $.ajax({
                     url: createURL('listAffinityGroups'),
                     data: data,
-                    success: function(json) {
+                    success: function (json) {
                         var items = json.listaffinitygroupsresponse.affinitygroup;
                         args.response.success({
                             data: items
@@ -53,7 +53,7 @@
                     label: 'label.add.affinity.group',
 
                     messages: {
-                        notification: function(args) {
+                        notification: function (args) {
                             return 'label.add.affinity.group';
                         }
                     },
@@ -72,10 +72,10 @@
                             },
                             type: {
                                 label: 'label.type',
-                                select: function(args) {
+                                select: function (args) {
                                     $.ajax({
                                         url: createURL('listAffinityGroupTypes'),
-                                        success: function(json) {
+                                        success: function (json) {
                                             var types = [];
                                             var items = json.listaffinitygrouptypesresponse.affinityGroupType;
                                             if (items != null) {
@@ -96,7 +96,7 @@
                         }
                     },
 
-                    action: function(args) {
+                    action: function (args) {
                         var data = {
                             name: args.data.name,
                             type: args.data.type
@@ -109,12 +109,12 @@
                         $.ajax({
                             url: createURL('createAffinityGroup'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var jid = json.createaffinitygroupresponse.jobid;
                                 args.response.success({
                                     _custom: {
                                         jobId: jid,
-                                        getUpdatedItem: function(json) {
+                                        getUpdatedItem: function (json) {
                                             return json.queryasyncjobresultresponse.jobresult.affinitygroup;
                                         }
                                     }
@@ -133,20 +133,20 @@
                     remove: {
                         label: 'label.delete.affinity.group',
                         messages: {
-                            confirm: function(args) {
+                            confirm: function (args) {
                                 return 'message.delete.affinity.group';
                             },
-                            notification: function(args) {
+                            notification: function (args) {
                                 return 'label.delete.affinity.group';
                             }
                         },
-                        action: function(args) {
+                        action: function (args) {
                             $.ajax({
                                 url: createURL('deleteAffinityGroup'),
                                 data: {
                                     id: args.context.affinityGroups[0].id
                                 },
-                                success: function(json) {
+                                success: function (json) {
                                     var jid = json.deleteaffinitygroupresponse.jobid;
                                     args.response.success({
                                         _custom: {
@@ -186,13 +186,13 @@
                             }
                         }],
 
-                        dataProvider: function(args) {
+                        dataProvider: function (args) {
                             $.ajax({
                                 url: createURL('listAffinityGroups'),
                                 data: {
                                     id: args.context.affinityGroups[0].id
                                 },
-                                success: function(json) {
+                                success: function (json) {
                                     var item = json.listaffinitygroupsresponse.affinitygroup[0];
                                     args.response.success({
                                         actionFilter: affinitygroupActionfilter,
@@ -207,7 +207,7 @@
         }
     };
 
-    var affinitygroupActionfilter = cloudStack.actionFilter.affinitygroupActionfilter = function(args) {
+    var affinitygroupActionfilter = cloudStack.actionFilter.affinitygroupActionfilter = function (args) {
         var jsonObj = args.context.item;
         var allowedActions = [];
         if (jsonObj.type != 'ExplicitDedication' || isAdmin()) {

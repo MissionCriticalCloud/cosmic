@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.user.vpn;
 import com.cloud.event.EventTypes;
 import com.cloud.network.Site2SiteVpnGateway;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -28,6 +27,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.Site2SiteVpnGatewayResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,13 +48,35 @@ public class DeleteVpnGatewayCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
+    @Override
+    public String getEventType() {
+        return EventTypes.EVENT_S2S_VPN_GATEWAY_DELETE;
     }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
+
+    @Override
+    public String getEventDescription() {
+        return "Delete site-to-site VPN gateway for account " + getEntityOwnerId();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void execute() {
+        boolean result = false;
+        result = _s2sVpnService.deleteVpnGateway(this);
+        if (result) {
+            SuccessResponse response = new SuccessResponse(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete customer VPN gateway");
+        }
+    }
 
     @Override
     public String getCommandName() {
@@ -68,27 +90,5 @@ public class DeleteVpnGatewayCmd extends BaseAsyncCmd {
             return gw.getAccountId();
         }
         return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
-    public String getEventDescription() {
-        return "Delete site-to-site VPN gateway for account " + getEntityOwnerId();
-    }
-
-    @Override
-    public String getEventType() {
-        return EventTypes.EVENT_S2S_VPN_GATEWAY_DELETE;
-    }
-
-    @Override
-    public void execute() {
-        boolean result = false;
-        result = _s2sVpnService.deleteVpnGateway(this);
-        if (result) {
-            SuccessResponse response = new SuccessResponse(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete customer VPN gateway");
-        }
     }
 }

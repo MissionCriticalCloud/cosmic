@@ -27,5 +27,4 @@ public class GuestOSCategoryDaoImpl extends GenericDaoBase<GuestOSCategoryVO, Lo
     protected GuestOSCategoryDaoImpl() {
 
     }
-
 }

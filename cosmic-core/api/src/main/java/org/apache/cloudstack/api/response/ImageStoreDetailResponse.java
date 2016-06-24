@@ -17,9 +17,9 @@
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 public class ImageStoreDetailResponse extends BaseResponse {
     @SerializedName("name")
@@ -40,22 +40,6 @@ public class ImageStoreDetailResponse extends BaseResponse {
         this.value = val;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -65,24 +49,44 @@ public class ImageStoreDetailResponse extends BaseResponse {
         return result;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        ImageStoreDetailResponse other = (ImageStoreDetailResponse)obj;
+        }
+        ImageStoreDetailResponse other = (ImageStoreDetailResponse) obj;
         String oid = this.getName();
         if (oid == null) {
-            if (other.getName() != null)
+            if (other.getName() != null) {
                 return false;
-        } else if (!oid.equals(other.getName()))
+            }
+        } else if (!oid.equals(other.getName())) {
             return false;
-        else if (this.getValue().equals(other.getValue()))
+        } else if (this.getValue().equals(other.getValue())) {
             return false;
+        }
         return true;
     }
 
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 }

@@ -17,7 +17,6 @@
 package org.apache.cloudstack.engine.cloud.entity.api.db.dao;
 
 import com.cloud.utils.db.GenericDao;
-
 import org.apache.cloudstack.engine.cloud.entity.api.db.VMEntityVO;
 
 /*
@@ -26,5 +25,4 @@ import org.apache.cloudstack.engine.cloud.entity.api.db.VMEntityVO;
 public interface VMEntityDao extends GenericDao<VMEntityVO, Long> {
 
     void loadVmReservation(VMEntityVO vm);
-
 }

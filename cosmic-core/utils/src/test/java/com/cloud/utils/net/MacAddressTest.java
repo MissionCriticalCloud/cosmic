@@ -28,20 +28,20 @@ public class MacAddressTest {
     @Test
     public final void testMacAddress() throws Exception {
         MacAddress mac = new MacAddress();
-        assertEquals(0L,mac.toLong());
+        assertEquals(0L, mac.toLong());
     }
 
     @Test
     public final void testMacAddressLong() throws Exception {
         MacAddress mac = new MacAddress(1L);
-        assertEquals(1L,mac.toLong());
+        assertEquals(1L, mac.toLong());
     }
 
     @Test
     public final void testMacAddressToLong() throws Exception {
         // TODO this test should fail this address is beyond the acceptable range for macaddresses
         MacAddress mac = new MacAddress(Long.MAX_VALUE);
-        assertEquals(Long.MAX_VALUE,mac.toLong());
+        assertEquals(Long.MAX_VALUE, mac.toLong());
         System.out.println(mac.toString());
     }
 
@@ -56,5 +56,4 @@ public class MacAddressTest {
     // TODO    public final void testParseInt() throws Exception {
     // TODO    public final void testParseShort() throws Exception {
     // TODO    public final void testParseByte() throws Exception {
-
 }

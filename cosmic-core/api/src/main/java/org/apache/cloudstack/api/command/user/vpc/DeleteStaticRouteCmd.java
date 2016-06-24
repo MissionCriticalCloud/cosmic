@@ -20,7 +20,6 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.vpc.StaticRoute;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -34,6 +33,7 @@ import org.apache.cloudstack.api.response.AccountResponse;
 import org.apache.cloudstack.api.response.StaticRouteResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,14 +62,6 @@ public class DeleteStaticRouteCmd extends BaseAsyncCmd {
         return id;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
     @Override
     public String getEventType() {
         return EventTypes.EVENT_STATIC_ROUTE_DELETE;
@@ -81,29 +73,8 @@ public class DeleteStaticRouteCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public long getEntityOwnerId() {
-        if (ownerId == null) {
-            StaticRoute route = _entityMgr.findById(StaticRoute.class, id);
-            if (route == null) {
-                throw new InvalidParameterValueException("Unable to find static route by id=" + id);
-            } else {
-                ownerId = route.getAccountId();
-            }
-        }
-        return ownerId;
-    }
-
-    @Override
-    public void execute() throws ResourceUnavailableException {
-        CallContext.current().setEventDetails("Route Id: " + id);
-        boolean result = _vpcService.revokeStaticRoute(id);
-
-        if (result) {
-            SuccessResponse response = new SuccessResponse(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete static route");
-        }
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.StaticRoute;
     }
 
     @Override
@@ -121,7 +92,36 @@ public class DeleteStaticRouteCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.StaticRoute;
+    public void execute() throws ResourceUnavailableException {
+        CallContext.current().setEventDetails("Route Id: " + id);
+        boolean result = _vpcService.revokeStaticRoute(id);
+
+        if (result) {
+            SuccessResponse response = new SuccessResponse(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete static route");
+        }
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        if (ownerId == null) {
+            StaticRoute route = _entityMgr.findById(StaticRoute.class, id);
+            if (route == null) {
+                throw new InvalidParameterValueException("Unable to find static route by id=" + id);
+            } else {
+                ownerId = route.getAccountId();
+            }
+        }
+        return ownerId;
     }
 }

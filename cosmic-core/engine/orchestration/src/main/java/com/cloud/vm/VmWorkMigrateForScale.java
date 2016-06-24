@@ -24,7 +24,7 @@ public class VmWorkMigrateForScale extends VmWorkMigrate {
     Long newSvcOfferingId;
 
     public VmWorkMigrateForScale(long userId, long accountId, long vmId, String handlerName, long srcHostId,
-            DeployDestination dest, Long newSvcOfferingId) {
+                                 DeployDestination dest, Long newSvcOfferingId) {
 
         super(userId, accountId, vmId, handlerName, srcHostId, dest);
         this.newSvcOfferingId = newSvcOfferingId;

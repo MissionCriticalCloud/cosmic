@@ -42,13 +42,13 @@ public class VncScreenDescription {
      * Store information about server pixel format.
      */
     public void setPixelFormat(int bitsPerPixel, int depth, int bigEndianFlag, int trueColorFlag, int redMax, int greenMax, int blueMax, int redShift, int greenShift,
-        int blueShift) {
+                               int blueShift) {
 
         bytesPerPixel = (bitsPerPixel + 7) / 8;
 
         rgb888Bit32le =
-            (depth == 24 && bitsPerPixel == 32 && redShift == 16 && greenShift == 8 && blueShift == 0 && redMax == 255 && greenMax == 255 && blueMax == 255 &&
-                bigEndianFlag == RfbConstants.LITTLE_ENDIAN && trueColorFlag == RfbConstants.TRUE_COLOR);
+                (depth == 24 && bitsPerPixel == 32 && redShift == 16 && greenShift == 8 && blueShift == 0 && redMax == 255 && greenMax == 255 && blueMax == 255 &&
+                        bigEndianFlag == RfbConstants.LITTLE_ENDIAN && trueColorFlag == RfbConstants.TRUE_COLOR);
     }
 
     /**
@@ -59,17 +59,17 @@ public class VncScreenDescription {
         this.framebufferHeight = framebufferHeight;
     }
 
+    public String getDesktopName() {
+        return desktopName;
+    }
+
+    // Getters for variables, as usual
+
     /**
      * Store server desktop name.
      */
     public void setDesktopName(String desktopName) {
         this.desktopName = desktopName;
-    }
-
-    // Getters for variables, as usual
-
-    public String getDesktopName() {
-        return desktopName;
     }
 
     public int getBytesPerPixel() {
@@ -87,5 +87,4 @@ public class VncScreenDescription {
     public boolean isRGB888_32_LE() {
         return rgb888Bit32le;
     }
-
 }

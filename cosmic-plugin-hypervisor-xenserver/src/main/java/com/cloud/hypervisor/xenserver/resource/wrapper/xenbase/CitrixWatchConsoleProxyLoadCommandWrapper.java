@@ -26,7 +26,7 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.resource.ServerResource;
 
-@ResourceWrapper(handles =  WatchConsoleProxyLoadCommand.class)
+@ResourceWrapper(handles = WatchConsoleProxyLoadCommand.class)
 public final class CitrixWatchConsoleProxyLoadCommandWrapper extends CitrixConsoleProxyLoadCommandWrapper<WatchConsoleProxyLoadCommand, Answer, CitrixResourceBase> {
 
     @Override

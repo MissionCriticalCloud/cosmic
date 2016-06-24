@@ -16,15 +16,6 @@
 // under the License.
 package com.cloud.storage.download;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.configuration.Config;
@@ -41,7 +32,6 @@ import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.Proxy;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
@@ -59,6 +49,15 @@ import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreVO;
 import org.apache.cloudstack.storage.to.TemplateObjectTO;
 import org.apache.cloudstack.storage.to.VolumeObjectTO;
+
+import javax.inject.Inject;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -66,15 +65,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class DownloadMonitorImpl extends ManagerBase implements DownloadMonitor {
     static final Logger s_logger = LoggerFactory.getLogger(DownloadMonitorImpl.class);
-
+    @Inject
+    private final VMTemplateDao _templateDao = null;
     @Inject
     private TemplateDataStoreDao _vmTemplateStoreDao;
     @Inject
     private VolumeDao _volumeDao;
     @Inject
     private VolumeDataStoreDao _volumeStoreDao;
-    @Inject
-    private final VMTemplateDao _templateDao = null;
     @Inject
     private AgentManager _agentMgr;
     @Inject
@@ -117,9 +115,31 @@ public class DownloadMonitorImpl extends ManagerBase implements DownloadMonitor 
         return true;
     }
 
+    @Override
+    public void downloadTemplateToStorage(DataObject template, AsyncCompletionCallback<DownloadAnswer> callback) {
+        if (template != null) {
+            long templateId = template.getId();
+            DataStore store = template.getDataStore();
+            if (isTemplateUpdateable(templateId, store.getId())) {
+                if (template.getUri() != null) {
+                    initiateTemplateDownload(template, callback);
+                } else {
+                    s_logger.info("Template url is null, cannot download");
+                    DownloadAnswer ans = new DownloadAnswer("Template url is null", Status.UNKNOWN);
+                    callback.complete(ans);
+                }
+            } else {
+                s_logger.info("Template download is already in progress or already downloaded");
+                DownloadAnswer ans =
+                        new DownloadAnswer("Template download is already in progress or already downloaded", Status.UNKNOWN);
+                callback.complete(ans);
+            }
+        }
+    }
+
     public boolean isTemplateUpdateable(Long templateId, Long storeId) {
         List<TemplateDataStoreVO> downloadsInProgress =
-            _vmTemplateStoreDao.listByTemplateStoreDownloadStatus(templateId, storeId, Status.DOWNLOAD_IN_PROGRESS, Status.DOWNLOADED);
+                _vmTemplateStoreDao.listByTemplateStoreDownloadStatus(templateId, storeId, Status.DOWNLOAD_IN_PROGRESS, Status.DOWNLOADED);
         return (downloadsInProgress.size() == 0);
     }
 
@@ -131,7 +151,7 @@ public class DownloadMonitorImpl extends ManagerBase implements DownloadMonitor 
         vmTemplateStore = _vmTemplateStoreDao.findByStoreTemplate(store.getId(), template.getId());
         if (vmTemplateStore == null) {
             vmTemplateStore =
-                new TemplateDataStoreVO(store.getId(), template.getId(), new Date(), 0, Status.NOT_DOWNLOADED, null, null, "jobid0000", null, template.getUri());
+                    new TemplateDataStoreVO(store.getId(), template.getId(), new Date(), 0, Status.NOT_DOWNLOADED, null, null, "jobid0000", null, template.getUri());
             vmTemplateStore.setDataStoreRole(store.getRole());
             vmTemplateStore = _vmTemplateStoreDao.persist(vmTemplateStore);
         } else if ((vmTemplateStore.getJobId() != null) && (vmTemplateStore.getJobId().length() > 2)) {
@@ -142,7 +162,7 @@ public class DownloadMonitorImpl extends ManagerBase implements DownloadMonitor 
         if (vmTemplateStore != null) {
             start();
             VirtualMachineTemplate tmpl = _templateDao.findById(template.getId());
-            DownloadCommand dcmd = new DownloadCommand((TemplateObjectTO)(template.getTO()), maxTemplateSizeInBytes);
+            DownloadCommand dcmd = new DownloadCommand((TemplateObjectTO) (template.getTO()), maxTemplateSizeInBytes);
             dcmd.setProxy(getHttpProxy());
             if (downloadJobExists) {
                 dcmd = new DownloadProgressCommand(dcmd, vmTemplateStore.getJobId(), RequestType.GET_OR_RESTART);
@@ -178,25 +198,24 @@ public class DownloadMonitorImpl extends ManagerBase implements DownloadMonitor 
         }
     }
 
-    @Override
-    public void downloadTemplateToStorage(DataObject template, AsyncCompletionCallback<DownloadAnswer> callback) {
-        if(template != null) {
-            long templateId = template.getId();
-            DataStore store = template.getDataStore();
-            if (isTemplateUpdateable(templateId, store.getId())) {
-                if (template.getUri() != null) {
-                    initiateTemplateDownload(template, callback);
-                } else {
-                    s_logger.info("Template url is null, cannot download");
-                    DownloadAnswer ans = new DownloadAnswer("Template url is null", Status.UNKNOWN);
-                    callback.complete(ans);
-                }
-            } else {
-                s_logger.info("Template download is already in progress or already downloaded");
-                DownloadAnswer ans =
-                        new DownloadAnswer("Template download is already in progress or already downloaded", Status.UNKNOWN);
-                callback.complete(ans);
-            }
+    private Long getMaxTemplateSizeInBytes() {
+        try {
+            return Long.parseLong(_configDao.getValue("max.template.iso.size")) * 1024L * 1024L * 1024L;
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private Proxy getHttpProxy() {
+        if (_proxy == null) {
+            return null;
+        }
+        try {
+            URI uri = new URI(_proxy);
+            Proxy prx = new Proxy(uri);
+            return prx;
+        } catch (URISyntaxException e) {
+            return null;
         }
     }
 
@@ -205,8 +224,8 @@ public class DownloadMonitorImpl extends ManagerBase implements DownloadMonitor 
         boolean downloadJobExists = false;
         VolumeDataStoreVO volumeHost = null;
         DataStore store = volume.getDataStore();
-        VolumeInfo volInfo = (VolumeInfo)volume;
-        RegisterVolumePayload payload = (RegisterVolumePayload)volInfo.getpayload();
+        VolumeInfo volInfo = (VolumeInfo) volume;
+        RegisterVolumePayload payload = (RegisterVolumePayload) volInfo.getpayload();
         String url = payload.getUrl();
         String checkSum = payload.getChecksum();
         ImageFormat format = ImageFormat.valueOf(payload.getFormat());
@@ -228,7 +247,7 @@ public class DownloadMonitorImpl extends ManagerBase implements DownloadMonitor 
         if (volumeHost != null) {
             start();
             Volume vol = _volumeDao.findById(volume.getId());
-            DownloadCommand dcmd = new DownloadCommand((VolumeObjectTO)(volume.getTO()), maxVolumeSizeInBytes, checkSum, url, format);
+            DownloadCommand dcmd = new DownloadCommand((VolumeObjectTO) (volume.getTO()), maxVolumeSizeInBytes, checkSum, url, format);
             dcmd.setProxy(getHttpProxy());
             if (downloadJobExists) {
                 dcmd = new DownloadProgressCommand(dcmd, volumeHost.getJobId(), RequestType.GET_OR_RESTART);
@@ -257,14 +276,6 @@ public class DownloadMonitorImpl extends ManagerBase implements DownloadMonitor 
         }
     }
 
-    private Long getMaxTemplateSizeInBytes() {
-        try {
-            return Long.parseLong(_configDao.getValue("max.template.iso.size")) * 1024L * 1024L * 1024L;
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
     private Long getMaxVolumeSizeInBytes() {
         try {
             return Long.parseLong(_configDao.getValue("storage.max.volume.upload.size")) * 1024L * 1024L * 1024L;
@@ -272,18 +283,4 @@ public class DownloadMonitorImpl extends ManagerBase implements DownloadMonitor 
             return null;
         }
     }
-
-    private Proxy getHttpProxy() {
-        if (_proxy == null) {
-            return null;
-        }
-        try {
-            URI uri = new URI(_proxy);
-            Proxy prx = new Proxy(uri);
-            return prx;
-        } catch (URISyntaxException e) {
-            return null;
-        }
-    }
-
 }

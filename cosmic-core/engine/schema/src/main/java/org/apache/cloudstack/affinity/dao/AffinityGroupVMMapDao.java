@@ -16,13 +16,12 @@
 // under the License.
 package org.apache.cloudstack.affinity.dao;
 
-import java.util.List;
-
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDao;
-
 import org.apache.cloudstack.affinity.AffinityGroupVMMapVO;
+
+import java.util.List;
 
 public interface AffinityGroupVMMapDao extends GenericDao<AffinityGroupVMMapVO, Long> {
 

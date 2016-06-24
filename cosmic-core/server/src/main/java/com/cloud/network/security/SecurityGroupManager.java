@@ -16,14 +16,13 @@
 // under the License.
 package com.cloud.network.security;
 
+import com.cloud.utils.Pair;
+
 import java.util.HashMap;
 import java.util.List;
 
-import com.cloud.utils.Pair;
-
 /**
  * Ensures that network firewall rules stay updated as VMs go up and down
- *
  */
 public interface SecurityGroupManager {
 

@@ -17,17 +17,17 @@
 
 package com.cloud.vm;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.utils.Journal;
-
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.jobs.impl.JobSerializerHelper;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 
 public class VmWorkStart extends VmWork {
@@ -56,7 +56,7 @@ public class VmWorkStart extends VmWork {
 
     public DeploymentPlan getPlan() {
 
-        if (podId != null || clusterId != null || hostId != null || poolId != null || physicalNetworkId != null || avoids !=null) {
+        if (podId != null || clusterId != null || hostId != null || poolId != null || physicalNetworkId != null || avoids != null) {
             // this is ugly, to work with legacy code, we need to re-construct the DeploymentPlan hard-codely
             // this has to be refactored together with migrating legacy code into the new way
             ReservationContext context = null;
@@ -87,17 +87,18 @@ public class VmWorkStart extends VmWork {
             physicalNetworkId = plan.getPhysicalNetworkId();
             avoids = plan.getAvoids();
 
-            if (plan.getReservationContext() != null)
+            if (plan.getReservationContext() != null) {
                 reservationId = plan.getReservationContext().getReservationId();
+            }
         }
-    }
-
-    public void setDeploymentPlanner(String planner) {
-        this.planner = planner;
     }
 
     public String getDeploymentPlanner() {
         return this.planner;
+    }
+
+    public void setDeploymentPlanner(String planner) {
+        this.planner = planner;
     }
 
     public Map<String, String> getRawParams() {
@@ -127,7 +128,7 @@ public class VmWorkStart extends VmWork {
             rawParams = new HashMap<String, String>();
             for (Map.Entry<VirtualMachineProfile.Param, Object> entry : params.entrySet()) {
                 rawParams.put(entry.getKey().getName(), JobSerializerHelper.toObjectSerializedString(
-                        entry.getValue() instanceof Serializable ? (Serializable)entry.getValue() : entry.getValue().toString()));
+                        entry.getValue() instanceof Serializable ? (Serializable) entry.getValue() : entry.getValue().toString()));
             }
         }
     }

@@ -16,15 +16,6 @@
 // under the License.
 package org.apache.cloudstack.storage.image.db;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.storage.DataStoreRole;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
@@ -33,13 +24,21 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreVO;
+
+import javax.naming.ConfigurationException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -47,6 +46,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO, Long> implements SnapshotDataStoreDao {
     private static final Logger s_logger = LoggerFactory.getLogger(SnapshotDataStoreDaoImpl.class);
+    private final String parentSearch = "select store_id, store_role, snapshot_id from cloud.snapshot_store_ref where store_id = ? "
+            + " and store_role = ? and volume_id = ? and state = 'Ready'" + " order by created DESC " + " limit 1";
+    private final String findLatestSnapshot = "select store_id, store_role, snapshot_id from cloud.snapshot_store_ref where " +
+            " store_role = ? and volume_id = ? and state = 'Ready'" +
+            " order by created DESC " +
+            " limit 1";
+    private final String findOldestSnapshot = "select store_id, store_role, snapshot_id from cloud.snapshot_store_ref where " +
+            " store_role = ? and volume_id = ? and state = 'Ready'" +
+            " order by created ASC " +
+            " limit 1";
     private SearchBuilder<SnapshotDataStoreVO> updateStateSearch;
     private SearchBuilder<SnapshotDataStoreVO> storeSearch;
     private SearchBuilder<SnapshotDataStoreVO> destroyedSearch;
@@ -56,17 +65,6 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
     private SearchBuilder<SnapshotDataStoreVO> snapshotIdSearch;
     private SearchBuilder<SnapshotDataStoreVO> volumeIdSearch;
     private SearchBuilder<SnapshotDataStoreVO> volumeSearch;
-
-    private final String parentSearch = "select store_id, store_role, snapshot_id from cloud.snapshot_store_ref where store_id = ? "
-        + " and store_role = ? and volume_id = ? and state = 'Ready'" + " order by created DESC " + " limit 1";
-    private final String findLatestSnapshot = "select store_id, store_role, snapshot_id from cloud.snapshot_store_ref where " +
-            " store_role = ? and volume_id = ? and state = 'Ready'" +
-            " order by created DESC " +
-            " limit 1";
-    private final String findOldestSnapshot = "select store_id, store_role, snapshot_id from cloud.snapshot_store_ref where " +
-            " store_role = ? and volume_id = ? and state = 'Ready'" +
-            " order by created ASC " +
-            " limit 1";
 
     @Override
     public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
@@ -130,7 +128,7 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
 
     @Override
     public boolean updateState(State currentState, Event event, State nextState, DataObjectInStore vo, Object data) {
-        SnapshotDataStoreVO dataObj = (SnapshotDataStoreVO)vo;
+        SnapshotDataStoreVO dataObj = (SnapshotDataStoreVO) vo;
         Long oldUpdated = dataObj.getUpdatedCount();
         Date oldUpdatedTime = dataObj.getUpdated();
 
@@ -151,33 +149,33 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
             if (dbVol != null) {
                 StringBuilder str = new StringBuilder("Unable to update ").append(dataObj.toString());
                 str.append(": DB Data={id=")
-                    .append(dbVol.getId())
-                    .append("; state=")
-                    .append(dbVol.getState())
-                    .append("; updatecount=")
-                    .append(dbVol.getUpdatedCount())
-                    .append(";updatedTime=")
-                    .append(dbVol.getUpdated());
+                   .append(dbVol.getId())
+                   .append("; state=")
+                   .append(dbVol.getState())
+                   .append("; updatecount=")
+                   .append(dbVol.getUpdatedCount())
+                   .append(";updatedTime=")
+                   .append(dbVol.getUpdated());
                 str.append(": New Data={id=")
-                    .append(dataObj.getId())
-                    .append("; state=")
-                    .append(nextState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatecount=")
-                    .append(dataObj.getUpdatedCount())
-                    .append("; updatedTime=")
-                    .append(dataObj.getUpdated());
+                   .append(dataObj.getId())
+                   .append("; state=")
+                   .append(nextState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatecount=")
+                   .append(dataObj.getUpdatedCount())
+                   .append("; updatedTime=")
+                   .append(dataObj.getUpdated());
                 str.append(": stale Data={id=")
-                    .append(dataObj.getId())
-                    .append("; state=")
-                    .append(currentState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatecount=")
-                    .append(oldUpdated)
-                    .append("; updatedTime=")
-                    .append(oldUpdatedTime);
+                   .append(dataObj.getId())
+                   .append("; state=")
+                   .append(currentState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatecount=")
+                   .append(oldUpdated)
+                   .append("; updatedTime=")
+                   .append(oldUpdatedTime);
             } else {
                 s_logger.debug("Unable to update objectIndatastore: id=" + dataObj.getId() + ", as there is no such object exists in the database anymore");
             }
@@ -195,20 +193,20 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
     }
 
     @Override
+    public List<SnapshotDataStoreVO> listActiveOnCache(long id) {
+        SearchCriteria<SnapshotDataStoreVO> sc = cacheSearch.create();
+        sc.setParameters("store_id", id);
+        sc.setParameters("store_role", DataStoreRole.ImageCache);
+        sc.setParameters("state", ObjectInDataStoreStateMachine.State.Destroyed);
+        sc.setParameters("ref_cnt", 0);
+        return listBy(sc);
+    }
+
+    @Override
     public void deletePrimaryRecordsForStore(long id, DataStoreRole role) {
         SearchCriteria<SnapshotDataStoreVO> sc = storeSearch.create();
         sc.setParameters("store_id", id);
         sc.setParameters("store_role", role);
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        remove(sc);
-        txn.commit();
-    }
-
-    @Override
-    public void deleteSnapshotRecordsOnPrimary() {
-        SearchCriteria<SnapshotDataStoreVO> sc = storeSearch.create();
-        sc.setParameters("store_role", DataStoreRole.Primary);
         TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
         remove(sc);
@@ -225,54 +223,12 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
     }
 
     @Override
-    public SnapshotDataStoreVO findLatestSnapshotForVolume(Long volumeId, DataStoreRole role) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try (
-                PreparedStatement pstmt = txn.prepareStatement(findLatestSnapshot);
-            ){
-            pstmt.setString(1, role.toString());
-            pstmt.setLong(2, volumeId);
-            try (ResultSet rs = pstmt.executeQuery();) {
-                while (rs.next()) {
-                    long sid = rs.getLong(1);
-                    long snid = rs.getLong(3);
-                    return findByStoreSnapshot(role, sid, snid);
-                }
-            }
-        } catch (SQLException e) {
-            s_logger.debug("Failed to find latest snapshot for volume: " + volumeId + " due to: "  + e.toString());
-        }
-        return null;
-    }
-
-    @Override
-    public SnapshotDataStoreVO findOldestSnapshotForVolume(Long volumeId, DataStoreRole role) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try (
-                PreparedStatement pstmt = txn.prepareStatement(findOldestSnapshot);
-            ){
-            pstmt.setString(1, role.toString());
-            pstmt.setLong(2, volumeId);
-            try (ResultSet rs = pstmt.executeQuery();) {
-                while (rs.next()) {
-                    long sid = rs.getLong(1);
-                    long snid = rs.getLong(3);
-                    return findByStoreSnapshot(role, sid, snid);
-                }
-            }
-        } catch (SQLException e) {
-            s_logger.debug("Failed to find oldest snapshot for volume: " + volumeId + " due to: "  + e.toString());
-        }
-        return null;
-    }
-
-    @Override
     @DB
     public SnapshotDataStoreVO findParent(DataStoreRole role, Long storeId, Long volumeId) {
         TransactionLegacy txn = TransactionLegacy.currentTxn();
         try (
                 PreparedStatement pstmt = txn.prepareStatement(parentSearch);
-            ){
+        ) {
             pstmt.setLong(1, storeId);
             pstmt.setString(2, role.toString());
             pstmt.setLong(3, volumeId);
@@ -298,21 +254,6 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
     }
 
     @Override
-    public SnapshotDataStoreVO findByVolume(long volumeId, DataStoreRole role) {
-        SearchCriteria<SnapshotDataStoreVO> sc = volumeSearch.create();
-        sc.setParameters("volume_id", volumeId);
-        sc.setParameters("store_role", role);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public List<SnapshotDataStoreVO> findBySnapshotId(long snapshotId) {
-        SearchCriteria<SnapshotDataStoreVO> sc = snapshotIdSearch.create();
-        sc.setParameters("snapshot_id", snapshotId);
-        return listBy(sc);
-    }
-
-    @Override
     public List<SnapshotDataStoreVO> listDestroyed(long id) {
         SearchCriteria<SnapshotDataStoreVO> sc = destroyedSearch.create();
         sc.setParameters("store_id", id);
@@ -322,12 +263,9 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
     }
 
     @Override
-    public List<SnapshotDataStoreVO> listActiveOnCache(long id) {
-        SearchCriteria<SnapshotDataStoreVO> sc = cacheSearch.create();
-        sc.setParameters("store_id", id);
-        sc.setParameters("store_role", DataStoreRole.ImageCache);
-        sc.setParameters("state", ObjectInDataStoreStateMachine.State.Destroyed);
-        sc.setParameters("ref_cnt", 0);
+    public List<SnapshotDataStoreVO> findBySnapshotId(long snapshotId) {
+        SearchCriteria<SnapshotDataStoreVO> sc = snapshotIdSearch.create();
+        sc.setParameters("snapshot_id", snapshotId);
         return listBy(sc);
     }
 
@@ -364,7 +302,16 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
                 update(snap.getId(), snap);
             }
         }
+    }
 
+    @Override
+    public void deleteSnapshotRecordsOnPrimary() {
+        SearchCriteria<SnapshotDataStoreVO> sc = storeSearch.create();
+        sc.setParameters("store_role", DataStoreRole.Primary);
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        txn.start();
+        remove(sc);
+        txn.commit();
     }
 
     @Override
@@ -400,6 +347,48 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
     }
 
     @Override
+    public SnapshotDataStoreVO findLatestSnapshotForVolume(Long volumeId, DataStoreRole role) {
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        try (
+                PreparedStatement pstmt = txn.prepareStatement(findLatestSnapshot);
+        ) {
+            pstmt.setString(1, role.toString());
+            pstmt.setLong(2, volumeId);
+            try (ResultSet rs = pstmt.executeQuery();) {
+                while (rs.next()) {
+                    long sid = rs.getLong(1);
+                    long snid = rs.getLong(3);
+                    return findByStoreSnapshot(role, sid, snid);
+                }
+            }
+        } catch (SQLException e) {
+            s_logger.debug("Failed to find latest snapshot for volume: " + volumeId + " due to: " + e.toString());
+        }
+        return null;
+    }
+
+    @Override
+    public SnapshotDataStoreVO findOldestSnapshotForVolume(Long volumeId, DataStoreRole role) {
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        try (
+                PreparedStatement pstmt = txn.prepareStatement(findOldestSnapshot);
+        ) {
+            pstmt.setString(1, role.toString());
+            pstmt.setLong(2, volumeId);
+            try (ResultSet rs = pstmt.executeQuery();) {
+                while (rs.next()) {
+                    long sid = rs.getLong(1);
+                    long snid = rs.getLong(3);
+                    return findByStoreSnapshot(role, sid, snid);
+                }
+            }
+        } catch (SQLException e) {
+            s_logger.debug("Failed to find oldest snapshot for volume: " + volumeId + " due to: " + e.toString());
+        }
+        return null;
+    }
+
+    @Override
     public void updateVolumeIds(long oldVolId, long newVolId) {
         SearchCriteria<SnapshotDataStoreVO> sc = volumeIdSearch.create();
         sc.setParameters("volume_id", oldVolId);
@@ -407,5 +396,13 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
         snapshot.setVolumeId(newVolId);
         UpdateBuilder ub = getUpdateBuilder(snapshot);
         update(ub, sc, null);
+    }
+
+    @Override
+    public SnapshotDataStoreVO findByVolume(long volumeId, DataStoreRole role) {
+        SearchCriteria<SnapshotDataStoreVO> sc = volumeSearch.create();
+        sc.setParameters("volume_id", volumeId);
+        sc.setParameters("store_role", role);
+        return findOneBy(sc);
     }
 }

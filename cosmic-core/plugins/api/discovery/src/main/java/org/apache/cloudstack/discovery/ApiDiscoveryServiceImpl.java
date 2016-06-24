@@ -16,24 +16,12 @@
 // under the License.
 package org.apache.cloudstack.discovery;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import com.cloud.serializer.Param;
 import com.cloud.user.User;
 import com.cloud.utils.ReflectUtil;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.component.ComponentLifecycleBase;
 import com.cloud.utils.component.PluggableService;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.acl.APIChecker;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.BaseAsyncCmd;
@@ -46,6 +34,17 @@ import org.apache.cloudstack.api.response.ApiDiscoveryResponse;
 import org.apache.cloudstack.api.response.ApiParameterResponse;
 import org.apache.cloudstack.api.response.ApiResponseResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
+import javax.inject.Inject;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.google.gson.annotations.SerializedName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -53,10 +52,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApiDiscoveryServiceImpl extends ComponentLifecycleBase implements ApiDiscoveryService {
     private static final Logger s_logger = LoggerFactory.getLogger(ApiDiscoveryServiceImpl.class);
-
+    private static Map<String, ApiDiscoveryResponse> s_apiNameDiscoveryResponseMap = null;
     List<APIChecker> _apiAccessCheckers = null;
     List<PluggableService> _services = null;
-    private static Map<String, ApiDiscoveryResponse> s_apiNameDiscoveryResponseMap = null;
 
     protected ApiDiscoveryServiceImpl() {
         super();
@@ -182,9 +180,9 @@ public class ApiDiscoveryServiceImpl extends ComponentLifecycleBase implements A
             response.setSince(apiCmdAnnotation.since());
         }
 
-        Set<Field> fields = ReflectUtil.getAllFieldsForClass(cmdClass, new Class<?>[] {BaseCmd.class, BaseAsyncCmd.class, BaseAsyncCreateCmd.class});
+        Set<Field> fields = ReflectUtil.getAllFieldsForClass(cmdClass, new Class<?>[]{BaseCmd.class, BaseAsyncCmd.class, BaseAsyncCreateCmd.class});
 
-        boolean isAsync = ReflectUtil.isCmdClassAsync(cmdClass, new Class<?>[] {BaseAsyncCmd.class, BaseAsyncCreateCmd.class});
+        boolean isAsync = ReflectUtil.isCmdClassAsync(cmdClass, new Class<?>[]{BaseAsyncCmd.class, BaseAsyncCreateCmd.class});
 
         response.setAsync(isAsync);
 
@@ -213,12 +211,14 @@ public class ApiDiscoveryServiceImpl extends ComponentLifecycleBase implements A
         ListResponse<ApiDiscoveryResponse> response = new ListResponse<ApiDiscoveryResponse>();
         List<ApiDiscoveryResponse> responseList = new ArrayList<ApiDiscoveryResponse>();
 
-        if (user == null)
+        if (user == null) {
             return null;
+        }
 
         if (name != null) {
-            if (!s_apiNameDiscoveryResponseMap.containsKey(name))
+            if (!s_apiNameDiscoveryResponseMap.containsKey(name)) {
                 return null;
+            }
 
             for (APIChecker apiChecker : _apiAccessCheckers) {
                 try {
@@ -229,7 +229,6 @@ public class ApiDiscoveryServiceImpl extends ComponentLifecycleBase implements A
                 }
             }
             responseList.add(s_apiNameDiscoveryResponseMap.get(name));
-
         } else {
             for (String apiName : s_apiNameDiscoveryResponseMap.keySet()) {
                 boolean isAllowed = true;
@@ -240,8 +239,9 @@ public class ApiDiscoveryServiceImpl extends ComponentLifecycleBase implements A
                         isAllowed = false;
                     }
                 }
-                if (isAllowed)
+                if (isAllowed) {
                     responseList.add(s_apiNameDiscoveryResponseMap.get(apiName));
+                }
             }
         }
         response.setResponses(responseList);

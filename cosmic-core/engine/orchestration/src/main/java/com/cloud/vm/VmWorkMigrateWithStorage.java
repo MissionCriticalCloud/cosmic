@@ -25,8 +25,8 @@ public class VmWorkMigrateWithStorage extends VmWork {
     long destHostId;
     Map<Long, Long> volumeToPool;
 
-    public VmWorkMigrateWithStorage(long userId, long accountId, long vmId, String handlerName, long srcHostId,
-            long destHostId, Map<Long, Long> volumeToPool) {
+    public VmWorkMigrateWithStorage(final long userId, final long accountId, final long vmId, final String handlerName, final long srcHostId,
+                                    final long destHostId, final Map<Long, Long> volumeToPool) {
 
         super(userId, accountId, vmId, handlerName);
 

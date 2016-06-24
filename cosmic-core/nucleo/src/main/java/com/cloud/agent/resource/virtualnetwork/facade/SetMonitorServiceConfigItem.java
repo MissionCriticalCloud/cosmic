@@ -19,14 +19,14 @@
 
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import java.util.List;
-
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SetMonitorServiceCommand;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.MonitorService;
+
+import java.util.List;
 
 public class SetMonitorServiceConfigItem extends AbstractConfigItemFacade {
 

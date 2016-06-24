@@ -16,7 +16,11 @@
 // under the License.
 package com.cloud.api.query.vo;
 
-import java.util.Date;
+import com.cloud.dc.DataCenter.NetworkType;
+import com.cloud.org.Grouping.AllocationState;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.Identity;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,75 +28,51 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.dc.DataCenter.NetworkType;
-import com.cloud.org.Grouping.AllocationState;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "data_center_view")
 public class DataCenterJoinVO extends BaseViewVO implements InternalIdentity, Identity {
 
-    @Id
-    @Column(name = "id")
-    private long id;
-
-    @Column(name = "uuid")
-    private String uuid;
-
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "description")
-    private String description = null;
-
-    @Column(name = "dns1")
-    private String dns1 = null;
-
-    @Column(name = "dns2")
-    private String dns2 = null;
-
-    @Column(name = "ip6_dns1")
-    private String ip6Dns1 = null;
-
-    @Column(name = "ip6_dns2")
-    private String ip6Dns2 = null;
-
-    @Column(name = "internal_dns1")
-    private String internalDns1 = null;
-
-    @Column(name = "internal_dns2")
-    private String internalDns2 = null;
-
-    @Column(name = "guest_network_cidr")
-    private String guestNetworkCidr = null;
-
-    @Column(name = "domain")
-    private String domain;
-
     @Column(name = "networktype")
     @Enumerated(EnumType.STRING)
     NetworkType networkType;
-
-    @Column(name = "dhcp_provider")
-    private String dhcpProvider;
-
-    @Column(name = "zone_token")
-    private String zoneToken;
-
     @Column(name = "allocation_state")
     @Enumerated(value = EnumType.STRING)
     AllocationState allocationState;
-
     @Column(name = "is_security_group_enabled")
     boolean securityGroupEnabled;
-
     @Column(name = "is_local_storage_enabled")
     boolean localStorageEnabled;
-
+    @Id
+    @Column(name = "id")
+    private long id;
+    @Column(name = "uuid")
+    private String uuid;
+    @Column(name = "name")
+    private String name;
+    @Column(name = "description")
+    private String description = null;
+    @Column(name = "dns1")
+    private String dns1 = null;
+    @Column(name = "dns2")
+    private String dns2 = null;
+    @Column(name = "ip6_dns1")
+    private String ip6Dns1 = null;
+    @Column(name = "ip6_dns2")
+    private String ip6Dns2 = null;
+    @Column(name = "internal_dns1")
+    private String internalDns1 = null;
+    @Column(name = "internal_dns2")
+    private String internalDns2 = null;
+    @Column(name = "guest_network_cidr")
+    private String guestNetworkCidr = null;
+    @Column(name = "domain")
+    private String domain;
+    @Column(name = "dhcp_provider")
+    private String dhcpProvider;
+    @Column(name = "zone_token")
+    private String zoneToken;
     @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
 

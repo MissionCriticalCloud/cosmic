@@ -16,15 +16,16 @@
 // under the License.
 package com.cloud.network.element;
 
-import java.util.List;
-
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Network;
 import com.cloud.network.rules.FirewallRule;
 
+import java.util.List;
+
 public interface FirewallServiceProvider extends NetworkElement {
     /**
      * Apply rules
+     *
      * @param network
      * @param rules
      * @return

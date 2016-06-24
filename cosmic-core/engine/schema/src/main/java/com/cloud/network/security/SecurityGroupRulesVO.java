@@ -16,6 +16,9 @@
 // under the License.
 package com.cloud.network.security;
 
+import com.cloud.network.security.SecurityRule.SecurityRuleType;
+import com.cloud.utils.db.JoinType;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,9 +27,6 @@ import javax.persistence.Id;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
-
-import com.cloud.network.security.SecurityRule.SecurityRuleType;
-import com.cloud.utils.db.JoinType;
 
 @Entity
 @Table(name = ("security_group"))
@@ -82,7 +82,7 @@ public class SecurityGroupRulesVO implements SecurityGroupRules {
     }
 
     public SecurityGroupRulesVO(long id, String name, String description, Long domainId, Long accountId, Long ruleId, String ruleUuid, int startPort, int endPort,
-            String protocol, Long allowedNetworkId, String allowedSourceIpCidr) {
+                                String protocol, Long allowedNetworkId, String allowedSourceIpCidr) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -148,15 +148,6 @@ public class SecurityGroupRulesVO implements SecurityGroupRules {
     }
 
     @Override
-    public SecurityRuleType getRuleType() {
-        if ("ingress".equalsIgnoreCase(this.type)) {
-            return SecurityRuleType.IngressRule;
-        } else {
-            return SecurityRuleType.EgressRule;
-        }
-    }
-
-    @Override
     public Long getAllowedNetworkId() {
         return allowedNetworkId;
     }
@@ -164,5 +155,14 @@ public class SecurityGroupRulesVO implements SecurityGroupRules {
     @Override
     public String getAllowedSourceIpCidr() {
         return allowedSourceIpCidr;
+    }
+
+    @Override
+    public SecurityRuleType getRuleType() {
+        if ("ingress".equalsIgnoreCase(this.type)) {
+            return SecurityRuleType.IngressRule;
+        } else {
+            return SecurityRuleType.EgressRule;
+        }
     }
 }

@@ -16,19 +16,18 @@
 // under the License.
 package org.apache.cloudstack.api.command;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.response.LDAPConfigResponse;
 import org.apache.cloudstack.api.response.LDAPRemoveResponse;
 import org.apache.cloudstack.ldap.LdapConfigurationVO;
 import org.apache.cloudstack.ldap.LdapManager;
+
+import javax.inject.Inject;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,17 +39,15 @@ import org.slf4j.LoggerFactory;
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class LDAPRemoveCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(LDAPRemoveCmd.class.getName());
-
+    private static final String s_name = "ldapremoveresponse";
     @Inject
     private LdapManager _ldapManager;
 
-    private static final String s_name = "ldapremoveresponse";
-
     @Override
     public void execute() {
-        boolean result = this.removeLDAP();
+        final boolean result = this.removeLDAP();
         if (result) {
-            LDAPRemoveResponse lr = new LDAPRemoveResponse();
+            final LDAPRemoveResponse lr = new LDAPRemoveResponse();
             lr.setObjectName("ldapremove");
             lr.setResponseName(getCommandName());
             this.setResponseObject(lr);
@@ -58,9 +55,9 @@ public class LDAPRemoveCmd extends BaseCmd {
     }
 
     private boolean removeLDAP() {
-        LdapListConfigurationCmd listConfigurationCmd = new LdapListConfigurationCmd(_ldapManager);
-        Pair<List<? extends LdapConfigurationVO>, Integer> result = _ldapManager.listConfigurations(listConfigurationCmd);
-        for (LdapConfigurationVO config : result.first()) {
+        final LdapListConfigurationCmd listConfigurationCmd = new LdapListConfigurationCmd(_ldapManager);
+        final Pair<List<? extends LdapConfigurationVO>, Integer> result = _ldapManager.listConfigurations(listConfigurationCmd);
+        for (final LdapConfigurationVO config : result.first()) {
             _ldapManager.deleteConfiguration(config.getHostname());
         }
         return true;
@@ -75,5 +72,4 @@ public class LDAPRemoveCmd extends BaseCmd {
     public long getEntityOwnerId() {
         return Account.ACCOUNT_ID_SYSTEM;
     }
-
 }

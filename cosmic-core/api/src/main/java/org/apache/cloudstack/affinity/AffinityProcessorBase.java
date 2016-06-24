@@ -57,13 +57,13 @@ public class AffinityProcessorBase extends AdapterBase implements AffinityGroupP
     }
 
     @Override
-    public void handleDeleteGroup(AffinityGroup group) {
-        // TODO Auto-generated method stub
-        return;
+    public boolean subDomainAccess() {
+        return false;
     }
 
     @Override
-    public boolean subDomainAccess() {
-        return false;
+    public void handleDeleteGroup(AffinityGroup group) {
+        // TODO Auto-generated method stub
+        return;
     }
 }

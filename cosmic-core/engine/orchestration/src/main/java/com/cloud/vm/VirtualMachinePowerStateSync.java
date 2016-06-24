@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.vm;
 
-import java.util.Map;
-
 import com.cloud.agent.api.HostVmStateReportEntry;
+
+import java.util.Map;
 
 public interface VirtualMachinePowerStateSync {
 

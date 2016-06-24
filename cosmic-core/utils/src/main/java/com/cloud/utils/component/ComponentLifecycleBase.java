@@ -19,10 +19,9 @@
 
 package com.cloud.utils.component;
 
+import javax.naming.ConfigurationException;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.naming.ConfigurationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,13 +49,13 @@ public class ComponentLifecycleBase implements ComponentLifecycle {
     }
 
     @Override
-    public void setConfigParams(Map<String, Object> params) {
-        _configParams = params;
+    public Map<String, Object> getConfigParams() {
+        return _configParams;
     }
 
     @Override
-    public Map<String, Object> getConfigParams() {
-        return _configParams;
+    public void setConfigParams(Map<String, Object> params) {
+        _configParams = params;
     }
 
     @Override

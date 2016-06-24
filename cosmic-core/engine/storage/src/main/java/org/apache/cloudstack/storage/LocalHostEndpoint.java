@@ -16,20 +16,12 @@
 // under the License.
 package org.apache.cloudstack.storage;
 
-import java.io.File;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.configuration.Config;
 import com.cloud.resource.ServerResource;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.net.NetUtils;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
 import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
@@ -38,14 +30,26 @@ import org.apache.cloudstack.storage.command.CopyCommand;
 import org.apache.cloudstack.storage.command.DownloadCommand;
 import org.apache.cloudstack.storage.resource.LocalNfsSecondaryStorageResource;
 
+import javax.inject.Inject;
+import java.io.File;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 public class LocalHostEndpoint implements EndPoint {
-    private ScheduledExecutorService executor;
     protected ServerResource resource;
     @Inject
     ConfigurationDao configDao;
+    private ScheduledExecutorService executor;
 
     public LocalHostEndpoint() {
 
+    }
+
+    public static EndPoint getEndpoint() {
+        LocalHostEndpoint endpoint = ComponentContext.inject(LocalHostEndpoint.class);
+        endpoint.configure();
+        return endpoint;
     }
 
     private void configure() {
@@ -59,12 +63,6 @@ public class LocalHostEndpoint implements EndPoint {
         localResource.setParentPath(path);
         resource = localResource;
         executor = Executors.newScheduledThreadPool(10);
-    }
-
-    public static EndPoint getEndpoint() {
-        LocalHostEndpoint endpoint = ComponentContext.inject(LocalHostEndpoint.class);
-        endpoint.configure();
-        return endpoint;
     }
 
     @Override
@@ -81,10 +79,11 @@ public class LocalHostEndpoint implements EndPoint {
     @Override
     public String getPublicAddr() {
         String hostIp = NetUtils.getDefaultHostIp();
-        if (hostIp != null)
+        if (hostIp != null) {
             return hostIp;
-        else
+        } else {
             return "127.0.0.0";
+        }
     }
 
     @Override
@@ -94,6 +93,19 @@ public class LocalHostEndpoint implements EndPoint {
         }
         // TODO Auto-generated method stub
         return new Answer(cmd, false, "unsupported command:" + cmd.toString());
+    }
+
+    @Override
+    public void sendMessageAsync(Command cmd, AsyncCompletionCallback<Answer> callback) {
+        executor.schedule(new CmdRunner(cmd, callback), 10, TimeUnit.SECONDS);
+    }
+
+    public ServerResource getResource() {
+        return resource;
+    }
+
+    public void setResource(ServerResource resource) {
+        this.resource = resource;
     }
 
     private class CmdRunner extends ManagedContextRunnable {
@@ -111,18 +123,4 @@ public class LocalHostEndpoint implements EndPoint {
             callback.complete(answer);
         }
     }
-
-    @Override
-    public void sendMessageAsync(Command cmd, AsyncCompletionCallback<Answer> callback) {
-        executor.schedule(new CmdRunner(cmd, callback), 10, TimeUnit.SECONDS);
-    }
-
-    public ServerResource getResource() {
-        return resource;
-    }
-
-    public void setResource(ServerResource resource) {
-        this.resource = resource;
-    }
-
 }

@@ -16,29 +16,22 @@
 // under the License.
 package com.cloud.storage.download;
 
-import java.util.Date;
-
 import com.cloud.agent.api.storage.DownloadAnswer;
+
+import java.util.Date;
 
 import org.apache.log4j.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class DownloadState {
-    public static enum DownloadEvent {
-        DOWNLOAD_ANSWER, ABANDON_DOWNLOAD, TIMEOUT_CHECK, DISCONNECT
-    };
-
     protected static final Logger s_logger = LoggerFactory.getLogger(DownloadListener.class.getName());
 
+    ;
     private DownloadListener dl;
 
     public DownloadState(DownloadListener dl) {
         this.dl = dl;
-    }
-
-    protected DownloadListener getDownloadListener() {
-        return dl;
     }
 
     public String handleEvent(DownloadEvent event, Object eventObj) {
@@ -47,7 +40,7 @@ public abstract class DownloadState {
         }
         switch (event) {
             case DOWNLOAD_ANSWER:
-                DownloadAnswer answer = (DownloadAnswer)eventObj;
+                DownloadAnswer answer = (DownloadAnswer) eventObj;
                 return handleAnswer(answer);
             case ABANDON_DOWNLOAD:
                 return handleAbort();
@@ -61,12 +54,26 @@ public abstract class DownloadState {
         return null;
     }
 
+    protected DownloadListener getDownloadListener() {
+        return dl;
+    }
+
+    public abstract String getName();
+
+    public abstract String handleAnswer(DownloadAnswer answer);
+
+    public abstract String handleAbort();
+
+    public abstract String handleTimeout(long updateMs);
+
+    public abstract String handleDisconnect();
+
     public void onEntry(String prevState, DownloadEvent event, Object evtObj) {
         if (s_logger.isTraceEnabled()) {
             getDownloadListener().log("onEntry, event type=" + event + ", curr state=" + getName(), Level.TRACE);
         }
         if (event == DownloadEvent.DOWNLOAD_ANSWER) {
-            getDownloadListener().callback((DownloadAnswer)evtObj);
+            getDownloadListener().callback((DownloadAnswer) evtObj);
         }
     }
 
@@ -74,14 +81,7 @@ public abstract class DownloadState {
 
     }
 
-    public abstract String handleTimeout(long updateMs);
-
-    public abstract String handleAbort();
-
-    public abstract String handleDisconnect();
-
-    public abstract String handleAnswer(DownloadAnswer answer);
-
-    public abstract String getName();
-
+    public static enum DownloadEvent {
+        DOWNLOAD_ANSWER, ABANDON_DOWNLOAD, TIMEOUT_CHECK, DISCONNECT
+    }
 }

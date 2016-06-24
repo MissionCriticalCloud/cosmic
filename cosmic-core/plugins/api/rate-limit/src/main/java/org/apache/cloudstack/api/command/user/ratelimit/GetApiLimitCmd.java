@@ -16,11 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.ratelimit;
 
-import javax.inject.Inject;
-
 import com.cloud.configuration.Config;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
@@ -29,6 +26,9 @@ import org.apache.cloudstack.api.response.ApiLimitResponse;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.ratelimit.ApiRateLimitService;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +50,19 @@ public class GetApiLimitCmd extends BaseCmd {
     /////////////////////////////////////////////////////
 
     @Override
+    public void execute() {
+        boolean apiLimitEnabled = Boolean.parseBoolean(_configDao.getValue(Config.ApiLimitEnabled.key()));
+        if (!apiLimitEnabled) {
+            throw new ServerApiException(ApiErrorCode.UNSUPPORTED_ACTION_ERROR, "This api is only available when api.throttling.enabled = true.");
+        }
+        Account caller = CallContext.current().getCallingAccount();
+        ApiLimitResponse response = _apiLimitService.searchApiLimit(caller);
+        response.setResponseName(getCommandName());
+        response.setObjectName("apilimit");
+        this.setResponseObject(response);
+    }
+
+    @Override
     public String getCommandName() {
         return s_name;
     }
@@ -62,18 +75,5 @@ public class GetApiLimitCmd extends BaseCmd {
         }
 
         return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
-
-    @Override
-    public void execute() {
-        boolean apiLimitEnabled = Boolean.parseBoolean(_configDao.getValue(Config.ApiLimitEnabled.key()));
-        if (!apiLimitEnabled) {
-            throw new ServerApiException(ApiErrorCode.UNSUPPORTED_ACTION_ERROR, "This api is only available when api.throttling.enabled = true.");
-        }
-        Account caller = CallContext.current().getCallingAccount();
-        ApiLimitResponse response = _apiLimitService.searchApiLimit(caller);
-        response.setResponseName(getCommandName());
-        response.setObjectName("apilimit");
-        this.setResponseObject(response);
     }
 }

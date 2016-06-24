@@ -16,16 +16,16 @@
 // under the License.
 package com.cloud.api.query.vo;
 
+import com.cloud.network.security.SecurityGroup;
+import com.cloud.network.security.SecurityRule.SecurityRuleType;
+import com.cloud.server.ResourceTag.ResourceObjectType;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.network.security.SecurityGroup;
-import com.cloud.network.security.SecurityRule.SecurityRuleType;
-import com.cloud.server.ResourceTag.ResourceObjectType;
 
 @Entity
 @Table(name = "security_group_view")
@@ -164,13 +164,13 @@ public class SecurityGroupJoinVO extends BaseViewVO implements ControlledViewEnt
     }
 
     @Override
-    public String getAccountUuid() {
-        return accountUuid;
+    public long getDomainId() {
+        return domainId;
     }
 
     @Override
-    public String getAccountName() {
-        return accountName;
+    public String getDomainPath() {
+        return domainPath;
     }
 
     @Override
@@ -179,8 +179,13 @@ public class SecurityGroupJoinVO extends BaseViewVO implements ControlledViewEnt
     }
 
     @Override
-    public long getDomainId() {
-        return domainId;
+    public String getAccountUuid() {
+        return accountUuid;
+    }
+
+    @Override
+    public String getAccountName() {
+        return accountName;
     }
 
     @Override
@@ -194,15 +199,6 @@ public class SecurityGroupJoinVO extends BaseViewVO implements ControlledViewEnt
     }
 
     @Override
-    public String getDomainPath() {
-        return domainPath;
-    }
-
-    public long getProjectId() {
-        return projectId;
-    }
-
-    @Override
     public String getProjectUuid() {
         return projectUuid;
     }
@@ -210,6 +206,10 @@ public class SecurityGroupJoinVO extends BaseViewVO implements ControlledViewEnt
     @Override
     public String getProjectName() {
         return projectName;
+    }
+
+    public long getProjectId() {
+        return projectId;
     }
 
     public Long getJobId() {

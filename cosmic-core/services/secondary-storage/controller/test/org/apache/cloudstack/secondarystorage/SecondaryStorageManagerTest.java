@@ -24,8 +24,6 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
-
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
@@ -33,6 +31,8 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -68,13 +68,13 @@ public class SecondaryStorageManagerTest {
         NetworkVO network = Mockito.mock(NetworkVO.class);
         NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
         when(_networkDao.listByZoneAndTrafficType(anyLong(), eq(TrafficType.Public)))
-                    .thenReturn(Collections.singletonList(network));
+                .thenReturn(Collections.singletonList(network));
 
         when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Public))))
-        .thenReturn(Collections.singletonList(badNetwork));
+                .thenReturn(Collections.singletonList(badNetwork));
 
         when(_networkDao.listByZoneSecurityGroup(anyLong()))
-                    .thenReturn(Collections.singletonList(badNetwork));
+                .thenReturn(Collections.singletonList(badNetwork));
 
         NetworkVO returnedNetwork = _ssMgr.getDefaultNetworkForAdvancedZone(dc);
 
@@ -94,10 +94,10 @@ public class SecondaryStorageManagerTest {
         NetworkVO network = Mockito.mock(NetworkVO.class);
         NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
         when(_networkDao.listByZoneAndTrafficType(anyLong(), any(TrafficType.class)))
-                    .thenReturn(Collections.singletonList(badNetwork));
+                .thenReturn(Collections.singletonList(badNetwork));
 
         when(_networkDao.listByZoneSecurityGroup(anyLong()))
-                    .thenReturn(Collections.singletonList(network));
+                .thenReturn(Collections.singletonList(network));
 
         NetworkVO returnedNetwork = _ssMgr.getDefaultNetworkForAdvancedZone(dc);
 
@@ -116,10 +116,10 @@ public class SecondaryStorageManagerTest {
         NetworkVO network = Mockito.mock(NetworkVO.class);
         NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
         when(_networkDao.listByZoneAndTrafficType(anyLong(), eq(TrafficType.Guest)))
-                    .thenReturn(Collections.singletonList(network));
+                .thenReturn(Collections.singletonList(network));
 
         when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Guest))))
-                    .thenReturn(Collections.singletonList(badNetwork));
+                .thenReturn(Collections.singletonList(badNetwork));
 
         NetworkVO returnedNetwork = _ssMgr.getDefaultNetworkForBasicZone(dc);
 
@@ -139,10 +139,10 @@ public class SecondaryStorageManagerTest {
         NetworkVO network = Mockito.mock(NetworkVO.class);
         NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
         when(_networkDao.listByZoneAndTrafficType(anyLong(), eq(TrafficType.Guest)))
-                    .thenReturn(Collections.singletonList(network));
+                .thenReturn(Collections.singletonList(network));
 
         when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Guest))))
-                    .thenReturn(Collections.singletonList(badNetwork));
+                .thenReturn(Collections.singletonList(badNetwork));
 
         NetworkVO returnedNetwork = _ssMgr.getDefaultNetworkForBasicZone(dc);
 
@@ -152,7 +152,7 @@ public class SecondaryStorageManagerTest {
     }
 
     //also test invalid input
-    @Test(expected=CloudRuntimeException.class)
+    @Test(expected = CloudRuntimeException.class)
     public void getDefaultNetworkForBasicSGWrongZoneType() {
         DataCenterVO dc = Mockito.mock(DataCenterVO.class);
         when(dc.getNetworkType()).thenReturn(NetworkType.Advanced);
@@ -163,15 +163,15 @@ public class SecondaryStorageManagerTest {
         NetworkVO network = Mockito.mock(NetworkVO.class);
         NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
         when(_networkDao.listByZoneAndTrafficType(anyLong(), eq(TrafficType.Guest)))
-                    .thenReturn(Collections.singletonList(network));
+                .thenReturn(Collections.singletonList(network));
 
         when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Guest))))
-                    .thenReturn(Collections.singletonList(badNetwork));
+                .thenReturn(Collections.singletonList(badNetwork));
 
         _ssMgr.getDefaultNetworkForBasicZone(dc);
     }
 
-    @Test(expected=CloudRuntimeException.class)
+    @Test(expected = CloudRuntimeException.class)
     public void getDefaultNetworkForAdvancedWrongZoneType() {
         DataCenterVO dc = Mockito.mock(DataCenterVO.class);
         when(dc.getNetworkType()).thenReturn(NetworkType.Basic);
@@ -182,10 +182,10 @@ public class SecondaryStorageManagerTest {
         NetworkVO network = Mockito.mock(NetworkVO.class);
         NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
         when(_networkDao.listByZoneAndTrafficType(anyLong(), any(TrafficType.class)))
-                    .thenReturn(Collections.singletonList(badNetwork));
+                .thenReturn(Collections.singletonList(badNetwork));
 
         when(_networkDao.listByZoneSecurityGroup(anyLong()))
-                    .thenReturn(Collections.singletonList(network));
+                .thenReturn(Collections.singletonList(network));
 
         _ssMgr.getDefaultNetworkForAdvancedZone(dc);
     }

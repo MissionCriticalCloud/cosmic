@@ -26,7 +26,7 @@ public class ForwardingRules extends ConfigBase {
         super(ConfigBase.FORWARDING_RULES);
     }
 
-    public ForwardingRules(ForwardingRule[] rules) {
+    public ForwardingRules(final ForwardingRule[] rules) {
         super(ConfigBase.FORWARDING_RULES);
         this.rules = rules;
     }
@@ -35,8 +35,7 @@ public class ForwardingRules extends ConfigBase {
         return rules;
     }
 
-    public void setRules(ForwardingRule[] rules) {
+    public void setRules(final ForwardingRule[] rules) {
         this.rules = rules;
     }
-
 }

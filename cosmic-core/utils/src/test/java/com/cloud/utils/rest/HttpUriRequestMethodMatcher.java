@@ -28,17 +28,16 @@ import org.hamcrest.Matcher;
 
 public class HttpUriRequestMethodMatcher extends FeatureMatcher<HttpUriRequest, String> {
 
-    public static HttpUriRequest aMethod(final String method) {
-        return argThat(new HttpUriRequestMethodMatcher(equalTo(method), "method", "method"));
-    }
-
     public HttpUriRequestMethodMatcher(final Matcher<? super String> subMatcher, final String featureDescription, final String featureName) {
         super(subMatcher, featureDescription, featureName);
+    }
+
+    public static HttpUriRequest aMethod(final String method) {
+        return argThat(new HttpUriRequestMethodMatcher(equalTo(method), "method", "method"));
     }
 
     @Override
     protected String featureValueOf(final HttpUriRequest actual) {
         return actual.getMethod();
     }
-
 }

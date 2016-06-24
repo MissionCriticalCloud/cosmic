@@ -16,8 +16,8 @@
 // under the License.
 package com.cloud.storage;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,82 +27,65 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
+import java.util.UUID;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.utils.db.GenericDao;
 import com.google.gson.annotations.Expose;
 
 @Entity
 @Table(name = "snapshots")
 public class SnapshotVO implements Snapshot {
 
+    @Column(name = "data_center_id")
+    long dataCenterId;
+    @Column(name = "account_id")
+    long accountId;
+    @Column(name = "domain_id")
+    long domainId;
+    @Column(name = "volume_id")
+    Long volumeId;
+    @Column(name = "disk_offering_id")
+    Long diskOfferingId;
+    @Expose
+    @Column(name = "name")
+    String name;
+    @Column(name = "snapshot_type")
+    short snapshotType;
+    @Column(name = "type_description")
+    String typeDescription;
+    @Column(name = "size")
+    long size;
+    @Column(name = GenericDao.CREATED_COLUMN)
+    Date created;
+    @Column(name = GenericDao.REMOVED_COLUMN)
+    Date removed;
+    @Column(name = "hypervisor_type")
+    @Enumerated(value = EnumType.STRING)
+    HypervisorType hypervisorType;
+    @Expose
+    @Column(name = "version")
+    String version;
+    @Column(name = "uuid")
+    String uuid;
+    @Column(name = "min_iops")
+    Long minIops;
+    @Column(name = "max_iops")
+    Long maxIops;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
-    @Column(name = "data_center_id")
-    long dataCenterId;
-
-    @Column(name = "account_id")
-    long accountId;
-
-    @Column(name = "domain_id")
-    long domainId;
-
-    @Column(name = "volume_id")
-    Long volumeId;
-
-    @Column(name = "disk_offering_id")
-    Long diskOfferingId;
-
-    @Expose
-    @Column(name = "name")
-    String name;
-
     @Expose
     @Column(name = "status", updatable = true, nullable = false)
     @Enumerated(value = EnumType.STRING)
     private State state;
-
-    @Column(name = "snapshot_type")
-    short snapshotType;
-
-    @Column(name = "type_description")
-    String typeDescription;
-
-    @Column(name = "size")
-    long size;
-
-    @Column(name = GenericDao.CREATED_COLUMN)
-    Date created;
-
-    @Column(name = GenericDao.REMOVED_COLUMN)
-    Date removed;
-
-    @Column(name = "hypervisor_type")
-    @Enumerated(value = EnumType.STRING)
-    HypervisorType hypervisorType;
-
-    @Expose
-    @Column(name = "version")
-    String version;
-
-    @Column(name = "uuid")
-    String uuid;
-
-    @Column(name = "min_iops")
-    Long minIops;
-
-    @Column(name = "max_iops")
-    Long maxIops;
 
     public SnapshotVO() {
         uuid = UUID.randomUUID().toString();
     }
 
     public SnapshotVO(long dcId, long accountId, long domainId, Long volumeId, Long diskOfferingId, String name, short snapshotType, String typeDescription, long size,
-            Long minIops, Long maxIops, HypervisorType hypervisorType) {
+                      Long minIops, Long maxIops, HypervisorType hypervisorType) {
         dataCenterId = dcId;
         this.accountId = accountId;
         this.domainId = domainId;
@@ -120,6 +103,15 @@ public class SnapshotVO implements Snapshot {
         uuid = UUID.randomUUID().toString();
     }
 
+    public static Type getSnapshotType(String snapshotType) {
+        for (Type type : Type.values()) {
+            if (type.equals(snapshotType)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
     @Override
     public long getId() {
         return id;
@@ -135,17 +127,8 @@ public class SnapshotVO implements Snapshot {
     }
 
     @Override
-    public long getDomainId() {
-        return domainId;
-    }
-
-    @Override
     public long getVolumeId() {
         return volumeId;
-    }
-
-    public long getDiskOfferingId() {
-        return diskOfferingId;
     }
 
     public void setVolumeId(Long volumeId) {
@@ -158,8 +141,8 @@ public class SnapshotVO implements Snapshot {
     }
 
     @Override
-    public short getsnapshotType() {
-        return snapshotType;
+    public Date getCreated() {
+        return created;
     }
 
     @Override
@@ -171,12 +154,13 @@ public class SnapshotVO implements Snapshot {
     }
 
     @Override
-    public HypervisorType getHypervisorType() {
-        return hypervisorType;
+    public State getState() {
+        return state;
     }
 
-    public void setSnapshotType(short snapshotType) {
-        this.snapshotType = snapshotType;
+    @Override
+    public HypervisorType getHypervisorType() {
+        return hypervisorType;
     }
 
     @Override
@@ -185,6 +169,28 @@ public class SnapshotVO implements Snapshot {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public short getsnapshotType() {
+        return snapshotType;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    @Override
+    public long getDomainId() {
+        return domainId;
+    }
+
+    public long getDiskOfferingId() {
+        return diskOfferingId;
+    }
+
+    public void setSnapshotType(short snapshotType) {
+        this.snapshotType = snapshotType;
     }
 
     public long getSize() {
@@ -215,31 +221,8 @@ public class SnapshotVO implements Snapshot {
         this.version = version;
     }
 
-    @Override
-    public Date getCreated() {
-        return created;
-    }
-
     public Date getRemoved() {
         return removed;
-    }
-
-    @Override
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
-    }
-
-    public static Type getSnapshotType(String snapshotType) {
-        for (Type type : Type.values()) {
-            if (type.equals(snapshotType)) {
-                return type;
-            }
-        }
-        return null;
     }
 
     @Override

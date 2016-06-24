@@ -28,5 +28,4 @@ public class ConfigurePublicIpsOnLogicalRouterAnswer extends Answer {
     public ConfigurePublicIpsOnLogicalRouterAnswer(final Command command, final Exception e) {
         super(command, e);
     }
-
 }

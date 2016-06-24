@@ -18,6 +18,10 @@
  */
 package org.apache.cloudstack.storage.resource;
 
+import com.cloud.utils.PropertiesUtil;
+import com.cloud.utils.exception.CloudRuntimeException;
+
+import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,24 +30,16 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.naming.ConfigurationException;
-
-import com.cloud.utils.PropertiesUtil;
-import com.cloud.utils.exception.CloudRuntimeException;
-
+import junit.framework.Assert;
+import junit.framework.TestCase;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 public class NfsSecondaryStorageResourceTest extends TestCase {
-    private static Map<String, Object> testParams;
-
     private static final Logger s_logger = Logger.getLogger(NfsSecondaryStorageResourceTest.class.getName());
-
+    private static Map<String, Object> testParams;
     NfsSecondaryStorageResource resource;
 
     @Before
@@ -56,8 +52,25 @@ public class NfsSecondaryStorageResourceTest extends TestCase {
         resource.configureStorageLayerClass(testParams);
         Object testLocalRoot = testParams.get("testLocalRoot");
         if (testLocalRoot != null) {
-            resource.setParentPath((String)testLocalRoot);
+            resource.setParentPath((String) testLocalRoot);
         }
+    }
+
+    public static Properties loadProperties() throws ConfigurationException {
+        Properties properties = new Properties();
+        final File file = PropertiesUtil.findConfigFile("agent.properties");
+        if (file == null) {
+            throw new ConfigurationException("Unable to find agent.properties.");
+        }
+        s_logger.info("agent.properties found at " + file.getAbsolutePath());
+        try (FileInputStream fs = new FileInputStream(file);) {
+            properties.load(fs);
+        } catch (final FileNotFoundException ex) {
+            throw new CloudRuntimeException("Cannot find the file: " + file.getAbsolutePath(), ex);
+        } catch (final IOException ex) {
+            throw new CloudRuntimeException("IOException in reading " + file.getAbsolutePath(), ex);
+        }
+        return properties;
     }
 
     @Test
@@ -76,7 +89,7 @@ public class NfsSecondaryStorageResourceTest extends TestCase {
 
         // attempt a configured mount
         final Map<String, Object> params = PropertiesUtil.toMap(loadProperties());
-        String sampleMount = (String)params.get("testCifsMount");
+        String sampleMount = (String) params.get("testCifsMount");
         if (!sampleMount.isEmpty()) {
             s_logger.info("functional test, mount " + sampleMount);
             URI realMntUri = new URI(sampleMount);
@@ -87,22 +100,4 @@ public class NfsSecondaryStorageResourceTest extends TestCase {
             s_logger.info("no entry for testCifsMount in " + "./conf/agent.properties - skip functional test");
         }
     }
-
-    public static Properties loadProperties() throws ConfigurationException {
-        Properties properties = new Properties();
-        final File file = PropertiesUtil.findConfigFile("agent.properties");
-        if (file == null) {
-            throw new ConfigurationException("Unable to find agent.properties.");
-        }
-        s_logger.info("agent.properties found at " + file.getAbsolutePath());
-        try(FileInputStream fs = new FileInputStream(file);) {
-            properties.load(fs);
-        } catch (final FileNotFoundException ex) {
-            throw new CloudRuntimeException("Cannot find the file: " + file.getAbsolutePath(), ex);
-        } catch (final IOException ex) {
-            throw new CloudRuntimeException("IOException in reading " + file.getAbsolutePath(), ex);
-        }
-        return properties;
-    }
-
 }

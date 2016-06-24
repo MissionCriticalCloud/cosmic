@@ -42,6 +42,11 @@ public class GetVmConfigAnswer extends Answer {
         return nics;
     }
 
+    @Override
+    public boolean executeInSequence() {
+        return false;
+    }
+
     public class NicDetails {
         String macAddress;
         String vlanid;
@@ -67,10 +72,5 @@ public class GetVmConfigAnswer extends Answer {
         public boolean getState() {
             return state;
         }
-    }
-
-    @Override
-    public boolean executeInSequence() {
-        return false;
     }
 }

@@ -16,6 +16,8 @@
 // under the License.
 package com.cloud.dc;
 
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,21 +25,19 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.apache.cloudstack.api.InternalIdentity;
-
 @Entity
-@Table(name="domain_vlan_map")
+@Table(name = "domain_vlan_map")
 public class DomainVlanMapVO implements InternalIdentity {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name="id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private long id;
 
-    @Column(name="domain_id")
+    @Column(name = "domain_id")
     private long domainId;
 
-    @Column(name="vlan_db_id")
+    @Column(name = "vlan_db_id")
     private long vlanDbId;
 
     public DomainVlanMapVO(long domainId, long vlanDbId) {

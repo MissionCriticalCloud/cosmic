@@ -16,26 +16,23 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.UUID;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.UUID;
 
 @Entity
 @Table(name = "load_balancer_cert_map")
 public class LoadBalancerCertMapVO implements InternalIdentity {
 
+    @Column(name = "uuid")
+    private final String uuid;
     @Id
     @Column(name = "id")
     private Long id;
-
-    @Column(name = "uuid")
-    private String uuid;
-
     @Column(name = "load_balancer_id")
     private Long lbId;
 
@@ -49,7 +46,7 @@ public class LoadBalancerCertMapVO implements InternalIdentity {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public LoadBalancerCertMapVO(Long lbId, Long certId, boolean revoke) {
+    public LoadBalancerCertMapVO(final Long lbId, final Long certId, final boolean revoke) {
 
         this.lbId = lbId;
         this.certId = certId;
@@ -71,24 +68,24 @@ public class LoadBalancerCertMapVO implements InternalIdentity {
         return lbId;
     }
 
+    //Setters
+    public void setLbId(final Long lbId) {
+        this.lbId = lbId;
+    }
+
     public Long getCertId() {
         return certId;
+    }
+
+    public void setCertId(final Long certId) {
+        this.certId = certId;
     }
 
     public boolean isRevoke() {
         return revoke;
     }
 
-    //Setters
-    public void setLbId(Long lbId) {
-        this.lbId = lbId;
-    }
-
-    public void setCertId(Long certId) {
-        this.certId = certId;
-    }
-
-    public void setRevoke(boolean revoke) {
+    public void setRevoke(final boolean revoke) {
         this.revoke = revoke;
     }
 }

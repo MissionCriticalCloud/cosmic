@@ -16,6 +16,14 @@
 // under the License.
 package com.cloud.network.element;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
@@ -29,6 +37,10 @@ import com.cloud.vm.dao.DomainRouterDao;
 import org.apache.cloudstack.network.topology.AdvancedNetworkTopology;
 import org.apache.cloudstack.network.topology.BasicNetworkTopology;
 import org.apache.cloudstack.network.topology.NetworkTopologyContext;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -36,31 +48,20 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
 @RunWith(MockitoJUnitRunner.class)
 public class VpcVirtualRouterElementTest {
     @Mock
     DataCenterDao _dcDao;
     @Mock
-    private DomainRouterDao _routerDao;
-
-    @Mock
     EntityManager _entityMgr;
-
     @Mock
     NetworkTopologyContext networkTopologyContext;
-
     @InjectMocks
     VpcVirtualNetworkApplianceManagerImpl _vpcRouterMgr;
-
     @InjectMocks
     VpcVirtualRouterElement vpcVirtualRouterElement;
-
+    @Mock
+    private DomainRouterDao _routerDao;
 
     @Test
     public void testApplyVpnUsers() {

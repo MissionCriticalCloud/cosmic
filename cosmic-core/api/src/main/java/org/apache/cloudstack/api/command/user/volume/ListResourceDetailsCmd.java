@@ -17,10 +17,7 @@
 
 package org.apache.cloudstack.api.command.user.volume;
 
-import java.util.List;
-
 import com.cloud.server.ResourceTag;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -29,6 +26,8 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.ResourceDetailResponse;
 import org.apache.cloudstack.api.response.ResourceTagResponse;
+
+import java.util.List;
 
 @APICommand(name = "listResourceDetails", description = "List resource detail(s)", responseObject = ResourceTagResponse.class, since = "4.2",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
@@ -44,12 +43,12 @@ public class ListResourceDetailsCmd extends BaseListProjectAndAccountResourcesCm
     @Parameter(name = ApiConstants.KEY, type = CommandType.STRING, description = "list by key")
     private String key;
 
-    @Parameter(name = ApiConstants.VALUE, type = CommandType.STRING, description = "list by key, value. Needs to be passed only along with key" ,
-            since = "4.4", authorized = { RoleType.Admin })
+    @Parameter(name = ApiConstants.VALUE, type = CommandType.STRING, description = "list by key, value. Needs to be passed only along with key",
+            since = "4.4", authorized = {RoleType.Admin})
     private String value;
 
     @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "if set to true, only details marked with display=true, are returned."
-            + " False by default", since = "4.3", authorized = { RoleType.Admin })
+            + " False by default", since = "4.3", authorized = {RoleType.Admin})
     private Boolean forDisplay;
 
     public String getResourceId() {
@@ -65,21 +64,12 @@ public class ListResourceDetailsCmd extends BaseListProjectAndAccountResourcesCm
     }
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public Boolean getDisplay() {
         if (forDisplay != null) {
             return forDisplay;
         }
         return super.getDisplay();
     }
-
-    /////////////////////////////////////////////////////
-    /////////////////// Accessors ///////////////////////
-    /////////////////////////////////////////////////////
 
     @Override
     public void execute() {
@@ -91,8 +81,16 @@ public class ListResourceDetailsCmd extends BaseListProjectAndAccountResourcesCm
         setResponseObject(response);
     }
 
+    /////////////////////////////////////////////////////
+    /////////////////// Accessors ///////////////////////
+    /////////////////////////////////////////////////////
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
     public ResourceTag.ResourceObjectType getResourceType() {
         return _taggedResourceService.getResourceType(resourceType);
     }
-
 }

@@ -20,8 +20,7 @@ public class StorageConflictException extends ManagementServerException {
 
     private static final long serialVersionUID = -294905017911859479L;
 
-    public StorageConflictException(String message) {
+    public StorageConflictException(final String message) {
         super(message);
     }
-
 }

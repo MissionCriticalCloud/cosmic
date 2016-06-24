@@ -24,10 +24,8 @@ import com.cloud.user.DomainService
 import com.cloud.user.User
 import com.cloud.user.UserAccountVO
 import com.cloud.user.UserVO
-import org.apache.cloudstack.api.command.LdapCreateAccountCmd
 import org.apache.cloudstack.api.command.LdapImportUsersCmd
 import org.apache.cloudstack.api.response.LdapUserResponse
-import org.apache.cloudstack.context.CallContext
 import org.apache.cloudstack.ldap.LdapManager
 import org.apache.cloudstack.ldap.LdapUser
 
@@ -176,7 +174,7 @@ class LdapImportUsersCmdSpec extends spock.lang.Specification {
         if (varDomainId != null) {
             1 * domainService.getDomain(varDomainId) >> domain;
         } else {
-            if(varGroupName != null) {
+            if (varGroupName != null) {
                 1 * domainService.getDomainByName(expectedDomainName, 1L) >> null
             } else {
                 domainService.getDomainByName(expectedDomainName, 1L) >>> [null, domain]
@@ -195,7 +193,7 @@ class LdapImportUsersCmdSpec extends spock.lang.Specification {
         1L          | null         | "TestDomain"
         1L          | "TestGroup"  | "TestDomain"
         null        | "TestGroup"  | "TestGroup"
-        null        | "Test Group"  | "TestGroup"
+        null        | "Test Group" | "TestGroup"
 
     }
 
@@ -210,14 +208,14 @@ class LdapImportUsersCmdSpec extends spock.lang.Specification {
         ldapManager.createLdapUserResponse(_) >>> response1
 
         def domainService = Mock(DomainService)
-        1 * domainService.getDomain(1L) >> new DomainVO("DOMAIN", 1L, 1L, "DOMAIN", UUID.randomUUID().toString());;
+        1 * domainService.getDomain(1L) >> new DomainVO("DOMAIN", 1L, 1L, "DOMAIN", UUID.randomUUID().toString()); ;
 
         def accountService = Mock(AccountService)
-        1 * accountService.getActiveAccountByName('ACCOUNT', 0) >>  Mock(AccountVO)
+        1 * accountService.getActiveAccountByName('ACCOUNT', 0) >> Mock(AccountVO)
 
-        1 * accountService.createUser('rmurphy', _ , 'Ryan', 'Murphy', 'rmurphy@test.com', null, 'ACCOUNT', 0, _, User.Source.LDAP) >> Mock(UserVO)
+        1 * accountService.createUser('rmurphy', _, 'Ryan', 'Murphy', 'rmurphy@test.com', null, 'ACCOUNT', 0, _, User.Source.LDAP) >> Mock(UserVO)
         0 * accountService.createUserAccount('rmurphy', _, 'Ryan', 'Murphy', 'rmurphy@test.com', null, 'ACCOUNT', 2, 0, 'DOMAIN', null, _, _, User.Source.LDAP)
-        0 * accountService.updateUser(_,'Ryan', 'Murphy', 'rmurphy@test.com', null, null, null, null, null);
+        0 * accountService.updateUser(_, 'Ryan', 'Murphy', 'rmurphy@test.com', null, null, null, null, null);
 
         def ldapImportUsersCmd = new LdapImportUsersCmd(ldapManager, domainService, accountService)
         ldapImportUsersCmd.accountName = "ACCOUNT"
@@ -240,14 +238,14 @@ class LdapImportUsersCmdSpec extends spock.lang.Specification {
         ldapManager.createLdapUserResponse(_) >>> response1
 
         def domainService = Mock(DomainService)
-        1 * domainService.getDomain(1L) >> new DomainVO("DOMAIN", 1L, 1L, "DOMAIN", UUID.randomUUID().toString());;
+        1 * domainService.getDomain(1L) >> new DomainVO("DOMAIN", 1L, 1L, "DOMAIN", UUID.randomUUID().toString()); ;
 
         def accountService = Mock(AccountService)
-        1 * accountService.getActiveAccountByName('ACCOUNT', 0) >>  Mock(AccountVO)
-        1 * accountService.getActiveUserAccount('rmurphy',0) >> Mock(UserAccountVO)
-        0 * accountService.createUser('rmurphy', _ , 'Ryan', 'Murphy', 'rmurphy@test.com', null, 'ACCOUNT', 0, _) >> Mock(UserVO)
+        1 * accountService.getActiveAccountByName('ACCOUNT', 0) >> Mock(AccountVO)
+        1 * accountService.getActiveUserAccount('rmurphy', 0) >> Mock(UserAccountVO)
+        0 * accountService.createUser('rmurphy', _, 'Ryan', 'Murphy', 'rmurphy@test.com', null, 'ACCOUNT', 0, _) >> Mock(UserVO)
         0 * accountService.createUserAccount('rmurphy', _, 'Ryan', 'Murphy', 'rmurphy@test.com', null, 'ACCOUNT', 2, 0, 'DOMAIN', null, _, _)
-        1 * accountService.updateUser(_,'Ryan', 'Murphy', 'rmurphy@test.com', null, null, null, null, null);
+        1 * accountService.updateUser(_, 'Ryan', 'Murphy', 'rmurphy@test.com', null, null, null, null, null);
 
         def ldapImportUsersCmd = new LdapImportUsersCmd(ldapManager, domainService, accountService)
         ldapImportUsersCmd.accountName = "ACCOUNT"
@@ -269,13 +267,13 @@ class LdapImportUsersCmdSpec extends spock.lang.Specification {
         ldapManager.createLdapUserResponse(_) >>> response1
 
         def domainService = Mock(DomainService)
-        1 * domainService.getDomain(1L) >> new DomainVO("DOMAIN", 1L, 1L, "DOMAIN", UUID.randomUUID().toString());;
+        1 * domainService.getDomain(1L) >> new DomainVO("DOMAIN", 1L, 1L, "DOMAIN", UUID.randomUUID().toString()); ;
 
         def accountService = Mock(AccountService)
-        1 * accountService.getActiveAccountByName('ACCOUNT', 0) >>  null
-        0 * accountService.createUser('rmurphy', _ , 'Ryan', 'Murphy', 'rmurphy@test.com', null, 'ACCOUNT', 0, _, User.Source.LDAP)
+        1 * accountService.getActiveAccountByName('ACCOUNT', 0) >> null
+        0 * accountService.createUser('rmurphy', _, 'Ryan', 'Murphy', 'rmurphy@test.com', null, 'ACCOUNT', 0, _, User.Source.LDAP)
         1 * accountService.createUserAccount('rmurphy', _, 'Ryan', 'Murphy', 'rmurphy@test.com', null, 'ACCOUNT', 2, 0, 'DOMAIN', null, _, _, User.Source.LDAP)
-        0 * accountService.updateUser(_,'Ryan', 'Murphy', 'rmurphy@test.com', null, null, null, null, null);
+        0 * accountService.updateUser(_, 'Ryan', 'Murphy', 'rmurphy@test.com', null, null, null, null, null);
 
         def ldapImportUsersCmd = new LdapImportUsersCmd(ldapManager, domainService, accountService)
         ldapImportUsersCmd.accountName = "ACCOUNT"

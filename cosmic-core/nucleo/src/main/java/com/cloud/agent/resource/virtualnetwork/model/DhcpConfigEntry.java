@@ -68,5 +68,4 @@ public class DhcpConfigEntry {
     public void setFirstIpOfSubnet(String firstIpOfSubnet) {
         this.firstIpOfSubnet = firstIpOfSubnet;
     }
-
 }

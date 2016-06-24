@@ -18,13 +18,13 @@ package org.apache.cloudstack.api.command.user.iso;
 
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseUpdateTemplateOrIsoCmd;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.TemplateResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +58,18 @@ public class UpdateIsoCmd extends BaseUpdateTemplateOrIsoCmd {
     /////////////////////////////////////////////////////
 
     @Override
+    public void execute() {
+        VirtualMachineTemplate result = _templateService.updateTemplate(this);
+        if (result != null) {
+            TemplateResponse response = _responseGenerator.createTemplateUpdateResponse(ResponseView.Restricted, result);
+            response.setResponseName(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update ISO");
+        }
+    }
+
+    @Override
     public String getCommandName() {
         return s_name;
     }
@@ -70,17 +82,5 @@ public class UpdateIsoCmd extends BaseUpdateTemplateOrIsoCmd {
         }
 
         return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
-
-    @Override
-    public void execute() {
-        VirtualMachineTemplate result = _templateService.updateTemplate(this);
-        if (result != null) {
-            TemplateResponse response = _responseGenerator.createTemplateUpdateResponse(ResponseView.Restricted, result);
-            response.setResponseName(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update ISO");
-        }
     }
 }

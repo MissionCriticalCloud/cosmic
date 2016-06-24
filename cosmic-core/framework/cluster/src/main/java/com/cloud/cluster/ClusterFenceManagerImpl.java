@@ -16,13 +16,12 @@
 // under the License.
 package com.cloud.cluster;
 
-import java.util.List;
-import java.util.Map;
+import com.cloud.utils.component.ManagerBase;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
-
-import com.cloud.utils.component.ManagerBase;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

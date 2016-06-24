@@ -41,5 +41,4 @@ public class DistinguishedNameParser {
         }
         throw new IllegalArgumentException("Malformed distinguished name: " + distinguishedName);
     }
-
 }

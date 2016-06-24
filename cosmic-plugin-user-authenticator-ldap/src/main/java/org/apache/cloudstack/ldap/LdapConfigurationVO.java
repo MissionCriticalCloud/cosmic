@@ -16,14 +16,14 @@
 // under the License.
 package org.apache.cloudstack.ldap;
 
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = "ldap_configuration")
@@ -56,11 +56,11 @@ public class LdapConfigurationVO implements InternalIdentity {
         return id;
     }
 
-    public int getPort() {
-        return port;
-    }
-
     public void setId(final long id) {
         this.id = id;
+    }
+
+    public int getPort() {
+        return port;
     }
 }

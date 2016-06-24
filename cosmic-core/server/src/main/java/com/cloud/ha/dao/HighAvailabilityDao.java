@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.ha.dao;
 
-import java.util.List;
-
 import com.cloud.ha.HaWorkVO;
 import com.cloud.ha.HighAvailabilityManager.WorkType;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface HighAvailabilityDao extends GenericDao<HaWorkVO, Long> {
 
@@ -58,7 +58,7 @@ public interface HighAvailabilityDao extends GenericDao<HaWorkVO, Long> {
      * finds out if a work item has been scheduled for this work type but has not been taken yet.
      *
      * @param instanceId vm instance id
-     * @param type type of work scheduled for it.
+     * @param type       type of work scheduled for it.
      * @return true if it has been scheduled and false if it hasn't.
      */
     boolean hasBeenScheduled(long instanceId, WorkType type);
@@ -68,7 +68,7 @@ public interface HighAvailabilityDao extends GenericDao<HaWorkVO, Long> {
     /**
      * Look for HA work that has been scheduled for a vm since a certain work id.
      *
-     * @param vmId virtual machine id.
+     * @param vmId   virtual machine id.
      * @param workId work item id.
      * @return List of work items.
      */

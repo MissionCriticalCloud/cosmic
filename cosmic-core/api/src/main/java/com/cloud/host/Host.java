@@ -28,30 +28,6 @@ import java.util.Date;
  * Host represents one particular host server.
  */
 public interface Host extends StateObject<Status>, Identity, InternalIdentity {
-    enum Type {
-        Storage(false), Routing(false), SecondaryStorage(false), SecondaryStorageCmdExecutor(false), ConsoleProxy(true), ExternalFirewall(false), ExternalLoadBalancer(
-                false), ExternalVirtualSwitchSupervisor(false), TrafficMonitor(false),
-
-        ExternalDhcp(false), SecondaryStorageVM(true), LocalSecondaryStorage(false), L2Networking(false);
-        boolean _virtual;
-
-        Type(final boolean virtual) {
-            _virtual = virtual;
-        }
-
-        public boolean isVirtual() {
-            return _virtual;
-        }
-
-        public static String[] toStrings(final Host.Type... types) {
-            final String[] strs = new String[types.length];
-            for (int i = 0; i < types.length; i++) {
-                strs[i] = types[i].toString();
-            }
-            return strs;
-        }
-    }
-
     /**
      * @return name of the machine.
      */
@@ -202,4 +178,28 @@ public interface Host extends StateObject<Status>, Identity, InternalIdentity {
     boolean isInMaintenanceStates();
 
     ResourceState getResourceState();
+
+    enum Type {
+        Storage(false), Routing(false), SecondaryStorage(false), SecondaryStorageCmdExecutor(false), ConsoleProxy(true), ExternalFirewall(false), ExternalLoadBalancer(
+                false), ExternalVirtualSwitchSupervisor(false), TrafficMonitor(false),
+
+        ExternalDhcp(false), SecondaryStorageVM(true), LocalSecondaryStorage(false), L2Networking(false);
+        boolean _virtual;
+
+        Type(final boolean virtual) {
+            _virtual = virtual;
+        }
+
+        public static String[] toStrings(final Host.Type... types) {
+            final String[] strs = new String[types.length];
+            for (int i = 0; i < types.length; i++) {
+                strs[i] = types[i].toString();
+            }
+            return strs;
+        }
+
+        public boolean isVirtual() {
+            return _virtual;
+        }
+    }
 }

@@ -22,9 +22,8 @@ package com.cloud.utils.events;
 import java.io.Serializable;
 
 public class EventArgs implements Serializable {
-    private static final long serialVersionUID = 30659016120504139L;
     public static final EventArgs Empty = new EventArgs();
-
+    private static final long serialVersionUID = 30659016120504139L;
     private String subject;
 
     public EventArgs() {

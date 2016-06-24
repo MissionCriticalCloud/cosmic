@@ -16,14 +16,14 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.List;
-
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
+
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
 
 @SuppressWarnings("unused")
 public class LoadBalancerResponse extends BaseResponse implements ControlledEntityResponse {
@@ -145,6 +145,16 @@ public class LoadBalancerResponse extends BaseResponse implements ControlledEnti
     }
 
     @Override
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    @Override
     public void setDomainId(String domainId) {
         this.domainId = domainId;
     }
@@ -164,16 +174,6 @@ public class LoadBalancerResponse extends BaseResponse implements ControlledEnti
 
     public void setZoneId(String zoneId) {
         this.zoneId = zoneId;
-    }
-
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
     }
 
     public void setTags(List<ResourceTagResponse> tags) {

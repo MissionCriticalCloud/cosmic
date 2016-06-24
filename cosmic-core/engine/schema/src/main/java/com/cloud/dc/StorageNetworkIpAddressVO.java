@@ -16,7 +16,7 @@
 // under the License.
 package com.cloud.dc;
 
-import java.util.Date;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,8 +29,7 @@ import javax.persistence.SecondaryTables;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "op_dc_storage_network_ip_address")
@@ -46,22 +45,17 @@ public class StorageNetworkIpAddressVO implements InternalIdentity {
 
     @Column(name = "ip_address", updatable = false, nullable = false)
     String ipAddress;
-
+    @Column(name = "mac_address")
+    long mac;
+    @Column(name = "vlan", table = "dc_storage_network_ip_range", insertable = false, updatable = false)
+    Integer vlan;
+    @Column(name = "gateway", table = "dc_storage_network_ip_range", insertable = false, updatable = false)
+    String gateway;
     @Column(name = "taken")
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date takenAt;
-
     @Column(name = "netmask", table = "dc_storage_network_ip_range", insertable = false, updatable = false)
     private String netmask;
-
-    @Column(name = "mac_address")
-    long mac;
-
-    @Column(name = "vlan", table = "dc_storage_network_ip_range", insertable = false, updatable = false)
-    Integer vlan;
-
-    @Column(name = "gateway", table = "dc_storage_network_ip_range", insertable = false, updatable = false)
-    String gateway;
 
     protected StorageNetworkIpAddressVO() {
     }
@@ -69,10 +63,6 @@ public class StorageNetworkIpAddressVO implements InternalIdentity {
     @Override
     public long getId() {
         return id;
-    }
-
-    public void setTakenAt(Date takenDate) {
-        this.takenAt = takenDate;
     }
 
     public String getIpAddress() {
@@ -85,6 +75,10 @@ public class StorageNetworkIpAddressVO implements InternalIdentity {
 
     public Date getTakenAt() {
         return takenAt;
+    }
+
+    public void setTakenAt(Date takenDate) {
+        this.takenAt = takenDate;
     }
 
     public long getRangeId() {

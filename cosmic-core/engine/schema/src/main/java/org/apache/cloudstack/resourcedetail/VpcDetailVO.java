@@ -16,14 +16,14 @@
 // under the License.
 package org.apache.cloudstack.resourcedetail;
 
+import org.apache.cloudstack.api.ResourceDetail;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.ResourceDetail;
 
 @Entity
 @Table(name = "vpc_details")
@@ -61,6 +61,11 @@ public class VpcDetailVO implements ResourceDetail {
     }
 
     @Override
+    public long getResourceId() {
+        return resourceId;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
@@ -68,11 +73,6 @@ public class VpcDetailVO implements ResourceDetail {
     @Override
     public String getValue() {
         return value;
-    }
-
-    @Override
-    public long getResourceId() {
-        return resourceId;
     }
 
     @Override

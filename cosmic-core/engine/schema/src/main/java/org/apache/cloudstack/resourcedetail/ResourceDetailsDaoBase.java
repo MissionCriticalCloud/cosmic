@@ -16,16 +16,15 @@
 // under the License.
 package org.apache.cloudstack.resourcedetail;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-
 import org.apache.cloudstack.api.ResourceDetail;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public abstract class ResourceDetailsDaoBase<R extends ResourceDetail> extends GenericDaoBase<R, Long> {
     private SearchBuilder<R> AllFieldsSearch;
@@ -42,26 +41,18 @@ public abstract class ResourceDetailsDaoBase<R extends ResourceDetail> extends G
         AllFieldsSearch.done();
     }
 
-    public R findDetail(long resourceId, String name) {
-        SearchCriteria<R> sc = AllFieldsSearch.create();
-        sc.setParameters("resourceId", resourceId);
-        sc.setParameters("name", name);
-
-        return findOneBy(sc);
-    }
-
     public List<R> findDetails(String name, String value, Boolean display) {
         SearchCriteria<R> sc = AllFieldsSearch.create();
 
-        if(display != null){
+        if (display != null) {
             sc.setParameters("display", display);
         }
 
-        if(name != null){
+        if (name != null) {
             sc.setParameters("name", name);
         }
 
-        if(value != null){
+        if (value != null) {
             sc.setParameters("value", value);
         }
 
@@ -130,6 +121,14 @@ public abstract class ResourceDetailsDaoBase<R extends ResourceDetail> extends G
             remove(existingDetail.getId());
         }
         persist(detail);
+    }
+
+    public R findDetail(long resourceId, String name) {
+        SearchCriteria<R> sc = AllFieldsSearch.create();
+        sc.setParameters("resourceId", resourceId);
+        sc.setParameters("name", name);
+
+        return findOneBy(sc);
     }
 
     public Map<String, String> listDetailsKeyPairs(long resourceId, boolean forDisplay) {

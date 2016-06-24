@@ -35,15 +35,12 @@ public interface DeploymentPlanningManager extends Manager {
      * pool).
      *
      * @throws AffinityConflictException
-     *
-     *
-     *
      */
     DeployDestination planDeployment(VirtualMachineProfile vmProfile, DeploymentPlan plan,
-            ExcludeList avoids, DeploymentPlanner planner) throws InsufficientServerCapacityException, AffinityConflictException;
+                                     ExcludeList avoids, DeploymentPlanner planner) throws InsufficientServerCapacityException, AffinityConflictException;
 
     String finalizeReservation(DeployDestination plannedDestination,
-            VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoids, DeploymentPlanner planner)
+                               VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoids, DeploymentPlanner planner)
             throws InsufficientServerCapacityException, AffinityConflictException;
 
     void cleanupVMReservations();

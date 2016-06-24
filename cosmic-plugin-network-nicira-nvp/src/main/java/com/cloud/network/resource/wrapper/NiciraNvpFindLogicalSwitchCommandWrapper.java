@@ -19,6 +19,8 @@
 
 package com.cloud.network.resource.wrapper;
 
+import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
+
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.FindLogicalSwitchAnswer;
 import com.cloud.agent.api.FindLogicalSwitchCommand;
@@ -31,8 +33,6 @@ import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 
 import java.util.List;
-
-import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
 
 @ResourceWrapper(handles = FindLogicalSwitchCommand.class)
 public final class NiciraNvpFindLogicalSwitchCommandWrapper extends CommandWrapper<FindLogicalSwitchCommand, Answer, NiciraNvpResource> {

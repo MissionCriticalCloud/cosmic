@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -32,6 +32,21 @@ public class AccountGuestVlanMapDaoImpl extends GenericDaoBase<AccountGuestVlanM
     protected SearchBuilder<AccountGuestVlanMapVO> AccountSearch;
     protected SearchBuilder<AccountGuestVlanMapVO> GuestVlanSearch;
     protected SearchBuilder<AccountGuestVlanMapVO> PhysicalNetworkSearch;
+
+    public AccountGuestVlanMapDaoImpl() {
+        super();
+        AccountSearch = createSearchBuilder();
+        AccountSearch.and("accountId", AccountSearch.entity().getAccountId(), SearchCriteria.Op.EQ);
+        AccountSearch.done();
+
+        GuestVlanSearch = createSearchBuilder();
+        GuestVlanSearch.and("guestVlanId", GuestVlanSearch.entity().getId(), SearchCriteria.Op.EQ);
+        GuestVlanSearch.done();
+
+        PhysicalNetworkSearch = createSearchBuilder();
+        PhysicalNetworkSearch.and("physicalNetworkId", PhysicalNetworkSearch.entity().getId(), SearchCriteria.Op.EQ);
+        PhysicalNetworkSearch.done();
+    }
 
     @Override
     public List<AccountGuestVlanMapVO> listAccountGuestVlanMapsByAccount(long accountId) {
@@ -60,20 +75,4 @@ public class AccountGuestVlanMapDaoImpl extends GenericDaoBase<AccountGuestVlanM
         sc.setParameters("accountId", accountId);
         return expunge(sc);
     }
-
-    public AccountGuestVlanMapDaoImpl() {
-        super();
-        AccountSearch = createSearchBuilder();
-        AccountSearch.and("accountId", AccountSearch.entity().getAccountId(), SearchCriteria.Op.EQ);
-        AccountSearch.done();
-
-        GuestVlanSearch = createSearchBuilder();
-        GuestVlanSearch.and("guestVlanId", GuestVlanSearch.entity().getId(), SearchCriteria.Op.EQ);
-        GuestVlanSearch.done();
-
-        PhysicalNetworkSearch = createSearchBuilder();
-        PhysicalNetworkSearch.and("physicalNetworkId", PhysicalNetworkSearch.entity().getId(), SearchCriteria.Op.EQ);
-        PhysicalNetworkSearch.done();
-    }
-
 }

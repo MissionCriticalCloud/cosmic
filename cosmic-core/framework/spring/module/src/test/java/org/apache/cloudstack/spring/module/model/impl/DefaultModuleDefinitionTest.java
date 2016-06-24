@@ -22,11 +22,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.apache.cloudstack.spring.module.util.ModuleLocationUtils;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.cloudstack.spring.module.util.ModuleLocationUtils;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -35,12 +36,6 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 public class DefaultModuleDefinitionTest {
 
     ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-
-    protected DefaultModuleDefinition createDef(String name) {
-        Resource resource = resolver.getResource(ModuleLocationUtils.getModuleLocation("testfiles", name));
-
-        return new DefaultModuleDefinition("testfiles", resource, resolver);
-    }
 
     @Test
     public void testBlankName() {
@@ -52,7 +47,12 @@ public class DefaultModuleDefinitionTest {
         } catch (IOException e) {
             assertTrue(e.getMessage().contains("Missing name property"));
         }
+    }
 
+    protected DefaultModuleDefinition createDef(String name) {
+        Resource resource = resolver.getResource(ModuleLocationUtils.getModuleLocation("testfiles", name));
+
+        return new DefaultModuleDefinition("testfiles", resource, resolver);
     }
 
     @Test
@@ -65,7 +65,6 @@ public class DefaultModuleDefinitionTest {
         } catch (IOException e) {
             assertTrue(e.getMessage().contains("Missing name property"));
         }
-
     }
 
     @Test

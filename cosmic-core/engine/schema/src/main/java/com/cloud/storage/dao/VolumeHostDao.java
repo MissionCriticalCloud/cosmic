@@ -16,14 +16,13 @@
 // under the License.
 package com.cloud.storage.dao;
 
-import java.util.List;
-
 import com.cloud.storage.VolumeHostVO;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
+
+import java.util.List;
 
 public interface VolumeHostDao extends GenericDao<VolumeHostVO, Long>,
         StateDao<ObjectInDataStoreStateMachine.State, ObjectInDataStoreStateMachine.Event, DataObjectInStore> {
@@ -37,5 +36,4 @@ public interface VolumeHostDao extends GenericDao<VolumeHostVO, Long>,
     List<VolumeHostVO> listDestroyed(long hostId);
 
     VolumeHostVO findVolumeByZone(long zoneId, long volumeId);
-
 }

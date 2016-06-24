@@ -16,15 +16,15 @@
 // under the License.
 package com.cloud.network.element;
 
-import java.util.List;
-import java.util.Set;
-
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.utils.component.Adapter;
+
+import java.util.List;
+import java.util.Set;
 
 public interface IpDeployer extends Adapter {
     /**
@@ -33,6 +33,7 @@ public interface IpDeployer extends Adapter {
      * appropriate action.
      * If state is Releasing the ip address should be de-allocated
      * If state is Allocating or Allocated the ip address should be provisioned
+     *
      * @param network
      * @param ipAddress
      * @return

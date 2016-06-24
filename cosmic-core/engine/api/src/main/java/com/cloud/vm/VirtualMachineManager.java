@@ -16,11 +16,6 @@
 // under the License.
 package com.cloud.vm;
 
-import java.net.URI;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.deploy.DeployDestination;
@@ -40,8 +35,12 @@ import com.cloud.storage.StoragePool;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.utils.component.Manager;
 import com.cloud.utils.fsm.NoTransitionException;
-
 import org.apache.cloudstack.framework.config.ConfigKey;
+
+import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Manages allocating resources to vms.
@@ -55,34 +54,30 @@ public interface VirtualMachineManager extends Manager {
     static final ConfigKey<String> VmConfigDriveLabel = new ConfigKey<String>("Hidden", String.class, "vm.configdrive.label", "config",
             "The default lable name for the config drive", false);
 
-    public interface Topics {
-        public static final String VM_POWER_STATE = "vm.powerstate";
-    }
-
     /**
      * Allocates a new virtual machine instance in the CloudStack DB.  This
      * orchestrates the creation of all virtual resources needed in CloudStack
      * DB to bring up a VM.
      *
-     * @param vmInstanceName Instance name of the VM.  This name uniquely
-     *        a VM in CloudStack's deploy environment.  The caller gets to
-     *        define this VM but it must be unqiue for all of CloudStack.
-     * @param template The template this VM is based on.
-     * @param serviceOffering The service offering that specifies the offering this VM should provide.
-     * @param defaultNetwork The default network for the VM.
-     * @param rootDiskOffering For created VMs not based on templates, root disk offering specifies the root disk.
+     * @param vmInstanceName    Instance name of the VM.  This name uniquely
+     *                          a VM in CloudStack's deploy environment.  The caller gets to
+     *                          define this VM but it must be unqiue for all of CloudStack.
+     * @param template          The template this VM is based on.
+     * @param serviceOffering   The service offering that specifies the offering this VM should provide.
+     * @param defaultNetwork    The default network for the VM.
+     * @param rootDiskOffering  For created VMs not based on templates, root disk offering specifies the root disk.
      * @param dataDiskOfferings Data disks to attach to the VM.
      * @param auxiliaryNetworks additional networks to attach the VMs to.
-     * @param plan How to deploy the VM.
-     * @param hyperType Hypervisor type
+     * @param plan              How to deploy the VM.
+     * @param hyperType         Hypervisor type
      * @throws InsufficientCapacityException If there are insufficient capacity to deploy this vm.
      */
     void allocate(String vmInstanceName, VirtualMachineTemplate template, ServiceOffering serviceOffering, DiskOfferingInfo rootDiskOfferingInfo,
-        List<DiskOfferingInfo> dataDiskOfferings, LinkedHashMap<? extends Network, List<? extends NicProfile>> auxiliaryNetworks, DeploymentPlan plan,
-        HypervisorType hyperType) throws InsufficientCapacityException;
+                  List<DiskOfferingInfo> dataDiskOfferings, LinkedHashMap<? extends Network, List<? extends NicProfile>> auxiliaryNetworks, DeploymentPlan plan,
+                  HypervisorType hyperType) throws InsufficientCapacityException;
 
     void allocate(String vmInstanceName, VirtualMachineTemplate template, ServiceOffering serviceOffering,
-        LinkedHashMap<? extends Network, List<? extends NicProfile>> networkProfiles, DeploymentPlan plan, HypervisorType hyperType) throws InsufficientCapacityException;
+                  LinkedHashMap<? extends Network, List<? extends NicProfile>> networkProfiles, DeploymentPlan plan, HypervisorType hyperType) throws InsufficientCapacityException;
 
     void start(String vmUuid, Map<VirtualMachineProfile.Param, Object> params);
 
@@ -102,8 +97,9 @@ public interface VirtualMachineManager extends Manager {
     void advanceStart(String vmUuid, Map<VirtualMachineProfile.Param, Object> params, DeploymentPlan planToDeploy, DeploymentPlanner planner) throws InsufficientCapacityException,
             ResourceUnavailableException, ConcurrentOperationException, OperationTimedoutException;
 
-    void orchestrateStart(String vmUuid, Map<VirtualMachineProfile.Param, Object> params, DeploymentPlan planToDeploy, DeploymentPlanner planner) throws InsufficientCapacityException,
-        ResourceUnavailableException, ConcurrentOperationException, OperationTimedoutException;
+    void orchestrateStart(String vmUuid, Map<VirtualMachineProfile.Param, Object> params, DeploymentPlan planToDeploy, DeploymentPlanner planner) throws
+            InsufficientCapacityException,
+            ResourceUnavailableException, ConcurrentOperationException, OperationTimedoutException;
 
     void advanceStop(String vmUuid, boolean cleanupEvenIfUnableToStop) throws ResourceUnavailableException, OperationTimedoutException, ConcurrentOperationException;
 
@@ -120,7 +116,7 @@ public interface VirtualMachineManager extends Manager {
     void reboot(String vmUuid, Map<VirtualMachineProfile.Param, Object> params) throws InsufficientCapacityException, ResourceUnavailableException;
 
     void advanceReboot(String vmUuid, Map<VirtualMachineProfile.Param, Object> params) throws InsufficientCapacityException, ResourceUnavailableException,
-        ConcurrentOperationException, OperationTimedoutException;
+            ConcurrentOperationException, OperationTimedoutException;
 
     /**
      * Check to see if a virtual machine can be upgraded to the given service offering
@@ -158,7 +154,7 @@ public interface VirtualMachineManager extends Manager {
      * @throws InsufficientCapacityException
      */
     NicProfile addVmToNetwork(VirtualMachine vm, Network network, NicProfile requested) throws ConcurrentOperationException,
-        ResourceUnavailableException, InsufficientCapacityException;
+            ResourceUnavailableException, InsufficientCapacityException;
 
     /**
      * @param vm
@@ -178,6 +174,7 @@ public interface VirtualMachineManager extends Manager {
      * @throws ConcurrentOperationException
      */
     boolean removeVmFromNetwork(VirtualMachine vm, Network network, URI broadcastUri) throws ConcurrentOperationException, ResourceUnavailableException;
+
     /**
      * @param nic
      * @param hypervisorType
@@ -196,7 +193,11 @@ public interface VirtualMachineManager extends Manager {
             InsufficientServerCapacityException;
 
     void findHostAndMigrate(String vmUuid, Long newSvcOfferingId, DeploymentPlanner.ExcludeList excludeHostList) throws InsufficientCapacityException,
-        ConcurrentOperationException, ResourceUnavailableException;
+            ConcurrentOperationException, ResourceUnavailableException;
 
     void migrateForScale(String vmUuid, long srcHostId, DeployDestination dest, Long newSvcOfferingId) throws ResourceUnavailableException, ConcurrentOperationException;
+
+    public interface Topics {
+        public static final String VM_POWER_STATE = "vm.powerstate";
+    }
 }

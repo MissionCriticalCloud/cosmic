@@ -31,5 +31,4 @@ public interface VmStats {
     public double getDiskReadKBs();
 
     public double getDiskWriteKBs();
-
 }

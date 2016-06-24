@@ -20,12 +20,6 @@ import java.util.HashMap;
 
 public class Criteria {
 
-    private Long offset;
-    private Long limit;
-    private String orderBy;
-    private Boolean ascending;
-    private final HashMap<String, Object> criteria;
-
     public static final String ID = "id";
     public static final String USERID = "userId";
     public static final String NAME = "name";
@@ -87,6 +81,11 @@ public class Criteria {
     public static final String SERVICE_OFFERING_ID = "serviceofferingid";
     public static final String DISPLAY = "display";
     public static final String SSH_KEYPAIR = "keypair";
+    private final HashMap<String, Object> criteria;
+    private Long offset;
+    private Long limit;
+    private String orderBy;
+    private Boolean ascending;
 
     public Criteria(String orderBy, Boolean ascending, Long offset, Long limit) {
         this.offset = offset;
@@ -105,16 +104,16 @@ public class Criteria {
         return offset;
     }
 
+    public void setOffset(Long offset) {
+        this.offset = offset;
+    }
+
     public void addCriteria(String name, Object val) {
         criteria.put(name, val);
     }
 
     public Object getCriteria(String name) {
         return criteria.get(name);
-    }
-
-    public void setOffset(Long offset) {
-        this.offset = offset;
     }
 
     public Long getLimit() {
@@ -140,5 +139,4 @@ public class Criteria {
     public void setAscending(Boolean ascending) {
         this.ascending = ascending;
     }
-
 }

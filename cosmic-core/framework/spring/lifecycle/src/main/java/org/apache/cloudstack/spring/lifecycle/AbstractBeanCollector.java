@@ -32,11 +32,10 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  * it will only find the types in the current context and not the parent.  This class
  * should only be used for very specific Spring bootstrap logic.  In general @Inject
  * is infinitely better.  Basically you need a very good reason to use this.
- *
  */
 public abstract class AbstractBeanCollector extends AbstractSmartLifeCycle implements BeanPostProcessor {
 
-    Class<?>[] typeClasses = new Class<?>[] {};
+    Class<?>[] typeClasses = new Class<?>[]{};
     Map<Class<?>, Set<Object>> beans = new HashMap<Class<?>, Set<Object>>();
 
     @Override
@@ -59,17 +58,6 @@ public abstract class AbstractBeanCollector extends AbstractSmartLifeCycle imple
     protected void doPostProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
     }
 
-    protected void doPostProcessAfterInitialization(Object bean, Class<?> typeClass, String beanName) throws BeansException {
-        Set<Object> beansOfType = beans.get(typeClass);
-
-        if (beansOfType == null) {
-            beansOfType = new HashSet<Object>();
-            beans.put(typeClass, beansOfType);
-        }
-
-        beansOfType.add(bean);
-    }
-
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         for (Class<?> typeClass : typeClasses) {
@@ -81,25 +69,38 @@ public abstract class AbstractBeanCollector extends AbstractSmartLifeCycle imple
         return bean;
     }
 
+    protected void doPostProcessAfterInitialization(Object bean, Class<?> typeClass, String beanName) throws BeansException {
+        Set<Object> beansOfType = beans.get(typeClass);
+
+        if (beansOfType == null) {
+            beansOfType = new HashSet<Object>();
+            beans.put(typeClass, beansOfType);
+        }
+
+        beansOfType.add(bean);
+    }
+
     protected <T> Set<T> getBeans(Class<T> typeClass) {
         @SuppressWarnings("unchecked")
-        Set<T> result = (Set<T>)beans.get(typeClass);
+        Set<T> result = (Set<T>) beans.get(typeClass);
 
-        if (result == null)
+        if (result == null) {
             return Collections.emptySet();
+        }
 
         return result;
     }
 
     public Class<?> getTypeClass() {
-        if (typeClasses == null || typeClasses.length == 0)
+        if (typeClasses == null || typeClasses.length == 0) {
             return null;
+        }
 
         return typeClasses[0];
     }
 
     public void setTypeClass(Class<?> typeClass) {
-        this.typeClasses = new Class<?>[] {typeClass};
+        this.typeClasses = new Class<?>[]{typeClass};
     }
 
     public Class<?>[] getTypeClasses() {
@@ -109,5 +110,4 @@ public abstract class AbstractBeanCollector extends AbstractSmartLifeCycle imple
     public void setTypeClasses(Class<?>[] typeClasses) {
         this.typeClasses = typeClasses;
     }
-
 }

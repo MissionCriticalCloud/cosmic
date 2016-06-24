@@ -24,16 +24,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.HashMap;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.GetGPUStatsCommand;
-import com.cloud.agent.api.VgpuTypesInfo;
 import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.util.HashMap;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Types.XenAPIException;
-
 import org.apache.xmlrpc.XmlRpcException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,7 +59,7 @@ public class XenServer620SP1WrapperTest {
 
         when(xenServer620SP1Resource.getConnection()).thenReturn(conn);
         try {
-            when(xenServer620SP1Resource.getGPUGroupDetails(conn)).thenReturn(new HashMap<String, HashMap<String, VgpuTypesInfo>>());
+            when(xenServer620SP1Resource.getGPUGroupDetails(conn)).thenReturn(new HashMap<>());
         } catch (final XenAPIException e) {
             fail(e.getMessage());
         } catch (final XmlRpcException e) {

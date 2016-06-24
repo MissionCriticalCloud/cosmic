@@ -16,21 +16,20 @@
 // under the License.
 package org.apache.cloudstack.engine.cloud.entity.api.db.dao;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-
 import org.apache.cloudstack.engine.cloud.entity.api.db.VMReservationVO;
 import org.apache.cloudstack.engine.cloud.entity.api.db.VolumeReservationVO;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -73,6 +72,13 @@ public class VMReservationDaoImpl extends GenericDaoBase<VMReservationVO, Long> 
     }
 
     @Override
+    public VMReservationVO findByReservationId(String reservationId) {
+        VMReservationVO vmRes = super.findByUuid(reservationId);
+        loadVolumeReservation(vmRes);
+        return vmRes;
+    }
+
+    @Override
     @DB
     public VMReservationVO persist(VMReservationVO reservation) {
         TransactionLegacy txn = TransactionLegacy.currentTxn();
@@ -92,16 +98,9 @@ public class VMReservationDaoImpl extends GenericDaoBase<VMReservationVO, Long> 
         if (reservation.getVolumeReservation() != null) {
             for (Long volumeId : reservation.getVolumeReservation().keySet()) {
                 VolumeReservationVO volumeReservation =
-                    new VolumeReservationVO(reservation.getVmId(), volumeId, reservation.getVolumeReservation().get(volumeId), reservation.getId());
+                        new VolumeReservationVO(reservation.getVmId(), volumeId, reservation.getVolumeReservation().get(volumeId), reservation.getId());
                 _volumeReservationDao.persist(volumeReservation);
             }
         }
-    }
-
-    @Override
-    public VMReservationVO findByReservationId(String reservationId) {
-        VMReservationVO vmRes = super.findByUuid(reservationId);
-        loadVolumeReservation(vmRes);
-        return vmRes;
     }
 }

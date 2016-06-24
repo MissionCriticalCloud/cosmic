@@ -19,10 +19,10 @@
 
 package com.cloud.agent.api.routing;
 
-import java.util.List;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.to.LoadBalancerTO;
+
+import java.util.List;
 
 /**
  * LoadBalancerConfigCommand sends the load balancer configuration
@@ -33,12 +33,11 @@ public class HealthCheckLBConfigAnswer extends Answer {
     protected HealthCheckLBConfigAnswer() {
     }
 
-    public HealthCheckLBConfigAnswer(List<LoadBalancerTO> loadBalancers) {
+    public HealthCheckLBConfigAnswer(final List<LoadBalancerTO> loadBalancers) {
         this.loadBalancers = loadBalancers;
     }
 
     public List<LoadBalancerTO> getLoadBalancers() {
         return loadBalancers;
     }
-
 }

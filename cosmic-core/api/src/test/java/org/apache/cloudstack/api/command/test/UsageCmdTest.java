@@ -16,29 +16,27 @@
 // under the License.
 package org.apache.cloudstack.api.command.test;
 
+import com.cloud.utils.Pair;
+import org.apache.cloudstack.api.command.admin.usage.GetUsageRecordsCmd;
+import org.apache.cloudstack.usage.Usage;
+import org.apache.cloudstack.usage.UsageService;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.cloud.utils.Pair;
-
-import org.apache.cloudstack.api.command.admin.usage.GetUsageRecordsCmd;
-import org.apache.cloudstack.usage.Usage;
-import org.apache.cloudstack.usage.UsageService;
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
-import junit.framework.TestCase;
-
 public class UsageCmdTest extends TestCase {
-
-    private GetUsageRecordsCmd getUsageRecordsCmd;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+    private GetUsageRecordsCmd getUsageRecordsCmd;
 
     @Override
     @Before
@@ -51,7 +49,7 @@ public class UsageCmdTest extends TestCase {
 
     @Test
     public void testExecuteSuccess() {
-        UsageService usageService = Mockito.mock(UsageService.class);
+        final UsageService usageService = Mockito.mock(UsageService.class);
         getUsageRecordsCmd._usageService = usageService;
         getUsageRecordsCmd.execute();
     }
@@ -59,15 +57,14 @@ public class UsageCmdTest extends TestCase {
     @Test
     public void testExecuteEmptyResult() {
 
-        UsageService usageService = Mockito.mock(UsageService.class);
+        final UsageService usageService = Mockito.mock(UsageService.class);
 
-        Pair<List<? extends Usage>, Integer> usageRecords = new Pair<List<? extends Usage>, Integer>(new ArrayList<Usage>(), new Integer(0));
+        final Pair<List<? extends Usage>, Integer> usageRecords = new Pair<>(new ArrayList<>(), new Integer(0));
 
         Mockito.when(usageService.getUsageRecords(getUsageRecordsCmd)).thenReturn(usageRecords);
 
         getUsageRecordsCmd._usageService = usageService;
         getUsageRecordsCmd.execute();
-
     }
 
     @Test
@@ -78,7 +75,7 @@ public class UsageCmdTest extends TestCase {
         getUsageRecordsCmd.setAccountName("someAccount");
         assertTrue(getUsageRecordsCmd.getAccountName().equals("someAccount"));
 
-        Date d = new Date();
+        final Date d = new Date();
         getUsageRecordsCmd.setStartDate(d);
         getUsageRecordsCmd.setEndDate(d);
         assertTrue(getUsageRecordsCmd.getStartDate().equals(d));
@@ -87,5 +84,4 @@ public class UsageCmdTest extends TestCase {
         getUsageRecordsCmd.setUsageId("someId");
         assertTrue(getUsageRecordsCmd.getUsageId().equals("someId"));
     }
-
 }

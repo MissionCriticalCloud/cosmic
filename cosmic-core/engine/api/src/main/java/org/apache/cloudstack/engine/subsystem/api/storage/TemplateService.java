@@ -20,25 +20,11 @@ package org.apache.cloudstack.engine.subsystem.api.storage;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.StoragePool;
-
 import org.apache.cloudstack.framework.async.AsyncCallFuture;
 import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
 import org.apache.cloudstack.storage.command.CommandResult;
 
 public interface TemplateService {
-
-    class TemplateApiResult extends CommandResult {
-        private final TemplateInfo template;
-
-        public TemplateApiResult(TemplateInfo template) {
-            super();
-            this.template = template;
-        }
-
-        public TemplateInfo getTemplate() {
-            return template;
-        }
-    }
 
     void createTemplateAsync(TemplateInfo template, DataStore store, AsyncCompletionCallback<TemplateApiResult> callback);
 
@@ -65,4 +51,17 @@ public interface TemplateService {
     void associateTemplateToZone(long templateId, Long zoneId);
 
     void associateCrosszoneTemplatesToZone(long dcId);
+
+    class TemplateApiResult extends CommandResult {
+        private final TemplateInfo template;
+
+        public TemplateApiResult(TemplateInfo template) {
+            super();
+            this.template = template;
+        }
+
+        public TemplateInfo getTemplate() {
+            return template;
+        }
+    }
 }

@@ -26,5 +26,4 @@ public interface GuestOsCategory extends Identity, InternalIdentity {
     String getName();
 
     void setName(String name);
-
 }

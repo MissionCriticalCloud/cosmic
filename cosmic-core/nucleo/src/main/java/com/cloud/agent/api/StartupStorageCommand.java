@@ -19,13 +19,13 @@
 
 package com.cloud.agent.api;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.cloud.host.Host;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.template.TemplateProp;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class StartupStorageCommand extends StartupCommand {
 
@@ -68,12 +68,12 @@ public class StartupStorageCommand extends StartupCommand {
         this.parent = parent;
     }
 
-    public void setNfsShare(String nfsShare) {
-        this.nfsShare = nfsShare;
-    }
-
     public String getNfsShare() {
         return nfsShare;
+    }
+
+    public void setNfsShare(String nfsShare) {
+        this.nfsShare = nfsShare;
     }
 
     public long getTotalSize() {

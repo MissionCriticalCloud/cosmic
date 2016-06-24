@@ -23,7 +23,13 @@ import com.cloud.agent.api.to.DataTO;
 
 public class CreateEntityDownloadURLCommand extends AbstractDownloadCommand {
 
-    public CreateEntityDownloadURLCommand(String parent, String installPath, String uuid, DataTO data) { // this constructor is for creating template download url
+    private String installPath;
+    private String parent;
+    private String extractLinkUUID;
+    private DataTO data;
+
+    public CreateEntityDownloadURLCommand(final String parent, final String installPath, final String uuid, final DataTO data) { // this constructor is for creating template
+        // download url
         super();
         this.parent = parent; // parent is required as not the template can be child of one of many parents
         this.installPath = installPath;
@@ -31,7 +37,7 @@ public class CreateEntityDownloadURLCommand extends AbstractDownloadCommand {
         this.data = data;
     }
 
-    public CreateEntityDownloadURLCommand(String installPath, String uuid) {
+    public CreateEntityDownloadURLCommand(final String installPath, final String uuid) {
         super();
         this.installPath = installPath;
         this.extractLinkUUID = uuid;
@@ -40,19 +46,13 @@ public class CreateEntityDownloadURLCommand extends AbstractDownloadCommand {
     public CreateEntityDownloadURLCommand() {
     }
 
-    private String installPath;
-    private String parent;
-    private String extractLinkUUID;
-
     public DataTO getData() {
         return data;
     }
 
-    public void setData(DataTO data) {
+    public void setData(final DataTO data) {
         this.data = data;
     }
-
-    private DataTO data;
 
     @Override
     public boolean executeInSequence() {
@@ -63,7 +63,7 @@ public class CreateEntityDownloadURLCommand extends AbstractDownloadCommand {
         return installPath;
     }
 
-    public void setInstallPath(String installPath) {
+    public void setInstallPath(final String installPath) {
         this.installPath = installPath;
     }
 
@@ -71,7 +71,7 @@ public class CreateEntityDownloadURLCommand extends AbstractDownloadCommand {
         return parent;
     }
 
-    public void setParent(String parent) {
+    public void setParent(final String parent) {
         this.parent = parent;
     }
 
@@ -79,8 +79,7 @@ public class CreateEntityDownloadURLCommand extends AbstractDownloadCommand {
         return extractLinkUUID;
     }
 
-    public void setExtractLinkUUID(String extractLinkUUID) {
+    public void setExtractLinkUUID(final String extractLinkUUID) {
         this.extractLinkUUID = extractLinkUUID;
     }
-
 }

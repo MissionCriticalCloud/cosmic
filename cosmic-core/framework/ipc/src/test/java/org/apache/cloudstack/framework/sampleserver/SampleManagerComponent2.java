@@ -18,9 +18,6 @@
  */
 package org.apache.cloudstack.framework.sampleserver;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import org.apache.cloudstack.framework.messagebus.MessageBus;
 import org.apache.cloudstack.framework.messagebus.MessageDispatcher;
 import org.apache.cloudstack.framework.messagebus.MessageHandler;
@@ -28,6 +25,10 @@ import org.apache.cloudstack.framework.rpc.RpcProvider;
 import org.apache.cloudstack.framework.rpc.RpcServerCall;
 import org.apache.cloudstack.framework.rpc.RpcServiceDispatcher;
 import org.apache.cloudstack.framework.rpc.RpcServiceHandler;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

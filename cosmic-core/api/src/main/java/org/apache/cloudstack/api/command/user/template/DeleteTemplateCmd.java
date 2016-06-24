@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.user.template;
 import com.cloud.event.EventTypes;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -31,13 +30,14 @@ import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.api.response.TemplateResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "deleteTemplate",
-            responseObject = SuccessResponse.class,
-            description = "Deletes a template from the system. All virtual machines using the deleted template will not be affected.",
-            requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
+        responseObject = SuccessResponse.class,
+        description = "Deletes a template from the system. All virtual machines using the deleted template will not be affected.",
+        requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteTemplateCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteTemplateCmd.class.getName());
     private static final String s_name = "deletetemplateresponse";
@@ -56,8 +56,8 @@ public class DeleteTemplateCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
+    public static String getStaticName() {
+        return s_name;
     }
 
     public Long getZoneId() {
@@ -67,25 +67,6 @@ public class DeleteTemplateCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public static String getStaticName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        VirtualMachineTemplate template = _entityMgr.findById(VirtualMachineTemplate.class, getId());
-        if (template != null) {
-            return template.getAccountId();
-        }
-
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
 
     @Override
     public String getEventType() {
@@ -98,24 +79,43 @@ public class DeleteTemplateCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.Template;
-    }
-
-    @Override
     public Long getInstanceId() {
         return getId();
     }
 
     @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.Template;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    @Override
     public void execute() {
         CallContext.current().setEventDetails("Template Id: " + getId());
-        boolean result = _templateService.deleteTemplate(this);
+        final boolean result = _templateService.deleteTemplate(this);
         if (result) {
-            SuccessResponse response = new SuccessResponse(getCommandName());
+            final SuccessResponse response = new SuccessResponse(getCommandName());
             this.setResponseObject(response);
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete template");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final VirtualMachineTemplate template = _entityMgr.findById(VirtualMachineTemplate.class, getId());
+        if (template != null) {
+            return template.getAccountId();
+        }
+
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

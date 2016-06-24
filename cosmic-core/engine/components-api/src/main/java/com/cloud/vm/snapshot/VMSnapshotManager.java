@@ -25,7 +25,8 @@ public interface VMSnapshotManager extends VMSnapshotService, Manager {
 
     /**
      * Delete all VM snapshots belonging to one VM
-     * @param id, VM id
+     *
+     * @param id,   VM id
      * @param type,
      * @return true for success, false for failure
      */
@@ -35,7 +36,7 @@ public interface VMSnapshotManager extends VMSnapshotService, Manager {
      * Sync VM snapshot state when VM snapshot in reverting or snapshoting or expunging state
      * Used for fullsync after agent connects
      *
-     * @param vm, the VM in question
+     * @param vm,    the VM in question
      * @param hostId
      * @return true if succeeds, false if fails
      */

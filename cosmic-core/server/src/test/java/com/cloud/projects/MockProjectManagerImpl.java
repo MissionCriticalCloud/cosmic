@@ -16,17 +16,16 @@
 // under the License.
 package com.cloud.projects;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.projects.ProjectAccount.Role;
 import com.cloud.user.Account;
 import com.cloud.utils.component.ManagerBase;
+
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
 
 public class MockProjectManagerImpl extends ManagerBase implements ProjectManager {
 
@@ -127,6 +126,17 @@ public class MockProjectManagerImpl extends ManagerBase implements ProjectManage
     }
 
     @Override
+    public Project findByProjectAccountIdIncludingRemoved(long projectAccountId) {
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
         // TODO Auto-generated method stub
         return true;
@@ -142,12 +152,6 @@ public class MockProjectManagerImpl extends ManagerBase implements ProjectManage
     public boolean stop() {
         // TODO Auto-generated method stub
         return false;
-    }
-
-    @Override
-    public String getName() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -197,10 +201,4 @@ public class MockProjectManagerImpl extends ManagerBase implements ProjectManage
         // TODO Auto-generated method stub
         return 0;
     }
-
-    @Override
-    public Project findByProjectAccountIdIncludingRemoved(long projectAccountId) {
-        return null;
-    }
-
 }

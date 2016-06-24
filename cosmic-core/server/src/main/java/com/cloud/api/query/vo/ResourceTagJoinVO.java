@@ -16,6 +16,9 @@
 // under the License.
 package com.cloud.api.query.vo;
 
+import com.cloud.server.ResourceTag;
+import com.cloud.server.ResourceTag.ResourceObjectType;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -23,39 +26,28 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.cloud.server.ResourceTag;
-import com.cloud.server.ResourceTag.ResourceObjectType;
-
 @Entity
 @Table(name = "resource_tag_view")
 public class ResourceTagJoinVO extends BaseViewVO implements ControlledViewEntity {
 
+    @Column(name = "value")
+    String value;
+    @Column(name = "resource_id")
+    long resourceId;
+    @Column(name = "customer")
+    String customer;
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "key")
     private String key;
-
-    @Column(name = "value")
-    String value;
-
-    @Column(name = "resource_id")
-    long resourceId;
-
     @Column(name = "resource_uuid")
     private String resourceUuid;
-
     @Column(name = "resource_type")
     @Enumerated(value = EnumType.STRING)
     private ResourceObjectType resourceType;
-
-    @Column(name = "customer")
-    String customer;
-
     @Column(name = "account_id")
     private long accountId;
 
@@ -108,13 +100,13 @@ public class ResourceTagJoinVO extends BaseViewVO implements ControlledViewEntit
     }
 
     @Override
-    public String getAccountUuid() {
-        return accountUuid;
+    public long getDomainId() {
+        return domainId;
     }
 
     @Override
-    public String getAccountName() {
-        return accountName;
+    public String getDomainPath() {
+        return domainPath;
     }
 
     @Override
@@ -123,8 +115,13 @@ public class ResourceTagJoinVO extends BaseViewVO implements ControlledViewEntit
     }
 
     @Override
-    public long getDomainId() {
-        return domainId;
+    public String getAccountUuid() {
+        return accountUuid;
+    }
+
+    @Override
+    public String getAccountName() {
+        return accountName;
     }
 
     @Override
@@ -138,15 +135,6 @@ public class ResourceTagJoinVO extends BaseViewVO implements ControlledViewEntit
     }
 
     @Override
-    public String getDomainPath() {
-        return domainPath;
-    }
-
-    public long getProjectId() {
-        return projectId;
-    }
-
-    @Override
     public String getProjectUuid() {
         return projectUuid;
     }
@@ -154,6 +142,10 @@ public class ResourceTagJoinVO extends BaseViewVO implements ControlledViewEntit
     @Override
     public String getProjectName() {
         return projectName;
+    }
+
+    public long getProjectId() {
+        return projectId;
     }
 
     public String getKey() {

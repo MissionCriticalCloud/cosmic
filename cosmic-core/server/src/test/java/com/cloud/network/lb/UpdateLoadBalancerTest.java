@@ -21,9 +21,6 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
@@ -46,9 +43,12 @@ import com.cloud.user.AccountVO;
 import com.cloud.user.MockAccountManagerImpl;
 import com.cloud.user.User;
 import com.cloud.user.UserVO;
-
 import org.apache.cloudstack.api.command.user.loadbalancer.UpdateLoadBalancerRuleCmd;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.ArrayList;
+import java.util.UUID;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,16 +57,14 @@ import org.mockito.Mockito;
 
 public class UpdateLoadBalancerTest {
 
+    private static long domainId = 5L;
+    private static String accountName = "admin";
     LoadBalancingRulesManagerImpl _lbMgr = new LoadBalancingRulesManagerImpl();
-
     private UpdateLoadBalancerRuleCmd updateLbRuleCmd;
     private LoadBalancerDao lbDao = Mockito.mock(LoadBalancerDao.class);
     private NetworkDao netDao = Mockito.mock(NetworkDao.class);
     private NetworkModel netModel = Mockito.mock(NetworkModel.class);
-    private LoadBalancingServiceProvider lbServiceProvider= Mockito.mock(LoadBalancingServiceProvider.class);
-
-    private static long domainId = 5L;
-    private static String accountName = "admin";
+    private LoadBalancingServiceProvider lbServiceProvider = Mockito.mock(LoadBalancingServiceProvider.class);
 
     @Before
     public void setUp() {
@@ -124,5 +122,4 @@ public class UpdateLoadBalancerTest {
     public void tearDown() {
         CallContext.unregister();
     }
-
 }

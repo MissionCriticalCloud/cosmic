@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.network.as.dao;
 
-import java.util.List;
-
 import com.cloud.network.as.AutoScaleVmGroupPolicyMapVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface AutoScaleVmGroupPolicyMapDao extends GenericDao<AutoScaleVmGroupPolicyMapVO, Long> {
     boolean removeByGroupId(long vmGroupId);

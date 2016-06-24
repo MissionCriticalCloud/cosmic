@@ -40,5 +40,4 @@ public class StaticNatRules extends ConfigBase {
     public void setRules(List<StaticNatRule> rules) {
         this.rules = rules;
     }
-
 }

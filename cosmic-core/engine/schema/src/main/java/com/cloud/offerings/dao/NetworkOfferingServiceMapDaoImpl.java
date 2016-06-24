@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.offerings.dao;
 
-import java.util.List;
-
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.offerings.NetworkOfferingServiceMapVO;
@@ -27,6 +25,8 @@ import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -86,7 +86,7 @@ public class NetworkOfferingServiceMapDaoImpl extends GenericDaoBase<NetworkOffe
                 i++;
             }
 
-            sc.setParameters("service", (Object[])servicesStr);
+            sc.setParameters("service", (Object[]) servicesStr);
         }
 
         List<NetworkOfferingServiceMapVO> offeringServices = listBy(sc);
@@ -150,6 +150,14 @@ public class NetworkOfferingServiceMapDaoImpl extends GenericDaoBase<NetworkOffe
     }
 
     @Override
+    public List<String> getDistinctProviders(long offId) {
+        SearchCriteria<String> sc = DistinctProvidersSearch.create();
+        sc.setParameters("offId", offId);
+        List<String> results = customSearch(sc, null);
+        return results;
+    }
+
+    @Override
     public NetworkOfferingServiceMapVO persist(NetworkOfferingServiceMapVO entity) {
         SearchCriteria<NetworkOfferingServiceMapVO> sc = AllFieldsSearch.create();
         sc.setParameters("networkOfferingId", entity.getNetworkOfferingId());
@@ -157,13 +165,5 @@ public class NetworkOfferingServiceMapDaoImpl extends GenericDaoBase<NetworkOffe
         sc.setParameters("provider", entity.getProvider());
         NetworkOfferingServiceMapVO mappingInDb = findOneBy(sc);
         return mappingInDb != null ? mappingInDb : super.persist(entity);
-    }
-
-    @Override
-    public List<String> getDistinctProviders(long offId) {
-        SearchCriteria<String> sc = DistinctProvidersSearch.create();
-        sc.setParameters("offId", offId);
-        List<String> results = customSearch(sc, null);
-        return results;
     }
 }

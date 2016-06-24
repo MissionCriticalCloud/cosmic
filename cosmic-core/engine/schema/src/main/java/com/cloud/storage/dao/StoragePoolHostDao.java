@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.storage.dao;
 
-import java.util.List;
-
 import com.cloud.host.Status;
 import com.cloud.storage.StoragePoolHostVO;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface StoragePoolHostDao extends GenericDao<StoragePoolHostVO, Long> {
     public List<StoragePoolHostVO> listByPoolId(long id);

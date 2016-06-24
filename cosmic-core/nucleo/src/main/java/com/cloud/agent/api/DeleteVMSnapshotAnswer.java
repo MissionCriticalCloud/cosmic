@@ -19,9 +19,9 @@
 
 package com.cloud.agent.api;
 
-import java.util.List;
-
 import org.apache.cloudstack.storage.to.VolumeObjectTO;
+
+import java.util.List;
 
 public class DeleteVMSnapshotAnswer extends Answer {
     private List<VolumeObjectTO> volumeTOs;
@@ -29,11 +29,11 @@ public class DeleteVMSnapshotAnswer extends Answer {
     public DeleteVMSnapshotAnswer() {
     }
 
-    public DeleteVMSnapshotAnswer(DeleteVMSnapshotCommand cmd, boolean result, String message) {
+    public DeleteVMSnapshotAnswer(final DeleteVMSnapshotCommand cmd, final boolean result, final String message) {
         super(cmd, result, message);
     }
 
-    public DeleteVMSnapshotAnswer(DeleteVMSnapshotCommand cmd, List<VolumeObjectTO> volumeTOs) {
+    public DeleteVMSnapshotAnswer(final DeleteVMSnapshotCommand cmd, final List<VolumeObjectTO> volumeTOs) {
         super(cmd, true, "");
         this.volumeTOs = volumeTOs;
     }
@@ -42,8 +42,7 @@ public class DeleteVMSnapshotAnswer extends Answer {
         return volumeTOs;
     }
 
-    public void setVolumeTOs(List<VolumeObjectTO> volumeTOs) {
+    public void setVolumeTOs(final List<VolumeObjectTO> volumeTOs) {
         this.volumeTOs = volumeTOs;
     }
-
 }

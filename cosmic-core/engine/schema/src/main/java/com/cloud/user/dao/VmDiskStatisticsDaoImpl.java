@@ -16,19 +16,19 @@
 // under the License.
 package com.cloud.user.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-
 import com.cloud.user.VmDiskStatisticsVO;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,12 +38,12 @@ import org.springframework.stereotype.Component;
 public class VmDiskStatisticsDaoImpl extends GenericDaoBase<VmDiskStatisticsVO, Long> implements VmDiskStatisticsDao {
     private static final Logger s_logger = LoggerFactory.getLogger(VmDiskStatisticsDaoImpl.class);
     private static final String ACTIVE_AND_RECENTLY_DELETED_SEARCH =
-        "SELECT bcf.id, bcf.data_center_id, bcf.account_id, bcf.vm_id, bcf.volume_id, bcf.agg_io_read, bcf.agg_io_write, bcf.agg_bytes_read, bcf.agg_bytes_write "
-            + "FROM vm_disk_statistics bcf, account a " + "WHERE bcf.account_id = a.id AND (a.removed IS NULL OR a.removed >= ?) " + "ORDER BY bcf.id";
+            "SELECT bcf.id, bcf.data_center_id, bcf.account_id, bcf.vm_id, bcf.volume_id, bcf.agg_io_read, bcf.agg_io_write, bcf.agg_bytes_read, bcf.agg_bytes_write "
+                    + "FROM vm_disk_statistics bcf, account a " + "WHERE bcf.account_id = a.id AND (a.removed IS NULL OR a.removed >= ?) " + "ORDER BY bcf.id";
     private static final String UPDATED_VM_NETWORK_STATS_SEARCH = "SELECT id, current_io_read, current_io_write, net_io_read, net_io_write, agg_io_read, agg_io_write, "
-        + "current_bytes_read, current_bytes_write, net_bytes_read, net_bytes_write, agg_bytes_read, agg_bytes_write " + "from  vm_disk_statistics "
-        + "where (agg_io_read < net_io_read + current_io_read) OR (agg_io_write < net_io_write + current_io_write) OR "
-        + "(agg_bytes_read < net_bytes_read + current_bytes_read) OR (agg_bytes_write < net_bytes_write + current_bytes_write)";
+            + "current_bytes_read, current_bytes_write, net_bytes_read, net_bytes_write, agg_bytes_read, agg_bytes_write " + "from  vm_disk_statistics "
+            + "where (agg_io_read < net_io_read + current_io_read) OR (agg_io_write < net_io_write + current_io_write) OR "
+            + "(agg_bytes_read < net_bytes_read + current_bytes_read) OR (agg_bytes_write < net_bytes_write + current_bytes_write)";
     private final SearchBuilder<VmDiskStatisticsVO> AllFieldsSearch;
     private final SearchBuilder<VmDiskStatisticsVO> AccountSearch;
 
@@ -90,8 +90,9 @@ public class VmDiskStatisticsDaoImpl extends GenericDaoBase<VmDiskStatisticsVO, 
     @Override
     public List<VmDiskStatisticsVO> listActiveAndRecentlyDeleted(Date minRemovedDate, int startIndex, int limit) {
         List<VmDiskStatisticsVO> vmDiskStats = new ArrayList<VmDiskStatisticsVO>();
-        if (minRemovedDate == null)
+        if (minRemovedDate == null) {
             return vmDiskStats;
+        }
 
         TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
@@ -126,5 +127,4 @@ public class VmDiskStatisticsDaoImpl extends GenericDaoBase<VmDiskStatisticsVO, 
         }
         return vmDiskStats;
     }
-
 }

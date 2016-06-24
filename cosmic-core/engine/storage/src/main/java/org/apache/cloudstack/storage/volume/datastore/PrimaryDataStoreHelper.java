@@ -18,13 +18,6 @@
  */
 package org.apache.cloudstack.storage.volume.datastore;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityVO;
@@ -41,13 +34,19 @@ import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.utils.crypt.DBEncryptionUtil;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.engine.subsystem.api.storage.HostScope;
 import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreParameters;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import javax.inject.Inject;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -56,19 +55,18 @@ import org.springframework.stereotype.Component;
 public class PrimaryDataStoreHelper {
     private static final Logger s_logger = LoggerFactory.getLogger(PrimaryDataStoreHelper.class);
     @Inject
-    private PrimaryDataStoreDao dataStoreDao;
+    protected CapacityDao _capacityDao;
+    @Inject
+    protected StoragePoolHostDao storagePoolHostDao;
     @Inject
     DataStoreManager dataStoreMgr;
     @Inject
     StorageManager storageMgr;
     @Inject
-    protected CapacityDao _capacityDao;
-    @Inject
-    protected StoragePoolHostDao storagePoolHostDao;
+    private PrimaryDataStoreDao dataStoreDao;
 
     public DataStore createPrimaryDataStore(PrimaryDataStoreParameters params) {
-        if(params == null)
-        {
+        if (params == null) {
             throw new InvalidParameterValueException("createPrimaryDataStore: Input params is null, please check");
         }
         StoragePoolVO dataStoreVO = dataStoreDao.findPoolByUUID(params.getUuid());
@@ -206,20 +204,6 @@ public class PrimaryDataStoreHelper {
         return true;
     }
 
-    protected boolean deletePoolStats(Long poolId) {
-        CapacityVO capacity1 = _capacityDao.findByHostIdType(poolId, Capacity.CAPACITY_TYPE_STORAGE);
-        CapacityVO capacity2 = _capacityDao.findByHostIdType(poolId, Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED);
-        if (capacity1 != null) {
-            _capacityDao.remove(capacity1.getId());
-        }
-
-        if (capacity2 != null) {
-            _capacityDao.remove(capacity2.getId());
-        }
-
-        return true;
-    }
-
     public boolean deletePrimaryDataStore(DataStore store) {
         List<StoragePoolHostVO> hostPoolRecords = this.storagePoolHostDao.listByPoolId(store.getId());
         StoragePoolVO poolVO = this.dataStoreDao.findById(store.getId());
@@ -240,4 +224,17 @@ public class PrimaryDataStoreHelper {
         return true;
     }
 
+    protected boolean deletePoolStats(Long poolId) {
+        CapacityVO capacity1 = _capacityDao.findByHostIdType(poolId, Capacity.CAPACITY_TYPE_STORAGE);
+        CapacityVO capacity2 = _capacityDao.findByHostIdType(poolId, Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED);
+        if (capacity1 != null) {
+            _capacityDao.remove(capacity1.getId());
+        }
+
+        if (capacity2 != null) {
+            _capacityDao.remove(capacity2.getId());
+        }
+
+        return true;
+    }
 }

@@ -16,20 +16,19 @@
 // under the License.
 package com.cloud.network.security;
 
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.network.security.LocalSecurityGroupWorkQueue.LocalSecurityGroupWork;
+import com.cloud.network.security.SecurityGroupWork.Step;
+import com.cloud.vm.VMInstanceVO;
+import com.cloud.vm.VirtualMachine.Type;
+
+import javax.management.StandardMBean;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.management.StandardMBean;
-
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.network.security.LocalSecurityGroupWorkQueue.LocalSecurityGroupWork;
-import com.cloud.network.security.SecurityGroupWork.Step;
-import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine.Type;
 
 public class SecurityManagerMBeanImpl extends StandardMBean implements SecurityGroupManagerMBean, RuleUpdateLog {
     SecurityGroupManagerImpl2 _sgMgr;
@@ -44,24 +43,18 @@ public class SecurityManagerMBeanImpl extends StandardMBean implements SecurityG
     }
 
     @Override
-    public int getQueueSize() {
-        return this._sgMgr.getQueueSize();
+    public void logScheduledDetails(Set<Long> vmIds) {
+        if (_monitoringEnabled) {
+            for (Long vmId : vmIds) {
+                _scheduleTimestamps.put(vmId, new Date());
+            }
+        }
     }
 
     @Override
     public void logUpdateDetails(Long vmId, Long seqno) {
         if (_monitoringEnabled) {
             _updateTimestamps.put(vmId, new Date());
-        }
-
-    }
-
-    @Override
-    public void logScheduledDetails(Set<Long> vmIds) {
-        if (_monitoringEnabled) {
-            for (Long vmId : vmIds) {
-                _scheduleTimestamps.put(vmId, new Date());
-            }
         }
     }
 
@@ -75,30 +68,13 @@ public class SecurityManagerMBeanImpl extends StandardMBean implements SecurityG
     }
 
     @Override
-    public Map<Long, Date> getScheduledTimestamps() {
-        return _scheduleTimestamps;
-    }
-
-    @Override
-    public Map<Long, Date> getLastUpdateSentTimestamps() {
-        return _updateTimestamps;
-    }
-
-    @Override
-    public List<Long> getVmsInQueue() {
-        return _sgMgr.getWorkQueue().getVmsInQueue();
-    }
-
-    @Override
     public void disableSchedulerForVm(Long vmId) {
         _sgMgr.disableSchedulerForVm(vmId, true);
-
     }
 
     @Override
     public void enableSchedulerForVm(Long vmId) {
         _sgMgr.disableSchedulerForVm(vmId, false);
-
     }
 
     @Override
@@ -109,7 +85,26 @@ public class SecurityManagerMBeanImpl extends StandardMBean implements SecurityG
     @Override
     public void enableSchedulerForAllVms() {
         _sgMgr.enableAllVmsForScheduler();
+    }
 
+    @Override
+    public Map<Long, Date> getScheduledTimestamps() {
+        return _scheduleTimestamps;
+    }
+
+    @Override
+    public Map<Long, Date> getLastUpdateSentTimestamps() {
+        return _updateTimestamps;
+    }
+
+    @Override
+    public int getQueueSize() {
+        return this._sgMgr.getQueueSize();
+    }
+
+    @Override
+    public List<Long> getVmsInQueue() {
+        return _sgMgr.getWorkQueue().getVmsInQueue();
     }
 
     @Override

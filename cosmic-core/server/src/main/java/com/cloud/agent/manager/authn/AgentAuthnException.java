@@ -20,7 +20,6 @@ import com.cloud.exception.CloudException;
 
 /**
  * Exception indicates authentication and/OR authorization problem
- *
  */
 public class AgentAuthnException extends CloudException {
 
@@ -33,5 +32,4 @@ public class AgentAuthnException extends CloudException {
     public AgentAuthnException(String message) {
         super(message);
     }
-
 }

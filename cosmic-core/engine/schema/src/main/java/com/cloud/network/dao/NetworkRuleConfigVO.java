@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.network.dao;
 
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = ("network_rule_config"))
@@ -48,7 +48,7 @@ public class NetworkRuleConfigVO implements InternalIdentity {
     public NetworkRuleConfigVO() {
     }
 
-    public NetworkRuleConfigVO(long securityGroupId, String publicPort, String privatePort, String protocol) {
+    public NetworkRuleConfigVO(final long securityGroupId, final String publicPort, final String privatePort, final String protocol) {
         this.securityGroupId = securityGroupId;
         this.publicPort = publicPort;
         this.privatePort = privatePort;

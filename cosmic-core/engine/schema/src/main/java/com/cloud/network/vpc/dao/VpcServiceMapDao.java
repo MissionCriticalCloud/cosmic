@@ -16,18 +16,17 @@
 // under the License.
 package com.cloud.network.vpc.dao;
 
-import java.util.List;
-
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.dao.NetworkServiceMapVO;
 import com.cloud.network.vpc.VpcServiceMapVO;
 import com.cloud.utils.db.GenericDao;
 
+import java.util.List;
+
 /**
  * VpcServiceMapDao deals with searches and operations done on the
  * vpc_service_map table.
- *
  */
 public interface VpcServiceMapDao extends GenericDao<VpcServiceMapVO, Long> {
     boolean areServicesSupportedInVpc(long vpcId, Service... services);

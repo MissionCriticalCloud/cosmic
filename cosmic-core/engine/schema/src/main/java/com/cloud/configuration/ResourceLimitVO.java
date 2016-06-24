@@ -50,7 +50,7 @@ public class ResourceLimitVO implements ResourceLimit {
     public ResourceLimitVO() {
     }
 
-    public ResourceLimitVO(ResourceCount.ResourceType type, Long max, long ownerId, ResourceOwnerType ownerType) {
+    public ResourceLimitVO(final ResourceCount.ResourceType type, final Long max, final long ownerId, final ResourceOwnerType ownerType) {
         this.type = type;
         this.max = max;
 
@@ -66,7 +66,7 @@ public class ResourceLimitVO implements ResourceLimit {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -75,26 +75,8 @@ public class ResourceLimitVO implements ResourceLimit {
         return type;
     }
 
-    public void setType(ResourceCount.ResourceType type) {
+    public void setType(final ResourceCount.ResourceType type) {
         this.type = type;
-    }
-
-    public Long getDomainId() {
-        return domainId;
-    }
-
-    public Long getAccountId() {
-        return accountId;
-    }
-
-    @Override
-    public Long getMax() {
-        return max;
-    }
-
-    @Override
-    public void setMax(Long max) {
-        this.max = max;
     }
 
     @Override
@@ -115,12 +97,29 @@ public class ResourceLimitVO implements ResourceLimit {
         }
     }
 
-    public void setDomainId(Long domainId) {
+    public Long getDomainId() {
+        return domainId;
+    }
+
+    public void setDomainId(final Long domainId) {
         this.domainId = domainId;
     }
 
-    public void setAccountId(Long accountId) {
+    public Long getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(final Long accountId) {
         this.accountId = accountId;
     }
 
+    @Override
+    public Long getMax() {
+        return max;
+    }
+
+    @Override
+    public void setMax(final Long max) {
+        this.max = max;
+    }
 }

@@ -35,5 +35,4 @@ public class NiciraNvpApiException extends Exception {
     public NiciraNvpApiException(final String message, final Throwable cause) {
         super(message, cause);
     }
-
 }

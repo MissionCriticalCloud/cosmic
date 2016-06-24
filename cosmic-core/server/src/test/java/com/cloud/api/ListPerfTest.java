@@ -24,7 +24,6 @@ import org.junit.Test;
 /**
  * Test fixture to do performance test for list command
  * Currently we commented out this test suite since it requires a real MS and Db running.
- *
  */
 public class ListPerfTest extends APITest {
 
@@ -45,7 +44,6 @@ public class ListPerfTest extends APITest {
         String result = this.sendRequest("listVirtualMachines", params);
         long after = System.currentTimeMillis();
         System.out.println("Time taken to list VM: " + (after - before) + " ms");
-
     }
 
     @Test
@@ -58,7 +56,6 @@ public class ListPerfTest extends APITest {
         String result = this.sendRequest("listVirtualMachines", params);
         long after = System.currentTimeMillis();
         System.out.println("Time taken to list VM: " + (after - before) + " ms");
-
     }
 
     @Test
@@ -72,7 +69,6 @@ public class ListPerfTest extends APITest {
         String result = this.sendRequest("listRouters", params);
         long after = System.currentTimeMillis();
         System.out.println("Time taken to list Routers: " + (after - before) + " ms");
-
     }
 
     @Test
@@ -85,7 +81,6 @@ public class ListPerfTest extends APITest {
         String result = this.sendRequest("listRouters", params);
         long after = System.currentTimeMillis();
         System.out.println("Time taken to list Routers: " + (after - before) + " ms");
-
     }
 
     @Test
@@ -99,7 +94,6 @@ public class ListPerfTest extends APITest {
         String result = this.sendRequest("listHosts", params);
         long after = System.currentTimeMillis();
         System.out.println("Time taken to list Hosts: " + (after - before) + " ms");
-
     }
 
     @Test
@@ -113,7 +107,6 @@ public class ListPerfTest extends APITest {
         String result = this.sendRequest("listVolumes", params);
         long after = System.currentTimeMillis();
         System.out.println("Time taken to list Volumes: " + (after - before) + " ms");
-
     }
 
     @Test
@@ -127,7 +120,6 @@ public class ListPerfTest extends APITest {
         String result = this.sendRequest("listAccounts", params);
         long after = System.currentTimeMillis();
         System.out.println("Time taken to list Accounts: " + (after - before) + " ms");
-
     }
 
     @Test
@@ -141,7 +133,6 @@ public class ListPerfTest extends APITest {
         String result = this.sendRequest("listUsers", params);
         long after = System.currentTimeMillis();
         System.out.println("Time taken to list Users: " + (after - before) + " ms");
-
     }
 
     @Test
@@ -155,7 +146,5 @@ public class ListPerfTest extends APITest {
         String result = this.sendRequest("listStoragePools", params);
         long after = System.currentTimeMillis();
         System.out.println("Time taken to list StoragePools: " + (after - before) + " ms");
-
     }
-
 }

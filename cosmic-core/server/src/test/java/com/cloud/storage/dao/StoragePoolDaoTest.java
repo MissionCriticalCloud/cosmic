@@ -16,17 +16,16 @@
 // under the License.
 package com.cloud.storage.dao;
 
+import com.cloud.storage.StoragePoolStatus;
+import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDaoImpl;
+
 import javax.inject.Inject;
 
-import com.cloud.storage.StoragePoolStatus;
-
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDaoImpl;
+import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/StoragePoolDaoTestContext.xml")

@@ -19,13 +19,13 @@
 
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.ScriptConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class BumpUpPriorityConfigItem extends AbstractConfigItemFacade {
 

@@ -20,7 +20,12 @@
 package com.cloud.network.guru;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.*;
+import com.cloud.agent.api.Answer;
+import com.cloud.agent.api.CreateLogicalSwitchAnswer;
+import com.cloud.agent.api.CreateLogicalSwitchCommand;
+import com.cloud.agent.api.DeleteLogicalSwitchAnswer;
+import com.cloud.agent.api.DeleteLogicalSwitchCommand;
+import com.cloud.agent.api.FindLogicalSwitchCommand;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
@@ -32,10 +37,18 @@ import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostDetailsDao;
-import com.cloud.network.*;
+import com.cloud.network.Network;
+import com.cloud.network.NetworkModel;
+import com.cloud.network.NetworkProfile;
 import com.cloud.network.Networks.BroadcastDomainType;
+import com.cloud.network.NiciraNvpDeviceVO;
+import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.PhysicalNetwork.IsolationMethod;
-import com.cloud.network.dao.*;
+import com.cloud.network.dao.NetworkDao;
+import com.cloud.network.dao.NetworkVO;
+import com.cloud.network.dao.NiciraNvpDao;
+import com.cloud.network.dao.PhysicalNetworkDao;
+import com.cloud.network.dao.PhysicalNetworkVO;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.resource.ResourceManager;
@@ -45,13 +58,14 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachineProfile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
     private static final int MAX_NAME_LENGTH = 40;
@@ -93,7 +107,8 @@ public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
                 && isMyIsolationMethod(physicalNetwork) && ntwkOfferingSrvcDao.areServicesSupportedByNetworkOffering(offering.getId(), Network.Service.Connectivity)) {
             return true;
         } else {
-            s_logger.debug("Cannot handle rquest. See GuestNetworkGuru message to check isolation methods. Details I have:\nNetwork type = " + networkType + "\nTraffic type = " + offering.getTrafficType() + "\nGuest type = " + offering.getGuestType());
+            s_logger.debug("Cannot handle rquest. See GuestNetworkGuru message to check isolation methods. Details I have:\nNetwork type = " + networkType + "\nTraffic type = "
+                    + offering.getTrafficType() + "\nGuest type = " + offering.getGuestType());
             return false;
         }
     }
@@ -255,5 +270,4 @@ public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
     public boolean trash(final Network network, final NetworkOffering offering) {
         return super.trash(network, offering);
     }
-
 }

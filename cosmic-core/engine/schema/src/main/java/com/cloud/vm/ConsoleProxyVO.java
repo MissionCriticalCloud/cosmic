@@ -16,7 +16,7 @@
 // under the License.
 package com.cloud.vm;
 
-import java.util.Date;
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -26,8 +26,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import java.util.Date;
 
 /**
  * ConsoleProxyVO domain object
@@ -66,7 +65,6 @@ public class ConsoleProxyVO extends VMInstanceVO implements ConsoleProxy {
 
     /**
      * Correct constructor to use.
-     *
      */
     public ConsoleProxyVO(long id, long serviceOfferingId, String name, long templateId, HypervisorType hypervisorType, long guestOSId, long dataCenterId, long domainId,
                           long accountId, long userId, int activeSession, boolean haEnabled) {
@@ -79,33 +77,13 @@ public class ConsoleProxyVO extends VMInstanceVO implements ConsoleProxy {
         super();
     }
 
-    public void setPublicIpAddress(String publicIpAddress) {
-        this.publicIpAddress = publicIpAddress;
-    }
-
-    public void setPublicNetmask(String publicNetmask) {
-        this.publicNetmask = publicNetmask;
-    }
-
-    public void setPublicMacAddress(String publicMacAddress) {
-        this.publicMacAddress = publicMacAddress;
-    }
-
-    public void setActiveSession(int activeSession) {
-        this.activeSession = activeSession;
-    }
-
-    public void setLastUpdateTime(Date time) {
-        lastUpdateTime = time;
-    }
-
-    public void setSessionDetails(byte[] details) {
-        sessionDetails = details;
-    }
-
     @Override
     public String getPublicIpAddress() {
         return publicIpAddress;
+    }
+
+    public void setPublicIpAddress(String publicIpAddress) {
+        this.publicIpAddress = publicIpAddress;
     }
 
     @Override
@@ -113,14 +91,17 @@ public class ConsoleProxyVO extends VMInstanceVO implements ConsoleProxy {
         return publicNetmask;
     }
 
+    public void setPublicNetmask(String publicNetmask) {
+        this.publicNetmask = publicNetmask;
+    }
+
     @Override
     public String getPublicMacAddress() {
         return publicMacAddress;
     }
 
-    @Override
-    public int getActiveSession() {
-        return activeSession;
+    public void setPublicMacAddress(String publicMacAddress) {
+        this.publicMacAddress = publicMacAddress;
     }
 
     @Override
@@ -128,9 +109,26 @@ public class ConsoleProxyVO extends VMInstanceVO implements ConsoleProxy {
         return lastUpdateTime;
     }
 
+    public void setLastUpdateTime(Date time) {
+        lastUpdateTime = time;
+    }
+
+    @Override
+    public int getActiveSession() {
+        return activeSession;
+    }
+
+    public void setActiveSession(int activeSession) {
+        this.activeSession = activeSession;
+    }
+
     @Override
     public byte[] getSessionDetails() {
         return sessionDetails;
+    }
+
+    public void setSessionDetails(byte[] details) {
+        sessionDetails = details;
     }
 
     public boolean isSslEnabled() {
@@ -141,12 +139,11 @@ public class ConsoleProxyVO extends VMInstanceVO implements ConsoleProxy {
         this.sslEnabled = sslEnabled;
     }
 
-    public void setPort(int port) {
-        this.port = port;
-    }
-
     public int getPort() {
         return port;
     }
 
+    public void setPort(int port) {
+        this.port = port;
+    }
 }

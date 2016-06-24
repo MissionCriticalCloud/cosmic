@@ -17,15 +17,16 @@
 
 """ Tests for Password Service
 """
-#Import Local Modules
-from marvin.cloudstackTestCase import *
+# Import Local Modules
+import logging
+import time
 from marvin.cloudstackAPI import *
-from marvin.lib.utils import *
+from marvin.cloudstackTestCase import *
 from marvin.lib.base import *
 from marvin.lib.common import *
+from marvin.lib.utils import *
 from nose.plugins.attrib import attr
-import time
-import logging
+
 
 class Services:
     """Test network services - Port Forwarding Rules Test Data Class.
@@ -173,8 +174,8 @@ class Services:
             "timeout": 10,
         }
 
-class TestPasswordService(cloudstackTestCase):
 
+class TestPasswordService(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
 
@@ -270,12 +271,12 @@ class TestPasswordService(cloudstackTestCase):
             vpc_1 = None
         else:
             self.logger.debug("Creating VPC with offering ID %s" % vpc_off.id)
-            vpc_1 = self.createVPC(vpc_off, cidr = '10.0.0.0/16')
+            vpc_1 = self.createVPC(vpc_off, cidr='10.0.0.0/16')
             self.cleanup += [vpc_1, vpc_off, self.account]
             self.logger.debug("Creating network inside VPC")
-            network_1 = self.createNetwork(vpc_1, gateway = '10.0.0.1')
+            network_1 = self.createNetwork(vpc_1, gateway='10.0.0.1')
             acl1 = self.createACL(vpc_1)
-            self.createACLItem(acl1.id, cidr = "0.0.0.0/0")
+            self.createACLItem(acl1.id, cidr="0.0.0.0/0")
             self.replaceNetworkAcl(acl1.id, network_1)
 
         # VM
@@ -348,7 +349,6 @@ class TestPasswordService(cloudstackTestCase):
             time.sleep(5)
         return False
 
-
     def routers_in_right_state(self):
         self.logger.debug("Check whether routers are happy")
         max_tries = 30
@@ -415,7 +415,8 @@ class TestPasswordService(cloudstackTestCase):
         if router.isredundantrouter and router_state == "BACKUP":
             expected_nr_or_processes = 0
 
-        self.assertEqual(int(number_of_processes_found[0]), expected_nr_or_processes, msg="Router should have " + str(expected_nr_or_processes) + " '" + find_process + "' processes running, found " + str(number_of_processes_found[0]))
+        self.assertEqual(int(number_of_processes_found[0]), expected_nr_or_processes,
+                         msg="Router should have " + str(expected_nr_or_processes) + " '" + find_process + "' processes running, found " + str(number_of_processes_found[0]))
 
     def test_password_server_logs(self, vm, router):
         host = self.get_host_details(router)
@@ -458,7 +459,6 @@ class TestPasswordService(cloudstackTestCase):
             0,
             "Log line 'password sent to' not found. The password was not retrieved by the VM!")
 
-
     def get_host_details(self, router):
         hosts = list_hosts(self.apiclient, id=router.hostid, type="Routing")
 
@@ -470,7 +470,7 @@ class TestPasswordService(cloudstackTestCase):
         host.port = self.services["configurableData"]["host"]["port"]
         return host
 
-    def createVPC(self, vpc_offering, cidr = '10.1.1.1/16'):
+    def createVPC(self, vpc_offering, cidr='10.1.1.1/16'):
         try:
             self.logger.debug("Creating a VPC in the account: %s" % self.account.name)
             self.services["vpc"]["cidr"] = cidr
@@ -521,7 +521,7 @@ class TestPasswordService(cloudstackTestCase):
 
         return acl
 
-    def createACLItem(self, aclId, cidr = "0.0.0.0/0"):
+    def createACLItem(self, aclId, cidr="0.0.0.0/0"):
         createAclItemCmd = createNetworkACL.createNetworkACLCmd()
         createAclItemCmd.cidr = cidr
         createAclItemCmd.protocol = "All"
@@ -536,7 +536,7 @@ class TestPasswordService(cloudstackTestCase):
         except Exception, e:
             self.fail('Unable to create ACL Item due to %s ' % e)
 
-    def createNetwork(self, vpc, net_offering = "network_offering", gateway = '10.1.1.1'):
+    def createNetwork(self, vpc, net_offering="network_offering", gateway='10.1.1.1'):
         try:
             self.logger.debug('Create NetworkOffering')
             net_offerring = self.services[net_offering]
@@ -613,7 +613,7 @@ class TestPasswordService(cloudstackTestCase):
 
         self.assertTrue(successResponse.success, "Failed to replace ACL list.")
 
-    def restart_vpc_with_cleanup(self, vpc, cleanup = True):
+    def restart_vpc_with_cleanup(self, vpc, cleanup=True):
         try:
             self.logger.debug("Restarting VPC %s with cleanup" % vpc.id)
             cmd = restartVPC.restartVPCCmd()
@@ -624,7 +624,7 @@ class TestPasswordService(cloudstackTestCase):
         except Exception, e:
             self.fail('Unable to restart VPC with cleanup due to %s ' % e)
 
-    def restart_network_with_cleanup(self, network, cleanup = True):
+    def restart_network_with_cleanup(self, network, cleanup=True):
         try:
             self.logger.debug("Restarting network %s with cleanup" % network.id)
             cmd = restartNetwork.restartNetworkCmd()

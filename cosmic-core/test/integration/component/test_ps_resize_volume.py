@@ -27,10 +27,17 @@
     CLOUDSTACK/Limit+Resources+to+domains+and+accounts
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import (
     cloudstackTestCase,
     unittest
+)
+from marvin.codes import (
+    PASS,
+    FAIL,
+    FAILED,
+    RESOURCE_PRIMARY_STORAGE,
+    RESOURCE_SECONDARY_STORAGE,
+    XEN_SERVER
 )
 from marvin.lib.base import (
     Account,
@@ -47,22 +54,13 @@ from marvin.lib.common import (
     get_template,
     matchResourceCount,
     isDomainResourceCountEqualToExpectedCount,
-    find_storage_pool_type,
     get_hypervisor_type
 )
 from marvin.lib.utils import cleanup_resources
-from marvin.codes import (
-    PASS,
-    FAIL,
-    FAILED,
-    RESOURCE_PRIMARY_STORAGE,
-    RESOURCE_SECONDARY_STORAGE,
-    XEN_SERVER
-)
+from nose.plugins.attrib import attr
 
 
 class TestResizeVolume(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cloudstackTestClient = super(TestResizeVolume,
@@ -79,8 +77,8 @@ class TestResizeVolume(cloudstackTestCase):
         cls.services["mode"] = cls.zone.networktype
         cls._cleanup = []
         cls.unsupportedStorageType = False
-        cls.resourcetypemapping = {RESOURCE_PRIMARY_STORAGE: 10,
-                                   RESOURCE_SECONDARY_STORAGE: 11}
+        cls.resourcetypemapping = { RESOURCE_PRIMARY_STORAGE: 10,
+                                    RESOURCE_SECONDARY_STORAGE: 11 }
 
         cls.template = get_template(
             cls.api_client,
@@ -212,7 +210,7 @@ class TestResizeVolume(cloudstackTestCase):
         self.assertNotEqual(apiclient, FAILED, "Failed to get api client\
                             of account: %s" % self.parentd_admin.name)
 
-        templateSize = (self.template.size / (1024**3))
+        templateSize = (self.template.size / (1024 ** 3))
         accountLimit = (templateSize + self.disk_offering_20_GB.disksize)
         response = self.updateResourceLimits(accountLimit=accountLimit)
         self.assertEqual(response[0], PASS, response[1])
@@ -276,7 +274,7 @@ class TestResizeVolume(cloudstackTestCase):
         result = self.setupAccounts()
         self.assertEqual(result[0], PASS, result[1])
 
-        templateSize = (self.template.size / (1024**3))
+        templateSize = (self.template.size / (1024 ** 3))
         accountLimit = ((templateSize + self.disk_offering_20_GB.disksize) - 1)
         response = self.updateResourceLimits(accountLimit=accountLimit)
         self.assertEqual(response[0], PASS, response[1])
@@ -340,7 +338,7 @@ class TestResizeVolume(cloudstackTestCase):
         result = self.setupAccounts()
         self.assertEqual(result[0], PASS, result[1])
 
-        templateSize = (self.template.size / (1024**3))
+        templateSize = (self.template.size / (1024 ** 3))
         domainLimit = ((templateSize + self.disk_offering_20_GB.disksize) - 1)
         response = self.updateResourceLimits(domainLimit=domainLimit)
         self.assertEqual(response[0], PASS, response[1])

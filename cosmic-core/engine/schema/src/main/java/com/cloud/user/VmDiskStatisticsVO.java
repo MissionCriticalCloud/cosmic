@@ -137,12 +137,12 @@ public class VmDiskStatisticsVO {
         return netIORead;
     }
 
-    public long getNetIOWrite() {
-        return netIOWrite;
-    }
-
     public void setNetIORead(long netIORead) {
         this.netIORead = netIORead;
+    }
+
+    public long getNetIOWrite() {
+        return netIOWrite;
     }
 
     public void setNetIOWrite(long netIOWrite) {
@@ -185,12 +185,12 @@ public class VmDiskStatisticsVO {
         return netBytesRead;
     }
 
-    public long getNetBytesWrite() {
-        return netBytesWrite;
-    }
-
     public void setNetBytesRead(long netBytesRead) {
         this.netBytesRead = netBytesRead;
+    }
+
+    public long getNetBytesWrite() {
+        return netBytesWrite;
     }
 
     public void setNetBytesWrite(long netBytesWrite) {
@@ -212,5 +212,4 @@ public class VmDiskStatisticsVO {
     public void setAggBytesWrite(long aggBytesWrite) {
         this.aggBytesWrite = aggBytesWrite;
     }
-
 }

@@ -29,5 +29,4 @@ public class AllAclRule extends AclRule {
     public AllAclRule(String cidr, boolean allowed) {
         super(cidr, allowed);
     }
-
 }

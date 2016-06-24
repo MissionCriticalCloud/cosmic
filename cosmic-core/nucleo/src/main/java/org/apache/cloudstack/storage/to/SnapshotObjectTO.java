@@ -19,15 +19,15 @@
 
 package org.apache.cloudstack.storage.to;
 
-import java.util.ArrayList;
-
 import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotInfo;
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
+
+import java.util.ArrayList;
+
 import org.apache.commons.lang.ArrayUtils;
 
 public class SnapshotObjectTO implements DataTO {
@@ -43,7 +43,6 @@ public class SnapshotObjectTO implements DataTO {
     private String[] parents;
     private Long physicalSize = (long) 0;
 
-
     public SnapshotObjectTO() {
 
     }
@@ -53,7 +52,7 @@ public class SnapshotObjectTO implements DataTO {
         this.setId(snapshot.getId());
         VolumeInfo vol = snapshot.getBaseVolume();
         if (vol != null) {
-            this.volume = (VolumeObjectTO)vol.getTO();
+            this.volume = (VolumeObjectTO) vol.getTO();
             this.setVmName(vol.getAttachedVmName());
         }
 
@@ -61,11 +60,11 @@ public class SnapshotObjectTO implements DataTO {
         ArrayList<String> parentsArry = new ArrayList<String>();
         if (parentSnapshot != null) {
             this.parentSnapshotPath = parentSnapshot.getPath();
-            while(parentSnapshot != null) {
+            while (parentSnapshot != null) {
                 parentsArry.add(parentSnapshot.getPath());
                 parentSnapshot = parentSnapshot.getParent();
             }
-            parents =  parentsArry.toArray(new String[parentsArry.size()]);
+            parents = parentsArry.toArray(new String[parentsArry.size()]);
             ArrayUtils.reverse(parents);
         }
 
@@ -90,6 +89,11 @@ public class SnapshotObjectTO implements DataTO {
     }
 
     @Override
+    public HypervisorType getHypervisorType() {
+        return hypervisorType;
+    }
+
+    @Override
     public String getPath() {
         return this.path;
     }
@@ -98,11 +102,24 @@ public class SnapshotObjectTO implements DataTO {
         this.path = path;
     }
 
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setHypervisorType(HypervisorType hypervisorType) {
+        this.hypervisorType = hypervisorType;
+    }
+
     public Long getPhysicalSize() {
         return this.physicalSize;
     }
 
-    public void setPhysicalSize(Long physicalSize ) {
+    public void setPhysicalSize(Long physicalSize) {
         this.physicalSize = physicalSize;
     }
 
@@ -130,30 +147,12 @@ public class SnapshotObjectTO implements DataTO {
         this.vmName = vmName;
     }
 
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    public HypervisorType getHypervisorType() {
-        return hypervisorType;
-    }
-
-    public void setHypervisorType(HypervisorType hypervisorType) {
-        this.hypervisorType = hypervisorType;
     }
 
     public boolean getquiescevm() {

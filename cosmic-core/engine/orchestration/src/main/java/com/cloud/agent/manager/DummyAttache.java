@@ -27,6 +27,11 @@ public class DummyAttache extends AgentAttache {
     }
 
     @Override
+    public void send(Request req) throws AgentUnavailableException {
+
+    }
+
+    @Override
     public void disconnect(Status state) {
 
     }
@@ -35,10 +40,4 @@ public class DummyAttache extends AgentAttache {
     protected boolean isClosed() {
         return false;
     }
-
-    @Override
-    public void send(Request req) throws AgentUnavailableException {
-
-    }
-
 }

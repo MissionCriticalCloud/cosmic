@@ -53,7 +53,7 @@ public class DestinationNatRule extends NatRule {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -63,7 +63,7 @@ public class DestinationNatRule extends NatRule {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        DestinationNatRule other = (DestinationNatRule)obj;
+        final DestinationNatRule other = (DestinationNatRule) obj;
         if (toDestinationIpAddress == null) {
             if (other.toDestinationIpAddress != null) {
                 return false;
@@ -82,7 +82,7 @@ public class DestinationNatRule extends NatRule {
     }
 
     @Override
-    public boolean equalsIgnoreUuid(Object obj) {
+    public boolean equalsIgnoreUuid(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -92,7 +92,7 @@ public class DestinationNatRule extends NatRule {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        DestinationNatRule other = (DestinationNatRule)obj;
+        final DestinationNatRule other = (DestinationNatRule) obj;
         if (toDestinationIpAddress == null) {
             if (other.toDestinationIpAddress != null) {
                 return false;
@@ -109,5 +109,4 @@ public class DestinationNatRule extends NatRule {
         }
         return true;
     }
-
 }

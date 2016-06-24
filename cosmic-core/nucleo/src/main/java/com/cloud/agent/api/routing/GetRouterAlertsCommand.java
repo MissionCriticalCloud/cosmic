@@ -19,8 +19,7 @@
 
 package com.cloud.agent.api.routing;
 
-
-public class GetRouterAlertsCommand  extends NetworkElementCommand {
+public class GetRouterAlertsCommand extends NetworkElementCommand {
 
     private String previousAlertTimeStamp;
 
@@ -28,21 +27,21 @@ public class GetRouterAlertsCommand  extends NetworkElementCommand {
 
     }
 
+    public GetRouterAlertsCommand(String timeStamp) {
+        this.previousAlertTimeStamp = timeStamp;
+    }
+
     @Override
     public boolean executeInSequence() {
         return false;
     }
 
-    public GetRouterAlertsCommand(String timeStamp) {
-        this.previousAlertTimeStamp = timeStamp;
+    @Override
+    public boolean isQuery() {
+        return true;
     }
 
     public String getPreviousAlertTimeStamp() {
         return previousAlertTimeStamp;
-    }
-
-    @Override
-    public boolean isQuery() {
-        return true;
     }
 }

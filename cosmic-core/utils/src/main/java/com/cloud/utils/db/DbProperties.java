@@ -19,14 +19,14 @@
 
 package com.cloud.utils.db;
 
+import com.cloud.utils.PropertiesUtil;
+import com.cloud.utils.crypt.EncryptionSecretKeyChecker;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
-import com.cloud.utils.PropertiesUtil;
-import com.cloud.utils.crypt.EncryptionSecretKeyChecker;
 
 import org.apache.commons.io.IOUtils;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
@@ -40,19 +40,6 @@ public class DbProperties {
 
     private static Properties properties = new Properties();
     private static boolean loaded = false;
-
-    protected static Properties wrapEncryption(Properties dbProps) throws IOException {
-        EncryptionSecretKeyChecker checker = new EncryptionSecretKeyChecker();
-        checker.check(dbProps);
-
-        if (EncryptionSecretKeyChecker.useEncryption()) {
-            return dbProps;
-        } else {
-            EncryptableProperties encrProps = new EncryptableProperties(EncryptionSecretKeyChecker.getEncryptor());
-            encrProps.putAll(dbProps);
-            return encrProps;
-        }
-    }
 
     public synchronized static Properties getDbProperties() {
         if (!loaded) {
@@ -106,5 +93,18 @@ public class DbProperties {
         properties = wrapEncryption(props);
         loaded = true;
         return properties;
+    }
+
+    protected static Properties wrapEncryption(Properties dbProps) throws IOException {
+        EncryptionSecretKeyChecker checker = new EncryptionSecretKeyChecker();
+        checker.check(dbProps);
+
+        if (EncryptionSecretKeyChecker.useEncryption()) {
+            return dbProps;
+        } else {
+            EncryptableProperties encrProps = new EncryptableProperties(EncryptionSecretKeyChecker.getEncryptor());
+            encrProps.putAll(dbProps);
+            return encrProps;
+        }
     }
 }

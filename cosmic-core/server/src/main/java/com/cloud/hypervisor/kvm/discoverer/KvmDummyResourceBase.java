@@ -16,11 +16,6 @@
 // under the License.
 package com.cloud.hypervisor.kvm.discoverer;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.PingCommand;
@@ -30,6 +25,10 @@ import com.cloud.host.Host.Type;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.ServerResourceBase;
+
+import javax.naming.ConfigurationException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class KvmDummyResourceBase extends ServerResourceBase implements ServerResource {
     private String _zoneId;
@@ -47,7 +46,7 @@ public class KvmDummyResourceBase extends ServerResourceBase implements ServerRe
     @Override
     public StartupCommand[] initialize() {
         StartupRoutingCommand cmd =
-            new StartupRoutingCommand(0, 0, 0, 0, null, Hypervisor.HypervisorType.KVM, new HashMap<String, String>());
+                new StartupRoutingCommand(0, 0, 0, 0, null, Hypervisor.HypervisorType.KVM, new HashMap<String, String>());
         cmd.setDataCenter(_zoneId);
         cmd.setPod(_podId);
         cmd.setCluster(_clusterId);
@@ -56,7 +55,7 @@ public class KvmDummyResourceBase extends ServerResourceBase implements ServerRe
         cmd.setPrivateIpAddress(_agentIp);
         cmd.setStorageIpAddress(_agentIp);
         cmd.setVersion(KvmDummyResourceBase.class.getPackage().getImplementationVersion());
-        return new StartupCommand[] {cmd};
+        return new StartupCommand[]{cmd};
     }
 
     @Override
@@ -72,19 +71,19 @@ public class KvmDummyResourceBase extends ServerResourceBase implements ServerRe
     }
 
     @Override
-    protected String getDefaultScriptsDir() {
-        // TODO Auto-generated method stub
-        return null;
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+        _zoneId = (String) params.get("zone");
+        _podId = (String) params.get("pod");
+        _clusterId = (String) params.get("cluster");
+        _guid = (String) params.get("guid");
+        _agentIp = (String) params.get("agentIp");
+        return true;
     }
 
     @Override
-    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _zoneId = (String)params.get("zone");
-        _podId = (String)params.get("pod");
-        _clusterId = (String)params.get("cluster");
-        _guid = (String)params.get("guid");
-        _agentIp = (String)params.get("agentIp");
-        return true;
+    protected String getDefaultScriptsDir() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
@@ -94,15 +93,15 @@ public class KvmDummyResourceBase extends ServerResourceBase implements ServerRe
     }
 
     @Override
-    public void setConfigParams(Map<String, Object> params) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public Map<String, Object> getConfigParams() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public void setConfigParams(Map<String, Object> params) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override

@@ -33,9 +33,13 @@ public class RpcCallbackDispatcher<T> {
         _targetObject = target;
     }
 
+    public static <P> RpcCallbackDispatcher<P> create(P target) {
+        return new RpcCallbackDispatcher<P>(target);
+    }
+
     @SuppressWarnings("unchecked")
     public T getTarget() {
-        return (T)Enhancer.create(_targetObject.getClass(), new MethodInterceptor() {
+        return (T) Enhancer.create(_targetObject.getClass(), new MethodInterceptor() {
             @Override
             public Object intercept(Object arg0, Method arg1, Object[] arg2, MethodProxy arg3) throws Throwable {
                 _callbackMethod = arg1;
@@ -48,15 +52,12 @@ public class RpcCallbackDispatcher<T> {
         return this;
     }
 
-    public static <P> RpcCallbackDispatcher<P> create(P target) {
-        return new RpcCallbackDispatcher<P>(target);
-    }
-
     public boolean dispatch(RpcClientCall clientCall) {
         assert (clientCall != null);
 
-        if (_callbackMethod == null)
+        if (_callbackMethod == null) {
             return false;
+        }
 
         try {
             _callbackMethod.invoke(_targetObject, clientCall, clientCall.getContext());

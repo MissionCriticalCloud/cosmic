@@ -17,13 +17,20 @@
 
 package com.cloud.alert;
 
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.utils.component.ManagerBase;
 
+import javax.naming.ConfigurationException;
+import java.util.Map;
+
 public class MockAlertManagerImpl extends ManagerBase implements AlertManager {
+
+    /* (non-Javadoc)
+     * @see com.cloud.utils.component.Manager#getName()
+     */
+    @Override
+    public String getName() {
+        return "MockAlertManagerImpl";
+    }
 
     /* (non-Javadoc)
      * @see com.cloud.utils.component.Manager#configure(java.lang.String, java.util.Map)
@@ -50,27 +57,10 @@ public class MockAlertManagerImpl extends ManagerBase implements AlertManager {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.utils.component.Manager#getName()
-     */
-    @Override
-    public String getName() {
-        return "MockAlertManagerImpl";
-    }
-
-    /* (non-Javadoc)
      * @see com.cloud.alert.AlertManager#clearAlert(short, long, long)
      */
     @Override
     public void clearAlert(AlertType alertType, long dataCenterId, long podId) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.alert.AlertManager#sendAlert(short, long, java.lang.Long, java.lang.String, java.lang.String)
-     */
-    @Override
-    public void sendAlert(AlertType alertType, long dataCenterId, Long podId, String subject, String body) {
         // TODO Auto-generated method stub
 
     }
@@ -84,10 +74,18 @@ public class MockAlertManagerImpl extends ManagerBase implements AlertManager {
 
     }
 
+    /* (non-Javadoc)
+     * @see com.cloud.alert.AlertManager#sendAlert(short, long, java.lang.Long, java.lang.String, java.lang.String)
+     */
+    @Override
+    public void sendAlert(AlertType alertType, long dataCenterId, Long podId, String subject, String body) {
+        // TODO Auto-generated method stub
+
+    }
+
     @Override
     public boolean generateAlert(AlertType alertType, long dataCenterId, Long podId, String msg) {
         // TODO Auto-generated method stub
         return false;
     }
-
 }

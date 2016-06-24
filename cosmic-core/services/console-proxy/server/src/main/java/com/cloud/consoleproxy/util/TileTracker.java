@@ -81,9 +81,19 @@ public class TileTracker {
         int cols = getTileCols();
         int rows = getTileRows();
         snapshot = new boolean[rows][cols];
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < cols; j++)
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
                 snapshot[i][j] = false;
+            }
+        }
+    }
+
+    private int getTileCols() {
+        return (trackWidth + tileWidth - 1) / tileWidth;
+    }
+
+    private int getTileRows() {
+        return (trackHeight + tileHeight - 1) / tileHeight;
     }
 
     public synchronized void resize(int trackWidth, int trackHeight) {
@@ -98,13 +108,51 @@ public class TileTracker {
         int cols = getTileCols();
         int rows = getTileRows();
         snapshot = new boolean[rows][cols];
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < cols; j++)
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
                 snapshot[i][j] = true;
+            }
+        }
     }
 
     public void invalidate(Rectangle rect) {
         setTileFlag(rect, true);
+    }
+
+    private synchronized void setTileFlag(Rectangle rect, boolean flag) {
+        int nStartTileRow;
+        int nStartTileCol;
+        int nEndTileRow;
+        int nEndTileCol;
+
+        int cols = getTileCols();
+        int rows = getTileRows();
+
+        if (rect != null) {
+            nStartTileRow = Math.min(getTileYPos(rect.y), rows - 1);
+            nStartTileCol = Math.min(getTileXPos(rect.x), cols - 1);
+            nEndTileRow = Math.min(getTileYPos(rect.y + rect.height - 1), rows - 1);
+            nEndTileCol = Math.min(getTileXPos(rect.x + rect.width - 1), cols - 1);
+        } else {
+            nStartTileRow = 0;
+            nStartTileCol = 0;
+            nEndTileRow = rows - 1;
+            nEndTileCol = cols - 1;
+        }
+
+        for (int i = nStartTileRow; i <= nEndTileRow; i++) {
+            for (int j = nStartTileCol; j <= nEndTileCol; j++) {
+                snapshot[i][j] = flag;
+            }
+        }
+    }
+
+    public int getTileYPos(int y) {
+        return y / tileHeight;
+    }
+
+    private int getTileXPos(int x) {
+        return x / tileWidth;
     }
 
     public void validate(Rectangle rect) {
@@ -138,8 +186,9 @@ public class TileTracker {
         synchronized (this) {
             for (int i = 0; i < getTileRows(); i++) {
                 for (int j = 0; j < getTileCols(); j++) {
-                    if (!snapshot[i][j])
+                    if (!snapshot[i][j]) {
                         return false;
+                    }
                 }
             }
         }
@@ -188,8 +237,9 @@ public class TileTracker {
                 rect.x = nCol * tileWidth;
                 rect.width = (nEndCol - nCol) * tileWidth;
 
-                if (!listener.onTileChange(rect, nRow, nEndCol))
+                if (!listener.onTileChange(rect, nRow, nEndCol)) {
                     break;
+                }
             }
 
             nPos = (nPos + 1) % nUnits;
@@ -221,47 +271,5 @@ public class TileTracker {
             }
         }
         listener.onRegionChange(classifier.getRegionList());
-    }
-
-    private synchronized void setTileFlag(Rectangle rect, boolean flag) {
-        int nStartTileRow;
-        int nStartTileCol;
-        int nEndTileRow;
-        int nEndTileCol;
-
-        int cols = getTileCols();
-        int rows = getTileRows();
-
-        if (rect != null) {
-            nStartTileRow = Math.min(getTileYPos(rect.y), rows - 1);
-            nStartTileCol = Math.min(getTileXPos(rect.x), cols - 1);
-            nEndTileRow = Math.min(getTileYPos(rect.y + rect.height - 1), rows - 1);
-            nEndTileCol = Math.min(getTileXPos(rect.x + rect.width - 1), cols - 1);
-        } else {
-            nStartTileRow = 0;
-            nStartTileCol = 0;
-            nEndTileRow = rows - 1;
-            nEndTileCol = cols - 1;
-        }
-
-        for (int i = nStartTileRow; i <= nEndTileRow; i++)
-            for (int j = nStartTileCol; j <= nEndTileCol; j++)
-                snapshot[i][j] = flag;
-    }
-
-    private int getTileRows() {
-        return (trackHeight + tileHeight - 1) / tileHeight;
-    }
-
-    private int getTileCols() {
-        return (trackWidth + tileWidth - 1) / tileWidth;
-    }
-
-    private int getTileXPos(int x) {
-        return x / tileWidth;
-    }
-
-    public int getTileYPos(int y) {
-        return y / tileHeight;
     }
 }

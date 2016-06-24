@@ -17,14 +17,11 @@
 
 package org.apache.cloudstack.api.command.user.region.ha.gslb;
 
-import javax.inject.Inject;
-
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.region.ha.GlobalLoadBalancerRule;
 import com.cloud.region.ha.GlobalLoadBalancingRulesService;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -36,6 +33,9 @@ import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.GlobalLoadBalancerResponse;
 import org.apache.cloudstack.api.response.RegionResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,31 +58,31 @@ public class CreateGlobalLoadBalancerRuleCmd extends BaseAsyncCreateCmd {
     private String description;
 
     @Parameter(name = ApiConstants.REGION_ID,
-               type = CommandType.INTEGER,
-               entityType = RegionResponse.class,
-               required = true,
-               description = "region where the global load balancer is going to be created.")
+            type = CommandType.INTEGER,
+            entityType = RegionResponse.class,
+            required = true,
+            description = "region where the global load balancer is going to be created.")
     private Integer regionId;
 
     @Parameter(name = ApiConstants.ACCOUNT,
-               type = CommandType.STRING,
-               description = "the account associated with the global load balancer. Must be used with the domainId parameter.")
+            type = CommandType.STRING,
+            description = "the account associated with the global load balancer. Must be used with the domainId parameter.")
     private String accountName;
 
     @Parameter(name = ApiConstants.DOMAIN_ID, type = CommandType.UUID, entityType = DomainResponse.class, description = "the domain ID associated with the load balancer")
     private Long domainId;
 
     @Parameter(name = ApiConstants.GSLB_LB_METHOD,
-               type = CommandType.STRING,
-               required = false,
-               description = "load balancer algorithm (roundrobin, leastconn, proximity) "
-                   + "that method is used to distribute traffic across the zones participating in global server load balancing, if not specified defaults to 'round robin'")
+            type = CommandType.STRING,
+            required = false,
+            description = "load balancer algorithm (roundrobin, leastconn, proximity) "
+                    + "that method is used to distribute traffic across the zones participating in global server load balancing, if not specified defaults to 'round robin'")
     private String algorithm;
 
     @Parameter(name = ApiConstants.GSLB_STICKY_SESSION_METHOD,
-               type = CommandType.STRING,
-               required = false,
-               description = "session sticky method (sourceip) if not specified defaults to sourceip")
+            type = CommandType.STRING,
+            required = false,
+            description = "session sticky method (sourceip) if not specified defaults to sourceip")
     private String stickyMethod;
 
     @Parameter(name = ApiConstants.GSLB_SERVICE_DOMAIN_NAME, type = CommandType.STRING, required = true, description = "domain name for the GSLB service.")
@@ -94,6 +94,8 @@ public class CreateGlobalLoadBalancerRuleCmd extends BaseAsyncCreateCmd {
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
+    @Inject
+    private GlobalLoadBalancingRulesService _gslbService;
 
     public String getName() {
         return globalLoadBalancerRuleName;
@@ -134,17 +136,9 @@ public class CreateGlobalLoadBalancerRuleCmd extends BaseAsyncCreateCmd {
         return serviceType;
     }
 
-    @Inject
-    private GlobalLoadBalancingRulesService _gslbService;
-
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
 
     @Override
     public void execute() throws ResourceAllocationException, ResourceUnavailableException {
@@ -154,6 +148,20 @@ public class CreateGlobalLoadBalancerRuleCmd extends BaseAsyncCreateCmd {
             response.setResponseName(getCommandName());
             this.setResponseObject(response);
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, null, true);
+        if (accountId == null) {
+            return CallContext.current().getCallingAccount().getId();
+        }
+        return accountId;
     }
 
     @Override
@@ -179,21 +187,11 @@ public class CreateGlobalLoadBalancerRuleCmd extends BaseAsyncCreateCmd {
     @Override
     public String getEventDescription() {
         return "creating a global load balancer rule Id: " + getEntityId();
-
     }
 
     @Override
     public ApiCommandJobType getInstanceType() {
         return ApiCommandJobType.GlobalLoadBalancerRule;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, null, true);
-        if (accountId == null) {
-            return CallContext.current().getCallingAccount().getId();
-        }
-        return accountId;
     }
 
     public String getAccountName() {

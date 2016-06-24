@@ -19,13 +19,13 @@
 
 package com.cloud.agent.api.routing;
 
+import com.cloud.agent.api.to.NetworkACLTO;
+import com.cloud.agent.api.to.NicTO;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import com.cloud.agent.api.to.NetworkACLTO;
-import com.cloud.agent.api.to.NicTO;
 
 public class SetNetworkACLCommand extends NetworkElementCommand {
     NetworkACLTO[] rules;

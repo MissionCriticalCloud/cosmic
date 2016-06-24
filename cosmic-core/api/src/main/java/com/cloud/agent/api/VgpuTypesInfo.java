@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 package com.cloud.agent.api;
+
 public class VgpuTypesInfo {
 
     private String modelName;
@@ -26,6 +27,19 @@ public class VgpuTypesInfo {
     private Long maxVgpuPerGpu;
     private Long remainingCapacity;
     private Long maxCapacity;
+
+    public VgpuTypesInfo(String groupName, String modelName, Long videoRam, Long maxHeads, Long maxResolutionX, Long maxResolutionY, Long maxVgpuPerGpu,
+                         Long remainingCapacity, Long maxCapacity) {
+        this.groupName = groupName;
+        this.modelName = modelName;
+        this.videoRam = videoRam;
+        this.maxHeads = maxHeads;
+        this.maxResolutionX = maxResolutionX;
+        this.maxResolutionY = maxResolutionY;
+        this.maxVgpuPerGpu = maxVgpuPerGpu;
+        this.remainingCapacity = remainingCapacity;
+        this.maxCapacity = maxCapacity;
+    }
 
     public String getModelName() {
         return modelName;
@@ -68,19 +82,6 @@ public class VgpuTypesInfo {
     }
 
     public void setMaxVmCapacity(Long maxCapacity) {
-        this.maxCapacity = maxCapacity;
-    }
-
-    public VgpuTypesInfo(String groupName, String modelName, Long videoRam, Long maxHeads, Long maxResolutionX, Long maxResolutionY, Long maxVgpuPerGpu,
-            Long remainingCapacity, Long maxCapacity) {
-        this.groupName = groupName;
-        this.modelName = modelName;
-        this.videoRam = videoRam;
-        this.maxHeads = maxHeads;
-        this.maxResolutionX = maxResolutionX;
-        this.maxResolutionY = maxResolutionY;
-        this.maxVgpuPerGpu = maxVgpuPerGpu;
-        this.remainingCapacity = remainingCapacity;
         this.maxCapacity = maxCapacity;
     }
 }

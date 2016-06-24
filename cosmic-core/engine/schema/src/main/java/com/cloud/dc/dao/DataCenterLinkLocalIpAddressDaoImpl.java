@@ -16,14 +16,6 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.dc.DataCenterLinkLocalIpAddressVO;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
@@ -34,6 +26,13 @@ import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
+
+import javax.naming.ConfigurationException;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,12 +47,35 @@ public class DataCenterLinkLocalIpAddressDaoImpl extends GenericDaoBase<DataCent
     private final GenericSearchBuilder<DataCenterLinkLocalIpAddressVO, Integer> AllIpCount;
     private final GenericSearchBuilder<DataCenterLinkLocalIpAddressVO, Integer> AllAllocatedIpCount;
 
+    public DataCenterLinkLocalIpAddressDaoImpl() {
+        super();
+        AllFieldsSearch = createSearchBuilder();
+        AllFieldsSearch.and("ip", AllFieldsSearch.entity().getIpAddress(), SearchCriteria.Op.EQ);
+        AllFieldsSearch.and("dc", AllFieldsSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        AllFieldsSearch.and("pod", AllFieldsSearch.entity().getPodId(), SearchCriteria.Op.EQ);
+        AllFieldsSearch.and("instance", AllFieldsSearch.entity().getInstanceId(), SearchCriteria.Op.EQ);
+        AllFieldsSearch.and("reservation", AllFieldsSearch.entity().getReservationId(), SearchCriteria.Op.EQ);
+        AllFieldsSearch.and("taken", AllFieldsSearch.entity().getTakenAt(), SearchCriteria.Op.EQ);
+        AllFieldsSearch.done();
+
+        AllIpCount = createSearchBuilder(Integer.class);
+        AllIpCount.select(null, Func.COUNT, AllIpCount.entity().getId());
+        AllIpCount.and("pod", AllIpCount.entity().getPodId(), SearchCriteria.Op.EQ);
+        AllIpCount.done();
+
+        AllAllocatedIpCount = createSearchBuilder(Integer.class);
+        AllAllocatedIpCount.select(null, Func.COUNT, AllAllocatedIpCount.entity().getId());
+        AllAllocatedIpCount.and("pod", AllAllocatedIpCount.entity().getPodId(), SearchCriteria.Op.EQ);
+        AllAllocatedIpCount.and("removed", AllAllocatedIpCount.entity().getTakenAt(), SearchCriteria.Op.NNULL);
+        AllAllocatedIpCount.done();
+    }
+
     @Override
     @DB
     public DataCenterLinkLocalIpAddressVO takeIpAddress(long dcId, long podId, long instanceId, String reservationId) {
         SearchCriteria<DataCenterLinkLocalIpAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("pod", podId);
-        sc.setParameters("taken", (Date)null);
+        sc.setParameters("taken", (Date) null);
 
         TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
@@ -155,30 +177,6 @@ public class DataCenterLinkLocalIpAddressDaoImpl extends GenericDaoBase<DataCent
         sc.setParameters("pod", podId);
         List<Integer> count = customSearch(sc, null);
         return count.get(0);
-    }
-
-    public DataCenterLinkLocalIpAddressDaoImpl() {
-        super();
-        AllFieldsSearch = createSearchBuilder();
-        AllFieldsSearch.and("ip", AllFieldsSearch.entity().getIpAddress(), SearchCriteria.Op.EQ);
-        AllFieldsSearch.and("dc", AllFieldsSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        AllFieldsSearch.and("pod", AllFieldsSearch.entity().getPodId(), SearchCriteria.Op.EQ);
-        AllFieldsSearch.and("instance", AllFieldsSearch.entity().getInstanceId(), SearchCriteria.Op.EQ);
-        AllFieldsSearch.and("reservation", AllFieldsSearch.entity().getReservationId(), SearchCriteria.Op.EQ);
-        AllFieldsSearch.and("taken", AllFieldsSearch.entity().getTakenAt(), SearchCriteria.Op.EQ);
-        AllFieldsSearch.done();
-
-        AllIpCount = createSearchBuilder(Integer.class);
-        AllIpCount.select(null, Func.COUNT, AllIpCount.entity().getId());
-        AllIpCount.and("pod", AllIpCount.entity().getPodId(), SearchCriteria.Op.EQ);
-        AllIpCount.done();
-
-        AllAllocatedIpCount = createSearchBuilder(Integer.class);
-        AllAllocatedIpCount.select(null, Func.COUNT, AllAllocatedIpCount.entity().getId());
-        AllAllocatedIpCount.and("pod", AllAllocatedIpCount.entity().getPodId(), SearchCriteria.Op.EQ);
-        AllAllocatedIpCount.and("removed", AllAllocatedIpCount.entity().getTakenAt(), SearchCriteria.Op.NNULL);
-        AllAllocatedIpCount.done();
-
     }
 
     @Override

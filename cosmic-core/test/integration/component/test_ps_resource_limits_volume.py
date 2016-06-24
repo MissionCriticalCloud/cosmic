@@ -20,11 +20,11 @@ Tests primary storage limits during upload volume
 """
 import unittest
 
-from ddt import ddt, data
+from ddt import ddt
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.codes import PASS, RESOURCE_PRIMARY_STORAGE, FAIL, USER_ACCOUNT
+from marvin.codes import PASS, RESOURCE_PRIMARY_STORAGE, FAIL
 from marvin.lib.base import Domain, Account, VirtualMachine, DiskOffering, ServiceOffering, Volume
-from marvin.lib.common import get_domain, get_zone, update_resource_limit, uploadVolume, matchResourceCount, get_template
+from marvin.lib.common import get_domain, get_zone, update_resource_limit, matchResourceCount, get_template
 from marvin.lib.utils import cleanup_resources, validateList
 from nose.plugins.attrib import attr
 
@@ -117,7 +117,7 @@ class TestPrimaryResourceLimitsVolume(cloudstackTestCase):
         return [PASS, None]
 
     # @data(USER_ACCOUNT)
-    @attr(tags=["advanced","basic"], required_hardware="true")
+    @attr(tags=["advanced", "basic"], required_hardware="true")
     def test_attach_volume_exceeding_primary_limits(self):
         """
         # do
@@ -156,17 +156,16 @@ class TestPrimaryResourceLimitsVolume(cloudstackTestCase):
         try:
             self.virtualMachine.attach_volume(self.apiclient, volume=volume)
         except Exception as e:
-            if "Maximum number of resources of type \'primary_storage\' for account name="+self.account.name in e.message:
+            if "Maximum number of resources of type \'primary_storage\' for account name=" + self.account.name in e.message:
                 self.assertTrue(True, "there should be primary store resource limit reached exception")
             else:
                 self.fail("only resource limit reached exception is expected. some other exception occurred. Failing the test case.")
 
         # resource count should match as the attach should fail due to reaching resource limits
         response = matchResourceCount(
-                self.apiclient, self.initialResourceCount,
-                RESOURCE_PRIMARY_STORAGE,
-                accountid=self.account.id)
+            self.apiclient, self.initialResourceCount,
+            RESOURCE_PRIMARY_STORAGE,
+            accountid=self.account.id)
         self.assertEqual(response[0], PASS, response[1])
 
         return
-

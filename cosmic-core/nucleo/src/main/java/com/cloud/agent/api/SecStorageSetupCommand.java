@@ -20,7 +20,6 @@
 package com.cloud.agent.api;
 
 import com.cloud.agent.api.to.DataStoreTO;
-
 import org.apache.cloudstack.framework.security.keystore.KeystoreManager;
 
 public class SecStorageSetupCommand extends Command {
@@ -28,7 +27,6 @@ public class SecStorageSetupCommand extends Command {
     private String secUrl;
     private KeystoreManager.Certificates certs;
     private String postUploadKey;
-
 
     public SecStorageSetupCommand() {
         super();
@@ -50,13 +48,12 @@ public class SecStorageSetupCommand extends Command {
         return secUrl;
     }
 
-    public KeystoreManager.Certificates getCerts() {
-        return certs;
-    }
-
     public void setSecUrl(String secUrl) {
         this.secUrl = secUrl;
+    }
 
+    public KeystoreManager.Certificates getCerts() {
+        return certs;
     }
 
     public DataStoreTO getDataStore() {

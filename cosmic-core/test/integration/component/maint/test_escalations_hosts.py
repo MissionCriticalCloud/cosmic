@@ -36,6 +36,7 @@ from nose.plugins.attrib import attr
 
 import time
 
+
 # These tests need to be run separately and not in parallel with other tests.
 # Because it disables the infrastructure for brief periods
 
@@ -105,10 +106,10 @@ def check_db(self, host_state):
 
 
 class TestHosts(cloudstackTestCase):
-
     """
     Testing Hosts
     """
+
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestHosts, cls).getClsTestClient()

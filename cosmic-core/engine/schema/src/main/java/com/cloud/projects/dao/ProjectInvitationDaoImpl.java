@@ -16,15 +16,15 @@
 // under the License.
 package com.cloud.projects.dao;
 
-import java.sql.Date;
-import java.util.List;
-
 import com.cloud.projects.ProjectInvitation.State;
 import com.cloud.projects.ProjectInvitationVO;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.sql.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +63,7 @@ public class ProjectInvitationDaoImpl extends GenericDaoBase<ProjectInvitationVO
         sc.setParameters("accountId", accountId);
         sc.setParameters("projectId", projectId);
         if (inviteState != null && inviteState.length > 0) {
-            sc.setParameters("state", (Object[])inviteState);
+            sc.setParameters("state", (Object[]) inviteState);
         }
 
         return findOneBy(sc);
@@ -97,14 +97,6 @@ public class ProjectInvitationDaoImpl extends GenericDaoBase<ProjectInvitationVO
     }
 
     @Override
-    public List<ProjectInvitationVO> listInvitationsToExpire(long timeOut) {
-        SearchCriteria<ProjectInvitationVO> sc = InactiveSearch.create();
-        sc.setParameters("created", new Date((DateUtil.currentGMTTime().getTime()) - timeOut));
-        sc.setParameters("state", State.Pending);
-        return listBy(sc);
-    }
-
-    @Override
     public boolean isActive(long id, long timeout) {
         SearchCriteria<ProjectInvitationVO> sc = InactiveSearch.create();
 
@@ -130,7 +122,7 @@ public class ProjectInvitationDaoImpl extends GenericDaoBase<ProjectInvitationVO
         sc.setParameters("email", email);
         sc.setParameters("projectId", projectId);
         if (inviteState != null && inviteState.length > 0) {
-            sc.setParameters("state", (Object[])inviteState);
+            sc.setParameters("state", (Object[]) inviteState);
         }
 
         return findOneBy(sc);
@@ -142,17 +134,8 @@ public class ProjectInvitationDaoImpl extends GenericDaoBase<ProjectInvitationVO
         sc.setParameters("token", token);
         sc.setParameters("projectId", projectId);
         if (inviteState != null && inviteState.length > 0) {
-            sc.setParameters("state", (Object[])inviteState);
+            sc.setParameters("state", (Object[]) inviteState);
         }
-
-        return findOneBy(sc);
-    }
-
-    @Override
-    public ProjectInvitationVO findPendingById(long id) {
-        SearchCriteria<ProjectInvitationVO> sc = AllFieldsSearch.create();
-        sc.setParameters("id", id);
-        sc.setParameters("state", State.Pending);
 
         return findOneBy(sc);
     }
@@ -166,4 +149,20 @@ public class ProjectInvitationDaoImpl extends GenericDaoBase<ProjectInvitationVO
         s_logger.debug("Removed " + numberRemoved + " invitations for project id=" + projectId);
     }
 
+    @Override
+    public ProjectInvitationVO findPendingById(long id) {
+        SearchCriteria<ProjectInvitationVO> sc = AllFieldsSearch.create();
+        sc.setParameters("id", id);
+        sc.setParameters("state", State.Pending);
+
+        return findOneBy(sc);
+    }
+
+    @Override
+    public List<ProjectInvitationVO> listInvitationsToExpire(long timeOut) {
+        SearchCriteria<ProjectInvitationVO> sc = InactiveSearch.create();
+        sc.setParameters("created", new Date((DateUtil.currentGMTTime().getTime()) - timeOut));
+        sc.setParameters("state", State.Pending);
+        return listBy(sc);
+    }
 }

@@ -21,7 +21,7 @@ import java.util.List;
 
 /**
  * ConsoleProxyClient defines an standard interface that a console client should implement,
- *
+ * <p>
  * ConsoleProxyClient maintains a session towards the target host, it glues the session
  * to a AJAX front-end viewer
  */

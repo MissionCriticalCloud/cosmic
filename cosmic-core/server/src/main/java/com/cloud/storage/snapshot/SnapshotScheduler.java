@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.storage.snapshot;
 
-import java.util.Date;
-
 import com.cloud.storage.SnapshotPolicyVO;
 import com.cloud.utils.component.Manager;
 import com.cloud.utils.concurrency.Scheduler;
+
+import java.util.Date;
 
 /**
  */
@@ -35,6 +35,7 @@ public interface SnapshotScheduler extends Manager, Scheduler {
 
     /**
      * Remove schedule for volumeId, policyId combination
+     *
      * @param volumeId
      * @param policyId
      * @return

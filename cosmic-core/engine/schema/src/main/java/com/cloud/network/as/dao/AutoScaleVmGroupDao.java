@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.network.as.dao;
 
-import java.util.List;
-
 import com.cloud.network.as.AutoScaleVmGroupVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface AutoScaleVmGroupDao extends GenericDao<AutoScaleVmGroupVO, Long> {
     List<AutoScaleVmGroupVO> listByAll(Long loadBalancerId, Long profileId);

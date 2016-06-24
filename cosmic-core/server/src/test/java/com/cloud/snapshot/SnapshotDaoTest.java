@@ -16,23 +16,21 @@
 // under the License.
 package com.cloud.snapshot;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.dao.SnapshotDaoImpl;
 import com.cloud.utils.component.ComponentContext;
 
+import javax.inject.Inject;
+import java.util.List;
+
+import junit.framework.Assert;
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/SnapshotDaoTestContext.xml")

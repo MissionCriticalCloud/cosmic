@@ -56,5 +56,4 @@ public interface HostEntity extends DataCenterResourceEntity {
     String getGuid();
 
     Long getClusterId();
-
 }

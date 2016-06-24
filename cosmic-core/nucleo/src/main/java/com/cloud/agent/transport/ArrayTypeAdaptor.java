@@ -19,13 +19,14 @@
 
 package com.cloud.agent.transport;
 
+import com.cloud.utils.exception.CloudRuntimeException;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -66,7 +67,7 @@ public class ArrayTypeAdaptor<T> implements JsonDeserializer<T[]>, JsonSerialize
         Iterator<JsonElement> it = array.iterator();
         ArrayList<T> cmds = new ArrayList<T>();
         while (it.hasNext()) {
-            JsonObject element = (JsonObject)it.next();
+            JsonObject element = (JsonObject) it.next();
             Map.Entry<String, JsonElement> entry = element.entrySet().iterator().next();
 
             String name = entry.getKey();
@@ -76,11 +77,11 @@ public class ArrayTypeAdaptor<T> implements JsonDeserializer<T[]>, JsonSerialize
             } catch (ClassNotFoundException e) {
                 throw new CloudRuntimeException("can't find " + name);
             }
-            T cmd = (T)_gson.fromJson(entry.getValue(), clazz);
+            T cmd = (T) _gson.fromJson(entry.getValue(), clazz);
             cmds.add(cmd);
         }
-        Class<?> type = ((Class<?>)typeOfT).getComponentType();
-        T[] ts = (T[])Array.newInstance(type, cmds.size());
+        Class<?> type = ((Class<?>) typeOfT).getComponentType();
+        T[] ts = (T[]) Array.newInstance(type, cmds.size());
         return cmds.toArray(ts);
     }
 }

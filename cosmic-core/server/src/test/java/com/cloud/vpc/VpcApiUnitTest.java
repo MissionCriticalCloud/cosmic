@@ -16,11 +16,6 @@
 // under the License.
 package com.cloud.vpc;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.Network.Service;
 import com.cloud.network.vpc.Vpc;
@@ -29,12 +24,15 @@ import com.cloud.network.vpc.VpcVO;
 import com.cloud.user.AccountVO;
 import com.cloud.utils.component.ComponentContext;
 
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration(locations = "classpath:/VpcTestContext.xml")
@@ -93,11 +91,10 @@ public class VpcApiUnitTest extends TestCase {
         } finally {
             assertTrue("Validate network offering: Test passed: the offering is valid for vpc creation", result);
         }
-
     }
 
     //2) invalid offering - source nat is not included
-    @Test(expected=InvalidParameterValueException.class)
+    @Test(expected = InvalidParameterValueException.class)
     public void validateNtwkOffForVpcInvalidMissingSourceNat() {
         boolean result = false;
         try {
@@ -106,11 +103,10 @@ public class VpcApiUnitTest extends TestCase {
         } finally {
             assertFalse("Validate network offering: TEST FAILED, can't use network offering without SourceNat service", result);
         }
-
     }
 
     //3) invalid offering - conserve mode is off
-    @Test(expected=InvalidParameterValueException.class)
+    @Test(expected = InvalidParameterValueException.class)
     public void validateNtwkOffForVpcInvalidNoConserveMode() {
         boolean result = false;
         try {
@@ -119,11 +115,10 @@ public class VpcApiUnitTest extends TestCase {
         } finally {
             assertFalse("Validate network offering: TEST FAILED, can't use network offering without conserve mode = true", result);
         }
-
     }
 
     //4) invalid offering - guest type shared
-    @Test(expected=InvalidParameterValueException.class)
+    @Test(expected = InvalidParameterValueException.class)
     public void validateNtwkOffForVpcInvalidTypeIsGuest() {
         boolean result = false;
         try {
@@ -132,11 +127,10 @@ public class VpcApiUnitTest extends TestCase {
         } finally {
             assertFalse("Validate network offering: TEST FAILED, can't use network offering with guest type = Shared", result);
         }
-
     }
 
     //5) Invalid offering - no redundant router support
-    @Test(expected=InvalidParameterValueException.class)
+    @Test(expected = InvalidParameterValueException.class)
     public void validateNtwkOffForVpcInvalidNoRVRSupport() {
         boolean result = false;
         try {

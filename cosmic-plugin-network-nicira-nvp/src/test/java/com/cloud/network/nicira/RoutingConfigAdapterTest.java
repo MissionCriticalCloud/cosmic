@@ -26,13 +26,12 @@ import static org.hamcrest.Matchers.notNullValue;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
-
 import org.junit.Test;
 
 public class RoutingConfigAdapterTest {
     private final Gson gson = new GsonBuilder()
-        .registerTypeAdapter(RoutingConfig.class, new RoutingConfigAdapter())
-        .create();
+            .registerTypeAdapter(RoutingConfig.class, new RoutingConfigAdapter())
+            .create();
 
     @Test(expected = JsonParseException.class)
     public void testRoutingConfigAdapterNoType() {
@@ -53,5 +52,4 @@ public class RoutingConfigAdapterTest {
         assertThat(object, notNullValue());
         assertThat(object, instanceOf(SingleDefaultRouteImplicitRoutingConfig.class));
     }
-
 }

@@ -16,15 +16,6 @@
 // under the License.
 package com.cloud.event.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
-import javax.inject.Inject;
-
 import com.cloud.dc.Vlan;
 import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventVO;
@@ -37,6 +28,14 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
 
+import javax.inject.Inject;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -44,20 +43,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class UsageEventDaoImpl extends GenericDaoBase<UsageEventVO, Long> implements UsageEventDao {
     public static final Logger s_logger = LoggerFactory.getLogger(UsageEventDaoImpl.class.getName());
-
-    private final SearchBuilder<UsageEventVO> latestEventsSearch;
-    private final SearchBuilder<UsageEventVO> IpeventsSearch;
     private static final String COPY_EVENTS =
-        "INSERT INTO cloud_usage.usage_event (id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size) "
-            + "SELECT id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size FROM cloud.usage_event vmevt WHERE vmevt.id > ? and vmevt.id <= ? ";
+            "INSERT INTO cloud_usage.usage_event (id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size) "
+                    + "SELECT id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size FROM cloud" +
+                    ".usage_event vmevt WHERE vmevt.id > ? and vmevt.id <= ? ";
     private static final String COPY_ALL_EVENTS =
-        "INSERT INTO cloud_usage.usage_event (id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size) "
-            + "SELECT id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size FROM cloud.usage_event vmevt WHERE vmevt.id <= ?";
+            "INSERT INTO cloud_usage.usage_event (id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size) "
+                    + "SELECT id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size FROM cloud" +
+                    ".usage_event vmevt WHERE vmevt.id <= ?";
     private static final String COPY_EVENT_DETAILS = "INSERT INTO cloud_usage.usage_event_details (id, usage_event_id, name, value) "
             + "SELECT id, usage_event_id, name, value FROM cloud.usage_event_details vmevtDetails WHERE vmevtDetails.usage_event_id > ? and vmevtDetails.usage_event_id <= ? ";
     private static final String COPY_ALL_EVENT_DETAILS = "INSERT INTO cloud_usage.usage_event_details (id, usage_event_id, name, value) "
             + "SELECT id, usage_event_id, name, value FROM cloud.usage_event_details vmevtDetails WHERE vmevtDetails.usage_event_id <= ?";
     private static final String MAX_EVENT = "select max(id) from cloud.usage_event where created <= ?";
+    private final SearchBuilder<UsageEventVO> latestEventsSearch;
+    private final SearchBuilder<UsageEventVO> IpeventsSearch;
     @Inject
     protected UsageEventDetailsDao usageEventDetailsDao;
 
@@ -228,5 +228,4 @@ public class UsageEventDaoImpl extends GenericDaoBase<UsageEventVO, Long> implem
     public void saveDetails(long eventId, Map<String, String> details) {
         usageEventDetailsDao.persist(eventId, details);
     }
-
 }

@@ -24,7 +24,6 @@ import java.io.Serializable;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-@SuppressWarnings("serial")
 public abstract class AccessRule implements Serializable {
 
     public static final String ETHERTYPE_IPV4 = "IPv4";
@@ -34,12 +33,11 @@ public abstract class AccessRule implements Serializable {
 
     protected int protocol;
 
-
     public String getEthertype() {
         return ethertype;
     }
 
-    public void setEthertype(String ethertype) {
+    public void setEthertype(final String ethertype) {
         this.ethertype = ethertype;
     }
 
@@ -47,7 +45,7 @@ public abstract class AccessRule implements Serializable {
         return protocol;
     }
 
-    public void setProtocol(int protocol) {
+    public void setProtocol(final int protocol) {
         this.protocol = protocol;
     }
 

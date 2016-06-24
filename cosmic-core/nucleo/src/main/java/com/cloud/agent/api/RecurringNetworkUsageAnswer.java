@@ -31,5 +31,4 @@ public class RecurringNetworkUsageAnswer extends Answer {
     public RecurringNetworkUsageAnswer(Command command, Exception e) {
         super(command, e);
     }
-
 }

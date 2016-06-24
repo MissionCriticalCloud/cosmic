@@ -16,11 +16,6 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDaoBase;
@@ -28,9 +23,14 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
-
 import org.apache.cloudstack.framework.jobs.impl.AsyncJobVO;
 import org.apache.cloudstack.jobs.JobInfo;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +92,6 @@ public class AsyncJobDaoImpl extends GenericDaoBase<AsyncJobVO, Long> implements
         failureMsidAsyncJobSearch.and("status", failureMsidAsyncJobSearch.entity().getStatus(), SearchCriteria.Op.EQ);
         failureMsidAsyncJobSearch.and("job_cmd", failureMsidAsyncJobSearch.entity().getCmd(), Op.IN);
         failureMsidAsyncJobSearch.done();
-
     }
 
     @Override
@@ -153,7 +152,7 @@ public class AsyncJobDaoImpl extends GenericDaoBase<AsyncJobVO, Long> implements
     public List<AsyncJobVO> getExpiredJobs(Date cutTime, int limit) {
         SearchCriteria<AsyncJobVO> sc = expiringAsyncJobSearch.create();
         sc.setParameters("created", cutTime);
-        Filter filter = new Filter(AsyncJobVO.class, "created", true, 0L, (long)limit);
+        Filter filter = new Filter(AsyncJobVO.class, "created", true, 0L, (long) limit);
         return listIncludingRemovedBy(sc, filter);
     }
 
@@ -163,23 +162,15 @@ public class AsyncJobDaoImpl extends GenericDaoBase<AsyncJobVO, Long> implements
         sc.setParameters("jobDispatcher", AsyncJobVO.JOB_DISPATCHER_PSEUDO);
         sc.setParameters("created", cutTime);
         sc.setParameters("jobStatus", JobInfo.Status.IN_PROGRESS);
-        Filter filter = new Filter(AsyncJobVO.class, "created", true, 0L, (long)limit);
-        return listIncludingRemovedBy(sc, filter);
-    }
-
-    @Override
-    public List<AsyncJobVO> getExpiredCompletedJobs(Date cutTime, int limit) {
-        SearchCriteria<AsyncJobVO> sc = expiringCompletedAsyncJobSearch.create();
-        sc.setParameters("created", cutTime);
-        sc.setParameters("jobStatus", JobInfo.Status.IN_PROGRESS);
-        Filter filter = new Filter(AsyncJobVO.class, "created", true, 0L, (long)limit);
+        Filter filter = new Filter(AsyncJobVO.class, "created", true, 0L, (long) limit);
         return listIncludingRemovedBy(sc, filter);
     }
 
     @Override
     @DB
     public void resetJobProcess(long msid, int jobResultCode, String jobResultMessage) {
-        String sql = "UPDATE async_job SET job_status=?, job_result_code=?, job_result=? where job_status=? AND (job_executing_msid=? OR (job_executing_msid IS NULL AND job_init_msid=?))";
+        String sql = "UPDATE async_job SET job_status=?, job_result_code=?, job_result=? where job_status=? AND (job_executing_msid=? OR (job_executing_msid IS NULL AND " +
+                "job_init_msid=?))";
         TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         try {
@@ -199,6 +190,15 @@ public class AsyncJobDaoImpl extends GenericDaoBase<AsyncJobVO, Long> implements
     }
 
     @Override
+    public List<AsyncJobVO> getExpiredCompletedJobs(Date cutTime, int limit) {
+        SearchCriteria<AsyncJobVO> sc = expiringCompletedAsyncJobSearch.create();
+        sc.setParameters("created", cutTime);
+        sc.setParameters("jobStatus", JobInfo.Status.IN_PROGRESS);
+        Filter filter = new Filter(AsyncJobVO.class, "created", true, 0L, (long) limit);
+        return listIncludingRemovedBy(sc, filter);
+    }
+
+    @Override
     public List<AsyncJobVO> getResetJobs(long msid) {
         SearchCriteria<AsyncJobVO> sc = pendingAsyncJobSearch.create();
         sc.setParameters("status", JobInfo.Status.IN_PROGRESS);
@@ -215,7 +215,6 @@ public class AsyncJobDaoImpl extends GenericDaoBase<AsyncJobVO, Long> implements
 
         Filter filter = new Filter(AsyncJobVO.class, "created", true, null, null);
         return listIncludingRemovedBy(sc, filter);
-
     }
 
     @Override
@@ -223,7 +222,7 @@ public class AsyncJobDaoImpl extends GenericDaoBase<AsyncJobVO, Long> implements
         SearchCriteria<AsyncJobVO> sc = failureMsidAsyncJobSearch.create();
         sc.setParameters("initMsid", msId);
         sc.setParameters("status", AsyncJobVO.Status.FAILED);
-        sc.setParameters("job_cmd", (Object[])cmds);
+        sc.setParameters("job_cmd", (Object[]) cmds);
         return listBy(sc);
     }
 }

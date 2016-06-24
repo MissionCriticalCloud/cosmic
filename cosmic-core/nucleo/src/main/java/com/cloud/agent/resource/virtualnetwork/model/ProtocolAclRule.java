@@ -39,5 +39,4 @@ public class ProtocolAclRule extends AclRule {
     public void setProtocol(int protocol) {
         this.protocol = protocol;
     }
-
 }

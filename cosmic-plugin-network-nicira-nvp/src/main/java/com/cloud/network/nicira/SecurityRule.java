@@ -22,7 +22,6 @@ package com.cloud.network.nicira;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-@SuppressWarnings("serial")
 public class SecurityRule extends AccessRule {
 
     protected String ipPrefix;
@@ -32,7 +31,6 @@ public class SecurityRule extends AccessRule {
     protected int portRangeMax;
 
     protected String profileUuid;
-
 
     /**
      * Default constructor
@@ -44,7 +42,7 @@ public class SecurityRule extends AccessRule {
      * Fully parameterized constructor
      */
     public SecurityRule(final String ethertype, final String ipPrefix, final String profileUuid,
-            final int portRangeMin, final int portRangeMax, final int protocol) {
+                        final int portRangeMin, final int portRangeMax, final int protocol) {
         this.ethertype = ethertype;
         this.ipPrefix = ipPrefix;
         this.portRangeMin = portRangeMin;
@@ -61,6 +59,16 @@ public class SecurityRule extends AccessRule {
     @Override
     public void setEthertype(final String ethertype) {
         this.ethertype = ethertype;
+    }
+
+    @Override
+    public int getProtocol() {
+        return protocol;
+    }
+
+    @Override
+    public void setProtocol(final int protocol) {
+        this.protocol = protocol;
     }
 
     public String getIpPrefix() {
@@ -96,22 +104,12 @@ public class SecurityRule extends AccessRule {
     }
 
     @Override
-    public int getProtocol() {
-        return protocol;
-    }
-
-    @Override
-    public void setProtocol(final int protocol) {
-        this.protocol = protocol;
-    }
-
-    @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 31)
-            .append(ethertype).append(ipPrefix)
-            .append(portRangeMin).append(portRangeMax)
-            .append(profileUuid).append(protocol)
-            .toHashCode();
+                .append(ethertype).append(ipPrefix)
+                .append(portRangeMin).append(portRangeMax)
+                .append(profileUuid).append(protocol)
+                .toHashCode();
     }
 
     @Override

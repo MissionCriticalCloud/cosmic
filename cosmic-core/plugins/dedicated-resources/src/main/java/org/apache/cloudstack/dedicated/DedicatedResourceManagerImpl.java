@@ -16,14 +16,6 @@
 // under the License.
 package org.apache.cloudstack.dedicated;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.ejb.Local;
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.configuration.Config;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenterVO;
@@ -57,7 +49,6 @@ import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
-
 import org.apache.cloudstack.affinity.AffinityGroup;
 import org.apache.cloudstack.affinity.AffinityGroupService;
 import org.apache.cloudstack.affinity.dao.AffinityGroupDao;
@@ -79,6 +70,14 @@ import org.apache.cloudstack.api.response.DedicatePodResponse;
 import org.apache.cloudstack.api.response.DedicateZoneResponse;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.ejb.Local;
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -119,6 +118,224 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         capacityReleaseInterval = NumbersUtil.parseInt(_configDao.getValue(Config.CapacitySkipcountingHours.key()), 3600);
         return true;
+    }
+
+    @Override
+    public DedicatePodResponse createDedicatePodResponse(DedicatedResources resource) {
+        DedicatePodResponse dedicatePodResponse = new DedicatePodResponse();
+        HostPodVO pod = _podDao.findById(resource.getPodId());
+        DomainVO domain = _domainDao.findById(resource.getDomainId());
+        AccountVO account = _accountDao.findById(resource.getAccountId());
+        AffinityGroup group = _affinityGroupDao.findById(resource.getAffinityGroupId());
+        dedicatePodResponse.setId(resource.getUuid());
+        dedicatePodResponse.setPodId(pod.getUuid());
+        dedicatePodResponse.setPodName(pod.getName());
+        dedicatePodResponse.setDomainId(domain.getUuid());
+        dedicatePodResponse.setAffinityGroupId(group.getUuid());
+        if (account != null) {
+            dedicatePodResponse.setAccountId(account.getUuid());
+        }
+        dedicatePodResponse.setObjectName("dedicatedpod");
+        return dedicatePodResponse;
+    }
+
+    @Override
+    public DedicateClusterResponse createDedicateClusterResponse(DedicatedResources resource) {
+        DedicateClusterResponse dedicateClusterResponse = new DedicateClusterResponse();
+        ClusterVO cluster = _clusterDao.findById(resource.getClusterId());
+        DomainVO domain = _domainDao.findById(resource.getDomainId());
+        AccountVO account = _accountDao.findById(resource.getAccountId());
+        AffinityGroup group = _affinityGroupDao.findById(resource.getAffinityGroupId());
+        dedicateClusterResponse.setId(resource.getUuid());
+        dedicateClusterResponse.setClusterId(cluster.getUuid());
+        dedicateClusterResponse.setClusterName(cluster.getName());
+        dedicateClusterResponse.setDomainId(domain.getUuid());
+        dedicateClusterResponse.setAffinityGroupId(group.getUuid());
+        if (account != null) {
+            dedicateClusterResponse.setAccountId(account.getUuid());
+        }
+        dedicateClusterResponse.setObjectName("dedicatedcluster");
+        return dedicateClusterResponse;
+    }
+
+    @Override
+    public DedicateHostResponse createDedicateHostResponse(DedicatedResources resource) {
+        DedicateHostResponse dedicateHostResponse = new DedicateHostResponse();
+        HostVO host = _hostDao.findById(resource.getHostId());
+        DomainVO domain = _domainDao.findById(resource.getDomainId());
+        AccountVO account = _accountDao.findById(resource.getAccountId());
+        AffinityGroup group = _affinityGroupDao.findById(resource.getAffinityGroupId());
+        dedicateHostResponse.setId(resource.getUuid());
+        dedicateHostResponse.setHostId(host.getUuid());
+        dedicateHostResponse.setHostName(host.getName());
+        dedicateHostResponse.setDomainId(domain.getUuid());
+        dedicateHostResponse.setAffinityGroupId(group.getUuid());
+        if (account != null) {
+            dedicateHostResponse.setAccountId(account.getUuid());
+        }
+        dedicateHostResponse.setObjectName("dedicatedhost");
+        return dedicateHostResponse;
+    }
+
+    @Override
+    public Pair<List<? extends DedicatedResourceVO>, Integer> listDedicatedPods(ListDedicatedPodsCmd cmd) {
+        Long podId = cmd.getPodId();
+        Long domainId = cmd.getDomainId();
+        String accountName = cmd.getAccountName();
+        Long accountId = null;
+        Long affinityGroupId = cmd.getAffinityGroupId();
+
+        if (accountName != null) {
+            if (domainId != null) {
+                Account account = _accountDao.findActiveAccount(accountName, domainId);
+                if (account != null) {
+                    accountId = account.getId();
+                }
+            } else {
+                throw new InvalidParameterValueException("Please specify the domain id of the account: " + accountName);
+            }
+        }
+        Pair<List<DedicatedResourceVO>, Integer> result = _dedicatedDao.searchDedicatedPods(podId, domainId, accountId, affinityGroupId);
+        return new Pair<List<? extends DedicatedResourceVO>, Integer>(result.first(), result.second());
+    }
+
+    @Override
+    public Pair<List<? extends DedicatedResourceVO>, Integer> listDedicatedHosts(ListDedicatedHostsCmd cmd) {
+        Long hostId = cmd.getHostId();
+        Long domainId = cmd.getDomainId();
+        String accountName = cmd.getAccountName();
+        Long affinityGroupId = cmd.getAffinityGroupId();
+
+        Long accountId = null;
+        if (accountName != null) {
+            if (domainId != null) {
+                Account account = _accountDao.findActiveAccount(accountName, domainId);
+                if (account != null) {
+                    accountId = account.getId();
+                }
+            } else {
+                throw new InvalidParameterValueException("Please specify the domain id of the account: " + accountName);
+            }
+        }
+
+        Pair<List<DedicatedResourceVO>, Integer> result = _dedicatedDao.searchDedicatedHosts(hostId, domainId, accountId, affinityGroupId);
+        return new Pair<List<? extends DedicatedResourceVO>, Integer>(result.first(), result.second());
+    }
+
+    @Override
+    public Pair<List<? extends DedicatedResourceVO>, Integer> listDedicatedClusters(ListDedicatedClustersCmd cmd) {
+        Long clusterId = cmd.getClusterId();
+        Long domainId = cmd.getDomainId();
+        String accountName = cmd.getAccountName();
+        Long accountId = null;
+        Long affinityGroupId = cmd.getAffinityGroupId();
+
+        if (accountName != null) {
+            if (domainId != null) {
+                Account account = _accountDao.findActiveAccount(accountName, domainId);
+                if (account != null) {
+                    accountId = account.getId();
+                }
+            } else {
+                throw new InvalidParameterValueException("Please specify the domain id of the account: " + accountName);
+            }
+        }
+        Pair<List<DedicatedResourceVO>, Integer> result = _dedicatedDao.searchDedicatedClusters(clusterId, domainId, accountId, affinityGroupId);
+        return new Pair<List<? extends DedicatedResourceVO>, Integer>(result.first(), result.second());
+    }
+
+    @Override
+    @DB
+    @ActionEvent(eventType = EventTypes.EVENT_DEDICATE_RESOURCE_RELEASE, eventDescription = "Releasing dedicated resource")
+    public boolean releaseDedicatedResource(final Long zoneId, Long podId, Long clusterId, Long hostId) throws InvalidParameterValueException {
+        DedicatedResourceVO resource = null;
+        if (zoneId != null) {
+            resource = _dedicatedDao.findByZoneId(zoneId);
+        }
+        if (podId != null) {
+            resource = _dedicatedDao.findByPodId(podId);
+        }
+        if (clusterId != null) {
+            resource = _dedicatedDao.findByClusterId(clusterId);
+        }
+        if (hostId != null) {
+            resource = _dedicatedDao.findByHostId(hostId);
+        }
+        if (resource == null) {
+            throw new InvalidParameterValueException("No Dedicated Resource available to release");
+        } else {
+            final DedicatedResourceVO resourceFinal = resource;
+            Transaction.execute(new TransactionCallbackNoReturn() {
+                @Override
+                public void doInTransactionWithoutResult(TransactionStatus status) {
+                    Long resourceId = resourceFinal.getId();
+                    if (!_dedicatedDao.remove(resourceId)) {
+                        throw new CloudRuntimeException("Failed to delete Resource " + resourceId);
+                    }
+                    if (zoneId != null) {
+                        // remove the domainId set in zone
+                        DataCenterVO dc = _zoneDao.findById(zoneId);
+                        if (dc != null) {
+                            dc.setDomainId(null);
+                            dc.setDomain(null);
+                            if (!_zoneDao.update(zoneId, dc)) {
+                                throw new CloudRuntimeException("Failed to release dedicated zone, could not clear domainId. Please contact Cloud Support.");
+                            }
+                        }
+                    }
+                }
+            });
+
+            // find the group associated and check if there are any more
+            // resources under that group
+            List<DedicatedResourceVO> resourcesInGroup = _dedicatedDao.listByAffinityGroupId(resource.getAffinityGroupId());
+            if (resourcesInGroup.isEmpty()) {
+                // delete the group
+                _affinityGroupService.deleteAffinityGroup(resource.getAffinityGroupId(), null, null, null, null);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public DedicateZoneResponse createDedicateZoneResponse(DedicatedResources resource) {
+        DedicateZoneResponse dedicateZoneResponse = new DedicateZoneResponse();
+        DataCenterVO dc = _zoneDao.findById(resource.getDataCenterId());
+        DomainVO domain = _domainDao.findById(resource.getDomainId());
+        AccountVO account = _accountDao.findById(resource.getAccountId());
+        AffinityGroup group = _affinityGroupDao.findById(resource.getAffinityGroupId());
+        dedicateZoneResponse.setId(resource.getUuid());
+        dedicateZoneResponse.setZoneId(dc.getUuid());
+        dedicateZoneResponse.setZoneName(dc.getName());
+        dedicateZoneResponse.setDomainId(domain.getUuid());
+        dedicateZoneResponse.setAffinityGroupId(group.getUuid());
+        if (account != null) {
+            dedicateZoneResponse.setAccountId(account.getUuid());
+        }
+        dedicateZoneResponse.setObjectName("dedicatedzone");
+        return dedicateZoneResponse;
+    }
+
+    @Override
+    public Pair<List<? extends DedicatedResourceVO>, Integer> listDedicatedZones(ListDedicatedZonesCmd cmd) {
+        Long zoneId = cmd.getZoneId();
+        Long domainId = cmd.getDomainId();
+        String accountName = cmd.getAccountName();
+        Long accountId = null;
+        Long affinityGroupId = cmd.getAffinityGroupId();
+
+        if (accountName != null) {
+            if (domainId != null) {
+                Account account = _accountDao.findActiveAccount(accountName, domainId);
+                if (account != null) {
+                    accountId = account.getId();
+                }
+            } else {
+                throw new InvalidParameterValueException("Please specify the domain id of the account: " + accountName);
+            }
+        }
+        Pair<List<DedicatedResourceVO>, Integer> result = _dedicatedDao.searchDedicatedZones(zoneId, domainId, accountId, affinityGroupId);
+        return new Pair<List<? extends DedicatedResourceVO>, Integer>(result.first(), result.second());
     }
 
     @Override
@@ -189,7 +406,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                         } else {
                             s_logger.error("Cluster " + cluster.getName() + " under this Zone " + dc.getName() + " is dedicated to different account/domain");
                             throw new CloudRuntimeException("Cluster " + cluster.getName() + " under this Zone " + dc.getName() +
-                                " is dedicated to different account/domain");
+                                    " is dedicated to different account/domain");
                         }
                     } else {
                         if (dCluster.getAccountId() == null && dCluster.getDomainId().equals(domainId)) {
@@ -256,7 +473,6 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                     if (!_zoneDao.update(zoneId, dc)) {
                         throw new CloudRuntimeException("Failed to dedicate zone, could not set domainId. Please contact Cloud Support.");
                     }
-
                 } catch (Exception e) {
                     s_logger.error("Unable to dedicate zone due to " + e.getMessage(), e);
                     throw new CloudRuntimeException("Failed to dedicate zone. Please contact Cloud Support.");
@@ -265,7 +481,6 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 List<DedicatedResourceVO> result = new ArrayList<DedicatedResourceVO>();
                 result.add(dedicatedResource);
                 return result;
-
             }
         });
     }
@@ -300,7 +515,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 boolean domainIdInChildreanList = getDomainChildIds(dedicatedZoneOfPod.getDomainId()).contains(domainId);
                 //can dedicate a pod to an account/domain if zone is dedicated to parent-domain
                 if (dedicatedZoneOfPod.getAccountId() != null || (accountId == null && !domainIdInChildreanList) ||
-                    (accountId != null && !(dedicatedZoneOfPod.getDomainId().equals(domainId) || domainIdInChildreanList))) {
+                        (accountId != null && !(dedicatedZoneOfPod.getDomainId().equals(domainId) || domainIdInChildreanList))) {
                     DataCenterVO zone = _zoneDao.findById(pod.getDataCenterId());
                     s_logger.error("Cannot dedicate Pod. Its zone is already dedicated");
                     throw new CloudRuntimeException("Pod's Zone " + zone.getName() + " is already dedicated");
@@ -325,7 +540,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                         } else {
                             s_logger.error("Cluster " + cluster.getName() + " under this Pod " + pod.getName() + " is dedicated to different account/domain");
                             throw new CloudRuntimeException("Cluster " + cluster.getName() + " under this Pod " + pod.getName() +
-                                " is dedicated to different account/domain");
+                                    " is dedicated to different account/domain");
                         }
                     } else {
                         if (dCluster.getAccountId() == null && dCluster.getDomainId().equals(domainId)) {
@@ -429,7 +644,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 boolean domainIdInChildreanList = getDomainChildIds(dedicatedPodOfCluster.getDomainId()).contains(domainId);
                 //can dedicate a cluster to an account/domain if pod is dedicated to parent-domain
                 if (dedicatedPodOfCluster.getAccountId() != null || (accountId == null && !domainIdInChildreanList) ||
-                    (accountId != null && !(dedicatedPodOfCluster.getDomainId().equals(domainId) || domainIdInChildreanList))) {
+                        (accountId != null && !(dedicatedPodOfCluster.getDomainId().equals(domainId) || domainIdInChildreanList))) {
                     s_logger.error("Cannot dedicate Cluster. Its Pod is already dedicated");
                     HostPodVO pod = _podDao.findById(cluster.getPodId());
                     throw new CloudRuntimeException("Cluster's Pod " + pod.getName() + " is already dedicated");
@@ -440,7 +655,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 boolean domainIdInChildreanList = getDomainChildIds(dedicatedZoneOfCluster.getDomainId()).contains(domainId);
                 //can dedicate a cluster to an account/domain if zone is dedicated to parent-domain
                 if (dedicatedZoneOfCluster.getAccountId() != null || (accountId == null && !domainIdInChildreanList) ||
-                    (accountId != null && !(dedicatedZoneOfCluster.getDomainId().equals(domainId) || domainIdInChildreanList))) {
+                        (accountId != null && !(dedicatedZoneOfCluster.getDomainId().equals(domainId) || domainIdInChildreanList))) {
                     s_logger.error("Cannot dedicate Cluster. Its zone is already dedicated");
                     DataCenterVO zone = _zoneDao.findById(cluster.getDataCenterId());
                     throw new CloudRuntimeException("Cluster's Zone " + zone.getName() + " is already dedicated");
@@ -455,7 +670,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 if (dHost != null) {
                     if (!(childDomainIds.contains(dHost.getDomainId()))) {
                         throw new CloudRuntimeException("Host " + host.getName() + " under this Cluster " + cluster.getName() +
-                            " is dedicated to different account/domain");
+                                " is dedicated to different account/domain");
                     }
                     /*if all dedicated resources belongs to same account and domain then we should release dedication
                     and make new entry for this cluster */
@@ -544,7 +759,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 boolean domainIdInChildreanList = getDomainChildIds(dedicatedClusterOfHost.getDomainId()).contains(domainId);
                 //can dedicate a host to an account/domain if cluster is dedicated to parent-domain
                 if (dedicatedClusterOfHost.getAccountId() != null || (accountId == null && !domainIdInChildreanList) ||
-                    (accountId != null && !(dedicatedClusterOfHost.getDomainId().equals(domainId) || domainIdInChildreanList))) {
+                        (accountId != null && !(dedicatedClusterOfHost.getDomainId().equals(domainId) || domainIdInChildreanList))) {
                     ClusterVO cluster = _clusterDao.findById(host.getClusterId());
                     s_logger.error("Host's Cluster " + cluster.getName() + " is already dedicated");
                     throw new CloudRuntimeException("Host's Cluster " + cluster.getName() + " is already dedicated");
@@ -555,7 +770,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 boolean domainIdInChildreanList = getDomainChildIds(dedicatedPodOfHost.getDomainId()).contains(domainId);
                 //can dedicate a host to an account/domain if pod is dedicated to parent-domain
                 if (dedicatedPodOfHost.getAccountId() != null || (accountId == null && !domainIdInChildreanList) ||
-                    (accountId != null && !(dedicatedPodOfHost.getDomainId().equals(domainId) || domainIdInChildreanList))) {
+                        (accountId != null && !(dedicatedPodOfHost.getDomainId().equals(domainId) || domainIdInChildreanList))) {
                     HostPodVO pod = _podDao.findById(host.getPodId());
                     s_logger.error("Host's Pod " + pod.getName() + " is already dedicated");
                     throw new CloudRuntimeException("Host's Pod " + pod.getName() + " is already dedicated");
@@ -566,7 +781,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 boolean domainIdInChildreanList = getDomainChildIds(dedicatedZoneOfHost.getDomainId()).contains(domainId);
                 //can dedicate a host to an account/domain if zone is dedicated to parent-domain
                 if (dedicatedZoneOfHost.getAccountId() != null || (accountId == null && !domainIdInChildreanList) ||
-                    (accountId != null && !(dedicatedZoneOfHost.getDomainId().equals(domainId) || domainIdInChildreanList))) {
+                        (accountId != null && !(dedicatedZoneOfHost.getDomainId().equals(domainId) || domainIdInChildreanList))) {
                     DataCenterVO zone = _zoneDao.findById(host.getDataCenterId());
                     s_logger.error("Host's Data Center " + zone.getName() + " is already dedicated");
                     throw new CloudRuntimeException("Host's Data Center " + zone.getName() + " is already dedicated");
@@ -605,7 +820,40 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 return result;
             }
         });
+    }
 
+    private List<Long> getDomainChildIds(long domainId) {
+        DomainVO domainRecord = _domainDao.findById(domainId);
+        List<Long> domainIds = new ArrayList<Long>();
+        domainIds.add(domainRecord.getId());
+        // find all domain Ids till leaf
+        List<DomainVO> allChildDomains = _domainDao.findAllChildren(domainRecord.getPath(), domainRecord.getId());
+        for (DomainVO domain : allChildDomains) {
+            domainIds.add(domain.getId());
+        }
+        return domainIds;
+    }
+
+    private void checkAccountAndDomain(Long accountId, Long domainId) {
+        DomainVO domain = _domainDao.findById(domainId);
+        if (domain == null) {
+            throw new InvalidParameterValueException("Unable to find the domain by id " + domainId + ", please specify valid domainId");
+        }
+        //check if account belongs to the domain id
+        if (accountId != null) {
+            AccountVO account = _accountDao.findById(accountId);
+            if (account == null || domainId != account.getDomainId()) {
+                throw new InvalidParameterValueException("Please specify the domain id of the account id " + accountId);
+            }
+        }
+    }
+
+    private boolean checkHostsSuitabilityForExplicitDedication(Long accountId, List<Long> domainIds, List<HostVO> hosts) {
+        boolean suitable = true;
+        for (HostVO host : hosts) {
+            checkHostSuitabilityForExplicitDedication(accountId, domainIds, host.getId());
+        }
+        return suitable;
     }
 
     private AffinityGroup findOrCreateDedicatedAffinityGroup(Long domainId, Long accountId) {
@@ -627,7 +875,6 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
             }
             // default to a groupname with account/domain information
             affinityGroupName = "DedicatedGrp-" + accountName;
-
         } else {
             // domain level group
             group = _affinityGroupDao.findDomainLevelGroupByType(domainId, "ExplicitDedication");
@@ -642,7 +889,29 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
         group = _affinityGroupService.createAffinityGroup(accountName, null, domainId, affinityGroupName, "ExplicitDedication", "dedicated resources group");
 
         return group;
+    }
 
+    private boolean checkHostSuitabilityForExplicitDedication(Long accountId, List<Long> domainIds, long hostId) {
+        boolean suitable = true;
+        List<UserVmVO> allVmsOnHost = getVmsOnHost(hostId);
+        if (accountId != null) {
+            for (UserVmVO vm : allVmsOnHost) {
+                if (vm.getAccountId() != accountId) {
+                    s_logger.info("Host " + vm.getHostId() + " found to be unsuitable for explicit dedication as it is " + "running instances of another account");
+                    throw new CloudRuntimeException("Host " + hostId + " found to be unsuitable for explicit dedication as it is " +
+                            "running instances of another account");
+                }
+            }
+        } else {
+            for (UserVmVO vm : allVmsOnHost) {
+                if (!domainIds.contains(vm.getDomainId())) {
+                    s_logger.info("Host " + vm.getHostId() + " found to be unsuitable for explicit dedication as it is " + "running instances of another domain");
+                    throw new CloudRuntimeException("Host " + hostId + " found to be unsuitable for explicit dedication as it is " +
+                            "running instances of another domain");
+                }
+            }
+        }
+        return suitable;
     }
 
     private List<UserVmVO> getVmsOnHost(long hostId) {
@@ -661,139 +930,6 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
         return vms;
     }
 
-    private boolean checkHostSuitabilityForExplicitDedication(Long accountId, List<Long> domainIds, long hostId) {
-        boolean suitable = true;
-        List<UserVmVO> allVmsOnHost = getVmsOnHost(hostId);
-        if (accountId != null) {
-            for (UserVmVO vm : allVmsOnHost) {
-                if (vm.getAccountId() != accountId) {
-                    s_logger.info("Host " + vm.getHostId() + " found to be unsuitable for explicit dedication as it is " + "running instances of another account");
-                    throw new CloudRuntimeException("Host " + hostId + " found to be unsuitable for explicit dedication as it is " +
-                        "running instances of another account");
-                }
-            }
-        } else {
-            for (UserVmVO vm : allVmsOnHost) {
-                if (!domainIds.contains(vm.getDomainId())) {
-                    s_logger.info("Host " + vm.getHostId() + " found to be unsuitable for explicit dedication as it is " + "running instances of another domain");
-                    throw new CloudRuntimeException("Host " + hostId + " found to be unsuitable for explicit dedication as it is " +
-                        "running instances of another domain");
-                }
-            }
-        }
-        return suitable;
-    }
-
-    private boolean checkHostsSuitabilityForExplicitDedication(Long accountId, List<Long> domainIds, List<HostVO> hosts) {
-        boolean suitable = true;
-        for (HostVO host : hosts) {
-            checkHostSuitabilityForExplicitDedication(accountId, domainIds, host.getId());
-        }
-        return suitable;
-    }
-
-    private void checkAccountAndDomain(Long accountId, Long domainId) {
-        DomainVO domain = _domainDao.findById(domainId);
-        if (domain == null) {
-            throw new InvalidParameterValueException("Unable to find the domain by id " + domainId + ", please specify valid domainId");
-        }
-        //check if account belongs to the domain id
-        if (accountId != null) {
-            AccountVO account = _accountDao.findById(accountId);
-            if (account == null || domainId != account.getDomainId()) {
-                throw new InvalidParameterValueException("Please specify the domain id of the account id " + accountId);
-            }
-        }
-    }
-
-    private List<Long> getDomainChildIds(long domainId) {
-        DomainVO domainRecord = _domainDao.findById(domainId);
-        List<Long> domainIds = new ArrayList<Long>();
-        domainIds.add(domainRecord.getId());
-        // find all domain Ids till leaf
-        List<DomainVO> allChildDomains = _domainDao.findAllChildren(domainRecord.getPath(), domainRecord.getId());
-        for (DomainVO domain : allChildDomains) {
-            domainIds.add(domain.getId());
-        }
-        return domainIds;
-    }
-
-    @Override
-    public DedicateZoneResponse createDedicateZoneResponse(DedicatedResources resource) {
-        DedicateZoneResponse dedicateZoneResponse = new DedicateZoneResponse();
-        DataCenterVO dc = _zoneDao.findById(resource.getDataCenterId());
-        DomainVO domain = _domainDao.findById(resource.getDomainId());
-        AccountVO account = _accountDao.findById(resource.getAccountId());
-        AffinityGroup group = _affinityGroupDao.findById(resource.getAffinityGroupId());
-        dedicateZoneResponse.setId(resource.getUuid());
-        dedicateZoneResponse.setZoneId(dc.getUuid());
-        dedicateZoneResponse.setZoneName(dc.getName());
-        dedicateZoneResponse.setDomainId(domain.getUuid());
-        dedicateZoneResponse.setAffinityGroupId(group.getUuid());
-        if (account != null) {
-            dedicateZoneResponse.setAccountId(account.getUuid());
-        }
-        dedicateZoneResponse.setObjectName("dedicatedzone");
-        return dedicateZoneResponse;
-    }
-
-    @Override
-    public DedicatePodResponse createDedicatePodResponse(DedicatedResources resource) {
-        DedicatePodResponse dedicatePodResponse = new DedicatePodResponse();
-        HostPodVO pod = _podDao.findById(resource.getPodId());
-        DomainVO domain = _domainDao.findById(resource.getDomainId());
-        AccountVO account = _accountDao.findById(resource.getAccountId());
-        AffinityGroup group = _affinityGroupDao.findById(resource.getAffinityGroupId());
-        dedicatePodResponse.setId(resource.getUuid());
-        dedicatePodResponse.setPodId(pod.getUuid());
-        dedicatePodResponse.setPodName(pod.getName());
-        dedicatePodResponse.setDomainId(domain.getUuid());
-        dedicatePodResponse.setAffinityGroupId(group.getUuid());
-        if (account != null) {
-            dedicatePodResponse.setAccountId(account.getUuid());
-        }
-        dedicatePodResponse.setObjectName("dedicatedpod");
-        return dedicatePodResponse;
-    }
-
-    @Override
-    public DedicateClusterResponse createDedicateClusterResponse(DedicatedResources resource) {
-        DedicateClusterResponse dedicateClusterResponse = new DedicateClusterResponse();
-        ClusterVO cluster = _clusterDao.findById(resource.getClusterId());
-        DomainVO domain = _domainDao.findById(resource.getDomainId());
-        AccountVO account = _accountDao.findById(resource.getAccountId());
-        AffinityGroup group = _affinityGroupDao.findById(resource.getAffinityGroupId());
-        dedicateClusterResponse.setId(resource.getUuid());
-        dedicateClusterResponse.setClusterId(cluster.getUuid());
-        dedicateClusterResponse.setClusterName(cluster.getName());
-        dedicateClusterResponse.setDomainId(domain.getUuid());
-        dedicateClusterResponse.setAffinityGroupId(group.getUuid());
-        if (account != null) {
-            dedicateClusterResponse.setAccountId(account.getUuid());
-        }
-        dedicateClusterResponse.setObjectName("dedicatedcluster");
-        return dedicateClusterResponse;
-    }
-
-    @Override
-    public DedicateHostResponse createDedicateHostResponse(DedicatedResources resource) {
-        DedicateHostResponse dedicateHostResponse = new DedicateHostResponse();
-        HostVO host = _hostDao.findById(resource.getHostId());
-        DomainVO domain = _domainDao.findById(resource.getDomainId());
-        AccountVO account = _accountDao.findById(resource.getAccountId());
-        AffinityGroup group = _affinityGroupDao.findById(resource.getAffinityGroupId());
-        dedicateHostResponse.setId(resource.getUuid());
-        dedicateHostResponse.setHostId(host.getUuid());
-        dedicateHostResponse.setHostName(host.getName());
-        dedicateHostResponse.setDomainId(domain.getUuid());
-        dedicateHostResponse.setAffinityGroupId(group.getUuid());
-        if (account != null) {
-            dedicateHostResponse.setAccountId(account.getUuid());
-        }
-        dedicateHostResponse.setObjectName("dedicatedhost");
-        return dedicateHostResponse;
-    }
-
     @Override
     public List<Class<?>> getCommands() {
         List<Class<?>> cmdList = new ArrayList<Class<?>>();
@@ -810,148 +946,5 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
         cmdList.add(ReleaseDedicatedPodCmd.class);
         cmdList.add(ReleaseDedicatedZoneCmd.class);
         return cmdList;
-    }
-
-    @Override
-    public Pair<List<? extends DedicatedResourceVO>, Integer> listDedicatedZones(ListDedicatedZonesCmd cmd) {
-        Long zoneId = cmd.getZoneId();
-        Long domainId = cmd.getDomainId();
-        String accountName = cmd.getAccountName();
-        Long accountId = null;
-        Long affinityGroupId = cmd.getAffinityGroupId();
-
-        if (accountName != null) {
-            if (domainId != null) {
-                Account account = _accountDao.findActiveAccount(accountName, domainId);
-                if (account != null) {
-                    accountId = account.getId();
-                }
-            } else {
-                throw new InvalidParameterValueException("Please specify the domain id of the account: " + accountName);
-            }
-        }
-        Pair<List<DedicatedResourceVO>, Integer> result = _dedicatedDao.searchDedicatedZones(zoneId, domainId, accountId, affinityGroupId);
-        return new Pair<List<? extends DedicatedResourceVO>, Integer>(result.first(), result.second());
-    }
-
-    @Override
-    public Pair<List<? extends DedicatedResourceVO>, Integer> listDedicatedPods(ListDedicatedPodsCmd cmd) {
-        Long podId = cmd.getPodId();
-        Long domainId = cmd.getDomainId();
-        String accountName = cmd.getAccountName();
-        Long accountId = null;
-        Long affinityGroupId = cmd.getAffinityGroupId();
-
-        if (accountName != null) {
-            if (domainId != null) {
-                Account account = _accountDao.findActiveAccount(accountName, domainId);
-                if (account != null) {
-                    accountId = account.getId();
-                }
-            } else {
-                throw new InvalidParameterValueException("Please specify the domain id of the account: " + accountName);
-            }
-        }
-        Pair<List<DedicatedResourceVO>, Integer> result = _dedicatedDao.searchDedicatedPods(podId, domainId, accountId, affinityGroupId);
-        return new Pair<List<? extends DedicatedResourceVO>, Integer>(result.first(), result.second());
-    }
-
-    @Override
-    public Pair<List<? extends DedicatedResourceVO>, Integer> listDedicatedClusters(ListDedicatedClustersCmd cmd) {
-        Long clusterId = cmd.getClusterId();
-        Long domainId = cmd.getDomainId();
-        String accountName = cmd.getAccountName();
-        Long accountId = null;
-        Long affinityGroupId = cmd.getAffinityGroupId();
-
-        if (accountName != null) {
-            if (domainId != null) {
-                Account account = _accountDao.findActiveAccount(accountName, domainId);
-                if (account != null) {
-                    accountId = account.getId();
-                }
-            } else {
-                throw new InvalidParameterValueException("Please specify the domain id of the account: " + accountName);
-            }
-        }
-        Pair<List<DedicatedResourceVO>, Integer> result = _dedicatedDao.searchDedicatedClusters(clusterId, domainId, accountId, affinityGroupId);
-        return new Pair<List<? extends DedicatedResourceVO>, Integer>(result.first(), result.second());
-    }
-
-    @Override
-    public Pair<List<? extends DedicatedResourceVO>, Integer> listDedicatedHosts(ListDedicatedHostsCmd cmd) {
-        Long hostId = cmd.getHostId();
-        Long domainId = cmd.getDomainId();
-        String accountName = cmd.getAccountName();
-        Long affinityGroupId = cmd.getAffinityGroupId();
-
-        Long accountId = null;
-        if (accountName != null) {
-            if (domainId != null) {
-                Account account = _accountDao.findActiveAccount(accountName, domainId);
-                if (account != null) {
-                    accountId = account.getId();
-                }
-            } else {
-                throw new InvalidParameterValueException("Please specify the domain id of the account: " + accountName);
-            }
-        }
-
-        Pair<List<DedicatedResourceVO>, Integer> result = _dedicatedDao.searchDedicatedHosts(hostId, domainId, accountId, affinityGroupId);
-        return new Pair<List<? extends DedicatedResourceVO>, Integer>(result.first(), result.second());
-    }
-
-    @Override
-    @DB
-    @ActionEvent(eventType = EventTypes.EVENT_DEDICATE_RESOURCE_RELEASE, eventDescription = "Releasing dedicated resource")
-    public boolean releaseDedicatedResource(final Long zoneId, Long podId, Long clusterId, Long hostId) throws InvalidParameterValueException {
-        DedicatedResourceVO resource = null;
-        if (zoneId != null) {
-            resource = _dedicatedDao.findByZoneId(zoneId);
-        }
-        if (podId != null) {
-            resource = _dedicatedDao.findByPodId(podId);
-        }
-        if (clusterId != null) {
-            resource = _dedicatedDao.findByClusterId(clusterId);
-        }
-        if (hostId != null) {
-            resource = _dedicatedDao.findByHostId(hostId);
-        }
-        if (resource == null) {
-            throw new InvalidParameterValueException("No Dedicated Resource available to release");
-        } else {
-            final DedicatedResourceVO resourceFinal = resource;
-            Transaction.execute(new TransactionCallbackNoReturn() {
-                @Override
-                public void doInTransactionWithoutResult(TransactionStatus status) {
-                    Long resourceId = resourceFinal.getId();
-                    if (!_dedicatedDao.remove(resourceId)) {
-                        throw new CloudRuntimeException("Failed to delete Resource " + resourceId);
-                    }
-                    if (zoneId != null) {
-                        // remove the domainId set in zone
-                        DataCenterVO dc = _zoneDao.findById(zoneId);
-                        if (dc != null) {
-                            dc.setDomainId(null);
-                            dc.setDomain(null);
-                            if (!_zoneDao.update(zoneId, dc)) {
-                                throw new CloudRuntimeException("Failed to release dedicated zone, could not clear domainId. Please contact Cloud Support.");
-                            }
-                        }
-                    }
-                }
-            });
-
-            // find the group associated and check if there are any more
-            // resources under that group
-            List<DedicatedResourceVO> resourcesInGroup = _dedicatedDao.listByAffinityGroupId(resource.getAffinityGroupId());
-            if (resourcesInGroup.isEmpty()) {
-                // delete the group
-                _affinityGroupService.deleteAffinityGroup(resource.getAffinityGroupId(), null, null, null, null);
-            }
-
-        }
-        return true;
     }
 }

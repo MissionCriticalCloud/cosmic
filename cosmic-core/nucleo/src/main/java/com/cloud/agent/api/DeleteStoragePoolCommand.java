@@ -19,12 +19,12 @@
 
 package com.cloud.agent.api;
 
+import com.cloud.agent.api.to.StorageFilerTO;
+import com.cloud.storage.StoragePool;
+
 import java.io.File;
 import java.util.Map;
 import java.util.UUID;
-
-import com.cloud.agent.api.to.StorageFilerTO;
-import com.cloud.storage.StoragePool;
 
 public class DeleteStoragePoolCommand extends Command {
     public static final String DATASTORE_NAME = "datastoreName";
@@ -43,41 +43,41 @@ public class DeleteStoragePoolCommand extends Command {
 
     }
 
-    public DeleteStoragePoolCommand(StoragePool pool, String localPath) {
-        _pool = new StorageFilerTO(pool);
-        _localPath = localPath;
-    }
-
     public DeleteStoragePoolCommand(StoragePool pool) {
         this(pool, LOCAL_PATH_PREFIX + File.separator + UUID.nameUUIDFromBytes((pool.getHostAddress() + pool.getPath()).getBytes()));
     }
 
-    public void setPool(StoragePool pool) {
+    public DeleteStoragePoolCommand(StoragePool pool, String localPath) {
         _pool = new StorageFilerTO(pool);
+        _localPath = localPath;
     }
 
     public StorageFilerTO getPool() {
         return _pool;
     }
 
-    public String getLocalPath() {
-        return _localPath;
+    public void setPool(StoragePool pool) {
+        _pool = new StorageFilerTO(pool);
     }
 
-    public void setRemoveDatastore(boolean removeDatastore) {
-        _removeDatastore = removeDatastore;
+    public String getLocalPath() {
+        return _localPath;
     }
 
     public boolean getRemoveDatastore() {
         return _removeDatastore;
     }
 
-    public void setDetails(Map<String, String> details) {
-        _details = details;
+    public void setRemoveDatastore(boolean removeDatastore) {
+        _removeDatastore = removeDatastore;
     }
 
     public Map<String, String> getDetails() {
         return _details;
+    }
+
+    public void setDetails(Map<String, String> details) {
+        _details = details;
     }
 
     @Override

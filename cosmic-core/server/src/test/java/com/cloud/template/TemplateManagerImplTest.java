@@ -27,20 +27,6 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.api.query.dao.UserVmJoinDao;
 import com.cloud.configuration.Resource;
@@ -82,7 +68,6 @@ import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.api.command.user.template.CreateTemplateCmd;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.VolumeOrchestrationService;
@@ -104,6 +89,20 @@ import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
 import org.apache.cloudstack.test.utils.SpringUtils;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -161,31 +160,6 @@ public class TemplateManagerImplTest {
 
     @Inject
     SnapshotDao snapshotDao;
-
-    public class CustomThreadPoolExecutor extends ThreadPoolExecutor {
-        AtomicInteger ai = new AtomicInteger(0);
-        public CustomThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
-                                        BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory) {
-            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
-        }
-
-        @Override
-        protected void beforeExecute(Thread t, Runnable r) {
-            ai.addAndGet(1);
-        }
-
-        public int getCount() {
-            try {
-                // Wait for some time to give before execute to run. Otherwise the tests that
-                // assert and check that template seeding has been scheduled may fail. If tests
-                // are seen to fail, consider increasing the sleep time.
-                Thread.sleep(1000);
-                return ai.get();
-            } catch (Exception e) {
-                return -1;
-            }
-        }
-    }
 
     @Before
     public void setUp() {
@@ -309,7 +283,7 @@ public class TemplateManagerImplTest {
         templateManager._preloadExecutor = preloadExecutor;
 
         templateManager.prepareTemplate(202, 1, 2l);
-        assertTrue("Test template is scheduled for seeding to on pool", ((CustomThreadPoolExecutor)preloadExecutor).getCount() == 1);
+        assertTrue("Test template is scheduled for seeding to on pool", ((CustomThreadPoolExecutor) preloadExecutor).getCount() == 1);
     }
 
     @Test
@@ -338,7 +312,7 @@ public class TemplateManagerImplTest {
         templateManager._preloadExecutor = preloadExecutor;
 
         templateManager.prepareTemplate(202, 1, 2l);
-        assertTrue("Test template is not scheduled for seeding on disabled pool", ((CustomThreadPoolExecutor)preloadExecutor).getCount() == 0);
+        assertTrue("Test template is not scheduled for seeding on disabled pool", ((CustomThreadPoolExecutor) preloadExecutor).getCount() == 0);
     }
 
     @Test
@@ -430,7 +404,7 @@ public class TemplateManagerImplTest {
             @Override
             public VMTemplateVO answer(InvocationOnMock invocationOnMock) throws Throwable {
                 Object[] args = invocationOnMock.getArguments();
-                return (VMTemplateVO)args[0];
+                return (VMTemplateVO) args[0];
             }
         });
 
@@ -629,6 +603,32 @@ public class TemplateManagerImplTest {
             public boolean match(MetadataReader mdr, MetadataReaderFactory arg1) throws IOException {
                 ComponentScan cs = TestConfiguration.class.getAnnotation(ComponentScan.class);
                 return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);
+            }
+        }
+    }
+
+    public class CustomThreadPoolExecutor extends ThreadPoolExecutor {
+        AtomicInteger ai = new AtomicInteger(0);
+
+        public CustomThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
+                                        BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory) {
+            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
+        }
+
+        @Override
+        protected void beforeExecute(Thread t, Runnable r) {
+            ai.addAndGet(1);
+        }
+
+        public int getCount() {
+            try {
+                // Wait for some time to give before execute to run. Otherwise the tests that
+                // assert and check that template seeding has been scheduled may fail. If tests
+                // are seen to fail, consider increasing the sleep time.
+                Thread.sleep(1000);
+                return ai.get();
+            } catch (Exception e) {
+                return -1;
             }
         }
     }

@@ -38,11 +38,11 @@ public class NioConnectionException extends Exception {
         super(msg);
     }
 
-    public void setCSErrorCode(final int cserrcode) {
-        csErrorCode = cserrcode;
-    }
-
     public int getCSErrorCode() {
         return csErrorCode;
+    }
+
+    public void setCSErrorCode(final int cserrcode) {
+        csErrorCode = cserrcode;
     }
 }

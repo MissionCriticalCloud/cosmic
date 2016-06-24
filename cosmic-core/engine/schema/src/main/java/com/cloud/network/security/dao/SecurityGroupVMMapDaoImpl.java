@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.network.security.dao;
 
-import java.util.List;
-
 import com.cloud.network.security.SecurityGroupVMMapVO;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.Filter;
@@ -28,15 +26,16 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.vm.VirtualMachine.State;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class SecurityGroupVMMapDaoImpl extends GenericDaoBase<SecurityGroupVMMapVO, Long> implements SecurityGroupVMMapDao {
+    protected GenericSearchBuilder<SecurityGroupVMMapVO, Long> CountSGForVm;
     private SearchBuilder<SecurityGroupVMMapVO> ListByIpAndVmId;
     private SearchBuilder<SecurityGroupVMMapVO> ListByVmId;
     private SearchBuilder<SecurityGroupVMMapVO> ListByVmIdGroupId;
-    protected GenericSearchBuilder<SecurityGroupVMMapVO, Long> CountSGForVm;
-
     private GenericSearchBuilder<SecurityGroupVMMapVO, Long> ListVmIdBySecurityGroup;
 
     private SearchBuilder<SecurityGroupVMMapVO> ListByIp;
@@ -91,20 +90,6 @@ public class SecurityGroupVMMapDaoImpl extends GenericDaoBase<SecurityGroupVMMap
     }
 
     @Override
-    public List<SecurityGroupVMMapVO> listBySecurityGroup(long securityGroupId) {
-        SearchCriteria<SecurityGroupVMMapVO> sc = ListBySecurityGroup.create();
-        sc.setParameters("securityGroupId", securityGroupId);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<SecurityGroupVMMapVO> listByIp(String ipAddress) {
-        SearchCriteria<SecurityGroupVMMapVO> sc = ListByIp.create();
-        sc.setParameters("ipAddress", ipAddress);
-        return listBy(sc);
-    }
-
-    @Override
     public List<SecurityGroupVMMapVO> listByInstanceId(long vmId) {
         SearchCriteria<SecurityGroupVMMapVO> sc = ListByVmId.create();
         sc.setParameters("instanceId", vmId);
@@ -119,18 +104,32 @@ public class SecurityGroupVMMapDaoImpl extends GenericDaoBase<SecurityGroupVMMap
     }
 
     @Override
-    public int deleteVM(long instanceId) {
-        SearchCriteria<SecurityGroupVMMapVO> sc = ListByVmId.create();
-        sc.setParameters("instanceId", instanceId);
-        return super.expunge(sc);
+    public List<SecurityGroupVMMapVO> listByIp(String ipAddress) {
+        SearchCriteria<SecurityGroupVMMapVO> sc = ListByIp.create();
+        sc.setParameters("ipAddress", ipAddress);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<SecurityGroupVMMapVO> listBySecurityGroup(long securityGroupId) {
+        SearchCriteria<SecurityGroupVMMapVO> sc = ListBySecurityGroup.create();
+        sc.setParameters("securityGroupId", securityGroupId);
+        return listBy(sc);
     }
 
     @Override
     public List<SecurityGroupVMMapVO> listBySecurityGroup(long securityGroupId, State... vmStates) {
         SearchCriteria<SecurityGroupVMMapVO> sc = ListBySecurityGroupAndStates.create();
         sc.setParameters("securityGroupId", securityGroupId);
-        sc.setParameters("states", (Object[])vmStates);
+        sc.setParameters("states", (Object[]) vmStates);
         return listBy(sc, null, true);
+    }
+
+    @Override
+    public int deleteVM(long instanceId) {
+        SearchCriteria<SecurityGroupVMMapVO> sc = ListByVmId.create();
+        sc.setParameters("instanceId", instanceId);
+        return super.expunge(sc);
     }
 
     @Override
@@ -154,5 +153,4 @@ public class SecurityGroupVMMapDaoImpl extends GenericDaoBase<SecurityGroupVMMap
         sc.setParameters("vmId", instanceId);
         return customSearch(sc, null).get(0);
     }
-
 }

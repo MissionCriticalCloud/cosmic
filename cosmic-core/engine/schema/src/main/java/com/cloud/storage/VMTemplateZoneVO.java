@@ -16,7 +16,9 @@
 // under the License.
 package com.cloud.storage;
 
-import java.util.Date;
+import com.cloud.utils.db.GenericDao;
+import com.cloud.utils.db.GenericDaoBase;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,11 +28,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.utils.db.GenericDao;
-import com.cloud.utils.db.GenericDaoBase;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "template_zone_ref")
@@ -107,12 +105,11 @@ public class VMTemplateZoneVO implements InternalIdentity {
         this.lastUpdated = lastUpdated;
     }
 
-    public void setRemoved(Date removed) {
-        this.removed = removed;
-    }
-
     public Date getRemoved() {
         return removed;
     }
 
+    public void setRemoved(Date removed) {
+        this.removed = removed;
+    }
 }

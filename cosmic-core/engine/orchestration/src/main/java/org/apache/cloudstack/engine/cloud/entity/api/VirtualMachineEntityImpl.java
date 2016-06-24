@@ -16,13 +16,6 @@
 // under the License.
 package org.apache.cloudstack.engine.cloud.entity.api;
 
-import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
@@ -32,8 +25,14 @@ import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.vm.VirtualMachineProfile;
-
 import org.apache.cloudstack.engine.cloud.entity.api.db.VMEntityVO;
+
+import javax.inject.Inject;
+import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -47,13 +46,9 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
     public VirtualMachineEntityImpl() {
     }
 
-    public void init(String vmId) {
-        this.vmEntityVO = this.manager.loadVirtualMachine(vmId);
-    }
-
-    public void init(String vmId, String owner, String hostName, String displayName, int cpu, int speed, long memory, List<String> computeTags,
-        List<String> rootDiskTags, List<String> networks) {
-        init(vmId);
+    public VirtualMachineEntityImpl(String vmId, String owner, String hostName, String displayName, int cpu, int speed, long memory, List<String> computeTags,
+                                    List<String> rootDiskTags, List<String> networks, VMEntityManager manager) {
+        this(vmId, manager);
         this.vmEntityVO.setOwner(owner);
         this.vmEntityVO.setHostname(hostName);
         this.vmEntityVO.setDisplayname(displayName);
@@ -69,9 +64,9 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
         this.vmEntityVO = this.manager.loadVirtualMachine(vmId);
     }
 
-    public VirtualMachineEntityImpl(String vmId, String owner, String hostName, String displayName, int cpu, int speed, long memory, List<String> computeTags,
-            List<String> rootDiskTags, List<String> networks, VMEntityManager manager) {
-        this(vmId, manager);
+    public void init(String vmId, String owner, String hostName, String displayName, int cpu, int speed, long memory, List<String> computeTags,
+                     List<String> rootDiskTags, List<String> networks) {
+        init(vmId);
         this.vmEntityVO.setOwner(owner);
         this.vmEntityVO.setHostname(hostName);
         this.vmEntityVO.setDisplayname(displayName);
@@ -80,6 +75,10 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
         this.vmEntityVO.setNetworkIds(networks);
 
         manager.saveVirtualMachine(vmEntityVO);
+    }
+
+    public void init(String vmId) {
+        this.vmEntityVO = this.manager.loadVirtualMachine(vmId);
     }
 
     @Override
@@ -196,7 +195,7 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
 
     @Override
     public String reserve(DeploymentPlanner plannerToUse, DeploymentPlan plan, ExcludeList exclude, String caller) throws InsufficientCapacityException,
-        ResourceUnavailableException {
+            ResourceUnavailableException {
         return manager.reserveVirtualMachine(this.vmEntityVO, plannerToUse, plan, exclude);
     }
 
@@ -208,7 +207,7 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
 
     @Override
     public void deploy(String reservationId, String caller, Map<VirtualMachineProfile.Param, Object> params) throws InsufficientCapacityException,
-        ResourceUnavailableException {
+            ResourceUnavailableException {
         manager.deployVirtualMachine(reservationId, this.vmEntityVO, caller, params);
     }
 
@@ -263,5 +262,4 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
         // TODO Auto-generated method stub
 
     }
-
 }

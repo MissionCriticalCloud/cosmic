@@ -16,15 +16,15 @@
 // under the License.
 package com.cloud.event;
 
+import com.cloud.utils.component.ComponentMethodInterceptor;
+import org.apache.cloudstack.context.CallContext;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cloud.utils.component.ComponentMethodInterceptor;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.apache.cloudstack.context.CallContext;
 
 public class ActionEventInterceptor implements ComponentMethodInterceptor, MethodInterceptor {
 
@@ -60,6 +60,60 @@ public class ActionEventInterceptor implements ComponentMethodInterceptor, Metho
         }
     }
 
+    protected List<ActionEvent> getActionEvents(Method m) {
+        List<ActionEvent> result = new ArrayList<ActionEvent>();
+
+        ActionEvents events = m.getAnnotation(ActionEvents.class);
+
+        if (events != null) {
+            for (ActionEvent e : events.value()) {
+                result.add(e);
+            }
+        }
+
+        ActionEvent e = m.getAnnotation(ActionEvent.class);
+
+        if (e != null) {
+            result.add(e);
+        }
+
+        return result;
+    }
+
+    protected String getEventDescription(ActionEvent actionEvent, CallContext ctx) {
+        String eventDescription = ctx.getEventDescription();
+        if (eventDescription == null) {
+            eventDescription = actionEvent.eventDescription();
+        }
+
+        if (ctx.getEventDetails() != null) {
+            eventDescription += ". " + ctx.getEventDetails();
+        }
+
+        return eventDescription;
+    }
+
+    protected String getEventType(ActionEvent actionEvent, CallContext ctx) {
+        String type = ctx.getEventType();
+
+        return type == null ? actionEvent.eventType() : type;
+    }
+
+    @Override
+    public boolean needToIntercept(Method method) {
+        ActionEvent actionEvent = method.getAnnotation(ActionEvent.class);
+        if (actionEvent != null) {
+            return true;
+        }
+
+        ActionEvents events = method.getAnnotation(ActionEvents.class);
+        if (events != null) {
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
     public Object interceptStart(Method method, Object target) {
         EventVO event = null;
@@ -83,14 +137,16 @@ public class ActionEventInterceptor implements ComponentMethodInterceptor, Metho
         for (ActionEvent actionEvent : getActionEvents(method)) {
             CallContext ctx = CallContext.current();
             long userId = ctx.getCallingUserId();
-            long accountId = ctx.getProject() != null ? ctx.getProject().getProjectAccountId() : ctx.getCallingAccountId();    //This should be the entity owner id rather than the Calling User Account Id.
+            long accountId = ctx.getProject() != null ? ctx.getProject().getProjectAccountId() : ctx.getCallingAccountId();    //This should be the entity owner id rather than
+            // the Calling User Account Id.
             long startEventId = ctx.getStartEventId();
             String eventDescription = getEventDescription(actionEvent, ctx);
             String eventType = getEventType(actionEvent, ctx);
             boolean isEventDisplayEnabled = ctx.isEventDisplayEnabled();
 
-            if (eventType.equals(""))
+            if (eventType.equals("")) {
                 return;
+            }
 
             if (actionEvent.create()) {
                 //This start event has to be used for subsequent events of this action
@@ -115,71 +171,18 @@ public class ActionEventInterceptor implements ComponentMethodInterceptor, Metho
             String eventType = getEventType(actionEvent, ctx);
             boolean isEventDisplayEnabled = ctx.isEventDisplayEnabled();
 
-            if (eventType.equals(""))
+            if (eventType.equals("")) {
                 return;
+            }
 
             if (actionEvent.create()) {
                 long eventId = ActionEventUtils.onCreatedActionEvent(userId, accountId, EventVO.LEVEL_ERROR, eventType,
-                            isEventDisplayEnabled, "Error while creating entity for " + eventDescription);
+                        isEventDisplayEnabled, "Error while creating entity for " + eventDescription);
                 ctx.setStartEventId(eventId);
             } else {
                 ActionEventUtils.onCompletedActionEvent(userId, accountId, EventVO.LEVEL_ERROR, eventType, isEventDisplayEnabled,
                         "Error while " + eventDescription, startEventId);
             }
         }
-    }
-
-    @Override
-    public boolean needToIntercept(Method method) {
-        ActionEvent actionEvent = method.getAnnotation(ActionEvent.class);
-        if (actionEvent != null) {
-            return true;
-        }
-
-        ActionEvents events = method.getAnnotation(ActionEvents.class);
-        if (events != null) {
-            return true;
-        }
-
-        return false;
-    }
-
-    protected List<ActionEvent> getActionEvents(Method m) {
-        List<ActionEvent> result = new ArrayList<ActionEvent>();
-
-        ActionEvents events = m.getAnnotation(ActionEvents.class);
-
-        if (events != null) {
-            for (ActionEvent e : events.value()) {
-                result.add(e);
-            }
-        }
-
-        ActionEvent e = m.getAnnotation(ActionEvent.class);
-
-        if (e != null) {
-            result.add(e);
-        }
-
-        return result;
-    }
-
-    protected String getEventType(ActionEvent actionEvent, CallContext ctx) {
-        String type = ctx.getEventType();
-
-        return type == null ? actionEvent.eventType() : type;
-    }
-
-    protected String getEventDescription(ActionEvent actionEvent, CallContext ctx) {
-        String eventDescription = ctx.getEventDescription();
-        if (eventDescription == null) {
-            eventDescription = actionEvent.eventDescription();
-        }
-
-        if (ctx.getEventDetails() != null) {
-            eventDescription += ". " + ctx.getEventDetails();
-        }
-
-        return eventDescription;
     }
 }

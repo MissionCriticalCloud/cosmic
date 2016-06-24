@@ -16,6 +16,12 @@
 // under the License.
 package org.apache.cloudstack.framework.security.keystore;
 
+import com.cloud.utils.Ternary;
+import com.cloud.utils.component.ManagerBase;
+import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.security.CertificateHelper;
+
+import javax.inject.Inject;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -27,13 +33,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-
-import com.cloud.utils.Ternary;
-import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.security.CertificateHelper;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -58,8 +57,9 @@ public class KeystoreManagerImpl extends ManagerBase implements KeystoreManager 
             String ksPassword = "passwordForValidation";
             byte[] ksBits = CertificateHelper.buildAndSaveKeystore(domainSuffix, certificate, getKeyContent(key), ksPassword);
             KeyStore ks = CertificateHelper.loadKeystore(ksBits, ksPassword);
-            if (ks != null)
+            if (ks != null) {
                 return true;
+            }
 
             s_logger.error("Unabled to construct keystore for domain: " + domainSuffix);
         } catch (Exception e) {
@@ -71,18 +71,11 @@ public class KeystoreManagerImpl extends ManagerBase implements KeystoreManager 
     @Override
     public void saveCertificate(String name, String certificate, String key, String domainSuffix) {
         if (name == null || name.isEmpty() || certificate == null || certificate.isEmpty() || key == null || key.isEmpty() || domainSuffix == null ||
-            domainSuffix.isEmpty())
+                domainSuffix.isEmpty()) {
             throw new CloudRuntimeException("invalid parameter in saveCerticate");
+        }
 
         _ksDao.save(name, certificate, key, domainSuffix);
-    }
-
-    @Override
-    public void saveCertificate(String name, String certificate, Integer index, String domainSuffix) {
-        if (name == null || name.isEmpty() || certificate == null || certificate.isEmpty() || index == null || domainSuffix == null || domainSuffix.isEmpty())
-            throw new CloudRuntimeException("invalid parameter in saveCerticate");
-
-        _ksDao.save(name, certificate, index, domainSuffix);
     }
 
     @Override
@@ -92,8 +85,9 @@ public class KeystoreManagerImpl extends ManagerBase implements KeystoreManager 
         assert (storePassword != null);
 
         KeystoreVO ksVo = _ksDao.findByName(name);
-        if (ksVo == null)
+        if (ksVo == null) {
             throw new CloudRuntimeException("Unable to find keystore " + name);
+        }
 
         List<Ternary<String, String, String>> certs = new ArrayList<Ternary<String, String, String>>();
         List<KeystoreVO> certChains = _ksDao.findCertChain();
@@ -120,6 +114,15 @@ public class KeystoreManagerImpl extends ManagerBase implements KeystoreManager 
             s_logger.warn("Unable to build keystore for " + name + " due to IOException");
         }
         return null;
+    }
+
+    @Override
+    public void saveCertificate(String name, String certificate, Integer index, String domainSuffix) {
+        if (name == null || name.isEmpty() || certificate == null || certificate.isEmpty() || index == null || domainSuffix == null || domainSuffix.isEmpty()) {
+            throw new CloudRuntimeException("invalid parameter in saveCerticate");
+        }
+
+        _ksDao.save(name, certificate, index, domainSuffix);
     }
 
     @Override
@@ -152,8 +155,9 @@ public class KeystoreManagerImpl extends ManagerBase implements KeystoreManager 
     private static String getKeyContent(String key) {
         Pattern regex = Pattern.compile("(^[\\-]+[^\\-]+[\\-]+[\\n]?)([^\\-]+)([\\-]+[^\\-]+[\\-]+$)");
         Matcher m = regex.matcher(key);
-        if (m.find())
+        if (m.find()) {
             return m.group(2);
+        }
 
         return key;
     }

@@ -19,18 +19,18 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
+import com.cloud.agent.api.Answer;
+import com.cloud.agent.api.Command;
+import com.cloud.agent.api.proxy.ConsoleProxyLoadAnswer;
+import com.cloud.resource.CommandWrapper;
+import com.cloud.resource.ServerResource;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.proxy.ConsoleProxyLoadAnswer;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ServerResource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public abstract class CitrixConsoleProxyLoadCommandWrapper<T extends Command, A 
             conn.setReadTimeout(5000);
 
             final InputStream is = conn.getInputStream();
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(is,"UTF-8"));
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
             final StringBuilder sb2 = new StringBuilder();
             String line = null;
             try {

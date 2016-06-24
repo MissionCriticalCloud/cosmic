@@ -17,11 +17,18 @@
 package org.apache.cloudstack.api;
 
 import com.cloud.serializer.Param;
+
 import com.google.gson.annotations.SerializedName;
 
 public abstract class BaseResponse implements ResponseObject {
+    @SerializedName(ApiConstants.JOB_ID)
+    @Param(description = "the UUID of the latest async job acting on this object")
+    protected String jobId;
     private transient String responseName;
     private transient String objectName;
+    @SerializedName(ApiConstants.JOB_STATUS)
+    @Param(description = "the current status of the latest async job acting on this object")
+    private Integer jobStatus;
 
     @Override
     public String getResponseName() {
@@ -47,14 +54,6 @@ public abstract class BaseResponse implements ResponseObject {
     public String getObjectId() {
         return null;
     }
-
-    @SerializedName(ApiConstants.JOB_ID)
-    @Param(description = "the UUID of the latest async job acting on this object")
-    protected String jobId;
-
-    @SerializedName(ApiConstants.JOB_STATUS)
-    @Param(description = "the current status of the latest async job acting on this object")
-    private Integer jobStatus;
 
     @Override
     public String getJobId() {

@@ -18,11 +18,11 @@ package org.apache.cloudstack.api.response;
 
 import com.cloud.projects.ProjectInvitation;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = ProjectInvitation.class)
 @SuppressWarnings("unused")
@@ -64,6 +64,11 @@ public class ProjectInvitationResponse extends BaseResponse implements Controlle
     }
 
     @Override
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    @Override
     public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
@@ -81,11 +86,6 @@ public class ProjectInvitationResponse extends BaseResponse implements Controlle
     @Override
     public void setDomainName(String domain) {
         this.domainName = domain;
-    }
-
-    @Override
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
     }
 
     public void setInvitationState(String invitationState) {

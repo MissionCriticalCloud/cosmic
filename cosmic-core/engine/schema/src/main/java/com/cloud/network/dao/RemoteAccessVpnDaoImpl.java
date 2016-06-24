@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +51,14 @@ public class RemoteAccessVpnDaoImpl extends GenericDaoBase<RemoteAccessVpnVO, Lo
     }
 
     @Override
+    public RemoteAccessVpnVO findByPublicIpAddressAndState(long ipAddressId, RemoteAccessVpn.State state) {
+        SearchCriteria<RemoteAccessVpnVO> sc = AllFieldsSearch.create();
+        sc.setParameters("ipAddress", ipAddressId);
+        sc.setParameters("state", state);
+        return findOneBy(sc);
+    }
+
+    @Override
     public RemoteAccessVpnVO findByAccountAndNetwork(Long accountId, Long networkId) {
         SearchCriteria<RemoteAccessVpnVO> sc = AllFieldsSearch.create();
         sc.setParameters("accountId", accountId);
@@ -71,14 +79,6 @@ public class RemoteAccessVpnDaoImpl extends GenericDaoBase<RemoteAccessVpnVO, Lo
         SearchCriteria<RemoteAccessVpnVO> sc = AllFieldsSearch.create();
         sc.setParameters("accountId", accountId);
         return listBy(sc);
-    }
-
-    @Override
-    public RemoteAccessVpnVO findByPublicIpAddressAndState(long ipAddressId, RemoteAccessVpn.State state) {
-        SearchCriteria<RemoteAccessVpnVO> sc = AllFieldsSearch.create();
-        sc.setParameters("ipAddress", ipAddressId);
-        sc.setParameters("state", state);
-        return findOneBy(sc);
     }
 
     @Override

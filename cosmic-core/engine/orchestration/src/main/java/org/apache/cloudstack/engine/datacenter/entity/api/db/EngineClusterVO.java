@@ -16,8 +16,16 @@
 // under the License.
 package org.apache.cloudstack.engine.datacenter.entity.api.db;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.org.Cluster;
+import com.cloud.org.Grouping;
+import com.cloud.org.Managed.ManagedState;
+import com.cloud.utils.NumbersUtil;
+import com.cloud.utils.db.GenericDao;
+import com.cloud.utils.db.StateMachine;
+import org.apache.cloudstack.api.Identity;
+import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State;
+import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,73 +37,18 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.org.Cluster;
-import com.cloud.org.Grouping;
-import com.cloud.org.Managed.ManagedState;
-import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.db.GenericDao;
-import com.cloud.utils.db.StateMachine;
-
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State;
-import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "cluster")
 public class EngineClusterVO implements EngineCluster, Identity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    long id;
-
-    @Column(name = "name")
-    String name;
-
-    @Column(name = "guid")
-    String guid;
-
-    @Column(name = "data_center_id")
-    long dataCenterId;
-
-    @Column(name = "pod_id")
-    long podId;
-
-    @Column(name = "hypervisor_type")
-    String hypervisorType;
-
-    @Column(name = "cluster_type")
-    @Enumerated(value = EnumType.STRING)
-    Cluster.ClusterType clusterType;
-
-    @Column(name = "allocation_state")
-    @Enumerated(value = EnumType.STRING)
-    AllocationState allocationState;
-
-    @Column(name = "managed_state")
-    @Enumerated(value = EnumType.STRING)
-    ManagedState managedState;
-
-    @Column(name = GenericDao.REMOVED_COLUMN)
-    private Date removed;
-
-    @Column(name = "uuid")
-    String uuid;
-
-    //orchestration
-
-    @Column(name = "owner")
-    private String owner = null;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     protected Date created;
-
     @Column(name = "lastUpdated", updatable = true)
     @Temporal(value = TemporalType.TIMESTAMP)
     protected Date lastUpdated;
-
     /**
      * Note that state is intentionally missing the setter.  Any updates to
      * the state machine needs to go through the DAO object because someone
@@ -105,6 +58,37 @@ public class EngineClusterVO implements EngineCluster, Identity {
     @StateMachine(state = State.class, event = Event.class)
     @Column(name = "engine_state", updatable = true, nullable = false, length = 32)
     protected State state = null;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    long id;
+    @Column(name = "name")
+    String name;
+    @Column(name = "guid")
+    String guid;
+    @Column(name = "data_center_id")
+    long dataCenterId;
+    @Column(name = "pod_id")
+    long podId;
+    @Column(name = "hypervisor_type")
+    String hypervisorType;
+    @Column(name = "cluster_type")
+    @Enumerated(value = EnumType.STRING)
+    Cluster.ClusterType clusterType;
+    @Column(name = "allocation_state")
+    @Enumerated(value = EnumType.STRING)
+    AllocationState allocationState;
+
+    //orchestration
+    @Column(name = "managed_state")
+    @Enumerated(value = EnumType.STRING)
+    ManagedState managedState;
+    @Column(name = "uuid")
+    String uuid;
+    @Column(name = GenericDao.REMOVED_COLUMN)
+    private Date removed;
+    @Column(name = "owner")
+    private String owner = null;
 
     public EngineClusterVO() {
         clusterType = Cluster.ClusterType.CloudManaged;
@@ -125,6 +109,10 @@ public class EngineClusterVO implements EngineCluster, Identity {
         this.state = State.Disabled;
     }
 
+    public EngineClusterVO(long clusterId) {
+        this.id = clusterId;
+    }
+
     @Override
     public long getId() {
         return id;
@@ -143,6 +131,11 @@ public class EngineClusterVO implements EngineCluster, Identity {
     @Override
     public long getPodId() {
         return podId;
+    }
+
+    @Override
+    public HypervisorType getHypervisorType() {
+        return HypervisorType.getType(hypervisorType);
     }
 
     @Override
@@ -172,8 +165,12 @@ public class EngineClusterVO implements EngineCluster, Identity {
         this.managedState = managedState;
     }
 
-    public EngineClusterVO(long clusterId) {
-        this.id = clusterId;
+    public void setHypervisorType(String hy) {
+        hypervisorType = hy;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
@@ -186,17 +183,8 @@ public class EngineClusterVO implements EngineCluster, Identity {
         if (!(obj instanceof EngineClusterVO)) {
             return false;
         }
-        EngineClusterVO that = (EngineClusterVO)obj;
+        EngineClusterVO that = (EngineClusterVO) obj;
         return this.id == that.id;
-    }
-
-    @Override
-    public HypervisorType getHypervisorType() {
-        return HypervisorType.getType(hypervisorType);
-    }
-
-    public void setHypervisorType(String hy) {
-        hypervisorType = hy;
     }
 
     public String getGuid() {
@@ -209,10 +197,6 @@ public class EngineClusterVO implements EngineCluster, Identity {
 
     public Date getRemoved() {
         return removed;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override

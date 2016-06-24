@@ -22,10 +22,6 @@ import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
 
 public interface RemoteAccessVpn extends ControlledEntity, InternalIdentity, Identity, Displayable {
-    enum State {
-        Added, Running, Removed
-    }
-
     long getServerAddressId();
 
     String getIpRange();
@@ -42,4 +38,8 @@ public interface RemoteAccessVpn extends ControlledEntity, InternalIdentity, Ide
 
     @Override
     boolean isDisplay();
+
+    enum State {
+        Added, Running, Removed
+    }
 }

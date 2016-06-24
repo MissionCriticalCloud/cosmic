@@ -16,11 +16,12 @@
 // under the License.
 package com.cloud.api.dispatch;
 
+import org.apache.cloudstack.api.ApiErrorCode;
+import org.apache.cloudstack.api.ServerApiException;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.ServerApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,13 +34,13 @@ public class ParamUnpackWorker implements DispatchWorker {
     public void handle(final DispatchTask task) throws ServerApiException {
         final Map<String, Object> lowercaseParams = new HashMap<String, Object>();
         final Map<String, String> params = task.getParams();
-        for (final Map.Entry<String,String> entry : params.entrySet()) {
+        for (final Map.Entry<String, String> entry : params.entrySet()) {
             final String key = entry.getKey();
             final int arrayStartIndex = key.indexOf('[');
             final int arrayStartLastIndex = key.lastIndexOf('[');
             if (arrayStartIndex != arrayStartLastIndex) {
                 throw new ServerApiException(ApiErrorCode.MALFORMED_PARAMETER_ERROR, "Unable to decode parameter " + key +
-                    "; if specifying an object array, please use parameter[index].field=XXX, e.g. userGroupList[0].group=httpGroup");
+                        "; if specifying an object array, please use parameter[index].field=XXX, e.g. userGroupList[0].group=httpGroup");
             }
 
             if (arrayStartIndex > 0) {
@@ -48,7 +49,7 @@ public class ParamUnpackWorker implements DispatchWorker {
                 if ((arrayEndIndex < arrayStartIndex) || (arrayEndIndex != arrayEndLastIndex)) {
                     // malformed parameter
                     throw new ServerApiException(ApiErrorCode.MALFORMED_PARAMETER_ERROR, "Unable to decode parameter " + key +
-                        "; if specifying an object array, please use parameter[index].field=XXX, e.g. userGroupList[0].group=httpGroup");
+                            "; if specifying an object array, please use parameter[index].field=XXX, e.g. userGroupList[0].group=httpGroup");
                 }
 
                 // Now that we have an array object, check for a field name in the case of a complex object
@@ -56,7 +57,7 @@ public class ParamUnpackWorker implements DispatchWorker {
                 String fieldName = null;
                 if (fieldIndex < arrayEndIndex) {
                     throw new ServerApiException(ApiErrorCode.MALFORMED_PARAMETER_ERROR, "Unable to decode parameter " + key +
-                        "; if specifying an object array, please use parameter[index].field=XXX, e.g. userGroupList[0].group=httpGroup");
+                            "; if specifying an object array, please use parameter[index].field=XXX, e.g. userGroupList[0].group=httpGroup");
                 } else {
                     fieldName = key.substring(fieldIndex + 1);
                 }
@@ -81,7 +82,7 @@ public class ParamUnpackWorker implements DispatchWorker {
 
                 if (!parsedIndex) {
                     throw new ServerApiException(ApiErrorCode.MALFORMED_PARAMETER_ERROR, "Unable to decode parameter " + key +
-                        "; if specifying an object array, please use parameter[index].field=XXX, e.g. userGroupList[0].group=httpGroup");
+                            "; if specifying an object array, please use parameter[index].field=XXX, e.g. userGroupList[0].group=httpGroup");
                 }
 
                 final Object value = lowercaseParams.get(paramName);
@@ -91,7 +92,7 @@ public class ParamUnpackWorker implements DispatchWorker {
                     mapValue = new HashMap<String, Object>();
                     mapArray.put(Integer.valueOf(index), mapValue);
                 } else if (value instanceof Map) {
-                    mapArray = (HashMap)value;
+                    mapArray = (HashMap) value;
                     mapValue = mapArray.get(Integer.valueOf(index));
                     if (mapValue == null) {
                         mapValue = new HashMap<String, Object>();
@@ -111,5 +112,4 @@ public class ParamUnpackWorker implements DispatchWorker {
         // The chain continues processing the unpacked parameters
         task.setParams(lowercaseParams);
     }
-
 }

@@ -18,11 +18,6 @@
  */
 package org.apache.cloudstack.storage.motion;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.storage.MigrateVolumeAnswer;
 import com.cloud.agent.api.storage.MigrateVolumeCommand;
@@ -42,7 +37,6 @@ import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VirtualMachineManager;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.ClusterScope;
 import org.apache.cloudstack.engine.subsystem.api.storage.CopyCommandResult;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataMotionStrategy;
@@ -66,6 +60,11 @@ import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.RemoteHostEndPoint;
 import org.apache.cloudstack.storage.command.CopyCommand;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreEntity;
+
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -94,6 +93,61 @@ public class AncientDataMotionStrategy implements DataMotionStrategy {
         return StrategyPriority.CANT_HANDLE;
     }
 
+    // Note: destHost is currently only used if the copyObject method is invoked
+    @Override
+    public Void copyAsync(DataObject srcData, DataObject destData, Host destHost, AsyncCompletionCallback<CopyCommandResult> callback) {
+        Answer answer = null;
+        String errMsg = null;
+        try {
+            s_logger.debug("copyAsync inspecting src type " + srcData.getType().toString() + " copyAsync inspecting dest type " + destData.getType().toString());
+
+            if (srcData.getType() == DataObjectType.SNAPSHOT && destData.getType() == DataObjectType.VOLUME) {
+                answer = copyVolumeFromSnapshot(srcData, destData);
+            } else if (srcData.getType() == DataObjectType.SNAPSHOT && destData.getType() == DataObjectType.TEMPLATE) {
+                answer = createTemplateFromSnapshot(srcData, destData);
+            } else if (srcData.getType() == DataObjectType.TEMPLATE && destData.getType() == DataObjectType.VOLUME) {
+                answer = cloneVolume(srcData, destData);
+            } else if (destData.getType() == DataObjectType.VOLUME && srcData.getType() == DataObjectType.VOLUME &&
+                    srcData.getDataStore().getRole() == DataStoreRole.Primary && destData.getDataStore().getRole() == DataStoreRole.Primary) {
+                if (srcData.getId() == destData.getId()) {
+                    // The volume has to be migrated across storage pools.
+                    answer = migrateVolumeToPool(srcData, destData);
+                } else {
+                    answer = copyVolumeBetweenPools(srcData, destData);
+                }
+            } else if (srcData.getType() == DataObjectType.SNAPSHOT && destData.getType() == DataObjectType.SNAPSHOT) {
+                answer = copySnapshot(srcData, destData);
+            } else {
+                answer = copyObject(srcData, destData, destHost);
+            }
+
+            if (answer != null && !answer.getResult()) {
+                errMsg = answer.getDetails();
+            }
+        } catch (Exception e) {
+            s_logger.debug("copy failed", e);
+            errMsg = e.toString();
+        }
+        CopyCommandResult result = new CopyCommandResult(null, answer);
+        result.setResult(errMsg);
+        callback.complete(result);
+        return null;
+    }
+
+    @Override
+    public Void copyAsync(DataObject srcData, DataObject destData, AsyncCompletionCallback<CopyCommandResult> callback) {
+        return copyAsync(srcData, destData, null, callback);
+    }
+
+    @Override
+    public Void copyAsync(Map<VolumeInfo, DataStore> volumeMap, VirtualMachineTO vmTo, Host srcHost, Host destHost, AsyncCompletionCallback<CopyCommandResult> callback) {
+        CopyCommandResult result = new CopyCommandResult(null, null);
+        result.setResult("Unsupported operation requested for copying data.");
+        callback.complete(result);
+
+        return null;
+    }
+
     protected boolean needCacheStorage(DataObject srcData, DataObject destData) {
         DataTO srcTO = srcData.getTO();
         DataStoreTO srcStoreTO = srcTO.getDataStore();
@@ -112,12 +166,12 @@ public class AncientDataMotionStrategy implements DataMotionStrategy {
         }
 
         if (srcData.getType() == DataObjectType.TEMPLATE) {
-            TemplateInfo template = (TemplateInfo)srcData;
+            TemplateInfo template = (TemplateInfo) srcData;
         }
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("needCacheStorage true, dest at " + destTO.getPath() + " dest role " + destStoreTO.getRole().toString() + srcTO.getPath() + " src role " +
-                srcStoreTO.getRole().toString());
+                    srcStoreTO.getRole().toString());
         }
         return true;
     }
@@ -125,13 +179,13 @@ public class AncientDataMotionStrategy implements DataMotionStrategy {
     private Scope getZoneScope(Scope destScope) {
         ZoneScope zoneScope = null;
         if (destScope instanceof ClusterScope) {
-            ClusterScope clusterScope = (ClusterScope)destScope;
+            ClusterScope clusterScope = (ClusterScope) destScope;
             zoneScope = new ZoneScope(clusterScope.getZoneId());
         } else if (destScope instanceof HostScope) {
-            HostScope hostScope = (HostScope)destScope;
+            HostScope hostScope = (HostScope) destScope;
             zoneScope = new ZoneScope(hostScope.getZoneId());
         } else {
-            zoneScope = (ZoneScope)destScope;
+            zoneScope = (ZoneScope) destScope;
         }
         return zoneScope;
     }
@@ -179,24 +233,24 @@ public class AncientDataMotionStrategy implements DataMotionStrategy {
                 final String cacheUuid = cacheData.getUuid().toString();
 
                 if (srcData.getType() == DataObjectType.VOLUME &&
-                    (destData.getType() == DataObjectType.VOLUME ||
-                     destData.getType() == DataObjectType.TEMPLATE)) {
+                        (destData.getType() == DataObjectType.VOLUME ||
+                                destData.getType() == DataObjectType.TEMPLATE)) {
                     // volume transfer from primary to secondary. Volume transfer between primary pools are already handled by copyVolumeBetweenPools
                     // Delete cache in order to certainly transfer a latest image.
                     s_logger.debug("Delete " + cacheType + " cache(id: " + cacheId +
-                                   ", uuid: " + cacheUuid + ")");
+                            ", uuid: " + cacheUuid + ")");
                     cacheMgr.deleteCacheObject(srcForCopy);
                 } else {
                     // for template, we want to leave it on cache for performance reason
                     if ((answer == null || !answer.getResult()) && srcForCopy.getRefCount() < 2) {
                         // cache object created by this copy, not already there
                         s_logger.warn("Copy may not be handled correctly by agent(id: " + (ep != null ? ep.getId() : "\"unspecified\"") + ")." +
-                                      " Delete " + cacheType + " cache(id: " + cacheId +
-                                      ", uuid: " + cacheUuid + ")");
+                                " Delete " + cacheType + " cache(id: " + cacheId +
+                                ", uuid: " + cacheUuid + ")");
                         cacheMgr.deleteCacheObject(srcForCopy);
                     } else {
                         s_logger.debug("Decrease reference count of " + cacheType +
-                                       " cache(id: " + cacheId + ", uuid: " + cacheUuid + ")");
+                                " cache(id: " + cacheId + ", uuid: " + cacheUuid + ")");
                         cacheMgr.releaseCacheObject(srcForCopy);
                     }
                 }
@@ -228,7 +282,6 @@ public class AncientDataMotionStrategy implements DataMotionStrategy {
         return leafData;
     }
 
-
     protected void deleteSnapshotCacheChain(SnapshotInfo snapshot) {
         while (snapshot != null) {
             cacheMgr.deleteCacheObject(snapshot);
@@ -244,8 +297,8 @@ public class AncientDataMotionStrategy implements DataMotionStrategy {
     }
 
     protected Answer copyVolumeFromSnapshot(DataObject snapObj, DataObject volObj) {
-        SnapshotInfo snapshot = (SnapshotInfo)snapObj;
-        StoragePool pool = (StoragePool)volObj.getDataStore();
+        SnapshotInfo snapshot = (SnapshotInfo) snapObj;
+        StoragePool pool = (StoragePool) volObj.getDataStore();
 
         String basicErrMsg = "Failed to create volume from " + snapshot.getName() + " on pool " + pool;
         DataStore store = snapObj.getDataStore();
@@ -284,7 +337,7 @@ public class AncientDataMotionStrategy implements DataMotionStrategy {
         } finally {
             if (!(storTO instanceof NfsTO)) {
                 // still keep snapshot on cache which may be migrated from previous secondary storage
-                releaseSnapshotCacheChain((SnapshotInfo)srcData);
+                releaseSnapshotCacheChain((SnapshotInfo) srcData);
             }
         }
     }
@@ -317,7 +370,7 @@ public class AncientDataMotionStrategy implements DataMotionStrategy {
         if (cacheStore == null) {
             // need to find a nfs or cifs image store, assuming that can't copy volume
             // directly to s3
-            ImageStoreEntity imageStore = (ImageStoreEntity)dataStoreMgr.getImageStore(destScope.getScopeId());
+            ImageStoreEntity imageStore = (ImageStoreEntity) dataStoreMgr.getImageStore(destScope.getScopeId());
             if (!imageStore.getProtocol().equalsIgnoreCase("nfs") && !imageStore.getProtocol().equalsIgnoreCase("cifs")) {
                 s_logger.debug("can't find a nfs (or cifs) image store to satisfy the need for a staging store");
                 return null;
@@ -380,15 +433,14 @@ public class AncientDataMotionStrategy implements DataMotionStrategy {
             }
             return answer;
         }
-
     }
 
     protected Answer migrateVolumeToPool(DataObject srcData, DataObject destData) {
         String value = configDao.getValue(Config.MigrateWait.key());
         int waitInterval = NumbersUtil.parseInt(value, Integer.parseInt(Config.MigrateWait.getDefaultValue()));
 
-        VolumeInfo volume = (VolumeInfo)srcData;
-        StoragePool destPool = (StoragePool)dataStoreMgr.getDataStore(destData.getDataStore().getId(), DataStoreRole.Primary);
+        VolumeInfo volume = (VolumeInfo) srcData;
+        StoragePool destPool = (StoragePool) dataStoreMgr.getDataStore(destData.getDataStore().getId(), DataStoreRole.Primary);
         MigrateVolumeCommand command = new MigrateVolumeCommand(volume.getId(), volume.getPath(), destPool, volume.getAttachedVmName(), volume.getVolumeType(), waitInterval);
         EndPoint ep = selector.select(srcData, StorageAction.MIGRATEVOLUME);
         Answer answer = null;
@@ -406,8 +458,8 @@ public class AncientDataMotionStrategy implements DataMotionStrategy {
             // Update the volume details after migration.
             VolumeVO volumeVo = volDao.findById(volume.getId());
             Long oldPoolId = volume.getPoolId();
-            volumeVo.setPath(((MigrateVolumeAnswer)answer).getVolumePath());
-            String chainInfo = ((MigrateVolumeAnswer)answer).getVolumeChainInfo();
+            volumeVo.setPath(((MigrateVolumeAnswer) answer).getVolumePath());
+            String chainInfo = ((MigrateVolumeAnswer) answer).getVolumeChainInfo();
             if (chainInfo != null) {
                 volumeVo.setChainInfo(chainInfo);
             }
@@ -425,52 +477,6 @@ public class AncientDataMotionStrategy implements DataMotionStrategy {
         }
 
         return answer;
-    }
-
-    // Note: destHost is currently only used if the copyObject method is invoked
-    @Override
-    public Void copyAsync(DataObject srcData, DataObject destData, Host destHost, AsyncCompletionCallback<CopyCommandResult> callback) {
-        Answer answer = null;
-        String errMsg = null;
-        try {
-            s_logger.debug("copyAsync inspecting src type " + srcData.getType().toString() + " copyAsync inspecting dest type " + destData.getType().toString());
-
-            if (srcData.getType() == DataObjectType.SNAPSHOT && destData.getType() == DataObjectType.VOLUME) {
-                answer = copyVolumeFromSnapshot(srcData, destData);
-            } else if (srcData.getType() == DataObjectType.SNAPSHOT && destData.getType() == DataObjectType.TEMPLATE) {
-                answer = createTemplateFromSnapshot(srcData, destData);
-            } else if (srcData.getType() == DataObjectType.TEMPLATE && destData.getType() == DataObjectType.VOLUME) {
-                answer = cloneVolume(srcData, destData);
-            } else if (destData.getType() == DataObjectType.VOLUME && srcData.getType() == DataObjectType.VOLUME &&
-                srcData.getDataStore().getRole() == DataStoreRole.Primary && destData.getDataStore().getRole() == DataStoreRole.Primary) {
-                if (srcData.getId() == destData.getId()) {
-                    // The volume has to be migrated across storage pools.
-                    answer = migrateVolumeToPool(srcData, destData);
-                } else {
-                    answer = copyVolumeBetweenPools(srcData, destData);
-                }
-            } else if (srcData.getType() == DataObjectType.SNAPSHOT && destData.getType() == DataObjectType.SNAPSHOT) {
-                answer = copySnapshot(srcData, destData);
-            } else {
-                answer = copyObject(srcData, destData, destHost);
-            }
-
-            if (answer != null && !answer.getResult()) {
-                errMsg = answer.getDetails();
-            }
-        } catch (Exception e) {
-            s_logger.debug("copy failed", e);
-            errMsg = e.toString();
-        }
-        CopyCommandResult result = new CopyCommandResult(null, answer);
-        result.setResult(errMsg);
-        callback.complete(result);
-        return null;
-    }
-
-    @Override
-    public Void copyAsync(DataObject srcData, DataObject destData, AsyncCompletionCallback<CopyCommandResult> callback) {
-        return copyAsync(srcData, destData, null, callback);
     }
 
     @DB
@@ -515,11 +521,11 @@ public class AncientDataMotionStrategy implements DataMotionStrategy {
         int _backupsnapshotwait = NumbersUtil.parseInt(value, Integer.parseInt(Config.BackupSnapshotWait.getDefaultValue()));
 
         DataObject cacheData = null;
-        SnapshotInfo snapshotInfo = (SnapshotInfo)srcData;
+        SnapshotInfo snapshotInfo = (SnapshotInfo) srcData;
         Object payload = snapshotInfo.getPayload();
         Boolean fullSnapshot = true;
         if (payload != null) {
-            fullSnapshot = (Boolean)payload;
+            fullSnapshot = (Boolean) payload;
         }
         Map<String, String> options = new HashMap<String, String>();
         options.put("fullSnapshot", fullSnapshot.toString());
@@ -551,7 +557,6 @@ public class AncientDataMotionStrategy implements DataMotionStrategy {
                 } else {
                     answer = ep.sendMessage(cmd);
                 }
-
             }
             // clean up cache entry
             if (cacheData != null) {
@@ -565,15 +570,5 @@ public class AncientDataMotionStrategy implements DataMotionStrategy {
             }
             throw new CloudRuntimeException(e.toString());
         }
-
-    }
-
-    @Override
-    public Void copyAsync(Map<VolumeInfo, DataStore> volumeMap, VirtualMachineTO vmTo, Host srcHost, Host destHost, AsyncCompletionCallback<CopyCommandResult> callback) {
-        CopyCommandResult result = new CopyCommandResult(null, null);
-        result.setResult("Unsupported operation requested for copying data.");
-        callback.complete(result);
-
-        return null;
     }
 }

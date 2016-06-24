@@ -19,25 +19,71 @@
 
 package com.cloud.network.resource;
 
-import com.cloud.agent.api.*;
-import com.cloud.agent.api.to.PortForwardingRuleTO;
-import com.cloud.agent.api.to.StaticNatRuleTO;
-import com.cloud.host.Host.Type;
-import com.cloud.network.nicira.*;
-import com.cloud.network.utils.CommandRetryUtility;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentMatcher;
-
-import javax.naming.ConfigurationException;
-import java.util.*;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.cloud.agent.api.ConfigurePortForwardingRulesOnLogicalRouterAnswer;
+import com.cloud.agent.api.ConfigurePortForwardingRulesOnLogicalRouterCommand;
+import com.cloud.agent.api.ConfigurePublicIpsOnLogicalRouterAnswer;
+import com.cloud.agent.api.ConfigurePublicIpsOnLogicalRouterCommand;
+import com.cloud.agent.api.ConfigureStaticNatRulesOnLogicalRouterAnswer;
+import com.cloud.agent.api.ConfigureStaticNatRulesOnLogicalRouterCommand;
+import com.cloud.agent.api.CreateLogicalRouterAnswer;
+import com.cloud.agent.api.CreateLogicalRouterCommand;
+import com.cloud.agent.api.CreateLogicalSwitchAnswer;
+import com.cloud.agent.api.CreateLogicalSwitchCommand;
+import com.cloud.agent.api.CreateLogicalSwitchPortAnswer;
+import com.cloud.agent.api.CreateLogicalSwitchPortCommand;
+import com.cloud.agent.api.DeleteLogicalRouterAnswer;
+import com.cloud.agent.api.DeleteLogicalRouterCommand;
+import com.cloud.agent.api.DeleteLogicalSwitchAnswer;
+import com.cloud.agent.api.DeleteLogicalSwitchCommand;
+import com.cloud.agent.api.DeleteLogicalSwitchPortAnswer;
+import com.cloud.agent.api.DeleteLogicalSwitchPortCommand;
+import com.cloud.agent.api.FindLogicalSwitchPortAnswer;
+import com.cloud.agent.api.FindLogicalSwitchPortCommand;
+import com.cloud.agent.api.PingCommand;
+import com.cloud.agent.api.StartupCommand;
+import com.cloud.agent.api.UpdateLogicalSwitchPortAnswer;
+import com.cloud.agent.api.UpdateLogicalSwitchPortCommand;
+import com.cloud.agent.api.to.PortForwardingRuleTO;
+import com.cloud.agent.api.to.StaticNatRuleTO;
+import com.cloud.host.Host.Type;
+import com.cloud.network.nicira.Attachment;
+import com.cloud.network.nicira.ControlClusterStatus;
+import com.cloud.network.nicira.DestinationNatRule;
+import com.cloud.network.nicira.LogicalRouter;
+import com.cloud.network.nicira.LogicalRouterPort;
+import com.cloud.network.nicira.LogicalSwitch;
+import com.cloud.network.nicira.LogicalSwitchPort;
+import com.cloud.network.nicira.NatRule;
+import com.cloud.network.nicira.NiciraNvpApi;
+import com.cloud.network.nicira.NiciraNvpApiException;
+import com.cloud.network.nicira.SourceNatRule;
+import com.cloud.network.utils.CommandRetryUtility;
+
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 
 public class NiciraNvpResourceTest {
     NiciraNvpApi nvpApi = mock(NiciraNvpApi.class);
@@ -193,7 +239,6 @@ public class NiciraNvpResourceTest {
         final CreateLogicalSwitchPortAnswer clspa = (CreateLogicalSwitchPortAnswer) resource.executeRequest(clspc);
         assertTrue(clspa.getResult());
         assertTrue("eeee".equals(clspa.getLogicalSwitchPortUuid()));
-
     }
 
     @Test
@@ -367,7 +412,6 @@ public class NiciraNvpResourceTest {
 
         final ConfigurePublicIpsOnLogicalRouterAnswer answer = (ConfigurePublicIpsOnLogicalRouterAnswer) resource.executeRequest(cmd);
         assertFalse(answer.getResult());
-
     }
 
     @Test
@@ -382,7 +426,6 @@ public class NiciraNvpResourceTest {
 
         final ConfigurePublicIpsOnLogicalRouterAnswer answer = (ConfigurePublicIpsOnLogicalRouterAnswer) resource.executeRequest(cmd);
         assertFalse(answer.getResult());
-
     }
 
     @Test
@@ -732,7 +775,6 @@ public class NiciraNvpResourceTest {
 
         // The expected result is false, Nicira does not support port ranges in DNAT
         assertFalse(a.getResult());
-
     }
 
     @Test

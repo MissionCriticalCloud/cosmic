@@ -13,17 +13,17 @@ import com.cloud.resource.ServerResource;
 
 @ResourceWrapper(handles = WatchConsoleProxyLoadCommand.class)
 public class LibvirtWatchConsoleProxyLoadCommandWrapper
-    extends LibvirtConsoleProxyLoadCommandWrapper<WatchConsoleProxyLoadCommand, Answer, LibvirtComputingResource> {
+        extends LibvirtConsoleProxyLoadCommandWrapper<WatchConsoleProxyLoadCommand, Answer, LibvirtComputingResource> {
 
-  @Override
-  public Answer execute(final Command command, final ServerResource serverResource) {
-    final WatchConsoleProxyLoadCommand cmd = (WatchConsoleProxyLoadCommand) command;
+    @Override
+    public Answer execute(final Command command, final ServerResource serverResource) {
+        final WatchConsoleProxyLoadCommand cmd = (WatchConsoleProxyLoadCommand) command;
 
-    final long proxyVmId = cmd.getProxyVmId();
-    final String proxyVmName = cmd.getProxyVmName();
-    final String proxyManagementIp = cmd.getProxyManagementIp();
-    final int proxyCmdPort = cmd.getProxyCmdPort();
+        final long proxyVmId = cmd.getProxyVmId();
+        final String proxyVmName = cmd.getProxyVmName();
+        final String proxyManagementIp = cmd.getProxyManagementIp();
+        final int proxyCmdPort = cmd.getProxyCmdPort();
 
-    return executeProxyLoadScan(cmd, proxyVmId, proxyVmName, proxyManagementIp, proxyCmdPort);
-  }
+        return executeProxyLoadScan(cmd, proxyVmId, proxyVmName, proxyManagementIp, proxyCmdPort);
+    }
 }

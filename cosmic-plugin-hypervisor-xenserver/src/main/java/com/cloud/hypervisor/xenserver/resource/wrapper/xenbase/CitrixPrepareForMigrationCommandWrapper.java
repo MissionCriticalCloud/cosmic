@@ -19,8 +19,6 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import java.util.List;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.PrepareForMigrationAnswer;
 import com.cloud.agent.api.PrepareForMigrationCommand;
@@ -29,12 +27,14 @@ import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.xensource.xenapi.Connection;
 
+import java.util.List;
+
+import com.xensource.xenapi.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  PrepareForMigrationCommand.class)
+@ResourceWrapper(handles = PrepareForMigrationCommand.class)
 public final class CitrixPrepareForMigrationCommandWrapper extends CommandWrapper<PrepareForMigrationCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixPrepareForMigrationCommandWrapper.class);
@@ -44,10 +44,10 @@ public final class CitrixPrepareForMigrationCommandWrapper extends CommandWrappe
         final Connection conn = citrixResourceBase.getConnection();
 
         final VirtualMachineTO vm = command.getVirtualMachine();
-        List<String[]> vmDataList = vm.getVmData();
+        final List<String[]> vmDataList = vm.getVmData();
         String configDriveLabel = vm.getConfigDriveLabel();
 
-        if (configDriveLabel == null)  {
+        if (configDriveLabel == null) {
             configDriveLabel = "config";
         }
 

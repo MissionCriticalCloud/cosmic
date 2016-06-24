@@ -16,14 +16,10 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.vpc;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.network.vpc.StaticRoute;
 import com.cloud.network.vpc.VpcGateway;
 import com.cloud.utils.Pair;
 import com.cloud.utils.net.NetUtils;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListTaggedResourcesCmd;
@@ -32,6 +28,9 @@ import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.PrivateGatewayResponse;
 import org.apache.cloudstack.api.response.StaticRouteResponse;
 import org.apache.cloudstack.api.response.VpcResponse;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @APICommand(name = "listStaticRoutes", description = "Lists all static routes", responseObject = StaticRouteResponse.class, entityType = {StaticRoute.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
@@ -76,14 +75,6 @@ public class ListStaticRoutesCmd extends BaseListTaggedResourcesCmd {
         return cidr;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////////// Accessors ///////////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
     @Override
     public void execute() {
         Pair<List<? extends StaticRoute>, Integer> result = _vpcService.listStaticRoutes(this);
@@ -98,7 +89,7 @@ public class ListStaticRoutesCmd extends BaseListTaggedResourcesCmd {
             GatewayCidr = NetUtils.ipAndNetMaskToCidr(gateway.getGateway(), gateway.getNetmask());
         }
         for (StaticRoute route : result.first()) {
-            if (! NetUtils.isIpWithtInCidrRange(route.getGwIpAddress(), GatewayCidr)) {
+            if (!NetUtils.isIpWithtInCidrRange(route.getGwIpAddress(), GatewayCidr)) {
                 continue;
             }
             StaticRouteResponse ruleData = _responseGenerator.createStaticRouteResponse(route);
@@ -109,4 +100,11 @@ public class ListStaticRoutesCmd extends BaseListTaggedResourcesCmd {
         setResponseObject(response);
     }
 
+    /////////////////////////////////////////////////////
+    /////////////////// Accessors ///////////////////////
+    /////////////////////////////////////////////////////
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
 }

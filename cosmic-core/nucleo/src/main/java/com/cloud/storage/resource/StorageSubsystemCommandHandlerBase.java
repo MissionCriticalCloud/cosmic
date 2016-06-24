@@ -27,7 +27,6 @@ import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.Volume;
-
 import org.apache.cloudstack.storage.command.AttachCommand;
 import org.apache.cloudstack.storage.command.CopyCommand;
 import org.apache.cloudstack.storage.command.CreateObjectAnswer;
@@ -37,6 +36,7 @@ import org.apache.cloudstack.storage.command.DettachCommand;
 import org.apache.cloudstack.storage.command.IntroduceObjectCmd;
 import org.apache.cloudstack.storage.command.SnapshotAndCopyCommand;
 import org.apache.cloudstack.storage.command.StorageSubSystemCommand;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,22 +51,22 @@ public class StorageSubsystemCommandHandlerBase implements StorageSubsystemComma
     @Override
     public Answer handleStorageCommands(StorageSubSystemCommand command) {
         if (command instanceof CopyCommand) {
-            return this.execute((CopyCommand)command);
+            return this.execute((CopyCommand) command);
         } else if (command instanceof CreateObjectCommand) {
-            return execute((CreateObjectCommand)command);
+            return execute((CreateObjectCommand) command);
         } else if (command instanceof DeleteCommand) {
-            return execute((DeleteCommand)command);
+            return execute((DeleteCommand) command);
         } else if (command instanceof AttachCommand) {
-            return execute((AttachCommand)command);
+            return execute((AttachCommand) command);
         } else if (command instanceof DettachCommand) {
-            return execute((DettachCommand)command);
+            return execute((DettachCommand) command);
         } else if (command instanceof IntroduceObjectCmd) {
-            return processor.introduceObject((IntroduceObjectCmd)command);
+            return processor.introduceObject((IntroduceObjectCmd) command);
         } else if (command instanceof SnapshotAndCopyCommand) {
-            return processor.snapshotAndCopy((SnapshotAndCopyCommand)command);
+            return processor.snapshotAndCopy((SnapshotAndCopyCommand) command);
         }
 
-        return new Answer((Command)command, false, "not implemented yet");
+        return new Answer((Command) command, false, "not implemented yet");
     }
 
     protected Answer execute(CopyCommand cmd) {
@@ -76,16 +76,16 @@ public class StorageSubsystemCommandHandlerBase implements StorageSubsystemComma
         DataStoreTO destDataStore = destData.getDataStore();
 
         if (srcData.getObjectType() == DataObjectType.TEMPLATE &&
-            (srcData.getDataStore().getRole() == DataStoreRole.Image || srcData.getDataStore().getRole() == DataStoreRole.ImageCache) &&
-            destData.getDataStore().getRole() == DataStoreRole.Primary) {
+                (srcData.getDataStore().getRole() == DataStoreRole.Image || srcData.getDataStore().getRole() == DataStoreRole.ImageCache) &&
+                destData.getDataStore().getRole() == DataStoreRole.Primary) {
             //copy template to primary storage
             return processor.copyTemplateToPrimaryStorage(cmd);
         } else if (srcData.getObjectType() == DataObjectType.TEMPLATE && srcDataStore.getRole() == DataStoreRole.Primary &&
-            destDataStore.getRole() == DataStoreRole.Primary) {
+                destDataStore.getRole() == DataStoreRole.Primary) {
             //clone template to a volume
             return processor.cloneVolumeFromBaseTemplate(cmd);
         } else if (srcData.getObjectType() == DataObjectType.VOLUME &&
-            (srcData.getDataStore().getRole() == DataStoreRole.ImageCache || srcDataStore.getRole() == DataStoreRole.Image)) {
+                (srcData.getDataStore().getRole() == DataStoreRole.ImageCache || srcDataStore.getRole() == DataStoreRole.Image)) {
             //copy volume from image cache to primary
             return processor.copyVolumeFromImageCacheToPrimary(cmd);
         } else if (srcData.getObjectType() == DataObjectType.VOLUME && srcData.getDataStore().getRole() == DataStoreRole.Primary) {
@@ -95,7 +95,7 @@ public class StorageSubsystemCommandHandlerBase implements StorageSubsystemComma
                 return processor.createTemplateFromVolume(cmd);
             }
         } else if (srcData.getObjectType() == DataObjectType.SNAPSHOT && destData.getObjectType() == DataObjectType.SNAPSHOT &&
-            srcData.getDataStore().getRole() == DataStoreRole.Primary) {
+                srcData.getDataStore().getRole() == DataStoreRole.Primary) {
             return processor.backupSnapshot(cmd);
         } else if (srcData.getObjectType() == DataObjectType.SNAPSHOT && destData.getObjectType() == DataObjectType.VOLUME) {
             return processor.createVolumeFromSnapshot(cmd);

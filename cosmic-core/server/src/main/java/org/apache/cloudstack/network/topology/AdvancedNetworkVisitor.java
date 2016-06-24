@@ -17,10 +17,6 @@
 
 package org.apache.cloudstack.network.topology;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.PvlanSetupCommand;
 import com.cloud.agent.manager.Commands;
@@ -49,6 +45,10 @@ import com.cloud.vm.NicVO;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,18 +88,6 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
     }
 
     @Override
-    public boolean visit(final NicPlugInOutRules nicPlugInOutRules) throws ResourceUnavailableException {
-        final VirtualRouter router = nicPlugInOutRules.getRouter();
-
-        final Commands commands = nicPlugInOutRules.getNetUsageCommands();
-
-        if (commands.size() > 0) {
-            return _networkGeneralHelper.sendCommandsToRouter(router, commands);
-        }
-        return true;
-    }
-
-    @Override
     public boolean visit(final NetworkAclsRules acls) throws ResourceUnavailableException {
         final VirtualRouter router = acls.getRouter();
         final Network network = acls.getNetwork();
@@ -126,6 +114,20 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
         } else {
             return true;
         }
+    }
+
+    @Override
+    public boolean visit(final AdvancedVpnRules vpnRules) throws ResourceUnavailableException {
+        final VirtualRouter router = vpnRules.getRouter();
+        final List<? extends VpnUser> users = vpnRules.getUsers();
+
+        final Commands cmds = new Commands(Command.OnError.Continue);
+        _commandSetupHelper.createApplyVpnUsersCommand(users, router, cmds);
+
+        // Currently we receive just one answer from the agent. In the future we
+        // have to parse individual answers and set
+        // results accordingly
+        return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
     }
 
     @Override
@@ -191,6 +193,18 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
     }
 
     @Override
+    public boolean visit(final NicPlugInOutRules nicPlugInOutRules) throws ResourceUnavailableException {
+        final VirtualRouter router = nicPlugInOutRules.getRouter();
+
+        final Commands commands = nicPlugInOutRules.getNetUsageCommands();
+
+        if (commands.size() > 0) {
+            return _networkGeneralHelper.sendCommandsToRouter(router, commands);
+        }
+        return true;
+    }
+
+    @Override
     public boolean visit(final StaticRoutesRules staticRoutesRules) throws ResourceUnavailableException {
         final VirtualRouter router = staticRoutesRules.getRouter();
         final List<StaticRouteProfile> staticRoutes = staticRoutesRules.getStaticRoutes();
@@ -198,20 +212,6 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
         final Commands cmds = new Commands(Command.OnError.Continue);
         _commandSetupHelper.createStaticRouteCommands(staticRoutes, router, cmds);
 
-        return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
-    }
-
-    @Override
-    public boolean visit(final AdvancedVpnRules vpnRules) throws ResourceUnavailableException {
-        final VirtualRouter router = vpnRules.getRouter();
-        final List<? extends VpnUser> users = vpnRules.getUsers();
-
-        final Commands cmds = new Commands(Command.OnError.Continue);
-        _commandSetupHelper.createApplyVpnUsersCommand(users, router, cmds);
-
-        // Currently we receive just one answer from the agent. In the future we
-        // have to parse individual answers and set
-        // results accordingly
         return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
     }
 }

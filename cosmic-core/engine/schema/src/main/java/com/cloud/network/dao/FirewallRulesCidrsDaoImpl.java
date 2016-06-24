@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +42,19 @@ public class FirewallRulesCidrsDaoImpl extends GenericDaoBase<FirewallRulesCidrs
 
     @Override
     @DB
+    public void persist(long firewallRuleId, List<String> sourceCidrs) {
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+
+        txn.start();
+        for (String tag : sourceCidrs) {
+            FirewallRulesCidrsVO vo = new FirewallRulesCidrsVO(firewallRuleId, tag);
+            persist(vo);
+        }
+        txn.commit();
+    }
+
+    @Override
+    @DB
     public List<String> getSourceCidrs(long firewallRuleId) {
         SearchCriteria<FirewallRulesCidrsVO> sc = CidrsSearch.create();
         sc.setParameters("firewallRuleId", firewallRuleId);
@@ -55,7 +68,8 @@ public class FirewallRulesCidrsDaoImpl extends GenericDaoBase<FirewallRulesCidrs
         return cidrs;
     }
 
-    @Override @DB
+    @Override
+    @DB
     public List<FirewallRulesCidrsVO> listByFirewallRuleId(long firewallRuleId) {
         SearchCriteria<FirewallRulesCidrsVO> sc = CidrsSearch.create();
         sc.setParameters("firewallRuleId", firewallRuleId);
@@ -63,18 +77,5 @@ public class FirewallRulesCidrsDaoImpl extends GenericDaoBase<FirewallRulesCidrs
         List<FirewallRulesCidrsVO> results = search(sc, null);
 
         return results;
-    }
-
-    @Override
-    @DB
-    public void persist(long firewallRuleId, List<String> sourceCidrs) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-
-        txn.start();
-        for (String tag : sourceCidrs) {
-            FirewallRulesCidrsVO vo = new FirewallRulesCidrsVO(firewallRuleId, tag);
-            persist(vo);
-        }
-        txn.commit();
     }
 }

@@ -22,16 +22,15 @@ import static org.mockito.Mockito.verify;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.resource.ResourceService;
 import com.cloud.server.ManagementService;
-
 import org.apache.cloudstack.api.ResponseGenerator;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.admin.host.UpdateHostPasswordCmd;
+
+import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import junit.framework.TestCase;
 
 public class UpdateHostPasswordCmdTest extends TestCase {
 

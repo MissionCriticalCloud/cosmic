@@ -18,12 +18,6 @@
  */
 package org.apache.cloudstack.storage.motion;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
@@ -49,7 +43,6 @@ import com.cloud.storage.dao.VolumeDao;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VirtualMachineManager;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.ChapInfo;
 import org.apache.cloudstack.engine.subsystem.api.storage.CopyCommandResult;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataMotionStrategy;
@@ -71,6 +64,12 @@ import org.apache.cloudstack.storage.command.CopyCmdAnswer;
 import org.apache.cloudstack.storage.command.CopyCommand;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -79,17 +78,28 @@ import org.springframework.stereotype.Component;
 public class StorageSystemDataMotionStrategy implements DataMotionStrategy {
     private static final Logger s_logger = LoggerFactory.getLogger(StorageSystemDataMotionStrategy.class);
 
-    @Inject private AgentManager _agentMgr;
-    @Inject private ConfigurationDao _configDao;
-    @Inject private DiskOfferingDao _diskOfferingDao;
-    @Inject private HostDao _hostDao;
-    @Inject private ManagementService _mgr;
-    @Inject private PrimaryDataStoreDao _storagePoolDao;
-    @Inject private SnapshotDao _snapshotDao;
-    @Inject private SnapshotDetailsDao _snapshotDetailsDao;
-    @Inject private VolumeDao _volumeDao;
-    @Inject private VolumeDataFactory _volumeDataFactory;
-    @Inject private VolumeService _volumeService;
+    @Inject
+    private AgentManager _agentMgr;
+    @Inject
+    private ConfigurationDao _configDao;
+    @Inject
+    private DiskOfferingDao _diskOfferingDao;
+    @Inject
+    private HostDao _hostDao;
+    @Inject
+    private ManagementService _mgr;
+    @Inject
+    private PrimaryDataStoreDao _storagePoolDao;
+    @Inject
+    private SnapshotDao _snapshotDao;
+    @Inject
+    private SnapshotDetailsDao _snapshotDetailsDao;
+    @Inject
+    private VolumeDao _volumeDao;
+    @Inject
+    private VolumeDataFactory _volumeDataFactory;
+    @Inject
+    private VolumeService _volumeService;
 
     @Override
     public StrategyPriority canHandle(DataObject srcData, DataObject destData) {
@@ -129,7 +139,7 @@ public class StorageSystemDataMotionStrategy implements DataMotionStrategy {
     @Override
     public Void copyAsync(DataObject srcData, DataObject destData, Host destHost, AsyncCompletionCallback<CopyCommandResult> callback) {
         if (srcData instanceof SnapshotInfo) {
-            SnapshotInfo snapshotInfo = (SnapshotInfo)srcData;
+            SnapshotInfo snapshotInfo = (SnapshotInfo) srcData;
 
             validate(snapshotInfo);
 
@@ -137,11 +147,11 @@ public class StorageSystemDataMotionStrategy implements DataMotionStrategy {
 
             if (canHandleSrc && destData instanceof TemplateInfo &&
                     (destData.getDataStore().getRole() == DataStoreRole.Image || destData.getDataStore().getRole() == DataStoreRole.ImageCache)) {
-                return handleCreateTemplateFromSnapshot(snapshotInfo, (TemplateInfo)destData, callback);
+                return handleCreateTemplateFromSnapshot(snapshotInfo, (TemplateInfo) destData, callback);
             }
 
             if (destData instanceof VolumeInfo) {
-                VolumeInfo volumeInfo = (VolumeInfo)destData;
+                VolumeInfo volumeInfo = (VolumeInfo) destData;
 
                 boolean canHandleDest = canHandle(destData.getDataStore());
 
@@ -164,6 +174,22 @@ public class StorageSystemDataMotionStrategy implements DataMotionStrategy {
         throw new UnsupportedOperationException("This operation is not supported.");
     }
 
+    @Override
+    public Void copyAsync(DataObject srcData, DataObject destData, AsyncCompletionCallback<CopyCommandResult> callback) {
+        return copyAsync(srcData, destData, null, callback);
+    }
+
+    @Override
+    public Void copyAsync(Map<VolumeInfo, DataStore> volumeMap, VirtualMachineTO vmTo, Host srcHost, Host destHost, AsyncCompletionCallback<CopyCommandResult> callback) {
+        CopyCommandResult result = new CopyCommandResult(null, null);
+
+        result.setResult("Unsupported operation requested for copying data.");
+
+        callback.complete(result);
+
+        return null;
+    }
+
     private void validate(SnapshotInfo snapshotInfo) {
         long volumeId = snapshotInfo.getVolumeId();
 
@@ -177,8 +203,7 @@ public class StorageSystemDataMotionStrategy implements DataMotionStrategy {
     private Void handleCreateTemplateFromSnapshot(SnapshotInfo snapshotInfo, TemplateInfo templateInfo, AsyncCompletionCallback<CopyCommandResult> callback) {
         try {
             snapshotInfo.processEvent(Event.CopyingRequested);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new CloudRuntimeException("This snapshot is not currently in a state where it can be used to create a template.");
         }
 
@@ -200,24 +225,20 @@ public class StorageSystemDataMotionStrategy implements DataMotionStrategy {
 
             copyCommand.setOptions(srcDetails);
 
-            copyCmdAnswer = (CopyCmdAnswer)_agentMgr.send(hostVO.getId(), copyCommand);
-        }
-        catch (Exception ex) {
+            copyCmdAnswer = (CopyCmdAnswer) _agentMgr.send(hostVO.getId(), copyCommand);
+        } catch (Exception ex) {
             throw new CloudRuntimeException(ex.getMessage());
-        }
-        finally {
+        } finally {
             try {
                 _volumeService.revokeAccess(snapshotInfo, hostVO, srcDataStore);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 s_logger.debug(ex.getMessage(), ex);
             }
 
             if (copyCmdAnswer == null || !copyCmdAnswer.getResult()) {
                 if (copyCmdAnswer != null && copyCmdAnswer.getDetails() != null && !copyCmdAnswer.getDetails().isEmpty()) {
                     errMsg = copyCmdAnswer.getDetails();
-                }
-                else {
+                } else {
                     errMsg = "Unable to perform host-side operation";
                 }
             }
@@ -225,12 +246,10 @@ public class StorageSystemDataMotionStrategy implements DataMotionStrategy {
             try {
                 if (errMsg == null) {
                     snapshotInfo.processEvent(Event.OperationSuccessed);
-                }
-                else {
+                } else {
                     snapshotInfo.processEvent(Event.OperationFailed);
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 s_logger.debug(ex.getMessage(), ex);
             }
         }
@@ -262,8 +281,7 @@ public class StorageSystemDataMotionStrategy implements DataMotionStrategy {
 
                 throw new CloudRuntimeException(result.getResult());
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new CloudRuntimeException(ex.getMessage());
         }
 
@@ -293,23 +311,19 @@ public class StorageSystemDataMotionStrategy implements DataMotionStrategy {
 
             copyCommand.setOptions2(destDetails);
 
-            copyCmdAnswer = (CopyCmdAnswer)_agentMgr.send(hostVO.getId(), copyCommand);
-        }
-        catch (Exception ex) {
+            copyCmdAnswer = (CopyCmdAnswer) _agentMgr.send(hostVO.getId(), copyCommand);
+        } catch (Exception ex) {
             throw new CloudRuntimeException(ex.getMessage());
-        }
-        finally {
+        } finally {
             try {
                 _volumeService.revokeAccess(snapshotInfo, hostVO, snapshotInfo.getDataStore());
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 s_logger.debug(ex.getMessage(), ex);
             }
 
             try {
                 _volumeService.revokeAccess(volumeInfo, hostVO, volumeInfo.getDataStore());
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 s_logger.debug(ex.getMessage(), ex);
             }
         }
@@ -319,8 +333,7 @@ public class StorageSystemDataMotionStrategy implements DataMotionStrategy {
         if (copyCmdAnswer == null || !copyCmdAnswer.getResult()) {
             if (copyCmdAnswer != null && copyCmdAnswer.getDetails() != null && !copyCmdAnswer.getDetails().isEmpty()) {
                 errMsg = copyCmdAnswer.getDetails();
-            }
-            else {
+            } else {
                 errMsg = "Unable to perform host-side operation";
             }
         }
@@ -410,21 +423,5 @@ public class StorageSystemDataMotionStrategy implements DataMotionStrategy {
         }
 
         throw new CloudRuntimeException("Unable to locate an applicable cluster");
-    }
-
-    @Override
-    public Void copyAsync(DataObject srcData, DataObject destData, AsyncCompletionCallback<CopyCommandResult> callback) {
-        return copyAsync(srcData, destData, null, callback);
-    }
-
-    @Override
-    public Void copyAsync(Map<VolumeInfo, DataStore> volumeMap, VirtualMachineTO vmTo, Host srcHost, Host destHost, AsyncCompletionCallback<CopyCommandResult> callback) {
-        CopyCommandResult result = new CopyCommandResult(null, null);
-
-        result.setResult("Unsupported operation requested for copying data.");
-
-        callback.complete(result);
-
-        return null;
     }
 }

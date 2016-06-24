@@ -18,6 +18,9 @@
  */
 package org.apache.cloudstack.spring.module.model.impl;
 
+import org.apache.cloudstack.spring.module.model.ModuleDefinition;
+import org.apache.cloudstack.spring.module.util.ModuleLocationUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -27,8 +30,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
-import org.apache.cloudstack.spring.module.model.ModuleDefinition;
-import org.apache.cloudstack.spring.module.util.ModuleLocationUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -99,6 +100,10 @@ public class DefaultModuleDefinition implements ModuleDefinition {
         }
     }
 
+    private String location() throws IOException {
+        return moduleProperties.getURL().toString();
+    }
+
     protected void checkNameMatchesSelf() throws IOException {
         String expectedLocation = ModuleLocationUtils.getModuleLocation(baseDir, name);
         Resource self = resolver.getResource(expectedLocation);
@@ -112,22 +117,13 @@ public class DefaultModuleDefinition implements ModuleDefinition {
 
         if (!moduleUrl.equals(selfUrl)) {
             throw new IOException("Resource [" + location() + "] and [" + self.getURL() + "] do not appear to be the same resource, " +
-                "please ensure the name property is correct or that the " + "module is not defined twice");
+                    "please ensure the name property is correct or that the " + "module is not defined twice");
         }
     }
 
-    private String location() throws IOException {
-        return moduleProperties.getURL().toString();
-    }
-
     @Override
-    public void addChild(ModuleDefinition def) {
-        children.put(def.getName(), def);
-    }
-
-    @Override
-    public Collection<ModuleDefinition> getChildren() {
-        return children.values();
+    public ClassLoader getClassLoader() {
+        return resolver.getClassLoader();
     }
 
     @Override
@@ -166,8 +162,12 @@ public class DefaultModuleDefinition implements ModuleDefinition {
     }
 
     @Override
-    public ClassLoader getClassLoader() {
-        return resolver.getClassLoader();
+    public Collection<ModuleDefinition> getChildren() {
+        return children.values();
     }
 
+    @Override
+    public void addChild(ModuleDefinition def) {
+        children.put(def.getName(), def);
+    }
 }

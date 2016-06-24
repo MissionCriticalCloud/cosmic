@@ -16,14 +16,6 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDaoBase;
@@ -35,10 +27,17 @@ import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.framework.jobs.impl.VmWorkJobVO;
 import org.apache.cloudstack.framework.jobs.impl.VmWorkJobVO.Step;
 import org.apache.cloudstack.jobs.JobInfo;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,8 +87,9 @@ public class VmWorkJobDaoImpl extends GenericDaoBase<VmWorkJobVO, Long> implemen
 
         Filter filter = new Filter(VmWorkJobVO.class, "created", true, null, null);
         List<VmWorkJobVO> result = this.listBy(sc, filter);
-        if (result != null && result.size() > 0)
+        if (result != null && result.size() > 0) {
             return result.get(0);
+        }
 
         return null;
     }
@@ -145,8 +145,9 @@ public class VmWorkJobDaoImpl extends GenericDaoBase<VmWorkJobVO, Long> implemen
         sc.setParameters("dispatcher", "VmWorkJobDispatcher");
         List<VmWorkJobVO> expungeList = listBy(sc);
         for (VmWorkJobVO job : expungeList) {
-            if (s_logger.isDebugEnabled())
+            if (s_logger.isDebugEnabled()) {
                 s_logger.debug("Expunge completed work job-" + job.getId());
+            }
             expunge(job.getId());
             _baseJobDao.expunge(job.getId());
         }
@@ -170,7 +171,8 @@ public class VmWorkJobDaoImpl extends GenericDaoBase<VmWorkJobVO, Long> implemen
                 try (
                         PreparedStatement pstmt = txn
                                 .prepareAutoCloseStatement(
-                            "DELETE FROM vm_work_job WHERE id IN (SELECT id FROM async_job WHERE (job_dispatcher='VmWorkJobPlaceHolder' OR job_dispatcher='VmWorkJobDispatcher') AND job_init_msid=?)");
+                                        "DELETE FROM vm_work_job WHERE id IN (SELECT id FROM async_job WHERE (job_dispatcher='VmWorkJobPlaceHolder' OR " +
+                                                "job_dispatcher='VmWorkJobDispatcher') AND job_init_msid=?)");
                 ) {
                     pstmt.setLong(1, msid);
 
@@ -185,7 +187,7 @@ public class VmWorkJobDaoImpl extends GenericDaoBase<VmWorkJobVO, Long> implemen
 
                 try (
                         PreparedStatement pstmt = txn.prepareAutoCloseStatement(
-                            "DELETE FROM async_job WHERE (job_dispatcher='VmWorkJobPlaceHolder' OR job_dispatcher='VmWorkJobDispatcher') AND job_init_msid=?");
+                                "DELETE FROM async_job WHERE (job_dispatcher='VmWorkJobPlaceHolder' OR job_dispatcher='VmWorkJobDispatcher') AND job_init_msid=?");
                 ) {
                     pstmt.setLong(1, msid);
 

@@ -36,11 +36,11 @@ public class GetVmIpAddressCommand extends Command {
         return false;
     }
 
-    public String getVmName(){
+    public String getVmName() {
         return vmName;
     }
 
-    public boolean isWindows(){
+    public boolean isWindows() {
         return windows;
     }
 

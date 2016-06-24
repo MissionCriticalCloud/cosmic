@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface LoadBalancerCertMapDao extends GenericDao<LoadBalancerCertMapVO, Long> {
     List<LoadBalancerCertMapVO> listByCertId(Long certId);

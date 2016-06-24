@@ -16,8 +16,6 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.address;
 
-import java.util.List;
-
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.event.EventTypes;
@@ -34,7 +32,6 @@ import com.cloud.network.vpc.Vpc;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.projects.Project;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
@@ -54,10 +51,14 @@ import org.apache.cloudstack.api.response.RegionResponse;
 import org.apache.cloudstack.api.response.VpcResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "associateIpAddress", description = "Acquires and associates a public IP to an account.", responseObject = IPAddressResponse.class, responseView = ResponseView.Restricted,
+@APICommand(name = "associateIpAddress", description = "Acquires and associates a public IP to an account.", responseObject = IPAddressResponse.class, responseView =
+        ResponseView.Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class AssociateIPAddrCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(AssociateIPAddrCmd.class.getName());
@@ -71,60 +72,113 @@ public class AssociateIPAddrCmd extends BaseAsyncCreateCmd {
     private String accountName;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               description = "the ID of the domain to associate with this IP address")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            description = "the ID of the domain to associate with this IP address")
     private Long domainId;
 
     @Parameter(name = ApiConstants.ZONE_ID,
-               type = CommandType.UUID,
-               entityType = ZoneResponse.class,
-               description = "the ID of the availability zone you want to acquire an public IP address from")
+            type = CommandType.UUID,
+            entityType = ZoneResponse.class,
+            description = "the ID of the availability zone you want to acquire an public IP address from")
     private Long zoneId;
 
     @Parameter(name = ApiConstants.NETWORK_ID,
-               type = CommandType.UUID,
-               entityType = NetworkResponse.class,
-               description = "The network this IP address should be associated to.")
+            type = CommandType.UUID,
+            entityType = NetworkResponse.class,
+            description = "The network this IP address should be associated to.")
     private Long networkId;
 
     @Parameter(name = ApiConstants.PROJECT_ID, type = CommandType.UUID, entityType = ProjectResponse.class, description = "Deploy VM for the project")
     private Long projectId;
 
     @Parameter(name = ApiConstants.VPC_ID, type = CommandType.UUID, entityType = VpcResponse.class, description = "the VPC you want the IP address to "
-        + "be associated with")
+            + "be associated with")
     private Long vpcId;
 
     @Parameter(name = ApiConstants.IS_PORTABLE, type = BaseCmd.CommandType.BOOLEAN, description = "should be set to true "
-        + "if public IP is required to be transferable across zones, if not specified defaults to false")
+            + "if public IP is required to be transferable across zones, if not specified defaults to false")
     private Boolean isPortable;
 
     @Parameter(name = ApiConstants.REGION_ID,
-               type = CommandType.INTEGER,
-               entityType = RegionResponse.class,
-               required = false,
-               description = "region ID from where portable IP is to be associated.")
+            type = CommandType.INTEGER,
+            entityType = RegionResponse.class,
+            required = false,
+            description = "region ID from where portable IP is to be associated.")
     private Integer regionId;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the IP to the end user or not", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the IP to the end user or not", since = "4" +
+            ".4", authorized = {RoleType.Admin})
     private Boolean display;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public String getAccountName() {
-        if (accountName != null) {
-            return accountName;
-        }
-        return CallContext.current().getCallingAccount().getAccountName();
+    public static String getResultObjectName() {
+        return "addressinfo";
     }
 
-    public long getDomainId() {
-        if (domainId != null) {
-            return domainId;
+    public Integer getRegionId() {
+        return regionId;
+    }
+
+    @Override
+    public String getEventType() {
+        if (isPortable()) {
+            return EventTypes.EVENT_PORTABLE_IP_ASSIGN;
+        } else {
+            return EventTypes.EVENT_NET_IP_ASSIGN;
         }
-        return CallContext.current().getCallingAccount().getDomainId();
+    }
+
+    public boolean isPortable() {
+        if (isPortable == null) {
+            return false;
+        } else {
+            return isPortable;
+        }
+    }
+
+    @Override
+    public String getEventDescription() {
+        return "associating IP to network ID: " + getNetworkId() + " in zone " + getZoneId();
+    }
+
+    public Long getNetworkId() {
+        if (vpcId != null) {
+            return null;
+        }
+
+        if (networkId != null) {
+            return networkId;
+        }
+        Long zoneId = getZoneId();
+
+        DataCenter zone = _entityMgr.findById(DataCenter.class, zoneId);
+        if (zone.getNetworkType() == NetworkType.Advanced) {
+            List<? extends Network> networks = _networkService.getIsolatedNetworksOwnedByAccountInZone(getZoneId(), _accountService.getAccount(getEntityOwnerId()));
+            if (networks.size() == 0) {
+                String domain = _domainService.getDomain(getDomainId()).getName();
+                throw new InvalidParameterValueException("Account name=" + getAccountName() + " domain=" + domain + " doesn't have virtual networks in zone=" +
+                        zone.getName());
+            }
+
+            if (networks.size() < 1) {
+                throw new InvalidParameterValueException("Account doesn't have any isolated networks in the zone");
+            } else if (networks.size() > 1) {
+                throw new InvalidParameterValueException("Account has more than one isolated network in the zone");
+            }
+
+            return networks.get(0).getId();
+        } else {
+            Network defaultGuestNetwork = _networkService.getExclusiveGuestNetwork(zoneId);
+            if (defaultGuestNetwork == null) {
+                throw new InvalidParameterValueException("Unable to find a default guest network for account " + getAccountName() + " in domain ID=" + getDomainId());
+            } else {
+                return defaultGuestNetwork.getId();
+            }
+        }
     }
 
     private long getZoneId() {
@@ -146,55 +200,66 @@ public class AssociateIPAddrCmd extends BaseAsyncCreateCmd {
                 + " Please specify either zoneId, or networkId, or vpcId in the call");
     }
 
+    public long getDomainId() {
+        if (domainId != null) {
+            return domainId;
+        }
+        return CallContext.current().getCallingAccount().getDomainId();
+    }
+
+    public String getAccountName() {
+        if (accountName != null) {
+            return accountName;
+        }
+        return CallContext.current().getCallingAccount().getAccountName();
+    }
+
     public Long getVpcId() {
         return vpcId;
     }
 
-    public boolean isPortable() {
-        if (isPortable == null) {
-            return false;
-        } else {
-            return isPortable;
-        }
+    @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.IpAddress;
     }
 
-    public Integer getRegionId() {
-        return regionId;
+    @Override
+    public String getSyncObjType() {
+        return BaseAsyncCmd.networkSyncObject;
     }
 
-    public Long getNetworkId() {
-        if (vpcId != null) {
-            return null;
-        }
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
 
-        if (networkId != null) {
-            return networkId;
-        }
-        Long zoneId = getZoneId();
+    @Override
+    public Long getSyncObjId() {
+        return getNetworkId();
+    }
 
-        DataCenter zone = _entityMgr.findById(DataCenter.class, zoneId);
-        if (zone.getNetworkType() == NetworkType.Advanced) {
-            List<? extends Network> networks = _networkService.getIsolatedNetworksOwnedByAccountInZone(getZoneId(), _accountService.getAccount(getEntityOwnerId()));
-            if (networks.size() == 0) {
-                String domain = _domainService.getDomain(getDomainId()).getName();
-                throw new InvalidParameterValueException("Account name=" + getAccountName() + " domain=" + domain + " doesn't have virtual networks in zone=" +
-                    zone.getName());
-            }
+    @Override
+    public void create() throws ResourceAllocationException {
+        try {
+            IpAddress ip = null;
 
-            if (networks.size() < 1) {
-                throw new InvalidParameterValueException("Account doesn't have any isolated networks in the zone");
-            } else if (networks.size() > 1) {
-                throw new InvalidParameterValueException("Account has more than one isolated network in the zone");
-            }
-
-            return networks.get(0).getId();
-        } else {
-            Network defaultGuestNetwork = _networkService.getExclusiveGuestNetwork(zoneId);
-            if (defaultGuestNetwork == null) {
-                throw new InvalidParameterValueException("Unable to find a default guest network for account " + getAccountName() + " in domain ID=" + getDomainId());
+            if (!isPortable()) {
+                ip = _networkService.allocateIP(_accountService.getAccount(getEntityOwnerId()), getZoneId(), getNetworkId(), getDisplayIp());
             } else {
-                return defaultGuestNetwork.getId();
+                ip = _networkService.allocatePortableIP(_accountService.getAccount(getEntityOwnerId()), 1, getZoneId(), getNetworkId(), getVpcId());
             }
+
+            if (ip != null) {
+                setEntityId(ip.getId());
+                setEntityUuid(ip.getUuid());
+            } else {
+                throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to allocate IP address");
+            }
+        } catch (ConcurrentOperationException ex) {
+            s_logger.warn("Exception: ", ex);
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, ex.getMessage());
+        } catch (InsufficientAddressCapacityException ex) {
+            s_logger.info(ex.toString());
+            throw new ServerApiException(ApiErrorCode.INSUFFICIENT_CAPACITY_ERROR, ex.getMessage());
         }
     }
 
@@ -204,11 +269,29 @@ public class AssociateIPAddrCmd extends BaseAsyncCreateCmd {
     }
 
     @Override
-    public boolean isDisplay() {
-        if(display == null)
-            return true;
-        else
-            return display;
+    public void execute() throws ResourceUnavailableException, ResourceAllocationException, ConcurrentOperationException, InsufficientCapacityException {
+        CallContext.current().setEventDetails("IP ID: " + getEntityId());
+
+        IpAddress result = null;
+
+        if (getVpcId() != null) {
+            result = _vpcService.associateIPToVpc(getEntityId(), getVpcId());
+        } else if (getNetworkId() != null) {
+            result = _networkService.associateIPToNetwork(getEntityId(), getNetworkId());
+        }
+
+        if (result != null) {
+            IPAddressResponse ipResponse = _responseGenerator.createIPAddressResponse(ResponseView.Restricted, result);
+            ipResponse.setResponseName(getCommandName());
+            setResponseObject(ipResponse);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to assign IP address");
+        }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 
     @Override
@@ -224,7 +307,7 @@ public class AssociateIPAddrCmd extends BaseAsyncCreateCmd {
                     return project.getProjectAccountId();
                 } else {
                     throw new PermissionDeniedException("Can't add resources to the project with specified projectId in state=" + project.getState() +
-                        " as it's no longer active");
+                            " as it's no longer active");
                 }
             } else {
                 throw new InvalidParameterValueException("Unable to find project by ID");
@@ -258,92 +341,11 @@ public class AssociateIPAddrCmd extends BaseAsyncCreateCmd {
     }
 
     @Override
-    public String getEventType() {
-        if (isPortable()) {
-            return EventTypes.EVENT_PORTABLE_IP_ASSIGN;
+    public boolean isDisplay() {
+        if (display == null) {
+            return true;
         } else {
-            return EventTypes.EVENT_NET_IP_ASSIGN;
+            return display;
         }
     }
-
-    @Override
-    public String getEventDescription() {
-        return  "associating IP to network ID: " + getNetworkId() + " in zone " + getZoneId();
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public static String getResultObjectName() {
-        return "addressinfo";
-    }
-
-    @Override
-    public void create() throws ResourceAllocationException {
-        try {
-            IpAddress ip = null;
-
-            if (!isPortable()) {
-                ip = _networkService.allocateIP(_accountService.getAccount(getEntityOwnerId()), getZoneId(), getNetworkId(), getDisplayIp());
-            } else {
-                ip = _networkService.allocatePortableIP(_accountService.getAccount(getEntityOwnerId()), 1, getZoneId(), getNetworkId(), getVpcId());
-            }
-
-            if (ip != null) {
-                setEntityId(ip.getId());
-                setEntityUuid(ip.getUuid());
-            } else {
-                throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to allocate IP address");
-            }
-        } catch (ConcurrentOperationException ex) {
-            s_logger.warn("Exception: ", ex);
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, ex.getMessage());
-        } catch (InsufficientAddressCapacityException ex) {
-            s_logger.info(ex.toString());
-            throw new ServerApiException(ApiErrorCode.INSUFFICIENT_CAPACITY_ERROR, ex.getMessage());
-        }
-    }
-
-    @Override
-    public void execute() throws ResourceUnavailableException, ResourceAllocationException, ConcurrentOperationException, InsufficientCapacityException {
-        CallContext.current().setEventDetails("IP ID: " + getEntityId());
-
-        IpAddress result = null;
-
-        if (getVpcId() != null) {
-            result = _vpcService.associateIPToVpc(getEntityId(), getVpcId());
-        } else if (getNetworkId() != null) {
-            result = _networkService.associateIPToNetwork(getEntityId(), getNetworkId());
-        }
-
-        if (result != null) {
-            IPAddressResponse ipResponse = _responseGenerator.createIPAddressResponse(ResponseView.Restricted, result);
-            ipResponse.setResponseName(getCommandName());
-            setResponseObject(ipResponse);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to assign IP address");
-        }
-    }
-
-    @Override
-    public String getSyncObjType() {
-        return BaseAsyncCmd.networkSyncObject;
-    }
-
-    @Override
-    public Long getSyncObjId() {
-        return getNetworkId();
-    }
-
-    @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.IpAddress;
-    }
-
 }

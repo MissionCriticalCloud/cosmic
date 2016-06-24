@@ -24,7 +24,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.snapshot.VMSnapshot;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -37,10 +36,12 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.api.response.VMSnapshotResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "revertToVMSnapshot", description = "Revert VM from a vmsnapshot.", responseObject = UserVmResponse.class, since = "4.2.0", responseView = ResponseView.Restricted,
+@APICommand(name = "revertToVMSnapshot", description = "Revert VM from a vmsnapshot.", responseObject = UserVmResponse.class, since = "4.2.0", responseView = ResponseView
+        .Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class RevertToVMSnapshotCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RevertToVMSnapshotCmd.class.getName());
@@ -48,14 +49,24 @@ public class RevertToVMSnapshotCmd extends BaseAsyncCmd {
 
     @ACL(accessType = AccessType.OperateEntry, pointerToEntity = "getVmId()")
     @Parameter(name = ApiConstants.VM_SNAPSHOT_ID,
-               type = CommandType.UUID,
-               required = true,
-               entityType = VMSnapshotResponse.class,
-               description = "The ID of the vm snapshot")
+            type = CommandType.UUID,
+            required = true,
+            entityType = VMSnapshotResponse.class,
+            description = "The ID of the vm snapshot")
     private Long vmSnapShotId;
 
-    public Long getVmSnapShotId() {
-        return vmSnapShotId;
+    @Override
+    public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ResourceAllocationException, ConcurrentOperationException {
+        CallContext.current().setEventDetails("vmsnapshot id: " + getVmSnapShotId());
+        UserVm result = _vmSnapshotService.revertToSnapshot(getVmSnapShotId());
+        if (result != null) {
+            UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Restricted,
+                    "virtualmachine", result).get(0);
+            response.setResponseName(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to revert VM snapshot");
+        }
     }
 
     @Override
@@ -72,23 +83,8 @@ public class RevertToVMSnapshotCmd extends BaseAsyncCmd {
         return Account.ACCOUNT_ID_SYSTEM;
     }
 
-    @Override
-    public void execute() throws  ResourceUnavailableException, InsufficientCapacityException, ResourceAllocationException, ConcurrentOperationException {
-        CallContext.current().setEventDetails("vmsnapshot id: " + getVmSnapShotId());
-        UserVm result = _vmSnapshotService.revertToSnapshot(getVmSnapShotId());
-        if (result != null) {
-            UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Restricted,
-                    "virtualmachine", result).get(0);
-            response.setResponseName(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to revert VM snapshot");
-        }
-    }
-
-    @Override
-    public String getEventDescription() {
-        return "Revert from VM snapshot: " + getVmSnapShotId();
+    public Long getVmSnapShotId() {
+        return vmSnapShotId;
     }
 
     @Override
@@ -96,4 +92,8 @@ public class RevertToVMSnapshotCmd extends BaseAsyncCmd {
         return EventTypes.EVENT_VM_SNAPSHOT_REVERT;
     }
 
+    @Override
+    public String getEventDescription() {
+        return "Revert from VM snapshot: " + getVmSnapShotId();
+    }
 }

@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.vm;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
@@ -25,6 +23,8 @@ import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.time.InaccurateClock;
 import com.cloud.vm.ItWorkVO.Step;
 import com.cloud.vm.VirtualMachine.State;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -81,16 +81,16 @@ public class ItWorkDaoImpl extends GenericDaoBase<ItWorkVO, String> implements I
     }
 
     @Override
+    public boolean updateStep(ItWorkVO work, Step step) {
+        work.setStep(step);
+        return update(work.getId(), work);
+    }
+
+    @Override
     public boolean update(String id, ItWorkVO work) {
         work.setUpdatedAt(InaccurateClock.getTimeInSeconds());
 
         return super.update(id, work);
-    }
-
-    @Override
-    public boolean updateStep(ItWorkVO work, Step step) {
-        work.setStep(step);
-        return update(work.getId(), work);
     }
 
     @Override
@@ -100,6 +100,5 @@ public class ItWorkDaoImpl extends GenericDaoBase<ItWorkVO, String> implements I
         sc.setParameters("step", Step.Done);
 
         return search(sc, null);
-
     }
 }

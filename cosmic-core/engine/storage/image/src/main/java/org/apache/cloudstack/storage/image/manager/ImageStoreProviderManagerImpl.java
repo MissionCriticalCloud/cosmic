@@ -18,20 +18,9 @@
  */
 package org.apache.cloudstack.storage.image.manager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.server.StatsCollector;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.dao.VMTemplateDao;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProviderManager;
 import org.apache.cloudstack.engine.subsystem.api.storage.ImageStoreProvider;
@@ -43,6 +32,16 @@ import org.apache.cloudstack.storage.image.ImageStoreDriver;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreEntity;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreProviderManager;
 import org.apache.cloudstack.storage.image.store.ImageStoreImpl;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -69,7 +68,7 @@ public class ImageStoreProviderManagerImpl implements ImageStoreProviderManager 
     public ImageStoreEntity getImageStore(long dataStoreId) {
         ImageStoreVO dataStore = dataStoreDao.findById(dataStoreId);
         String providerName = dataStore.getProviderName();
-        ImageStoreProvider provider = (ImageStoreProvider)providerManager.getDataStoreProvider(providerName);
+        ImageStoreProvider provider = (ImageStoreProvider) providerManager.getDataStoreProvider(providerName);
         ImageStoreEntity imgStore = ImageStoreImpl.getDataStore(dataStore, driverMaps.get(provider.getName()), provider);
         return imgStore;
     }
@@ -149,7 +148,7 @@ public class ImageStoreProviderManagerImpl implements ImageStoreProviderManager 
             Collections.shuffle(imageStores); // Randomize image store list.
             Iterator<DataStore> i = imageStores.iterator();
             DataStore imageStore = null;
-            while(i.hasNext()) {
+            while (i.hasNext()) {
                 imageStore = i.next();
                 // Return image store if used percentage is less then threshold value i.e. 90%.
                 if (_statsCollector.imageStoreHasEnoughCapacity(imageStore)) {

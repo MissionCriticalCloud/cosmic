@@ -29,7 +29,7 @@ public class PluggableServiceLifecycle extends RegistryLifecycle {
 
         for (Object obj : beans) {
             if (obj instanceof PluggableService) {
-                for (Class<?> cmd : ((PluggableService)obj).getCommands()) {
+                for (Class<?> cmd : ((PluggableService) obj).getCommands()) {
                     ComponentContext.addDelegateContext(cmd, applicationContext);
                 }
             }
@@ -40,7 +40,7 @@ public class PluggableServiceLifecycle extends RegistryLifecycle {
     public void stop() {
         for (Object obj : beans) {
             if (obj instanceof PluggableService) {
-                for (Class<?> cmd : ((PluggableService)obj).getCommands()) {
+                for (Class<?> cmd : ((PluggableService) obj).getCommands()) {
                     ComponentContext.removeDelegateContext(cmd);
                 }
             }
@@ -48,5 +48,4 @@ public class PluggableServiceLifecycle extends RegistryLifecycle {
 
         super.stop();
     }
-
 }

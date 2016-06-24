@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.storage.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.storage.SnapshotScheduleVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Date;
+import java.util.List;
 
 /*
  * Data Access Object for snapshot_schedule table
@@ -36,5 +36,4 @@ public interface SnapshotScheduleDao extends GenericDao<SnapshotScheduleVO, Long
     SnapshotScheduleVO findOneByVolume(long volumeId);
 
     SnapshotScheduleVO findOneByVolumePolicy(long volumeId, long policyId);
-
 }

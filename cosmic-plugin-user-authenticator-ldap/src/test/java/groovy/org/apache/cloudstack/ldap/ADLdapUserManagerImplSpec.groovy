@@ -47,10 +47,10 @@ class ADLdapUserManagerImplSpec extends spock.lang.Specification {
 
         def result = adLdapUserManager.generateADGroupSearchFilter(group);
         expect:
-            assert result.contains("memberOf:1.2.840.113556.1.4.1941:=")
-            result == "(&(objectClass=user)(memberOf:1.2.840.113556.1.4.1941:=CN=" + group + ",DC=cloud,DC=citrix,DC=com))"
+        assert result.contains("memberOf:1.2.840.113556.1.4.1941:=")
+        result == "(&(objectClass=user)(memberOf:1.2.840.113556.1.4.1941:=CN=" + group + ",DC=cloud,DC=citrix,DC=com))"
         where:
-            group << ["dev", "dev-hyd"]
+        group << ["dev", "dev-hyd"]
     }
 
     def "test generate AD search filter with nested groups disabled"() {
@@ -75,11 +75,11 @@ class ADLdapUserManagerImplSpec extends spock.lang.Specification {
         LdapContext context = Mock(LdapContext);
 
         when:
-            def result = adLdapUserManager.getUsersInGroup(group, context)
+        def result = adLdapUserManager.getUsersInGroup(group, context)
         then:
-            thrown(IllegalArgumentException)
+        thrown(IllegalArgumentException)
         where:
-            group << [null, "group", null]
+        group << [null, "group", null]
 
     }
 }

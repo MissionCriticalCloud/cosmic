@@ -58,5 +58,4 @@ public class ResourceApplicationContext extends AbstractXmlApplicationContext {
     public String toString() {
         return "ResourceApplicationContext [applicationName=" + applicationName + ", configResources=" + Arrays.toString(configResources) + "]";
     }
-
 }

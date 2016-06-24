@@ -16,13 +16,13 @@
 // under the License.
 package com.cloud.network.as.dao;
 
-import java.util.List;
-
 import com.cloud.network.as.AutoScaleVmGroupPolicyMapVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -70,5 +70,4 @@ public class AutoScaleVmGroupPolicyMapDaoImpl extends GenericDaoBase<AutoScaleVm
         sc.addAnd("policyId", SearchCriteria.Op.EQ, policyId);
         return findOneBy(sc) != null;
     }
-
 }

@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.util.List;
-
 import com.cloud.dc.ClusterVSMMapVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface ClusterVSMMapDao extends GenericDao<ClusterVSMMapVO, Long> {
     ClusterVSMMapVO findByClusterId(long clusterId);

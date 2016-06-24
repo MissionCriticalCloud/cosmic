@@ -16,12 +16,6 @@
 // under the License.
 package org.cloud.network.router.deployment;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.deploy.DeployDestination;
@@ -49,8 +43,13 @@ import com.cloud.vm.VirtualMachineProfile.Param;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -58,6 +57,13 @@ public class RouterDeploymentDefinitionBuilder {
 
     @Inject
     protected NetworkDao networkDao;
+    @Autowired
+    @Qualifier("networkHelper")
+    protected NetworkHelper nwHelper;
+    @Autowired
+    @Qualifier("vpcNetworkHelper")
+    protected VpcNetworkHelperImpl vpcNwHelper;
+    protected Long offeringId;
     @Inject
     private DomainRouterDao routerDao;
     @Inject
@@ -96,15 +102,6 @@ public class RouterDeploymentDefinitionBuilder {
     private VpcManager vpcMgr;
     @Inject
     private VlanDao vlanDao;
-
-    @Autowired
-    @Qualifier("networkHelper")
-    protected NetworkHelper nwHelper;
-    @Autowired
-    @Qualifier("vpcNetworkHelper")
-    protected VpcNetworkHelperImpl vpcNwHelper;
-
-    protected Long offeringId;
 
     public void setOfferingId(final Long offeringId) {
         this.offeringId = offeringId;
@@ -157,14 +154,13 @@ public class RouterDeploymentDefinitionBuilder {
 
     public class IntermediateStateBuilder {
 
-        RouterDeploymentDefinitionBuilder builder;
-
         protected Vpc vpc;
         protected Network guestNetwork;
         protected DeployDestination dest;
         protected Account owner;
         protected Map<Param, Object> params;
         protected List<DomainRouterVO> routers = new ArrayList<>();
+        RouterDeploymentDefinitionBuilder builder;
 
         protected IntermediateStateBuilder(final RouterDeploymentDefinitionBuilder builder) {
             this.builder = builder;
@@ -206,5 +202,4 @@ public class RouterDeploymentDefinitionBuilder {
             return builder.injectDependencies(routerDeploymentDefinition);
         }
     }
-
 }

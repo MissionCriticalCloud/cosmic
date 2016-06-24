@@ -16,11 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.commands;
 
-import javax.inject.Inject;
-
 import com.cloud.event.EventTypes;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -30,6 +27,9 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.dedicated.DedicatedService;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,13 +53,24 @@ public class ReleaseDedicatedZoneCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getZoneId() {
-        return zoneId;
+    @Override
+    public void execute() {
+        final boolean result = dedicatedService.releaseDedicatedResource(getZoneId(), null, null, null);
+        if (result) {
+            final SuccessResponse response = new SuccessResponse(getCommandName());
+            this.setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to release dedicated zone");
+        }
     }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
+
+    public Long getZoneId() {
+        return zoneId;
+    }
 
     @Override
     public String getCommandName() {
@@ -69,17 +80,6 @@ public class ReleaseDedicatedZoneCmd extends BaseAsyncCmd {
     @Override
     public long getEntityOwnerId() {
         return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
-    public void execute() {
-        boolean result = dedicatedService.releaseDedicatedResource(getZoneId(), null, null, null);
-        if (result) {
-            SuccessResponse response = new SuccessResponse(getCommandName());
-            this.setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to release dedicated zone");
-        }
     }
 
     @Override

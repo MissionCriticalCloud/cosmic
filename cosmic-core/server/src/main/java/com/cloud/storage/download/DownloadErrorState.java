@@ -18,18 +18,18 @@ package com.cloud.storage.download;
 
 import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
-
 import org.apache.cloudstack.storage.command.DownloadProgressCommand.RequestType;
+
 import org.apache.log4j.Level;
 
 public class DownloadErrorState extends DownloadInactiveState {
 
-    public DownloadErrorState(DownloadListener dl) {
+    public DownloadErrorState(final DownloadListener dl) {
         super(dl);
     }
 
     @Override
-    public String handleAnswer(DownloadAnswer answer) {
+    public String handleAnswer(final DownloadAnswer answer) {
         switch (answer.getDownloadStatus()) {
             case DOWNLOAD_IN_PROGRESS:
                 getDownloadListener().scheduleStatusCheck(RequestType.GET_STATUS);
@@ -65,21 +65,20 @@ public class DownloadErrorState extends DownloadInactiveState {
     }
 
     @Override
-    public void onEntry(String prevState, DownloadEvent event, Object evtObj) {
+    public void onEntry(final String prevState, final DownloadEvent event, final Object evtObj) {
         super.onEntry(prevState, event, evtObj);
         if (event == DownloadEvent.DISCONNECT) {
             getDownloadListener().logDisconnect();
             getDownloadListener().cancelStatusTask();
             getDownloadListener().cancelTimeoutTask();
-            DownloadAnswer answer = new DownloadAnswer("Storage agent or storage VM disconnected", Status.DOWNLOAD_ERROR);
+            final DownloadAnswer answer = new DownloadAnswer("Storage agent or storage VM disconnected", Status.DOWNLOAD_ERROR);
             getDownloadListener().callback(answer);
             getDownloadListener().log("Entering download error state because the storage host disconnected", Level.WARN);
         } else if (event == DownloadEvent.TIMEOUT_CHECK) {
-            DownloadAnswer answer = new DownloadAnswer("Timeout waiting for response from storage host", Status.DOWNLOAD_ERROR);
+            final DownloadAnswer answer = new DownloadAnswer("Timeout waiting for response from storage host", Status.DOWNLOAD_ERROR);
             getDownloadListener().callback(answer);
             getDownloadListener().log("Entering download error state: timeout waiting for response from storage host", Level.WARN);
         }
         getDownloadListener().setDownloadInactive(Status.DOWNLOAD_ERROR);
     }
-
 }

@@ -19,24 +19,24 @@ package com.cloud.hypervisor.ovm3.objects;
 
 public class Common extends OvmObject {
 
-  public Common(Connection connection) {
-    setClient(connection);
-  }
+    public Common(final Connection connection) {
+        setClient(connection);
+    }
 
-  public Integer getApiVersion() throws Ovm3ResourceException {
-    final Object[] x = (Object[]) callWrapper("get_api_version");
-    return (Integer) x[0];
-  }
+    public Integer getApiVersion() throws Ovm3ResourceException {
+        final Object[] x = (Object[]) callWrapper("get_api_version");
+        return (Integer) x[0];
+    }
 
-  public Boolean sleep(int seconds) throws Ovm3ResourceException {
-    return nullIsTrueCallWrapper("sleep", seconds);
-  }
+    public Boolean sleep(final int seconds) throws Ovm3ResourceException {
+        return nullIsTrueCallWrapper("sleep", seconds);
+    }
 
-  public <T> String dispatch(String url, String function, T... args) throws Ovm3ResourceException {
-    return callString("dispatch", url, function, args);
-  }
+    public <T> String dispatch(final String url, final String function, final T... args) throws Ovm3ResourceException {
+        return callString("dispatch", url, function, args);
+    }
 
-  public String echo(String msg) throws Ovm3ResourceException {
-    return callString("echo", msg);
-  }
+    public String echo(final String msg) throws Ovm3ResourceException {
+        return callString("echo", msg);
+    }
 }

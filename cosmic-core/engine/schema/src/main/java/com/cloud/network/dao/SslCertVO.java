@@ -16,49 +16,40 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.UUID;
+import com.cloud.network.lb.SslCert;
+import com.cloud.utils.db.Encrypt;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.network.lb.SslCert;
-import com.cloud.utils.db.Encrypt;
+import java.util.UUID;
 
 @Entity
 @Table(name = "sslcerts")
 public class SslCertVO implements SslCert {
 
+    @Column(name = "domain_id")
+    long domainId;
+    @Column(name = "fingerprint")
+    String fingerPrint;
     @Id
     @Column(name = "id")
     private Long id;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "certificate", length = 16384)
     private String certificate;
-
     @Column(name = "chain", length = 2097152)
     private String chain;
-
     @Encrypt
     @Column(name = "key", length = 16384)
     private String key;
-
     @Encrypt
     @Column(name = "password")
     private String password;
-
     @Column(name = "account_id")
     private Long accountId;
-
-    @Column(name = "domain_id")
-    long domainId;
-
-    @Column(name = "fingerprint")
-    String fingerPrint;
 
     public SslCertVO() {
         uuid = UUID.randomUUID().toString();
@@ -102,18 +93,8 @@ public class SslCertVO implements SslCert {
     }
 
     @Override
-    public long getAccountId() {
-        return accountId;
-    }
-
-    @Override
     public String getPassword() {
         return password;
-    }
-
-    @Override
-    public long getDomainId() {
-        return domainId;
     }
 
     @Override
@@ -122,8 +103,17 @@ public class SslCertVO implements SslCert {
     }
 
     @Override
+    public long getAccountId() {
+        return accountId;
+    }
+
+    @Override
+    public long getDomainId() {
+        return domainId;
+    }
+
+    @Override
     public Class<?> getEntityType() {
         return SslCert.class;
     }
-
 }

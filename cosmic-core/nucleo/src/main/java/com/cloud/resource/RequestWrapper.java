@@ -19,12 +19,12 @@
 
 package com.cloud.resource;
 
+import com.cloud.agent.api.Answer;
+import com.cloud.agent.api.Command;
+
 import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.Set;
-
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,8 @@ public abstract class RequestWrapper {
     private static final Logger s_logger = LoggerFactory.getLogger(RequestWrapper.class);
 
     @SuppressWarnings("rawtypes")
-    protected Hashtable<Class<? extends ServerResource>, Hashtable<Class<? extends Command>, CommandWrapper>> resources = new Hashtable<Class<? extends ServerResource>, Hashtable<Class<? extends Command>, CommandWrapper>>();
+    protected Hashtable<Class<? extends ServerResource>, Hashtable<Class<? extends Command>, CommandWrapper>> resources = new Hashtable<Class<? extends ServerResource>,
+            Hashtable<Class<? extends Command>, CommandWrapper>>();
 
     /**
      * @param command to be executed.
@@ -42,7 +43,37 @@ public abstract class RequestWrapper {
      */
     public abstract Answer execute(Command command, ServerResource serverResource);
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected CommandWrapper<Command, Answer, ServerResource> retryWhenAllFails(final Command command, final Class<? extends ServerResource> resourceClass,
+                                                                                final Hashtable<Class<? extends Command>, CommandWrapper> resourceCommands) {
+
+        Class<? extends ServerResource> keepResourceClass = resourceClass;
+        CommandWrapper<Command, Answer, ServerResource> commandWrapper = resourceCommands.get(command.getClass());
+        while (commandWrapper == null) {
+            // Could not find the command in the given resource, will traverse
+            // the family tree.
+            try {
+                final Class<? extends ServerResource> resourceClass2 = (Class<? extends ServerResource>) keepResourceClass.getSuperclass();
+
+                if (resourceClass2 == null) {
+                    throw new NullPointerException("All the SERVER-RESOURCE hierarchy tree has been visited but no compliant key has been found for '" + command.getClass() + "'.");
+                }
+
+                final Hashtable<Class<? extends Command>, CommandWrapper> resourceCommands2 = retrieveResource(command,
+                        (Class<? extends ServerResource>) keepResourceClass.getSuperclass());
+                keepResourceClass = resourceClass2;
+
+                commandWrapper = retrieveCommands(command.getClass(), resourceCommands2);
+            } catch (final ClassCastException e) {
+                throw new NullPointerException("No key found for '" + command.getClass() + "' in the Map!");
+            } catch (final NullPointerException e) {
+                throw e;
+            }
+        }
+        return commandWrapper;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
     protected Hashtable<Class<? extends Command>, CommandWrapper> retrieveResource(final Command command, final Class<? extends ServerResource> resourceClass) {
         Class<? extends ServerResource> keepResourceClass = resourceClass;
         Hashtable<Class<? extends Command>, CommandWrapper> resource = resources.get(keepResourceClass);
@@ -59,9 +90,9 @@ public abstract class RequestWrapper {
         return resource;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     protected CommandWrapper<Command, Answer, ServerResource> retrieveCommands(final Class<? extends Command> commandClass,
-            final Hashtable<Class<? extends Command>, CommandWrapper> resourceCommands) {
+                                                                               final Hashtable<Class<? extends Command>, CommandWrapper> resourceCommands) {
 
         Class<? extends Command> keepCommandClass = commandClass;
         CommandWrapper<Command, Answer, ServerResource> commandWrapper = resourceCommands.get(keepCommandClass);
@@ -85,36 +116,6 @@ public abstract class RequestWrapper {
                 // resource, an Unsupported answer will be thrown by the base
                 // class.
                 return null;
-            }
-        }
-        return commandWrapper;
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected CommandWrapper<Command, Answer, ServerResource> retryWhenAllFails(final Command command, final Class<? extends ServerResource> resourceClass,
-            final Hashtable<Class<? extends Command>, CommandWrapper> resourceCommands) {
-
-        Class<? extends ServerResource> keepResourceClass = resourceClass;
-        CommandWrapper<Command, Answer, ServerResource> commandWrapper = resourceCommands.get(command.getClass());
-        while (commandWrapper == null) {
-            // Could not find the command in the given resource, will traverse
-            // the family tree.
-            try {
-                final Class<? extends ServerResource> resourceClass2 = (Class<? extends ServerResource>) keepResourceClass.getSuperclass();
-
-                if (resourceClass2 == null) {
-                    throw new NullPointerException("All the SERVER-RESOURCE hierarchy tree has been visited but no compliant key has been found for '" + command.getClass() + "'.");
-                }
-
-                final Hashtable<Class<? extends Command>, CommandWrapper> resourceCommands2 = retrieveResource(command,
-                        (Class<? extends ServerResource>) keepResourceClass.getSuperclass());
-                keepResourceClass = resourceClass2;
-
-                commandWrapper = retrieveCommands(command.getClass(), resourceCommands2);
-            } catch (final ClassCastException e) {
-                throw new NullPointerException("No key found for '" + command.getClass() + "' in the Map!");
-            } catch (final NullPointerException e) {
-                throw e;
             }
         }
         return commandWrapper;

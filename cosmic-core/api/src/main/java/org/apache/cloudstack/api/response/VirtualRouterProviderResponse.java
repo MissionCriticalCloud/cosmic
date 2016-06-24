@@ -18,11 +18,11 @@ package org.apache.cloudstack.api.response;
 
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = VirtualRouterProvider.class)
 @SuppressWarnings("unused")
@@ -64,8 +64,14 @@ public class VirtualRouterProviderResponse extends BaseResponse implements Contr
         this.accountName = accountName;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    @Override
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 
     @Override
@@ -78,14 +84,8 @@ public class VirtualRouterProviderResponse extends BaseResponse implements Contr
         this.domainName = domainName;
     }
 
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setNspId(String nspId) {

@@ -16,10 +16,6 @@
 // under the License.
 package com.cloud.offerings.dao;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Detail;
 import com.cloud.offerings.NetworkOfferingDetailsVO;
@@ -29,6 +25,10 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class NetworkOfferingDetailsDaoImpl extends GenericDaoBase<NetworkOfferingDetailsVO, Long> implements NetworkOfferingDetailsDao {
     protected final SearchBuilder<NetworkOfferingDetailsVO> DetailSearch;
@@ -74,5 +74,4 @@ public class NetworkOfferingDetailsDaoImpl extends GenericDaoBase<NetworkOfferin
             return results.get(0);
         }
     }
-
 }

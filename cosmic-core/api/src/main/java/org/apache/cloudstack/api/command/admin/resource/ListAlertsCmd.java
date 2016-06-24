@@ -16,18 +16,18 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.resource;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.alert.Alert;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.AlertResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,11 +73,6 @@ public class ListAlertsCmd extends BaseListCmd {
     // ///////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
         Pair<List<? extends Alert>, Integer> result = _mgr.searchForAlerts(this);
         ListResponse<AlertResponse> response = new ListResponse<AlertResponse>();
@@ -97,5 +92,10 @@ public class ListAlertsCmd extends BaseListCmd {
         response.setResponses(alertResponseList, result.second());
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

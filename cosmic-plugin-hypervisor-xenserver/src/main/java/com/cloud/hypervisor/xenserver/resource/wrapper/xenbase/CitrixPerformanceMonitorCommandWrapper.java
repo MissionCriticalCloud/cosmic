@@ -25,9 +25,10 @@ import com.cloud.agent.api.PerformanceMonitorCommand;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
+
 import com.xensource.xenapi.Connection;
 
-@ResourceWrapper(handles =  PerformanceMonitorCommand.class)
+@ResourceWrapper(handles = PerformanceMonitorCommand.class)
 public final class CitrixPerformanceMonitorCommandWrapper extends CommandWrapper<PerformanceMonitorCommand, Answer, CitrixResourceBase> {
 
     @Override

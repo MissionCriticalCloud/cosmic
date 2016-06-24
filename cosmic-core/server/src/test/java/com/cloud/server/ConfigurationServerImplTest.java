@@ -16,9 +16,6 @@
 // under the License.
 package com.cloud.server;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.dao.ResourceCountDao;
 import com.cloud.dc.dao.DataCenterDao;
@@ -32,10 +29,13 @@ import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.db.TransactionLegacy;
-
 import org.apache.cloudstack.framework.config.ConfigDepot;
 import org.apache.cloudstack.framework.config.ConfigDepotAdmin;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -50,6 +50,19 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigurationServerImplTest {
 
+    final static String TEST = "the quick brown fox jumped over the lazy dog";
+    @Spy
+    ConfigurationServerImpl windowsImpl = new ConfigurationServerImpl() {
+        protected boolean isOnWindows() {
+            return true;
+        }
+    };
+    @Spy
+    ConfigurationServerImpl linuxImpl = new ConfigurationServerImpl() {
+        protected boolean isOnWindows() {
+            return false;
+        }
+    };
     @Mock
     private ConfigurationDao _configDao;
     @Mock
@@ -84,25 +97,8 @@ public class ConfigurationServerImplTest {
     private ConfigurationManager _configMgr;
     @Mock
     private ManagementService _mgrService;
-
     @InjectMocks
     private ConfigurationServerImpl configurationServer;
-
-    @Spy
-    ConfigurationServerImpl windowsImpl = new ConfigurationServerImpl() {
-      protected boolean isOnWindows() {
-        return true;
-      }
-    };
-
-    @Spy
-    ConfigurationServerImpl linuxImpl = new ConfigurationServerImpl() {
-      protected boolean isOnWindows() {
-        return false;
-      }
-    };
-
-    final static String TEST = "the quick brown fox jumped over the lazy dog";
 
     @Test(expected = IOException.class)
     public void testGetBase64KeystoreNoSuchFile() throws IOException {
@@ -139,11 +135,11 @@ public class ConfigurationServerImplTest {
 
     @Test
     public void testWindowsScript() {
-      Assert.assertTrue(windowsImpl.isOnWindows());
-      Assert.assertEquals("scripts/vm/systemvm/injectkeys.py", windowsImpl.getInjectScript());
+        Assert.assertTrue(windowsImpl.isOnWindows());
+        Assert.assertEquals("scripts/vm/systemvm/injectkeys.py", windowsImpl.getInjectScript());
 
-      Assert.assertFalse(linuxImpl.isOnWindows());
-      Assert.assertEquals("scripts/vm/systemvm/injectkeys.sh", linuxImpl.getInjectScript());
+        Assert.assertFalse(linuxImpl.isOnWindows());
+        Assert.assertEquals("scripts/vm/systemvm/injectkeys.sh", linuxImpl.getInjectScript());
     }
 
     @Test

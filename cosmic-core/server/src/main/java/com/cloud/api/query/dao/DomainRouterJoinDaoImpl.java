@@ -16,11 +16,6 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.api.ApiResponseHelper;
 import com.cloud.api.query.vo.DomainRouterJoinVO;
 import com.cloud.maint.Version;
@@ -32,11 +27,15 @@ import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.response.DomainRouterResponse;
 import org.apache.cloudstack.api.response.NicResponse;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -44,15 +43,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, Long> implements DomainRouterJoinDao {
     public static final Logger s_logger = LoggerFactory.getLogger(DomainRouterJoinDaoImpl.class);
-
-    @Inject
-    private ConfigurationDao  _configDao;
+    private final SearchBuilder<DomainRouterJoinVO> vrSearch;
+    private final SearchBuilder<DomainRouterJoinVO> vrIdSearch;
     @Inject
     public AccountManager _accountMgr;
-
-    private final SearchBuilder<DomainRouterJoinVO> vrSearch;
-
-    private final SearchBuilder<DomainRouterJoinVO> vrIdSearch;
+    @Inject
+    private ConfigurationDao _configDao;
 
     protected DomainRouterJoinDaoImpl() {
 
@@ -246,6 +242,14 @@ public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, 
     }
 
     @Override
+    public List<DomainRouterJoinVO> newDomainRouterView(VirtualRouter vr) {
+
+        SearchCriteria<DomainRouterJoinVO> sc = vrIdSearch.create();
+        sc.setParameters("id", vr.getId());
+        return searchIncludingRemoved(sc, null, null, false);
+    }
+
+    @Override
     public List<DomainRouterJoinVO> searchByIds(Long... vrIds) {
         // set detail batch query size
         int DETAILS_BATCH_SIZE = 2000;
@@ -288,13 +292,4 @@ public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, 
         }
         return uvList;
     }
-
-    @Override
-    public List<DomainRouterJoinVO> newDomainRouterView(VirtualRouter vr) {
-
-        SearchCriteria<DomainRouterJoinVO> sc = vrIdSearch.create();
-        sc.setParameters("id", vr.getId());
-        return searchIncludingRemoved(sc, null, null, false);
-    }
-
 }

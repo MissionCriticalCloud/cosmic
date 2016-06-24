@@ -36,6 +36,7 @@ public interface VolumeInfo extends DataObject, Volume {
     Long getLastPoolId();
 
     String getAttachedVmName();
+
     VirtualMachine getAttachedVM();
 
     void processEventOnly(ObjectInDataStoreStateMachine.Event event);

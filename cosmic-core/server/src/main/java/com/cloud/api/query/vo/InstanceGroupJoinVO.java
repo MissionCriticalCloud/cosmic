@@ -16,30 +16,26 @@
 // under the License.
 package com.cloud.api.query.vo;
 
-import java.util.Date;
+import com.cloud.utils.db.GenericDao;
+import com.cloud.vm.InstanceGroup;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
-import com.cloud.vm.InstanceGroup;
+import java.util.Date;
 
 @Entity
 @Table(name = "instance_group_view")
 public class InstanceGroupJoinVO extends BaseViewVO implements ControlledViewEntity {
 
+    @Column(name = "name")
+    String name;
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
-
     @Column(name = "uuid")
     private String uuid;
-
-    @Column(name = "name")
-    String name;
-
     @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
 
@@ -98,13 +94,13 @@ public class InstanceGroupJoinVO extends BaseViewVO implements ControlledViewEnt
     }
 
     @Override
-    public String getAccountUuid() {
-        return accountUuid;
+    public long getDomainId() {
+        return domainId;
     }
 
     @Override
-    public String getAccountName() {
-        return accountName;
+    public String getDomainPath() {
+        return domainPath;
     }
 
     @Override
@@ -113,8 +109,13 @@ public class InstanceGroupJoinVO extends BaseViewVO implements ControlledViewEnt
     }
 
     @Override
-    public long getDomainId() {
-        return domainId;
+    public String getAccountUuid() {
+        return accountUuid;
+    }
+
+    @Override
+    public String getAccountName() {
+        return accountName;
     }
 
     @Override
@@ -128,15 +129,6 @@ public class InstanceGroupJoinVO extends BaseViewVO implements ControlledViewEnt
     }
 
     @Override
-    public String getDomainPath() {
-        return domainPath;
-    }
-
-    public long getProjectId() {
-        return projectId;
-    }
-
-    @Override
     public String getProjectUuid() {
         return projectUuid;
     }
@@ -144,6 +136,10 @@ public class InstanceGroupJoinVO extends BaseViewVO implements ControlledViewEnt
     @Override
     public String getProjectName() {
         return projectName;
+    }
+
+    public long getProjectId() {
+        return projectId;
     }
 
     public String getName() {

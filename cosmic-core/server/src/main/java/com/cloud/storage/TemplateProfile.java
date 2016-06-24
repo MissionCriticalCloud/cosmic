@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.storage;
 
-import java.util.Map;
-
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
+
+import java.util.Map;
 
 public class TemplateProfile {
     Long userId;
@@ -50,9 +50,47 @@ public class TemplateProfile {
     Boolean isDynamicallyScalable;
     TemplateType templateType;
 
+    public TemplateProfile(Long userId, VMTemplateVO template, Long zoneId) {
+        this.userId = userId;
+        this.template = template;
+        this.zoneId = zoneId;
+    }
+
     public TemplateProfile(Long templateId, Long userId, String name, String displayText, Integer bits, Boolean passwordEnabled, Boolean requiresHvm, String url,
-            Boolean isPublic, Boolean featured, Boolean isExtractable, ImageFormat format, Long guestOsId, Long zoneId, HypervisorType hypervisorType,
-            String accountName, Long domainId, Long accountId, String chksum, Boolean bootable, Map details, Boolean sshKeyEnabled) {
+                           Boolean isPublic, Boolean featured, Boolean isExtractable, ImageFormat format, Long guestOsId, Long zoneId,
+
+                           HypervisorType hypervisorType, String accountName, Long domainId, Long accountId, String chksum, Boolean bootable, String templateTag, Map details,
+                           Boolean sshKeyEnabled, Long imageStoreId, Boolean isDynamicallyScalable, TemplateType templateType) {
+        this(templateId,
+                userId,
+                name,
+                displayText,
+                bits,
+                passwordEnabled,
+                requiresHvm,
+                url,
+                isPublic,
+                featured,
+                isExtractable,
+                format,
+                guestOsId,
+                zoneId,
+                hypervisorType,
+                accountName,
+                domainId,
+                accountId,
+                chksum,
+                bootable,
+                details,
+                sshKeyEnabled);
+        this.templateTag = templateTag;
+        this.isDynamicallyScalable = isDynamicallyScalable;
+        this.templateType = templateType;
+    }
+
+    public TemplateProfile(Long templateId, Long userId, String name, String displayText, Integer bits, Boolean passwordEnabled, Boolean requiresHvm, String url,
+                           Boolean isPublic, Boolean featured, Boolean isExtractable, ImageFormat format, Long guestOsId, Long zoneId, HypervisorType hypervisorType,
+                           String accountName, Long domainId, Long accountId, String chksum, Boolean bootable, Map details, Boolean sshKeyEnabled) {
         this.templateId = templateId;
         this.userId = userId;
         this.name = name;
@@ -75,44 +113,6 @@ public class TemplateProfile {
         this.bootable = bootable;
         this.details = details;
         this.sshKeyEnbaled = sshKeyEnabled;
-    }
-
-    public TemplateProfile(Long userId, VMTemplateVO template, Long zoneId) {
-        this.userId = userId;
-        this.template = template;
-        this.zoneId = zoneId;
-    }
-
-    public TemplateProfile(Long templateId, Long userId, String name, String displayText, Integer bits, Boolean passwordEnabled, Boolean requiresHvm, String url,
-            Boolean isPublic, Boolean featured, Boolean isExtractable, ImageFormat format, Long guestOsId, Long zoneId,
-
-            HypervisorType hypervisorType, String accountName, Long domainId, Long accountId, String chksum, Boolean bootable, String templateTag, Map details,
-            Boolean sshKeyEnabled, Long imageStoreId, Boolean isDynamicallyScalable, TemplateType templateType) {
-        this(templateId,
-            userId,
-            name,
-            displayText,
-            bits,
-            passwordEnabled,
-            requiresHvm,
-            url,
-            isPublic,
-            featured,
-            isExtractable,
-            format,
-            guestOsId,
-            zoneId,
-            hypervisorType,
-            accountName,
-            domainId,
-            accountId,
-            chksum,
-            bootable,
-            details,
-            sshKeyEnabled);
-        this.templateTag = templateTag;
-        this.isDynamicallyScalable = isDynamicallyScalable;
-        this.templateType = templateType;
     }
 
     public Long getTemplateId() {
@@ -291,12 +291,12 @@ public class TemplateProfile {
         this.details = details;
     }
 
-    public void setSshKeyEnabled(Boolean enabled) {
-        this.sshKeyEnbaled = enabled;
-    }
-
     public Boolean getSshKeyEnabled() {
         return this.sshKeyEnbaled;
+    }
+
+    public void setSshKeyEnabled(Boolean enabled) {
+        this.sshKeyEnbaled = enabled;
     }
 
     public Boolean IsDynamicallyScalable() {

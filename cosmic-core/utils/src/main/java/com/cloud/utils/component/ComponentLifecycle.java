@@ -19,9 +19,8 @@
 
 package com.cloud.utils.component;
 
-import java.util.Map;
-
 import javax.naming.ConfigurationException;
+import java.util.Map;
 
 public interface ComponentLifecycle extends Named {
     public static final int RUN_LEVEL_SYSTEM_BOOTSTRAP = 0;        // for system level bootstrap components
@@ -38,9 +37,9 @@ public interface ComponentLifecycle extends Named {
 
     void setName(String name);
 
-    void setConfigParams(Map<String, Object> params);
-
     Map<String, Object> getConfigParams();
+
+    void setConfigParams(Map<String, Object> params);
 
     int getRunLevel();
 

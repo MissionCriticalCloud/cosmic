@@ -15,7 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from pprint import pprint
 import copy
 
 
@@ -27,7 +26,7 @@ def merge(dbag, data):
         id = str(rule['id'])
         if rule['revoked']:
             if id in dbagc.keys():
-                del(dbagc[id])
+                del (dbagc[id])
         elif id not in dbagc.keys():
             dbagc[id] = rule
     return dbagc

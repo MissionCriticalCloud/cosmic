@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface NetworkDomainDao extends GenericDao<NetworkDomainVO, Long> {
     List<NetworkDomainVO> listDomainNetworkMapByDomain(Object... domainId);

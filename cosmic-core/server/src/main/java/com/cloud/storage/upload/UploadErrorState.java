@@ -79,5 +79,4 @@ public class UploadErrorState extends UploadInactiveState {
         }
         getUploadListener().setUploadInactive(Status.UPLOAD_ERROR);
     }
-
 }

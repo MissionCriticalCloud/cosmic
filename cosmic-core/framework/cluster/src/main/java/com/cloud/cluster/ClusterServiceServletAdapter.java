@@ -16,20 +16,19 @@
 // under the License.
 package com.cloud.cluster;
 
-import java.rmi.RemoteException;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.cluster.dao.ManagementServerHostDao;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.component.ComponentLifecycle;
 import com.cloud.utils.db.DbProperties;
-
 import org.apache.cloudstack.framework.config.ConfigDepot;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.rmi.RemoteException;
+import java.util.Map;
+import java.util.Properties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,15 +37,12 @@ public class ClusterServiceServletAdapter extends AdapterBase implements Cluster
     private static final Logger s_logger = LoggerFactory.getLogger(ClusterServiceServletAdapter.class);
     private static final int DEFAULT_SERVICE_PORT = 9090;
     private static final int DEFAULT_REQUEST_TIMEOUT = 300;            // 300 seconds
-
-    @Inject
-    private ClusterManager _manager;
-
-    @Inject
-    private ManagementServerHostDao _mshostDao;
     @Inject
     protected ConfigDepot _configDepot;
-
+    @Inject
+    private ClusterManager _manager;
+    @Inject
+    private ManagementServerHostDao _mshostDao;
     private ClusterServiceServletContainer _servletContainer;
 
     private int _clusterServicePort = DEFAULT_SERVICE_PORT;
@@ -65,8 +61,9 @@ public class ClusterServiceServletAdapter extends AdapterBase implements Cluster
         }
 
         String serviceUrl = getServiceEndpointName(strPeer);
-        if (serviceUrl == null)
+        if (serviceUrl == null) {
             return null;
+        }
 
         return new ClusterServiceServletImpl(serviceUrl);
     }
@@ -83,8 +80,9 @@ public class ClusterServiceServletAdapter extends AdapterBase implements Cluster
         long msid = Long.parseLong(strPeer);
 
         ManagementServerHostVO mshost = _mshostDao.findByMsid(msid);
-        if (mshost == null)
+        if (mshost == null) {
             return null;
+        }
 
         return composeEndpointName(mshost.getServiceIP(), mshost.getServicePort());
     }
@@ -92,6 +90,19 @@ public class ClusterServiceServletAdapter extends AdapterBase implements Cluster
     @Override
     public int getServicePort() {
         return _clusterServicePort;
+    }
+
+    private void init() throws ConfigurationException {
+        if (_mshostDao != null) {
+            return;
+        }
+
+        Properties dbProps = DbProperties.getDbProperties();
+
+        _clusterServicePort = NumbersUtil.parseInt(dbProps.getProperty("cluster.servlet.port"), DEFAULT_SERVICE_PORT);
+        if (s_logger.isInfoEnabled()) {
+            s_logger.info("Cluster servlet port : " + _clusterServicePort);
+        }
     }
 
     private String composeEndpointName(String nodeIP, int port) {
@@ -115,19 +126,9 @@ public class ClusterServiceServletAdapter extends AdapterBase implements Cluster
 
     @Override
     public boolean stop() {
-        if (_servletContainer != null)
+        if (_servletContainer != null) {
             _servletContainer.stop();
+        }
         return true;
-    }
-
-    private void init() throws ConfigurationException {
-        if (_mshostDao != null)
-            return;
-
-        Properties dbProps = DbProperties.getDbProperties();
-
-        _clusterServicePort = NumbersUtil.parseInt(dbProps.getProperty("cluster.servlet.port"), DEFAULT_SERVICE_PORT);
-        if (s_logger.isInfoEnabled())
-            s_logger.info("Cluster servlet port : " + _clusterServicePort);
     }
 }

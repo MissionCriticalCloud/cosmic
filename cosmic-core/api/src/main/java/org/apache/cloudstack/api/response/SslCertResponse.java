@@ -16,60 +16,51 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.List;
-
 import com.cloud.network.lb.SslCert;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
 
 //import org.apache.cloudstack.api.EntityReference;
 
 @EntityReference(value = SslCert.class)
 public class SslCertResponse extends BaseResponse {
 
-    @SerializedName(ApiConstants.ID)
-    @Param(description = "SSL certificate ID")
-    private String id;
-
-    @SerializedName(ApiConstants.CERTIFICATE)
-    @Param(description = "certificate")
-    private String certificate;
-
-    @SerializedName(ApiConstants.ACCOUNT)
-    @Param(description = "account for the certificate")
-    private String accountName;
-
-    @SerializedName(ApiConstants.PROJECT_ID)
-    @Param(description = "the project id of the certificate")
-    private String projectId;
-
-    @SerializedName(ApiConstants.PROJECT)
-    @Param(description = "the project name of the certificate")
-    private String projectName;
-
-    @SerializedName(ApiConstants.DOMAIN_ID)
-    @Param(description = "the domain id of the network owner")
-    private String domainId;
-
-    @SerializedName(ApiConstants.DOMAIN)
-    @Param(description = "the domain name of the network owner")
-    private String domain;
-
-    @SerializedName(ApiConstants.CERTIFICATE_CHAIN)
-    @Param(description = "certificate chain")
-    private String certchain;
-
-    @SerializedName(ApiConstants.CERTIFICATE_FINGERPRINT)
-    @Param(description = "certificate fingerprint")
-    private String fingerprint;
-
     @SerializedName(ApiConstants.LOAD_BALANCER_RULE_LIST)
     @Param(description = "List of loabalancers this certificate is bound to")
     List<String> lbIds;
+    @SerializedName(ApiConstants.ID)
+    @Param(description = "SSL certificate ID")
+    private String id;
+    @SerializedName(ApiConstants.CERTIFICATE)
+    @Param(description = "certificate")
+    private String certificate;
+    @SerializedName(ApiConstants.ACCOUNT)
+    @Param(description = "account for the certificate")
+    private String accountName;
+    @SerializedName(ApiConstants.PROJECT_ID)
+    @Param(description = "the project id of the certificate")
+    private String projectId;
+    @SerializedName(ApiConstants.PROJECT)
+    @Param(description = "the project name of the certificate")
+    private String projectName;
+    @SerializedName(ApiConstants.DOMAIN_ID)
+    @Param(description = "the domain id of the network owner")
+    private String domainId;
+    @SerializedName(ApiConstants.DOMAIN)
+    @Param(description = "the domain name of the network owner")
+    private String domain;
+    @SerializedName(ApiConstants.CERTIFICATE_CHAIN)
+    @Param(description = "certificate chain")
+    private String certchain;
+    @SerializedName(ApiConstants.CERTIFICATE_FINGERPRINT)
+    @Param(description = "certificate fingerprint")
+    private String fingerprint;
 
     public SslCertResponse() {
     }

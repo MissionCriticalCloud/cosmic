@@ -19,11 +19,6 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.RevertToVMSnapshotAnswer;
 import com.cloud.agent.api.RevertToVMSnapshotCommand;
@@ -32,17 +27,22 @@ import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.vm.VirtualMachine.PowerState;
 import com.cloud.vm.snapshot.VMSnapshot;
+import org.apache.cloudstack.storage.to.VolumeObjectTO;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Types;
 import com.xensource.xenapi.VBD;
 import com.xensource.xenapi.VDI;
 import com.xensource.xenapi.VM;
-
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  RevertToVMSnapshotCommand.class)
+@ResourceWrapper(handles = RevertToVMSnapshotCommand.class)
 public final class CitrixRevertToVMSnapshotCommandWrapper extends CommandWrapper<RevertToVMSnapshotCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixRevertToVMSnapshotCommandWrapper.class);
@@ -80,7 +80,7 @@ public final class CitrixRevertToVMSnapshotCommandWrapper extends CommandWrapper
             citrixResourceBase.revertToSnapshot(conn, vmSnapshot, vmName, vm.getUuid(conn), snapshotMemory, citrixResourceBase.getHost().getUuid());
             vm = citrixResourceBase.getVM(conn, vmName);
             final Set<VBD> vbds = vm.getVBDs(conn);
-            final Map<String, VDI> vdiMap = new HashMap<String, VDI>();
+            final Map<String, VDI> vdiMap = new HashMap<>();
             // get vdi:vbdr to a map
             for (final VBD vbd : vbds) {
                 final VBD.Record vbdr = vbd.getRecord(conn);

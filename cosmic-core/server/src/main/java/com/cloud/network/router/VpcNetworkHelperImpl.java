@@ -16,15 +16,6 @@
 // under the License.
 package com.cloud.network.router;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.TreeSet;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
@@ -43,24 +34,29 @@ import com.cloud.service.ServiceOfferingVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.vm.NicProfile;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.TreeSet;
+
 import org.apache.commons.lang.StringUtils;
 import org.cloud.network.router.deployment.RouterDeploymentDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class VpcNetworkHelperImpl extends NetworkHelperImpl {
 
     private static final Logger s_logger = LoggerFactory.getLogger(VpcNetworkHelperImpl.class);
-
-    @Inject
-    private VlanDao _vlanDao;
     @Inject
     protected VpcManager vpcMgr;
     @Inject
     protected NicProfileHelper nicProfileHelper;
-
     protected String noHypervisorsErrMsgDetails;
+    @Inject
+    private VlanDao _vlanDao;
 
     @PostConstruct
     protected void setupNoHypervisorsErrMsgDetails() {
@@ -69,17 +65,18 @@ public class VpcNetworkHelperImpl extends NetworkHelperImpl {
     }
 
     @Override
-    protected String getNoHypervisorsErrMsgDetails() {
-        return noHypervisorsErrMsgDetails;
-    }
-
-    @Override
     protected void filterSupportedHypervisors(final List<HypervisorType> hypervisors) {
         hypervisors.retainAll(vpcMgr.getSupportedVpcHypervisors());
     }
 
     @Override
-    public void reallocateRouterNetworks(final RouterDeploymentDefinition vpcRouterDeploymentDefinition, final VirtualRouter router, final VMTemplateVO template, final HypervisorType hType)
+    protected String getNoHypervisorsErrMsgDetails() {
+        return noHypervisorsErrMsgDetails;
+    }
+
+    @Override
+    public void reallocateRouterNetworks(final RouterDeploymentDefinition vpcRouterDeploymentDefinition, final VirtualRouter router, final VMTemplateVO template, final
+    HypervisorType hType)
             throws ConcurrentOperationException, InsufficientCapacityException {
 
         final TreeSet<String> publicVlans = new TreeSet<String>();
@@ -135,7 +132,8 @@ public class VpcNetworkHelperImpl extends NetworkHelperImpl {
                 publicNic.setIsolationUri(IsolationType.Vlan.toUri(publicIp.getVlanTag()));
                 final NetworkOffering publicOffering = _networkModel.getSystemAccountNetworkOfferings(NetworkOffering.SystemPublicNetwork).get(0);
                 if (publicNetwork == null) {
-                    final List<? extends Network> publicNetworks = _networkMgr.setupNetwork(s_systemAccount, publicOffering, vpcRouterDeploymentDefinition.getPlan(), null, null, false);
+                    final List<? extends Network> publicNetworks = _networkMgr.setupNetwork(s_systemAccount, publicOffering, vpcRouterDeploymentDefinition.getPlan(), null, null,
+                            false);
                     publicNetwork = publicNetworks.get(0);
                 }
                 publicNics.add(publicNic);
@@ -146,7 +144,7 @@ public class VpcNetworkHelperImpl extends NetworkHelperImpl {
             if (networks.get(publicNetwork) != null) {
                 @SuppressWarnings("unchecked")
                 final
-                List<NicProfile> publicNicProfiles = (List<NicProfile>)networks.get(publicNetwork);
+                List<NicProfile> publicNicProfiles = (List<NicProfile>) networks.get(publicNetwork);
                 publicNicProfiles.addAll(publicNics);
                 networks.put(publicNetwork, publicNicProfiles);
             } else {
@@ -160,7 +158,8 @@ public class VpcNetworkHelperImpl extends NetworkHelperImpl {
     }
 
     @Override
-    public LinkedHashMap<Network, List<? extends NicProfile>> configureDefaultNics(final RouterDeploymentDefinition routerDeploymentDefinition) throws ConcurrentOperationException, InsufficientAddressCapacityException {
+    public LinkedHashMap<Network, List<? extends NicProfile>> configureDefaultNics(final RouterDeploymentDefinition routerDeploymentDefinition) throws
+            ConcurrentOperationException, InsufficientAddressCapacityException {
 
         final LinkedHashMap<Network, List<? extends NicProfile>> networks = new LinkedHashMap<Network, List<? extends NicProfile>>(3);
 

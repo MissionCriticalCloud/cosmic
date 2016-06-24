@@ -17,9 +17,6 @@
 
 package com.cloud.vm.snapshot.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
@@ -29,6 +26,9 @@ import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshot.Event;
 import com.cloud.vm.snapshot.VMSnapshot.State;
 import com.cloud.vm.snapshot.VMSnapshotVO;
+
+import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +91,7 @@ public class VMSnapshotDaoImpl extends GenericDaoBase<VMSnapshotVO, Long> implem
     public List<VMSnapshotVO> listByInstanceId(Long vmId, State... status) {
         SearchCriteria<VMSnapshotVO> sc = SnapshotStatusSearch.create();
         sc.setParameters("vm_id", vmId);
-        sc.setParameters("state", (Object[])status);
+        sc.setParameters("state", (Object[]) status);
         return listBy(sc, null);
     }
 
@@ -121,7 +121,7 @@ public class VMSnapshotDaoImpl extends GenericDaoBase<VMSnapshotVO, Long> implem
 
     public List<VMSnapshotVO> listByAccountId(Long accountId) {
         SearchCriteria sc = this.AllFieldsSearch.create();
-        sc.setParameters("accountId", new Object[] { accountId });
+        sc.setParameters("accountId", new Object[]{accountId});
         return listBy(sc, null);
     }
 
@@ -142,44 +142,43 @@ public class VMSnapshotDaoImpl extends GenericDaoBase<VMSnapshotVO, Long> implem
         builder.set(vo, "state", nextState);
         builder.set(vo, "updated", new Date());
 
-        int rows = update((VMSnapshotVO)vo, sc);
+        int rows = update((VMSnapshotVO) vo, sc);
         if (rows == 0 && s_logger.isDebugEnabled()) {
             VMSnapshotVO dbVol = findByIdIncludingRemoved(vo.getId());
             if (dbVol != null) {
                 StringBuilder str = new StringBuilder("Unable to update ").append(vo.toString());
                 str.append(": DB Data={id=")
-                    .append(dbVol.getId())
-                    .append("; state=")
-                    .append(dbVol.getState())
-                    .append("; updatecount=")
-                    .append(dbVol.getUpdatedCount())
-                    .append(";updatedTime=")
-                    .append(dbVol.getUpdated());
+                   .append(dbVol.getId())
+                   .append("; state=")
+                   .append(dbVol.getState())
+                   .append("; updatecount=")
+                   .append(dbVol.getUpdatedCount())
+                   .append(";updatedTime=")
+                   .append(dbVol.getUpdated());
                 str.append(": New Data={id=")
-                    .append(vo.getId())
-                    .append("; state=")
-                    .append(nextState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatecount=")
-                    .append(vo.getUpdatedCount())
-                    .append("; updatedTime=")
-                    .append(vo.getUpdated());
+                   .append(vo.getId())
+                   .append("; state=")
+                   .append(nextState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatecount=")
+                   .append(vo.getUpdatedCount())
+                   .append("; updatedTime=")
+                   .append(vo.getUpdated());
                 str.append(": stale Data={id=")
-                    .append(vo.getId())
-                    .append("; state=")
-                    .append(currentState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatecount=")
-                    .append(oldUpdated)
-                    .append("; updatedTime=")
-                    .append(oldUpdatedTime);
+                   .append(vo.getId())
+                   .append("; state=")
+                   .append(currentState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatecount=")
+                   .append(oldUpdated)
+                   .append("; updatedTime=")
+                   .append(oldUpdatedTime);
             } else {
                 s_logger.debug("Unable to update VM snapshot: id=" + vo.getId() + ", as there is no such snapshot exists in the database anymore");
             }
         }
         return rows > 0;
     }
-
 }

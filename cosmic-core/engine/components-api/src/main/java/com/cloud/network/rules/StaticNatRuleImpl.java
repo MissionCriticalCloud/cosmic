@@ -50,26 +50,6 @@ public class StaticNatRuleImpl implements StaticNatRule {
     }
 
     @Override
-    public String getProtocol() {
-        return protocol;
-    }
-
-    @Override
-    public Integer getSourcePortEnd() {
-        return portEnd;
-    }
-
-    @Override
-    public Purpose getPurpose() {
-        return Purpose.StaticNat;
-    }
-
-    @Override
-    public State getState() {
-        return state;
-    }
-
-    @Override
     public long getAccountId() {
         return accountId;
     }
@@ -80,23 +60,8 @@ public class StaticNatRuleImpl implements StaticNatRule {
     }
 
     @Override
-    public long getNetworkId() {
-        return networkId;
-    }
-
-    @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    public Integer getSourcePortStart() {
-        return portStart;
-    }
-
-    @Override
-    public Long getSourceIpAddressId() {
-        return sourceIpAddressId;
     }
 
     @Override
@@ -110,8 +75,38 @@ public class StaticNatRuleImpl implements StaticNatRule {
     }
 
     @Override
-    public String getUuid() {
-        return uuid;
+    public Integer getSourcePortStart() {
+        return portStart;
+    }
+
+    @Override
+    public Integer getSourcePortEnd() {
+        return portEnd;
+    }
+
+    @Override
+    public String getProtocol() {
+        return protocol;
+    }
+
+    @Override
+    public Purpose getPurpose() {
+        return Purpose.StaticNat;
+    }
+
+    @Override
+    public State getState() {
+        return state;
+    }
+
+    @Override
+    public long getNetworkId() {
+        return networkId;
+    }
+
+    @Override
+    public Long getSourceIpAddressId() {
+        return sourceIpAddressId;
     }
 
     @Override
@@ -147,6 +142,11 @@ public class StaticNatRuleImpl implements StaticNatRule {
     @Override
     public boolean isDisplay() {
         return forDisplay;
+    }
+
+    @Override
+    public String getUuid() {
+        return uuid;
     }
 
     @Override

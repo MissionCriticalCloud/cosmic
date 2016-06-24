@@ -25,13 +25,12 @@ import static org.hamcrest.Matchers.instanceOf;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
-
 import org.junit.Test;
 
 public class NatRuleAdapterTest {
     private final Gson gson = new GsonBuilder()
-        .registerTypeAdapter(NatRule.class, new NatRuleAdapter())
-        .create();
+            .registerTypeAdapter(NatRule.class, new NatRuleAdapter())
+            .create();
 
     @Test(expected = JsonParseException.class)
     public void testNatRuleAdapterNoType() {
@@ -56,5 +55,4 @@ public class NatRuleAdapterTest {
 
         assertThat(destinationNatRule, instanceOf(DestinationNatRule.class));
     }
-
 }

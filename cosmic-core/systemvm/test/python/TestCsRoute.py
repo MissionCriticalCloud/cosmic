@@ -15,13 +15,12 @@
 # specific language governing permissions and limitations
 # under the License.
 
+import merge
 import unittest
 from cs.CsRoute import CsRoute
-import merge
 
 
 class TestCsRoute(unittest.TestCase):
-
     def setUp(self):
         merge.DataBag.DPATH = "."
 
@@ -41,6 +40,7 @@ class TestCsRoute(unittest.TestCase):
         csroute = CsRoute()
         name = "eth1"
         self.assertEqual("Table_eth1", csroute.get_tablename(name))
+
 
 if __name__ == '__main__':
     unittest.main()

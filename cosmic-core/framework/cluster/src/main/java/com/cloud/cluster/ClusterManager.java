@@ -17,20 +17,20 @@
 package com.cloud.cluster;
 
 import com.cloud.utils.component.Manager;
-
 import org.apache.cloudstack.framework.config.ConfigKey;
 
 public interface ClusterManager extends Manager {
     static final String ALERT_SUBJECT = "cluster-alert";
     final ConfigKey<Integer> HeartbeatInterval = new ConfigKey<Integer>(Integer.class, "cluster.heartbeat.interval", "management-server", "1500",
-        "Interval to check for the heart beat between management server nodes", false);
+            "Interval to check for the heart beat between management server nodes", false);
     final ConfigKey<Integer> HeartbeatThreshold = new ConfigKey<Integer>(Integer.class, "cluster.heartbeat.threshold", "management-server", "150000",
-        "Threshold before self-fence the management server", true);
+            "Threshold before self-fence the management server", true);
 
     void OnReceiveClusterServicePdu(ClusterServicePdu pdu);
 
     /**
      * This executes
+     *
      * @param strPeer
      * @param agentId
      * @param cmds
@@ -41,8 +41,9 @@ public interface ClusterManager extends Manager {
 
     /**
      * Broadcast the command to all of the  management server nodes.
+     *
      * @param agentId agent id this broadcast is regarding
-     * @param cmds commands to broadcast
+     * @param cmds    commands to broadcast
      */
     void broadcast(long agentId, String cmds);
 

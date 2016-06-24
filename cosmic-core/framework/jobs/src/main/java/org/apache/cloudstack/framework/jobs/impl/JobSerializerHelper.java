@@ -16,6 +16,8 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs.impl;
 
+import com.cloud.utils.exception.CloudRuntimeException;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,7 +28,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -37,7 +38,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,10 +46,10 @@ import org.slf4j.LoggerFactory;
  * Note: toPairList and appendPairList only support simple POJO objects currently
  */
 public class JobSerializerHelper {
-    private static final Logger s_logger = LoggerFactory.getLogger(JobSerializerHelper.class);
     public static final String token = "/";
-
+    private static final Logger s_logger = LoggerFactory.getLogger(JobSerializerHelper.class);
     private static Gson s_gson;
+
     static {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setVersion(1.5);
@@ -120,8 +120,9 @@ public class JobSerializerHelper {
     }
 
     public static Object fromObjectSerializedString(String base64EncodedString) {
-        if (base64EncodedString == null)
+        if (base64EncodedString == null) {
             return null;
+        }
 
         byte[] content = Base64.decodeBase64(base64EncodedString);
         ByteArrayInputStream bs = new ByteArrayInputStream(content);
@@ -159,11 +160,11 @@ public class JobSerializerHelper {
 
         @Override
         public Throwable deserialize(JsonElement json, Type type, JsonDeserializationContext ctx) throws JsonParseException {
-            JsonObject obj = (JsonObject)json;
+            JsonObject obj = (JsonObject) json;
 
             String className = obj.get("class").getAsString();
             try {
-                Class<Throwable> clazz = (Class<Throwable>)Class.forName(className);
+                Class<Throwable> clazz = (Class<Throwable>) Class.forName(className);
                 Throwable cause = s_gson.fromJson(obj.get("cause"), Throwable.class);
                 String msg = obj.get("msg").getAsString();
                 Constructor<Throwable> constructor = clazz.getConstructor(String.class, Throwable.class);
@@ -193,11 +194,9 @@ public class JobSerializerHelper {
             json.add("class", new JsonPrimitive(th.getClass().getName()));
             json.add("cause", s_gson.toJsonTree(th.getCause()));
             json.add("msg", new JsonPrimitive(th.getMessage()));
-//            json.add("stack", s_gson.toJsonTree(th.getStackTrace()));
+            //            json.add("stack", s_gson.toJsonTree(th.getStackTrace()));
 
             return json;
         }
-
     }
-
 }

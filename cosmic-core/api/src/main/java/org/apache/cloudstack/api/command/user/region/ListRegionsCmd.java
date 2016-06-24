@@ -16,11 +16,6 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.region;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
@@ -29,6 +24,11 @@ import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.RegionResponse;
 import org.apache.cloudstack.region.Region;
 import org.apache.cloudstack.region.RegionService;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,15 +42,12 @@ public class ListRegionsCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
-
-    @Parameter(name = ApiConstants.ID, type = CommandType.INTEGER, description = "List Region by region ID.")
-    private Integer id;
-
-    @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "List Region by region name.")
-    private String name;
-
     @Inject
     RegionService _regionService;
+    @Parameter(name = ApiConstants.ID, type = CommandType.INTEGER, description = "List Region by region ID.")
+    private Integer id;
+    @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "List Region by region name.")
+    private String name;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -69,11 +66,6 @@ public class ListRegionsCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
         List<? extends Region> result = _regionService.listRegions(this);
         ListResponse<RegionResponse> response = new ListResponse<RegionResponse>();
@@ -87,5 +79,10 @@ public class ListRegionsCmd extends BaseListCmd {
         response.setResponses(regionResponses);
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

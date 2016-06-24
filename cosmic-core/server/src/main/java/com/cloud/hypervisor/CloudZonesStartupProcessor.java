@@ -16,12 +16,6 @@
 // under the License.
 package com.cloud.hypervisor;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.StartupCommandProcessor;
 import com.cloud.agent.api.StartupCommand;
@@ -46,16 +40,20 @@ import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.MacAddress;
 import com.cloud.utils.net.NetUtils;
-
 import org.apache.cloudstack.api.ResourceDetail;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
  * Creates a host record and supporting records such as pod and ip address
- *
  */
 @Component
 public class CloudZonesStartupProcessor extends AdapterBase implements StartupCommandProcessor {
@@ -95,9 +93,9 @@ public class CloudZonesStartupProcessor extends AdapterBase implements StartupCo
     public boolean processInitialConnect(StartupCommand[] cmd) throws ConnectionException {
         StartupCommand startup = cmd[0];
         if (startup instanceof StartupRoutingCommand) {
-            return processHostStartup((StartupRoutingCommand)startup);
+            return processHostStartup((StartupRoutingCommand) startup);
         } else if (startup instanceof StartupStorageCommand) {
-            return processStorageStartup((StartupStorageCommand)startup);
+            return processStorageStartup((StartupStorageCommand) startup);
         }
 
         return false;
@@ -143,7 +141,51 @@ public class CloudZonesStartupProcessor extends AdapterBase implements StartupCo
         }
         */
         return true;
+    }
 
+    protected boolean processStorageStartup(StartupStorageCommand startup) throws ConnectionException {
+        /*
+        if (startup.getResourceType() != Storage.StorageResourceType.LOCAL_SECONDARY_STORAGE) {
+            return false;
+        }
+        boolean found = false;
+        Type type = Host.Type.LocalSecondaryStorage;
+        final Map<String, String> hostDetails = startup.getHostDetails();
+        HostVO server = _hostDao.findByGuid(startup.getGuid());
+        if (server == null) {
+            server = _hostDao.findByGuid(startup.getGuidWithoutResource());
+        }
+        if (server != null && server.getRemoved() == null) {
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("Found the host " + server.getId() + " by guid: "
+                        + startup.getGuid());
+            }
+            found = true;
+
+        } else {
+            server = new HostVO(startup.getGuid());
+        }
+        server.setDetails(hostDetails);
+
+        try {
+            updateSecondaryHost(server, startup, type);
+        } catch (AgentAuthnException e) {
+            throw new ConnectionException(true, "Failed to authorize host, invalid configuration", e);
+        }
+        if (!found) {
+            server.setHostAllocationState(Host.HostAllocationState.Enabled);
+            server = _hostDao.persist(server);
+        } else {
+            if (!_hostDao.connect(server, _nodeId)) {
+                throw new CloudRuntimeException(
+                        "Agent cannot connect because the current state is "
+                        + server.getStatus().toString());
+            }
+            s_logger.info("Old " + server.getType().toString()
+                    + " host reconnected w/ id =" + server.getId());
+        }
+        */
+        return true;
     }
 
     protected void updateComputeHost(final HostVO host, final StartupCommand startup, final Host.Type type) throws AgentAuthnException {
@@ -183,7 +225,7 @@ public class CloudZonesStartupProcessor extends AdapterBase implements StartupCo
             }
             if (currentCountOfHosts >= maxHosts) {
                 throw new AgentAuthnException("Number of running Routing hosts in the Zone:" + zone.getName() + " is already at the max limit:" + maxHosts +
-                    ", cannot start one more host");
+                        ", cannot start one more host");
             }
         }
 
@@ -257,10 +299,9 @@ public class CloudZonesStartupProcessor extends AdapterBase implements StartupCo
                     // no longer tolerate exception during the cluster creation phase
                     throw new CloudRuntimeException("Unable to create new Pod " + podName + " in Zone: " + zoneId, e);
                 }
-
             }
         }
-        final StartupRoutingCommand scc = (StartupRoutingCommand)startup;
+        final StartupRoutingCommand scc = (StartupRoutingCommand) startup;
 
         ClusterVO cluster = null;
         if (host.getClusterId() != null) {
@@ -318,7 +359,6 @@ public class CloudZonesStartupProcessor extends AdapterBase implements StartupCo
         HypervisorType hyType = scc.getHypervisorType();
         host.setHypervisorType(hyType);
         host.setHypervisorVersion(scc.getHypervisorVersion());
-
     }
 
     private boolean checkCIDR(Host.Type type, HostPodVO pod, String serverPrivateIP, String serverPrivateNetmask) {
@@ -353,52 +393,6 @@ public class CloudZonesStartupProcessor extends AdapterBase implements StartupCo
             pod.setCidrSize(newCidrSize);
             _podDao.update(pod.getId(), pod);
         }
-    }
-
-    protected boolean processStorageStartup(StartupStorageCommand startup) throws ConnectionException {
-        /*
-        if (startup.getResourceType() != Storage.StorageResourceType.LOCAL_SECONDARY_STORAGE) {
-            return false;
-        }
-        boolean found = false;
-        Type type = Host.Type.LocalSecondaryStorage;
-        final Map<String, String> hostDetails = startup.getHostDetails();
-        HostVO server = _hostDao.findByGuid(startup.getGuid());
-        if (server == null) {
-            server = _hostDao.findByGuid(startup.getGuidWithoutResource());
-        }
-        if (server != null && server.getRemoved() == null) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Found the host " + server.getId() + " by guid: "
-                        + startup.getGuid());
-            }
-            found = true;
-
-        } else {
-            server = new HostVO(startup.getGuid());
-        }
-        server.setDetails(hostDetails);
-
-        try {
-            updateSecondaryHost(server, startup, type);
-        } catch (AgentAuthnException e) {
-            throw new ConnectionException(true, "Failed to authorize host, invalid configuration", e);
-        }
-        if (!found) {
-            server.setHostAllocationState(Host.HostAllocationState.Enabled);
-            server = _hostDao.persist(server);
-        } else {
-            if (!_hostDao.connect(server, _nodeId)) {
-                throw new CloudRuntimeException(
-                        "Agent cannot connect because the current state is "
-                        + server.getStatus().toString());
-            }
-            s_logger.info("Old " + server.getType().toString()
-                    + " host reconnected w/ id =" + server.getId());
-        }
-        */
-        return true;
-
     }
 
     protected void updateSecondaryHost(final HostVO host, final StartupStorageCommand startup, final Host.Type type) throws AgentAuthnException {
@@ -461,7 +455,6 @@ public class CloudZonesStartupProcessor extends AdapterBase implements StartupCo
         if (startup.getNfsShare() != null) {
             host.setStorageUrl(startup.getNfsShare());
         }
-
     }
 
     private HostPodVO findPod(StartupCommand startup, long zoneId, Host.Type type) {
@@ -478,7 +471,5 @@ public class CloudZonesStartupProcessor extends AdapterBase implements StartupCo
             }
         }
         return pod;
-
     }
-
 }

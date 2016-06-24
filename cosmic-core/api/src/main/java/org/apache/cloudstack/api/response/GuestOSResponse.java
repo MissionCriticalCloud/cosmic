@@ -18,11 +18,11 @@ package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
 import com.cloud.storage.GuestOS;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = GuestOS.class)
 public class GuestOSResponse extends BaseResponse {
@@ -73,5 +73,4 @@ public class GuestOSResponse extends BaseResponse {
     public void setIsUserDefined(String isUserDefined) {
         this.isUserDefined = isUserDefined;
     }
-
 }

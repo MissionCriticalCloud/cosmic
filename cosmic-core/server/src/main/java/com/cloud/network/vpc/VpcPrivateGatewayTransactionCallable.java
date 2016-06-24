@@ -16,16 +16,15 @@
 // under the License.
 package com.cloud.network.vpc;
 
-import java.util.List;
-import java.util.concurrent.Callable;
-
-import javax.inject.Inject;
-
 import com.cloud.network.vpc.dao.PrivateIpDao;
 import com.cloud.network.vpc.dao.VpcGatewayDao;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

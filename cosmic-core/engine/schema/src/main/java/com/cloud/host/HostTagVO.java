@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.host;
 
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = "host_tags")
@@ -42,7 +42,7 @@ public class HostTagVO implements InternalIdentity {
     protected HostTagVO() {
     }
 
-    public HostTagVO(long hostId, String tag) {
+    public HostTagVO(final long hostId, final String tag) {
         this.hostId = hostId;
         this.tag = tag;
     }
@@ -55,7 +55,7 @@ public class HostTagVO implements InternalIdentity {
         return tag;
     }
 
-    public void setTag(String tag) {
+    public void setTag(final String tag) {
         this.tag = tag;
     }
 

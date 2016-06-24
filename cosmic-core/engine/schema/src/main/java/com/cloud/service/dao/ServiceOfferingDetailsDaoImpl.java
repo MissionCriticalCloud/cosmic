@@ -17,8 +17,8 @@
 package com.cloud.service.dao;
 
 import com.cloud.service.ServiceOfferingDetailsVO;
-
 import org.apache.cloudstack.resourcedetail.ResourceDetailsDaoBase;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,5 +28,4 @@ public class ServiceOfferingDetailsDaoImpl extends ResourceDetailsDaoBase<Servic
     public void addDetail(long resourceId, String key, String value, boolean display) {
         super.addDetail(new ServiceOfferingDetailsVO(resourceId, key, value, display));
     }
-
 }

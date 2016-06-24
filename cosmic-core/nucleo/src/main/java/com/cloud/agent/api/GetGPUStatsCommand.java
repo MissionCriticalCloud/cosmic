@@ -22,8 +22,7 @@ package com.cloud.agent.api;
 import com.cloud.agent.api.LogLevel.Log4jLevel;
 
 @LogLevel(Log4jLevel.Trace)
-public class GetGPUStatsCommand extends Command
-{
+public class GetGPUStatsCommand extends Command {
     String hostGuid;
     String hostName;
 
@@ -35,11 +34,11 @@ public class GetGPUStatsCommand extends Command
         this.hostName = hostName;
     }
 
-    public String getHostGuid(){
+    public String getHostGuid() {
         return this.hostGuid;
     }
 
-    public String getHostName(){
+    public String getHostName() {
         return this.hostName;
     }
 

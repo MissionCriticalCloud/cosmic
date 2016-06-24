@@ -15,18 +15,18 @@
 
 package org.apache.cloudstack.storage.allocator;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.StoragePool;
 import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachineProfile;
-
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +63,7 @@ public class RandomStoragePoolAllocator extends AbstractStoragePoolAllocator {
             if (suitablePools.size() == returnUpTo) {
                 break;
             }
-            StoragePool pol = (StoragePool)this.dataStoreMgr.getPrimaryDataStore(pool.getId());
+            StoragePool pol = (StoragePool) this.dataStoreMgr.getPrimaryDataStore(pool.getId());
 
             if (filter(avoid, pol, dskCh, plan)) {
                 suitablePools.add(pol);
