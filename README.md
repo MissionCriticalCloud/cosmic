@@ -1,4 +1,5 @@
 # Cosmic
+[![Build Status](https://beta-jenkins.mcc.schubergphilis.com/buildStatus/icon?job=cosmic/0001-cosmic-master-build)](https://beta-jenkins.mcc.schubergphilis.com/job/cosmic/job/0001-cosmic-master-build/)
 Cosmic is open source software designed to deploy and manage large
 networks of virtual machines, as a highly available, highly scalable
 Infrastructure as a Service (IaaS) cloud computing platform. Cosmic
@@ -32,7 +33,7 @@ Cosmic requires:
 
 In order to build Cosmic, you have to follow the steps below:
 
-    git clone --recursive git@github.com:MissionCriticalCloud/cosmic.git
+    git clone git@github.com:MissionCriticalCloud/cosmic.git
     cd cosmic
     mvn clean install -P developer,systemvm
 
