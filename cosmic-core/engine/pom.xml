@@ -23,6 +23,5 @@
     <module>storage/snapshot</module>
     <module>components-api</module>
     <module>schema</module>
-    <module>network</module>
   </modules>
 </project>
