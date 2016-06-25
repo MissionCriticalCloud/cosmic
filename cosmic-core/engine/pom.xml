@@ -8,7 +8,6 @@
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
         <version>5.1.0.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     <build>
         <defaultGoal>install</defaultGoal>

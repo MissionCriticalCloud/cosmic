@@ -111,13 +111,6 @@
         <module>cosmic-agent</module>
         <module>cosmic-client</module>
         <module>cosmic-core</module>
-        <module>cosmic-plugin-event-bus-rabbitmq</module>
-        <module>cosmic-plugin-hypervisor-kvm</module>
-        <module>cosmic-plugin-hypervisor-ovm3</module>
-        <module>cosmic-plugin-hypervisor-xenserver</module>
-        <module>cosmic-plugin-network-nicira-nvp</module>
-        <module>cosmic-plugin-user-authenticator-ldap</module>
-        <module>cosmic-plugin-user-authenticator-sha256salted</module>
     </modules>
 
     <repositories>

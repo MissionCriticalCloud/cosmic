@@ -128,7 +128,7 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-plugin-planner-skip-heurestics</artifactId>
+            <artifactId>cloud-plugin-planner-skip-heuristics</artifactId>
             <version>5.1.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>

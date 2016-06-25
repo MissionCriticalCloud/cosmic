@@ -27,17 +27,24 @@
         <module>plugins/affinity-group-processors/host-anti-affinity</module>
         <module>plugins/affinity-group-processors/explicit-dedication</module>
         <module>plugins/acl-static-role-based</module>
-        <module>plugins/storage-allocator-random</module>
-        <module>plugins/storage-volume-default</module>
-        <module>plugins/storage-image-default</module>
-        <module>plugins/storage-image-s3</module>
-        <module>plugins/network-internal-loadbalancer</module>
-        <module>plugins/planner-skip-heuristics</module>
+        <module>plugins/storage/allocator-random</module>
+        <module>plugins/storage/volume-default</module>
+        <module>plugins/storage/image-default</module>
+        <module>plugins/storage/image-s3</module>
+        <module>plugins/network/internal-loadbalancer</module>
         <module>plugins/host-allocator-random</module>
         <module>plugins/deployment-planners/user-concentrated-pod</module>
         <module>plugins/deployment-planners/user-dispersing</module>
         <module>plugins/deployment-planners/implicit-dedication</module>
+        <module>plugins/deployment-planners/skip-heuristics</module>
         <module>plugins/dedicated-resources</module>
+        <module>plugins/hypervisor/kvm</module>
+        <module>plugins/hypervisor/xenserver</module>
+        <module>plugins/hypervisor/ovm3</module>
+        <module>plugins/authentication/ldap</module>
+        <module>plugins/authentication/sha256salted</module>
+        <module>plugins/network/nicira-nvp</module>
+        <module>plugins/event-bus-rabbitmq</module>
         <module>framework</module>
         <module>services</module>
     </modules>

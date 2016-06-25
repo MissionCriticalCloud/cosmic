@@ -1,0 +1,34 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cloud-plugin-storage-image-default</artifactId>
+    <name>Cosmic Plugin - Storage Image default provider</name>
+    <parent>
+        <groupId>cloud.cosmic</groupId>
+        <artifactId>cosmic-core</artifactId>
+        <version>5.1.0.1-SNAPSHOT</version>
+        <relativePath>../../../</relativePath>
+    </parent>
+    <dependencies>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-storage</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-storage-image</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-storage-volume</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-storage-snapshot</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+</project>
