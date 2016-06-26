@@ -76,39 +76,6 @@
                     <version>2.5.3</version>
                 </plugin>
                 <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>${cs.mycila.license.version}</version>
-                    <executions>
-                        <execution>
-                            <id>cosmic-checklicence</id>
-                            <phase>process-classes</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <strictCheck>true</strictCheck>
-                        <aggregate>true</aggregate>
-                        <header>../LICENSE</header>
-                        <mapping>
-                            <xml>XML_STYLE</xml>
-                            <java>DOUBLESLASH_STYLE</java>
-                            <clj>SEMICOLON_STYLE</clj>
-                        </mapping>
-                        <useDefaultExcludes>false</useDefaultExcludes>
-                        <excludes>
-                            <exclude>**/target/**</exclude>
-                            <exclude>.settings/**</exclude>
-                            <exclude>.checkstyle</exclude>
-                            <exclude>.project</exclude>
-                            <exclude>.classpath</exclude>
-                            <exclude>.pmd*</exclude>
-                        </excludes>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
                     <configuration>
                         <excludeDefaultDirectories>true</excludeDefaultDirectories>
@@ -139,93 +106,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>1.8</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.rat</groupId>
-                    <artifactId>apache-rat-plugin</artifactId>
-                    <configuration>
-                        <numUnapprovedLicenses>0</numUnapprovedLicenses>
-                        <excludeSubProjects>false</excludeSubProjects>
-                        <excludes>
-                            <exclude>CHANGES.md</exclude>
-                            <exclude>README.md</exclude>
-                            <exclude>INSTALL.md</exclude>
-                            <exclude>CONTRIBUTING.md</exclude>
-                            <exclude>.idea/</exclude>
-                            <exclude>**/*.log</exclude>
-                            <exclude>**/*.patch</exclude>
-                            <exclude>**/.classpath</exclude>
-                            <exclude>**/.project</exclude>
-                            <exclude>**/.idea/**</exclude>
-                            <exclude>**/*.iml</exclude>
-                            <exclude>**/.settings/**</exclude>
-                            <exclude>.metadata/**</exclude>
-                            <exclude>.git/**</exclude>
-                            <exclude>.gitignore</exclude>
-                            <exclude>**/*.crt</exclude>
-                            <exclude>**/*.csr</exclude>
-                            <exclude>**/*.key</exclude>
-                            <exclude>**/authorized_keys</exclude>
-                            <exclude>**/*.war</exclude>
-                            <exclude>**/*.mar</exclude>
-                            <exclude>**/*.jar</exclude>
-                            <exclude>**/*.iso</exclude>
-                            <exclude>**/*.tgz</exclude>
-                            <exclude>**/*.zip</exclude>
-                            <exclude>**/target/**</exclude>
-                            <exclude>**/.vagrant</exclude>
-                            <exclude>**/*.json</exclude>
-                            <exclude>build/build.number</exclude>
-                            <exclude>services/console-proxy/server/js/jquery.js</exclude>
-                            <exclude>debian/compat</exclude>
-                            <exclude>debian/control</exclude>
-                            <exclude>debian/dirs</exclude>
-                            <exclude>debian/rules</exclude>
-                            <exclude>debian/source/format</exclude>
-                            <exclude>dist/console-proxy/js/jquery.js</exclude>
-                            <exclude>scripts/vm/systemvm/id_rsa.cloud</exclude>
-                            <exclude>services/console-proxy/server/conf/agent.properties</exclude>
-                            <exclude>services/console-proxy/server/conf/environment.properties</exclude>
-                            <exclude>services/secondary-storage/conf/agent.properties</exclude>
-                            <exclude>services/secondary-storage/conf/environment.properties</exclude>
-                            <exclude>systemvm/conf/agent.properties</exclude>
-                            <exclude>systemvm/conf/environment.properties</exclude>
-                            <exclude>systemvm/js/jquery.js</exclude>
-                            <exclude>systemvm/patches/debian/systemvm.vmx</exclude>
-                            <exclude>systemvm/patches/debian/config/root/.ssh/authorized_keys</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/apache2/httpd.conf</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/apache2/ports.conf</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/apache2/sites-available/default</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/apache2/sites-available/default-ssl</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/apache2/vhostexample.conf</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/dnsmasq.conf.tmpl</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/vpcdnsmasq.conf</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/ssh/sshd_config</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/rsyslog.conf</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/logrotate.conf</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/logrotate.d/*</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/sysctl.conf</exclude>
-                            <exclude>systemvm/patches/debian/config/root/redundant_router/keepalived.conf.templ
-                            </exclude>
-                            <exclude>systemvm/patches/debian/config/root/redundant_router/arping_gateways.sh.templ
-                            </exclude>
-                            <exclude>systemvm/patches/debian/config/root/redundant_router/conntrackd.conf.templ
-                            </exclude>
-                            <exclude>systemvm/patches/debian/vpn/etc/ipsec.conf</exclude>
-                            <exclude>systemvm/patches/debian/vpn/etc/ppp/options.xl2tpd</exclude>
-                            <exclude>systemvm/patches/debian/vpn/etc/xl2tpd/xl2tpd.conf</exclude>
-                            <exclude>systemvm/patches/debian/vpn/etc/ipsec.secrets</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/haproxy/haproxy.cfg</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/cloud-nic.rules</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/modprobe.d/aesni_intel</exclude>
-                            <exclude>systemvm/patches/debian/config/etc/rc.local</exclude>
-                            <exclude>systemvm/patches/debian/config/var/www/html/userdata/.htaccess</exclude>
-                            <exclude>systemvm/patches/debian/config/var/www/html/latest/.htaccess</exclude>
-                            <exclude>systemvm/patches/debian/vpn/etc/ipsec.d/l2tp.conf</exclude>
-                            <exclude>**/.checkstyle</exclude>
-                            <exclude>**/*.md</exclude>
-                        </excludes>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
