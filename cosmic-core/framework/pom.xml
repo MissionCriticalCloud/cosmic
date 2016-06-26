@@ -9,9 +9,6 @@
         <artifactId>cosmic-core</artifactId>
         <version>5.1.0.1-SNAPSHOT</version>
     </parent>
-    <build>
-        <defaultGoal>install</defaultGoal>
-    </build>
     <modules>
         <module>ipc</module>
         <module>rest</module>
