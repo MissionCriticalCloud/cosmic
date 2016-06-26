@@ -16,14 +16,13 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.util.List;
-
 import com.cloud.api.query.vo.SecurityGroupJoinVO;
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.user.Account;
 import com.cloud.utils.db.GenericDao;
-
 import org.apache.cloudstack.api.response.SecurityGroupResponse;
+
+import java.util.List;
 
 public interface SecurityGroupJoinDao extends GenericDao<SecurityGroupJoinVO, Long> {
 

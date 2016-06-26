@@ -21,9 +21,9 @@ import com.cloud.configuration.Resource.ResourceType;
 public class ResourceAllocationException extends ManagementServerException {
 
     private static final long serialVersionUID = -2232066904895010203L;
-    private ResourceType resourceType;
+    private final ResourceType resourceType;
 
-    public ResourceAllocationException(String message, ResourceType resourceType) {
+    public ResourceAllocationException(final String message, final ResourceType resourceType) {
         super(message);
         this.resourceType = resourceType;
     }
@@ -31,5 +31,4 @@ public class ResourceAllocationException extends ManagementServerException {
     public ResourceType getResourceType() {
         return this.resourceType;
     }
-
 }

@@ -16,18 +16,16 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import sys
-from merge import QueueFile
-import logging
-import subprocess
-from subprocess import PIPE, STDOUT
-import os
-import os.path
-import configure
 import glob
 import json
-from cs.CsVmPassword import *
+import logging
+import os
+import os.path
+import sys
 
+import configure
+from cs.CsVmPassword import *
+from merge import QueueFile
 
 OCCURRENCES = 1
 
@@ -74,7 +72,6 @@ def process_vmpasswd():
 
 
 def is_guestnet_configured(guestnet_dict, keys):
-
     existing_keys = []
     new_eth_key = None
 
@@ -128,6 +125,7 @@ def is_guestnet_configured(guestnet_dict, keys):
             break
 
     return exists
+
 
 filename = min(glob.iglob(jsonCmdConfigPath + '*'), key=os.path.getctime)
 if not (os.path.isfile(filename) and os.access(filename, os.R_OK)):

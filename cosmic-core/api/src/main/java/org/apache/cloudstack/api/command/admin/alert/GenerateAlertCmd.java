@@ -17,7 +17,6 @@
 package org.apache.cloudstack.api.command.admin.alert;
 
 import com.cloud.event.EventTypes;
-
 import org.apache.cloudstack.alert.AlertService;
 import org.apache.cloudstack.alert.AlertService.AlertType;
 import org.apache.cloudstack.api.APICommand;
@@ -29,6 +28,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.PodResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,41 +59,6 @@ public class GenerateAlertCmd extends BaseAsyncCmd {
     @Parameter(name = ApiConstants.POD_ID, type = CommandType.UUID, entityType = PodResponse.class, description = "Pod id for which alert is generated")
     private Long podId;
 
-    // ///////////////////////////////////////////////////
-    // ///////////////// Accessors ///////////////////////
-    // ///////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public Short getType() {
-        return type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public long getZoneId() {
-        if (zoneId == null) {
-            return 0L;
-        }
-        return zoneId;
-    }
-
-    public Long getPodId() {
-        return podId;
-    }
-
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-
     @Override
     public void execute() {
         AlertType alertType = AlertService.AlertType.generateAlert(getType(), getName());
@@ -105,6 +70,46 @@ public class GenerateAlertCmd extends BaseAsyncCmd {
         }
     }
 
+    // ///////////////////////////////////////////////////
+    // ///////////////// Accessors ///////////////////////
+    // ///////////////////////////////////////////////////
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return 0;
+    }
+
+    public Short getType() {
+        return type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public long getZoneId() {
+        if (zoneId == null) {
+            return 0L;
+        }
+        return zoneId;
+    }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
+
+    public Long getPodId() {
+        return podId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
     @Override
     public String getEventType() {
         return EventTypes.ALERT_GENERATE;
@@ -113,10 +118,5 @@ public class GenerateAlertCmd extends BaseAsyncCmd {
     @Override
     public String getEventDescription() {
         return "Generating alert of type " + type + "; name " + name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return 0;
     }
 }

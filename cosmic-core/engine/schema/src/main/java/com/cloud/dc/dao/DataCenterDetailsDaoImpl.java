@@ -17,7 +17,6 @@
 package com.cloud.dc.dao;
 
 import com.cloud.dc.DataCenterDetailVO;
-
 import org.apache.cloudstack.api.ResourceDetail;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.ConfigKey.Scope;
@@ -32,14 +31,13 @@ public class DataCenterDetailsDaoImpl extends ResourceDetailsDaoBase<DataCenterD
     }
 
     @Override
-    public String getConfigValue(long id, ConfigKey<?> key) {
-        ResourceDetail vo = findDetail(id, key.key());
+    public String getConfigValue(final long id, final ConfigKey<?> key) {
+        final ResourceDetail vo = findDetail(id, key.key());
         return vo == null ? null : vo.getValue();
     }
 
     @Override
-    public void addDetail(long resourceId, String key, String value, boolean display) {
+    public void addDetail(final long resourceId, final String key, final String value, final boolean display) {
         super.addDetail(new DataCenterDetailVO(resourceId, key, value, display));
     }
-
 }

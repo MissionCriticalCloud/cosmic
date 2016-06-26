@@ -27,17 +27,16 @@ import com.cloud.host.Status;
 
 /**
  * There are several types of events that the AgentManager forwards
- *
- *   1. Agent Connect & Disconnect
- *   2. Commands sent by the agent.
- *   3. Answers sent by the agent.
+ * <p>
+ * 1. Agent Connect & Disconnect
+ * 2. Commands sent by the agent.
+ * 3. Answers sent by the agent.
  */
 public interface Listener {
 
     /**
-     *
      * @param agentId id of the agent
-     * @param seq sequence number return by the send() method.
+     * @param seq     sequence number return by the send() method.
      * @param answers answers to the commands.
      * @return true if processed.  false if not.
      */
@@ -48,8 +47,8 @@ public interface Listener {
      * a command to the server.  In order to process these commands,
      * the Listener must be registered for host commands.
      *
-     * @param agentId id of the agent.
-     * @param seq sequence number of the command sent.
+     * @param agentId  id of the agent.
+     * @param seq      sequence number of the command sent.
      * @param commands commands that were sent.
      * @return true if you processed the commands.  false if not.
      */
@@ -57,6 +56,7 @@ public interface Listener {
 
     /**
      * process control command sent from agent under its management
+     *
      * @param agentId
      * @param cmd
      * @return
@@ -67,9 +67,10 @@ public interface Listener {
      * This method is called by AgentManager when an agent made a
      * connection to this server if the listener has
      * been registered for host events.
-     * @param cmd command sent by the agent to the server on startup.
+     *
+     * @param cmd          command sent by the agent to the server on startup.
      * @param forRebalance TODO
-     * @param agentId id of the agent
+     * @param agentId      id of the agent
      * @throws ConnectionException if host has problems and needs to put into maintenance state.
      */
     void processConnect(Host host, StartupCommand cmd, boolean forRebalance) throws ConnectionException;
@@ -77,12 +78,12 @@ public interface Listener {
     /**
      * This method is called by AgentManager when an agent disconnects
      * from this server if the listener has been registered for host events.
-     *
+     * <p>
      * If the Listener is passed to the send() method, this method is
      * also called by AgentManager if the agent disconnected.
      *
      * @param agentId id of the agent
-     * @param state the current state of the agent.
+     * @param state   the current state of the agent.
      */
     boolean processDisconnect(long agentId, Status state);
 
@@ -110,10 +111,10 @@ public interface Listener {
     /**
      * If the Listener is passed to the send() method, this method is
      * called by the AgentManager to process a command timeout.
+     *
      * @param agentId id of the agent
-     * @param seq sequence number returned by the send().
+     * @param seq     sequence number returned by the send().
      * @return true if processed; false if not.
      */
     boolean processTimeout(long agentId, long seq);
-
 }

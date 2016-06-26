@@ -16,30 +16,29 @@
 // under the License.
 package com.cloud.consoleproxy.vnc;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
-import java.io.DataInputStream;
-import java.io.IOException;
-
 import com.cloud.consoleproxy.ConsoleProxyClientListener;
 import com.cloud.consoleproxy.util.Logger;
 import com.cloud.consoleproxy.vnc.packet.server.FramebufferUpdatePacket;
 import com.cloud.consoleproxy.vnc.packet.server.ServerCutText;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.io.DataInputStream;
+import java.io.IOException;
+
 public class VncServerPacketReceiver implements Runnable {
     private static final Logger s_logger = Logger.getLogger(VncServerPacketReceiver.class);
 
     private final VncScreenDescription screen;
-    private BufferedImageCanvas canvas;
-    private DataInputStream is;
-
-    private boolean connectionAlive = true;
-    private VncClient vncConnection;
     private final FrameBufferUpdateListener fburListener;
     private final ConsoleProxyClientListener clientListener;
+    private BufferedImageCanvas canvas;
+    private DataInputStream is;
+    private boolean connectionAlive = true;
+    private VncClient vncConnection;
 
     public VncServerPacketReceiver(DataInputStream is, BufferedImageCanvas canvas, VncScreenDescription screen, VncClient vncConnection,
-            FrameBufferUpdateListener fburListener, ConsoleProxyClientListener clientListener) {
+                                   FrameBufferUpdateListener fburListener, ConsoleProxyClientListener clientListener) {
         this.screen = screen;
         this.canvas = canvas;
         this.is = is;
@@ -97,14 +96,6 @@ public class VncServerPacketReceiver implements Runnable {
         }
     }
 
-    public void closeConnection() {
-        connectionAlive = false;
-    }
-
-    public boolean isConnectionAlive() {
-        return connectionAlive;
-    }
-
     /**
      * Handle server bell packet.
      */
@@ -121,5 +112,13 @@ public class VncServerPacketReceiver implements Runnable {
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(contents, null);
 
         s_logger.info("Server clipboard buffer: " + clipboardContent.getContent());
+    }
+
+    public void closeConnection() {
+        connectionAlive = false;
+    }
+
+    public boolean isConnectionAlive() {
+        return connectionAlive;
     }
 }

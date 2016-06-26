@@ -16,15 +16,6 @@
 // under the License.
 package com.cloud.usage.parser;
 
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.usage.StorageTypes;
 import com.cloud.usage.UsageStorageVO;
 import com.cloud.usage.UsageVO;
@@ -32,8 +23,16 @@ import com.cloud.usage.dao.UsageDao;
 import com.cloud.usage.dao.UsageStorageDao;
 import com.cloud.user.AccountVO;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.usage.UsageTypes;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.text.DecimalFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -49,12 +48,6 @@ public class StorageUsageParser {
     private UsageDao _usageDao;
     @Inject
     private UsageStorageDao _usageStorageDao;
-
-    @PostConstruct
-    void init() {
-        s_usageDao = _usageDao;
-        s_usageStorageDao = _usageStorageDao;
-    }
 
     public static boolean parse(AccountVO account, Date startDate, Date endDate) {
         if (s_logger.isDebugEnabled()) {
@@ -112,7 +105,8 @@ public class StorageUsageParser {
                 continue;
             }
 
-            long currentDuration = (storageDeleteDate.getTime() - storageCreateDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to find total number of millis to charge)
+            long currentDuration = (storageDeleteDate.getTime() - storageCreateDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1
+            // to find total number of millis to charge)
 
             updateStorageUsageData(usageMap, key, usageStorage.getId(), currentDuration);
         }
@@ -125,7 +119,7 @@ public class StorageUsageParser {
             if (useTime > 0L) {
                 StorageInfo info = storageMap.get(storageIdKey);
                 createUsageRecord(info.getZoneId(), info.getStorageType(), useTime, startDate, endDate, account, info.getStorageId(), info.getSourceId(), info.getSize(),
-                    info.getVirtualSize());
+                        info.getVirtualSize());
             }
         }
 
@@ -145,7 +139,7 @@ public class StorageUsageParser {
     }
 
     private static void createUsageRecord(long zoneId, int type, long runningTime, Date startDate, Date endDate, AccountVO account, long storageId, Long sourceId,
-        long size, Long virtualSize) {
+                                          long size, Long virtualSize) {
         // Our smallest increment is hourly for now
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Total running time " + runningTime + "ms");
@@ -158,7 +152,7 @@ public class StorageUsageParser {
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Creating Storage usage record for type: " + type + " with id: " + storageId + ", usage: " + usageDisplay + ", startDate: " + startDate +
-                ", endDate: " + endDate + ", for account: " + account.getId());
+                    ", endDate: " + endDate + ", for account: " + account.getId());
         }
 
         String usageDesc = "";
@@ -186,9 +180,15 @@ public class StorageUsageParser {
 
         //ToDo: get zone id
         UsageVO usageRecord =
-            new UsageVO(zoneId, account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", usage_type, new Double(usage), null, null, null, tmplSourceId,
-                storageId, size, virtualSize, startDate, endDate);
+                new UsageVO(zoneId, account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", usage_type, new Double(usage), null, null, null, tmplSourceId,
+                        storageId, size, virtualSize, startDate, endDate);
         s_usageDao.persist(usageRecord);
+    }
+
+    @PostConstruct
+    void init() {
+        s_usageDao = _usageDao;
+        s_usageStorageDao = _usageStorageDao;
     }
 
     private static class StorageInfo {

@@ -16,10 +16,7 @@
 // under the License.
 package org.apache.cloudstack.query;
 
-import java.util.List;
-
 import com.cloud.exception.PermissionDeniedException;
-
 import org.apache.cloudstack.affinity.AffinityGroupResponse;
 import org.apache.cloudstack.api.command.admin.domain.ListDomainsCmd;
 import org.apache.cloudstack.api.command.admin.host.ListHostTagsCmd;
@@ -76,9 +73,10 @@ import org.apache.cloudstack.api.response.VolumeResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.framework.config.ConfigKey;
 
+import java.util.List;
+
 /**
  * Service used for list api query.
- *
  */
 public interface QueryService {
 
@@ -120,13 +118,13 @@ public interface QueryService {
 
     ListResponse<AccountResponse> searchForAccounts(ListAccountsCmd cmd);
 
-    ListResponse<AsyncJobResponse>  searchForAsyncJobs(ListAsyncJobsCmd cmd);
+    ListResponse<AsyncJobResponse> searchForAsyncJobs(ListAsyncJobsCmd cmd);
 
-    ListResponse<DiskOfferingResponse>  searchForDiskOfferings(ListDiskOfferingsCmd cmd);
+    ListResponse<DiskOfferingResponse> searchForDiskOfferings(ListDiskOfferingsCmd cmd);
 
-    ListResponse<ServiceOfferingResponse>  searchForServiceOfferings(ListServiceOfferingsCmd cmd);
+    ListResponse<ServiceOfferingResponse> searchForServiceOfferings(ListServiceOfferingsCmd cmd);
 
-    ListResponse<ZoneResponse>  listDataCenters(ListZonesCmd cmd);
+    ListResponse<ZoneResponse> listDataCenters(ListZonesCmd cmd);
 
     ListResponse<TemplateResponse> listTemplates(ListTemplatesCmd cmd);
 

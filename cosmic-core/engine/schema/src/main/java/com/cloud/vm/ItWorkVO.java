@@ -16,6 +16,9 @@
 // under the License.
 package com.cloud.vm;
 
+import com.cloud.utils.time.InaccurateClock;
+import com.cloud.vm.VirtualMachine.State;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -23,58 +26,53 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.cloud.utils.time.InaccurateClock;
-import com.cloud.vm.VirtualMachine.State;
-
 @Entity
 @Table(name = "op_it_work")
 public class ItWorkVO {
-    enum ResourceType {
-        Volume, Nic, Host
-    }
-
-    enum Step {
-        Prepare, Starting, Started, Release, Done, Migrating, Reconfiguring
-    }
-
     @Id
     @Column(name = "id")
     String id;
-
     @Column(name = "created_at")
     long createdAt;
-
     @Column(name = "mgmt_server_id")
     long managementServerId;
-
     @Column(name = "type")
     State type;
-
     @Column(name = "thread")
     String threadName;
-
     @Column(name = "step")
     Step step;
-
     @Column(name = "updated_at")
     long updatedAt;
-
     @Column(name = "instance_id")
     long instanceId;
+    @Column(name = "resource_id")
+    long resourceId;
+    @Column(name = "resource_type")
+    ResourceType resourceType;
+    @Column(name = "vm_type")
+    @Enumerated(value = EnumType.STRING)
+    VirtualMachine.Type vmType;
+
+    protected ItWorkVO() {
+    }
+
+    protected ItWorkVO(String id, long managementServerId, State type, VirtualMachine.Type vmType, long instanceId) {
+        this.id = id;
+        this.managementServerId = managementServerId;
+        this.type = type;
+        this.threadName = Thread.currentThread().getName();
+        this.step = Step.Prepare;
+        this.instanceId = instanceId;
+        this.resourceType = null;
+        this.createdAt = InaccurateClock.getTimeInSeconds();
+        this.updatedAt = createdAt;
+        this.vmType = vmType;
+    }
 
     public long getInstanceId() {
         return instanceId;
     }
-
-    @Column(name = "resource_id")
-    long resourceId;
-
-    @Column(name = "resource_type")
-    ResourceType resourceType;
-
-    @Column(name = "vm_type")
-    @Enumerated(value = EnumType.STRING)
-    VirtualMachine.Type vmType;
 
     public VirtualMachine.Type getVmType() {
         return vmType;
@@ -94,22 +92,6 @@ public class ItWorkVO {
 
     public void setResourceType(ResourceType resourceType) {
         this.resourceType = resourceType;
-    }
-
-    protected ItWorkVO() {
-    }
-
-    protected ItWorkVO(String id, long managementServerId, State type, VirtualMachine.Type vmType, long instanceId) {
-        this.id = id;
-        this.managementServerId = managementServerId;
-        this.type = type;
-        this.threadName = Thread.currentThread().getName();
-        this.step = Step.Prepare;
-        this.instanceId = instanceId;
-        this.resourceType = null;
-        this.createdAt = InaccurateClock.getTimeInSeconds();
-        this.updatedAt = createdAt;
-        this.vmType = vmType;
     }
 
     public String getId() {
@@ -167,13 +149,21 @@ public class ItWorkVO {
     @Override
     public String toString() {
         return new StringBuilder("ItWork[").append(id)
-            .append("-")
-            .append(type.toString())
-            .append("-")
-            .append(instanceId)
-            .append("-")
-            .append(step.toString())
-            .append("]")
-            .toString();
+                                           .append("-")
+                                           .append(type.toString())
+                                           .append("-")
+                                           .append(instanceId)
+                                           .append("-")
+                                           .append(step.toString())
+                                           .append("]")
+                                           .toString();
+    }
+
+    enum ResourceType {
+        Volume, Nic, Host
+    }
+
+    enum Step {
+        Prepare, Starting, Started, Release, Done, Migrating, Reconfiguring
     }
 }

@@ -14,9 +14,9 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-(function($, cloudStack) {
-  cloudStack.modules = [
-    'vpc',
-    'infrastructure'
-  ];
+(function ($, cloudStack) {
+    cloudStack.modules = [
+        'vpc',
+        'infrastructure'
+    ];
 }(jQuery, cloudStack));

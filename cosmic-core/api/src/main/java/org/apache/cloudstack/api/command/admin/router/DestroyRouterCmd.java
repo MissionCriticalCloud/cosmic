@@ -22,7 +22,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.user.Account;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -32,6 +31,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.DomainRouterResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +52,9 @@ public class DestroyRouterCmd extends BaseAsyncCmd {
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
+    @Override
+    public String getEventType() {
+        return EventTypes.EVENT_ROUTER_DESTROY;
     }
 
     // ///////////////////////////////////////////////////
@@ -61,33 +62,8 @@ public class DestroyRouterCmd extends BaseAsyncCmd {
     // ///////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        VirtualRouter router = _entityMgr.findById(VirtualRouter.class, getId());
-        if (router != null) {
-            return router.getAccountId();
-        }
-
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
-
-    @Override
-    public String getEventType() {
-        return EventTypes.EVENT_ROUTER_DESTROY;
-    }
-
-    @Override
     public String getEventDescription() {
         return "destroying router: " + getId();
-    }
-
-    @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.DomainRouter;
     }
 
     @Override
@@ -96,17 +72,41 @@ public class DestroyRouterCmd extends BaseAsyncCmd {
     }
 
     @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.DomainRouter;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    @Override
     public void execute() throws ConcurrentOperationException, ResourceUnavailableException {
-        CallContext ctx = CallContext.current();
+        final CallContext ctx = CallContext.current();
         ctx.setEventDetails("Router Id: " + getId());
 
-        VirtualRouter result = _routerService.destroyRouter(getId(), ctx.getCallingAccount(), ctx.getCallingUserId());
+        final VirtualRouter result = _routerService.destroyRouter(getId(), ctx.getCallingAccount(), ctx.getCallingUserId());
         if (result != null) {
-            DomainRouterResponse response = _responseGenerator.createDomainRouterResponse(result);
+            final DomainRouterResponse response = _responseGenerator.createDomainRouterResponse(result);
             response.setResponseName(getCommandName());
             setResponseObject(response);
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to destroy router");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final VirtualRouter router = _entityMgr.findById(VirtualRouter.class, getId());
+        if (router != null) {
+            return router.getAccountId();
+        }
+
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 }

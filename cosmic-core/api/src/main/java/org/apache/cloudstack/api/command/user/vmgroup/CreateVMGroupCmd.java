@@ -17,7 +17,6 @@
 package org.apache.cloudstack.api.command.user.vmgroup;
 
 import com.cloud.vm.InstanceGroup;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -28,6 +27,7 @@ import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.InstanceGroupResponse;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,14 +46,14 @@ public class CreateVMGroupCmd extends BaseCmd {
     private String groupName;
 
     @Parameter(name = ApiConstants.ACCOUNT,
-               type = CommandType.STRING,
-               description = "the account of the instance group. The account parameter must be used with the domainId parameter.")
+            type = CommandType.STRING,
+            description = "the account of the instance group. The account parameter must be used with the domainId parameter.")
     private String accountName;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               description = "the domain ID of account owning the instance group")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            description = "the domain ID of account owning the instance group")
     private Long domainId;
 
     @Parameter(name = ApiConstants.PROJECT_ID, type = CommandType.UUID, entityType = ProjectResponse.class, description = "The project of the instance group")
@@ -84,6 +84,18 @@ public class CreateVMGroupCmd extends BaseCmd {
     // ///////////////////////////////////////////////////
 
     @Override
+    public void execute() {
+        InstanceGroup result = _userVmService.createVmGroup(this);
+        if (result != null) {
+            InstanceGroupResponse response = _responseGenerator.createInstanceGroupResponse(result);
+            response.setResponseName(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create vm instance group");
+        }
+    }
+
+    @Override
     public String getCommandName() {
         return s_name;
     }
@@ -96,17 +108,5 @@ public class CreateVMGroupCmd extends BaseCmd {
         }
 
         return accountId;
-    }
-
-    @Override
-    public void execute() {
-        InstanceGroup result = _userVmService.createVmGroup(this);
-        if (result != null) {
-            InstanceGroupResponse response = _responseGenerator.createInstanceGroupResponse(result);
-            response.setResponseName(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create vm instance group");
-        }
     }
 }

@@ -16,17 +16,13 @@
 // under the License.
 package com.cloud.projects;
 
-import java.util.Date;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
 
-public interface ProjectInvitation extends ControlledEntity, Identity, InternalIdentity {
-    public enum State {
-        Pending, Completed, Expired, Declined
-    }
+import java.util.Date;
 
+public interface ProjectInvitation extends ControlledEntity, Identity, InternalIdentity {
     long getProjectId();
 
     Long getForAccountId();
@@ -41,4 +37,7 @@ public interface ProjectInvitation extends ControlledEntity, Identity, InternalI
 
     Long getInDomainId();
 
+    public enum State {
+        Pending, Completed, Expired, Declined
+    }
 }

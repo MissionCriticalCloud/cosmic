@@ -16,10 +16,10 @@
 # under the License.
 """ Test cases for Testing Max Hypervisor Limit
 """
-from nose.plugins.attrib import attr
+from marvin.cloudstackAPI import (updateHypervisorCapabilities,
+                                  listHypervisorCapabilities)
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources,
-                              validateList)
+from marvin.codes import PASS
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              VirtualMachine,
@@ -32,16 +32,12 @@ from marvin.lib.common import (get_domain,
                                list_ssvms,
                                list_routers
                                )
-
-
-from marvin.cloudstackAPI import (updateHypervisorCapabilities,
-                                  listHypervisorCapabilities)
-
-from marvin.codes import PASS
+from marvin.lib.utils import (cleanup_resources,
+                              validateList)
+from nose.plugins.attrib import attr
 
 
 class TestMaxHyperviosrLimit(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestMaxHyperviosrLimit, cls).getClsTestClient()
@@ -194,7 +190,7 @@ class TestMaxHyperviosrLimit(cloudstackTestCase):
             self.skipTest("No hypervisor capabilities found for %s \
                     with version %s" % (self.hypervisor, qresultset[0][0]))
 
-        cmdUpdate = updateHypervisorCapabilities.\
+        cmdUpdate = updateHypervisorCapabilities. \
             updateHypervisorCapabilitiesCmd()
         cmdUpdate.id = self.hostCapId
         cmdUpdate.maxguestslimit = newValue

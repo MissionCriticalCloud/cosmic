@@ -49,5 +49,4 @@ public class TestXmlObject {
         ).putElement("shutdown", "false");
         System.out.println(xml.toString());
     }
-
 }

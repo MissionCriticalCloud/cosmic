@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.network;
 
-import java.util.List;
-
 import com.cloud.dc.StorageNetworkIpAddressVO;
 import com.cloud.utils.component.Manager;
 import com.cloud.vm.SecondaryStorageVmVO;
+
+import java.util.List;
 
 public interface StorageNetworkManager extends Manager {
     StorageNetworkIpAddressVO acquireIpAddress(long podId);

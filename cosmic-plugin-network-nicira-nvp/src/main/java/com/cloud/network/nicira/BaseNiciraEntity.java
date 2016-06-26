@@ -56,11 +56,6 @@ public abstract class BaseNiciraEntity implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return ReflectionToStringBuilder.reflectionToString(this, ToStringStyle.DEFAULT_STYLE, false);
-    }
-
-    @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 31)
                 .append(this.getClass())
@@ -81,5 +76,10 @@ public abstract class BaseNiciraEntity implements Serializable {
         }
         final BaseNiciraEntity another = (BaseNiciraEntity) obj;
         return new EqualsBuilder().append(uuid, another.uuid).isEquals();
+    }
+
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.reflectionToString(this, ToStringStyle.DEFAULT_STYLE, false);
     }
 }

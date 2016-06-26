@@ -18,11 +18,6 @@
  */
 package com.cloud.storage;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.ModifyStoragePoolCommand;
@@ -52,13 +47,17 @@ import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.SecondaryStorageVmDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProviderManager;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -71,8 +70,6 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
     @Inject
     protected SecondaryStorageVmDao _secStrgDao;
     @Inject
-    UserVmDao userVmDao;
-    @Inject
     protected UserDao _userDao;
     @Inject
     protected DomainRouterDao _domrDao;
@@ -82,15 +79,16 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
     protected AlertManager _alertMgr;
     @Inject
     protected ConsoleProxyDao _consoleProxyDao;
-
     @Inject
     protected StoragePoolWorkDao _storagePoolWorkDao;
+    @Inject
+    protected ResourceManager _resourceMgr;
+    @Inject
+    UserVmDao userVmDao;
     @Inject
     PrimaryDataStoreDao primaryDataStoreDao;
     @Inject
     DataStoreManager dataStoreMgr;
-    @Inject
-    protected ResourceManager _resourceMgr;
     @Inject
     AgentManager agentMgr;
     @Inject
@@ -120,10 +118,10 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
             for (StoragePoolVO sp : spes) {
                 if (sp.getStatus() == StoragePoolStatus.PrepareForMaintenance) {
                     throw new CloudRuntimeException("Only one storage pool in a cluster can be in PrepareForMaintenance mode, " + sp.getId() +
-                        " is already in  PrepareForMaintenance mode ");
+                            " is already in  PrepareForMaintenance mode ");
                 }
             }
-            StoragePool storagePool = (StoragePool)store;
+            StoragePool storagePool = (StoragePool) store;
 
             //Handeling the Zone wide and cluster wide primay storage
             List<HostVO> hosts = new ArrayList<HostVO>();
@@ -132,8 +130,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
             if (pool.getScope().equals(ScopeType.ZONE)) {
                 if (HypervisorType.Any.equals(pool.getHypervisor())) {
                     hosts = _resourceMgr.listAllUpAndEnabledHostsInOneZone(pool.getDataCenterId());
-                }
-                else {
+                } else {
                     hosts = _resourceMgr.listAllUpAndEnabledHostsInOneZoneByHypervisor(pool.getHypervisor(), pool.getDataCenterId());
                 }
             } else {
@@ -291,7 +288,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
         User user = _userDao.findById(userId);
         Account account = CallContext.current().getCallingAccount();
         StoragePoolVO poolVO = primaryDataStoreDao.findById(store.getId());
-        StoragePool pool = (StoragePool)store;
+        StoragePool pool = (StoragePool) store;
 
         //Handeling the Zone wide and cluster wide primay storage
         List<HostVO> hosts = new ArrayList<HostVO>();
@@ -299,8 +296,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
         if (poolVO.getScope().equals(ScopeType.ZONE)) {
             if (HypervisorType.Any.equals(pool.getHypervisor())) {
                 hosts = _resourceMgr.listAllUpAndEnabledHostsInOneZone(pool.getDataCenterId());
-            }
-            else {
+            } else {
                 hosts = _resourceMgr.listAllUpAndEnabledHostsInOneZoneByHypervisor(poolVO.getHypervisor(), pool.getDataCenterId());
             }
         } else {
@@ -393,5 +389,4 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
         }
         return false;
     }
-
 }

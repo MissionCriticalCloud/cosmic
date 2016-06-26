@@ -39,5 +39,4 @@ public class ManageSnapshotAnswer extends Answer {
     public String getSnapshotPath() {
         return _snapshotPath;
     }
-
 }

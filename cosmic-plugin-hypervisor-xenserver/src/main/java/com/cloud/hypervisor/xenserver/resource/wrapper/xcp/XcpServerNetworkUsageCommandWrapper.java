@@ -25,12 +25,12 @@ import com.cloud.agent.api.NetworkUsageCommand;
 import com.cloud.hypervisor.xenserver.resource.XcpServerResource;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.xensource.xenapi.Connection;
 
+import com.xensource.xenapi.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  NetworkUsageCommand.class)
+@ResourceWrapper(handles = NetworkUsageCommand.class)
 public final class XcpServerNetworkUsageCommandWrapper extends CommandWrapper<NetworkUsageCommand, Answer, XcpServerResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(XcpServerNetworkUsageCommandWrapper.class);

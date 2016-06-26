@@ -47,6 +47,4 @@ public class MonitorService extends ConfigBase {
     public void setDisableMonitoring(String disableMonitoring) {
         this.disableMonitoring = disableMonitoring;
     }
-
-
 }

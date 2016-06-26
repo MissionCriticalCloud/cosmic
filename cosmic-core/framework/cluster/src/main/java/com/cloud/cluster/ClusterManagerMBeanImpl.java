@@ -16,12 +16,11 @@
 // under the License.
 package com.cloud.cluster;
 
-import java.util.Date;
-import java.util.TimeZone;
+import com.cloud.utils.DateUtil;
 
 import javax.management.StandardMBean;
-
-import com.cloud.utils.DateUtil;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class ClusterManagerMBeanImpl extends StandardMBean implements ClusterManagerMBean {
     private final ClusterManagerImpl _clusterMgr;

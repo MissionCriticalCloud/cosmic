@@ -8,11 +8,11 @@ import com.cloud.resource.ResourceWrapper;
 
 @ResourceWrapper(handles = CleanupNetworkRulesCmd.class)
 public final class LibvirtCleanupNetworkRulesCommandWrapper
-    extends CommandWrapper<CleanupNetworkRulesCmd, Answer, LibvirtComputingResource> {
+        extends CommandWrapper<CleanupNetworkRulesCmd, Answer, LibvirtComputingResource> {
 
-  @Override
-  public Answer execute(final CleanupNetworkRulesCmd command, final LibvirtComputingResource libvirtComputingResource) {
-    final boolean result = libvirtComputingResource.cleanupRules();
-    return new Answer(command, result, "");
-  }
+    @Override
+    public Answer execute(final CleanupNetworkRulesCmd command, final LibvirtComputingResource libvirtComputingResource) {
+        final boolean result = libvirtComputingResource.cleanupRules();
+        return new Answer(command, result, "");
+    }
 }

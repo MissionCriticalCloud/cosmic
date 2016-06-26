@@ -18,14 +18,11 @@
  */
 package org.apache.cloudstack.api.command.admin.storage;
 
-import java.util.List;
-
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -34,6 +31,9 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.StorageProviderResponse;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,17 +47,8 @@ public class ListStorageProvidersCmd extends BaseListCmd {
     private String type;
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public String getType() {
-        return this.type;
-    }
-
-    @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException, NetworkRuleConflictException {
+            ResourceAllocationException, NetworkRuleConflictException {
         if (getType() == null) {
             throw new ServerApiException(ApiErrorCode.MALFORMED_PARAMETER_ERROR, "need to specify type: either primary or image");
         }
@@ -70,5 +61,14 @@ public class ListStorageProvidersCmd extends BaseListCmd {
         responses.setResponses(providers);
         responses.setResponseName(this.getCommandName());
         this.setResponseObject(responses);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    public String getType() {
+        return this.type;
     }
 }

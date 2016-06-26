@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface PhysicalNetworkTrafficTypeDao extends GenericDao<PhysicalNetworkTrafficTypeVO, Long> {
     Pair<List<PhysicalNetworkTrafficTypeVO>, Integer> listAndCountBy(long physicalNetworkId);

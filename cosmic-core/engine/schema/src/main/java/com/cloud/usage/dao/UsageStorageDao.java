@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.usage.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.usage.UsageStorageVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Date;
+import java.util.List;
 
 public interface UsageStorageDao extends GenericDao<UsageStorageVO, Long> {
     public void removeBy(long userId, long id, int storageType);

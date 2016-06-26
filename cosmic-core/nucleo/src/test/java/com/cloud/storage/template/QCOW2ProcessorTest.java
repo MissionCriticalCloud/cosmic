@@ -18,14 +18,14 @@
  */
 package com.cloud.storage.template;
 
+import com.cloud.exception.InternalErrorException;
+import com.cloud.storage.Storage;
+import com.cloud.storage.StorageLayer;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.cloud.exception.InternalErrorException;
-import com.cloud.storage.Storage;
-import com.cloud.storage.StorageLayer;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -60,7 +60,7 @@ public class QCOW2ProcessorTest {
 
         Mockito.when(mockStorageLayer.getFile(Mockito.anyString())).thenReturn(mockFile);
         Mockito.when(mockStorageLayer.getSize(Mockito.anyString())).thenReturn(1000L);
-        Mockito.doThrow(new IOException("virtual size calculation failed")).when(processor).getTemplateVirtualSize((File)Mockito.any());
+        Mockito.doThrow(new IOException("virtual size calculation failed")).when(processor).getTemplateVirtualSize((File) Mockito.any());
 
         processor.process(templatePath, null, templateName);
     }
@@ -77,7 +77,7 @@ public class QCOW2ProcessorTest {
 
         Mockito.when(mockStorageLayer.getFile(Mockito.anyString())).thenReturn(mockFile);
         Mockito.when(mockStorageLayer.getSize(Mockito.anyString())).thenReturn(actualSize);
-        Mockito.doReturn(virtualSize).when(processor).getTemplateVirtualSize((File)Mockito.any());
+        Mockito.doReturn(virtualSize).when(processor).getTemplateVirtualSize((File) Mockito.any());
 
         Processor.FormatInfo info = processor.process(templatePath, null, templateName);
         Assert.assertEquals(Storage.ImageFormat.QCOW2, info.format);
@@ -92,7 +92,7 @@ public class QCOW2ProcessorTest {
         long actualSize = 1000;
         File mockFile = Mockito.mock(File.class);
         Mockito.when(mockFile.length()).thenReturn(actualSize);
-        Mockito.doThrow(new IOException("virtual size calculation failed")).when(processor).getTemplateVirtualSize((File)Mockito.any());
+        Mockito.doThrow(new IOException("virtual size calculation failed")).when(processor).getTemplateVirtualSize((File) Mockito.any());
         Assert.assertEquals(actualSize, processor.getVirtualSize(mockFile));
         Mockito.verify(mockFile, Mockito.times(1)).length();
     }
@@ -103,7 +103,7 @@ public class QCOW2ProcessorTest {
         long actualSize = 1000;
         File mockFile = Mockito.mock(File.class);
         Mockito.when(mockFile.length()).thenReturn(actualSize);
-        Mockito.doReturn(virtualSize).when(processor).getTemplateVirtualSize((File)Mockito.any());
+        Mockito.doReturn(virtualSize).when(processor).getTemplateVirtualSize((File) Mockito.any());
         Assert.assertEquals(virtualSize, processor.getVirtualSize(mockFile));
         Mockito.verify(mockFile, Mockito.times(0)).length();
     }

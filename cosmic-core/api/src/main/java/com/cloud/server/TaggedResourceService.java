@@ -17,18 +17,18 @@
 
 package com.cloud.server;
 
+import com.cloud.server.ResourceTag.ResourceObjectType;
+
 import java.util.List;
 import java.util.Map;
-
-import com.cloud.server.ResourceTag.ResourceObjectType;
 
 public interface TaggedResourceService {
 
     /**
-     * @param resourceIds TODO
+     * @param resourceIds  TODO
      * @param resourceType
      * @param tags
-     * @param customer TODO
+     * @param customer     TODO
      * @return
      */
     List<ResourceTag> createTags(List<String> resourceIds, ResourceObjectType resourceType, Map<String, String> tags, String customer);

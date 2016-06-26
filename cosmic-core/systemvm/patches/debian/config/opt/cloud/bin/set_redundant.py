@@ -19,9 +19,10 @@
 
 # This file is used by the tests to switch the redundancy status
 
-from cs.CsConfig import CsConfig
-from optparse import OptionParser
 import logging
+from optparse import OptionParser
+
+from cs.CsConfig import CsConfig
 
 parser = OptionParser()
 parser.add_option("-e", "--enable",

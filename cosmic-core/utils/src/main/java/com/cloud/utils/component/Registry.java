@@ -47,5 +47,4 @@ public interface Registry<T> extends Named {
      * @return Unmodifiable list of registered items
      */
     List<T> getRegistered();
-
 }

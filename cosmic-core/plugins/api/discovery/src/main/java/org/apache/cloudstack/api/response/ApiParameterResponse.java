@@ -17,10 +17,10 @@
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 public class ApiParameterResponse extends BaseResponse {
     @SerializedName(ApiConstants.NAME)
@@ -85,5 +85,4 @@ public class ApiParameterResponse extends BaseResponse {
     public void setRelated(String related) {
         this.related = related;
     }
-
 }

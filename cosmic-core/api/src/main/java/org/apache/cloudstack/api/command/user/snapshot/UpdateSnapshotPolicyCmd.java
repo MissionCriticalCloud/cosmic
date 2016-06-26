@@ -21,7 +21,6 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.storage.Volume;
 import com.cloud.storage.snapshot.SnapshotPolicy;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.api.ACL;
@@ -34,11 +33,12 @@ import org.apache.cloudstack.api.ResponseObject;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.SnapshotPolicyResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-@APICommand(name = "updateSnapshotPolicy", description = "Updates the snapshot policy.", responseObject = SnapshotPolicyResponse.class, responseView = ResponseObject.ResponseView.Restricted, entityType = {Volume.class},
+@APICommand(name = "updateSnapshotPolicy", description = "Updates the snapshot policy.", responseObject = SnapshotPolicyResponse.class, responseView = ResponseObject
+        .ResponseView.Restricted, entityType = {Volume.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateSnapshotPolicyCmd extends BaseAsyncCustomIdCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateSnapshotPolicyCmd.class.getName());
@@ -49,7 +49,7 @@ public class UpdateSnapshotPolicyCmd extends BaseAsyncCustomIdCmd {
     /////////////////////////////////////////////////////
 
     @ACL(accessType = SecurityChecker.AccessType.OperateEntry)
-    @Parameter(name= ApiConstants.ID, type=CommandType.UUID, entityType=SnapshotPolicyResponse.class, description="the ID of the snapshot policy")
+    @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = SnapshotPolicyResponse.class, description = "the ID of the snapshot policy")
     private Long id;
 
     @Parameter(name = ApiConstants.FOR_DISPLAY,
@@ -63,41 +63,8 @@ public class UpdateSnapshotPolicyCmd extends BaseAsyncCustomIdCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
-    }
-
     public Boolean getDisplay() {
         return display;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public Long getInstanceId() {
-        return getId();
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-
-        SnapshotPolicy policy = _entityMgr.findById(SnapshotPolicy.class, getId());
-        if (policy == null) {
-            throw new InvalidParameterValueException("Invalid snapshot policy id was provided");
-        }
-        Volume volume = _responseGenerator.findVolumeById(policy.getVolumeId());
-        if (volume == null) {
-            throw new InvalidParameterValueException("Snapshot policy's volume id doesnt exist");
-        }else{
-            return volume.getAccountId();
-        }
     }
 
     @Override
@@ -105,11 +72,24 @@ public class UpdateSnapshotPolicyCmd extends BaseAsyncCustomIdCmd {
         return EventTypes.EVENT_SNAPSHOT_POLICY_UPDATE;
     }
 
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
     @Override
     public String getEventDescription() {
         StringBuilder desc = new StringBuilder("Updating snapshot policy: ");
         desc.append(getId());
         return desc.toString();
+    }
+
+    @Override
+    public Long getInstanceId() {
+        return getId();
+    }
+
+    public Long getId() {
+        return id;
     }
 
     @Override
@@ -126,10 +106,29 @@ public class UpdateSnapshotPolicyCmd extends BaseAsyncCustomIdCmd {
     }
 
     @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+
+        SnapshotPolicy policy = _entityMgr.findById(SnapshotPolicy.class, getId());
+        if (policy == null) {
+            throw new InvalidParameterValueException("Invalid snapshot policy id was provided");
+        }
+        Volume volume = _responseGenerator.findVolumeById(policy.getVolumeId());
+        if (volume == null) {
+            throw new InvalidParameterValueException("Snapshot policy's volume id doesnt exist");
+        } else {
+            return volume.getAccountId();
+        }
+    }
+
+    @Override
     public void checkUuid() {
         if (getCustomId() != null) {
             _uuidMgr.checkUuid(getCustomId(), SnapshotPolicy.class);
         }
     }
-
 }

@@ -15,12 +15,12 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-import CsHelper
 import logging
+
+import CsHelper
 
 
 class CsRoute:
-
     """ Manage routes """
 
     def __init__(self):
@@ -73,7 +73,7 @@ class CsRoute:
         """
         if not gateway:
             raise Exception("Gateway cannot be None.")
-        
+
         if self.defaultroute_exists():
             return False
         else:

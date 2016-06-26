@@ -22,17 +22,13 @@ package org.apache.cloudstack.storage.command;
 import com.cloud.agent.api.Command;
 
 public class UploadStatusCommand extends Command {
-    public enum EntityType {
-        Volume,
-        Template
-    }
     private String entityUuid;
     private EntityType entityType;
 
     protected UploadStatusCommand() {
     }
 
-    public UploadStatusCommand(String entityUuid, EntityType entityType) {
+    public UploadStatusCommand(final String entityUuid, final EntityType entityType) {
         this.entityUuid = entityUuid;
         this.entityType = entityType;
     }
@@ -50,4 +46,8 @@ public class UploadStatusCommand extends Command {
         return false;
     }
 
+    public enum EntityType {
+        Volume,
+        Template
+    }
 }

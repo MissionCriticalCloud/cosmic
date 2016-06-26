@@ -16,12 +16,12 @@
 // under the License.
 package org.apache.cloudstack.api;
 
+import com.cloud.exception.InvalidParameterValueException;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import com.cloud.exception.InvalidParameterValueException;
 
 public abstract class BaseListTaggedResourcesCmd extends BaseListProjectAndAccountResourcesCmd implements IBaseListTaggedResourcesCmd {
     @Parameter(name = ApiConstants.TAGS, type = CommandType.MAP, description = "List resources by tags (key/value pairs)")
@@ -35,7 +35,7 @@ public abstract class BaseListTaggedResourcesCmd extends BaseListProjectAndAccou
             Collection<?> servicesCollection = tags.values();
             Iterator<?> iter = servicesCollection.iterator();
             while (iter.hasNext()) {
-                HashMap<String, String> services = (HashMap<String, String>)iter.next();
+                HashMap<String, String> services = (HashMap<String, String>) iter.next();
                 String key = services.get("key");
                 String value = services.get("value");
                 if (value == null) {

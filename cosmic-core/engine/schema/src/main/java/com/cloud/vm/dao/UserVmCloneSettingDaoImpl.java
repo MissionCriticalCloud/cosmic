@@ -16,16 +16,15 @@
 // under the License.
 package com.cloud.vm.dao;
 
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.vm.UserVmCloneSettingVO;
+
+import javax.annotation.PostConstruct;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,5 +66,4 @@ public class UserVmCloneSettingDaoImpl extends GenericDaoBase<UserVmCloneSetting
         sc.setParameters("cloneType", cloneType);
         return search(sc, null);
     }
-
 }

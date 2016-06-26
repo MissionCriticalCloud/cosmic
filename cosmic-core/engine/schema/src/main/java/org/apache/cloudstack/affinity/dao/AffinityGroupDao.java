@@ -16,11 +16,10 @@
 // under the License.
 package org.apache.cloudstack.affinity.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
-
 import org.apache.cloudstack.affinity.AffinityGroupVO;
+
+import java.util.List;
 
 public interface AffinityGroupDao extends GenericDao<AffinityGroupVO, Long> {
     List<AffinityGroupVO> listByAccountId(long accountId);

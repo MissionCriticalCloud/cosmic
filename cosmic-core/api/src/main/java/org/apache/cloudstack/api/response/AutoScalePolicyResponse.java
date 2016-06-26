@@ -16,15 +16,15 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.List;
-
 import com.cloud.network.as.AutoScalePolicy;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = AutoScalePolicy.class)
 public class AutoScalePolicyResponse extends BaseResponse implements ControlledEntityResponse {
@@ -100,16 +100,6 @@ public class AutoScalePolicyResponse extends BaseResponse implements ControlledE
     }
 
     @Override
-    public void setDomainId(String domainId) {
-        this.domainId = domainId;
-    }
-
-    @Override
-    public void setDomainName(String domainName) {
-        this.domainName = domainName;
-    }
-
-    @Override
     public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
@@ -117,5 +107,15 @@ public class AutoScalePolicyResponse extends BaseResponse implements ControlledE
     @Override
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    @Override
+    public void setDomainId(String domainId) {
+        this.domainId = domainId;
+    }
+
+    @Override
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
     }
 }

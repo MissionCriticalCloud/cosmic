@@ -16,9 +16,6 @@
 // under the License.
 package com.cloud.vm.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.SearchBuilder;
@@ -26,6 +23,9 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.vm.NicIpAlias;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -60,13 +60,6 @@ public class NicIpAliasDaoImpl extends GenericDaoBase<NicIpAliasVO, Long> implem
     }
 
     @Override
-    public List<NicIpAliasVO> listByNicId(long nicId) {
-        SearchCriteria<NicIpAliasVO> sc = AllFieldsSearch.create();
-        sc.setParameters("nicId", nicId);
-        return listBy(sc);
-    }
-
-    @Override
     public List<String> listAliasIpAddressInNetwork(long networkId) {
         SearchCriteria<String> sc = IpSearch.create();
         sc.setParameters("network", networkId);
@@ -78,42 +71,6 @@ public class NicIpAliasDaoImpl extends GenericDaoBase<NicIpAliasVO, Long> implem
         SearchCriteria<NicIpAliasVO> sc = AllFieldsSearch.create();
         sc.setParameters("network", networkId);
         return listBy(sc);
-    }
-
-    @Override
-    public List<NicIpAliasVO> listByNetworkIdAndState(long networkId, NicIpAlias.State state) {
-        SearchCriteria<NicIpAliasVO> sc = AllFieldsSearch.create();
-        sc.setParameters("network", networkId);
-        sc.setParameters("state", state);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<NicIpAliasVO> listByNicIdAndVmid(long nicId, long vmId) {
-        SearchCriteria<NicIpAliasVO> sc = AllFieldsSearch.create();
-        sc.setParameters("nicId", nicId);
-        sc.setParameters("instanceId", vmId);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<NicIpAliasVO> getAliasIpForVm(long vmId) {
-        SearchCriteria<NicIpAliasVO> sc = AllFieldsSearch.create();
-        sc.setParameters("instanceId", vmId);
-        sc.setParameters("state", NicIpAlias.State.active);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<String> getAliasIpAddressesForNic(long nicId) {
-        SearchCriteria<NicIpAliasVO> sc = AllFieldsSearch.create();
-        sc.setParameters("nicId", nicId);
-        List<NicIpAliasVO> results = search(sc, null);
-        List<String> ips = new ArrayList<String>(results.size());
-        for (NicIpAliasVO result : results) {
-            ips.add(result.getIp4Address());
-        }
-        return ips;
     }
 
     @Override
@@ -131,20 +88,26 @@ public class NicIpAliasDaoImpl extends GenericDaoBase<NicIpAliasVO, Long> implem
     }
 
     @Override
-    public NicIpAliasVO findByGatewayAndNetworkIdAndState(String gateway, long networkId, NicIpAlias.State state) {
+    public List<NicIpAliasVO> getAliasIpForVm(long vmId) {
         SearchCriteria<NicIpAliasVO> sc = AllFieldsSearch.create();
-        sc.setParameters("gateway", gateway);
-        sc.setParameters("network", networkId);
-        sc.setParameters("state", state);
-        return findOneBy(sc);
+        sc.setParameters("instanceId", vmId);
+        sc.setParameters("state", NicIpAlias.State.active);
+        return listBy(sc);
     }
 
     @Override
-    public NicIpAliasVO findByIp4AddressAndVmId(String ip4Address, long vmId) {
+    public List<NicIpAliasVO> listByNicId(long nicId) {
         SearchCriteria<NicIpAliasVO> sc = AllFieldsSearch.create();
-        sc.setParameters("address", ip4Address);
+        sc.setParameters("nicId", nicId);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<NicIpAliasVO> listByNicIdAndVmid(long nicId, long vmId) {
+        SearchCriteria<NicIpAliasVO> sc = AllFieldsSearch.create();
+        sc.setParameters("nicId", nicId);
         sc.setParameters("instanceId", vmId);
-        return findOneBy(sc);
+        return listBy(sc);
     }
 
     @Override
@@ -165,10 +128,47 @@ public class NicIpAliasDaoImpl extends GenericDaoBase<NicIpAliasVO, Long> implem
     }
 
     @Override
+    public List<String> getAliasIpAddressesForNic(long nicId) {
+        SearchCriteria<NicIpAliasVO> sc = AllFieldsSearch.create();
+        sc.setParameters("nicId", nicId);
+        List<NicIpAliasVO> results = search(sc, null);
+        List<String> ips = new ArrayList<String>(results.size());
+        for (NicIpAliasVO result : results) {
+            ips.add(result.getIp4Address());
+        }
+        return ips;
+    }
+
+    @Override
     public Integer countAliasIps(long id) {
         SearchCriteria<NicIpAliasVO> sc = AllFieldsSearch.create();
         sc.setParameters("instanceId", id);
         List<NicIpAliasVO> list = listBy(sc);
         return list.size();
+    }
+
+    @Override
+    public NicIpAliasVO findByIp4AddressAndVmId(String ip4Address, long vmId) {
+        SearchCriteria<NicIpAliasVO> sc = AllFieldsSearch.create();
+        sc.setParameters("address", ip4Address);
+        sc.setParameters("instanceId", vmId);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public NicIpAliasVO findByGatewayAndNetworkIdAndState(String gateway, long networkId, NicIpAlias.State state) {
+        SearchCriteria<NicIpAliasVO> sc = AllFieldsSearch.create();
+        sc.setParameters("gateway", gateway);
+        sc.setParameters("network", networkId);
+        sc.setParameters("state", state);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public List<NicIpAliasVO> listByNetworkIdAndState(long networkId, NicIpAlias.State state) {
+        SearchCriteria<NicIpAliasVO> sc = AllFieldsSearch.create();
+        sc.setParameters("network", networkId);
+        sc.setParameters("state", state);
+        return listBy(sc);
     }
 }

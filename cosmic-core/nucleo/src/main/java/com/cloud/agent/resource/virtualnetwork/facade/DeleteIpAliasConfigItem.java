@@ -19,9 +19,6 @@
 
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.cloud.agent.api.routing.DeleteIpAliasCommand;
 import com.cloud.agent.api.routing.IpAliasTO;
 import com.cloud.agent.api.routing.NetworkElementCommand;
@@ -31,13 +28,16 @@ import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.IpAddressAlias;
 import com.cloud.agent.resource.virtualnetwork.model.IpAliases;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class DeleteIpAliasConfigItem extends AbstractConfigItemFacade {
 
     @Override
     public List<ConfigItem> generateConfig(final NetworkElementCommand cmd) {
         final DeleteIpAliasCommand command = (DeleteIpAliasCommand) cmd;
 
-        final List<IpAddressAlias> ipAliases = new LinkedList<IpAddressAlias>();
+        final List<IpAddressAlias> ipAliases = new LinkedList<>();
 
         final List<IpAliasTO> revokedIpAliasTOs = command.getDeleteIpAliasTos();
         for (final IpAliasTO ipAliasTO : revokedIpAliasTOs) {

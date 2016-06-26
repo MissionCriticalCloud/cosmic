@@ -18,10 +18,10 @@
  */
 package org.apache.cloudstack.engine.service.api;
 
+import com.cloud.utils.component.PluggableService;
+
 import java.net.URI;
 import java.util.List;
-
-import com.cloud.utils.component.PluggableService;
 
 public interface DirectoryService {
     void registerService(String serviceName, URI endpoint);
@@ -33,5 +33,4 @@ public interface DirectoryService {
     URI getLoadBalancedEndPoint(String serviceName);
 
     List<PluggableService> listServices();
-
 }

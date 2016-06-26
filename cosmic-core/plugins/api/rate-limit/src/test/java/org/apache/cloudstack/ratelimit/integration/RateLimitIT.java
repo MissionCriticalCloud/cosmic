@@ -16,19 +16,20 @@
 // under the License.
 package org.apache.cloudstack.ratelimit.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import com.cloud.utils.exception.CloudRuntimeException;
 import org.apache.cloudstack.api.response.ApiLimitResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test fixture to do integration rate limit test.
@@ -49,7 +50,6 @@ public class RateLimitIT extends APITest {
         params.put("sessionkey", sessionKey);
         final String resetResult = sendRequest("resetApiLimit", params);
         assertNotNull("Reset count failed!", fromSerializedString(resetResult, SuccessResponse.class));
-
     }
 
     @Test
@@ -83,7 +83,6 @@ public class RateLimitIT extends APITest {
                         sendRequest("listAccounts", params);
 
                         isUsable[j] = true;
-
                     } catch (final CloudRuntimeException e) {
                         isUsable[j] = false;
                         e.printStackTrace();
@@ -108,12 +107,12 @@ public class RateLimitIT extends APITest {
 
         int rejectCount = 0;
         for (int i = 0; i < isUsable.length; ++i) {
-            if (!isUsable[i])
+            if (!isUsable[i]) {
                 rejectCount++;
+            }
         }
 
         assertEquals("No request should be rejected!", 0, rejectCount);
-
     }
 
     @Test
@@ -149,7 +148,6 @@ public class RateLimitIT extends APITest {
                         sendRequest("listAccounts", params);
 
                         isUsable[j] = true;
-
                     } catch (final CloudRuntimeException e) {
                         isUsable[j] = false;
                         e.printStackTrace();
@@ -174,12 +172,12 @@ public class RateLimitIT extends APITest {
 
         int rejectCount = 0;
         for (int i = 0; i < isUsable.length; ++i) {
-            if (!isUsable[i])
+            if (!isUsable[i]) {
                 rejectCount++;
+            }
         }
 
         assertEquals("Only one request should be rejected!", 1, rejectCount);
-
     }
 
     @Test

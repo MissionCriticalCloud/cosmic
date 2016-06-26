@@ -16,13 +16,7 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.account;
 
-import java.util.Collection;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -35,6 +29,11 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.AccountResponse;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.region.RegionService;
+
+import javax.inject.Inject;
+import java.util.Collection;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,49 +42,30 @@ import org.slf4j.LoggerFactory;
 public class UpdateAccountCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateAccountCmd.class.getName());
     private static final String s_name = "updateaccountresponse";
-
+    @Inject
+    RegionService _regionService;
     /////////////////////////////////////////////////////
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
     @ACL(accessType = AccessType.OperateEntry)
     @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = AccountResponse.class, description = "Account id")
     private Long id;
-
     @Parameter(name = ApiConstants.ACCOUNT, type = CommandType.STRING, description = "the current account name")
     private String accountName;
-
     @Parameter(name = ApiConstants.DOMAIN_ID, type = CommandType.UUID, entityType = DomainResponse.class, description = "the ID of the domain where the account exists")
     private Long domainId;
-
     @Parameter(name = ApiConstants.NEW_NAME, type = CommandType.STRING, required = true, description = "new name for the account")
     private String newName;
-
     @Parameter(name = ApiConstants.NETWORK_DOMAIN,
-               type = CommandType.STRING,
-               description = "Network domain for the account's networks; empty string will update domainName with NULL value")
+            type = CommandType.STRING,
+            description = "Network domain for the account's networks; empty string will update domainName with NULL value")
     private String networkDomain;
-
     @Parameter(name = ApiConstants.ACCOUNT_DETAILS, type = CommandType.MAP, description = "details for account used to store specific parameters")
     private Map details;
-
-    @Inject
-    RegionService _regionService;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getAccountName() {
-        return accountName;
-    }
-
-    public Long getDomainId() {
-        return domainId;
-    }
 
     public String getNewName() {
         return newName;
@@ -101,13 +81,21 @@ public class UpdateAccountCmd extends BaseCmd {
         }
 
         Collection paramsCollection = details.values();
-        Map params = (Map)(paramsCollection.toArray())[0];
+        Map params = (Map) (paramsCollection.toArray())[0];
         return params;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
+    @Override
+    public void execute() {
+        Account result = _regionService.updateAccount(this);
+        if (result != null) {
+            AccountResponse response = _responseGenerator.createAccountResponse(ResponseView.Full, result);
+            response.setResponseName(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update account");
+        }
+    }
 
     @Override
     public String getCommandName() {
@@ -128,15 +116,19 @@ public class UpdateAccountCmd extends BaseCmd {
         return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 
-    @Override
-    public void execute() {
-        Account result = _regionService.updateAccount(this);
-        if (result != null){
-            AccountResponse response = _responseGenerator.createAccountResponse(ResponseView.Full, result);
-            response.setResponseName(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update account");
-        }
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public Long getDomainId() {
+        return domainId;
     }
 }

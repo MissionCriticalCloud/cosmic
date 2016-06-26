@@ -25,22 +25,27 @@ import com.cloud.storage.StoragePool;
 import com.cloud.vm.DiskProfile;
 
 public class CreateCommand extends Command {
+    boolean executeInSequence = false;
     private long volId;
     private StorageFilerTO pool;
     private DiskProfile diskCharacteristics;
     private String templateUrl;
-    boolean executeInSequence = false;
 
     protected CreateCommand() {
         super();
     }
 
+    public CreateCommand(DiskProfile diskCharacteristics, String templateUrl, StoragePool pool, boolean executeInSequence) {
+        this(diskCharacteristics, templateUrl, new StorageFilerTO(pool), executeInSequence);
+    }
+
     /**
      * Construction for template based volumes.
+     *
      * @param diskCharacteristics
      * @param templateUrl
      * @param pool
-     * @param executeInSequence TODO
+     * @param executeInSequence   TODO
      * @param vol
      * @param vm
      */
@@ -52,9 +57,10 @@ public class CreateCommand extends Command {
 
     /**
      * Construction for regular volumes.
+     *
      * @param diskCharacteristics
      * @param pool
-     * @param executeInSequence TODO
+     * @param executeInSequence   TODO
      * @param vol
      * @param vm
      */
@@ -64,10 +70,6 @@ public class CreateCommand extends Command {
         this.pool = pool;
         this.templateUrl = null;
         this.executeInSequence = executeInSequence;
-    }
-
-    public CreateCommand(DiskProfile diskCharacteristics, String templateUrl, StoragePool pool, boolean executeInSequence) {
-        this(diskCharacteristics, templateUrl, new StorageFilerTO(pool), executeInSequence);
     }
 
     public CreateCommand(DiskProfile diskCharacteristics, StoragePool pool, boolean executeInSequence) {

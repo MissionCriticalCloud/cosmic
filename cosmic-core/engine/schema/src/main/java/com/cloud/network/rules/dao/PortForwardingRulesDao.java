@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.network.rules.dao;
 
-import java.util.List;
-
 import com.cloud.network.rules.PortForwardingRuleVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface PortForwardingRulesDao extends GenericDao<PortForwardingRuleVO, Long> {
     List<PortForwardingRuleVO> listForApplication(long ipId);

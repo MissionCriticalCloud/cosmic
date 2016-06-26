@@ -25,6 +25,25 @@ import org.apache.cloudstack.api.InternalIdentity;
  */
 public interface GlobalLoadBalancerRule extends Identity, InternalIdentity, ControlledEntity {
 
+    public String getName();
+
+    public String getDescription();
+
+    public String getGslbDomain();
+
+    public String getAlgorithm();
+
+    public String getPersistence();
+
+    public int getRegion();
+
+    @Override
+    public long getAccountId();
+
+    public State getState();
+
+    public String getServiceType();
+
     enum Algorithm {
 
         RoundRobin, LeastConn, Proximity;
@@ -51,10 +70,11 @@ public interface GlobalLoadBalancerRule extends Identity, InternalIdentity, Cont
 
     enum ServiceType {
         tcp, udp, http;
+
         public static boolean isValidServiceType(String serviceType) {
             if (tcp.name().equalsIgnoreCase(serviceType) ||
-                udp.name().equalsIgnoreCase(serviceType) ||
-                http.name().equalsIgnoreCase(serviceType)) {
+                    udp.name().equalsIgnoreCase(serviceType) ||
+                    http.name().equalsIgnoreCase(serviceType)) {
                 return true;
             }
             return false;
@@ -64,23 +84,4 @@ public interface GlobalLoadBalancerRule extends Identity, InternalIdentity, Cont
     enum State {
         Staged, Add, Active, Revoke
     }
-
-    public String getName();
-
-    public String getDescription();
-
-    public String getGslbDomain();
-
-    public String getAlgorithm();
-
-    public String getPersistence();
-
-    public int getRegion();
-
-    @Override
-    public long getAccountId();
-
-    public State getState();
-
-    public String getServiceType();
 }

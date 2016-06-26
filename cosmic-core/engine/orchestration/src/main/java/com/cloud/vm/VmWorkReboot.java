@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.vm;
 
+import org.apache.cloudstack.framework.jobs.impl.JobSerializerHelper;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.cloudstack.framework.jobs.impl.JobSerializerHelper;
 
 public class VmWorkReboot extends VmWork {
     private static final long serialVersionUID = 195907627459759933L;
@@ -53,7 +53,7 @@ public class VmWorkReboot extends VmWork {
             rawParams = new HashMap<String, String>();
             for (Map.Entry<VirtualMachineProfile.Param, Object> entry : params.entrySet()) {
                 rawParams.put(entry.getKey().getName(), JobSerializerHelper.toObjectSerializedString(
-                    entry.getValue() instanceof Serializable ? (Serializable)entry.getValue() : entry.getValue().toString()));
+                        entry.getValue() instanceof Serializable ? (Serializable) entry.getValue() : entry.getValue().toString()));
             }
         }
     }

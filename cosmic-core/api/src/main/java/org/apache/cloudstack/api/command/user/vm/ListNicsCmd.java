@@ -16,16 +16,12 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.vm;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.user.Account;
 import com.cloud.vm.Nic;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
@@ -39,6 +35,10 @@ import org.apache.cloudstack.api.response.NetworkResponse;
 import org.apache.cloudstack.api.response.NicResponse;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,12 +61,17 @@ public class ListNicsCmd extends BaseListCmd {
     @Parameter(name = ApiConstants.NETWORK_ID, type = CommandType.UUID, entityType = NetworkResponse.class, description = "list nic of the specific vm's network")
     private Long networkId;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "list resources by display flag; only ROOT admin is eligible to pass this parameter", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "list resources by display flag; only ROOT admin is eligible to pass this parameter",
+            since = "4.4", authorized = {RoleType.Admin})
     private Boolean display;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
+
+    public static String getResultObjectName() {
+        return "addressinfo";
+    }
 
     public String getEntityTable() {
         return "nics";
@@ -92,13 +97,6 @@ public class ListNicsCmd extends BaseListCmd {
         return networkId;
     }
 
-    @Override
-    public long getEntityOwnerId() {
-        Account caller = CallContext.current().getCallingAccount();
-        return caller.getAccountId();
-    }
-
-
     public Boolean getDisplay() {
         if (display != null) {
             return display;
@@ -109,15 +107,6 @@ public class ListNicsCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public static String getResultObjectName() {
-        return "addressinfo";
-    }
 
     @Override
     public void execute() throws ResourceUnavailableException, ResourceAllocationException, ConcurrentOperationException, InsufficientCapacityException {
@@ -138,7 +127,6 @@ public class ListNicsCmd extends BaseListCmd {
             response.setResponses(resList);
             response.setResponseName(getCommandName());
             this.setResponseObject(response);
-
         } catch (Exception e) {
             s_logger.warn("Failed to list secondary ip address per nic ");
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, e.getMessage());
@@ -146,8 +134,18 @@ public class ListNicsCmd extends BaseListCmd {
     }
 
     @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
     public ApiCommandJobType getInstanceType() {
         return ApiCommandJobType.IpAddress;
     }
 
+    @Override
+    public long getEntityOwnerId() {
+        Account caller = CallContext.current().getCallingAccount();
+        return caller.getAccountId();
+    }
 }

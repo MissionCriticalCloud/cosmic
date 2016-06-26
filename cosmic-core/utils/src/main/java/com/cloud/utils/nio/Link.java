@@ -19,6 +19,18 @@
 
 package com.cloud.utils.nio;
 
+import com.cloud.utils.PropertiesUtil;
+import com.cloud.utils.db.DbProperties;
+import org.apache.cloudstack.utils.security.SSLUtils;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLEngineResult;
+import javax.net.ssl.SSLEngineResult.HandshakeStatus;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,39 +47,31 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLEngineResult;
-import javax.net.ssl.SSLEngineResult.HandshakeStatus;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-
-import com.cloud.utils.PropertiesUtil;
-import com.cloud.utils.db.DbProperties;
-
-import org.apache.cloudstack.utils.security.SSLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  */
 public class Link {
+    public static final String keystoreFile = "/cloudmanagementserver.keystore";
+    /* SSL has limitation of 16k, we may need to split packets. 18000 is 16k + some extra SSL informations */
+    protected static final int MAX_SIZE_PER_PACKET = 18000;
+    protected static final int HEADER_FLAG_FOLLOWING = 0x10000;
     private static final Logger s_logger = LoggerFactory.getLogger(Link.class);
-
     private final InetSocketAddress _addr;
     private final NioConnection _connection;
-    private SelectionKey _key;
     private final ConcurrentLinkedQueue<ByteBuffer[]> _writeQueue;
+    private SelectionKey _key;
     private ByteBuffer _readBuffer;
     private ByteBuffer _plaintextBuffer;
     private Object _attach;
     private boolean _readHeader;
     private boolean _gotFollowingPacket;
-
     private SSLEngine _sslEngine;
-    public static final String keystoreFile = "/cloudmanagementserver.keystore";
+
+    public Link(Link link) {
+        this(link._addr, link._connection);
+    }
 
     public Link(InetSocketAddress addr, NioConnection connection) {
         _addr = addr;
@@ -80,69 +84,63 @@ public class Link {
         _gotFollowingPacket = false;
     }
 
-    public Link(Link link) {
-        this(link._addr, link._connection);
-    }
-
-    public Object attachment() {
-        return _attach;
-    }
-
-    public void attach(Object attach) {
-        _attach = attach;
-    }
-
-    public void setKey(SelectionKey key) {
-        synchronized (this) {
-            _key = key;
+    /**
+     * write method to write to a socket.  This method writes to completion so
+     * it doesn't follow the nio standard.  We use this to make sure we write
+     * our own protocol.
+     *
+     * @param ch      channel to write to.
+     * @param buffers buffers to write.
+     * @throws IOException if unable to write to completion.
+     */
+    public static void write(SocketChannel ch, ByteBuffer[] buffers, SSLEngine sslEngine) throws IOException {
+        synchronized (ch) {
+            doWrite(ch, buffers, sslEngine);
         }
-    }
-
-    public void setSSLEngine(SSLEngine sslEngine) {
-        _sslEngine = sslEngine;
     }
 
     /**
      * No user, so comment it out.
-     *
+     * <p>
      * Static methods for reading from a channel in case
      * you need to add a client that doesn't require nio.
-     * @param ch channel to read from.
+     *
+     * @param ch         channel to read from.
      * @param bytebuffer to use.
      * @return bytes read
      * @throws IOException if not read to completion.
-    public static byte[] read(SocketChannel ch, ByteBuffer buff) throws IOException {
-        synchronized(buff) {
-            buff.clear();
-            buff.limit(4);
-
-            while (buff.hasRemaining()) {
-                if (ch.read(buff) == -1) {
-                    throw new IOException("Connection closed with -1 on reading size.");
-                }
-            }
-
-            buff.flip();
-
-            int length = buff.getInt();
-            ByteArrayOutputStream output = new ByteArrayOutputStream(length);
-            WritableByteChannel outCh = Channels.newChannel(output);
-
-            int count = 0;
-            while (count < length) {
-                buff.clear();
-                int read = ch.read(buff);
-                if (read < 0) {
-                    throw new IOException("Connection closed with -1 on reading data.");
-                }
-                count += read;
-                buff.flip();
-                outCh.write(buff);
-            }
-
-            return output.toByteArray();
-        }
-    }
+     *                     public static byte[] read(SocketChannel ch, ByteBuffer buff) throws IOException {
+     *                     synchronized(buff) {
+     *                     buff.clear();
+     *                     buff.limit(4);
+     *                     <p>
+     *                     while (buff.hasRemaining()) {
+     *                     if (ch.read(buff) == -1) {
+     *                     throw new IOException("Connection closed with -1 on reading size.");
+     *                     }
+     *                     }
+     *                     <p>
+     *                     buff.flip();
+     *                     <p>
+     *                     int length = buff.getInt();
+     *                     ByteArrayOutputStream output = new ByteArrayOutputStream(length);
+     *                     WritableByteChannel outCh = Channels.newChannel(output);
+     *                     <p>
+     *                     int count = 0;
+     *                     while (count < length) {
+     *                     buff.clear();
+     *                     int read = ch.read(buff);
+     *                     if (read < 0) {
+     *                     throw new IOException("Connection closed with -1 on reading data.");
+     *                     }
+     *                     count += read;
+     *                     buff.flip();
+     *                     outCh.write(buff);
+     *                     }
+     *                     <p>
+     *                     return output.toByteArray();
+     *                     }
+     *                     }
      */
 
     private static void doWrite(SocketChannel ch, ByteBuffer[] buffers, SSLEngine sslEngine) throws IOException {
@@ -197,216 +195,6 @@ public class Link {
                 dataRemaining -= count;
             }
         }
-    }
-
-    /**
-     * write method to write to a socket.  This method writes to completion so
-     * it doesn't follow the nio standard.  We use this to make sure we write
-     * our own protocol.
-     *
-     * @param ch channel to write to.
-     * @param buffers buffers to write.
-     * @throws IOException if unable to write to completion.
-     */
-    public static void write(SocketChannel ch, ByteBuffer[] buffers, SSLEngine sslEngine) throws IOException {
-        synchronized (ch) {
-            doWrite(ch, buffers, sslEngine);
-        }
-    }
-
-    /* SSL has limitation of 16k, we may need to split packets. 18000 is 16k + some extra SSL informations */
-    protected static final int MAX_SIZE_PER_PACKET = 18000;
-    protected static final int HEADER_FLAG_FOLLOWING = 0x10000;
-
-    public byte[] read(SocketChannel ch) throws IOException {
-        if (_readHeader) {   // Start of a packet
-            if (_readBuffer.position() == 0) {
-                _readBuffer.limit(4);
-            }
-
-            if (ch.read(_readBuffer) == -1) {
-                throw new IOException("Connection closed with -1 on reading size.");
-            }
-
-            if (_readBuffer.hasRemaining()) {
-                s_logger.trace("Need to read the rest of the packet length");
-                return null;
-            }
-            _readBuffer.flip();
-            int header = _readBuffer.getInt();
-            int readSize = (short)header;
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Packet length is " + readSize);
-            }
-
-            if (readSize > MAX_SIZE_PER_PACKET) {
-                throw new IOException("Wrong packet size: " + readSize);
-            }
-
-            if (!_gotFollowingPacket) {
-                _plaintextBuffer = ByteBuffer.allocate(2000);
-            }
-
-            if ((header & HEADER_FLAG_FOLLOWING) != 0) {
-                _gotFollowingPacket = true;
-            } else {
-                _gotFollowingPacket = false;
-            }
-
-            _readBuffer.clear();
-            _readHeader = false;
-
-            if (_readBuffer.capacity() < readSize) {
-                if (s_logger.isTraceEnabled()) {
-                    s_logger.trace("Resizing the byte buffer from " + _readBuffer.capacity());
-                }
-                _readBuffer = ByteBuffer.allocate(readSize);
-            }
-            _readBuffer.limit(readSize);
-        }
-
-        if (ch.read(_readBuffer) == -1) {
-            throw new IOException("Connection closed with -1 on read.");
-        }
-
-        if (_readBuffer.hasRemaining()) {   // We're not done yet.
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Still has " + _readBuffer.remaining());
-            }
-            return null;
-        }
-
-        _readBuffer.flip();
-
-        ByteBuffer appBuf;
-
-        SSLSession sslSession = _sslEngine.getSession();
-        SSLEngineResult engResult;
-        int remaining = 0;
-
-        while (_readBuffer.hasRemaining()) {
-            remaining = _readBuffer.remaining();
-            appBuf = ByteBuffer.allocate(sslSession.getApplicationBufferSize() + 40);
-            engResult = _sslEngine.unwrap(_readBuffer, appBuf);
-            if (engResult.getHandshakeStatus() != HandshakeStatus.FINISHED && engResult.getHandshakeStatus() != HandshakeStatus.NOT_HANDSHAKING &&
-                    engResult.getStatus() != SSLEngineResult.Status.OK) {
-                throw new IOException("SSL: SSLEngine return bad result! " + engResult);
-            }
-            if (remaining == _readBuffer.remaining()) {
-                throw new IOException("SSL: Unable to unwrap received data! still remaining " + remaining + "bytes!");
-            }
-
-            appBuf.flip();
-            if (_plaintextBuffer.remaining() < appBuf.limit()) {
-                // We need to expand _plaintextBuffer for more data
-                ByteBuffer newBuffer = ByteBuffer.allocate(_plaintextBuffer.capacity() + appBuf.limit() * 5);
-                _plaintextBuffer.flip();
-                newBuffer.put(_plaintextBuffer);
-                _plaintextBuffer = newBuffer;
-            }
-            _plaintextBuffer.put(appBuf);
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Done with packet: " + appBuf.limit());
-            }
-        }
-
-        _readBuffer.clear();
-        _readHeader = true;
-
-        if (!_gotFollowingPacket) {
-            _plaintextBuffer.flip();
-            byte[] result = new byte[_plaintextBuffer.limit()];
-            _plaintextBuffer.get(result);
-            return result;
-        } else {
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Waiting for more packets");
-            }
-            return null;
-        }
-    }
-
-    public void send(byte[] data) throws ClosedChannelException {
-        send(data, false);
-    }
-
-    public void send(byte[] data, boolean close) throws ClosedChannelException {
-        send(new ByteBuffer[] {ByteBuffer.wrap(data)}, close);
-    }
-
-    public void send(ByteBuffer[] data, boolean close) throws ClosedChannelException {
-        ByteBuffer[] item = new ByteBuffer[data.length + 1];
-        int remaining = 0;
-        for (int i = 0; i < data.length; i++) {
-            remaining += data[i].remaining();
-            item[i + 1] = data[i];
-        }
-
-        item[0] = ByteBuffer.allocate(4);
-        item[0].putInt(remaining);
-        item[0].flip();
-
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("Sending packet of length " + remaining);
-        }
-
-        _writeQueue.add(item);
-        if (close) {
-            _writeQueue.add(new ByteBuffer[0]);
-        }
-        synchronized (this) {
-            if (_key == null) {
-                throw new ClosedChannelException();
-            }
-            _connection.change(SelectionKey.OP_WRITE, _key, null);
-        }
-    }
-
-    public void send(ByteBuffer[] data) throws ClosedChannelException {
-        send(data, false);
-    }
-
-    public synchronized void close() {
-        if (_key != null) {
-            _connection.close(_key);
-        }
-    }
-
-    public boolean write(SocketChannel ch) throws IOException {
-        ByteBuffer[] data = null;
-        while ((data = _writeQueue.poll()) != null) {
-            if (data.length == 0) {
-                if (s_logger.isTraceEnabled()) {
-                    s_logger.trace("Closing connection requested");
-                }
-                return true;
-            }
-
-            ByteBuffer[] raw_data = new ByteBuffer[data.length - 1];
-            System.arraycopy(data, 1, raw_data, 0, data.length - 1);
-
-            doWrite(ch, raw_data, _sslEngine);
-        }
-        return false;
-    }
-
-    public InetSocketAddress getSocketAddress() {
-        return _addr;
-    }
-
-    public String getIpAddress() {
-        return _addr.getAddress().toString();
-    }
-
-    public synchronized void terminated() {
-        _key = null;
-    }
-
-    public synchronized void schedule(Task task) throws ClosedChannelException {
-        if (_key == null) {
-            throw new ClosedChannelException();
-        }
-        _connection.scheduleTask(task);
     }
 
     public static SSLContext initSSLContext(boolean isClient) throws GeneralSecurityException, IOException {
@@ -558,11 +346,220 @@ public class Link {
             if (engResult != null && engResult.getStatus() != SSLEngineResult.Status.OK) {
                 throw new IOException("Fail to handshake! " + engResult.getStatus());
             }
-            if (engResult != null)
+            if (engResult != null) {
                 hsStatus = engResult.getHandshakeStatus();
-            else
+            } else {
                 hsStatus = sslEngine.getHandshakeStatus();
+            }
         }
     }
 
+    public Object attachment() {
+        return _attach;
+    }
+
+    public void attach(Object attach) {
+        _attach = attach;
+    }
+
+    public void setKey(SelectionKey key) {
+        synchronized (this) {
+            _key = key;
+        }
+    }
+
+    public void setSSLEngine(SSLEngine sslEngine) {
+        _sslEngine = sslEngine;
+    }
+
+    public byte[] read(SocketChannel ch) throws IOException {
+        if (_readHeader) {   // Start of a packet
+            if (_readBuffer.position() == 0) {
+                _readBuffer.limit(4);
+            }
+
+            if (ch.read(_readBuffer) == -1) {
+                throw new IOException("Connection closed with -1 on reading size.");
+            }
+
+            if (_readBuffer.hasRemaining()) {
+                s_logger.trace("Need to read the rest of the packet length");
+                return null;
+            }
+            _readBuffer.flip();
+            int header = _readBuffer.getInt();
+            int readSize = (short) header;
+            if (s_logger.isTraceEnabled()) {
+                s_logger.trace("Packet length is " + readSize);
+            }
+
+            if (readSize > MAX_SIZE_PER_PACKET) {
+                throw new IOException("Wrong packet size: " + readSize);
+            }
+
+            if (!_gotFollowingPacket) {
+                _plaintextBuffer = ByteBuffer.allocate(2000);
+            }
+
+            if ((header & HEADER_FLAG_FOLLOWING) != 0) {
+                _gotFollowingPacket = true;
+            } else {
+                _gotFollowingPacket = false;
+            }
+
+            _readBuffer.clear();
+            _readHeader = false;
+
+            if (_readBuffer.capacity() < readSize) {
+                if (s_logger.isTraceEnabled()) {
+                    s_logger.trace("Resizing the byte buffer from " + _readBuffer.capacity());
+                }
+                _readBuffer = ByteBuffer.allocate(readSize);
+            }
+            _readBuffer.limit(readSize);
+        }
+
+        if (ch.read(_readBuffer) == -1) {
+            throw new IOException("Connection closed with -1 on read.");
+        }
+
+        if (_readBuffer.hasRemaining()) {   // We're not done yet.
+            if (s_logger.isTraceEnabled()) {
+                s_logger.trace("Still has " + _readBuffer.remaining());
+            }
+            return null;
+        }
+
+        _readBuffer.flip();
+
+        ByteBuffer appBuf;
+
+        SSLSession sslSession = _sslEngine.getSession();
+        SSLEngineResult engResult;
+        int remaining = 0;
+
+        while (_readBuffer.hasRemaining()) {
+            remaining = _readBuffer.remaining();
+            appBuf = ByteBuffer.allocate(sslSession.getApplicationBufferSize() + 40);
+            engResult = _sslEngine.unwrap(_readBuffer, appBuf);
+            if (engResult.getHandshakeStatus() != HandshakeStatus.FINISHED && engResult.getHandshakeStatus() != HandshakeStatus.NOT_HANDSHAKING &&
+                    engResult.getStatus() != SSLEngineResult.Status.OK) {
+                throw new IOException("SSL: SSLEngine return bad result! " + engResult);
+            }
+            if (remaining == _readBuffer.remaining()) {
+                throw new IOException("SSL: Unable to unwrap received data! still remaining " + remaining + "bytes!");
+            }
+
+            appBuf.flip();
+            if (_plaintextBuffer.remaining() < appBuf.limit()) {
+                // We need to expand _plaintextBuffer for more data
+                ByteBuffer newBuffer = ByteBuffer.allocate(_plaintextBuffer.capacity() + appBuf.limit() * 5);
+                _plaintextBuffer.flip();
+                newBuffer.put(_plaintextBuffer);
+                _plaintextBuffer = newBuffer;
+            }
+            _plaintextBuffer.put(appBuf);
+            if (s_logger.isTraceEnabled()) {
+                s_logger.trace("Done with packet: " + appBuf.limit());
+            }
+        }
+
+        _readBuffer.clear();
+        _readHeader = true;
+
+        if (!_gotFollowingPacket) {
+            _plaintextBuffer.flip();
+            byte[] result = new byte[_plaintextBuffer.limit()];
+            _plaintextBuffer.get(result);
+            return result;
+        } else {
+            if (s_logger.isTraceEnabled()) {
+                s_logger.trace("Waiting for more packets");
+            }
+            return null;
+        }
+    }
+
+    public void send(byte[] data) throws ClosedChannelException {
+        send(data, false);
+    }
+
+    public void send(byte[] data, boolean close) throws ClosedChannelException {
+        send(new ByteBuffer[]{ByteBuffer.wrap(data)}, close);
+    }
+
+    public void send(ByteBuffer[] data, boolean close) throws ClosedChannelException {
+        ByteBuffer[] item = new ByteBuffer[data.length + 1];
+        int remaining = 0;
+        for (int i = 0; i < data.length; i++) {
+            remaining += data[i].remaining();
+            item[i + 1] = data[i];
+        }
+
+        item[0] = ByteBuffer.allocate(4);
+        item[0].putInt(remaining);
+        item[0].flip();
+
+        if (s_logger.isTraceEnabled()) {
+            s_logger.trace("Sending packet of length " + remaining);
+        }
+
+        _writeQueue.add(item);
+        if (close) {
+            _writeQueue.add(new ByteBuffer[0]);
+        }
+        synchronized (this) {
+            if (_key == null) {
+                throw new ClosedChannelException();
+            }
+            _connection.change(SelectionKey.OP_WRITE, _key, null);
+        }
+    }
+
+    public void send(ByteBuffer[] data) throws ClosedChannelException {
+        send(data, false);
+    }
+
+    public synchronized void close() {
+        if (_key != null) {
+            _connection.close(_key);
+        }
+    }
+
+    public boolean write(SocketChannel ch) throws IOException {
+        ByteBuffer[] data = null;
+        while ((data = _writeQueue.poll()) != null) {
+            if (data.length == 0) {
+                if (s_logger.isTraceEnabled()) {
+                    s_logger.trace("Closing connection requested");
+                }
+                return true;
+            }
+
+            ByteBuffer[] raw_data = new ByteBuffer[data.length - 1];
+            System.arraycopy(data, 1, raw_data, 0, data.length - 1);
+
+            doWrite(ch, raw_data, _sslEngine);
+        }
+        return false;
+    }
+
+    public InetSocketAddress getSocketAddress() {
+        return _addr;
+    }
+
+    public String getIpAddress() {
+        return _addr.getAddress().toString();
+    }
+
+    public synchronized void terminated() {
+        _key = null;
+    }
+
+    public synchronized void schedule(Task task) throws ClosedChannelException {
+        if (_key == null) {
+            throw new ClosedChannelException();
+        }
+        _connection.scheduleTask(task);
+    }
 }

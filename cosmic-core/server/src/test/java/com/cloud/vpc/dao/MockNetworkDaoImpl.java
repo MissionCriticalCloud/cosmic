@@ -16,10 +16,6 @@
 // under the License.
 package com.cloud.vpc.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Networks.TrafficType;
@@ -29,6 +25,10 @@ import com.cloud.network.dao.NetworkVO;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @DB()
 public class MockNetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements NetworkDao {
@@ -345,11 +345,6 @@ public class MockNetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implemen
         return 0;
     }
 
-    @Override
-    public boolean updateState(final Network.State currentState, final Network.Event event, final Network.State nextState, final Network vo, final Object data) {
-        return true;
-    }
-
     /* (non-Javadoc)
      * @see com.cloud.network.dao.NetworkDao#listNetworksByAccount(long, long, com.cloud.network.Network.GuestType, boolean)
      */
@@ -379,5 +374,10 @@ public class MockNetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implemen
     @Override
     public int getNonSystemNetworkCountByVpcId(final long vpcId) {
         return 0;
+    }
+
+    @Override
+    public boolean updateState(final Network.State currentState, final Network.Event event, final Network.State nextState, final Network vo, final Object data) {
+        return true;
     }
 }

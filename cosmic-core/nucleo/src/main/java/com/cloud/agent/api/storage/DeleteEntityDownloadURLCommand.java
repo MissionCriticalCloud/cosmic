@@ -71,5 +71,4 @@ public class DeleteEntityDownloadURLCommand extends AbstractDownloadCommand {
     public void setParentPath(String parentPath) {
         this.parentPath = parentPath;
     }
-
 }

@@ -30,5 +30,4 @@ public class HttpStatusCodeHelper {
     public static boolean isUnauthorized(final int statusCode) {
         return statusCode == HttpStatus.SC_UNAUTHORIZED;
     }
-
 }

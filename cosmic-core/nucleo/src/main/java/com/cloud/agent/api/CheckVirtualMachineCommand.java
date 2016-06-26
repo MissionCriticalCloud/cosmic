@@ -40,5 +40,4 @@ public class CheckVirtualMachineCommand extends Command {
     public boolean executeInSequence() {
         return false;
     }
-
 }

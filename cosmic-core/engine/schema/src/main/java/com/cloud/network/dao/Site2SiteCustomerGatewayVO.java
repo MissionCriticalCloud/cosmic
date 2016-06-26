@@ -16,8 +16,9 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.network.Site2SiteCustomerGateway;
+import com.cloud.utils.db.Encrypt;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,11 +26,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.network.Site2SiteCustomerGateway;
-import com.cloud.utils.db.Encrypt;
-import com.cloud.utils.db.GenericDao;
-
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = ("s2s_customer_gateway"))
@@ -86,7 +84,7 @@ public class Site2SiteCustomerGatewayVO implements Site2SiteCustomerGateway {
     }
 
     public Site2SiteCustomerGatewayVO(String name, long accountId, long domainId, String gatewayIp, String guestCidrList, String ipsecPsk, String ikePolicy,
-            String espPolicy, long ikeLifetime, long espLifetime, boolean dpd, boolean encap) {
+                                      String espPolicy, long ikeLifetime, long espLifetime, boolean dpd, boolean encap) {
         this.name = name;
         this.gatewayIp = gatewayIp;
         this.guestCidrList = guestCidrList;
@@ -105,15 +103,6 @@ public class Site2SiteCustomerGatewayVO implements Site2SiteCustomerGateway {
     @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override
@@ -144,12 +133,17 @@ public class Site2SiteCustomerGatewayVO implements Site2SiteCustomerGateway {
     }
 
     @Override
-    public Date getRemoved() {
-        return removed;
+    public String getIkePolicy() {
+        return ikePolicy;
     }
 
-    public void setRemoved(Date removed) {
-        this.removed = removed;
+    public void setIkePolicy(String ikePolicy) {
+        this.ikePolicy = ikePolicy;
+    }
+
+    @Override
+    public String getEspPolicy() {
+        return espPolicy;
     }
 
     @Override
@@ -171,24 +165,6 @@ public class Site2SiteCustomerGatewayVO implements Site2SiteCustomerGateway {
     }
 
     @Override
-    public String getIkePolicy() {
-        return ikePolicy;
-    }
-
-    public void setIkePolicy(String ikePolicy) {
-        this.ikePolicy = ikePolicy;
-    }
-
-    @Override
-    public String getEspPolicy() {
-        return espPolicy;
-    }
-
-    public void setEspPolicy(String espPolicy) {
-        this.espPolicy = espPolicy;
-    }
-
-    @Override
     public Boolean getDpd() {
         return dpd;
     }
@@ -202,8 +178,30 @@ public class Site2SiteCustomerGatewayVO implements Site2SiteCustomerGateway {
         return encap;
     }
 
+    @Override
+    public Date getRemoved() {
+        return removed;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setRemoved(Date removed) {
+        this.removed = removed;
+    }
+
     public void setEncap(boolean encap) {
         this.encap = encap;
+    }
+
+    public void setEspPolicy(String espPolicy) {
+        this.espPolicy = espPolicy;
     }
 
     @Override

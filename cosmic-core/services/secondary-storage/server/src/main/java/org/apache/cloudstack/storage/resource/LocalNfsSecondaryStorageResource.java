@@ -16,16 +16,16 @@
 // under the License.
 package org.apache.cloudstack.storage.resource;
 
-import java.net.URI;
-import java.util.concurrent.Executors;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.storage.JavaStorageLayer;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.script.Script;
-
 import org.apache.cloudstack.storage.template.DownloadManagerImpl;
+
+import java.net.URI;
+import java.util.concurrent.Executors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -37,7 +37,7 @@ public class LocalNfsSecondaryStorageResource extends NfsSecondaryStorageResourc
 
     public LocalNfsSecondaryStorageResource() {
         this._dlMgr = new DownloadManagerImpl();
-        ((DownloadManagerImpl)_dlMgr).setThreadPool(Executors.newFixedThreadPool(10));
+        ((DownloadManagerImpl) _dlMgr).setThreadPool(Executors.newFixedThreadPool(10));
         _storage = new JavaStorageLayer();
         this._inSystemVM = false;
     }
@@ -45,11 +45,6 @@ public class LocalNfsSecondaryStorageResource extends NfsSecondaryStorageResourc
     @Override
     public void setParentPath(String path) {
         this._parent = path;
-    }
-
-    @Override
-    public Answer executeRequest(Command cmd) {
-        return super.executeRequest(cmd);
     }
 
     @Override
@@ -63,6 +58,11 @@ public class LocalNfsSecondaryStorageResource extends NfsSecondaryStorageResourc
             s_logger.error(msg, e);
             throw new CloudRuntimeException(msg);
         }
+    }
+
+    @Override
+    public Answer executeRequest(Command cmd) {
+        return super.executeRequest(cmd);
     }
 
     @Override
@@ -91,5 +91,4 @@ public class LocalNfsSecondaryStorageResource extends NfsSecondaryStorageResourc
         checkForSnapshotsDir(localRootPath);
         checkForVolumesDir(localRootPath);
     }
-
 }

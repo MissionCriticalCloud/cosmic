@@ -21,7 +21,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Volume;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
@@ -40,12 +39,14 @@ import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.api.response.VolumeResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createVolume", responseObject = VolumeResponse.class, description = "Creates a disk volume from a disk offering. This disk volume must still be attached to a virtual machine to make use of it.", responseView = ResponseView.Restricted, entityType = {
+@APICommand(name = "createVolume", responseObject = VolumeResponse.class, description = "Creates a disk volume from a disk offering. This disk volume must still be attached to a" +
+        " virtual machine to make use of it.", responseView = ResponseView.Restricted, entityType = {
         Volume.class, VirtualMachine.class},
-            requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
+        requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateVolumeCmd extends BaseAsyncCreateCustomIdCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateVolumeCmd.class.getName());
     private static final String s_name = "createvolumeresponse";
@@ -55,28 +56,28 @@ public class CreateVolumeCmd extends BaseAsyncCreateCustomIdCmd {
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.ACCOUNT,
-               type = BaseCmd.CommandType.STRING,
-               description = "the account associated with the disk volume. Must be used with the domainId parameter.")
+            type = BaseCmd.CommandType.STRING,
+            description = "the account associated with the disk volume. Must be used with the domainId parameter.")
     private String accountName;
 
     @Parameter(name = ApiConstants.PROJECT_ID,
-               type = CommandType.UUID,
-               entityType = ProjectResponse.class,
-               description = "the project associated with the volume. Mutually exclusive with account parameter")
+            type = CommandType.UUID,
+            entityType = ProjectResponse.class,
+            description = "the project associated with the volume. Mutually exclusive with account parameter")
     private Long projectId;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               description = "the domain ID associated with the disk offering. If used with the account parameter"
-                   + " returns the disk volume associated with the account for the specified domain.")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            description = "the domain ID associated with the disk offering. If used with the account parameter"
+                    + " returns the disk volume associated with the account for the specified domain.")
     private Long domainId;
 
     @Parameter(name = ApiConstants.DISK_OFFERING_ID,
-               required = false,
-               type = CommandType.UUID,
-               entityType = DiskOfferingResponse.class,
-               description = "the ID of the disk offering. Either diskOfferingId or snapshotId must be passed in.")
+            required = false,
+            type = CommandType.UUID,
+            entityType = DiskOfferingResponse.class,
+            description = "the ID of the disk offering. Either diskOfferingId or snapshotId must be passed in.")
     private Long diskOfferingId;
 
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "the name of the disk volume")
@@ -92,26 +93,31 @@ public class CreateVolumeCmd extends BaseAsyncCreateCustomIdCmd {
     private Long maxIops;
 
     @Parameter(name = ApiConstants.SNAPSHOT_ID,
-               type = CommandType.UUID,
-               entityType = SnapshotResponse.class,
-               description = "the snapshot ID for the disk volume. Either diskOfferingId or snapshotId must be passed in.")
+            type = CommandType.UUID,
+            entityType = SnapshotResponse.class,
+            description = "the snapshot ID for the disk volume. Either diskOfferingId or snapshotId must be passed in.")
     private Long snapshotId;
 
     @Parameter(name = ApiConstants.ZONE_ID, type = CommandType.UUID, entityType = ZoneResponse.class, description = "the ID of the availability zone")
     private Long zoneId;
 
-    @Parameter(name = ApiConstants.DISPLAY_VOLUME, type = CommandType.BOOLEAN, description = "an optional field, whether to display the volume to the end user or not.", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.DISPLAY_VOLUME, type = CommandType.BOOLEAN, description = "an optional field, whether to display the volume to the end user or not.",
+            authorized = {RoleType.Admin})
     private Boolean displayVolume;
 
     @Parameter(name = ApiConstants.VIRTUAL_MACHINE_ID,
-               type = CommandType.UUID,
-               entityType = UserVmResponse.class,
-               description = "the ID of the virtual machine; to be used with snapshot Id, VM to which the volume gets attached after creation")
+            type = CommandType.UUID,
+            entityType = UserVmResponse.class,
+            description = "the ID of the virtual machine; to be used with snapshot Id, VM to which the volume gets attached after creation")
     private Long virtualMachineId;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
+
+    public static String getResultObjectName() {
+        return "volume";
+    }
 
     public String getAccountName() {
         return accountName;
@@ -123,10 +129,6 @@ public class CreateVolumeCmd extends BaseAsyncCreateCustomIdCmd {
 
     public Long getDomainId() {
         return domainId;
-    }
-
-    public String getVolumeName() {
-        return volumeName;
     }
 
     public Long getSize() {
@@ -141,10 +143,6 @@ public class CreateVolumeCmd extends BaseAsyncCreateCustomIdCmd {
         return maxIops;
     }
 
-    public Long getSnapshotId() {
-        return snapshotId;
-    }
-
     public Long getZoneId() {
         return zoneId;
     }
@@ -157,43 +155,8 @@ public class CreateVolumeCmd extends BaseAsyncCreateCustomIdCmd {
         return displayVolume;
     }
 
-    @Override
-    public boolean isDisplay() {
-        if(displayVolume == null)
-            return true;
-        else
-            return displayVolume;
-    }
-
     public Long getVirtualMachineId() {
         return virtualMachineId;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public static String getResultObjectName() {
-        return "volume";
-    }
-
-    @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.Volume;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, projectId, true);
-        if (accountId == null) {
-            return CallContext.current().getCallingAccount().getId();
-        }
-
-        return accountId;
     }
 
     @Override
@@ -203,7 +166,20 @@ public class CreateVolumeCmd extends BaseAsyncCreateCustomIdCmd {
 
     @Override
     public String getEventDescription() {
-        return  "creating volume: " + getVolumeName() + ((getSnapshotId() == null) ? "" : " from snapshot: " + getSnapshotId());
+        return "creating volume: " + getVolumeName() + ((getSnapshotId() == null) ? "" : " from snapshot: " + getSnapshotId());
+    }
+
+    public String getVolumeName() {
+        return volumeName;
+    }
+
+    public Long getSnapshotId() {
+        return snapshotId;
+    }
+
+    @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.Volume;
     }
 
     @Override
@@ -241,6 +217,33 @@ public class CreateVolumeCmd extends BaseAsyncCreateCustomIdCmd {
             setResponseObject(response);
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create a volume");
+        }
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, projectId, true);
+        if (accountId == null) {
+            return CallContext.current().getCallingAccount().getId();
+        }
+
+        return accountId;
+    }
+
+    @Override
+    public boolean isDisplay() {
+        if (displayVolume == null) {
+            return true;
+        } else {
+            return displayVolume;
         }
     }
 }

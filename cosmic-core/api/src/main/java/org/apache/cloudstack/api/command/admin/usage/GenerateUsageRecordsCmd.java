@@ -16,10 +16,7 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.usage;
 
-import java.util.Date;
-
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -28,14 +25,17 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "generateUsageRecords",
-            description = "Generates usage records. This will generate records only if there any records to be generated, i.e if the scheduled usage job was not run or failed",
-            responseObject = SuccessResponse.class,
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = false)
+        description = "Generates usage records. This will generate records only if there any records to be generated, i.e if the scheduled usage job was not run or failed",
+        responseObject = SuccessResponse.class,
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = false)
 public class GenerateUsageRecordsCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(GenerateUsageRecordsCmd.class.getName());
 
@@ -49,15 +49,15 @@ public class GenerateUsageRecordsCmd extends BaseCmd {
     private Long domainId;
 
     @Parameter(name = ApiConstants.END_DATE,
-               type = CommandType.DATE,
-               required = true,
-               description = "End date range for usage record query. Use yyyy-MM-dd as the date format, e.g. startDate=2009-06-03.")
+            type = CommandType.DATE,
+            required = true,
+            description = "End date range for usage record query. Use yyyy-MM-dd as the date format, e.g. startDate=2009-06-03.")
     private Date endDate;
 
     @Parameter(name = ApiConstants.START_DATE,
-               type = CommandType.DATE,
-               required = true,
-               description = "Start date range for usage record query. Use yyyy-MM-dd as the date format, e.g. startDate=2009-06-01.")
+            type = CommandType.DATE,
+            required = true,
+            description = "Start date range for usage record query. Use yyyy-MM-dd as the date format, e.g. startDate=2009-06-01.")
     private Date startDate;
 
     /////////////////////////////////////////////////////
@@ -81,16 +81,6 @@ public class GenerateUsageRecordsCmd extends BaseCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
     public void execute() {
         boolean result = _usageService.generateUsageRecords(this);
         if (result) {
@@ -99,5 +89,15 @@ public class GenerateUsageRecordsCmd extends BaseCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to generate usage records");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

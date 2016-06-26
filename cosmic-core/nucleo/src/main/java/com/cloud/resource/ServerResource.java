@@ -38,6 +38,7 @@ public interface ServerResource extends Manager {
 
     /**
      * Generate a startup command containing information regarding the resource.
+     *
      * @return StartupCommand ready to be sent to the management server.
      */
     StartupCommand[] initialize();
@@ -50,6 +51,7 @@ public interface ServerResource extends Manager {
 
     /**
      * Execute the request coming from the computing server.
+     *
      * @param cmd Command to execute.
      * @return Answer
      */
@@ -64,10 +66,10 @@ public interface ServerResource extends Manager {
 
     /**
      * This is added to allow calling agent control service from within the resource
+     *
      * @return
      */
     IAgentControl getAgentControl();
 
     void setAgentControl(IAgentControl agentControl);
-
 }

@@ -16,17 +16,6 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.vo.HostJoinVO;
 import com.cloud.gpu.HostGpuGroupsVO;
@@ -40,13 +29,23 @@ import com.cloud.storage.StorageStats;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.ApiConstants.HostDetails;
 import org.apache.cloudstack.api.response.GpuResponse;
 import org.apache.cloudstack.api.response.HostForMigrationResponse;
 import org.apache.cloudstack.api.response.HostResponse;
 import org.apache.cloudstack.api.response.VgpuResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -54,15 +53,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements HostJoinDao {
     public static final Logger s_logger = LoggerFactory.getLogger(HostJoinDaoImpl.class);
-
+    private final SearchBuilder<HostJoinVO> hostSearch;
+    private final SearchBuilder<HostJoinVO> hostIdSearch;
     @Inject
     private ConfigurationDao _configDao;
     @Inject
     private HostDao hostDao;
-
-    private final SearchBuilder<HostJoinVO> hostSearch;
-
-    private final SearchBuilder<HostJoinVO> hostIdSearch;
 
     protected HostJoinDaoImpl() {
 
@@ -165,7 +161,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
 
                 hostResponse.setHypervisorVersion(host.getHypervisorVersion());
 
-                String cpuAlloc = decimalFormat.format(((float)cpu / (float)(host.getCpus() * host.getSpeed())) * 100f) + "%";
+                String cpuAlloc = decimalFormat.format(((float) cpu / (float) (host.getCpus() * host.getSpeed())) * 100f) + "%";
                 hostResponse.setCpuAllocated(cpuAlloc);
                 String cpuWithOverprovisioning = new Float(host.getCpus() * host.getSpeed() * ApiDBUtils.getCpuOverprovisioningFactor()).toString();
                 hostResponse.setCpuWithOverprovisioning(cpuWithOverprovisioning);
@@ -176,13 +172,12 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
                 String cpuUsed = null;
                 HostStats hostStats = ApiDBUtils.getHostStatistics(host.getId());
                 if (hostStats != null) {
-                    float cpuUtil = (float)hostStats.getCpuUtilization();
+                    float cpuUtil = (float) hostStats.getCpuUtilization();
                     cpuUsed = decimalFormat.format(cpuUtil) + "%";
                     hostResponse.setCpuUsed(cpuUsed);
                     hostResponse.setMemoryUsed((new Double(hostStats.getUsedMemory())).longValue());
                     hostResponse.setNetworkKbsRead((new Double(hostStats.getNetworkReadKBs())).longValue());
                     hostResponse.setNetworkKbsWrite((new Double(hostStats.getNetworkWriteKBs())).longValue());
-
                 }
             }
 
@@ -198,7 +193,6 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
                     s_logger.debug("failed to get host details", e);
                 }
             }
-
         } else if (host.getType() == Host.Type.SecondaryStorage) {
             StorageStats secStorageStats = ApiDBUtils.getSecondaryStorageStatistics(host.getId());
             if (secStorageStats != null) {
@@ -311,7 +305,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
 
                 hostResponse.setHypervisorVersion(host.getHypervisorVersion());
 
-                String cpuAlloc = decimalFormat.format(((float)cpu / (float)(host.getCpus() * host.getSpeed())) * 100f) + "%";
+                String cpuAlloc = decimalFormat.format(((float) cpu / (float) (host.getCpus() * host.getSpeed())) * 100f) + "%";
                 hostResponse.setCpuAllocated(cpuAlloc);
                 String cpuWithOverprovisioning = new Float(host.getCpus() * host.getSpeed() * ApiDBUtils.getCpuOverprovisioningFactor()).toString();
                 hostResponse.setCpuWithOverprovisioning(cpuWithOverprovisioning);
@@ -322,16 +316,14 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
                 String cpuUsed = null;
                 HostStats hostStats = ApiDBUtils.getHostStatistics(host.getId());
                 if (hostStats != null) {
-                    float cpuUtil = (float)hostStats.getCpuUtilization();
+                    float cpuUtil = (float) hostStats.getCpuUtilization();
                     cpuUsed = decimalFormat.format(cpuUtil) + "%";
                     hostResponse.setCpuUsed(cpuUsed);
                     hostResponse.setMemoryUsed((new Double(hostStats.getUsedMemory())).longValue());
                     hostResponse.setNetworkKbsRead((new Double(hostStats.getNetworkReadKBs())).longValue());
                     hostResponse.setNetworkKbsWrite((new Double(hostStats.getNetworkWriteKBs())).longValue());
-
                 }
             }
-
         } else if (host.getType() == Host.Type.SecondaryStorage) {
             StorageStats secStorageStats = ApiDBUtils.getSecondaryStorageStatistics(host.getId());
             if (secStorageStats != null) {
@@ -387,7 +379,6 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
         SearchCriteria<HostJoinVO> sc = hostIdSearch.create();
         sc.setParameters("id", host.getId());
         return searchIncludingRemoved(sc, null, null, false);
-
     }
 
     @Override
@@ -433,5 +424,4 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
         }
         return uvList;
     }
-
 }

@@ -17,14 +17,6 @@
 
 package org.apache.cloudstack.framework.jobs.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Filter;
@@ -35,8 +27,16 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
-
 import org.apache.cloudstack.framework.jobs.impl.SyncQueueItemVO;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,8 +74,9 @@ public class SyncQueueItemDaoImpl extends GenericDaoBase<SyncQueueItemVO, Long> 
 
         Filter filter = new Filter(SyncQueueItemVO.class, "created", true, 0L, 1L);
         List<SyncQueueItemVO> l = listBy(sc, filter);
-        if(l != null && l.size() > 0)
+        if (l != null && l.size() > 0) {
             return l.get(0);
+        }
 
         return null;
     }
@@ -95,7 +96,7 @@ public class SyncQueueItemDaoImpl extends GenericDaoBase<SyncQueueItemVO, Long> 
 
         String sql = "SELECT i.id, i.queue_id, i.content_type, i.content_id, i.created " +
                 " FROM sync_queue AS q JOIN sync_queue_item AS i ON q.id = i.queue_id " +
-                     " WHERE i.queue_proc_number IS NULL " +
+                " WHERE i.queue_proc_number IS NULL " +
                 " GROUP BY q.id " +
                 " ORDER BY i.id " +
                 " LIMIT 0, ?";
@@ -106,7 +107,7 @@ public class SyncQueueItemDaoImpl extends GenericDaoBase<SyncQueueItemVO, Long> 
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setInt(1, maxItems);
             ResultSet rs = pstmt.executeQuery();
-            while(rs.next()) {
+            while (rs.next()) {
                 SyncQueueItemVO item = new SyncQueueItemVO();
                 item.setId(rs.getLong(1));
                 item.setQueueId(rs.getLong(2));
@@ -135,8 +136,9 @@ public class SyncQueueItemDaoImpl extends GenericDaoBase<SyncQueueItemVO, Long> 
 
         Filter filter = new Filter(SyncQueueItemVO.class, "created", true, null, null);
 
-        if (exclusive)
+        if (exclusive) {
             return lockRows(sc, filter, true);
+        }
         return listBy(sc, filter);
     }
 
@@ -155,8 +157,9 @@ public class SyncQueueItemDaoImpl extends GenericDaoBase<SyncQueueItemVO, Long> 
         SearchCriteria<SyncQueueItemVO> sc = sbItem.create();
         sc.setParameters("lastProcessTime2", new Date(cutTime.getTime() - thresholdMs));
 
-        if(exclusive)
+        if (exclusive) {
             return lockRows(sc, null, true);
+        }
         return listBy(sc, null);
     }
 

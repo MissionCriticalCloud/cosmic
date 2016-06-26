@@ -30,5 +30,4 @@ public class HttpConstants {
     public static final String TEXT_HTML_CONTENT_TYPE = "text/html";
     public static final String JSON_CONTENT_TYPE = "application/json";
     public static final String CONTENT_TYPE = "Content-Type";
-
 }

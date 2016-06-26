@@ -21,8 +21,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import javax.inject.Inject;
-
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.VirtualRouterProvider.Type;
@@ -32,8 +30,10 @@ import com.cloud.network.dao.VirtualRouterProviderDao;
 import com.cloud.network.element.VirtualRouterProviderVO;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.component.ComponentContext;
-
 import org.apache.cloudstack.network.element.InternalLoadBalancerElementService;
+
+import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -100,7 +100,7 @@ public class InternalLbElementServiceTest {
             throw e;
         } finally {
             assertEquals("Test failed. The non-existing intenral lb provider was found" + expectedExcText, expectedExcText,
-                "Unable to find InternalLoadBalancerElementService by id");
+                    "Unable to find InternalLoadBalancerElementService by id");
         }
     }
 
@@ -114,7 +114,7 @@ public class InternalLbElementServiceTest {
             throw e;
         } finally {
             assertEquals("Test failed. The non-existing intenral lb provider was found" + expectedExcText, expectedExcText,
-                "Unable to find InternalLoadBalancerElementService by id");
+                    "Unable to find InternalLoadBalancerElementService by id");
         }
     }
 
@@ -134,7 +134,6 @@ public class InternalLbElementServiceTest {
     public void configureNonExistingVm() {
 
         _lbElSvc.configureInternalLoadBalancerElement(nonExistingElId, true);
-
     }
 
     @Test(expected = InvalidParameterValueException.class)
@@ -170,7 +169,6 @@ public class InternalLbElementServiceTest {
     public void addToNonExistingProvider() {
 
         _lbElSvc.addInternalLoadBalancerElement(nonExistingProviderId);
-
     }
 
     public void addToInvalidProvider() {
@@ -181,5 +179,4 @@ public class InternalLbElementServiceTest {
     public void addToExistingProvider() {
         _lbElSvc.addInternalLoadBalancerElement(validProviderId);
     }
-
 }

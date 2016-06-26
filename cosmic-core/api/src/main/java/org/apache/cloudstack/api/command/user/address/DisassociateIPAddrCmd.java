@@ -21,7 +21,6 @@ import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.IpAddress;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -33,11 +32,12 @@ import org.apache.cloudstack.api.response.AccountResponse;
 import org.apache.cloudstack.api.response.IPAddressResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "disassociateIpAddress", description = "Disassociates an IP address from the account.", responseObject = SuccessResponse.class,
- requestHasSensitiveInfo = false, responseHasSensitiveInfo = false, entityType = { IpAddress.class })
+        requestHasSensitiveInfo = false, responseHasSensitiveInfo = false, entityType = {IpAddress.class})
 public class DisassociateIPAddrCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DisassociateIPAddrCmd.class.getName());
 
@@ -48,7 +48,7 @@ public class DisassociateIPAddrCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = IPAddressResponse.class, required = true, description = "the ID of the public IP address"
-        + " to disassociate")
+            + " to disassociate")
     private Long id;
 
     // unexposed parameter needed for events logging
@@ -58,19 +58,6 @@ public class DisassociateIPAddrCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public Long getIpAddressId() {
-        return id;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
 
     @Override
     public void execute() throws InsufficientAddressCapacityException {
@@ -89,18 +76,32 @@ public class DisassociateIPAddrCmd extends BaseAsyncCmd {
         }
     }
 
-    @Override
-    public String getEventType() {
-        if (!isPortable(id)) {
-            return EventTypes.EVENT_NET_IP_RELEASE;
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public Long getIpAddressId() {
+        return id;
+    }
+
+    private boolean isPortable(long id) {
+        IpAddress ip = getIpAddress(id);
+        return ip.isPortable();
+    }
+
+    private IpAddress getIpAddress(long id) {
+        IpAddress ip = _entityMgr.findById(IpAddress.class, id);
+
+        if (ip == null) {
+            throw new InvalidParameterValueException("Unable to find IP address by ID=" + id);
         } else {
-            return EventTypes.EVENT_PORTABLE_IP_RELEASE;
+            return ip;
         }
     }
 
     @Override
-    public String getEventDescription() {
-        return ("Disassociating IP address with ID=" + id);
+    public String getCommandName() {
+        return s_name;
     }
 
     @Override
@@ -120,24 +121,22 @@ public class DisassociateIPAddrCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public String getSyncObjType() {
-        return BaseAsyncCmd.networkSyncObject;
+    public String getEventType() {
+        if (!isPortable(id)) {
+            return EventTypes.EVENT_NET_IP_RELEASE;
+        } else {
+            return EventTypes.EVENT_PORTABLE_IP_RELEASE;
+        }
     }
 
     @Override
-    public Long getSyncObjId() {
-        IpAddress ip = getIpAddress(id);
-        return ip.getAssociatedWithNetworkId();
+    public String getEventDescription() {
+        return ("Disassociating IP address with ID=" + id);
     }
 
-    private IpAddress getIpAddress(long id) {
-        IpAddress ip = _entityMgr.findById(IpAddress.class, id);
-
-        if (ip == null) {
-            throw new InvalidParameterValueException("Unable to find IP address by ID=" + id);
-        } else {
-            return ip;
-        }
+    @Override
+    public Long getInstanceId() {
+        return getIpAddressId();
     }
 
     @Override
@@ -146,12 +145,13 @@ public class DisassociateIPAddrCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public Long getInstanceId() {
-        return getIpAddressId();
+    public String getSyncObjType() {
+        return BaseAsyncCmd.networkSyncObject;
     }
 
-    private boolean isPortable(long id) {
+    @Override
+    public Long getSyncObjId() {
         IpAddress ip = getIpAddress(id);
-        return ip.isPortable();
+        return ip.getAssociatedWithNetworkId();
     }
 }

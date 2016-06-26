@@ -21,7 +21,6 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -33,6 +32,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.api.response.LoadBalancerResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,16 +53,17 @@ public class UpdateLoadBalancerRuleCmd extends BaseAsyncCustomIdCmd {
     private String description;
 
     @Parameter(name = ApiConstants.ID,
-               type = CommandType.UUID,
-               entityType = FirewallRuleResponse.class,
-               required = true,
-               description = "the ID of the load balancer rule to update")
+            type = CommandType.UUID,
+            entityType = FirewallRuleResponse.class,
+            required = true,
+            description = "the ID of the load balancer rule to update")
     private Long id;
 
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "the name of the load balancer rule")
     private String loadBalancerName;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4" +
+            ".4", authorized = {RoleType.Admin})
     private Boolean display;
 
     /////////////////////////////////////////////////////
@@ -77,10 +78,6 @@ public class UpdateLoadBalancerRuleCmd extends BaseAsyncCustomIdCmd {
         return description;
     }
 
-    public Long getId() {
-        return id;
-    }
-
     public String getLoadBalancerName() {
         return loadBalancerName;
     }
@@ -89,45 +86,18 @@ public class UpdateLoadBalancerRuleCmd extends BaseAsyncCustomIdCmd {
         return display;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        LoadBalancer lb = _entityMgr.findById(LoadBalancer.class, getId());
-        if (lb == null) {
-            return Account.ACCOUNT_ID_SYSTEM; // bad id given, parent this command to SYSTEM so ERROR events are tracked
-        }
-        return lb.getAccountId();
-    }
-
     @Override
     public String getEventType() {
         return EventTypes.EVENT_LOAD_BALANCER_UPDATE;
     }
 
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
     @Override
     public String getEventDescription() {
         return "updating load balancer rule";
-    }
-
-    @Override
-    public void execute() {
-        CallContext.current().setEventDetails("Load balancer ID: " + getId());
-        LoadBalancer result = _lbService.updateLoadBalancerRule(this);
-        if (result != null) {
-            LoadBalancerResponse response = _responseGenerator.createLoadBalancerResponse(result);
-            response.setResponseName(getCommandName());
-            this.setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update load balancer rule");
-        }
     }
 
     @Override
@@ -137,11 +107,42 @@ public class UpdateLoadBalancerRuleCmd extends BaseAsyncCustomIdCmd {
 
     @Override
     public Long getSyncObjId() {
-        LoadBalancer lb = _lbService.findById(getId());
+        final LoadBalancer lb = _lbService.findById(getId());
         if (lb == null) {
             throw new InvalidParameterValueException("Unable to find load balancer rule by ID " + getId());
         }
         return lb.getNetworkId();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void execute() {
+        CallContext.current().setEventDetails("Load balancer ID: " + getId());
+        final LoadBalancer result = _lbService.updateLoadBalancerRule(this);
+        if (result != null) {
+            final LoadBalancerResponse response = _responseGenerator.createLoadBalancerResponse(result);
+            response.setResponseName(getCommandName());
+            this.setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update load balancer rule");
+        }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final LoadBalancer lb = _entityMgr.findById(LoadBalancer.class, getId());
+        if (lb == null) {
+            return Account.ACCOUNT_ID_SYSTEM; // bad id given, parent this command to SYSTEM so ERROR events are tracked
+        }
+        return lb.getAccountId();
     }
 
     @Override

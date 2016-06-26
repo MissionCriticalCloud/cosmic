@@ -16,14 +16,6 @@
 // under the License.
 package org.apache.cloudstack.storage.allocator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.offering.ServiceOffering;
@@ -32,8 +24,15 @@ import com.cloud.storage.StoragePool;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachineProfile;
-
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -44,6 +43,20 @@ public class ClusterScopeStoragePoolAllocator extends AbstractStoragePoolAllocat
 
     @Inject
     DiskOfferingDao _diskOfferingDao;
+
+    @Override
+    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+        super.configure(name, params);
+
+        if (_configDao != null) {
+            Map<String, String> configs = _configDao.getConfiguration(params);
+            String allocationAlgorithm = configs.get("vm.allocation.algorithm");
+            if (allocationAlgorithm != null) {
+                _allocationAlgorithm = allocationAlgorithm;
+            }
+        }
+        return true;
+    }
 
     @Override
     protected List<StoragePool> select(DiskProfile dskCh, VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoid, int returnUpTo) {
@@ -106,7 +119,7 @@ public class ClusterScopeStoragePoolAllocator extends AbstractStoragePoolAllocat
             if (suitablePools.size() == returnUpTo) {
                 break;
             }
-            StoragePool storagePool = (StoragePool)dataStoreMgr.getPrimaryDataStore(pool.getId());
+            StoragePool storagePool = (StoragePool) dataStoreMgr.getPrimaryDataStore(pool.getId());
             if (filter(avoid, storagePool, dskCh, plan)) {
                 suitablePools.add(storagePool);
             } else {
@@ -119,19 +132,5 @@ public class ClusterScopeStoragePoolAllocator extends AbstractStoragePoolAllocat
         }
 
         return suitablePools;
-    }
-
-    @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
-        super.configure(name, params);
-
-        if (_configDao != null) {
-            Map<String, String> configs = _configDao.getConfiguration(params);
-            String allocationAlgorithm = configs.get("vm.allocation.algorithm");
-            if (allocationAlgorithm != null) {
-                _allocationAlgorithm = allocationAlgorithm;
-            }
-        }
-        return true;
     }
 }

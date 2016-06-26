@@ -16,19 +16,22 @@
 # under the License.
 """ P1 tests for updating the granular Configuration parameter with scope and resource id provided.
 """
-#Import Local Modules
-from marvin.cloudstackTestCase import *
+# Import Local Modules
 from marvin.cloudstackAPI import *
-from marvin.lib.utils import *
+from marvin.cloudstackTestCase import *
 from marvin.lib.base import *
 from marvin.lib.common import *
+from marvin.lib.utils import *
 from nose.plugins.attrib import attr
-#Import System modules
+
+
+# Import System modules
 
 class TestUpdateConfigWithScope(cloudstackTestCase):
     """
     Test to update a configuration (global setting) at various scopes
     """
+
     def setUp(self):
         self.apiClient = self.testClient.getApiClient()
 
@@ -45,7 +48,7 @@ class TestUpdateConfigWithScope(cloudstackTestCase):
         updateConfigurationCmd.scopeid = 1
 
         updateConfigurationResponse = self.apiClient.updateConfiguration(updateConfigurationCmd)
-        self.debug("updated the parameter %s with value %s"%(updateConfigurationResponse.name, updateConfigurationResponse.value))
+        self.debug("updated the parameter %s with value %s" % (updateConfigurationResponse.name, updateConfigurationResponse.value))
 
         listConfigurationsCmd = listConfigurations.listConfigurationsCmd()
         listConfigurationsCmd.cfgName = updateConfigurationResponse.name
@@ -62,7 +65,6 @@ class TestUpdateConfigWithScope(cloudstackTestCase):
 
         self.assertEqual(configParam.value, updateConfigurationResponse.value, "Check if the update API returned \
                          is the same as the one we got in the list API")
-
 
     def tearDown(self):
         """

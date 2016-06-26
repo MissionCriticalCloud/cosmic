@@ -16,11 +16,6 @@
 // under the License.
 package org.cloud.network.router.deployment;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
@@ -42,6 +37,11 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.VirtualMachineProfile.Param;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +57,7 @@ public class VpcRouterDeploymentDefinition extends RouterDeploymentDefinition {
     protected Vpc vpc;
 
     protected VpcRouterDeploymentDefinition(final Network guestNetwork, final Vpc vpc, final DeployDestination dest, final Account owner,
-            final Map<Param, Object> params) {
+                                            final Map<Param, Object> params) {
 
         super(guestNetwork, dest, owner, params);
 
@@ -106,9 +106,8 @@ public class VpcRouterDeploymentDefinition extends RouterDeploymentDefinition {
     }
 
     /**
-     * @see RouterDeploymentDefinition#prepareDeployment()
-     *
      * @return if the deployment can proceed
+     * @see RouterDeploymentDefinition#prepareDeployment()
      */
     @Override
     protected boolean prepareDeployment() {
@@ -204,11 +203,11 @@ public class VpcRouterDeploymentDefinition extends RouterDeploymentDefinition {
 
     @Override
     protected void deployAllVirtualRouters() throws ConcurrentOperationException, InsufficientCapacityException,
-    ResourceUnavailableException {
+            ResourceUnavailableException {
 
         // Implement Redundant Vpc
         final int routersToDeploy = getNumberOfRoutersToDeploy();
-        for(int i = 0; i < routersToDeploy; i++) {
+        for (int i = 0; i < routersToDeploy; i++) {
             // Don't start the router as we are holding the network lock that needs to be released at the end of router allocation
             final DomainRouterVO router = nwHelper.deployRouter(this, false);
 

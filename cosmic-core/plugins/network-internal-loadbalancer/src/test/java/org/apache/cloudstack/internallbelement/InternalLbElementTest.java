@@ -16,6 +16,11 @@
 // under the License.
 package org.apache.cloudstack.internallbelement;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.dao.EntityManager;
@@ -40,13 +45,6 @@ import com.cloud.utils.net.Ip;
 import org.apache.cloudstack.lb.ApplicationLoadBalancerRuleVO;
 import org.apache.cloudstack.network.element.InternalLoadBalancerElement;
 import org.apache.cloudstack.network.lb.InternalLoadBalancerVMManager;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;
@@ -54,7 +52,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/lb_element.xml")
@@ -133,6 +137,22 @@ public class InternalLbElementTest {
         assertTrue("Valid provider is returned as not ready", isReady);
     }
 
+    private static PhysicalNetworkServiceProviderVO setId(final PhysicalNetworkServiceProviderVO vo, final long id) {
+        final PhysicalNetworkServiceProviderVO voToReturn = vo;
+        final Class<?> c = voToReturn.getClass();
+        try {
+            final Field f = c.getDeclaredField("id");
+            f.setAccessible(true);
+            f.setLong(voToReturn, id);
+        } catch (final NoSuchFieldException ex) {
+            return null;
+        } catch (final IllegalAccessException ex) {
+            return null;
+        }
+
+        return voToReturn;
+    }
+
     @Test
     public void verifyNonExistingProviderState() {
         PhysicalNetworkServiceProviderVO provider = new PhysicalNetworkServiceProviderVO();
@@ -197,21 +217,4 @@ public class InternalLbElementTest {
         final boolean result = _lbEl.validateLBRule(new NetworkVO(), rule);
         assertTrue("Wrong value is returned by validateLBRule method", result);
     }
-
-    private static PhysicalNetworkServiceProviderVO setId(final PhysicalNetworkServiceProviderVO vo, final long id) {
-        final PhysicalNetworkServiceProviderVO voToReturn = vo;
-        final Class<?> c = voToReturn.getClass();
-        try {
-            final Field f = c.getDeclaredField("id");
-            f.setAccessible(true);
-            f.setLong(voToReturn, id);
-        } catch (final NoSuchFieldException ex) {
-            return null;
-        } catch (final IllegalAccessException ex) {
-            return null;
-        }
-
-        return voToReturn;
-    }
-
 }

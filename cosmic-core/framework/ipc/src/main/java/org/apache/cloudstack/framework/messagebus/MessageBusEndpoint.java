@@ -35,22 +35,22 @@ public class MessageBusEndpoint {
         return this;
     }
 
+    public PublishScope getScope() {
+        return _scope;
+    }
+
     public MessageBusEndpoint setScope(PublishScope scope) {
         _scope = scope;
         return this;
     }
 
-    public PublishScope getScope() {
-        return _scope;
+    public String getSender() {
+        return _sender;
     }
 
     public MessageBusEndpoint setSender(String sender) {
         _sender = sender;
         return this;
-    }
-
-    public String getSender() {
-        return _sender;
     }
 
     public void Publish(String subject, Object args) {

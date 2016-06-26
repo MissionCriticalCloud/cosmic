@@ -15,12 +15,13 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from marvin.cloudstackTestCase import *
 from marvin.cloudstackAPI import *
-from marvin.lib.utils import *
+from marvin.cloudstackTestCase import *
 from marvin.lib.base import *
 from marvin.lib.common import *
+from marvin.lib.utils import *
 from nose.plugins.attrib import attr
+
 
 class TestRegions(cloudstackTestCase):
     """Test Regions - basic region creation
@@ -40,12 +41,12 @@ class TestRegions(cloudstackTestCase):
         """ Test for create region
         """
         region = Region.create(self.apiclient,
-            self.services["region"]
-        )
+                               self.services["region"]
+                               )
 
         list_region = Region.list(self.apiclient,
-            id=self.services["region"]["regionid"]
-        )
+                                  id=self.services["region"]["regionid"]
+                                  )
 
         self.assertEqual(
             isinstance(list_region, list),
@@ -76,7 +77,7 @@ class TestRegions(cloudstackTestCase):
     @classmethod
     def tearDownClass(cls):
         try:
-            #Clean up
+            # Clean up
             cleanup_resources(cls.apiclient, cls.cleanup)
             list_region = Region.list(cls.apiclient, id=cls.services["region"]["regionid"])
             assert list_region is None, "Region deletion fails"

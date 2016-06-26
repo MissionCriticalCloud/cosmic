@@ -1,28 +1,29 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>cloud-engine</artifactId>
-  <name>Cosmic Cloud Engine</name>
-  <packaging>pom</packaging>
-  <parent>
-    <groupId>cloud.cosmic</groupId>
-    <artifactId>cosmic-core</artifactId>
-    <version>5.1.0.1-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
-  <build>
-    <defaultGoal>install</defaultGoal>
-  </build>
-  <modules>
-    <module>api</module>
-    <module>orchestration</module>
-    <module>storage</module>
-    <module>storage/volume</module>
-    <module>storage/image</module>
-    <module>storage/datamotion</module>
-    <module>storage/cache</module>
-    <module>storage/snapshot</module>
-    <module>components-api</module>
-    <module>schema</module>
-    <module>network</module>
-  </modules>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cloud-engine</artifactId>
+    <name>Cosmic Cloud Engine</name>
+    <packaging>pom</packaging>
+    <parent>
+        <groupId>cloud.cosmic</groupId>
+        <artifactId>cosmic-core</artifactId>
+        <version>5.1.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <build>
+        <defaultGoal>install</defaultGoal>
+    </build>
+    <modules>
+        <module>api</module>
+        <module>orchestration</module>
+        <module>storage</module>
+        <module>storage/volume</module>
+        <module>storage/image</module>
+        <module>storage/datamotion</module>
+        <module>storage/cache</module>
+        <module>storage/snapshot</module>
+        <module>components-api</module>
+        <module>schema</module>
+        <module>network</module>
+    </modules>
 </project>

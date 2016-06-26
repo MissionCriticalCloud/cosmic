@@ -27,8 +27,8 @@ import com.cloud.agent.api.FenceCommand;
 import com.cloud.host.Host;
 import com.cloud.hypervisor.xenserver.resource.XenServer56FP1Resource;
 import com.cloud.vm.VMInstanceVO;
-import com.xensource.xenapi.Connection;
 
+import com.xensource.xenapi.Connection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

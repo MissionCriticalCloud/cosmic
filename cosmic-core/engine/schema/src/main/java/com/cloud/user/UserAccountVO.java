@@ -16,7 +16,9 @@
 // under the License.
 package com.cloud.user;
 
-import java.util.Date;
+import com.cloud.utils.db.Encrypt;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,67 +30,47 @@ import javax.persistence.Id;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.Encrypt;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "user")
 @SecondaryTable(name = "account", pkJoinColumns = {@PrimaryKeyJoinColumn(name = "account_id", referencedColumnName = "id")})
 public class UserAccountVO implements UserAccount, InternalIdentity {
+    @Column(name = "is_registered")
+    boolean registered;
+    @Column(name = "incorrect_login_attempts")
+    int loginAttempts;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id = null;
-
     @Column(name = "username")
     private String username = null;
-
     @Column(name = "password")
     private String password = null;
-
     @Column(name = "firstname")
     private String firstname = null;
-
     @Column(name = "lastname")
     private String lastname = null;
-
     @Column(name = "account_id")
     private long accountId;
-
     @Column(name = "email")
     private String email = null;
-
     @Column(name = "state")
     private String state;
-
     @Column(name = "api_key")
     private String apiKey = null;
-
     @Encrypt
     @Column(name = "secret_key")
     private String secretKey = null;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
-
     @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
-
     @Column(name = "timezone")
     private String timezone;
-
     @Column(name = "registration_token")
     private String registrationToken = null;
-
-    @Column(name = "is_registered")
-    boolean registered;
-
-    @Column(name = "incorrect_login_attempts")
-    int loginAttempts;
-
     @Column(name = "account_name", table = "account", insertable = false, updatable = false)
     private String accountName = null;
 
@@ -206,9 +188,9 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return created;
     }
 
-//    public void setCreated(Date created) {
-//        this.created = created;
-//    }
+    //    public void setCreated(Date created) {
+    //        this.created = created;
+    //    }
 
     @Override
     public Date getRemoved() {
@@ -282,13 +264,13 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         this.registered = registered;
     }
 
-    public void setLoginAttempts(int loginAttempts) {
-        this.loginAttempts = loginAttempts;
-    }
-
     @Override
     public int getLoginAttempts() {
         return loginAttempts;
+    }
+
+    public void setLoginAttempts(int loginAttempts) {
+        this.loginAttempts = loginAttempts;
     }
 
     @Override

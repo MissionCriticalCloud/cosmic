@@ -17,9 +17,9 @@
 
 package org.apache.cloudstack.region.gslb;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface GlobalLoadBalancerRuleDao extends GenericDao<GlobalLoadBalancerRuleVO, Long> {
 

@@ -24,10 +24,10 @@ import com.cloud.storage.Volume;
 
 @LogLevel(Log4jLevel.Trace)
 public class GetFileStatsCommand extends Command {
+    String paths;
+
     protected GetFileStatsCommand() {
     }
-
-    String paths;
 
     public GetFileStatsCommand(Volume volume) {
         paths = volume.getPath();

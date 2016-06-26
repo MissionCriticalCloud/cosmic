@@ -17,6 +17,10 @@
 
 package com.cloud.upgrade.dao;
 
+import com.cloud.utils.db.DbProperties;
+import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.script.Script;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,10 +28,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.UUID;
-
-import com.cloud.utils.db.DbProperties;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.script.Script;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class Upgrade40to41 implements DbUpgrade {
 
     @Override
     public String[] getUpgradableVersionRange() {
-        return new String[] {"4.0.0", "4.1.0"};
+        return new String[]{"4.0.0", "4.1.0"};
     }
 
     @Override
@@ -57,7 +57,7 @@ public class Upgrade40to41 implements DbUpgrade {
             throw new CloudRuntimeException("Unable to find db/schema-40to410.sql");
         }
 
-        return new File[] {new File(script)};
+        return new File[]{new File(script)};
     }
 
     @Override
@@ -73,7 +73,7 @@ public class Upgrade40to41 implements DbUpgrade {
             throw new CloudRuntimeException("Unable to find db/schema-40to410-cleanup.sql");
         }
 
-        return new File[] {new File(script)};
+        return new File[]{new File(script)};
     }
 
     private void updateRegionEntries(Connection conn) {
@@ -88,7 +88,6 @@ public class Upgrade40to41 implements DbUpgrade {
             s_logger.debug("Updating region table with Id: " + region_id);
             pstmt.setInt(1, region_id);
             pstmt.executeUpdate();
-
         } catch (SQLException e) {
             throw new CloudRuntimeException("Error while updating region entries", e);
         }
@@ -98,14 +97,12 @@ public class Upgrade40to41 implements DbUpgrade {
 
         // update the existing ingress rules traffic type
         try (PreparedStatement updateNwpstmt = conn.prepareStatement("update `cloud`.`firewall_rules`  set traffic_type='Ingress' where purpose='Firewall' and ip_address_id is " +
-                "not null and traffic_type is null");)
-        {
+                "not null and traffic_type is null");) {
             updateNwpstmt.executeUpdate();
             s_logger.debug("Updating firewall Ingress rule traffic type: " + updateNwpstmt);
         } catch (SQLException e) {
             throw new CloudRuntimeException("Unable to update ingress firewall rules ", e);
         }
-
 
         try (PreparedStatement vrNwpstmt = conn.prepareStatement("select network_id FROM `cloud`.`ntwk_service_map` where service='Firewall' and provider='VirtualRouter' ");
              ResultSet vrNwsRs = vrNwpstmt.executeQuery();
@@ -116,7 +113,7 @@ public class Upgrade40to41 implements DbUpgrade {
                 //after this. So checking for Isolated OR Virtual
                 try (PreparedStatement NwAcctDomIdpstmt = conn.prepareStatement("select account_id, domain_id FROM `cloud`.`networks` where (guest_type='Isolated' OR " +
                         "guest_type='Virtual') and traffic_type='Guest' and vpc_id is NULL and " +
-                        "(state='implemented' OR state='Shutdown') and id=? "); ) {
+                        "(state='implemented' OR state='Shutdown') and id=? ");) {
                     NwAcctDomIdpstmt.setLong(1, netId);
 
                     try (ResultSet NwAcctDomIdps = NwAcctDomIdpstmt.executeQuery();) {
@@ -127,62 +124,56 @@ public class Upgrade40to41 implements DbUpgrade {
                             long domainId = NwAcctDomIdps.getLong(2);
                             //Add new rule for the existing networks
                             s_logger.debug("Adding default egress firewall rule for network " + netId);
-                            try (PreparedStatement fwRulespstmt = conn.prepareStatement("INSERT INTO firewall_rules "+
+                            try (PreparedStatement fwRulespstmt = conn.prepareStatement("INSERT INTO firewall_rules " +
                                     " (uuid, state, protocol, purpose, account_id, domain_id, network_id, xid, created,"
                                     + " traffic_type) VALUES (?, 'Active', 'all', 'Firewall', ?, ?, ?, ?, now(), "
-                                 +"'Egress')");
+                                    + "'Egress')");
                             ) {
-                            fwRulespstmt.setString(1, UUID.randomUUID().toString());
-                            fwRulespstmt.setLong(2, accountId);
-                            fwRulespstmt.setLong(3, domainId);
-                            fwRulespstmt.setLong(4, netId);
-                            fwRulespstmt.setString(5, UUID.randomUUID().toString());
-                            s_logger.debug("Inserting default egress firewall rule " + fwRulespstmt);
-                            fwRulespstmt.executeUpdate();
-                            }  catch (SQLException e) {
+                                fwRulespstmt.setString(1, UUID.randomUUID().toString());
+                                fwRulespstmt.setLong(2, accountId);
+                                fwRulespstmt.setLong(3, domainId);
+                                fwRulespstmt.setLong(4, netId);
+                                fwRulespstmt.setString(5, UUID.randomUUID().toString());
+                                s_logger.debug("Inserting default egress firewall rule " + fwRulespstmt);
+                                fwRulespstmt.executeUpdate();
+                            } catch (SQLException e) {
                                 throw new CloudRuntimeException("failed to insert default egress firewall rule ", e);
                             }
 
-                            try (PreparedStatement protoAllpstmt = conn.prepareStatement("select id from firewall_rules where protocol='all' and network_id=?");)
-                            {
-                            protoAllpstmt.setLong(1, netId);
+                            try (PreparedStatement protoAllpstmt = conn.prepareStatement("select id from firewall_rules where protocol='all' and network_id=?");) {
+                                protoAllpstmt.setLong(1, netId);
 
                                 try (ResultSet protoAllRs = protoAllpstmt.executeQuery();) {
                                     long firewallRuleId;
                                     if (protoAllRs.next()) {
                                         firewallRuleId = protoAllRs.getLong(1);
 
-                                        try (PreparedStatement fwCidrsPstmt = conn.prepareStatement("insert into firewall_rules_cidrs (firewall_rule_id,source_cidr) values (?, '0.0.0.0/0')");) {
+                                        try (PreparedStatement fwCidrsPstmt = conn.prepareStatement("insert into firewall_rules_cidrs (firewall_rule_id,source_cidr) values (?, " +
+                                                "'0.0.0.0/0')");) {
                                             fwCidrsPstmt.setLong(1, firewallRuleId);
                                             s_logger.debug("Inserting rule for cidr 0.0.0.0/0 for the new Firewall rule id=" + firewallRuleId + " with statement " + fwCidrsPstmt);
                                             fwCidrsPstmt.executeUpdate();
-                                        }  catch (SQLException e) {
+                                        } catch (SQLException e) {
                                             throw new CloudRuntimeException("Unable to set egress firewall rules ", e);
                                         }
-
                                     }
                                 } catch (SQLException e) {
                                     throw new CloudRuntimeException("Unable to set egress firewall rules ", e);
                                 }
-
                             } catch (SQLException e) {
                                 throw new CloudRuntimeException("Unable to set egress firewall rules ", e);
                             }
-
                         } //if
                     } catch (SQLException e) {
                         throw new CloudRuntimeException("Unable execute update query ", e);
                     }
-
                 } catch (SQLException e) {
                     throw new CloudRuntimeException("Unable to get account id domainid of networks ", e);
                 }
             } //while
         } catch (SQLException e) {
             throw new CloudRuntimeException("Unable to set egress firewall rules ", e);
-
         }
     }
-
 }
 

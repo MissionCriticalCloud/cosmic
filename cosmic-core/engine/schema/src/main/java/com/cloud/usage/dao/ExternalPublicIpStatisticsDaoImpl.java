@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.usage.dao;
 
-import java.util.List;
-
 import com.cloud.usage.ExternalPublicIpStatisticsVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -56,14 +56,6 @@ public class ExternalPublicIpStatisticsDaoImpl extends GenericDaoBase<ExternalPu
         return findOneBy(sc);
     }
 
-    private SearchCriteria<ExternalPublicIpStatisticsVO> getSingleRowSc(long accountId, long zoneId, String publicIpAddress) {
-        SearchCriteria<ExternalPublicIpStatisticsVO> sc = SingleRowSearch.create();
-        sc.setParameters("accountId", accountId);
-        sc.setParameters("zoneId", zoneId);
-        sc.setParameters("publicIp", publicIpAddress);
-        return sc;
-    }
-
     @Override
     public List<ExternalPublicIpStatisticsVO> listBy(long accountId, long zoneId) {
         SearchCriteria<ExternalPublicIpStatisticsVO> sc = AccountZoneSearch.create();
@@ -72,4 +64,11 @@ public class ExternalPublicIpStatisticsDaoImpl extends GenericDaoBase<ExternalPu
         return search(sc, null);
     }
 
+    private SearchCriteria<ExternalPublicIpStatisticsVO> getSingleRowSc(long accountId, long zoneId, String publicIpAddress) {
+        SearchCriteria<ExternalPublicIpStatisticsVO> sc = SingleRowSearch.create();
+        sc.setParameters("accountId", accountId);
+        sc.setParameters("zoneId", zoneId);
+        sc.setParameters("publicIp", publicIpAddress);
+        return sc;
+    }
 }

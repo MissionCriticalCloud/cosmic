@@ -19,13 +19,7 @@
 
 package com.cloud.agent.api.routing;
 
-public class AggregationControlCommand extends NetworkElementCommand{
-    public enum Action {
-        Start,
-        Finish,
-        Cleanup,
-    }
-
+public class AggregationControlCommand extends NetworkElementCommand {
     private Action action;
 
     protected AggregationControlCommand() {
@@ -42,5 +36,11 @@ public class AggregationControlCommand extends NetworkElementCommand{
 
     public Action getAction() {
         return action;
+    }
+
+    public enum Action {
+        Start,
+        Finish,
+        Cleanup,
     }
 }

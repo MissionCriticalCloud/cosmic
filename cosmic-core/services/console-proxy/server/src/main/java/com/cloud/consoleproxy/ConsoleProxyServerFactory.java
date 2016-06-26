@@ -16,9 +16,8 @@
 // under the License.
 package com.cloud.consoleproxy;
 
-import java.io.IOException;
-
 import javax.net.ssl.SSLServerSocket;
+import java.io.IOException;
 
 import com.sun.net.httpserver.HttpServer;
 

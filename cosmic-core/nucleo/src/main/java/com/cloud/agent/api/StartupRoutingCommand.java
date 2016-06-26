@@ -19,14 +19,14 @@
 
 package com.cloud.agent.api;
 
+import com.cloud.host.Host;
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.network.Networks.RouterPrivateIpStrategy;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.cloud.host.Host;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.network.Networks.RouterPrivateIpStrategy;
 
 public class StartupRoutingCommand extends StartupCommand {
     Integer cpuSockets;
@@ -35,7 +35,6 @@ public class StartupRoutingCommand extends StartupCommand {
     long memory;
     long dom0MinMemory;
     boolean poolSync;
-
 
     String caps;
     String pool;
@@ -49,11 +48,28 @@ public class StartupRoutingCommand extends StartupCommand {
         super(Host.Type.Routing);
         hostDetails = new HashMap<String, String>();
         getHostDetails().put(RouterPrivateIpStrategy.class.getCanonicalName(), RouterPrivateIpStrategy.DcGlobal.toString());
+    }
 
+    public Map<String, String> getHostDetails() {
+        return hostDetails;
+    }
+
+    public void setHostDetails(Map<String, String> hostDetails) {
+        this.hostDetails = hostDetails;
+    }
+
+    public StartupRoutingCommand(int cpus, long speed, long memory, long dom0MinMemory, String caps, HypervisorType hypervisorType,
+                                 RouterPrivateIpStrategy privIpStrategy) {
+        this(cpus, speed, memory, dom0MinMemory, caps, hypervisorType);
+        getHostDetails().put(RouterPrivateIpStrategy.class.getCanonicalName(), privIpStrategy.toString());
+    }
+
+    public StartupRoutingCommand(int cpus2, long speed2, long memory2, long dom0MinMemory2, String caps2, HypervisorType hypervisorType2) {
+        this(cpus2, speed2, memory2, dom0MinMemory2, caps2, hypervisorType2, new HashMap<String, String>());
     }
 
     public StartupRoutingCommand(int cpus, long speed, long memory, long dom0MinMemory, final String caps, final HypervisorType hypervisorType,
-            final Map<String, String> hostDetails) {
+                                 final Map<String, String> hostDetails) {
         super(Host.Type.Routing);
         this.cpus = cpus;
         this.speed = speed;
@@ -65,24 +81,20 @@ public class StartupRoutingCommand extends StartupCommand {
         this.poolSync = false;
     }
 
-    public StartupRoutingCommand(int cpus, long speed, long memory, long dom0MinMemory, String caps, HypervisorType hypervisorType,
-            RouterPrivateIpStrategy privIpStrategy) {
-        this(cpus, speed, memory, dom0MinMemory, caps, hypervisorType);
-        getHostDetails().put(RouterPrivateIpStrategy.class.getCanonicalName(), privIpStrategy.toString());
-    }
-
-
-    public StartupRoutingCommand(int cpus2, long speed2, long memory2, long dom0MinMemory2, String caps2, HypervisorType hypervisorType2) {
-        this(cpus2, speed2, memory2, dom0MinMemory2, caps2, hypervisorType2, new HashMap<String, String>());
-    }
-
-
     public Integer getCpuSockets() {
         return cpuSockets;
     }
 
+    public void setCpuSockets(Integer cpuSockets) {
+        this.cpuSockets = cpuSockets;
+    }
+
     public int getCpus() {
         return cpus;
+    }
+
+    public void setCpus(int cpus) {
+        this.cpus = cpus;
     }
 
     public String getCapabilities() {
@@ -93,28 +105,20 @@ public class StartupRoutingCommand extends StartupCommand {
         return speed;
     }
 
-    public long getMemory() {
-        return memory;
-    }
-
-    public long getDom0MinMemory() {
-        return dom0MinMemory;
-    }
-
     public void setSpeed(long speed) {
         this.speed = speed;
     }
 
-    public void setCpuSockets(Integer cpuSockets) {
-        this.cpuSockets = cpuSockets;
-    }
-
-    public void setCpus(int cpus) {
-        this.cpus = cpus;
+    public long getMemory() {
+        return memory;
     }
 
     public void setMemory(long memory) {
         this.memory = memory;
+    }
+
+    public long getDom0MinMemory() {
+        return dom0MinMemory;
     }
 
     public void setDom0MinMemory(long dom0MinMemory) {
@@ -149,14 +153,6 @@ public class StartupRoutingCommand extends StartupCommand {
         this.hypervisorType = hypervisorType;
     }
 
-    public Map<String, String> getHostDetails() {
-        return hostDetails;
-    }
-
-    public void setHostDetails(Map<String, String> hostDetails) {
-        this.hostDetails = hostDetails;
-    }
-
     public String getHypervisorVersion() {
         return hypervisorVersion;
     }
@@ -173,7 +169,7 @@ public class StartupRoutingCommand extends StartupCommand {
         this.hostTags.add(hostTag);
     }
 
-    public  HashMap<String, HashMap<String, VgpuTypesInfo>> getGpuGroupDetails() {
+    public HashMap<String, HashMap<String, VgpuTypesInfo>> getGpuGroupDetails() {
         return groupDetails;
     }
 

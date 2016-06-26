@@ -16,6 +16,26 @@
 // under the License.
 package com.cloud.api.doc;
 
+import com.cloud.alert.AlertManager;
+import com.cloud.serializer.Param;
+import com.cloud.utils.IteratorUtil;
+import com.cloud.utils.ReflectUtil;
+import org.apache.cloudstack.api.APICommand;
+import org.apache.cloudstack.api.BaseAsyncCmd;
+import org.apache.cloudstack.api.BaseAsyncCreateCmd;
+import org.apache.cloudstack.api.BaseCmd;
+import org.apache.cloudstack.api.BaseResponse;
+import org.apache.cloudstack.api.Parameter;
+import org.apache.cloudstack.api.response.AsyncJobResponse;
+import org.apache.cloudstack.api.response.HostResponse;
+import org.apache.cloudstack.api.response.IPAddressResponse;
+import org.apache.cloudstack.api.response.SecurityGroupResponse;
+import org.apache.cloudstack.api.response.SnapshotResponse;
+import org.apache.cloudstack.api.response.StoragePoolResponse;
+import org.apache.cloudstack.api.response.TemplateResponse;
+import org.apache.cloudstack.api.response.UserVmResponse;
+import org.apache.cloudstack.api.response.VolumeResponse;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -41,28 +61,8 @@ import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import com.cloud.alert.AlertManager;
-import com.cloud.serializer.Param;
-import com.cloud.utils.IteratorUtil;
-import com.cloud.utils.ReflectUtil;
 import com.google.gson.annotations.SerializedName;
 import com.thoughtworks.xstream.XStream;
-
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.BaseAsyncCmd;
-import org.apache.cloudstack.api.BaseAsyncCreateCmd;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.AsyncJobResponse;
-import org.apache.cloudstack.api.response.HostResponse;
-import org.apache.cloudstack.api.response.IPAddressResponse;
-import org.apache.cloudstack.api.response.SecurityGroupResponse;
-import org.apache.cloudstack.api.response.SnapshotResponse;
-import org.apache.cloudstack.api.response.StoragePoolResponse;
-import org.apache.cloudstack.api.response.TemplateResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
-import org.apache.cloudstack.api.response.VolumeResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +71,7 @@ public class ApiXmlDocWriter {
 
     private static final short DOMAIN_ADMIN_COMMAND = 4;
     private static final short USER_COMMAND = 8;
+    private static final List<String> AsyncResponses = setAsyncResponses();
     private static Map<String, Class<?>> s_apiNameCmdClassMap = new HashMap<String, Class<?>>();
     private static LinkedHashMap<Object, String> s_allApiCommands = new LinkedHashMap<Object, String>();
     private static LinkedHashMap<Object, String> s_domainAdminApiCommands = new LinkedHashMap<Object, String>();
@@ -79,7 +80,6 @@ public class ApiXmlDocWriter {
     private static TreeMap<Object, String> s_domainAdminApiCommandsSorted = new TreeMap<Object, String>();
     private static TreeMap<Object, String> s_regularUserApiCommandsSorted = new TreeMap<Object, String>();
     private static String s_dirName = "";
-    private static final List<String> AsyncResponses = setAsyncResponses();
 
     private static List<String> setAsyncResponses() {
         List<String> asyncResponses = new ArrayList<String>();
@@ -98,13 +98,13 @@ public class ApiXmlDocWriter {
     }
 
     public static void main(String[] args) {
-        Set<Class<?>> cmdClasses = ReflectUtil.getClassesWithAnnotation(APICommand.class, new String[] {"org.apache.cloudstack.api", "com.cloud.api",
-            "com.cloud.api.commands", "org.apache.cloudstack.api.command.admin.zone", "org.apache.cloudstack.network.contrail.api.command"});
+        Set<Class<?>> cmdClasses = ReflectUtil.getClassesWithAnnotation(APICommand.class, new String[]{"org.apache.cloudstack.api", "com.cloud.api",
+                "com.cloud.api.commands", "org.apache.cloudstack.api.command.admin.zone", "org.apache.cloudstack.network.contrail.api.command"});
 
         for (Class<?> cmdClass : cmdClasses) {
-            if(cmdClass.getAnnotation(APICommand.class)==null){
-               System.out.println("Warning, API Cmd class " + cmdClass.getName() + " has no APICommand annotation ");
-               continue;
+            if (cmdClass.getAnnotation(APICommand.class) == null) {
+                System.out.println("Warning, API Cmd class " + cmdClass.getName() + " has no APICommand annotation ");
+                continue;
             }
             String apiName = cmdClass.getAnnotation(APICommand.class).name();
             if (s_apiNameCmdClassMap.containsKey(apiName)) {
@@ -147,7 +147,7 @@ public class ApiXmlDocWriter {
         }
 
         for (String fileName : fileNames) {
-            try(FileInputStream in = new FileInputStream(fileName);) {
+            try (FileInputStream in = new FileInputStream(fileName);) {
                 preProcessedCommands.load(in);
             } catch (FileNotFoundException ex) {
                 System.out.println("Can't find file " + fileName);
@@ -161,7 +161,7 @@ public class ApiXmlDocWriter {
         Iterator<?> propertiesIterator = preProcessedCommands.keys.iterator();
         // Get command classes and response object classes
         while (propertiesIterator.hasNext()) {
-            String key = (String)propertiesIterator.next();
+            String key = (String) propertiesIterator.next();
             String preProcessedCommand = preProcessedCommands.getProperty(key);
             int splitIndex = preProcessedCommand.lastIndexOf(";");
             String commandRoleMask = preProcessedCommand.substring(splitIndex + 1);
@@ -214,7 +214,7 @@ public class ApiXmlDocWriter {
             // Write commands in the order they are represented in commands.properties.in file
             Iterator<?> it = s_allApiCommands.keySet().iterator();
             while (it.hasNext()) {
-                String key = (String)it.next();
+                String key = (String) it.next();
 
                 // Write admin commands
                 writeCommand(out, key);
@@ -243,7 +243,7 @@ public class ApiXmlDocWriter {
             // Write sorted commands
             it = s_allApiCommandsSorted.keySet().iterator();
             while (it.hasNext()) {
-                String key = (String)it.next();
+                String key = (String) it.next();
 
                 writeCommand(rootAdminSorted, key);
 
@@ -315,11 +315,11 @@ public class ApiXmlDocWriter {
                 apiCommand.setSinceVersion(impl.since());
             }
 
-            boolean isAsync = ReflectUtil.isCmdClassAsync(clas, new Class<?>[] {BaseAsyncCmd.class, BaseAsyncCreateCmd.class});
+            boolean isAsync = ReflectUtil.isCmdClassAsync(clas, new Class<?>[]{BaseAsyncCmd.class, BaseAsyncCreateCmd.class});
 
             apiCommand.setAsync(isAsync);
 
-            Set<Field> fields = ReflectUtil.getAllFieldsForClass(clas, new Class<?>[] {BaseCmd.class, BaseAsyncCmd.class, BaseAsyncCreateCmd.class});
+            Set<Field> fields = ReflectUtil.getAllFieldsForClass(clas, new Class<?>[]{BaseCmd.class, BaseAsyncCmd.class, BaseAsyncCreateCmd.class});
 
             request = setRequestFields(fields);
 
@@ -479,16 +479,15 @@ public class ApiXmlDocWriter {
                 addDir(files[i], out);
                 continue;
             }
-            try(FileInputStream in = new FileInputStream(files[i].getPath());) {
+            try (FileInputStream in = new FileInputStream(files[i].getPath());) {
                 out.putNextEntry(new ZipEntry(files[i].getPath().substring(pathToDir.length())));
                 int len;
                 while ((len = in.read(tmpBuf)) > 0) {
                     out.write(tmpBuf, 0, len);
                 }
                 out.closeEntry();
-            }catch(IOException ex)
-            {
-                s_logger.error("addDir:Exception:"+ ex.getMessage(),ex);
+            } catch (IOException ex) {
+                s_logger.error("addDir:Exception:" + ex.getMessage(), ex);
             }
         }
     }
@@ -508,7 +507,7 @@ public class ApiXmlDocWriter {
     private static void writeAlertTypes(String dirName) {
         XStream xs = new XStream();
         xs.alias("alert", Alert.class);
-        try(ObjectOutputStream out = xs.createObjectOutputStream(new FileWriter(dirName + "/alert_types.xml"), "alerts");) {
+        try (ObjectOutputStream out = xs.createObjectOutputStream(new FileWriter(dirName + "/alert_types.xml"), "alerts");) {
             for (Field f : AlertManager.class.getFields()) {
                 if (f.getClass().isAssignableFrom(Number.class)) {
                     String name = f.getName().substring(11);
@@ -528,7 +527,7 @@ public class ApiXmlDocWriter {
 
         @Override
         public Enumeration<Object> keys() {
-            return Collections.<Object> enumeration(keys);
+            return Collections.<Object>enumeration(keys);
         }
 
         @Override
@@ -538,5 +537,4 @@ public class ApiXmlDocWriter {
             return super.put(key, value);
         }
     }
-
 }

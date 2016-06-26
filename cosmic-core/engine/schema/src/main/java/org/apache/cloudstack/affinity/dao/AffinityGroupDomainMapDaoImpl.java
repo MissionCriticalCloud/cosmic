@@ -16,16 +16,14 @@
 // under the License.
 package org.apache.cloudstack.affinity.dao;
 
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
-
 import org.apache.cloudstack.affinity.AffinityGroupDomainMapVO;
+
+import javax.annotation.PostConstruct;
+import java.util.List;
 
 public class AffinityGroupDomainMapDaoImpl extends GenericDaoBase<AffinityGroupDomainMapVO, Long> implements AffinityGroupDomainMapDao {
 
@@ -48,18 +46,17 @@ public class AffinityGroupDomainMapDaoImpl extends GenericDaoBase<AffinityGroupD
     }
 
     @Override
-    public AffinityGroupDomainMapVO findByAffinityGroup(long affinityGroupId) {
-        SearchCriteria<AffinityGroupDomainMapVO> sc = ListByAffinityGroup.create();
+    public AffinityGroupDomainMapVO findByAffinityGroup(final long affinityGroupId) {
+        final SearchCriteria<AffinityGroupDomainMapVO> sc = ListByAffinityGroup.create();
         sc.setParameters("affinityGroupId", affinityGroupId);
         return findOneBy(sc);
     }
 
     @Override
-    public List<AffinityGroupDomainMapVO> listByDomain(Object... domainId) {
-        SearchCriteria<AffinityGroupDomainMapVO> sc = DomainsSearch.create();
+    public List<AffinityGroupDomainMapVO> listByDomain(final Object... domainId) {
+        final SearchCriteria<AffinityGroupDomainMapVO> sc = DomainsSearch.create();
         sc.setParameters("domainId", domainId);
 
         return listBy(sc);
     }
-
 }

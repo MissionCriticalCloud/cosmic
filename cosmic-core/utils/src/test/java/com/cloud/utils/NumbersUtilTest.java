@@ -39,9 +39,8 @@ public class NumbersUtilTest {
 
     @Test
     public void bytesToLong() {
-        assertEquals(0, NumbersUtil.bytesToLong(new byte[] {0, 0, 0, 0, 0, 0, 0, 0}));
-        assertEquals(1, NumbersUtil.bytesToLong(new byte[] {0, 0, 0, 0, 0, 0, 0, 1}));
-        assertEquals(257, NumbersUtil.bytesToLong(new byte[] {0, 0, 0, 0, 0, 0, 1, 1}));
+        assertEquals(0, NumbersUtil.bytesToLong(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}));
+        assertEquals(1, NumbersUtil.bytesToLong(new byte[]{0, 0, 0, 0, 0, 0, 0, 1}));
+        assertEquals(257, NumbersUtil.bytesToLong(new byte[]{0, 0, 0, 0, 0, 0, 1, 1}));
     }
-
 }

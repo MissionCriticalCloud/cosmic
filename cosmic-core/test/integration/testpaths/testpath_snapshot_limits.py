@@ -17,10 +17,8 @@
 """ Test cases for Storage and Snapshot Limits Test Path
 """
 
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources,
-                              validateList)
+from marvin.codes import (BACKED_UP, PASS, FAIL)
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              DiskOffering,
@@ -33,12 +31,12 @@ from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template
                                )
-
-from marvin.codes import (BACKED_UP, PASS, FAIL)
+from marvin.lib.utils import (cleanup_resources,
+                              validateList)
+from nose.plugins.attrib import attr
 
 
 class TestStorageSnapshotsLimits(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestStorageSnapshotsLimits, cls).getClsTestClient()
@@ -251,7 +249,7 @@ class TestStorageSnapshotsLimits(cloudstackTestCase):
 
         snapshot_size = snapshots_list[0].physicalsize
         secStorageIncreased = secStorageBeforeSnapshot + \
-            snapshot_size
+                              snapshot_size
 
         self.assertEqual(
             secStorageIncreased,
@@ -283,7 +281,7 @@ class TestStorageSnapshotsLimits(cloudstackTestCase):
         secStorageAfterSnapshotDeleted = qryresult_after_snapshot_deleted[0][2]
 
         secStorageDecreased = secStorageAfterSnapshotCreated - \
-            snapshot_size
+                              snapshot_size
 
         self.assertEqual(
             secStorageDecreased,

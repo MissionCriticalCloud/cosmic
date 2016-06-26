@@ -19,11 +19,10 @@
 
 package com.cloud.utils.rest;
 
+import javax.net.ssl.SSLContext;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-
-import javax.net.ssl.SSLContext;
 
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -62,30 +61,29 @@ public class HttpClientHelper {
         connManager.setDefaultMaxPerRoute(MAX_ALLOCATED_CONNECTIONS_PER_ROUTE);
         connManager.setMaxTotal(MAX_ALLOCATED_CONNECTIONS);
         final RequestConfig requestConfig = RequestConfig.custom()
-            .setCookieSpec(CookieSpecs.DEFAULT)
-            .setMaxRedirects(maxRedirects)
-            .setSocketTimeout(DEFAULT_SOCKET_TIMEOUT)
-            .setConnectionRequestTimeout(DEFAULT_CONNECTION_REQUEST_TIMEOUT)
-            .setConnectTimeout(DEFAULT_CONNECT_TIMEOUT)
-            .build();
+                                                         .setCookieSpec(CookieSpecs.DEFAULT)
+                                                         .setMaxRedirects(maxRedirects)
+                                                         .setSocketTimeout(DEFAULT_SOCKET_TIMEOUT)
+                                                         .setConnectionRequestTimeout(DEFAULT_CONNECTION_REQUEST_TIMEOUT)
+                                                         .setConnectTimeout(DEFAULT_CONNECT_TIMEOUT)
+                                                         .build();
         return HttpClientBuilder.create()
-            .setConnectionManager(connManager)
-            .setRedirectStrategy(new LaxRedirectStrategy())
-            .setDefaultRequestConfig(requestConfig)
-            .setDefaultCookieStore(cookieStore)
-            .setRetryHandler(new StandardHttpRequestRetryHandler())
-            .build();
+                                .setConnectionManager(connManager)
+                                .setRedirectStrategy(new LaxRedirectStrategy())
+                                .setDefaultRequestConfig(requestConfig)
+                                .setDefaultCookieStore(cookieStore)
+                                .setRetryHandler(new StandardHttpRequestRetryHandler())
+                                .build();
     }
 
     private static Registry<ConnectionSocketFactory> createSocketFactoryConfigration() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
         Registry<ConnectionSocketFactory> socketFactoryRegistry;
         final SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(new TrustSelfSignedStrategy()).build();
         final SSLConnectionSocketFactory cnnectionSocketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
-        socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
-            .register(HTTPS, cnnectionSocketFactory)
-            .build();
+        socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
+                .register(HTTPS, cnnectionSocketFactory)
+                .build();
 
         return socketFactoryRegistry;
     }
-
 }

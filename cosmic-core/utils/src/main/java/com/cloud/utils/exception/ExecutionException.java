@@ -23,7 +23,6 @@ import com.cloud.utils.SerialVersionUID;
 
 /**
  * a public method.
- *
  */
 public class ExecutionException extends Exception {
     private static final long serialVersionUID = SerialVersionUID.ExecutionException;
@@ -39,11 +38,11 @@ public class ExecutionException extends Exception {
         super(msg);
     }
 
-    public void setCSErrorCode(int cserrcode) {
-        this.csErrorCode = cserrcode;
-    }
-
     public int getCSErrorCode() {
         return this.csErrorCode;
+    }
+
+    public void setCSErrorCode(int cserrcode) {
+        this.csErrorCode = cserrcode;
     }
 }

@@ -56,36 +56,36 @@ public class DettachCommand extends StorageSubSystemCommand {
         this.vmName = vmName;
     }
 
-    public void setManaged(final boolean managed) {
-        _managed = managed;
-    }
-
     public boolean isManaged() {
         return _managed;
     }
 
-    public void set_iScsiName(final String iScsiName) {
-        _iScsiName = iScsiName;
+    public void setManaged(final boolean managed) {
+        _managed = managed;
     }
 
     public String get_iScsiName() {
         return _iScsiName;
     }
 
-    public void setStorageHost(final String storageHost) {
-        _storageHost = storageHost;
+    public void set_iScsiName(final String iScsiName) {
+        _iScsiName = iScsiName;
     }
 
     public String getStorageHost() {
         return _storageHost;
     }
 
-    public void setStoragePort(final int storagePort) {
-        _storagePort = storagePort;
+    public void setStorageHost(final String storageHost) {
+        _storageHost = storageHost;
     }
 
     public int getStoragePort() {
         return _storagePort;
+    }
+
+    public void setStoragePort(final int storagePort) {
+        _storagePort = storagePort;
     }
 
     @Override

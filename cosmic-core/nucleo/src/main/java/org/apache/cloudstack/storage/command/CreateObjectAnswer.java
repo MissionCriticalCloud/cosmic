@@ -34,11 +34,11 @@ public final class CreateObjectAnswer extends Answer {
         this.data = data;
     }
 
-    public DataTO getData() {
-        return data;
-    }
-
     public CreateObjectAnswer(String errMsg) {
         super(null, false, errMsg);
+    }
+
+    public DataTO getData() {
+        return data;
     }
 }

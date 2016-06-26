@@ -132,5 +132,4 @@ public class VmStatsEntry implements VmStats {
     public void setEntityType(String entityType) {
         this.entityType = entityType;
     }
-
 }

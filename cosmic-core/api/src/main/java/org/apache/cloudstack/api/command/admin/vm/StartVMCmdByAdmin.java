@@ -25,7 +25,6 @@ import com.cloud.exception.StorageUnavailableException;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.exception.ExecutionException;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
@@ -33,21 +32,22 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.vm.StartVMCmd;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "startVirtualMachine", responseObject = UserVmResponse.class, description = "Starts a virtual machine.", responseView = ResponseView.Full, entityType = {VirtualMachine.class},
+@APICommand(name = "startVirtualMachine", responseObject = UserVmResponse.class, description = "Starts a virtual machine.", responseView = ResponseView.Full, entityType =
+        {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class StartVMCmdByAdmin extends StartVMCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(StartVMCmdByAdmin.class.getName());
-
 
     @Override
     public void execute() throws ResourceUnavailableException, ResourceAllocationException {
         try {
             CallContext.current().setEventDetails("Vm Id: " + getId());
 
-            UserVm result ;
+            UserVm result;
             result = _userVmService.startVirtualMachine(this);
 
             if (result != null) {
@@ -78,5 +78,4 @@ public class StartVMCmdByAdmin extends StartVMCmd {
             throw new ServerApiException(ApiErrorCode.INSUFFICIENT_CAPACITY_ERROR, message.toString());
         }
     }
-
 }

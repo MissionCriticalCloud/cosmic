@@ -27,12 +27,11 @@ import java.nio.charset.CharsetEncoder;
 import java.util.BitSet;
 
 /**
- *
  * This class is very similar to the java.net.URLEncoder class.
- *
+ * <p>
  * Unfortunately, with java.net.URLEncoder there is no way to specify to the
  * java.net.URLEncoder which characters should NOT be encoded.
- *
+ * <p>
  * This code was moved from DefaultServlet.java
  *
  * @author Craig R. McClanahan
@@ -80,11 +79,11 @@ public class URLEncoder {
             // NOTICE - !isPureAscii(path.charAt(i)) check was added by
             // CloudStack
             if (safeCharacters.get(c) || !isPureAscii(path.charAt(i))) {
-                rewrittenPath.append((char)c);
+                rewrittenPath.append((char) c);
             } else {
                 // convert to external encoding before hex conversion
                 try {
-                    writer.write((char)c);
+                    writer.write((char) c);
                     writer.flush();
                 } catch (IOException e) {
                     buf.reset();

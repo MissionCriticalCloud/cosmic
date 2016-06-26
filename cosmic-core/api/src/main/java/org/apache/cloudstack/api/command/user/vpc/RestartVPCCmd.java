@@ -22,7 +22,6 @@ import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -33,11 +32,12 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.api.response.VpcResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "restartVPC", description = "Restarts a VPC", responseObject = VpcResponse.class, entityType = {Vpc.class},
-requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
+        requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class RestartVPCCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RestartVPCCmd.class.getName());
     private static final String s_name = "restartvpcresponse";
@@ -59,42 +59,6 @@ public class RestartVPCCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
-    }
-
-    public Boolean getCleanup() {
-        if (cleanup != null) {
-            return cleanup;
-        }
-        return true;
-    }
-
-    public Boolean getMakeredundant() {
-        if (makeredundant != null) {
-            return makeredundant;
-        }
-        return true;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        final Vpc vpc = _entityMgr.findById(Vpc.class, getId());
-        if (vpc != null) {
-            return vpc.getAccountId();
-        }
-
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
-
     @Override
     public void execute() {
         try {
@@ -115,6 +79,42 @@ public class RestartVPCCmd extends BaseAsyncCmd {
             s_logger.info(ex.toString());
             throw new ServerApiException(ApiErrorCode.INSUFFICIENT_CAPACITY_ERROR, ex.getMessage());
         }
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final Vpc vpc = _entityMgr.findById(Vpc.class, getId());
+        if (vpc != null) {
+            return vpc.getAccountId();
+        }
+
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Boolean getCleanup() {
+        if (cleanup != null) {
+            return cleanup;
+        }
+        return true;
+    }
+
+    public Boolean getMakeredundant() {
+        if (makeredundant != null) {
+            return makeredundant;
+        }
+        return true;
     }
 
     @Override

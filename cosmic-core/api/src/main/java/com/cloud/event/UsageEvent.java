@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.event;
 
-import java.util.Date;
-
 import org.apache.cloudstack.api.InternalIdentity;
+
+import java.util.Date;
 
 public interface UsageEvent extends InternalIdentity {
     String getType();

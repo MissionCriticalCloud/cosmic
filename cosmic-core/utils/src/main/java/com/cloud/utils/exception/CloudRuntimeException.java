@@ -19,14 +19,14 @@
 
 package com.cloud.utils.exception;
 
+import com.cloud.utils.Pair;
+import com.cloud.utils.SerialVersionUID;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.cloud.utils.Pair;
-import com.cloud.utils.SerialVersionUID;
 
 /**
  * wrap exceptions that you know there's no point in dealing with.
@@ -58,6 +58,10 @@ public class CloudRuntimeException extends RuntimeException implements ErrorCont
         setCSErrorCode(CSExceptionErrorCode.getCSErrCode(this.getClass().getName()));
     }
 
+    public CloudRuntimeException(Throwable t) {
+        super(t.getMessage(), t);
+    }
+
     public void addProxyObject(ExceptionProxyObject obj) {
         idList.add(obj);
     }
@@ -77,25 +81,21 @@ public class CloudRuntimeException extends RuntimeException implements ErrorCont
         return this;
     }
 
-    public ArrayList<ExceptionProxyObject> getIdProxyList() {
-        return idList;
+    @Override
+    public List<Pair<Class<?>, String>> getEntitiesInError() {
+        return uuidList;
     }
 
-    public void setCSErrorCode(int cserrcode) {
-        csErrorCode = cserrcode;
+    public ArrayList<ExceptionProxyObject> getIdProxyList() {
+        return idList;
     }
 
     public int getCSErrorCode() {
         return csErrorCode;
     }
 
-    public CloudRuntimeException(Throwable t) {
-        super(t.getMessage(), t);
-    }
-
-    @Override
-    public List<Pair<Class<?>, String>> getEntitiesInError() {
-        return uuidList;
+    public void setCSErrorCode(int cserrcode) {
+        csErrorCode = cserrcode;
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -119,21 +119,23 @@ public class CloudRuntimeException extends RuntimeException implements ErrorCont
         in.defaultReadObject();
 
         int idListSize = in.readInt();
-        if (idList == null)
+        if (idList == null) {
             idList = new ArrayList<ExceptionProxyObject>();
-        if (uuidList == null)
+        }
+        if (uuidList == null) {
             uuidList = new ArrayList<Pair<Class<?>, String>>();
+        }
 
         for (int i = 0; i < idListSize; i++) {
-            ExceptionProxyObject proxy = (ExceptionProxyObject)in.readObject();
+            ExceptionProxyObject proxy = (ExceptionProxyObject) in.readObject();
 
             idList.add(proxy);
         }
 
         int uuidListSize = in.readInt();
         for (int i = 0; i < uuidListSize; i++) {
-            String clzName = (String)in.readObject();
-            String val = (String)in.readObject();
+            String clzName = (String) in.readObject();
+            String val = (String) in.readObject();
 
             uuidList.add(new Pair<Class<?>, String>(Class.forName(clzName), val));
         }

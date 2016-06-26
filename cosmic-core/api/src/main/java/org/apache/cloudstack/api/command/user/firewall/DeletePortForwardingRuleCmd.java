@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.user.firewall;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.rules.PortForwardingRule;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -33,6 +32,7 @@ import org.apache.cloudstack.api.response.AccountResponse;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +48,10 @@ public class DeletePortForwardingRuleCmd extends BaseAsyncCmd {
 
     @ACL(accessType = AccessType.OperateEntry)
     @Parameter(name = ApiConstants.ID,
-               type = CommandType.UUID,
-               entityType = FirewallRuleResponse.class,
-               required = true,
-               description = "the ID of the port forwarding rule")
+            type = CommandType.UUID,
+            entityType = FirewallRuleResponse.class,
+            required = true,
+            description = "the ID of the port forwarding rule")
     private Long id;
 
     // unexposed parameter needed for events logging
@@ -66,14 +66,6 @@ public class DeletePortForwardingRuleCmd extends BaseAsyncCmd {
         return id;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
     @Override
     public String getEventType() {
         return EventTypes.EVENT_NET_RULE_DELETE;
@@ -85,17 +77,18 @@ public class DeletePortForwardingRuleCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public long getEntityOwnerId() {
-        if (ownerId == null) {
-            PortForwardingRule rule = _entityMgr.findById(PortForwardingRule.class, id);
-            if (rule == null) {
-                throw new InvalidParameterValueException("Unable to find port forwarding rule by ID=" + id);
-            } else {
-                ownerId = _entityMgr.findById(PortForwardingRule.class, id).getAccountId();
-            }
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.FirewallRule;
+    }
 
-        }
-        return ownerId;
+    @Override
+    public String getSyncObjType() {
+        return BaseAsyncCmd.networkSyncObject;
+    }
+
+    @Override
+    public Long getSyncObjId() {
+        return _entityMgr.findById(PortForwardingRule.class, id).getNetworkId();
     }
 
     @Override
@@ -113,18 +106,24 @@ public class DeletePortForwardingRuleCmd extends BaseAsyncCmd {
         }
     }
 
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
     @Override
-    public String getSyncObjType() {
-        return BaseAsyncCmd.networkSyncObject;
+    public String getCommandName() {
+        return s_name;
     }
 
     @Override
-    public Long getSyncObjId() {
-        return _entityMgr.findById(PortForwardingRule.class, id).getNetworkId();
-    }
-
-    @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.FirewallRule;
+    public long getEntityOwnerId() {
+        if (ownerId == null) {
+            PortForwardingRule rule = _entityMgr.findById(PortForwardingRule.class, id);
+            if (rule == null) {
+                throw new InvalidParameterValueException("Unable to find port forwarding rule by ID=" + id);
+            } else {
+                ownerId = _entityMgr.findById(PortForwardingRule.class, id).getAccountId();
+            }
+        }
+        return ownerId;
     }
 }

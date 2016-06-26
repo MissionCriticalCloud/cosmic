@@ -21,7 +21,6 @@ import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.user.Account;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -33,6 +32,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.SystemVmResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,10 +49,10 @@ public class StopSystemVmCmd extends BaseAsyncCmd {
 
     @ACL(accessType = AccessType.OperateEntry)
     @Parameter(name = ApiConstants.ID,
-               type = CommandType.UUID,
-               entityType = SystemVmResponse.class,
-               required = true,
-               description = "The ID of the system virtual machine")
+            type = CommandType.UUID,
+            entityType = SystemVmResponse.class,
+            required = true,
+            description = "The ID of the system virtual machine")
     private Long id;
 
     @Parameter(name = ApiConstants.FORCED, type = CommandType.BOOLEAN, required = false, description = "Force stop the VM.  The caller knows the VM is stopped.")
@@ -61,29 +61,6 @@ public class StopSystemVmCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public Long getId() {
-        return id;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Account account = CallContext.current().getCallingAccount();
-        if (account != null) {
-            return account.getId();
-        }
-
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
 
     @Override
     public String getEventType() {
@@ -95,19 +72,27 @@ public class StopSystemVmCmd extends BaseAsyncCmd {
         }
     }
 
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public Long getId() {
+        return id;
+    }
+
     @Override
     public String getEventDescription() {
         return "stopping system vm: " + getId();
     }
 
     @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.SystemVm;
+    public Long getInstanceId() {
+        return getId();
     }
 
     @Override
-    public Long getInstanceId() {
-        return getId();
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.SystemVm;
     }
 
     public boolean isForced() {
@@ -125,5 +110,20 @@ public class StopSystemVmCmd extends BaseAsyncCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Fail to stop system vm");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        Account account = CallContext.current().getCallingAccount();
+        if (account != null) {
+            return account.getId();
+        }
+
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 }

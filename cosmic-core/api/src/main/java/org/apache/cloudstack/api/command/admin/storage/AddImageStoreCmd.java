@@ -16,15 +16,9 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.storage;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import com.cloud.exception.DiscoveryException;
 import com.cloud.storage.ImageStore;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -33,6 +27,12 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ImageStoreResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,79 +59,17 @@ public class AddImageStoreCmd extends BaseCmd {
     private String providerName;
 
     @Parameter(name = ApiConstants.DETAILS,
-               type = CommandType.MAP,
-               description = "the details for the image store. Example: details[0].key=accesskey&details[0].value=s389ddssaa&details[1].key=secretkey&details[1].value=8dshfsss")
+            type = CommandType.MAP,
+            description = "the details for the image store. Example: details[0].key=accesskey&details[0].value=s389ddssaa&details[1].key=secretkey&details[1].value=8dshfsss")
     private Map details;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public String getUrl() {
-        return url;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Long getZoneId() {
-        return zoneId;
-    }
-
-    public Map<String, String> getDetails() {
-        Map<String, String> detailsMap = null;
-        if (details != null && !details.isEmpty()) {
-            detailsMap = new HashMap<String, String>();
-            Collection<?> props = details.values();
-            Iterator<?> iter = props.iterator();
-            while (iter.hasNext()) {
-                HashMap<String, String> detail = (HashMap<String, String>)iter.next();
-                String key = detail.get("key");
-                String value = detail.get("value");
-                detailsMap.put(key, value);
-            }
-        }
-        return detailsMap;
-    }
-
-    public String getProviderName() {
-        return providerName;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public void setZoneId(Long zoneId) {
-        this.zoneId = zoneId;
-    }
-
-    public void setProviderName(String providerName) {
-        this.providerName = providerName;
-    }
-
-    public void setDetails(Map<String, String> details) {
-        this.details = details;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
-    public void execute(){
-        try{
+    public void execute() {
+        try {
             ImageStore result = _storageService.discoverImageStore(getName(), getUrl(), getProviderName(), getZoneId(), getDetails());
             ImageStoreResponse storeResponse = null;
             if (result != null) {
@@ -146,5 +84,67 @@ public class AddImageStoreCmd extends BaseCmd {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, ex.getMessage());
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getProviderName() {
+        return providerName;
+    }
+
+    public Long getZoneId() {
+        return zoneId;
+    }
+
+    public Map<String, String> getDetails() {
+        Map<String, String> detailsMap = null;
+        if (details != null && !details.isEmpty()) {
+            detailsMap = new HashMap<String, String>();
+            Collection<?> props = details.values();
+            Iterator<?> iter = props.iterator();
+            while (iter.hasNext()) {
+                HashMap<String, String> detail = (HashMap<String, String>) iter.next();
+                String key = detail.get("key");
+                String value = detail.get("value");
+                detailsMap.put(key, value);
+            }
+        }
+        return detailsMap;
+    }
+
+    public void setDetails(Map<String, String> details) {
+        this.details = details;
+    }
+
+    public void setZoneId(Long zoneId) {
+        this.zoneId = zoneId;
+    }
+
+    public void setProviderName(String providerName) {
+        this.providerName = providerName;
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

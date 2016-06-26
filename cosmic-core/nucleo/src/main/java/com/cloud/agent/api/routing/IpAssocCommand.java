@@ -37,12 +37,12 @@ public class IpAssocCommand extends NetworkElementCommand {
         return false;
     }
 
-    public IpAddressTO[] getIpAddresses() {
-        return ipAddresses;
-    }
-
     @Override
     public int getAnswersCount() {
         return ipAddresses.length;
+    }
+
+    public IpAddressTO[] getIpAddresses() {
+        return ipAddresses;
     }
 }

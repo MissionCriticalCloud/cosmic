@@ -30,15 +30,16 @@ public class DataCenterDeployment implements DeploymentPlan {
     boolean _recreateDisks;
     ReservationContext _context;
 
-    public DataCenterDeployment(long dataCenterId) {
+    public DataCenterDeployment(final long dataCenterId) {
         this(dataCenterId, null, null, null, null, null);
     }
 
-    public DataCenterDeployment(long dataCenterId, Long podId, Long clusterId, Long hostId, Long poolId, Long physicalNetworkId) {
+    public DataCenterDeployment(final long dataCenterId, final Long podId, final Long clusterId, final Long hostId, final Long poolId, final Long physicalNetworkId) {
         this(dataCenterId, podId, clusterId, hostId, poolId, physicalNetworkId, null);
     }
 
-    public DataCenterDeployment(long dataCenterId, Long podId, Long clusterId, Long hostId, Long poolId, Long physicalNetworkId, ReservationContext context) {
+    public DataCenterDeployment(final long dataCenterId, final Long podId, final Long clusterId, final Long hostId, final Long poolId, final Long physicalNetworkId, final
+    ReservationContext context) {
         _dcId = dataCenterId;
         _podId = podId;
         _clusterId = clusterId;
@@ -79,7 +80,7 @@ public class DataCenterDeployment implements DeploymentPlan {
     }
 
     @Override
-    public void setAvoids(ExcludeList avoids) {
+    public void setAvoids(final ExcludeList avoids) {
         _avoids = avoids;
     }
 
@@ -92,5 +93,4 @@ public class DataCenterDeployment implements DeploymentPlan {
     public ReservationContext getReservationContext() {
         return _context;
     }
-
 }

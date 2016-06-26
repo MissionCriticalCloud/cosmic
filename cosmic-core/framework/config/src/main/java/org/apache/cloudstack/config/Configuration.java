@@ -22,7 +22,6 @@ import java.util.Date;
  * Configuration represents one global configuration parameter for CloudStack.
  * Its scope should indicate whether this parameter can be set at different
  * organization levels in CloudStack.
- *
  */
 public interface Configuration {
 

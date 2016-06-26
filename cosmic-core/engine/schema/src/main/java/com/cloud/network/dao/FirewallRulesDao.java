@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 /*
  * Data Access Object for user_ip_address and ip_forwarding tables

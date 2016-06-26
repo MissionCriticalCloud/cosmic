@@ -16,13 +16,6 @@
 // under the License.
 package org.apache.cloudstack.ratelimit;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.configuration.Config;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.RequestLimitException;
@@ -30,45 +23,44 @@ import com.cloud.user.Account;
 import com.cloud.user.AccountService;
 import com.cloud.user.User;
 import com.cloud.utils.component.AdapterBase;
-
 import org.apache.cloudstack.acl.APIChecker;
 import org.apache.cloudstack.api.command.admin.ratelimit.ResetApiLimitCmd;
 import org.apache.cloudstack.api.command.user.ratelimit.GetApiLimitCmd;
 import org.apache.cloudstack.api.response.ApiLimitResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-
 @Component
 public class ApiRateLimitServiceImpl extends AdapterBase implements APIChecker, ApiRateLimitService {
     private static final Logger s_logger = LoggerFactory.getLogger(ApiRateLimitServiceImpl.class);
-
+    @Inject
+    AccountService _accountService;
+    @Inject
+    ConfigurationDao _configDao;
     /**
      * True if api rate limiting is enabled
      */
     private boolean enabled = false;
-
     /**
      * Fixed time duration where api rate limit is set, in seconds
      */
     private int timeToLive = 1;
-
     /**
      * Max number of api requests during timeToLive duration.
      */
     private int maxAllowed = 30;
-
     private LimitStore _store = null;
-
-    @Inject
-    AccountService _accountService;
-
-    @Inject
-    ConfigurationDao _configDao;
 
     @Override
     public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
@@ -101,7 +93,6 @@ public class ApiRateLimitServiceImpl extends AdapterBase implements APIChecker, 
             s_logger.info("Limit Cache created with timeToLive=" + timeToLive + ", maxAllowed=" + maxAllowed + ", maxElements=" + maxElements);
             cacheStore.setCache(cache);
             _store = cacheStore;
-
         }
 
         return true;
@@ -137,6 +128,21 @@ public class ApiRateLimitServiceImpl extends AdapterBase implements APIChecker, 
             _store.resetCounters();
         }
         return true;
+    }
+
+    @Override
+    public void setTimeToLive(int timeToLive) {
+        this.timeToLive = timeToLive;
+    }
+
+    @Override
+    public void setMaxAllowed(int max) {
+        maxAllowed = max;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override
@@ -181,22 +187,4 @@ public class ApiRateLimitServiceImpl extends AdapterBase implements APIChecker, 
         cmdList.add(GetApiLimitCmd.class);
         return cmdList;
     }
-
-    @Override
-    public void setTimeToLive(int timeToLive) {
-        this.timeToLive = timeToLive;
-    }
-
-    @Override
-    public void setMaxAllowed(int max) {
-        maxAllowed = max;
-
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-
-    }
-
 }

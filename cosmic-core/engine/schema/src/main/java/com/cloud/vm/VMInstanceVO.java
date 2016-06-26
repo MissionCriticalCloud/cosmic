@@ -16,11 +16,12 @@
 // under the License.
 package com.cloud.vm;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.utils.db.Encrypt;
+import com.cloud.utils.db.GenericDao;
+import com.cloud.utils.db.StateMachine;
+import com.cloud.utils.fsm.FiniteStateObject;
+import com.cloud.vm.VirtualMachine.State;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -36,13 +37,11 @@ import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.utils.db.Encrypt;
-import com.cloud.utils.db.GenericDao;
-import com.cloud.utils.db.StateMachine;
-import com.cloud.utils.fsm.FiniteStateObject;
-import com.cloud.vm.VirtualMachine.State;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -119,75 +118,64 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
 
     @Column(name = "display_vm", updatable = true, nullable = false)
     protected boolean displayVm = true;
-
-    @Column(name = "limit_cpu_use", updatable = true, nullable = true)
-    private boolean limitCpuUse;
-
     @Column(name = "update_count", updatable = true, nullable = false)
     protected long updated; // This field should be updated everytime the state is updated.  There's no set method in the vo object because it is done with in the dao code.
-
     @Column(name = GenericDao.CREATED_COLUMN)
     protected Date created;
-
     @Column(name = GenericDao.REMOVED_COLUMN)
     protected Date removed;
-
     @Column(name = "update_time", updatable = true)
     @Temporal(value = TemporalType.TIMESTAMP)
     protected Date updateTime;
-
     @Column(name = "domain_id")
     protected long domainId;
-
     @Column(name = "account_id")
     protected long accountId;
-
     @Column(name = "user_id")
     protected long userId;
-
     @Column(name = "service_offering_id")
     protected long serviceOfferingId;
-
     @Column(name = "reservation_id")
     protected String reservationId;
-
     @Column(name = "hypervisor_type")
     @Enumerated(value = EnumType.STRING)
     protected HypervisorType hypervisorType;
-
     @Column(name = "dynamically_scalable")
     protected boolean dynamicallyScalable;
+    @Column(name = "uuid")
+    protected String uuid = UUID.randomUUID().toString();
 
     /*
     @Column(name="tags")
     protected String tags;
     */
-
-    @Transient
-    Map<String, String> details;
-
-    @Column(name = "uuid")
-    protected String uuid = UUID.randomUUID().toString();
-
     @Column(name = "disk_offering_id")
     protected Long diskOfferingId;
-
     //
     // Power state for VM state sync
     //
     @Enumerated(value = EnumType.STRING)
     @Column(name = "power_state", updatable = true)
     protected PowerState powerState;
-
     @Column(name = "power_state_update_time", updatable = true, nullable = false)
     @Temporal(value = TemporalType.TIMESTAMP)
     protected Date powerStateUpdateTime;
-
     @Column(name = "power_state_update_count", updatable = true)
     protected int powerStateUpdateCount;
-
     @Column(name = "power_host", updatable = true)
     protected Long powerHostId;
+    @Transient
+    Map<String, String> details;
+    transient String toString;
+    @Column(name = "limit_cpu_use", updatable = true, nullable = true)
+    private boolean limitCpuUse;
+
+    public VMInstanceVO(long id, long serviceOfferingId, String name, String instanceName, Type type, Long vmTemplateId, HypervisorType hypervisorType, long guestOSId,
+                        long domainId, long accountId, long userId, boolean haEnabled, boolean limitResourceUse, Long diskOfferingId) {
+        this(id, serviceOfferingId, name, instanceName, type, vmTemplateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
+        limitCpuUse = limitResourceUse;
+        this.diskOfferingId = diskOfferingId;
+    }
 
     public VMInstanceVO(long id, long serviceOfferingId, String name, String instanceName, Type type, Long vmTemplateId, HypervisorType hypervisorType, long guestOSId,
                         long domainId, long accountId, long userId, boolean haEnabled) {
@@ -217,13 +205,6 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
         }
     }
 
-    public VMInstanceVO(long id, long serviceOfferingId, String name, String instanceName, Type type, Long vmTemplateId, HypervisorType hypervisorType, long guestOSId,
-                        long domainId, long accountId, long userId, boolean haEnabled, boolean limitResourceUse, Long diskOfferingId) {
-        this(id, serviceOfferingId, name, instanceName, type, vmTemplateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
-        limitCpuUse = limitResourceUse;
-        this.diskOfferingId = diskOfferingId;
-    }
-
     protected VMInstanceVO() {
     }
 
@@ -242,16 +223,6 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
     }
 
     @Override
-    public Type getType() {
-        return type;
-    }
-
-    @Override
-    public long getUpdated() {
-        return updated;
-    }
-
-    @Override
     public long getId() {
         return id;
     }
@@ -265,42 +236,8 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
         this.uuid = uuid;
     }
 
-    @Override
-    public HypervisorType getHypervisorType() {
-        return hypervisorType;
-    }
-
-    @Override
-    public Date getCreated() {
-        return created;
-    }
-
     public Date getUpdateTime() {
         return updateTime;
-    }
-
-    @Override
-    public long getDataCenterId() {
-        return dataCenterId;
-    }
-
-    @Override
-    public String getHostName() {
-        return hostName;
-    }
-
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
-    }
-
-    @Override
-    public String getInstanceName() {
-        return instanceName;
-    }
-
-    // Be very careful to use this. This has to be unique for the vm and if changed should be done by root admin only.
-    public void setInstanceName(String instanceName) {
-        this.instanceName = instanceName;
     }
 
     @Override
@@ -312,29 +249,6 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
     @Override
     public void setState(State state) {
         this.state = state;
-    }
-
-    @Override
-    public String getPrivateIpAddress() {
-        return privateIpAddress;
-    }
-
-    public void setPrivateIpAddress(String address) {
-        privateIpAddress = address;
-    }
-
-    public void setVncPassword(String vncPassword) {
-        this.vncPassword = vncPassword;
-    }
-
-    @Override
-    public String getVncPassword() {
-        return vncPassword;
-    }
-
-    @Override
-    public long getServiceOfferingId() {
-        return serviceOfferingId;
     }
 
     public Long getProxyId() {
@@ -351,6 +265,116 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
 
     public void setProxyAssignTime(Date time) {
         proxyAssignTime = time;
+    }
+
+    public void incrUpdated() {
+        updated++;
+    }
+
+    public void decrUpdated() {
+        updated--;
+    }
+
+    //FIXME - Remove this and use isDisplay() instead
+    public boolean isDisplayVm() {
+        return displayVm;
+    }
+
+    public void setDisplayVm(boolean displayVm) {
+        this.displayVm = displayVm;
+    }
+
+    public void setLimitCpuUse(boolean value) {
+        limitCpuUse = value;
+    }
+
+    public boolean isRemoved() {
+        return removed != null;
+    }
+
+    public String getReservationId() {
+        return reservationId;
+    }
+
+    public void setReservationId(String reservationId) {
+        this.reservationId = reservationId;
+    }
+
+    public void setDetail(String name, String value) {
+        assert (details != null) : "Did you forget to load the details?";
+
+        details.put(name, value);
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (id ^ (id >>> 32));
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        VMInstanceVO other = (VMInstanceVO) obj;
+        if (id != other.id) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        if (toString == null) {
+            toString = new StringBuilder("VM[").append(type.toString()).append("|").append(getInstanceName()).append("]").toString();
+        }
+        return toString;
+    }
+
+    @Override
+    public String getInstanceName() {
+        return instanceName;
+    }
+
+    @Override
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
+    }
+
+    @Override
+    public String getPrivateIpAddress() {
+        return privateIpAddress;
+    }
+
+    public void setPrivateIpAddress(String address) {
+        privateIpAddress = address;
+    }
+
+    @Override
+    public String getPrivateMacAddress() {
+        return privateMacAddress;
+    }
+
+    @Override
+    public String getVncPassword() {
+        return vncPassword;
+    }
+
+    public void setVncPassword(String vncPassword) {
+        this.vncPassword = vncPassword;
     }
 
     @Override
@@ -375,17 +399,14 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
         this.guestOSId = guestOSId;
     }
 
-    public void incrUpdated() {
-        updated++;
-    }
-
-    public void decrUpdated() {
-        updated--;
+    @Override
+    public Long getPodIdToDeployIn() {
+        return podIdToDeployIn;
     }
 
     @Override
-    public Long getHostId() {
-        return hostId;
+    public long getDataCenterId() {
+        return dataCenterId;
     }
 
     @Override
@@ -393,8 +414,9 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
         return lastHostId;
     }
 
-    public void setLastHostId(Long lastHostId) {
-        this.lastHostId = lastHostId;
+    @Override
+    public Long getHostId() {
+        return hostId;
     }
 
     public void setHostId(Long hostId) {
@@ -406,9 +428,48 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
         return haEnabled;
     }
 
-    //FIXME - Remove this and use isDisplay() instead
-    public boolean isDisplayVm() {
-        return displayVm;
+    @Override
+    public boolean limitCpuUse() {
+        return limitCpuUse;
+    }
+
+    @Override
+    public Date getCreated() {
+        return created;
+    }
+
+    @Override
+    public long getServiceOfferingId() {
+        return serviceOfferingId;
+    }
+
+    public void setServiceOfferingId(long serviceOfferingId) {
+        this.serviceOfferingId = serviceOfferingId;
+    }
+
+    @Override
+    public Long getDiskOfferingId() {
+        return diskOfferingId;
+    }
+
+    @Override
+    public Type getType() {
+        return type;
+    }
+
+    @Override
+    public HypervisorType getHypervisorType() {
+        return hypervisorType;
+    }
+
+    @Override
+    public Map<String, String> getDetails() {
+        return details;
+    }
+
+    @Override
+    public long getUpdated() {
+        return updated;
     }
 
     @Override
@@ -416,27 +477,20 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
         return displayVm;
     }
 
-    public void setDisplayVm(boolean displayVm) {
-        this.displayVm = displayVm;
+    public void setDetails(Map<String, String> details) {
+        this.details = details;
     }
 
-    @Override
-    public boolean limitCpuUse() {
-        return limitCpuUse;
+    public void setHaEnabled(boolean value) {
+        haEnabled = value;
     }
 
-    public void setLimitCpuUse(boolean value) {
-        limitCpuUse = value;
+    public void setLastHostId(Long lastHostId) {
+        this.lastHostId = lastHostId;
     }
 
-    @Override
-    public String getPrivateMacAddress() {
-        return privateMacAddress;
-    }
-
-    @Override
-    public Long getPodIdToDeployIn() {
-        return podIdToDeployIn;
+    public void setDataCenterId(long dataCenterId) {
+        this.dataCenterId = dataCenterId;
     }
 
     public void setPodIdToDeployIn(Long podId) {
@@ -447,80 +501,9 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
         this.privateMacAddress = privateMacAddress;
     }
 
-    public void setDataCenterId(long dataCenterId) {
-        this.dataCenterId = dataCenterId;
-    }
-
-    public boolean isRemoved() {
-        return removed != null;
-    }
-
-    public void setHaEnabled(boolean value) {
-        haEnabled = value;
-    }
-
-    public void setReservationId(String reservationId) {
-        this.reservationId = reservationId;
-    }
-
-    public String getReservationId() {
-        return reservationId;
-    }
-
-    @Override
-    public Map<String, String> getDetails() {
-        return details;
-    }
-
-    public void setDetail(String name, String value) {
-        assert (details != null) : "Did you forget to load the details?";
-
-        details.put(name, value);
-    }
-
-    public void setDetails(Map<String, String> details) {
-        this.details = details;
-    }
-
-    transient String toString;
-
-    @Override
-    public String toString() {
-        if (toString == null) {
-            toString = new StringBuilder("VM[").append(type.toString()).append("|").append(getInstanceName()).append("]").toString();
-        }
-        return toString;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int)(id ^ (id >>> 32));
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        VMInstanceVO other = (VMInstanceVO)obj;
-        if (id != other.id)
-            return false;
-        return true;
-    }
-
-    public void setServiceOfferingId(long serviceOfferingId) {
-        this.serviceOfferingId = serviceOfferingId;
-    }
-
-    @Override
-    public Long getDiskOfferingId() {
-        return diskOfferingId;
+    // Be very careful to use this. This has to be unique for the vm and if changed should be done by root admin only.
+    public void setInstanceName(String instanceName) {
+        this.instanceName = instanceName;
     }
 
     public void setDynamicallyScalable(boolean dynamicallyScalable) {

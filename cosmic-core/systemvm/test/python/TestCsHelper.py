@@ -15,14 +15,13 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import unittest
-import mock
-from cs import CsHelper
 import merge
+import mock
+import unittest
+from cs import CsHelper
 
 
 class TestCsHelper(unittest.TestCase):
-
     def setUp(self):
         merge.DataBag.DPATH = "."
 
@@ -30,6 +29,7 @@ class TestCsHelper(unittest.TestCase):
     def test_execute(self, mock_subprocess):
         result = CsHelper.execute("/bin/false")
         self.assertTrue(result is not None)
+
 
 if __name__ == '__main__':
     unittest.main()

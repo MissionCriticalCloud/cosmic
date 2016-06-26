@@ -25,9 +25,9 @@ import org.apache.cloudstack.framework.transport.TransportMultiplexier;
 public interface RpcProvider extends TransportMultiplexier {
     final static String RPC_MULTIPLEXIER = "rpc";
 
-    void setMessageSerializer(MessageSerializer messageSerializer);
-
     MessageSerializer getMessageSerializer();
+
+    void setMessageSerializer(MessageSerializer messageSerializer);
 
     boolean initialize();
 

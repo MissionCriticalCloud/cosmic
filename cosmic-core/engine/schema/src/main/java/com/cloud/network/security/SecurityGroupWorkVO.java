@@ -16,7 +16,8 @@
 // under the License.
 package com.cloud.network.security;
 
-import java.util.Date;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,10 +29,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "op_nwgrp_work")
@@ -65,6 +63,15 @@ public class SecurityGroupWorkVO implements SecurityGroupWork, InternalIdentity 
     protected SecurityGroupWorkVO() {
     }
 
+    public SecurityGroupWorkVO(Long instanceId, Long serverId, Date created, Step step, Date dateTaken) {
+        super();
+        this.instanceId = instanceId;
+        this.serverId = serverId;
+        this.created = created;
+        this.step = step;
+        this.dateTaken = dateTaken;
+    }
+
     @Override
     public long getId() {
         return id;
@@ -73,6 +80,26 @@ public class SecurityGroupWorkVO implements SecurityGroupWork, InternalIdentity 
     @Override
     public Long getInstanceId() {
         return instanceId;
+    }
+
+    @Override
+    public Long getLogsequenceNumber() {
+        return logsequenceNumber;
+    }
+
+    @Override
+    public void setLogsequenceNumber(Long logsequenceNumber) {
+        this.logsequenceNumber = logsequenceNumber;
+    }
+
+    @Override
+    public Step getStep() {
+        return step;
+    }
+
+    @Override
+    public void setStep(Step step) {
+        this.step = step;
     }
 
     public Long getServerId() {
@@ -87,15 +114,6 @@ public class SecurityGroupWorkVO implements SecurityGroupWork, InternalIdentity 
         return created;
     }
 
-    public SecurityGroupWorkVO(Long instanceId, Long serverId, Date created, Step step, Date dateTaken) {
-        super();
-        this.instanceId = instanceId;
-        this.serverId = serverId;
-        this.created = created;
-        this.step = step;
-        this.dateTaken = dateTaken;
-    }
-
     @Override
     public String toString() {
         return new StringBuilder("[NWGrp-Work:id=").append(id).append(":vm=").append(instanceId).append("]").toString();
@@ -105,28 +123,7 @@ public class SecurityGroupWorkVO implements SecurityGroupWork, InternalIdentity 
         return dateTaken;
     }
 
-    @Override
-    public void setStep(Step step) {
-        this.step = step;
-    }
-
-    @Override
-    public Step getStep() {
-        return step;
-    }
-
     public void setDateTaken(Date date) {
         dateTaken = date;
     }
-
-    @Override
-    public Long getLogsequenceNumber() {
-        return logsequenceNumber;
-    }
-
-    @Override
-    public void setLogsequenceNumber(Long logsequenceNumber) {
-        this.logsequenceNumber = logsequenceNumber;
-    }
-
 }

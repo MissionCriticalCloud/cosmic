@@ -18,27 +18,26 @@
  */
 package org.apache.cloudstack.framework.client;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import com.cloud.utils.concurrency.NamedThreadFactory;
-
 import org.apache.cloudstack.framework.serializer.MessageSerializer;
 import org.apache.cloudstack.framework.transport.TransportEndpoint;
 import org.apache.cloudstack.framework.transport.TransportEndpointSite;
 import org.apache.cloudstack.framework.transport.TransportProvider;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ClientTransportProvider implements TransportProvider {
-    final static Logger s_logger = LoggerFactory.getLogger(ClientTransportProvider.class);
     public static final int DEFAULT_WORKER_POOL_SIZE = 5;
-
-    private final Map<Integer, ClientTransportEndpointSite> _endpointSites = new HashMap<Integer, ClientTransportEndpointSite>();
-    private final Map<String, ClientTransportEndpointSite> _attachedMap = new HashMap<String, ClientTransportEndpointSite>();
+    final static Logger s_logger = LoggerFactory.getLogger(ClientTransportProvider.class);
+    private final Map<Integer, ClientTransportEndpointSite> _endpointSites = new HashMap<>();
+    private final Map<String, ClientTransportEndpointSite> _attachedMap = new HashMap<>();
 
     private MessageSerializer _messageSerializer;
 
@@ -54,12 +53,12 @@ public class ClientTransportProvider implements TransportProvider {
     public ClientTransportProvider() {
     }
 
-    public ClientTransportProvider setPoolSize(int poolSize) {
+    public ClientTransportProvider setPoolSize(final int poolSize) {
         _poolSize = poolSize;
         return this;
     }
 
-    public void initialize(String serverAddress, int serverPort) {
+    public void initialize(final String serverAddress, final int serverPort) {
         _serverAddress = serverAddress;
         _serverPort = serverPort;
 
@@ -71,7 +70,7 @@ public class ClientTransportProvider implements TransportProvider {
             protected void runInContext() {
                 try {
                     _connection.connect(_serverAddress, _serverPort);
-                } catch (Throwable e) {
+                } catch (final Throwable e) {
                     s_logger.info("[ignored]"
                             + "error during ipc client initialization: " + e.getLocalizedMessage());
                 }
@@ -80,7 +79,18 @@ public class ClientTransportProvider implements TransportProvider {
     }
 
     @Override
-    public TransportEndpointSite attach(TransportEndpoint endpoint, String predefinedAddress) {
+    public MessageSerializer getMessageSerializer() {
+        return _messageSerializer;
+    }
+
+    @Override
+    public void setMessageSerializer(final MessageSerializer messageSerializer) {
+        assert (messageSerializer != null);
+        _messageSerializer = messageSerializer;
+    }
+
+    @Override
+    public TransportEndpointSite attach(final TransportEndpoint endpoint, final String predefinedAddress) {
 
         ClientTransportEndpointSite endpointSite;
         synchronized (this) {
@@ -98,38 +108,28 @@ public class ClientTransportProvider implements TransportProvider {
     }
 
     @Override
-    public boolean detach(TransportEndpoint endpoint) {
+    public boolean detach(final TransportEndpoint endpoint) {
         // TODO Auto-generated method stub
 
         return false;
     }
 
     @Override
-    public void setMessageSerializer(MessageSerializer messageSerializer) {
-        assert (messageSerializer != null);
-        _messageSerializer = messageSerializer;
-    }
-
-    @Override
-    public MessageSerializer getMessageSerializer() {
-        return _messageSerializer;
-    }
-
-    @Override
-    public void requestSiteOutput(TransportEndpointSite site) {
+    public void requestSiteOutput(final TransportEndpointSite site) {
         // ???
     }
 
     @Override
-    public void sendMessage(String soureEndpointAddress, String targetEndpointAddress, String multiplexier, String message) {
+    public void sendMessage(final String soureEndpointAddress, final String targetEndpointAddress, final String multiplexier, final String message) {
         // TODO
     }
 
-    private ClientTransportEndpointSite getEndpointSite(TransportEndpoint endpoint) {
+    private ClientTransportEndpointSite getEndpointSite(final TransportEndpoint endpoint) {
         synchronized (this) {
-            for (ClientTransportEndpointSite endpointSite : _endpointSites.values()) {
-                if (endpointSite.getEndpoint() == endpoint)
+            for (final ClientTransportEndpointSite endpointSite : _endpointSites.values()) {
+                if (endpointSite.getEndpoint() == endpoint) {
                     return endpointSite;
+                }
             }
         }
 

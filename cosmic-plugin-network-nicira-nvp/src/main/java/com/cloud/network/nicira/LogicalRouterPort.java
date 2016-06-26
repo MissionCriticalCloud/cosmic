@@ -22,11 +22,11 @@ package com.cloud.network.nicira;
 import java.util.List;
 
 public class LogicalRouterPort extends BaseNiciraNamedEntity {
+    private final String type = "LogicalRouterPortConfig";
     private Integer portno;
     private boolean adminStatusEnabled;
     private List<String> ipAddresses;
     private String macAddress;
-    private final String type = "LogicalRouterPortConfig";
 
     public int getPortno() {
         return portno;

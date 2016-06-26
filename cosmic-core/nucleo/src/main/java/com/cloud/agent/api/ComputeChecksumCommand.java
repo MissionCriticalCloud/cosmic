@@ -46,5 +46,4 @@ public class ComputeChecksumCommand extends SsCommand {
     public void setStore(DataStoreTO store) {
         this.store = store;
     }
-
 }

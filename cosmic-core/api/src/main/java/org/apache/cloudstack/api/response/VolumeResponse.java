@@ -16,226 +16,179 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import com.cloud.serializer.Param;
 import com.cloud.storage.Volume;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
 
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import com.google.gson.annotations.SerializedName;
+
 @EntityReference(value = Volume.class)
 @SuppressWarnings("unused")
 public class VolumeResponse extends BaseResponse implements ControlledViewEntityResponse {
-    @SerializedName(ApiConstants.ID)
-    @Param(description = "ID of the disk volume")
-    private String id;
-
-    @SerializedName(ApiConstants.NAME)
-    @Param(description = "name of the disk volume")
-    private String name;
-
-    @SerializedName(ApiConstants.ZONE_ID)
-    @Param(description = "ID of the availability zone")
-    private String zoneId;
-
-    @SerializedName(ApiConstants.ZONE_NAME)
-    @Param(description = "name of the availability zone")
-    private String zoneName;
-
-    @SerializedName(ApiConstants.TYPE)
-    @Param(description = "type of the disk volume (ROOT or DATADISK)")
-    private String volumeType;
-
-    @SerializedName(ApiConstants.DEVICE_ID)
-    @Param(description = "the ID of the device on user vm the volume is attahed to. This tag is not returned when the volume is detached.")
-    private Long deviceId;
-
-    @SerializedName(ApiConstants.VIRTUAL_MACHINE_ID)
-    @Param(description = "id of the virtual machine")
-    private String virtualMachineId;
-
-    @SerializedName("isoid")
-    @Param(description = "the ID of the ISO attached to the virtual machine")
-    private String isoId;
-
-    @SerializedName("isoname")
-    @Param(description = "the name of the ISO attached to the virtual machine")
-    private String isoName;
-
-    @SerializedName("isodisplaytext")
-    @Param(description = "an alternate display text of the ISO attached to the virtual machine")
-    private String isoDisplayText;
-
-    @SerializedName(ApiConstants.TEMPLATE_ID)
-    @Param(description = "the ID of the template for the virtual machine. A -1 is returned if the virtual machine was created from an ISO file.")
-    private String templateId;
-
-    @SerializedName("templatename")
-    @Param(description = "the name of the template for the virtual machine")
-    private String templateName;
-
-    @SerializedName("templatedisplaytext")
-    @Param(description = " an alternate display text of the template for the virtual machine")
-    private String templateDisplayText;
-
-    @SerializedName("vmname")
-    @Param(description = "name of the virtual machine")
-    private String virtualMachineName;
-
-    @SerializedName("vmdisplayname")
-    @Param(description = "display name of the virtual machine")
-    private String virtualMachineDisplayName;
-
-    @SerializedName("vmstate")
-    @Param(description = "state of the virtual machine")
-    private String virtualMachineState;
-
-    @SerializedName(ApiConstants.PROVISIONINGTYPE)
-    @Param(description = "provisioning type used to create volumes.")
-    private String provisioningType;
-
-    @SerializedName(ApiConstants.SIZE)
-    @Param(description = "size of the disk volume")
-    private Long size;
-
-    @SerializedName(ApiConstants.MIN_IOPS)
-    @Param(description = "min iops of the disk volume")
-    private Long minIops;
-
-    @SerializedName(ApiConstants.MAX_IOPS)
-    @Param(description = "max iops of the disk volume")
-    private Long maxIops;
-
-    @SerializedName(ApiConstants.CREATED)
-    @Param(description = "the date the disk volume was created")
-    private Date created;
-
-    @SerializedName(ApiConstants.STATE)
-    @Param(description = "the state of the disk volume")
-    private String state;
-
-    @SerializedName(ApiConstants.ACCOUNT)
-    @Param(description = "the account associated with the disk volume")
-    private String accountName;
-
-    @SerializedName(ApiConstants.PROJECT_ID)
-    @Param(description = "the project id of the vpn")
-    private String projectId;
-
-    @SerializedName(ApiConstants.PROJECT)
-    @Param(description = "the project name of the vpn")
-    private String projectName;
-
-    @SerializedName(ApiConstants.DOMAIN_ID)
-    @Param(description = "the ID of the domain associated with the disk volume")
-    private String domainId;
-
-    @SerializedName(ApiConstants.DOMAIN)
-    @Param(description = "the domain associated with the disk volume")
-    private String domainName;
-
-    @SerializedName("storagetype")
-    @Param(description = "shared or local storage")
-    private String storageType;
-
-    @SerializedName("diskBytesReadRate")
-    @Param(description = "bytes read rate of the disk volume")
-    private Long bytesReadRate;
-
-    @SerializedName("diskBytesWriteRate")
-    @Param(description = "bytes write rate of the disk volume")
-    private Long bytesWriteRate;
-
-    @SerializedName("diskIopsReadRate")
-    @Param(description = "io requests read rate of the disk volume")
-    private Long iopsReadRate;
-
-    @SerializedName("diskIopsWriteRate")
-    @Param(description = "io requests write rate of the disk volume")
-    private Long iopsWriteRate;
-
-    @SerializedName(ApiConstants.HYPERVISOR)
-    @Param(description = "Hypervisor the volume belongs to")
-    private String hypervisor;
-
-    @SerializedName(ApiConstants.DISK_OFFERING_ID)
-    @Param(description = "ID of the disk offering")
-    private String diskOfferingId;
-
-    @SerializedName("diskofferingname")
-    @Param(description = "name of the disk offering")
-    private String diskOfferingName;
-
-    @SerializedName("diskofferingdisplaytext")
-    @Param(description = "the display text of the disk offering")
-    private String diskOfferingDisplayText;
-
-    @SerializedName("storage")
-    @Param(description = "name of the primary storage hosting the disk volume")
-    private String storagePoolName;
-
-    @SerializedName(ApiConstants.SNAPSHOT_ID)
-    @Param(description = "ID of the snapshot from which this volume was created")
-    private String snapshotId;
-
-    @SerializedName("attached")
-    @Param(description = "the date the volume was attached to a VM instance")
-    private Date attached;
-
-    @SerializedName("destroyed")
-    @Param(description = "the boolean state of whether the volume is destroyed or not")
-    private Boolean destroyed;
-
-    @SerializedName(ApiConstants.SERVICE_OFFERING_ID)
-    @Param(description = "ID of the service offering for root disk")
-    private String serviceOfferingId;
-
-    @SerializedName("serviceofferingname")
-    @Param(description = "name of the service offering for root disk")
-    private String serviceOfferingName;
-
-    @SerializedName("serviceofferingdisplaytext")
-    @Param(description = "the display text of the service offering for root disk")
-    private String serviceOfferingDisplayText;
-
-    @SerializedName("isextractable")
-    @Param(description = "true if the volume is extractable, false otherwise")
-    private Boolean extractable;
-
-    @SerializedName(ApiConstants.STATUS)
-    @Param(description = "the status of the volume")
-    private String status;
-
-    @SerializedName(ApiConstants.TAGS)
-    @Param(description = "the list of resource tags associated with volume", responseObject = ResourceTagResponse.class)
-    private Set<ResourceTagResponse> tags;
-
-    @SerializedName(ApiConstants.DISPLAY_VOLUME)
-    @Param(description = "an optional field whether to the display the volume to the end user or not.", authorized = {RoleType.Admin})
-    private Boolean displayVolume;
-
-    @SerializedName(ApiConstants.PATH)
-    @Param(description = "the path of the volume")
-    private String path;
-
-    @SerializedName(ApiConstants.STORAGE_ID)
-    @Param(description = "id of the primary storage hosting the disk volume; returned to admin user only", since = "4.3")
-    private String storagePoolId;
-
     @SerializedName(ApiConstants.CHAIN_INFO)
     @Param(description = "the chain info of the volume", since = "4.4")
     String chainInfo;
-
+    @SerializedName(ApiConstants.ID)
+    @Param(description = "ID of the disk volume")
+    private String id;
+    @SerializedName(ApiConstants.NAME)
+    @Param(description = "name of the disk volume")
+    private String name;
+    @SerializedName(ApiConstants.ZONE_ID)
+    @Param(description = "ID of the availability zone")
+    private String zoneId;
+    @SerializedName(ApiConstants.ZONE_NAME)
+    @Param(description = "name of the availability zone")
+    private String zoneName;
+    @SerializedName(ApiConstants.TYPE)
+    @Param(description = "type of the disk volume (ROOT or DATADISK)")
+    private String volumeType;
+    @SerializedName(ApiConstants.DEVICE_ID)
+    @Param(description = "the ID of the device on user vm the volume is attahed to. This tag is not returned when the volume is detached.")
+    private Long deviceId;
+    @SerializedName(ApiConstants.VIRTUAL_MACHINE_ID)
+    @Param(description = "id of the virtual machine")
+    private String virtualMachineId;
+    @SerializedName("isoid")
+    @Param(description = "the ID of the ISO attached to the virtual machine")
+    private String isoId;
+    @SerializedName("isoname")
+    @Param(description = "the name of the ISO attached to the virtual machine")
+    private String isoName;
+    @SerializedName("isodisplaytext")
+    @Param(description = "an alternate display text of the ISO attached to the virtual machine")
+    private String isoDisplayText;
+    @SerializedName(ApiConstants.TEMPLATE_ID)
+    @Param(description = "the ID of the template for the virtual machine. A -1 is returned if the virtual machine was created from an ISO file.")
+    private String templateId;
+    @SerializedName("templatename")
+    @Param(description = "the name of the template for the virtual machine")
+    private String templateName;
+    @SerializedName("templatedisplaytext")
+    @Param(description = " an alternate display text of the template for the virtual machine")
+    private String templateDisplayText;
+    @SerializedName("vmname")
+    @Param(description = "name of the virtual machine")
+    private String virtualMachineName;
+    @SerializedName("vmdisplayname")
+    @Param(description = "display name of the virtual machine")
+    private String virtualMachineDisplayName;
+    @SerializedName("vmstate")
+    @Param(description = "state of the virtual machine")
+    private String virtualMachineState;
+    @SerializedName(ApiConstants.PROVISIONINGTYPE)
+    @Param(description = "provisioning type used to create volumes.")
+    private String provisioningType;
+    @SerializedName(ApiConstants.SIZE)
+    @Param(description = "size of the disk volume")
+    private Long size;
+    @SerializedName(ApiConstants.MIN_IOPS)
+    @Param(description = "min iops of the disk volume")
+    private Long minIops;
+    @SerializedName(ApiConstants.MAX_IOPS)
+    @Param(description = "max iops of the disk volume")
+    private Long maxIops;
+    @SerializedName(ApiConstants.CREATED)
+    @Param(description = "the date the disk volume was created")
+    private Date created;
+    @SerializedName(ApiConstants.STATE)
+    @Param(description = "the state of the disk volume")
+    private String state;
+    @SerializedName(ApiConstants.ACCOUNT)
+    @Param(description = "the account associated with the disk volume")
+    private String accountName;
+    @SerializedName(ApiConstants.PROJECT_ID)
+    @Param(description = "the project id of the vpn")
+    private String projectId;
+    @SerializedName(ApiConstants.PROJECT)
+    @Param(description = "the project name of the vpn")
+    private String projectName;
+    @SerializedName(ApiConstants.DOMAIN_ID)
+    @Param(description = "the ID of the domain associated with the disk volume")
+    private String domainId;
+    @SerializedName(ApiConstants.DOMAIN)
+    @Param(description = "the domain associated with the disk volume")
+    private String domainName;
+    @SerializedName("storagetype")
+    @Param(description = "shared or local storage")
+    private String storageType;
+    @SerializedName("diskBytesReadRate")
+    @Param(description = "bytes read rate of the disk volume")
+    private Long bytesReadRate;
+    @SerializedName("diskBytesWriteRate")
+    @Param(description = "bytes write rate of the disk volume")
+    private Long bytesWriteRate;
+    @SerializedName("diskIopsReadRate")
+    @Param(description = "io requests read rate of the disk volume")
+    private Long iopsReadRate;
+    @SerializedName("diskIopsWriteRate")
+    @Param(description = "io requests write rate of the disk volume")
+    private Long iopsWriteRate;
+    @SerializedName(ApiConstants.HYPERVISOR)
+    @Param(description = "Hypervisor the volume belongs to")
+    private String hypervisor;
+    @SerializedName(ApiConstants.DISK_OFFERING_ID)
+    @Param(description = "ID of the disk offering")
+    private String diskOfferingId;
+    @SerializedName("diskofferingname")
+    @Param(description = "name of the disk offering")
+    private String diskOfferingName;
+    @SerializedName("diskofferingdisplaytext")
+    @Param(description = "the display text of the disk offering")
+    private String diskOfferingDisplayText;
+    @SerializedName("storage")
+    @Param(description = "name of the primary storage hosting the disk volume")
+    private String storagePoolName;
+    @SerializedName(ApiConstants.SNAPSHOT_ID)
+    @Param(description = "ID of the snapshot from which this volume was created")
+    private String snapshotId;
+    @SerializedName("attached")
+    @Param(description = "the date the volume was attached to a VM instance")
+    private Date attached;
+    @SerializedName("destroyed")
+    @Param(description = "the boolean state of whether the volume is destroyed or not")
+    private Boolean destroyed;
+    @SerializedName(ApiConstants.SERVICE_OFFERING_ID)
+    @Param(description = "ID of the service offering for root disk")
+    private String serviceOfferingId;
+    @SerializedName("serviceofferingname")
+    @Param(description = "name of the service offering for root disk")
+    private String serviceOfferingName;
+    @SerializedName("serviceofferingdisplaytext")
+    @Param(description = "the display text of the service offering for root disk")
+    private String serviceOfferingDisplayText;
+    @SerializedName("isextractable")
+    @Param(description = "true if the volume is extractable, false otherwise")
+    private Boolean extractable;
+    @SerializedName(ApiConstants.STATUS)
+    @Param(description = "the status of the volume")
+    private String status;
+    @SerializedName(ApiConstants.TAGS)
+    @Param(description = "the list of resource tags associated with volume", responseObject = ResourceTagResponse.class)
+    private Set<ResourceTagResponse> tags;
+    @SerializedName(ApiConstants.DISPLAY_VOLUME)
+    @Param(description = "an optional field whether to the display the volume to the end user or not.", authorized = {RoleType.Admin})
+    private Boolean displayVolume;
+    @SerializedName(ApiConstants.PATH)
+    @Param(description = "the path of the volume")
+    private String path;
+    @SerializedName(ApiConstants.STORAGE_ID)
+    @Param(description = "id of the primary storage hosting the disk volume; returned to admin user only", since = "4.3")
+    private String storagePoolId;
     @SerializedName(ApiConstants.SNAPSHOT_QUIESCEVM)
-    @Param(description = "need quiesce vm or not when taking snapshot", since="4.3")
+    @Param(description = "need quiesce vm or not when taking snapshot", since = "4.3")
     private boolean needQuiescevm;
 
+    public VolumeResponse() {
+        tags = new LinkedHashSet<ResourceTagResponse>();
+    }
 
     public String getPath() {
         return path;
@@ -245,21 +198,9 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
         this.path = path;
     }
 
-    public VolumeResponse() {
-        tags = new LinkedHashSet<ResourceTagResponse>();
-    }
-
     @Override
     public String getObjectId() {
         return this.getId();
-    }
-
-    public Boolean getDestroyed() {
-        return destroyed;
-    }
-
-    public void setDestroyed(Boolean destroyed) {
-        this.destroyed = destroyed;
     }
 
     public String getId() {
@@ -268,6 +209,14 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Boolean getDestroyed() {
+        return destroyed;
+    }
+
+    public void setDestroyed(Boolean destroyed) {
+        this.destroyed = destroyed;
     }
 
     public void setName(String name) {
@@ -306,7 +255,7 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
         this.virtualMachineState = virtualMachineState;
     }
 
-    public void setProvisioningType(String provisioningType){
+    public void setProvisioningType(String provisioningType) {
         this.provisioningType = provisioningType;
     }
 
@@ -332,6 +281,16 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
     }
 
     @Override
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    @Override
     public void setDomainId(String domainId) {
         this.domainId = domainId;
     }
@@ -345,36 +304,36 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
         this.storageType = storageType;
     }
 
-    public void setBytesReadRate(Long bytesReadRate) {
-        this.bytesReadRate = bytesReadRate;
-    }
-
     public Long getBytesReadRate() {
         return bytesReadRate;
     }
 
-    public void setBytesWriteRate(Long bytesWriteRate) {
-        this.bytesWriteRate = bytesWriteRate;
+    public void setBytesReadRate(Long bytesReadRate) {
+        this.bytesReadRate = bytesReadRate;
     }
 
     public Long getBytesWriteRate() {
         return bytesWriteRate;
     }
 
-    public void setIopsReadRate(Long iopsReadRate) {
-        this.iopsReadRate = iopsReadRate;
+    public void setBytesWriteRate(Long bytesWriteRate) {
+        this.bytesWriteRate = bytesWriteRate;
     }
 
     public Long getIopsReadRate() {
         return iopsReadRate;
     }
 
-    public void setIopsWriteRate(Long iopsWriteRate) {
-        this.iopsWriteRate = iopsWriteRate;
+    public void setIopsReadRate(Long iopsReadRate) {
+        this.iopsReadRate = iopsReadRate;
     }
 
     public Long getIopsWriteRate() {
         return iopsWriteRate;
+    }
+
+    public void setIopsWriteRate(Long iopsWriteRate) {
+        this.iopsWriteRate = iopsWriteRate;
     }
 
     public void setHypervisor(String hypervisor) {
@@ -429,16 +388,6 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
         this.state = state;
     }
 
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
     public void setTags(Set<ResourceTagResponse> tags) {
         this.tags = tags;
     }
@@ -449,10 +398,6 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
 
     public void setDisplayVolume(Boolean displayVm) {
         this.displayVolume = displayVm;
-    }
-
-    public void setStoragePoolId(String storagePoolId) {
-        this.storagePoolId = storagePoolId;
     }
 
     public String getChainInfo() {
@@ -467,12 +412,16 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
         return storagePoolId;
     }
 
-    public void setNeedQuiescevm(boolean quiescevm) {
-        this.needQuiescevm = quiescevm;
+    public void setStoragePoolId(String storagePoolId) {
+        this.storagePoolId = storagePoolId;
     }
 
     public boolean isNeedQuiescevm() {
         return this.needQuiescevm;
+    }
+
+    public void setNeedQuiescevm(boolean quiescevm) {
+        this.needQuiescevm = quiescevm;
     }
 
     public String getIsoId() {

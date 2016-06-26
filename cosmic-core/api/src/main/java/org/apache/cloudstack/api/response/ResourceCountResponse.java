@@ -17,10 +17,10 @@
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 @SuppressWarnings("unused")
 public class ResourceCountResponse extends BaseResponse implements ControlledEntityResponse {
@@ -58,6 +58,16 @@ public class ResourceCountResponse extends BaseResponse implements ControlledEnt
     }
 
     @Override
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    @Override
     public void setDomainId(String domainId) {
         this.domainId = domainId;
     }
@@ -74,15 +84,4 @@ public class ResourceCountResponse extends BaseResponse implements ControlledEnt
     public void setResourceCount(Long resourceCount) {
         this.resourceCount = resourceCount;
     }
-
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
 }

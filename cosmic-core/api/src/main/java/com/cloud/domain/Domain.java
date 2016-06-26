@@ -16,12 +16,11 @@
 // under the License.
 package com.cloud.domain;
 
-import java.util.Date;
-
 import com.cloud.user.OwnedBy;
-
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
+
+import java.util.Date;
 
 /**
  * Domain defines the Domain object.
@@ -29,10 +28,6 @@ import org.apache.cloudstack.api.InternalIdentity;
 
 public interface Domain extends OwnedBy, Identity, InternalIdentity {
     public static final long ROOT_DOMAIN = 1L;
-
-    enum State {
-        Active, Inactive
-    };
 
     Long getParent();
 
@@ -60,4 +55,7 @@ public interface Domain extends OwnedBy, Identity, InternalIdentity {
 
     String getNetworkDomain();
 
+    enum State {
+        Active, Inactive
+    }
 }

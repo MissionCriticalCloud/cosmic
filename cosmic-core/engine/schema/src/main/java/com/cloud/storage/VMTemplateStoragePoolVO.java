@@ -16,7 +16,10 @@
 // under the License.
 package com.cloud.storage;
 
-import java.util.Date;
+import com.cloud.utils.db.GenericDaoBase;
+import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
+import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
+import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,27 +31,19 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.utils.db.GenericDaoBase;
-
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
+import java.util.Date;
 
 /**
  * Join table for storage pools and templates
- *
  */
 @Entity
 @Table(name = "template_spool_ref")
 public class VMTemplateStoragePoolVO implements VMTemplateStorageResourceAssoc, DataObjectInStore {
+    @Column(name = "update_count", updatable = true, nullable = false)
+    protected long updatedCount;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
-
-    @Column(name = "pool_id")
-    private long poolId;
-
     @Column(name = "template_id")
     long templateId;
 
@@ -83,92 +78,16 @@ public class VMTemplateStoragePoolVO implements VMTemplateStorageResourceAssoc, 
 
     @Column(name = "marked_for_gc")
     boolean markedForGC;
-
-    @Column(name = "update_count", updatable = true, nullable = false)
-    protected long updatedCount;
-
     @Column(name = "updated")
     @Temporal(value = TemporalType.TIMESTAMP)
     Date updated;
-
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     ObjectInDataStoreStateMachine.State state;
+    @Column(name = "pool_id")
+    private long poolId;
 
-    @Override
-    public String getInstallPath() {
-        return installPath;
-    }
-
-    @Override
-    public long getTemplateSize() {
-        return templateSize;
-    }
-
-    public long getPoolId() {
-        return poolId;
-    }
-
-    public void setpoolId(long poolId) {
-        this.poolId = poolId;
-    }
-
-    @Override
-    public long getTemplateId() {
-        return templateId;
-    }
-
-    @Override
-    public void setTemplateId(long templateId) {
-        this.templateId = templateId;
-    }
-
-    @Override
-    public int getDownloadPercent() {
-        return downloadPercent;
-    }
-
-    @Override
-    public void setDownloadPercent(int downloadPercent) {
-        this.downloadPercent = downloadPercent;
-    }
-
-    @Override
-    public void setDownloadState(Status downloadState) {
-        this.downloadState = downloadState;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public Date getCreated() {
-        return created;
-    }
-
-    @Override
-    public Date getLastUpdated() {
-        return lastUpdated;
-    }
-
-    @Override
-    public void setLastUpdated(Date date) {
-        lastUpdated = date;
-    }
-
-    @Override
-    public void setInstallPath(String installPath) {
-        this.installPath = installPath;
-    }
-
-    @Override
-    public Status getDownloadState() {
-        return downloadState;
-    }
-
-    public VMTemplateStoragePoolVO(long poolId, long templateId) {
+    public VMTemplateStoragePoolVO(final long poolId, final long templateId) {
         super();
         this.poolId = poolId;
         this.templateId = templateId;
@@ -177,8 +96,9 @@ public class VMTemplateStoragePoolVO implements VMTemplateStorageResourceAssoc, 
         this.markedForGC = false;
     }
 
-    public VMTemplateStoragePoolVO(long poolId, long templateId, Date lastUpdated, int downloadPercent, Status downloadState, String localDownloadPath,
-            String errorString, String jobId, String installPath, long templateSize) {
+    public VMTemplateStoragePoolVO(final long poolId, final long templateId, final Date lastUpdated, final int downloadPercent, final Status downloadState, final String
+            localDownloadPath,
+                                   final String errorString, final String jobId, final String installPath, final long templateSize) {
         super();
         this.poolId = poolId;
         this.templateId = templateId;
@@ -197,8 +117,58 @@ public class VMTemplateStoragePoolVO implements VMTemplateStorageResourceAssoc, 
     }
 
     @Override
-    public void setLocalDownloadPath(String localPath) {
-        this.localDownloadPath = localPath;
+    public String getInstallPath() {
+        return installPath;
+    }
+
+    @Override
+    public void setInstallPath(final String installPath) {
+        this.installPath = installPath;
+    }
+
+    @Override
+    public long getTemplateId() {
+        return templateId;
+    }
+
+    @Override
+    public void setTemplateId(final long templateId) {
+        this.templateId = templateId;
+    }
+
+    @Override
+    public int getDownloadPercent() {
+        return downloadPercent;
+    }
+
+    @Override
+    public void setDownloadPercent(final int downloadPercent) {
+        this.downloadPercent = downloadPercent;
+    }
+
+    @Override
+    public Date getCreated() {
+        return created;
+    }
+
+    @Override
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    @Override
+    public void setLastUpdated(final Date date) {
+        lastUpdated = date;
+    }
+
+    @Override
+    public Status getDownloadState() {
+        return downloadState;
+    }
+
+    @Override
+    public void setDownloadState(final Status downloadState) {
+        this.downloadState = downloadState;
     }
 
     @Override
@@ -207,8 +177,8 @@ public class VMTemplateStoragePoolVO implements VMTemplateStorageResourceAssoc, 
     }
 
     @Override
-    public void setErrorString(String errorString) {
-        this.errorString = errorString;
+    public void setLocalDownloadPath(final String localPath) {
+        this.localDownloadPath = localPath;
     }
 
     @Override
@@ -217,8 +187,8 @@ public class VMTemplateStoragePoolVO implements VMTemplateStorageResourceAssoc, 
     }
 
     @Override
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
+    public void setErrorString(final String errorString) {
+        this.errorString = errorString;
     }
 
     @Override
@@ -226,32 +196,55 @@ public class VMTemplateStoragePoolVO implements VMTemplateStorageResourceAssoc, 
         return jobId;
     }
 
-    public void setTemplateSize(long templateSize) {
+    @Override
+    public void setJobId(final String jobId) {
+        this.jobId = jobId;
+    }
+
+    @Override
+    public long getTemplateSize() {
+        return templateSize;
+    }
+
+    public void setTemplateSize(final long templateSize) {
         this.templateSize = templateSize;
+    }
+
+    public void setpoolId(final long poolId) {
+        this.poolId = poolId;
+    }
+
+    @Override
+    public long getId() {
+        return id;
     }
 
     public boolean getMarkedForGC() {
         return markedForGC;
     }
 
-    public void setMarkedForGC(boolean markedForGC) {
+    public void setMarkedForGC(final boolean markedForGC) {
         this.markedForGC = markedForGC;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public int hashCode() {
+        final Long tid = new Long(templateId);
+        final Long hid = new Long(poolId);
+        return tid.hashCode() + hid.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
         if (obj instanceof VMTemplateStoragePoolVO) {
-            VMTemplateStoragePoolVO other = (VMTemplateStoragePoolVO)obj;
+            final VMTemplateStoragePoolVO other = (VMTemplateStoragePoolVO) obj;
             return (this.templateId == other.getTemplateId() && this.poolId == other.getPoolId());
         }
         return false;
     }
 
-    @Override
-    public int hashCode() {
-        Long tid = new Long(templateId);
-        Long hid = new Long(poolId);
-        return tid.hashCode() + hid.hashCode();
+    public long getPoolId() {
+        return poolId;
     }
 
     @Override
@@ -265,7 +258,7 @@ public class VMTemplateStoragePoolVO implements VMTemplateStorageResourceAssoc, 
     }
 
     //TODO: this should be revisited post-4.2 to completely use state transition machine
-    public void setState(ObjectInDataStoreStateMachine.State state) {
+    public void setState(final ObjectInDataStoreStateMachine.State state) {
         this.state = state;
     }
 
@@ -299,5 +292,4 @@ public class VMTemplateStoragePoolVO implements VMTemplateStorageResourceAssoc, 
     public State getObjectInStoreState() {
         return this.state;
     }
-
 }

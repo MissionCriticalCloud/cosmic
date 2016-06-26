@@ -46,5 +46,4 @@ public interface PortForwardingRule extends FirewallRule {
      * @return destination ip address.
      */
     long getVirtualMachineId();
-
 }

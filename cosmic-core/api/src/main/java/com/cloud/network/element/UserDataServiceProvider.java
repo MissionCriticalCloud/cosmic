@@ -27,7 +27,7 @@ import com.cloud.vm.VirtualMachineProfile;
 
 public interface UserDataServiceProvider extends NetworkElement {
     public boolean addPasswordAndUserdata(Network network, NicProfile nic, VirtualMachineProfile vm, DeployDestination dest, ReservationContext context)
-        throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException;
+            throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException;
 
     boolean savePassword(Network network, NicProfile nic, VirtualMachineProfile vm) throws ResourceUnavailableException;
 

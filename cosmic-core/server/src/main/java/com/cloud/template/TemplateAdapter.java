@@ -35,20 +35,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface TemplateAdapter extends Adapter {
-    class TemplateAdapterType {
-        String _name;
-
-        public static final TemplateAdapterType Hypervisor = new TemplateAdapterType("HypervisorAdapter");
-
-        public TemplateAdapterType(final String name) {
-            _name = name;
-        }
-
-        public String getName() {
-            return _name;
-        }
-    }
-
     TemplateProfile prepare(RegisterTemplateCmd cmd) throws ResourceAllocationException;
 
     TemplateProfile prepare(GetUploadParamsForTemplateCmd cmd) throws ResourceAllocationException;
@@ -68,7 +54,8 @@ public interface TemplateAdapter extends Adapter {
     boolean delete(TemplateProfile profile);
 
     TemplateProfile prepare(boolean isIso, Long userId, String name, String displayText, Integer bits, Boolean passwordEnabled, Boolean requiresHVM, String url,
-                            Boolean isPublic, Boolean featured, Boolean isExtractable, String format, Long guestOSId, Long zoneId, HypervisorType hypervisorType, String accountName,
+                            Boolean isPublic, Boolean featured, Boolean isExtractable, String format, Long guestOSId, Long zoneId, HypervisorType hypervisorType, String
+                                    accountName,
                             Long domainId, String chksum, Boolean bootable, Map details) throws ResourceAllocationException;
 
     TemplateProfile prepare(boolean isIso, long userId, String name, String displayText, Integer bits, Boolean passwordEnabled, Boolean requiresHVM, String url,
@@ -76,4 +63,16 @@ public interface TemplateAdapter extends Adapter {
                             Boolean bootable, String templateTag, Account templateOwner, Map details, Boolean sshKeyEnabled, String imageStoreUuid, Boolean isDynamicallyScalable,
                             TemplateType templateType) throws ResourceAllocationException;
 
+    class TemplateAdapterType {
+        public static final TemplateAdapterType Hypervisor = new TemplateAdapterType("HypervisorAdapter");
+        String _name;
+
+        public TemplateAdapterType(final String name) {
+            _name = name;
+        }
+
+        public String getName() {
+            return _name;
+        }
+    }
 }

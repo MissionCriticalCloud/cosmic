@@ -16,12 +16,6 @@
 // under the License.
 package com.cloud.api.query;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.Hashtable;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.vo.AccountJoinVO;
 import com.cloud.api.query.vo.AffinityGroupJoinVO;
@@ -48,7 +42,6 @@ import com.cloud.api.query.vo.UserAccountJoinVO;
 import com.cloud.api.query.vo.UserVmJoinVO;
 import com.cloud.api.query.vo.VolumeJoinVO;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.affinity.AffinityGroupResponse;
 import org.apache.cloudstack.api.ApiConstants.HostDetails;
 import org.apache.cloudstack.api.ApiConstants.VMDetails;
@@ -78,28 +71,22 @@ import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.api.response.VolumeResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Helper class to generate response from DB view VO objects.
- *
  */
 public class ViewResponseHelper {
 
     public static final Logger s_logger = LoggerFactory.getLogger(ViewResponseHelper.class);
-
-    public static List<UserResponse> createUserResponse(UserAccountJoinVO... users) {
-        return createUserResponse(null, users);
-    }
-
-    public static List<UserResponse> createUserResponse(Long domainId, UserAccountJoinVO... users) {
-        List<UserResponse> respList = new ArrayList<UserResponse>();
-        for (UserAccountJoinVO vt : users) {
-            respList.add(ApiDBUtils.newUserResponse(vt, domainId));
-        }
-        return respList;
-    }
 
     public static List<EventResponse> createEventResponse(EventJoinVO... events) {
         List<EventResponse> respList = new ArrayList<EventResponse>();
@@ -125,7 +112,6 @@ public class ViewResponseHelper {
         return respList;
     }
 
-
     public static List<UserVmResponse> createUserVmResponse(ResponseView view, String objectName, UserVmJoinVO... userVms) {
         return createUserVmResponse(view, objectName, EnumSet.of(VMDetails.all), userVms);
     }
@@ -141,7 +127,7 @@ public class ViewResponseHelper {
             if (userVmData == null) {
                 // first time encountering this vm
                 userVmData = ApiDBUtils.newUserVmResponse(view, objectName, userVm, details, caller);
-            } else{
+            } else {
                 // update nics, securitygroups, tags, affinitygroups for 1 to many mapping fields
                 userVmData = ApiDBUtils.fillVmDetails(view, userVmData, userVm);
             }
@@ -177,7 +163,6 @@ public class ViewResponseHelper {
             if (vrData == null) {
                 // first time encountering this sg
                 vrData = ApiDBUtils.newSecurityGroupResponse(vr, caller);
-
             } else {
                 // update rules for 1 to many mapping fields
                 vrData = ApiDBUtils.fillSecurityGroupDetails(vrData, vr);
@@ -217,6 +202,18 @@ public class ViewResponseHelper {
             responseList.add(resp);
         }
         return responseList;
+    }
+
+    public static List<UserResponse> createUserResponse(UserAccountJoinVO... users) {
+        return createUserResponse(null, users);
+    }
+
+    public static List<UserResponse> createUserResponse(Long domainId, UserAccountJoinVO... users) {
+        List<UserResponse> respList = new ArrayList<UserResponse>();
+        for (UserAccountJoinVO vt : users) {
+            respList.add(ApiDBUtils.newUserResponse(vt, domainId));
+        }
+        return respList;
     }
 
     public static List<ProjectInvitationResponse> createProjectInvitationResponse(ProjectInvitationJoinVO... invites) {
@@ -268,8 +265,7 @@ public class ViewResponseHelper {
             if (vrData == null) {
                 // first time encountering this volume
                 vrData = ApiDBUtils.newVolumeResponse(view, vr);
-            }
-            else{
+            } else {
                 // update tags
                 vrData = ApiDBUtils.fillVolumeDetails(view, vrData, vr);
             }
@@ -351,7 +347,7 @@ public class ViewResponseHelper {
 
     public static List<DomainResponse> createDomainResponse(ResponseView view, DomainJoinVO... domains) {
         List<DomainResponse> respList = new ArrayList<DomainResponse>();
-        for (DomainJoinVO vt : domains){
+        for (DomainJoinVO vt : domains) {
             respList.add(ApiDBUtils.newDomainResponse(view, vt));
         }
         return respList;
@@ -359,7 +355,7 @@ public class ViewResponseHelper {
 
     public static List<AccountResponse> createAccountResponse(ResponseView view, AccountJoinVO... accounts) {
         List<AccountResponse> respList = new ArrayList<AccountResponse>();
-        for (AccountJoinVO vt : accounts){
+        for (AccountJoinVO vt : accounts) {
             respList.add(ApiDBUtils.newAccountResponse(view, vt));
         }
         return respList;
@@ -391,7 +387,7 @@ public class ViewResponseHelper {
 
     public static List<ZoneResponse> createDataCenterResponse(ResponseView view, Boolean showCapacities, DataCenterJoinVO... dcs) {
         List<ZoneResponse> respList = new ArrayList<ZoneResponse>();
-        for (DataCenterJoinVO vt : dcs){
+        for (DataCenterJoinVO vt : dcs) {
             respList.add(ApiDBUtils.newDataCenterResponse(view, vt, showCapacities));
         }
         return respList;
@@ -404,8 +400,7 @@ public class ViewResponseHelper {
             if (vrData == null) {
                 // first time encountering this volume
                 vrData = ApiDBUtils.newTemplateResponse(view, vr);
-            }
-            else{
+            } else {
                 // update tags
                 vrData = ApiDBUtils.fillTemplateDetails(view, vrData, vr);
             }
@@ -461,5 +456,4 @@ public class ViewResponseHelper {
         }
         return new ArrayList<AffinityGroupResponse>(vrDataList.values());
     }
-
 }

@@ -16,11 +16,6 @@
 // under the License.
 package com.cloud.storage.dao;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.EntityExistsException;
-
 import com.cloud.offering.DiskOffering.Type;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.utils.db.Attribute;
@@ -30,14 +25,18 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 
+import javax.persistence.EntityExistsException;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class DiskOfferingDaoImpl extends GenericDaoBase<DiskOfferingVO, Long> implements DiskOfferingDao {
+    protected final SearchBuilder<DiskOfferingVO> UniqueNameSearch;
     private final SearchBuilder<DiskOfferingVO> DomainIdSearch;
     private final SearchBuilder<DiskOfferingVO> PrivateDiskOfferingSearch;
     private final SearchBuilder<DiskOfferingVO> PublicDiskOfferingSearch;
-    protected final SearchBuilder<DiskOfferingVO> UniqueNameSearch;
     private final Attribute _typeAttr;
 
     protected DiskOfferingDaoImpl() {
@@ -80,31 +79,6 @@ public class DiskOfferingDaoImpl extends GenericDaoBase<DiskOfferingVO, Long> im
     }
 
     @Override
-    public List<DiskOfferingVO> searchIncludingRemoved(SearchCriteria<DiskOfferingVO> sc, final Filter filter, final Boolean lock, final boolean cache) {
-        sc.addAnd(_typeAttr, Op.EQ, Type.Disk);
-        return super.searchIncludingRemoved(sc, filter, lock, cache);
-    }
-
-    @Override
-    public <K> List<K> customSearchIncludingRemoved(SearchCriteria<K> sc, final Filter filter) {
-        sc.addAnd(_typeAttr, Op.EQ, Type.Disk);
-        return super.customSearchIncludingRemoved(sc, filter);
-    }
-
-    @Override
-    protected List<DiskOfferingVO> executeList(final String sql, final Object... params) {
-        StringBuilder builder = new StringBuilder(sql);
-        int index = builder.indexOf("WHERE");
-        if (index == -1) {
-            builder.append(" WHERE type=?");
-        } else {
-            builder.insert(index + 6, "type=? ");
-        }
-
-        return super.executeList(sql, Type.Disk, params);
-    }
-
-    @Override
     public List<DiskOfferingVO> findPublicDiskOfferings() {
         SearchCriteria<DiskOfferingVO> sc = PublicDiskOfferingSearch.create();
         sc.setParameters("system", false);
@@ -136,6 +110,31 @@ public class DiskOfferingDaoImpl extends GenericDaoBase<DiskOfferingVO, Long> im
             // Assume it's conflict on unique name
             return findByUniqueName(offering.getUniqueName());
         }
+    }
+
+    @Override
+    public List<DiskOfferingVO> searchIncludingRemoved(SearchCriteria<DiskOfferingVO> sc, final Filter filter, final Boolean lock, final boolean cache) {
+        sc.addAnd(_typeAttr, Op.EQ, Type.Disk);
+        return super.searchIncludingRemoved(sc, filter, lock, cache);
+    }
+
+    @Override
+    public <K> List<K> customSearchIncludingRemoved(SearchCriteria<K> sc, final Filter filter) {
+        sc.addAnd(_typeAttr, Op.EQ, Type.Disk);
+        return super.customSearchIncludingRemoved(sc, filter);
+    }
+
+    @Override
+    protected List<DiskOfferingVO> executeList(final String sql, final Object... params) {
+        StringBuilder builder = new StringBuilder(sql);
+        int index = builder.indexOf("WHERE");
+        if (index == -1) {
+            builder.append(" WHERE type=?");
+        } else {
+            builder.insert(index + 6, "type=? ");
+        }
+
+        return super.executeList(sql, Type.Disk, params);
     }
 
     @Override

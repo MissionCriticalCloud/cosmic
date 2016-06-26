@@ -39,6 +39,9 @@ public class DbTestVO {
     @Column(name = "fld_string")
     String fieldString;
 
+    public DbTestVO() {
+    }
+
     public String getFieldString() {
         return fieldString;
     }
@@ -49,8 +52,5 @@ public class DbTestVO {
 
     public long getFieldLong() {
         return fieldLong;
-    }
-
-    public DbTestVO() {
     }
 }

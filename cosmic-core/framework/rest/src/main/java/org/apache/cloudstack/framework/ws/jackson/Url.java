@@ -28,11 +28,10 @@ import java.lang.annotation.Target;
 /**
  * Url can be placed onto a method to construct an URL from the returned
  * results.
- *
+ * <p>
  * This annotation is supplemental to JAX-RS 2.0's annotations.  JAX-RS 2.0
  * annotations do not include a way to construct an URL.  Of
  * course, this only works with how CloudStack works.
- *
  */
 @Target({FIELD, METHOD})
 @Retention(RUNTIME)

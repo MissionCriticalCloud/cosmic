@@ -23,10 +23,10 @@ import com.cloud.agent.api.Answer;
 
 public class CreateEntityDownloadURLAnswer extends Answer {
 
-    String resultString;
-    short resultCode;
     public static final short RESULT_SUCCESS = 1;
     public static final short RESULT_FAILURE = 0;
+    String resultString;
+    short resultCode;
 
     public CreateEntityDownloadURLAnswer(String resultString, short resultCode) {
         super();
@@ -36,5 +36,4 @@ public class CreateEntityDownloadURLAnswer extends Answer {
 
     public CreateEntityDownloadURLAnswer() {
     }
-
 }

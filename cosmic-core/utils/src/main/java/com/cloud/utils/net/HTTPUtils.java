@@ -39,7 +39,8 @@ public final class HTTPUtils {
     // The connection manager.
     private static final MultiThreadedHttpConnectionManager s_httpClientManager = new MultiThreadedHttpConnectionManager();
 
-    private HTTPUtils() {}
+    private HTTPUtils() {
+    }
 
     public static HttpClient getHTTPClient() {
         return new HttpClient(s_httpClientManager);
@@ -83,7 +84,8 @@ public final class HTTPUtils {
     public static void setProxy(Proxy proxy, HttpClient httpClient) {
         if (proxy != null && httpClient != null) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Setting proxy with host " + proxy.getHost() + " and port " + proxy.getPort() + " for host " + httpClient.getHostConfiguration().getHost() + ":" + httpClient.getHostConfiguration().getPort());
+                LOGGER.debug("Setting proxy with host " + proxy.getHost() + " and port " + proxy.getPort() + " for host " + httpClient.getHostConfiguration().getHost() + ":" +
+                        httpClient.getHostConfiguration().getPort());
             }
 
             httpClient.getHostConfiguration().setProxy(proxy.getHost(), proxy.getPort());
@@ -101,20 +103,21 @@ public final class HTTPUtils {
     public static void setCredentials(String username, String password, HttpClient httpClient) {
         if (username != null && password != null && httpClient != null) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Setting credentials with username " + username + " for host " + httpClient.getHostConfiguration().getHost() + ":" + httpClient.getHostConfiguration().getPort());
+                LOGGER.debug("Setting credentials with username " + username + " for host " + httpClient.getHostConfiguration().getHost() + ":" + httpClient.getHostConfiguration
+                        ().getPort());
             }
 
             httpClient.getParams().setAuthenticationPreemptive(true);
             httpClient.getState().setCredentials(
-                    new AuthScope(httpClient.getHostConfiguration().getHost(), httpClient.getHostConfiguration().getPort(), AuthScope.ANY_REALM), new UsernamePasswordCredentials(username, password));
+                    new AuthScope(httpClient.getHostConfiguration().getHost(), httpClient.getHostConfiguration().getPort(), AuthScope.ANY_REALM), new UsernamePasswordCredentials
+                            (username, password));
         }
     }
 
     /**
      * @param httpClient
      * @param httpMethod
-     * @return
-     *          Returns the HTTP Status Code or -1 if an exception occurred.
+     * @return Returns the HTTP Status Code or -1 if an exception occurred.
      */
     public static int executeMethod(HttpClient httpClient, HttpMethod httpMethod) {
         // Execute GetMethod
@@ -122,7 +125,7 @@ public final class HTTPUtils {
             return httpClient.executeMethod(httpMethod);
         } catch (IOException e) {
             LOGGER.warn("Exception while executing HttpMethod " + httpMethod.getName() + " on URL " + httpMethod.getPath());
-            return  -1;
+            return -1;
         }
     }
 
@@ -138,7 +141,6 @@ public final class HTTPUtils {
                 return true;
             default:
                 return false;
-
         }
     }
 }

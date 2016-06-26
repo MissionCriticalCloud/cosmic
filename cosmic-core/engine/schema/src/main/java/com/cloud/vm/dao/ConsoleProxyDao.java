@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.vm.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.info.ConsoleProxyLoadInfo;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.ConsoleProxyVO;
 import com.cloud.vm.VirtualMachine.State;
+
+import java.util.Date;
+import java.util.List;
 
 public interface ConsoleProxyDao extends GenericDao<ConsoleProxyVO, Long> {
 

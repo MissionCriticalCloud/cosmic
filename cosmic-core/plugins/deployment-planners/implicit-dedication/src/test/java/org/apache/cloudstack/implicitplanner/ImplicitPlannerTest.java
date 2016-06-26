@@ -23,17 +23,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
 import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityManager;
 import com.cloud.capacity.dao.CapacityDao;
@@ -72,12 +61,22 @@ import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachineProfileImpl;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.test.utils.SpringUtils;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -99,6 +98,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
 public class ImplicitPlannerTest {
 
+    private static long domainId = 5L;
     @Inject
     ImplicitDedicationPlanner planner = new ImplicitDedicationPlanner();
     @Inject
@@ -145,8 +145,6 @@ public class ImplicitPlannerTest {
     ServiceOfferingDetailsDao serviceOfferingDetailsDao;
     @Inject
     ResourceManager resourceMgr;
-
-    private static long domainId = 5L;
     long dataCenterId = 1L;
     long accountId = 200L;
     long offeringId = 12L;
@@ -222,6 +220,122 @@ public class ImplicitPlannerTest {
         hostsThatShouldBeInAvoidList.add(6L);
         hostsThatShouldBeInAvoidList.add(7L);
         assertTrue("Hosts 6 and 7 that should have been present were not found in avoid list", hostsInAvoidList.containsAll(hostsThatShouldBeInAvoidList));
+    }
+
+    private void initializeForTest(VirtualMachineProfileImpl vmProfile, DataCenterDeployment plan) {
+        DataCenterVO mockDc = mock(DataCenterVO.class);
+        VMInstanceVO vm = mock(VMInstanceVO.class);
+        UserVmVO userVm = mock(UserVmVO.class);
+        ServiceOfferingVO offering = mock(ServiceOfferingVO.class);
+
+        AccountVO account = mock(AccountVO.class);
+        when(account.getId()).thenReturn(accountId);
+        when(account.getAccountId()).thenReturn(accountId);
+        when(vmProfile.getOwner()).thenReturn(account);
+        when(vmProfile.getVirtualMachine()).thenReturn(vm);
+        when(vmProfile.getId()).thenReturn(12L);
+        when(vmDao.findById(12L)).thenReturn(userVm);
+        when(userVm.getAccountId()).thenReturn(accountId);
+
+        when(vm.getDataCenterId()).thenReturn(dataCenterId);
+        when(dcDao.findById(1L)).thenReturn(mockDc);
+        when(plan.getDataCenterId()).thenReturn(dataCenterId);
+        when(plan.getClusterId()).thenReturn(null);
+        when(plan.getPodId()).thenReturn(null);
+        when(configDao.getValue(anyString())).thenReturn("false").thenReturn("CPU");
+
+        // Mock offering details.
+        when(vmProfile.getServiceOffering()).thenReturn(offering);
+        when(offering.getId()).thenReturn(offeringId);
+        when(vmProfile.getServiceOfferingId()).thenReturn(offeringId);
+        when(offering.getCpu()).thenReturn(noOfCpusInOffering);
+        when(offering.getSpeed()).thenReturn(cpuSpeedInOffering);
+        when(offering.getRamSize()).thenReturn(ramInOffering);
+
+        List<Long> clustersWithEnoughCapacity = new ArrayList<Long>();
+        clustersWithEnoughCapacity.add(1L);
+        clustersWithEnoughCapacity.add(2L);
+        clustersWithEnoughCapacity.add(3L);
+        when(
+                capacityDao.listClustersInZoneOrPodByHostCapacities(dataCenterId, noOfCpusInOffering * cpuSpeedInOffering, ramInOffering * 1024L * 1024L,
+                        Capacity.CAPACITY_TYPE_CPU, true)).thenReturn(clustersWithEnoughCapacity);
+
+        Map<Long, Double> clusterCapacityMap = new HashMap<Long, Double>();
+        clusterCapacityMap.put(1L, 2048D);
+        clusterCapacityMap.put(2L, 2048D);
+        clusterCapacityMap.put(3L, 2048D);
+        Pair<List<Long>, Map<Long, Double>> clustersOrderedByCapacity = new Pair<List<Long>, Map<Long, Double>>(clustersWithEnoughCapacity, clusterCapacityMap);
+        when(capacityDao.orderClustersByAggregateCapacity(dataCenterId, Capacity.CAPACITY_TYPE_CPU, true)).thenReturn(clustersOrderedByCapacity);
+
+        List<Long> disabledClusters = new ArrayList<Long>();
+        List<Long> clustersWithDisabledPods = new ArrayList<Long>();
+        when(clusterDao.listDisabledClusters(dataCenterId, null)).thenReturn(disabledClusters);
+        when(clusterDao.listClustersWithDisabledPods(dataCenterId)).thenReturn(clustersWithDisabledPods);
+    }
+
+    private void initializeForImplicitPlannerTest(boolean preferred) {
+        String plannerMode = new String("Strict");
+        if (preferred) {
+            plannerMode = new String("Preferred");
+        }
+
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("ImplicitDedicationMode", plannerMode);
+        when(serviceOfferingDetailsDao.listDetailsKeyPairs(offeringId)).thenReturn(details);
+
+        // Initialize hosts in clusters
+        HostVO host1 = mock(HostVO.class);
+        when(host1.getId()).thenReturn(5L);
+        HostVO host2 = mock(HostVO.class);
+        when(host2.getId()).thenReturn(6L);
+        HostVO host3 = mock(HostVO.class);
+        when(host3.getId()).thenReturn(7L);
+        List<HostVO> hostsInCluster1 = new ArrayList<HostVO>();
+        List<HostVO> hostsInCluster2 = new ArrayList<HostVO>();
+        List<HostVO> hostsInCluster3 = new ArrayList<HostVO>();
+        hostsInCluster1.add(host1);
+        hostsInCluster2.add(host2);
+        hostsInCluster3.add(host3);
+        when(resourceMgr.listAllHostsInCluster(1)).thenReturn(hostsInCluster1);
+        when(resourceMgr.listAllHostsInCluster(2)).thenReturn(hostsInCluster2);
+        when(resourceMgr.listAllHostsInCluster(3)).thenReturn(hostsInCluster3);
+
+        // Mock vms on each host.
+        long offeringIdForVmsOfThisAccount = 15L;
+        long offeringIdForVmsOfOtherAccount = 16L;
+        UserVmVO vm1 = mock(UserVmVO.class);
+        when(vm1.getAccountId()).thenReturn(accountId);
+        when(vm1.getServiceOfferingId()).thenReturn(offeringIdForVmsOfThisAccount);
+        UserVmVO vm2 = mock(UserVmVO.class);
+        when(vm2.getAccountId()).thenReturn(accountId);
+        when(vm2.getServiceOfferingId()).thenReturn(offeringIdForVmsOfThisAccount);
+        // Vm from different account
+        UserVmVO vm3 = mock(UserVmVO.class);
+        when(vm3.getAccountId()).thenReturn(201L);
+        when(vm3.getServiceOfferingId()).thenReturn(offeringIdForVmsOfOtherAccount);
+        List<VMInstanceVO> vmsForHost1 = new ArrayList<VMInstanceVO>();
+        List<VMInstanceVO> vmsForHost2 = new ArrayList<VMInstanceVO>();
+        List<VMInstanceVO> vmsForHost3 = new ArrayList<VMInstanceVO>();
+        List<VMInstanceVO> stoppedVmsForHost = new ArrayList<VMInstanceVO>();
+        // Host 2 is empty.
+        vmsForHost1.add(vm1);
+        vmsForHost1.add(vm2);
+        vmsForHost3.add(vm3);
+        when(vmInstanceDao.listUpByHostId(5L)).thenReturn(vmsForHost1);
+        when(vmInstanceDao.listUpByHostId(6L)).thenReturn(vmsForHost2);
+        when(vmInstanceDao.listUpByHostId(7L)).thenReturn(vmsForHost3);
+        when(vmInstanceDao.listByLastHostId(5L)).thenReturn(stoppedVmsForHost);
+        when(vmInstanceDao.listByLastHostId(6L)).thenReturn(stoppedVmsForHost);
+        when(vmInstanceDao.listByLastHostId(7L)).thenReturn(stoppedVmsForHost);
+
+        // Mock the offering with which the vm was created.
+        ServiceOfferingVO offeringForVmOfThisAccount = mock(ServiceOfferingVO.class);
+        when(serviceOfferingDao.findByIdIncludingRemoved(offeringIdForVmsOfThisAccount)).thenReturn(offeringForVmOfThisAccount);
+        when(offeringForVmOfThisAccount.getDeploymentPlanner()).thenReturn(planner.getName());
+
+        ServiceOfferingVO offeringForVMOfOtherAccount = mock(ServiceOfferingVO.class);
+        when(serviceOfferingDao.findByIdIncludingRemoved(offeringIdForVmsOfOtherAccount)).thenReturn(offeringForVMOfOtherAccount);
+        when(offeringForVMOfOtherAccount.getDeploymentPlanner()).thenReturn("FirstFitPlanner");
     }
 
     @Test
@@ -342,126 +456,10 @@ public class ImplicitPlannerTest {
         assertTrue("Cluster list should not be null/empty", (clusterList == null || clusterList.isEmpty()));
     }
 
-    private void initializeForTest(VirtualMachineProfileImpl vmProfile, DataCenterDeployment plan) {
-        DataCenterVO mockDc = mock(DataCenterVO.class);
-        VMInstanceVO vm = mock(VMInstanceVO.class);
-        UserVmVO userVm = mock(UserVmVO.class);
-        ServiceOfferingVO offering = mock(ServiceOfferingVO.class);
-
-        AccountVO account = mock(AccountVO.class);
-        when(account.getId()).thenReturn(accountId);
-        when(account.getAccountId()).thenReturn(accountId);
-        when(vmProfile.getOwner()).thenReturn(account);
-        when(vmProfile.getVirtualMachine()).thenReturn(vm);
-        when(vmProfile.getId()).thenReturn(12L);
-        when(vmDao.findById(12L)).thenReturn(userVm);
-        when(userVm.getAccountId()).thenReturn(accountId);
-
-        when(vm.getDataCenterId()).thenReturn(dataCenterId);
-        when(dcDao.findById(1L)).thenReturn(mockDc);
-        when(plan.getDataCenterId()).thenReturn(dataCenterId);
-        when(plan.getClusterId()).thenReturn(null);
-        when(plan.getPodId()).thenReturn(null);
-        when(configDao.getValue(anyString())).thenReturn("false").thenReturn("CPU");
-
-        // Mock offering details.
-        when(vmProfile.getServiceOffering()).thenReturn(offering);
-        when(offering.getId()).thenReturn(offeringId);
-        when(vmProfile.getServiceOfferingId()).thenReturn(offeringId);
-        when(offering.getCpu()).thenReturn(noOfCpusInOffering);
-        when(offering.getSpeed()).thenReturn(cpuSpeedInOffering);
-        when(offering.getRamSize()).thenReturn(ramInOffering);
-
-        List<Long> clustersWithEnoughCapacity = new ArrayList<Long>();
-        clustersWithEnoughCapacity.add(1L);
-        clustersWithEnoughCapacity.add(2L);
-        clustersWithEnoughCapacity.add(3L);
-        when(
-            capacityDao.listClustersInZoneOrPodByHostCapacities(dataCenterId, noOfCpusInOffering * cpuSpeedInOffering, ramInOffering * 1024L * 1024L,
-                Capacity.CAPACITY_TYPE_CPU, true)).thenReturn(clustersWithEnoughCapacity);
-
-        Map<Long, Double> clusterCapacityMap = new HashMap<Long, Double>();
-        clusterCapacityMap.put(1L, 2048D);
-        clusterCapacityMap.put(2L, 2048D);
-        clusterCapacityMap.put(3L, 2048D);
-        Pair<List<Long>, Map<Long, Double>> clustersOrderedByCapacity = new Pair<List<Long>, Map<Long, Double>>(clustersWithEnoughCapacity, clusterCapacityMap);
-        when(capacityDao.orderClustersByAggregateCapacity(dataCenterId, Capacity.CAPACITY_TYPE_CPU, true)).thenReturn(clustersOrderedByCapacity);
-
-        List<Long> disabledClusters = new ArrayList<Long>();
-        List<Long> clustersWithDisabledPods = new ArrayList<Long>();
-        when(clusterDao.listDisabledClusters(dataCenterId, null)).thenReturn(disabledClusters);
-        when(clusterDao.listClustersWithDisabledPods(dataCenterId)).thenReturn(clustersWithDisabledPods);
-    }
-
-    private void initializeForImplicitPlannerTest(boolean preferred) {
-        String plannerMode = new String("Strict");
-        if (preferred) {
-            plannerMode = new String("Preferred");
-        }
-
-        Map<String, String> details = new HashMap<String, String>();
-        details.put("ImplicitDedicationMode", plannerMode);
-        when(serviceOfferingDetailsDao.listDetailsKeyPairs(offeringId)).thenReturn(details);
-
-        // Initialize hosts in clusters
-        HostVO host1 = mock(HostVO.class);
-        when(host1.getId()).thenReturn(5L);
-        HostVO host2 = mock(HostVO.class);
-        when(host2.getId()).thenReturn(6L);
-        HostVO host3 = mock(HostVO.class);
-        when(host3.getId()).thenReturn(7L);
-        List<HostVO> hostsInCluster1 = new ArrayList<HostVO>();
-        List<HostVO> hostsInCluster2 = new ArrayList<HostVO>();
-        List<HostVO> hostsInCluster3 = new ArrayList<HostVO>();
-        hostsInCluster1.add(host1);
-        hostsInCluster2.add(host2);
-        hostsInCluster3.add(host3);
-        when(resourceMgr.listAllHostsInCluster(1)).thenReturn(hostsInCluster1);
-        when(resourceMgr.listAllHostsInCluster(2)).thenReturn(hostsInCluster2);
-        when(resourceMgr.listAllHostsInCluster(3)).thenReturn(hostsInCluster3);
-
-        // Mock vms on each host.
-        long offeringIdForVmsOfThisAccount = 15L;
-        long offeringIdForVmsOfOtherAccount = 16L;
-        UserVmVO vm1 = mock(UserVmVO.class);
-        when(vm1.getAccountId()).thenReturn(accountId);
-        when(vm1.getServiceOfferingId()).thenReturn(offeringIdForVmsOfThisAccount);
-        UserVmVO vm2 = mock(UserVmVO.class);
-        when(vm2.getAccountId()).thenReturn(accountId);
-        when(vm2.getServiceOfferingId()).thenReturn(offeringIdForVmsOfThisAccount);
-        // Vm from different account
-        UserVmVO vm3 = mock(UserVmVO.class);
-        when(vm3.getAccountId()).thenReturn(201L);
-        when(vm3.getServiceOfferingId()).thenReturn(offeringIdForVmsOfOtherAccount);
-        List<VMInstanceVO> vmsForHost1 = new ArrayList<VMInstanceVO>();
-        List<VMInstanceVO> vmsForHost2 = new ArrayList<VMInstanceVO>();
-        List<VMInstanceVO> vmsForHost3 = new ArrayList<VMInstanceVO>();
-        List<VMInstanceVO> stoppedVmsForHost = new ArrayList<VMInstanceVO>();
-        // Host 2 is empty.
-        vmsForHost1.add(vm1);
-        vmsForHost1.add(vm2);
-        vmsForHost3.add(vm3);
-        when(vmInstanceDao.listUpByHostId(5L)).thenReturn(vmsForHost1);
-        when(vmInstanceDao.listUpByHostId(6L)).thenReturn(vmsForHost2);
-        when(vmInstanceDao.listUpByHostId(7L)).thenReturn(vmsForHost3);
-        when(vmInstanceDao.listByLastHostId(5L)).thenReturn(stoppedVmsForHost);
-        when(vmInstanceDao.listByLastHostId(6L)).thenReturn(stoppedVmsForHost);
-        when(vmInstanceDao.listByLastHostId(7L)).thenReturn(stoppedVmsForHost);
-
-        // Mock the offering with which the vm was created.
-        ServiceOfferingVO offeringForVmOfThisAccount = mock(ServiceOfferingVO.class);
-        when(serviceOfferingDao.findByIdIncludingRemoved(offeringIdForVmsOfThisAccount)).thenReturn(offeringForVmOfThisAccount);
-        when(offeringForVmOfThisAccount.getDeploymentPlanner()).thenReturn(planner.getName());
-
-        ServiceOfferingVO offeringForVMOfOtherAccount = mock(ServiceOfferingVO.class);
-        when(serviceOfferingDao.findByIdIncludingRemoved(offeringIdForVmsOfOtherAccount)).thenReturn(offeringForVMOfOtherAccount);
-        when(offeringForVMOfOtherAccount.getDeploymentPlanner()).thenReturn("FirstFitPlanner");
-    }
-
     @Configuration
     @ComponentScan(basePackageClasses = {ImplicitDedicationPlanner.class},
-                   includeFilters = {@Filter(value = TestConfiguration.Library.class, type = FilterType.CUSTOM)},
-                   useDefaultFilters = false)
+            includeFilters = {@Filter(value = TestConfiguration.Library.class, type = FilterType.CUSTOM)},
+            useDefaultFilters = false)
     public static class TestConfiguration extends SpringUtils.CloudStackTestConfiguration {
 
         @Bean

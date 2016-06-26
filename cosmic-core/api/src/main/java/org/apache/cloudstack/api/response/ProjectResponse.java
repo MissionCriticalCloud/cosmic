@@ -16,16 +16,16 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.projects.Project;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = Project.class)
 @SuppressWarnings("unused")
@@ -240,91 +240,6 @@ public class ProjectResponse extends BaseResponse implements ResourceLimitAndCou
     }
 
     @Override
-    public void setVmLimit(String vmLimit) {
-        this.vmLimit = vmLimit;
-    }
-
-    @Override
-    public void setVmTotal(Long vmTotal) {
-        this.vmTotal = vmTotal;
-    }
-
-    @Override
-    public void setVmAvailable(String vmAvailable) {
-        this.vmAvailable = vmAvailable;
-    }
-
-    @Override
-    public void setIpLimit(String ipLimit) {
-        this.ipLimit = ipLimit;
-    }
-
-    @Override
-    public void setIpTotal(Long ipTotal) {
-        this.ipTotal = ipTotal;
-    }
-
-    @Override
-    public void setIpAvailable(String ipAvailable) {
-        this.ipAvailable = ipAvailable;
-    }
-
-    @Override
-    public void setVolumeLimit(String volumeLimit) {
-        this.volumeLimit = volumeLimit;
-    }
-
-    @Override
-    public void setVolumeTotal(Long volumeTotal) {
-        this.volumeTotal = volumeTotal;
-    }
-
-    @Override
-    public void setVolumeAvailable(String volumeAvailable) {
-        this.volumeAvailable = volumeAvailable;
-    }
-
-    @Override
-    public void setSnapshotLimit(String snapshotLimit) {
-        this.snapshotLimit = snapshotLimit;
-    }
-
-    @Override
-    public void setSnapshotTotal(Long snapshotTotal) {
-        this.snapshotTotal = snapshotTotal;
-    }
-
-    @Override
-    public void setSnapshotAvailable(String snapshotAvailable) {
-        this.snapshotAvailable = snapshotAvailable;
-    }
-
-    @Override
-    public void setTemplateLimit(String templateLimit) {
-        this.templateLimit = templateLimit;
-    }
-
-    @Override
-    public void setTemplateTotal(Long templateTotal) {
-        this.templateTotal = templateTotal;
-    }
-
-    @Override
-    public void setTemplateAvailable(String templateAvailable) {
-        this.templateAvailable = templateAvailable;
-    }
-
-    @Override
-    public void setVmStopped(Integer vmStopped) {
-        this.vmStopped = vmStopped;
-    }
-
-    @Override
-    public void setVmRunning(Integer vmRunning) {
-        this.vmRunning = vmRunning;
-    }
-
-    @Override
     public void setNetworkLimit(String networkLimit) {
         this.networkLimit = networkLimit;
     }
@@ -414,4 +329,88 @@ public class ProjectResponse extends BaseResponse implements ResourceLimitAndCou
         this.secondaryStorageAvailable = secondaryStorageAvailable;
     }
 
+    @Override
+    public void setVmLimit(String vmLimit) {
+        this.vmLimit = vmLimit;
+    }
+
+    @Override
+    public void setVmTotal(Long vmTotal) {
+        this.vmTotal = vmTotal;
+    }
+
+    @Override
+    public void setVmAvailable(String vmAvailable) {
+        this.vmAvailable = vmAvailable;
+    }
+
+    @Override
+    public void setIpLimit(String ipLimit) {
+        this.ipLimit = ipLimit;
+    }
+
+    @Override
+    public void setIpTotal(Long ipTotal) {
+        this.ipTotal = ipTotal;
+    }
+
+    @Override
+    public void setIpAvailable(String ipAvailable) {
+        this.ipAvailable = ipAvailable;
+    }
+
+    @Override
+    public void setVolumeLimit(String volumeLimit) {
+        this.volumeLimit = volumeLimit;
+    }
+
+    @Override
+    public void setVolumeTotal(Long volumeTotal) {
+        this.volumeTotal = volumeTotal;
+    }
+
+    @Override
+    public void setVolumeAvailable(String volumeAvailable) {
+        this.volumeAvailable = volumeAvailable;
+    }
+
+    @Override
+    public void setSnapshotLimit(String snapshotLimit) {
+        this.snapshotLimit = snapshotLimit;
+    }
+
+    @Override
+    public void setSnapshotTotal(Long snapshotTotal) {
+        this.snapshotTotal = snapshotTotal;
+    }
+
+    @Override
+    public void setSnapshotAvailable(String snapshotAvailable) {
+        this.snapshotAvailable = snapshotAvailable;
+    }
+
+    @Override
+    public void setTemplateLimit(String templateLimit) {
+        this.templateLimit = templateLimit;
+    }
+
+    @Override
+    public void setTemplateTotal(Long templateTotal) {
+        this.templateTotal = templateTotal;
+    }
+
+    @Override
+    public void setTemplateAvailable(String templateAvailable) {
+        this.templateAvailable = templateAvailable;
+    }
+
+    @Override
+    public void setVmStopped(Integer vmStopped) {
+        this.vmStopped = vmStopped;
+    }
+
+    @Override
+    public void setVmRunning(Integer vmRunning) {
+        this.vmRunning = vmRunning;
+    }
 }

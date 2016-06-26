@@ -19,14 +19,14 @@
 
 package com.cloud.network;
 
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = "nicira_nvp_nic_map")
@@ -75,7 +75,7 @@ public class NiciraNvpNicMappingVO implements InternalIdentity {
         return nicUuid;
     }
 
-    public void setNicUuid(String nicUuid) {
+    public void setNicUuid(final String nicUuid) {
         this.nicUuid = nicUuid;
     }
 
@@ -83,5 +83,4 @@ public class NiciraNvpNicMappingVO implements InternalIdentity {
     public long getId() {
         return id;
     }
-
 }

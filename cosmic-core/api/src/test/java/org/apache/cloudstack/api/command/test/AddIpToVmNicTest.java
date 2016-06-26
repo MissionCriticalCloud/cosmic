@@ -24,19 +24,18 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.NetworkService;
 import com.cloud.vm.NicSecondaryIp;
-
 import org.apache.cloudstack.api.ResponseGenerator;
 import org.apache.cloudstack.api.command.user.vm.AddIpToVmNicCmd;
 import org.apache.cloudstack.api.command.user.vm.RemoveIpFromVmNicCmd;
 import org.apache.cloudstack.api.response.NicSecondaryIpResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
+import junit.framework.Assert;
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 public class AddIpToVmNicTest extends TestCase {
 
@@ -59,8 +58,8 @@ public class AddIpToVmNicTest extends TestCase {
         NicSecondaryIp secIp = Mockito.mock(NicSecondaryIp.class);
 
         Mockito.when(
-            networkService.allocateSecondaryGuestIP(Matchers.anyLong(), Matchers.anyString()))
-            .thenReturn(secIp);
+                networkService.allocateSecondaryGuestIP(Matchers.anyLong(), Matchers.anyString()))
+               .thenReturn(secIp);
 
         ipTonicCmd._networkService = networkService;
         responseGenerator = Mockito.mock(ResponseGenerator.class);
@@ -79,8 +78,8 @@ public class AddIpToVmNicTest extends TestCase {
         AddIpToVmNicCmd ipTonicCmd = Mockito.mock(AddIpToVmNicCmd.class);
 
         Mockito.when(
-            networkService.allocateSecondaryGuestIP(Matchers.anyLong(), Matchers.anyString()))
-            .thenReturn(null);
+                networkService.allocateSecondaryGuestIP(Matchers.anyLong(), Matchers.anyString()))
+               .thenReturn(null);
 
         ipTonicCmd._networkService = networkService;
 
@@ -93,7 +92,7 @@ public class AddIpToVmNicTest extends TestCase {
 
     @Test
     public void testRemoveIpFromVmNicSuccess() throws ResourceAllocationException, ResourceUnavailableException, ConcurrentOperationException,
-        InsufficientCapacityException {
+            InsufficientCapacityException {
 
         NetworkService networkService = Mockito.mock(NetworkService.class);
         RemoveIpFromVmNicCmd removeIpFromNic = Mockito.mock(RemoveIpFromVmNicCmd.class);

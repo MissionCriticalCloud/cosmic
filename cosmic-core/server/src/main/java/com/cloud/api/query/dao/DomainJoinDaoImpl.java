@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.util.List;
-
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.vo.DomainJoinVO;
 import com.cloud.configuration.Resource.ResourceType;
@@ -25,10 +23,12 @@ import com.cloud.domain.Domain;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.ResourceLimitAndCountResponse;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -87,6 +87,15 @@ public class DomainJoinDaoImpl extends GenericDaoBase<DomainJoinVO, Long> implem
         domainResponse.setObjectName("domain");
 
         return domainResponse;
+    }
+
+    @Override
+    public DomainJoinVO newDomainView(Domain domain) {
+        SearchCriteria<DomainJoinVO> sc = domainIdSearch.create();
+        sc.setParameters("id", domain.getId());
+        List<DomainJoinVO> domains = searchIncludingRemoved(sc, null, null, false);
+        assert domains != null && domains.size() == 1 : "No domain found for domain id " + domain.getId();
+        return domains.get(0);
     }
 
     @Override
@@ -168,7 +177,7 @@ public class DomainJoinDaoImpl extends GenericDaoBase<DomainJoinVO, Long> implem
         response.setMemoryTotal(memoryTotal);
         response.setMemoryAvailable(memoryAvail);
 
-      //get resource limits for primary storage space and convert it from Bytes to GiB
+        //get resource limits for primary storage space and convert it from Bytes to GiB
         long primaryStorageLimit = ApiDBUtils.findCorrectResourceLimitForDomain(domain.getPrimaryStorageLimit(), fullView, ResourceType.primary_storage, domain.getId());
         String primaryStorageLimitDisplay = (fullView || primaryStorageLimit == -1) ? "Unlimited" : String.valueOf(primaryStorageLimit / ResourceType.bytesToGiB);
         long primaryStorageTotal = (domain.getPrimaryStorageTotal() == null) ? 0 : (domain.getPrimaryStorageTotal() / ResourceType.bytesToGiB);
@@ -181,18 +190,10 @@ public class DomainJoinDaoImpl extends GenericDaoBase<DomainJoinVO, Long> implem
         long secondaryStorageLimit = ApiDBUtils.findCorrectResourceLimitForDomain(domain.getSecondaryStorageLimit(), fullView, ResourceType.secondary_storage, domain.getId());
         String secondaryStorageLimitDisplay = (fullView || secondaryStorageLimit == -1) ? "Unlimited" : String.valueOf(secondaryStorageLimit / ResourceType.bytesToGiB);
         long secondaryStorageTotal = (domain.getSecondaryStorageTotal() == null) ? 0 : (domain.getSecondaryStorageTotal() / ResourceType.bytesToGiB);
-        String secondaryStorageAvail = (fullView || secondaryStorageLimit == -1) ? "Unlimited" : String.valueOf((secondaryStorageLimit / ResourceType.bytesToGiB) - secondaryStorageTotal);
+        String secondaryStorageAvail = (fullView || secondaryStorageLimit == -1) ? "Unlimited" : String.valueOf((secondaryStorageLimit / ResourceType.bytesToGiB) -
+                secondaryStorageTotal);
         response.setSecondaryStorageLimit(secondaryStorageLimitDisplay);
         response.setSecondaryStorageTotal(secondaryStorageTotal);
         response.setSecondaryStorageAvailable(secondaryStorageAvail);
-    }
-
-    @Override
-    public DomainJoinVO newDomainView(Domain domain) {
-        SearchCriteria<DomainJoinVO> sc = domainIdSearch.create();
-        sc.setParameters("id", domain.getId());
-        List<DomainJoinVO> domains = searchIncludingRemoved(sc, null, null, false);
-        assert domains != null && domains.size() == 1 : "No domain found for domain id " + domain.getId();
-        return domains.get(0);
     }
 }

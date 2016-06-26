@@ -16,7 +16,9 @@
 // under the License.
 package com.cloud.network.vpc;
 
-import java.util.Date;
+import com.cloud.network.Network.Provider;
+import com.cloud.network.Network.Service;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,10 +26,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
 
 @Entity
 @Table(name = "vpc_service_map")
@@ -49,6 +48,15 @@ public class VpcServiceMapVO {
     @Column(name = GenericDao.CREATED_COLUMN)
     Date created;
 
+    public VpcServiceMapVO() {
+    }
+
+    public VpcServiceMapVO(final long vpcId, final Service service, final Provider provider) {
+        this.vpcId = vpcId;
+        this.service = service.getName();
+        this.provider = provider.getName();
+    }
+
     public long getId() {
         return id;
     }
@@ -69,18 +77,9 @@ public class VpcServiceMapVO {
         return created;
     }
 
-    public VpcServiceMapVO() {
-    }
-
-    public VpcServiceMapVO(long vpcId, Service service, Provider provider) {
-        this.vpcId = vpcId;
-        this.service = service.getName();
-        this.provider = provider.getName();
-    }
-
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder("[VPC Service[");
+        final StringBuilder buf = new StringBuilder("[VPC Service[");
         return buf.append(vpcId).append("-").append(service).append("-").append(provider).append("]").toString();
     }
 }

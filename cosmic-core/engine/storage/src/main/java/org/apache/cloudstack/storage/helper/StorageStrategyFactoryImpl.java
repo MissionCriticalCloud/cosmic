@@ -18,16 +18,9 @@
  */
 package org.apache.cloudstack.storage.helper;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.host.Host;
 import com.cloud.storage.Snapshot;
 import com.cloud.vm.snapshot.VMSnapshot;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataMotionStrategy;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
@@ -37,6 +30,11 @@ import org.apache.cloudstack.engine.subsystem.api.storage.StorageStrategyFactory
 import org.apache.cloudstack.engine.subsystem.api.storage.StrategyPriority;
 import org.apache.cloudstack.engine.subsystem.api.storage.VMSnapshotStrategy;
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
+
+import javax.inject.Inject;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class StorageStrategyFactoryImpl implements StorageStrategyFactory {
 
@@ -85,8 +83,9 @@ public class StorageStrategyFactoryImpl implements StorageStrategyFactory {
     }
 
     private static <T> T bestMatch(Collection<T> collection, final CanHandle<T> canHandle) {
-        if (collection.size() == 0)
+        if (collection.size() == 0) {
             return null;
+        }
 
         StrategyPriority highestPriority = StrategyPriority.CANT_HANDLE;
 
@@ -100,10 +99,6 @@ public class StorageStrategyFactoryImpl implements StorageStrategyFactory {
         }
 
         return strategyToUse;
-    }
-
-    private static interface CanHandle<T> {
-        StrategyPriority canHandle(T strategy);
     }
 
     public List<SnapshotStrategy> getSnapshotStrategies() {
@@ -124,13 +119,16 @@ public class StorageStrategyFactoryImpl implements StorageStrategyFactory {
         this.dataMotionStrategies = dataMotionStrategies;
     }
 
+    public List<VMSnapshotStrategy> getVmSnapshotStrategies() {
+        return vmSnapshotStrategies;
+    }
+
     @Inject
     public void setVmSnapshotStrategies(List<VMSnapshotStrategy> vmSnapshotStrategies) {
         this.vmSnapshotStrategies = vmSnapshotStrategies;
     }
 
-    public List<VMSnapshotStrategy> getVmSnapshotStrategies() {
-        return vmSnapshotStrategies;
+    private static interface CanHandle<T> {
+        StrategyPriority canHandle(T strategy);
     }
-
 }

@@ -47,7 +47,7 @@ public class SecurityGroupRuleResultObject {
     }
 
     public SecurityGroupRuleResultObject(Long id, int startPort, int endPort, String protocol, String allowedSecurityGroup, String allowedSecGroupAcct,
-            String allowedSourceIpCidr) {
+                                         String allowedSourceIpCidr) {
         this.id = id;
         this.startPort = startPort;
         this.endPort = endPort;
@@ -69,16 +69,16 @@ public class SecurityGroupRuleResultObject {
         return startPort;
     }
 
-    public void setRuleType(SecurityRuleType type) {
-        this.type = type;
+    public void setStartPort(int startPort) {
+        this.startPort = startPort;
     }
 
     public SecurityRuleType getRuleType() {
         return type;
     }
 
-    public void setStartPort(int startPort) {
-        this.startPort = startPort;
+    public void setRuleType(SecurityRuleType type) {
+        this.type = type;
     }
 
     public int getEndPort() {

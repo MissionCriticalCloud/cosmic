@@ -16,10 +16,6 @@
 // under the License.
 package com.cloud.network.router;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.exception.AgentUnavailableException;
@@ -38,23 +34,27 @@ import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.VirtualMachineProfile.Param;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.cloud.network.router.deployment.RouterDeploymentDefinition;
 
 public interface NetworkHelper {
 
     public abstract boolean sendCommandsToRouter(VirtualRouter router,
-            Commands cmds) throws AgentUnavailableException, ResourceUnavailableException;
+                                                 Commands cmds) throws AgentUnavailableException, ResourceUnavailableException;
 
     public abstract void handleSingleWorkingRedundantRouter(
             List<? extends VirtualRouter> connectedRouters,
             List<? extends VirtualRouter> disconnectedRouters, String reason)
-                    throws ResourceUnavailableException;
+            throws ResourceUnavailableException;
 
     public abstract NicTO getNicTO(VirtualRouter router, Long networkId,
-            String broadcastUri);
+                                   String broadcastUri);
 
     public abstract VirtualRouter destroyRouter(long routerId, Account caller,
-            Long callerUserId) throws ResourceUnavailableException,
+                                                Long callerUserId) throws ResourceUnavailableException,
             ConcurrentOperationException;
 
     /**
@@ -67,19 +67,19 @@ public interface NetworkHelper {
 
     public abstract List<DomainRouterVO> startRouters(
             RouterDeploymentDefinition routerDeploymentDefinition)
-                    throws StorageUnavailableException, InsufficientCapacityException,
-                    ConcurrentOperationException, ResourceUnavailableException;
+            throws StorageUnavailableException, InsufficientCapacityException,
+            ConcurrentOperationException, ResourceUnavailableException;
 
     public abstract DomainRouterVO startVirtualRouter(DomainRouterVO router,
-            User user, Account caller, Map<Param, Object> params)
-                    throws StorageUnavailableException, InsufficientCapacityException,
-                    ConcurrentOperationException, ResourceUnavailableException;
+                                                      User user, Account caller, Map<Param, Object> params)
+            throws StorageUnavailableException, InsufficientCapacityException,
+            ConcurrentOperationException, ResourceUnavailableException;
 
     public abstract DomainRouterVO deployRouter(
             RouterDeploymentDefinition routerDeploymentDefinition, boolean startRouter)
-                    throws InsufficientAddressCapacityException,
-                    InsufficientServerCapacityException, InsufficientCapacityException,
-                    StorageUnavailableException, ResourceUnavailableException;
+            throws InsufficientAddressCapacityException,
+            InsufficientServerCapacityException, InsufficientCapacityException,
+            StorageUnavailableException, ResourceUnavailableException;
 
     public abstract void reallocateRouterNetworks(RouterDeploymentDefinition routerDeploymentDefinition, VirtualRouter router, VMTemplateVO template, HypervisorType hType)
             throws ConcurrentOperationException, InsufficientAddressCapacityException, InsufficientCapacityException;

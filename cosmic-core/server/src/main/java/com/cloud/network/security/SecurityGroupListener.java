@@ -16,12 +16,6 @@
 // under the License.
 package com.cloud.network.security;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
 import com.cloud.agent.api.AgentControlAnswer;
@@ -41,12 +35,17 @@ import com.cloud.host.Status;
 import com.cloud.network.security.SecurityGroupWork.Step;
 import com.cloud.network.security.dao.SecurityGroupWorkDao;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Listens for answers to ingress rules modification commands
- *
  */
 public class SecurityGroupListener implements Listener {
     public static final Logger s_logger = LoggerFactory.getLogger(SecurityGroupListener.class.getName());
@@ -70,22 +69,12 @@ public class SecurityGroupListener implements Listener {
     }
 
     @Override
-    public int getTimeout() {
-        return -1;
-    }
-
-    @Override
-    public boolean isRecurring() {
-        return true;
-    }
-
-    @Override
     public boolean processAnswers(long agentId, long seq, Answer[] answers) {
         List<Long> affectedVms = new ArrayList<Long>();
         int commandNum = 0;
         for (Answer ans : answers) {
             if (ans instanceof SecurityGroupRuleAnswer) {
-                SecurityGroupRuleAnswer ruleAnswer = (SecurityGroupRuleAnswer)ans;
+                SecurityGroupRuleAnswer ruleAnswer = (SecurityGroupRuleAnswer) ans;
                 if (ans.getResult()) {
                     s_logger.debug("Successfully programmed rule " + ruleAnswer.toString() + " into host " + agentId);
                     _workDao.updateStep(ruleAnswer.getVmId(), ruleAnswer.getLogSequenceNumber(), Step.Done);
@@ -94,10 +83,10 @@ public class SecurityGroupListener implements Listener {
                     _workDao.updateStep(ruleAnswer.getVmId(), ruleAnswer.getLogSequenceNumber(), Step.Error);
                     ;
                     s_logger.debug("Failed to program rule " + ruleAnswer.toString() + " into host " + agentId + " due to " + ruleAnswer.getDetails() +
-                        " and updated  jobs");
+                            " and updated  jobs");
                     if (ruleAnswer.getReason() == FailureReason.CANNOT_BRIDGE_FIREWALL) {
                         s_logger.debug("Not retrying security group rules for vm " + ruleAnswer.getVmId() + " on failure since host " + agentId +
-                            " cannot do bridge firewalling");
+                                " cannot do bridge firewalling");
                     } else if (ruleAnswer.getReason() == FailureReason.PROGRAMMING_FAILED) {
                         if (checkShouldRetryOnFailure(ruleAnswer.getVmId())) {
                             s_logger.debug("Retrying security group rules on failure for vm " + ruleAnswer.getVmId());
@@ -108,8 +97,9 @@ public class SecurityGroupListener implements Listener {
                     }
                 }
                 commandNum++;
-                if (_workTracker != null)
+                if (_workTracker != null) {
                     _workTracker.processAnswers(agentId, seq, answers);
+                }
             }
         }
 
@@ -120,10 +110,15 @@ public class SecurityGroupListener implements Listener {
         return true;
     }
 
+    protected void recordSuccess(long vmId) {
+        _vmFailureCounts.remove(vmId);
+    }
+
     protected boolean checkShouldRetryOnFailure(long vmId) {
         Integer currCount = _vmFailureCounts.get(vmId);
-        if (currCount == null)
+        if (currCount == null) {
             currCount = 0;
+        }
 
         if (currCount.intValue() < MAX_RETRIES_ON_FAILURE) {
             _vmFailureCounts.put(vmId, ++currCount);
@@ -133,16 +128,12 @@ public class SecurityGroupListener implements Listener {
         return false;
     }
 
-    protected void recordSuccess(long vmId) {
-        _vmFailureCounts.remove(vmId);
-    }
-
     @Override
     public boolean processCommands(long agentId, long seq, Command[] commands) {
         boolean processed = false;
         for (Command cmd : commands) {
             if (cmd instanceof PingRoutingWithNwGroupsCommand) {
-                PingRoutingWithNwGroupsCommand ping = (PingRoutingWithNwGroupsCommand)cmd;
+                PingRoutingWithNwGroupsCommand ping = (PingRoutingWithNwGroupsCommand) cmd;
                 if (ping.getNewGroupStates().size() > 0) {
                     _securityGroupManager.fullSync(agentId, ping.getNewGroupStates());
                 }
@@ -153,9 +144,15 @@ public class SecurityGroupListener implements Listener {
     }
 
     @Override
+    public AgentControlAnswer processControlCommand(long agentId, AgentControlCommand cmd) {
+        return null;
+    }
+
+    @Override
     public void processConnect(Host host, StartupCommand cmd, boolean forRebalance) {
-        if (s_logger.isInfoEnabled())
+        if (s_logger.isInfoEnabled()) {
             s_logger.info("Received a host startup notification");
+        }
 
         if (cmd instanceof StartupRoutingCommand) {
             //if (Boolean.toString(true).equals(host.getDetail("can_bridge_firewall"))) {
@@ -164,8 +161,9 @@ public class SecurityGroupListener implements Listener {
                 CleanupNetworkRulesCmd cleanupCmd = new CleanupNetworkRulesCmd(interval);
                 Commands c = new Commands(cleanupCmd);
                 _agentMgr.send(host.getId(), c, this);
-                if (s_logger.isInfoEnabled())
+                if (s_logger.isInfoEnabled()) {
                     s_logger.info("Scheduled network rules cleanup, interval=" + cleanupCmd.getInterval());
+                }
             } catch (AgentUnavailableException e) {
                 //usually hypervisors that do not understand sec group rules.
                 s_logger.debug("Unable to schedule network rules cleanup for host " + host.getId(), e);
@@ -177,16 +175,21 @@ public class SecurityGroupListener implements Listener {
     }
 
     @Override
-    public AgentControlAnswer processControlCommand(long agentId, AgentControlCommand cmd) {
-        return null;
-    }
-
-    @Override
     public boolean processDisconnect(long agentId, Status state) {
         if (_workTracker != null) {
             _workTracker.processDisconnect(agentId);
         }
         return true;
+    }
+
+    @Override
+    public boolean isRecurring() {
+        return true;
+    }
+
+    @Override
+    public int getTimeout() {
+        return -1;
     }
 
     @Override

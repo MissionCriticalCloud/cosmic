@@ -16,15 +16,15 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.List;
-
 import com.cloud.projects.ProjectAccount;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = ProjectAccount.class)
 @SuppressWarnings("unused")
@@ -65,6 +65,15 @@ public class ProjectAccountResponse extends BaseResponse implements ControlledVi
     @Param(description = "the list of users associated with account", responseObject = UserResponse.class)
     private List<UserResponse> users;
 
+    public void setAccountId(String id) {
+        this.accountId = id;
+    }
+
+    @Override
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
     @Override
     public void setProjectId(String projectId) {
         this.projectId = projectId;
@@ -75,19 +84,6 @@ public class ProjectAccountResponse extends BaseResponse implements ControlledVi
         this.projectName = projectName;
     }
 
-    public void setAccountId(String id) {
-        this.accountId = id;
-    }
-
-    @Override
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-    }
-
-    public void setAccountType(Short accountType) {
-        this.accountType = accountType;
-    }
-
     @Override
     public void setDomainId(String domainId) {
         this.domainId = domainId;
@@ -96,6 +92,10 @@ public class ProjectAccountResponse extends BaseResponse implements ControlledVi
     @Override
     public void setDomainName(String domainName) {
         this.domainName = domainName;
+    }
+
+    public void setAccountType(Short accountType) {
+        this.accountType = accountType;
     }
 
     public void setUsers(List<UserResponse> users) {

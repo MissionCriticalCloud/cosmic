@@ -16,36 +16,17 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs;
 
-import java.util.Date;
-
 import org.apache.cloudstack.framework.jobs.impl.SyncQueueItem;
 import org.apache.cloudstack.jobs.JobInfo;
 
+import java.util.Date;
+
 public interface AsyncJob extends JobInfo {
-
-    public enum JournalType {
-        SUCCESS, FAILURE
-    };
-
-    public static interface Topics {
-        public static final String JOB_HEARTBEAT = "job.heartbeat";
-        public static final String JOB_STATE = "job.state";
-        public static final String JOB_EVENT_PUBLISH = "job.eventpublish";
-    }
-
-    public static interface Constants {
-
-        // Although we may have detailed masks for each individual wakeup event, i.e.
-        // periodical timer, matched topic from message bus, it seems that we don't
-        // need to distinguish them to such level. Therefore, only one wakeup signal
-        // is defined
-        public static final int SIGNAL_MASK_WAKEUP = 1;
-
-        public static final String SYNC_LOCK_NAME = "SyncLock";
-    }
 
     @Override
     String getType();
+
+    ;
 
     @Override
     String getDispatcher();
@@ -115,4 +96,25 @@ public interface AsyncJob extends JobInfo {
     void setSyncSource(SyncQueueItem item);
 
     String getRelated();
+
+    public enum JournalType {
+        SUCCESS, FAILURE
+    }
+
+    public static interface Topics {
+        public static final String JOB_HEARTBEAT = "job.heartbeat";
+        public static final String JOB_STATE = "job.state";
+        public static final String JOB_EVENT_PUBLISH = "job.eventpublish";
+    }
+
+    public static interface Constants {
+
+        // Although we may have detailed masks for each individual wakeup event, i.e.
+        // periodical timer, matched topic from message bus, it seems that we don't
+        // need to distinguish them to such level. Therefore, only one wakeup signal
+        // is defined
+        public static final int SIGNAL_MASK_WAKEUP = 1;
+
+        public static final String SYNC_LOCK_NAME = "SyncLock";
+    }
 }

@@ -16,12 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.snapshot;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.storage.Snapshot;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -31,6 +27,10 @@ import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.SnapshotResponse;
 import org.apache.cloudstack.api.response.VolumeResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,11 +96,6 @@ public class ListSnapshotsCmd extends BaseListTaggedResourcesCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public ApiCommandJobType getInstanceType() {
         return ApiCommandJobType.Snapshot;
     }
@@ -119,5 +114,10 @@ public class ListSnapshotsCmd extends BaseListTaggedResourcesCmd {
         response.setResponseName(getCommandName());
 
         setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

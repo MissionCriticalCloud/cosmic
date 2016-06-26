@@ -16,12 +16,12 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
+import com.cloud.serializer.Param;
+import org.apache.cloudstack.api.BaseResponse;
+
 import java.util.Date;
 
-import com.cloud.serializer.Param;
 import com.google.gson.annotations.SerializedName;
-
-import org.apache.cloudstack.api.BaseResponse;
 
 public class SnapshotScheduleResponse extends BaseResponse {
     @SerializedName("id")

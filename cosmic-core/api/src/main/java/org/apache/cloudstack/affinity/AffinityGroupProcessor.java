@@ -29,12 +29,9 @@ public interface AffinityGroupProcessor extends Adapter {
      * process() is called to apply any user preferences to the deployment plan
      * and avoid set for the given VM placement.
      *
-     * @param vm
-     *            virtual machine.
-     * @param plan
-     *            deployment plan that tells you where it's being deployed to.
-     * @param avoid
-     *            avoid these data centers, pods, clusters, or hosts.
+     * @param vm    virtual machine.
+     * @param plan  deployment plan that tells you where it's being deployed to.
+     * @param avoid avoid these data centers, pods, clusters, or hosts.
      */
     void process(VirtualMachineProfile vm, DeploymentPlan plan, ExcludeList avoid) throws AffinityConflictException;
 
@@ -50,10 +47,8 @@ public interface AffinityGroupProcessor extends Adapter {
      * check() is called to see if the planned destination fits the group
      * requirements
      *
-     * @param vm
-     *            virtual machine.
-     * @param plannedDestination
-     *            deployment destination where VM is planned to be deployed
+     * @param vm                 virtual machine.
+     * @param plannedDestination deployment destination where VM is planned to be deployed
      */
     boolean check(VirtualMachineProfile vm, DeployDestination plannedDestination) throws AffinityConflictException;
 
@@ -84,5 +79,4 @@ public interface AffinityGroupProcessor extends Adapter {
     boolean subDomainAccess();
 
     void handleDeleteGroup(AffinityGroup group);
-
 }

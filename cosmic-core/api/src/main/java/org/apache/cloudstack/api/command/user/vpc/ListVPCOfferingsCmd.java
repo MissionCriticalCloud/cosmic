@@ -16,18 +16,18 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.vpc;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.network.vpc.VpcOffering;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.VpcOfferingResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,13 +53,34 @@ public class ListVPCOfferingsCmd extends BaseListCmd {
     private Boolean isDefault;
 
     @Parameter(name = ApiConstants.SUPPORTED_SERVICES,
-               type = CommandType.LIST,
-               collectionType = CommandType.STRING,
-               description = "list VPC offerings supporting certain services")
+            type = CommandType.LIST,
+            collectionType = CommandType.STRING,
+            description = "list VPC offerings supporting certain services")
     private List<String> supportedServices;
 
     @Parameter(name = ApiConstants.STATE, type = CommandType.STRING, description = "list VPC offerings by state")
     private String state;
+
+    public Boolean getIsDefault() {
+        return isDefault;
+    }
+
+    @Override
+    public void execute() {
+        Pair<List<? extends VpcOffering>, Integer> offerings =
+                _vpcProvSvc.listVpcOfferings(getId(), getVpcOffName(), getDisplayText(), getSupportedServices(), isDefault, this.getKeyword(), getState(),
+                        this.getStartIndex(), this.getPageSizeVal());
+        ListResponse<VpcOfferingResponse> response = new ListResponse<VpcOfferingResponse>();
+        List<VpcOfferingResponse> offeringResponses = new ArrayList<VpcOfferingResponse>();
+        for (VpcOffering offering : offerings.first()) {
+            VpcOfferingResponse offeringResponse = _responseGenerator.createVpcOfferingResponse(offering);
+            offeringResponses.add(offeringResponse);
+        }
+
+        response.setResponses(offeringResponses, offerings.second());
+        response.setResponseName(getCommandName());
+        this.setResponseObject(response);
+    }
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -76,42 +97,20 @@ public class ListVPCOfferingsCmd extends BaseListCmd {
         return displayText;
     }
 
-    public Boolean getIsDefault() {
-        return isDefault;
-    }
-
     public List<String> getSupportedServices() {
         return supportedServices;
-    }
-
-    public String getState() {
-        return state;
     }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
 
-    @Override
-    public void execute() {
-        Pair<List<? extends VpcOffering>, Integer> offerings =
-            _vpcProvSvc.listVpcOfferings(getId(), getVpcOffName(), getDisplayText(), getSupportedServices(), isDefault, this.getKeyword(), getState(),
-                this.getStartIndex(), this.getPageSizeVal());
-        ListResponse<VpcOfferingResponse> response = new ListResponse<VpcOfferingResponse>();
-        List<VpcOfferingResponse> offeringResponses = new ArrayList<VpcOfferingResponse>();
-        for (VpcOffering offering : offerings.first()) {
-            VpcOfferingResponse offeringResponse = _responseGenerator.createVpcOfferingResponse(offering);
-            offeringResponses.add(offeringResponse);
-        }
-
-        response.setResponses(offeringResponses, offerings.second());
-        response.setResponseName(getCommandName());
-        this.setResponseObject(response);
+    public String getState() {
+        return state;
     }
 
     @Override
     public String getCommandName() {
         return s_name;
     }
-
 }

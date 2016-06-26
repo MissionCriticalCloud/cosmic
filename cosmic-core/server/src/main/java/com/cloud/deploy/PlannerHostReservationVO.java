@@ -16,6 +16,9 @@
 // under the License.
 package com.cloud.deploy;
 
+import com.cloud.deploy.DeploymentPlanner.PlannerResourceUsage;
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -24,10 +27,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.deploy.DeploymentPlanner.PlannerResourceUsage;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = "op_host_planner_reservation")
@@ -115,5 +114,4 @@ public class PlannerHostReservationVO implements InternalIdentity {
     public void setResourceUsage(PlannerResourceUsage resourceType) {
         this.resourceUsage = resourceType;
     }
-
 }

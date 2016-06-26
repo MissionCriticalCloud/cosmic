@@ -41,5 +41,4 @@ public class DhcpConfig extends ConfigBase {
     public void setEntries(List<DhcpConfigEntry> entries) {
         this.entries = entries;
     }
-
 }

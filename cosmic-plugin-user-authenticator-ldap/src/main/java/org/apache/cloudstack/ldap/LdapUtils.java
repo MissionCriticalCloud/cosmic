@@ -21,6 +21,9 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 
 public final class LdapUtils {
+    private LdapUtils() {
+    }
+
     public static String escapeLDAPSearchFilter(final String filter) {
         final StringBuilder sb = new StringBuilder();
         for (final char character : filter.toCharArray()) {
@@ -54,8 +57,5 @@ public final class LdapUtils {
             return String.valueOf(value);
         }
         return null;
-    }
-
-    private LdapUtils() {
     }
 }

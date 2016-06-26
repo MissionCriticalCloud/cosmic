@@ -29,5 +29,4 @@ public interface TransactionMBean {
     List<Map<String, String>> getActiveTransactions();
 
     List<Map<String, String>> getTransactionsWithDatabaseConnection();
-
 }

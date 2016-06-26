@@ -16,7 +16,8 @@
 // under the License.
 package com.cloud.storage;
 
-import java.util.UUID;
+import com.cloud.storage.snapshot.SnapshotPolicy;
+import com.cloud.utils.DateUtil.IntervalType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,42 +25,32 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.storage.snapshot.SnapshotPolicy;
-import com.cloud.utils.DateUtil.IntervalType;
+import java.util.UUID;
 
 @Entity
 @Table(name = "snapshot_policy")
 public class SnapshotPolicyVO implements SnapshotPolicy {
 
+    @Column(name = "display", updatable = true, nullable = false)
+    protected boolean display = true;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     long id;
-
     @Column(name = "volume_id")
     long volumeId;
-
     @Column(name = "schedule")
     String schedule;
-
     @Column(name = "timezone")
     String timezone;
-
-    @Column(name = "interval")
-    private short interval;
-
-    @Column(name = "max_snaps")
-    private int maxSnaps;
-
     @Column(name = "active")
     boolean active = false;
-
     @Column(name = "uuid")
     String uuid;
-
-    @Column(name = "display", updatable = true, nullable = false)
-    protected boolean display = true;
+    @Column(name = "interval")
+    private short interval;
+    @Column(name = "max_snaps")
+    private int maxSnaps;
 
     public SnapshotPolicyVO() {
         this.uuid = UUID.randomUUID().toString();
@@ -69,7 +60,7 @@ public class SnapshotPolicyVO implements SnapshotPolicy {
         this.volumeId = volumeId;
         this.schedule = schedule;
         this.timezone = timezone;
-        this.interval = (short)intvType.ordinal();
+        this.interval = (short) intvType.ordinal();
         this.maxSnaps = maxSnaps;
         this.active = true;
         this.display = display;
@@ -87,23 +78,13 @@ public class SnapshotPolicyVO implements SnapshotPolicy {
     }
 
     @Override
-    public void setSchedule(String schedule) {
-        this.schedule = schedule;
-    }
-
-    @Override
     public String getSchedule() {
         return schedule;
     }
 
     @Override
-    public void setInterval(short interval) {
-        this.interval = interval;
-    }
-
-    @Override
-    public void setTimezone(String timezone) {
-        this.timezone = timezone;
+    public void setSchedule(String schedule) {
+        this.schedule = schedule;
     }
 
     @Override
@@ -112,18 +93,28 @@ public class SnapshotPolicyVO implements SnapshotPolicy {
     }
 
     @Override
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
+
+    @Override
     public short getInterval() {
         return interval;
     }
 
     @Override
-    public void setMaxSnaps(int maxSnaps) {
-        this.maxSnaps = maxSnaps;
+    public void setInterval(short interval) {
+        this.interval = interval;
     }
 
     @Override
     public int getMaxSnaps() {
         return maxSnaps;
+    }
+
+    @Override
+    public void setMaxSnaps(int maxSnaps) {
+        this.maxSnaps = maxSnaps;
     }
 
     @Override

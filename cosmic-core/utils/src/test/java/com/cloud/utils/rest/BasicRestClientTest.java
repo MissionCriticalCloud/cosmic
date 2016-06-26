@@ -56,9 +56,9 @@ public class BasicRestClientTest {
     @BeforeClass
     public static void setupClass() throws Exception {
         request = HttpUriRequestBuilder.create()
-            .method(HttpMethods.GET)
-            .path("/path")
-            .build();
+                                       .method(HttpMethods.GET)
+                                       .path("/path")
+                                       .build();
         httpClient = spy(HttpClientHelper.createHttpClient(2));
     }
 
@@ -67,9 +67,9 @@ public class BasicRestClientTest {
         when(mockResponse.getStatusLine()).thenReturn(HTTP_200_REPSONSE);
         doReturn(mockResponse).when(httpClient).execute(any(HttpHost.class), HttpRequestMatcher.eq(request), any(HttpClientContext.class));
         final BasicRestClient restClient = BasicRestClient.create()
-            .host(LOCALHOST)
-            .client(httpClient)
-            .build();
+                                                          .host(LOCALHOST)
+                                                          .client(httpClient)
+                                                          .build();
 
         final CloseableHttpResponse response = restClient.execute(request);
 
@@ -83,9 +83,9 @@ public class BasicRestClientTest {
         when(mockResponse.getStatusLine()).thenReturn(HTTP_503_STATUSLINE);
         doReturn(mockResponse).when(httpClient).execute(any(HttpHost.class), HttpRequestMatcher.eq(request), any(HttpClientContext.class));
         final BasicRestClient restClient = BasicRestClient.create()
-            .host(LOCALHOST)
-            .client(httpClient)
-            .build();
+                                                          .host(LOCALHOST)
+                                                          .client(httpClient)
+                                                          .build();
 
         final CloseableHttpResponse response = restClient.execute(request);
 
@@ -97,14 +97,13 @@ public class BasicRestClientTest {
     @Test(expected = CloudstackRESTException.class)
     public void testExecuteRequestWhenClientThrowsIOException() throws Exception {
         final BasicRestClient restClient = BasicRestClient.create()
-            .host(LOCALHOST)
-            .client(HttpClientHelper.createHttpClient(5))
-            .build();
+                                                          .host(LOCALHOST)
+                                                          .client(HttpClientHelper.createHttpClient(5))
+                                                          .build();
 
         final CloseableHttpResponse response = restClient.execute(request);
-        fail("A CloudstackRESTException should have been thrown by now."+
+        fail("A CloudstackRESTException should have been thrown by now." +
                 "\nWe got " + response.getStatusLine() +
                 "\nMake sure you cannot reach '" + request.getURI() + "' by method " + request.getMethod());
     }
-
 }

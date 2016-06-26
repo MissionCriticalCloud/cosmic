@@ -16,17 +16,16 @@
 // under the License.
 package com.cloud.ha;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.host.Host;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+
+import javax.inject.Inject;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

@@ -16,17 +16,13 @@
 // under the License.
 package com.cloud.event;
 
-import java.util.Date;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
 
-public interface Event extends ControlledEntity, Identity, InternalIdentity {
-    public enum State {
-        Created, Scheduled, Started, Completed;
-    }
+import java.util.Date;
 
+public interface Event extends ControlledEntity, Identity, InternalIdentity {
     String getType();
 
     State getState();
@@ -46,4 +42,8 @@ public interface Event extends ControlledEntity, Identity, InternalIdentity {
     String getParameters();
 
     boolean getArchived();
+
+    public enum State {
+        Created, Scheduled, Started, Completed
+    }
 }

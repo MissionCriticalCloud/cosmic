@@ -21,7 +21,6 @@ import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.storage.StoragePool;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -31,6 +30,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.StoragePoolResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,42 +51,13 @@ public class PreparePrimaryStorageForMaintenanceCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
+    public static String getResultObjectName() {
+        return "primarystorage";
     }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public static String getResultObjectName() {
-        return "primarystorage";
-    }
-
-    @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.StoragePool;
-    }
-
-    @Override
-    public Long getInstanceId() {
-        return getId();
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Account account = CallContext.current().getCallingAccount();
-        if (account != null) {
-            return account.getId();
-        }
-
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
 
     @Override
     public String getEventType() {
@@ -99,14 +70,43 @@ public class PreparePrimaryStorageForMaintenanceCmd extends BaseAsyncCmd {
     }
 
     @Override
+    public Long getInstanceId() {
+        return getId();
+    }
+
+    @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.StoragePool;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException {
-        StoragePool result = _storageService.preparePrimaryStorageForMaintenance(getId());
+        final StoragePool result = _storageService.preparePrimaryStorageForMaintenance(getId());
         if (result != null) {
-            StoragePoolResponse response = _responseGenerator.createStoragePoolResponse(result);
+            final StoragePoolResponse response = _responseGenerator.createStoragePoolResponse(result);
             response.setResponseName("storagepool");
             this.setResponseObject(response);
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to prepare primary storage for maintenance");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final Account account = CallContext.current().getCallingAccount();
+        if (account != null) {
+            return account.getId();
+        }
+
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 }

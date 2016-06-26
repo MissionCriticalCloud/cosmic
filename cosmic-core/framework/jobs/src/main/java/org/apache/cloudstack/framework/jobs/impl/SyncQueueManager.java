@@ -16,9 +16,9 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs.impl;
 
-import java.util.List;
-
 import com.cloud.utils.component.Manager;
+
+import java.util.List;
 
 public interface SyncQueueManager extends Manager {
     public SyncQueueVO queue(String syncObjType, long syncObjId, String itemType, long itemId, long queueSizeLimit);

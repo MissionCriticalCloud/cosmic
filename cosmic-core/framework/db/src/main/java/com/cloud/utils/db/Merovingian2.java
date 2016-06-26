@@ -16,6 +16,12 @@
 // under the License.
 package com.cloud.utils.db;
 
+import com.cloud.utils.DateUtil;
+import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.mgmt.JmxUtil;
+import com.cloud.utils.time.InaccurateClock;
+
+import javax.management.StandardMBean;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,13 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-
-import javax.management.StandardMBean;
-
-import com.cloud.utils.DateUtil;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.mgmt.JmxUtil;
-import com.cloud.utils.time.InaccurateClock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,14 +51,11 @@ public class Merovingian2 extends StandardMBean implements MerovingianMBean {
     private static final String SELECT_MGMT_LOCKS_SQL = SELECT_SQL + " WHERE mac=?";
     private static final String SELECT_THREAD_LOCKS_SQL = SELECT_SQL + " WHERE mac=? AND ip=?";
     private static final String CLEANUP_THREAD_LOCKS_SQL = "DELETE FROM op_lock WHERE mac=? AND ip=? AND thread=?";
-
-    TimeZone _gmtTimeZone = TimeZone.getTimeZone("GMT");
-
-    private final long _msId;
-
     private static Merovingian2 s_instance = null;
-    private ConnectionConcierge _concierge = null;
     private static ThreadLocal<Count> s_tls = new ThreadLocal<Count>();
+    private final long _msId;
+    TimeZone _gmtTimeZone = TimeZone.getTimeZone("GMT");
+    private ConnectionConcierge _concierge = null;
 
     private Merovingian2(long msId) {
         super(MerovingianMBean.class, false);
@@ -96,27 +92,12 @@ public class Merovingian2 extends StandardMBean implements MerovingianMBean {
         return s_instance;
     }
 
+    public void cleanupThisServer() {
+        cleanupForServer(_msId);
+    }
+
     public static Merovingian2 getLockMaster() {
         return s_instance;
-    }
-
-    protected void incrCount() {
-        Count count = s_tls.get();
-        if (count == null) {
-            count = new Count();
-            s_tls.set(count);
-        }
-
-        count.count++;
-    }
-
-    protected void decrCount() {
-        Count count = s_tls.get();
-        if (count == null) {
-            return;
-        }
-
-        count.count--;
     }
 
     public boolean acquire(String key, int timeInSeconds) {
@@ -148,14 +129,27 @@ public class Merovingian2 extends StandardMBean implements MerovingianMBean {
                 s_logger.debug("[ignored] interupted while aquiring " + key);
             }
         }
-        String msg = "Timed out on acquiring lock " + key + " .  Waited for " + ((InaccurateClock.getTime() - startTime)/1000) +  "seconds";
+        String msg = "Timed out on acquiring lock " + key + " .  Waited for " + ((InaccurateClock.getTime() - startTime) / 1000) + "seconds";
         Exception e = new CloudRuntimeException(msg);
         s_logger.warn(msg, e);
         return false;
     }
 
+    public int owns(String key) {
+        Thread th = Thread.currentThread();
+        int threadId = System.identityHashCode(th);
+        Map<String, String> owner = isLocked(key);
+        if (owner == null) {
+            return 0;
+        }
+        if (owner.get("mgmt").equals(Long.toString(_msId)) && owner.get("tid").equals(Integer.toString(threadId))) {
+            return Integer.parseInt(owner.get("count"));
+        }
+        return -1;
+    }
+
     protected boolean increment(String key, String threadName, int threadId) {
-      try (PreparedStatement pstmt = _concierge.conn().prepareStatement(INCREMENT_SQL);){
+        try (PreparedStatement pstmt = _concierge.conn().prepareStatement(INCREMENT_SQL);) {
             pstmt.setString(1, key);
             pstmt.setLong(2, _msId);
             pstmt.setString(3, threadName);
@@ -171,14 +165,14 @@ public class Merovingian2 extends StandardMBean implements MerovingianMBean {
             }
             return false;
         } catch (Exception e) {
-            s_logger.error("increment:Exception:"+e.getMessage());
-            throw new CloudRuntimeException("increment:Exception:"+e.getMessage(), e);
+            s_logger.error("increment:Exception:" + e.getMessage());
+            throw new CloudRuntimeException("increment:Exception:" + e.getMessage(), e);
         }
     }
 
     protected boolean doAcquire(String key, String threadName, int threadId) {
         long startTime = InaccurateClock.getTime();
-        try(PreparedStatement pstmt = _concierge.conn().prepareStatement(ACQUIRE_SQL);) {
+        try (PreparedStatement pstmt = _concierge.conn().prepareStatement(ACQUIRE_SQL);) {
             pstmt.setString(1, key);
             pstmt.setLong(2, _msId);
             pstmt.setString(3, threadName);
@@ -199,7 +193,7 @@ public class Merovingian2 extends StandardMBean implements MerovingianMBean {
                 }
             }
         } catch (SQLException e) {
-            s_logger.error("doAcquire:Exception:"+e.getMessage());
+            s_logger.error("doAcquire:Exception:" + e.getMessage());
             throw new CloudRuntimeException("Unable to lock " + key + ".  Waited " + (InaccurateClock.getTime() - startTime), e);
         }
 
@@ -208,54 +202,49 @@ public class Merovingian2 extends StandardMBean implements MerovingianMBean {
     }
 
     protected Map<String, String> isLocked(String key) {
-        try (PreparedStatement pstmt = _concierge.conn().prepareStatement(INQUIRE_SQL);){
+        try (PreparedStatement pstmt = _concierge.conn().prepareStatement(INQUIRE_SQL);) {
             pstmt.setString(1, key);
-            try(ResultSet rs = pstmt.executeQuery();)
-            {
+            try (ResultSet rs = pstmt.executeQuery();) {
                 if (!rs.next()) {
                     return null;
                 }
                 return toLock(rs);
-            }catch (SQLException e) {
-                s_logger.error("isLocked:Exception:"+e.getMessage());
-                throw new CloudRuntimeException("isLocked:Exception:"+e.getMessage(), e);
+            } catch (SQLException e) {
+                s_logger.error("isLocked:Exception:" + e.getMessage());
+                throw new CloudRuntimeException("isLocked:Exception:" + e.getMessage(), e);
             }
         } catch (SQLException e) {
-            s_logger.error("isLocked:Exception:"+e.getMessage());
-            throw new CloudRuntimeException("isLocked:Exception:"+e.getMessage(), e);
+            s_logger.error("isLocked:Exception:" + e.getMessage());
+            throw new CloudRuntimeException("isLocked:Exception:" + e.getMessage(), e);
         }
     }
 
-    public void cleanupThisServer() {
-        cleanupForServer(_msId);
+    protected void incrCount() {
+        Count count = s_tls.get();
+        if (count == null) {
+            count = new Count();
+            s_tls.set(count);
+        }
+
+        count.count++;
     }
 
-    @Override
-    public void cleanupForServer(long msId) {
-        s_logger.info("Cleaning up locks for " + msId);
-        try {
-            synchronized (_concierge.conn()) {
-                try(PreparedStatement pstmt = _concierge.conn().prepareStatement(CLEANUP_MGMT_LOCKS_SQL);) {
-                    pstmt.setLong(1, msId);
-                    int rows = pstmt.executeUpdate();
-                    s_logger.info("Released " + rows + " locks for " + msId);
-                }catch (Exception e) {
-                    s_logger.error("cleanupForServer:Exception:"+e.getMessage());
-                    throw new CloudRuntimeException("cleanupForServer:Exception:"+e.getMessage(), e);
-                }
-            }
-        } catch (Exception e) {
-            s_logger.error("cleanupForServer:Exception:"+e.getMessage());
-            throw new CloudRuntimeException("cleanupForServer:Exception:"+e.getMessage(), e);
-        }
+    protected Map<String, String> toLock(ResultSet rs) throws SQLException {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("key", rs.getString(1));
+        map.put("mgmt", rs.getString(2));
+        map.put("name", rs.getString(3));
+        map.put("tid", Integer.toString(rs.getInt(4)));
+        map.put("date", rs.getString(5));
+        map.put("count", Integer.toString(rs.getInt(6)));
+        return map;
     }
 
     public boolean release(String key) {
         Thread th = Thread.currentThread();
         String threadName = th.getName();
         int threadId = System.identityHashCode(th);
-        try (PreparedStatement pstmt = _concierge.conn().prepareStatement(DECREMENT_SQL);)
-        {
+        try (PreparedStatement pstmt = _concierge.conn().prepareStatement(DECREMENT_SQL);) {
             pstmt.setString(1, key);
             pstmt.setLong(2, _msId);
             pstmt.setString(3, threadName);
@@ -275,9 +264,9 @@ public class Merovingian2 extends StandardMBean implements MerovingianMBean {
                         s_logger.trace("lck-" + key + " removed");
                     }
                     decrCount();
-                }catch (Exception e) {
-                    s_logger.error("release:Exception:"+ e.getMessage());
-                    throw new CloudRuntimeException("release:Exception:"+ e.getMessage(), e);
+                } catch (Exception e) {
+                    s_logger.error("release:Exception:" + e.getMessage());
+                    throw new CloudRuntimeException("release:Exception:" + e.getMessage(), e);
                 }
             } else if (rows < 1) {
                 String msg = ("Was unable to find lock for the key " + key + " and thread id " + threadId);
@@ -286,21 +275,40 @@ public class Merovingian2 extends StandardMBean implements MerovingianMBean {
             }
             return rows == 1;
         } catch (Exception e) {
-            s_logger.error("release:Exception:"+ e.getMessage());
-            throw new CloudRuntimeException("release:Exception:"+ e.getMessage(), e);
+            s_logger.error("release:Exception:" + e.getMessage());
+            throw new CloudRuntimeException("release:Exception:" + e.getMessage(), e);
         }
     }
 
-    protected Map<String, String> toLock(ResultSet rs) throws SQLException {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("key", rs.getString(1));
-        map.put("mgmt", rs.getString(2));
-        map.put("name", rs.getString(3));
-        map.put("tid", Integer.toString(rs.getInt(4)));
-        map.put("date", rs.getString(5));
-        map.put("count", Integer.toString(rs.getInt(6)));
-        return map;
+    protected void decrCount() {
+        Count count = s_tls.get();
+        if (count == null) {
+            return;
+        }
 
+        count.count--;
+    }
+
+    @Override
+    public List<Map<String, String>> getAllLocks() {
+        return getLocks(SELECT_SQL, null);
+    }
+
+    protected List<Map<String, String>> getLocks(String sql, Long msId) {
+        try (PreparedStatement pstmt = _concierge.conn().prepareStatement(sql);) {
+            if (msId != null) {
+                pstmt.setLong(1, msId);
+            }
+            try (ResultSet rs = pstmt.executeQuery();) {
+                return toLocks(rs);
+            } catch (Exception e) {
+                s_logger.error("getLocks:Exception:" + e.getMessage());
+                throw new CloudRuntimeException("getLocks:Exception:" + e.getMessage(), e);
+            }
+        } catch (Exception e) {
+            s_logger.error("getLocks:Exception:" + e.getMessage());
+            throw new CloudRuntimeException("getLocks:Exception:" + e.getMessage(), e);
+        }
     }
 
     protected List<Map<String, String>> toLocks(ResultSet rs) throws SQLException {
@@ -311,62 +319,57 @@ public class Merovingian2 extends StandardMBean implements MerovingianMBean {
         return results;
     }
 
-    protected List<Map<String, String>> getLocks(String sql, Long msId) {
-        try (PreparedStatement pstmt = _concierge.conn().prepareStatement(sql);)
-        {
-            if (msId != null) {
-                pstmt.setLong(1, msId);
-            }
-            try(ResultSet rs = pstmt.executeQuery();)
-            {
-                return toLocks(rs);
-            }catch (Exception e) {
-                s_logger.error("getLocks:Exception:"+e.getMessage());
-                throw new CloudRuntimeException("getLocks:Exception:"+e.getMessage(), e);
-            }
-       } catch (Exception e) {
-            s_logger.error("getLocks:Exception:"+e.getMessage());
-            throw new CloudRuntimeException("getLocks:Exception:"+e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public List<Map<String, String>> getAllLocks() {
-        return getLocks(SELECT_SQL, null);
-    }
-
     @Override
     public List<Map<String, String>> getLocksAcquiredByThisServer() {
         return getLocks(SELECT_MGMT_LOCKS_SQL, _msId);
     }
 
-    public int owns(String key) {
-        Thread th = Thread.currentThread();
-        int threadId = System.identityHashCode(th);
-        Map<String, String> owner = isLocked(key);
-        if (owner == null) {
-            return 0;
+    @Override
+    public boolean releaseLockAsLastResortAndIReallyKnowWhatIAmDoing(String key) {
+        s_logger.info("Releasing a lock from JMX lck-" + key);
+        try (PreparedStatement pstmt = _concierge.conn().prepareStatement(RELEASE_LOCK_SQL);) {
+            pstmt.setString(1, key);
+            int rows = pstmt.executeUpdate();
+            return rows > 0;
+        } catch (Exception e) {
+            s_logger.error("releaseLockAsLastResortAndIReallyKnowWhatIAmDoing : Exception: " + e.getMessage());
+            return false;
         }
-        if (owner.get("mgmt").equals(Long.toString(_msId)) && owner.get("tid").equals(Integer.toString(threadId))) {
-            return Integer.parseInt(owner.get("count"));
+    }
+
+    @Override
+    public void cleanupForServer(long msId) {
+        s_logger.info("Cleaning up locks for " + msId);
+        try {
+            synchronized (_concierge.conn()) {
+                try (PreparedStatement pstmt = _concierge.conn().prepareStatement(CLEANUP_MGMT_LOCKS_SQL);) {
+                    pstmt.setLong(1, msId);
+                    int rows = pstmt.executeUpdate();
+                    s_logger.info("Released " + rows + " locks for " + msId);
+                } catch (Exception e) {
+                    s_logger.error("cleanupForServer:Exception:" + e.getMessage());
+                    throw new CloudRuntimeException("cleanupForServer:Exception:" + e.getMessage(), e);
+                }
+            }
+        } catch (Exception e) {
+            s_logger.error("cleanupForServer:Exception:" + e.getMessage());
+            throw new CloudRuntimeException("cleanupForServer:Exception:" + e.getMessage(), e);
         }
-        return -1;
     }
 
     public List<Map<String, String>> getLocksAcquiredBy(long msId, String threadName) {
-        try (PreparedStatement pstmt = _concierge.conn().prepareStatement(SELECT_THREAD_LOCKS_SQL);){
+        try (PreparedStatement pstmt = _concierge.conn().prepareStatement(SELECT_THREAD_LOCKS_SQL);) {
             pstmt.setLong(1, msId);
             pstmt.setString(2, threadName);
-            try (ResultSet rs =pstmt.executeQuery();) {
+            try (ResultSet rs = pstmt.executeQuery();) {
                 return toLocks(rs);
-            }
-            catch (Exception e) {
-                s_logger.error("getLocksAcquiredBy:Exception:"+e.getMessage());
+            } catch (Exception e) {
+                s_logger.error("getLocksAcquiredBy:Exception:" + e.getMessage());
                 throw new CloudRuntimeException("Can't get locks " + pstmt, e);
             }
         } catch (Exception e) {
-            s_logger.error("getLocksAcquiredBy:Exception:"+e.getMessage());
-            throw new CloudRuntimeException("getLocksAcquiredBy:Exception:"+e.getMessage(), e);
+            s_logger.error("getLocksAcquiredBy:Exception:" + e.getMessage());
+            throw new CloudRuntimeException("getLocksAcquiredBy:Exception:" + e.getMessage(), e);
         }
     }
 
@@ -382,31 +385,16 @@ public class Merovingian2 extends StandardMBean implements MerovingianMBean {
         Thread th = Thread.currentThread();
         String threadName = th.getName();
         int threadId = System.identityHashCode(th);
-        try (PreparedStatement pstmt = _concierge.conn().prepareStatement(CLEANUP_THREAD_LOCKS_SQL);)
-        {
+        try (PreparedStatement pstmt = _concierge.conn().prepareStatement(CLEANUP_THREAD_LOCKS_SQL);) {
             pstmt.setLong(1, _msId);
             pstmt.setString(2, threadName);
             pstmt.setInt(3, threadId);
             int rows = pstmt.executeUpdate();
             assert (false) : "Abandon hope, all ye who enter here....There were still " + rows + ":" + c +
-            " locks not released when the transaction ended, check for lock not released or @DB is not added to the code that using the locks!";
+                    " locks not released when the transaction ended, check for lock not released or @DB is not added to the code that using the locks!";
         } catch (Exception e) {
-            s_logger.error("cleanupThread:Exception:" +  e.getMessage());
-            throw new CloudRuntimeException("cleanupThread:Exception:" +  e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public boolean releaseLockAsLastResortAndIReallyKnowWhatIAmDoing(String key) {
-        s_logger.info("Releasing a lock from JMX lck-" + key);
-        try (PreparedStatement pstmt = _concierge.conn().prepareStatement(RELEASE_LOCK_SQL);)
-        {
-            pstmt.setString(1, key);
-            int rows = pstmt.executeUpdate();
-            return rows > 0;
-        } catch (Exception e) {
-            s_logger.error("releaseLockAsLastResortAndIReallyKnowWhatIAmDoing : Exception: " +  e.getMessage());
-            return  false;
+            s_logger.error("cleanupThread:Exception:" + e.getMessage());
+            throw new CloudRuntimeException("cleanupThread:Exception:" + e.getMessage(), e);
         }
     }
 

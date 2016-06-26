@@ -16,13 +16,13 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -45,15 +45,15 @@ public class NetworkExternalLoadBalancerDaoImpl extends GenericDaoBase<NetworkEx
     }
 
     @Override
-    public NetworkExternalLoadBalancerVO findByNetworkId(long networkId) {
-        SearchCriteria<NetworkExternalLoadBalancerVO> sc = networkIdSearch.create();
+    public NetworkExternalLoadBalancerVO findByNetworkId(final long networkId) {
+        final SearchCriteria<NetworkExternalLoadBalancerVO> sc = networkIdSearch.create();
         sc.setParameters("networkId", networkId);
         return findOneBy(sc);
     }
 
     @Override
-    public List<NetworkExternalLoadBalancerVO> listByLoadBalancerDeviceId(long lbDeviceId) {
-        SearchCriteria<NetworkExternalLoadBalancerVO> sc = deviceIdSearch.create();
+    public List<NetworkExternalLoadBalancerVO> listByLoadBalancerDeviceId(final long lbDeviceId) {
+        final SearchCriteria<NetworkExternalLoadBalancerVO> sc = deviceIdSearch.create();
         sc.setParameters("externalLBDeviceId", lbDeviceId);
         return search(sc, null);
     }

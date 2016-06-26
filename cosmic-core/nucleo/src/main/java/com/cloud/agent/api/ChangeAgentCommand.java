@@ -45,5 +45,4 @@ public class ChangeAgentCommand extends Command {
     public boolean executeInSequence() {
         return false;
     }
-
 }

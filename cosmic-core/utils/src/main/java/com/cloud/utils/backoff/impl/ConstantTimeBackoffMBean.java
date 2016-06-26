@@ -19,9 +19,9 @@
 
 package com.cloud.utils.backoff.impl;
 
-import java.util.Collection;
-
 import com.cloud.utils.mgmt.ManagementBean;
+
+import java.util.Collection;
 
 public interface ConstantTimeBackoffMBean extends ManagementBean {
     public long getTimeToWait();
@@ -31,5 +31,4 @@ public interface ConstantTimeBackoffMBean extends ManagementBean {
     Collection<String> getWaiters();
 
     boolean wakeup(String threadName);
-
 }

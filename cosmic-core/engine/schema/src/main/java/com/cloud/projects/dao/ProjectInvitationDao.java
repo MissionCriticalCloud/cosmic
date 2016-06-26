@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.projects.dao;
 
-import java.util.List;
-
 import com.cloud.projects.ProjectInvitation.State;
 import com.cloud.projects.ProjectInvitationVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface ProjectInvitationDao extends GenericDao<ProjectInvitationVO, Long> {
     ProjectInvitationVO findByAccountIdProjectId(long accountId, long projectId, State... inviteState);
@@ -40,5 +40,4 @@ public interface ProjectInvitationDao extends GenericDao<ProjectInvitationVO, Lo
     ProjectInvitationVO findPendingById(long id);
 
     List<ProjectInvitationVO> listInvitationsToExpire(long timeOut);
-
 }

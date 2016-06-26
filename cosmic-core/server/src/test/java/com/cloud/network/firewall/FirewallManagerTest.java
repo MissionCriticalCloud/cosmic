@@ -24,9 +24,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.IpAddressManager;
@@ -45,8 +42,12 @@ import com.cloud.network.vpc.VpcManager;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainManager;
 import com.cloud.utils.component.ComponentContext;
-
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -58,8 +59,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import junit.framework.Assert;
-
 //@Ignore("Requires database to be set up")
 @RunWith(MockitoJUnitRunner.class)
 //@ContextConfiguration(locations = "classpath:/testContext.xml")
@@ -67,48 +66,17 @@ import junit.framework.Assert;
 public class FirewallManagerTest {
     private static final Logger s_logger = LoggerFactory.getLogger(FirewallManagerTest.class);
 
-//    @Before
-//    public void setUp() {
-//        Logger daoLogger = LoggerFactory.getLogger(GenericDaoBase.class);
-//        Logger cloudLogger = LoggerFactory.getLogger("com.cloud");
-//
-//        componentlogger.setLevel(Level.WARN);
-//        daoLogger.setLevel(Level.ERROR);
-//        cloudLogger.setLevel(Level.ERROR);
-//        s_logger.setLevel(Level.INFO);
-//        super.setUp();
-//    }
-
-    @Ignore("Requires database to be set up")
-    @Test
-    public void testInjected() {
-
-//        FirewallManagerImpl firewallMgr = (FirewallManagerImpl)ComponentLocator.getCurrentLocator().getManager(FirewallManager.class);
-//        Assert.assertTrue(firewallMgr._firewallElements.enumeration().hasMoreElements());
-//        Assert.assertTrue(firewallMgr._pfElements.enumeration().hasMoreElements());
-//        Assert.assertTrue(firewallMgr._staticNatElements.enumeration().hasMoreElements());
-//        Assert.assertTrue(firewallMgr._networkAclElements.enumeration().hasMoreElements());
-//        Assert.assertNotNull(firewallMgr._networkModel);
-//
-//        Assert.assertNotNull(firewallMgr._firewallElements.get("VirtualRouter"));
-//        Assert.assertNotNull(firewallMgr._firewallElements.get("VpcVirtualRouter"));
-//        Assert.assertNotNull(firewallMgr._pfElements.get("VirtualRouter"));
-//        Assert.assertNotNull(firewallMgr._pfElements.get("VpcVirtualRouter"));
-//        Assert.assertNotNull(firewallMgr._staticNatElements.get("VirtualRouter"));
-//        Assert.assertNotNull(firewallMgr._staticNatElements.get("VpcVirtualRouter"));
-//        Assert.assertNotNull(firewallMgr._networkAclElements.get("VpcVirtualRouter"));
-//        Assert.assertNull(firewallMgr._networkAclElements.get("VirtualRouter"));
-//
-//
-//        Assert.assertTrue(firewallMgr._firewallElements.get("VirtualRouter") instanceof FirewallServiceProvider);
-//        Assert.assertTrue(firewallMgr._pfElements.get("VirtualRouter") instanceof PortForwardingServiceProvider);
-//        Assert.assertTrue(firewallMgr._staticNatElements.get("VirtualRouter") instanceof StaticNatServiceProvider);
-//        Assert.assertTrue(firewallMgr._networkAclElements.get("VpcVirtualRouter") instanceof NetworkACLServiceProvider);
-
-        s_logger.info("Done testing injection of service elements into firewall manager");
-
-    }
-
+    //    @Before
+    //    public void setUp() {
+    //        Logger daoLogger = LoggerFactory.getLogger(GenericDaoBase.class);
+    //        Logger cloudLogger = LoggerFactory.getLogger("com.cloud");
+    //
+    //        componentlogger.setLevel(Level.WARN);
+    //        daoLogger.setLevel(Level.ERROR);
+    //        cloudLogger.setLevel(Level.ERROR);
+    //        s_logger.setLevel(Level.INFO);
+    //        super.setUp();
+    //    }
     @Mock
     AccountManager _accountMgr;
     @Mock
@@ -123,9 +91,37 @@ public class FirewallManagerTest {
     IpAddressManager _ipAddrMgr;
     @Mock
     FirewallRulesDao _firewallDao;
-
     @InjectMocks
     FirewallManager _firewallMgr = new FirewallManagerImpl();
+
+    @Ignore("Requires database to be set up")
+    @Test
+    public void testInjected() {
+
+        //        FirewallManagerImpl firewallMgr = (FirewallManagerImpl)ComponentLocator.getCurrentLocator().getManager(FirewallManager.class);
+        //        Assert.assertTrue(firewallMgr._firewallElements.enumeration().hasMoreElements());
+        //        Assert.assertTrue(firewallMgr._pfElements.enumeration().hasMoreElements());
+        //        Assert.assertTrue(firewallMgr._staticNatElements.enumeration().hasMoreElements());
+        //        Assert.assertTrue(firewallMgr._networkAclElements.enumeration().hasMoreElements());
+        //        Assert.assertNotNull(firewallMgr._networkModel);
+        //
+        //        Assert.assertNotNull(firewallMgr._firewallElements.get("VirtualRouter"));
+        //        Assert.assertNotNull(firewallMgr._firewallElements.get("VpcVirtualRouter"));
+        //        Assert.assertNotNull(firewallMgr._pfElements.get("VirtualRouter"));
+        //        Assert.assertNotNull(firewallMgr._pfElements.get("VpcVirtualRouter"));
+        //        Assert.assertNotNull(firewallMgr._staticNatElements.get("VirtualRouter"));
+        //        Assert.assertNotNull(firewallMgr._staticNatElements.get("VpcVirtualRouter"));
+        //        Assert.assertNotNull(firewallMgr._networkAclElements.get("VpcVirtualRouter"));
+        //        Assert.assertNull(firewallMgr._networkAclElements.get("VirtualRouter"));
+        //
+        //
+        //        Assert.assertTrue(firewallMgr._firewallElements.get("VirtualRouter") instanceof FirewallServiceProvider);
+        //        Assert.assertTrue(firewallMgr._pfElements.get("VirtualRouter") instanceof PortForwardingServiceProvider);
+        //        Assert.assertTrue(firewallMgr._staticNatElements.get("VirtualRouter") instanceof StaticNatServiceProvider);
+        //        Assert.assertTrue(firewallMgr._networkAclElements.get("VpcVirtualRouter") instanceof NetworkACLServiceProvider);
+
+        s_logger.info("Done testing injection of service elements into firewall manager");
+    }
 
     @Before
     public void initMocks() {
@@ -138,7 +134,7 @@ public class FirewallManagerTest {
         List<FirewallRuleVO> ruleList = new ArrayList<FirewallRuleVO>();
         FirewallRuleVO rule = new FirewallRuleVO("rule1", 1, 80, "TCP", 1, 2, 1, FirewallRule.Purpose.Firewall, null, null, null, null);
         ruleList.add(rule);
-        FirewallManagerImpl firewallMgr = (FirewallManagerImpl)_firewallMgr;
+        FirewallManagerImpl firewallMgr = (FirewallManagerImpl) _firewallMgr;
 
         NetworkOrchestrationService netMgr = mock(NetworkOrchestrationService.class);
         IpAddressManager addrMgr = mock(IpAddressManager.class);
@@ -147,7 +143,6 @@ public class FirewallManagerTest {
         try {
             firewallMgr.applyRules(ruleList, false, false);
             verify(addrMgr).applyRules(any(List.class), any(FirewallRule.Purpose.class), any(NetworkRuleApplier.class), anyBoolean());
-
         } catch (ResourceUnavailableException e) {
             Assert.fail("Unreachable code");
         }
@@ -159,7 +154,7 @@ public class FirewallManagerTest {
         List<FirewallRuleVO> ruleList = new ArrayList<FirewallRuleVO>();
         FirewallRuleVO rule = new FirewallRuleVO("rule1", 1, 80, "TCP", 1, 2, 1, FirewallRule.Purpose.Firewall, null, null, null, null);
         ruleList.add(rule);
-        FirewallManagerImpl firewallMgr = (FirewallManagerImpl)_firewallMgr;
+        FirewallManagerImpl firewallMgr = (FirewallManagerImpl) _firewallMgr;
         VirtualRouterElement virtualRouter = mock(VirtualRouterElement.class);
         VpcVirtualRouterElement vpcVirtualRouter = mock(VpcVirtualRouterElement.class);
 
@@ -176,7 +171,6 @@ public class FirewallManagerTest {
             firewallMgr.applyRules(mock(Network.class), Purpose.Firewall, ruleList);
             verify(vpcVirtualRouter).applyFWRules(any(Network.class), any(List.class));
             verify(virtualRouter).applyFWRules(any(Network.class), any(List.class));
-
         } catch (ResourceUnavailableException e) {
             Assert.fail("Unreachable code");
         }
@@ -193,9 +187,9 @@ public class FirewallManagerTest {
         ruleList.add(rule2);
         ruleList.add(rule3);
 
-        FirewallManagerImpl firewallMgr = (FirewallManagerImpl)_firewallMgr;
+        FirewallManagerImpl firewallMgr = (FirewallManagerImpl) _firewallMgr;
 
-        when(firewallMgr._firewallDao.listByIpAndPurposeAndNotRevoked(3,null)).thenReturn(ruleList);
+        when(firewallMgr._firewallDao.listByIpAndPurposeAndNotRevoked(3, null)).thenReturn(ruleList);
         when(rule1.getId()).thenReturn(1L);
         when(rule2.getId()).thenReturn(2L);
         when(rule3.getId()).thenReturn(3L);
@@ -208,12 +202,8 @@ public class FirewallManagerTest {
             firewallMgr.detectRulesConflict(newRule1);
             firewallMgr.detectRulesConflict(newRule2);
             firewallMgr.detectRulesConflict(newRule3);
-        }
-        catch (NetworkRuleConflictException ex) {
+        } catch (NetworkRuleConflictException ex) {
             Assert.fail();
         }
     }
-
-
-
 }

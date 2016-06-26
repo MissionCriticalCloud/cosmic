@@ -16,7 +16,7 @@
 // under the License.
 package com.cloud.tags;
 
-import java.util.UUID;
+import com.cloud.server.ResourceTag;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,46 +26,35 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.server.ResourceTag;
-
+import java.util.UUID;
 
 @Entity
 @Table(name = "resource_tags")
 public class ResourceTagVO implements ResourceTag {
 
+    @Column(name = "value")
+    String value;
+    @Column(name = "domain_id")
+    long domainId;
+    @Column(name = "account_id")
+    long accountId;
+    @Column(name = "resource_id")
+    long resourceId;
+    @Column(name = "customer")
+    String customer;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "key")
     private String key;
-
-    @Column(name = "value")
-    String value;
-
-    @Column(name = "domain_id")
-    long domainId;
-
-    @Column(name = "account_id")
-    long accountId;
-
-    @Column(name = "resource_id")
-    long resourceId;
-
     @Column(name = "resource_uuid")
     private String resourceUuid;
-
     @Column(name = "resource_type")
     @Enumerated(value = EnumType.STRING)
     private ResourceObjectType resourceType;
-
-    @Column(name = "customer")
-    String customer;
 
     protected ResourceTagVO() {
         uuid = UUID.randomUUID().toString();
@@ -78,7 +67,7 @@ public class ResourceTagVO implements ResourceTag {
      * @param domainId
      * @param resourceId
      * @param resourceType
-     * @param customer TODO
+     * @param customer     TODO
      * @param resourceUuid TODO
      */
     public ResourceTagVO(String key, String value, long accountId, long domainId, long resourceId, ResourceObjectType resourceType, String customer, String resourceUuid) {
@@ -98,18 +87,18 @@ public class ResourceTagVO implements ResourceTag {
     public String toString() {
         StringBuilder buf = new StringBuilder("Tag[");
         buf.append(id)
-            .append("|key=")
-            .append(key)
-            .append("|value=")
-            .append(domainId)
-            .append("|value=")
-            .append("|resourceType=")
-            .append(resourceType)
-            .append("|resourceId=")
-            .append(resourceId)
-            .append("|accountId=")
-            .append(accountId)
-            .append("]");
+           .append("|key=")
+           .append(key)
+           .append("|value=")
+           .append(domainId)
+           .append("|value=")
+           .append("|resourceType=")
+           .append(resourceType)
+           .append("|resourceId=")
+           .append(resourceId)
+           .append("|accountId=")
+           .append(accountId)
+           .append("]");
         return buf.toString();
     }
 
@@ -129,32 +118,18 @@ public class ResourceTagVO implements ResourceTag {
     }
 
     @Override
-    public long getDomainId() {
-        return domainId;
-    }
-
-    @Override
-    public long getAccountId() {
-        return accountId;
-    }
-
-    @Override
     public long getResourceId() {
         return resourceId;
     }
 
-    @Override public void setResourceId(long resourceId) {
+    @Override
+    public void setResourceId(long resourceId) {
         this.resourceId = resourceId;
     }
 
     @Override
     public ResourceObjectType getResourceType() {
         return resourceType;
-    }
-
-    @Override
-    public String getUuid() {
-        return uuid;
     }
 
     @Override
@@ -165,6 +140,21 @@ public class ResourceTagVO implements ResourceTag {
     @Override
     public String getResourceUuid() {
         return resourceUuid;
+    }
+
+    @Override
+    public long getDomainId() {
+        return domainId;
+    }
+
+    @Override
+    public long getAccountId() {
+        return accountId;
+    }
+
+    @Override
+    public String getUuid() {
+        return uuid;
     }
 
     @Override

@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.user;
 
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = "user_statistics")
@@ -134,12 +134,12 @@ public class UserStatisticsVO implements InternalIdentity {
         return netBytesReceived;
     }
 
-    public long getNetBytesSent() {
-        return netBytesSent;
-    }
-
     public void setNetBytesReceived(long netBytesReceived) {
         this.netBytesReceived = netBytesReceived;
+    }
+
+    public long getNetBytesSent() {
+        return netBytesSent;
     }
 
     public void setNetBytesSent(long netBytesSent) {
@@ -161,5 +161,4 @@ public class UserStatisticsVO implements InternalIdentity {
     public void setAggBytesSent(long aggBytesSent) {
         this.aggBytesSent = aggBytesSent;
     }
-
 }

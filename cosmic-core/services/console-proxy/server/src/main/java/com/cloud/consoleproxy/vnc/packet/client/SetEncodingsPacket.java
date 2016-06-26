@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.consoleproxy.vnc.packet.client;
 
+import com.cloud.consoleproxy.vnc.RfbConstants;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
-
-import com.cloud.consoleproxy.vnc.RfbConstants;
 
 public class SetEncodingsPacket implements ClientPacket {
 
@@ -41,5 +41,4 @@ public class SetEncodingsPacket implements ClientPacket {
             os.writeInt(encodings[i]);
         }
     }
-
 }

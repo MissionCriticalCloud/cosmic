@@ -18,13 +18,8 @@
  */
 package org.apache.cloudstack.storage.cache.allocator;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.server.StatsCollector;
 import com.cloud.storage.ScopeType;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
@@ -33,6 +28,10 @@ import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreState
 import org.apache.cloudstack.engine.subsystem.api.storage.Scope;
 import org.apache.cloudstack.storage.datastore.ObjectInDataStoreManager;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreProviderManager;
+
+import javax.inject.Inject;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

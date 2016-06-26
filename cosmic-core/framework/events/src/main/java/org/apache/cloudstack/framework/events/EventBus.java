@@ -23,7 +23,6 @@ import java.util.UUID;
 
 /**
  * Interface to publish and subscribe to CloudStack events
- *
  */
 public interface EventBus {
 
@@ -37,7 +36,7 @@ public interface EventBus {
     /**
      * subscribe to events that matches specified event topics
      *
-     * @param topic defines category and type of the events being subscribed to
+     * @param topic      defines category and type of the events being subscribed to
      * @param subscriber subscriber that intends to receive event notification
      * @return UUID returns the subscription ID
      */
@@ -49,5 +48,4 @@ public interface EventBus {
      * @param subscriber subscriber that intends to unsubscribe from the event notification
      */
     void unsubscribe(UUID subscriberId, EventSubscriber subscriber) throws EventBusException;
-
 }

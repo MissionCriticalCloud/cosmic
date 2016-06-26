@@ -16,15 +16,15 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.util.List;
-
 import com.cloud.api.query.vo.ProjectInvitationJoinVO;
 import com.cloud.projects.ProjectInvitation;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.response.ProjectInvitationResponse;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -75,5 +75,4 @@ public class ProjectInvitationJoinDaoImpl extends GenericDaoBase<ProjectInvitati
         assert grps != null && grps.size() == 1 : "No project invitation found for id  " + proj.getId();
         return grps.get(0);
     }
-
 }

@@ -16,7 +16,6 @@
 // under the License.
 package com.cloud.network.vpc;
 
-
 public class PrivateGatewayProfile implements PrivateGateway {
     VpcGateway vpcGateway;
     long physicalNetworkId;
@@ -62,16 +61,6 @@ public class PrivateGatewayProfile implements PrivateGateway {
     }
 
     @Override
-    public String getUuid() {
-        return vpcGateway.getUuid();
-    }
-
-    @Override
-    public String getBroadcastUri() {
-        return vpcGateway.getBroadcastUri();
-    }
-
-    @Override
     public String getGateway() {
         return vpcGateway.getGateway();
     }
@@ -82,18 +71,8 @@ public class PrivateGatewayProfile implements PrivateGateway {
     }
 
     @Override
-    public long getPhysicalNetworkId() {
-        return physicalNetworkId;
-    }
-
-    @Override
-    public long getAccountId() {
-        return vpcGateway.getAccountId();
-    }
-
-    @Override
-    public long getDomainId() {
-        return vpcGateway.getDomainId();
+    public String getBroadcastUri() {
+        return vpcGateway.getBroadcastUri();
     }
 
     @Override
@@ -109,6 +88,26 @@ public class PrivateGatewayProfile implements PrivateGateway {
     @Override
     public long getNetworkACLId() {
         return vpcGateway.getNetworkACLId();
+    }
+
+    @Override
+    public String getUuid() {
+        return vpcGateway.getUuid();
+    }
+
+    @Override
+    public long getPhysicalNetworkId() {
+        return physicalNetworkId;
+    }
+
+    @Override
+    public long getAccountId() {
+        return vpcGateway.getAccountId();
+    }
+
+    @Override
+    public long getDomainId() {
+        return vpcGateway.getDomainId();
     }
 
     @Override

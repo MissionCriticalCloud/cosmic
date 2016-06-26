@@ -16,9 +16,6 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.State;
@@ -26,6 +23,9 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.fsm.StateDao;
+
+import java.util.List;
+import java.util.Map;
 
 public interface NetworkDao extends GenericDao<NetworkVO, Long>, StateDao<State, Network.Event, Network> {
 
@@ -52,8 +52,7 @@ public interface NetworkDao extends GenericDao<NetworkVO, Long>, StateDao<State,
     /**
      * Retrieves the next available mac address in this network configuration.
      *
-     * @param networkConfigId
-     *            id
+     * @param networkConfigId id
      * @return mac address if there is one. null if not.
      */
     String getNextAvailableMacAddress(long networkConfigId);

@@ -16,7 +16,6 @@
 // under the License.
 package com.cloud.gpu;
 
-
 public class GPU {
 
     public enum Keys {
@@ -34,9 +33,9 @@ public class GPU {
         GRID_K260("GRID K260Q"),
         passthrough("passthrough");
 
-        private String type;
+        private final String type;
 
-        GPUType(String type) {
+        GPUType(final String type) {
             this.type = type;
         }
 

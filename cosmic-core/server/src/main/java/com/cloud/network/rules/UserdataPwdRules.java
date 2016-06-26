@@ -27,7 +27,6 @@ import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.UserVmDao;
-
 import org.apache.cloudstack.network.topology.NetworkTopologyVisitor;
 
 public class UserdataPwdRules extends RuleApplier {

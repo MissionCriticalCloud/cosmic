@@ -22,7 +22,6 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.TrafficType;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -32,6 +31,7 @@ import org.apache.cloudstack.api.response.AccountResponse;
 import org.apache.cloudstack.api.response.FirewallResponse;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,8 @@ public class UpdateEgressFirewallRuleCmd extends BaseAsyncCustomIdCmd {
     @Parameter(name = ApiConstants.ACCOUNT_ID, type = CommandType.UUID, entityType = AccountResponse.class, expose = false)
     private Long ownerId;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4" +
+            ".4", authorized = {RoleType.Admin})
     private Boolean display;
 
     // ///////////////////////////////////////////////////
@@ -62,18 +63,6 @@ public class UpdateEgressFirewallRuleCmd extends BaseAsyncCustomIdCmd {
 
     public Long getId() {
         return id;
-    }
-
-    public Boolean getDisplay() {
-        return display;
-    }
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
     }
 
     @Override
@@ -88,24 +77,17 @@ public class UpdateEgressFirewallRuleCmd extends BaseAsyncCustomIdCmd {
         }
         fwResponse.setResponseName(getCommandName());
     }
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
 
-    @Override
-    public void checkUuid() {
-        if (this.getCustomId() != null) {
-            _uuidMgr.checkUuid(this.getCustomId(), FirewallRule.class);
-        }
+    public Boolean getDisplay() {
+        return display;
     }
 
     @Override
-    public String getEventType() {
-        return EventTypes.EVENT_FIREWALL_EGRESS_UPDATE;
-
-    }
-
-    @Override
-    public String getEventDescription() {
-        return ("Updating egress firewall rule id=" + id);
-
+    public String getCommandName() {
+        return s_name;
     }
 
     @Override
@@ -119,5 +101,22 @@ public class UpdateEgressFirewallRuleCmd extends BaseAsyncCustomIdCmd {
             }
         }
         return ownerId;
+    }
+
+    @Override
+    public void checkUuid() {
+        if (this.getCustomId() != null) {
+            _uuidMgr.checkUuid(this.getCustomId(), FirewallRule.class);
+        }
+    }
+
+    @Override
+    public String getEventType() {
+        return EventTypes.EVENT_FIREWALL_EGRESS_UPDATE;
+    }
+
+    @Override
+    public String getEventDescription() {
+        return ("Updating egress firewall rule id=" + id);
     }
 }

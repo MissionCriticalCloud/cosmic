@@ -16,9 +16,8 @@
 // under the License.
 package com.cloud.storage;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import com.cloud.offering.DiskOffering;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -35,9 +34,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-
-import com.cloud.offering.DiskOffering;
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "disk_offering")
@@ -52,94 +51,68 @@ public class DiskOfferingVO implements DiskOffering {
 
     @Column(name = "domain_id")
     Long domainId;
-
-    @Column(name = "unique_name")
-    private String uniqueName;
-
-    @Column(name = "name")
-    private String name = null;
-
-    @Column(name = "display_text", length = 4096)
-    private String displayText = null;
-
     @Column(name = "disk_size")
     long diskSize;
-
     @Column(name = "tags", length = 4096)
     String tags;
-
     @Column(name = "type")
     Type type;
-
-    @Column(name = GenericDao.REMOVED_COLUMN)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date removed;
-
-    @Column(name = GenericDao.CREATED_COLUMN)
-    private Date created;
-
-    @Column(name = "recreatable")
-    private boolean recreatable;
-
-    @Column(name = "use_local_storage")
-    private boolean useLocalStorage;
-
-    @Column(name = "system_use")
-    private boolean systemUse;
-
-    @Column(name = "customized")
-    private boolean customized;
-
-    @Column(name = "uuid")
-    private String uuid;
-
-    @Column(name = "customized_iops")
-    private Boolean customizedIops;
-
-    @Column(name = "min_iops")
-    private Long minIops;
-
-    @Column(name = "max_iops")
-    private Long maxIops;
-
     @Column(name = "sort_key")
     int sortKey;
-
     @Column(name = "bytes_read_rate")
     Long bytesReadRate;
-
     @Column(name = "bytes_write_rate")
     Long bytesWriteRate;
-
     @Column(name = "iops_read_rate")
     Long iopsReadRate;
-
     @Column(name = "iops_write_rate")
     Long iopsWriteRate;
-
-    @Column(name = "cache_mode", updatable = true, nullable = false)
-    @Enumerated(value = EnumType.STRING)
-    private DiskCacheMode cacheMode;
-
-    @Column(name="provisioning_type")
+    @Column(name = "provisioning_type")
     Storage.ProvisioningType provisioningType;
-
-    @Column(name="display_offering")
+    @Column(name = "display_offering")
     boolean displayOffering = true;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "state")
     State state;
-
     @Column(name = "hv_ss_reserve")
     Integer hypervisorSnapshotReserve;
+    @Column(name = "unique_name")
+    private String uniqueName;
+    @Column(name = "name")
+    private String name = null;
+    @Column(name = "display_text", length = 4096)
+    private String displayText = null;
+    @Column(name = GenericDao.REMOVED_COLUMN)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date removed;
+    @Column(name = GenericDao.CREATED_COLUMN)
+    private Date created;
+    @Column(name = "recreatable")
+    private boolean recreatable;
+    @Column(name = "use_local_storage")
+    private boolean useLocalStorage;
+    @Column(name = "system_use")
+    private boolean systemUse;
+    @Column(name = "customized")
+    private boolean customized;
+    @Column(name = "uuid")
+    private String uuid;
+    @Column(name = "customized_iops")
+    private Boolean customizedIops;
+    @Column(name = "min_iops")
+    private Long minIops;
+    @Column(name = "max_iops")
+    private Long maxIops;
+    @Column(name = "cache_mode", updatable = true, nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private DiskCacheMode cacheMode;
 
     public DiskOfferingVO() {
         uuid = UUID.randomUUID().toString();
     }
 
     public DiskOfferingVO(Long domainId, String name, String displayText, Storage.ProvisioningType provisioningType, long diskSize, String tags, boolean isCustomized,
-            Boolean isCustomizedIops, Long minIops, Long maxIops, DiskCacheMode cacheMode) {
+                          Boolean isCustomizedIops, Long minIops, Long maxIops, DiskCacheMode cacheMode) {
         this.domainId = domainId;
         this.name = name;
         this.displayText = displayText;
@@ -158,7 +131,7 @@ public class DiskOfferingVO implements DiskOffering {
     }
 
     public DiskOfferingVO(Long domainId, String name, String displayText, Storage.ProvisioningType provisioningType, long diskSize, String tags, boolean isCustomized,
-            Boolean isCustomizedIops, Long minIops, Long maxIops) {
+                          Boolean isCustomizedIops, Long minIops, Long maxIops) {
         this.domainId = domainId;
         this.name = name;
         this.displayText = displayText;
@@ -177,7 +150,7 @@ public class DiskOfferingVO implements DiskOffering {
     }
 
     public DiskOfferingVO(String name, String displayText, Storage.ProvisioningType provisioningType, boolean mirrored, String tags, boolean recreatable,
-            boolean useLocalStorage, boolean systemUse, boolean customized) {
+                          boolean useLocalStorage, boolean systemUse, boolean customized) {
         domainId = null;
         type = Type.Service;
         this.name = name;
@@ -195,7 +168,7 @@ public class DiskOfferingVO implements DiskOffering {
     // domain specific offerings constructor (null domainId implies public
     // offering)
     public DiskOfferingVO(String name, String displayText, Storage.ProvisioningType provisioningType, boolean mirrored, String tags, boolean recreatable,
-            boolean useLocalStorage, boolean systemUse, boolean customized, Long domainId) {
+                          boolean useLocalStorage, boolean systemUse, boolean customized, Long domainId) {
         type = Type.Service;
         this.name = name;
         this.displayText = displayText;
@@ -211,7 +184,7 @@ public class DiskOfferingVO implements DiskOffering {
     }
 
     public DiskOfferingVO(long id, String name, String displayText, Storage.ProvisioningType provisioningType, boolean mirrored, String tags, boolean recreatable,
-            boolean useLocalStorage, boolean systemUse, boolean customized, boolean customizedIops, Long domainId, Long minIops, Long maxIops) {
+                          boolean useLocalStorage, boolean systemUse, boolean customized, boolean customizedIops, Long domainId, Long minIops, Long maxIops) {
         this.id = id;
         type = Type.Service;
         this.name = name;
@@ -240,60 +213,6 @@ public class DiskOfferingVO implements DiskOffering {
     }
 
     @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public boolean isCustomized() {
-        return customized;
-    }
-
-    public void setCustomized(boolean customized) {
-        this.customized = customized;
-    }
-
-    @Override
-    public Boolean isCustomizedIops() {
-        return customizedIops;
-    }
-
-    @Override
-    public void setCustomizedIops(Boolean customizedIops) {
-        this.customizedIops = customizedIops;
-    }
-
-    @Override
-    public Long getMinIops() {
-        return minIops;
-    }
-
-    @Override
-    public void setMinIops(Long minIops) {
-        this.minIops = minIops;
-    }
-
-    @Override
-    public Long getMaxIops() {
-        return maxIops;
-    }
-
-    @Override
-    public void setMaxIops(Long maxIops) {
-        this.maxIops = maxIops;
-    }
-
-    @Override
-    public DiskCacheMode getCacheMode() {
-        return cacheMode;
-    }
-
-    @Override
-    public void setCacheMode(DiskCacheMode cacheMode) {
-        this.cacheMode = cacheMode;
-    }
-
-    @Override
     public String getUniqueName() {
         return uniqueName;
     }
@@ -306,15 +225,6 @@ public class DiskOfferingVO implements DiskOffering {
     @Override
     public Long getDomainId() {
         return domainId;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    @Override
-    public boolean isRecreatable() {
-        return recreatable;
     }
 
     public void setDomainId(Long domainId) {
@@ -349,31 +259,8 @@ public class DiskOfferingVO implements DiskOffering {
     }
 
     @Override
-    public Storage.ProvisioningType getProvisioningType(){
+    public Storage.ProvisioningType getProvisioningType() {
         return provisioningType;
-    }
-
-    @Override
-    public long getDiskSize() {
-        return diskSize;
-    }
-
-    @Override
-    public void setDiskSize(long diskSize) {
-        this.diskSize = diskSize;
-    }
-
-    public Date getRemoved() {
-        return removed;
-    }
-
-    @Override
-    public Date getCreated() {
-        return created;
-    }
-
-    protected void setTags(String tags) {
-        this.tags = tags;
     }
 
     @Override
@@ -381,8 +268,8 @@ public class DiskOfferingVO implements DiskOffering {
         return tags;
     }
 
-    public void setUniqueName(String name) {
-        uniqueName = name;
+    protected void setTags(String tags) {
+        this.tags = tags;
     }
 
     @Override
@@ -396,19 +283,131 @@ public class DiskOfferingVO implements DiskOffering {
         return tags.split(",");
     }
 
-    @Transient
-    public boolean containsTag(String... tags) {
-        if (this.tags == null) {
-            return false;
-        }
+    @Override
+    public Date getCreated() {
+        return created;
+    }
 
-        for (String tag : tags) {
-            if (!this.tags.matches(tag)) {
-                return false;
-            }
-        }
+    @Override
+    public boolean isCustomized() {
+        return customized;
+    }
 
-        return true;
+    public void setCustomized(boolean customized) {
+        this.customized = customized;
+    }
+
+    @Override
+    public long getDiskSize() {
+        return diskSize;
+    }
+
+    @Override
+    public void setDiskSize(long diskSize) {
+        this.diskSize = diskSize;
+    }
+
+    @Override
+    public void setCustomizedIops(Boolean customizedIops) {
+        this.customizedIops = customizedIops;
+    }
+
+    @Override
+    public Boolean isCustomizedIops() {
+        return customizedIops;
+    }
+
+    @Override
+    public Long getMinIops() {
+        return minIops;
+    }
+
+    @Override
+    public void setMinIops(Long minIops) {
+        this.minIops = minIops;
+    }
+
+    @Override
+    public Long getMaxIops() {
+        return maxIops;
+    }
+
+    @Override
+    public void setMaxIops(Long maxIops) {
+        this.maxIops = maxIops;
+    }
+
+    @Override
+    public boolean isRecreatable() {
+        return recreatable;
+    }
+
+    public void setRecreatable(boolean recreatable) {
+        this.recreatable = recreatable;
+    }
+
+    @Override
+    public Long getBytesReadRate() {
+        return bytesReadRate;
+    }
+
+    @Override
+    public void setBytesReadRate(Long bytesReadRate) {
+        this.bytesReadRate = bytesReadRate;
+    }
+
+    @Override
+    public Long getBytesWriteRate() {
+        return bytesWriteRate;
+    }
+
+    @Override
+    public void setBytesWriteRate(Long bytesWriteRate) {
+        this.bytesWriteRate = bytesWriteRate;
+    }
+
+    @Override
+    public Long getIopsReadRate() {
+        return iopsReadRate;
+    }
+
+    @Override
+    public void setIopsReadRate(Long iopsReadRate) {
+        this.iopsReadRate = iopsReadRate;
+    }
+
+    @Override
+    public Long getIopsWriteRate() {
+        return iopsWriteRate;
+    }
+
+    @Override
+    public void setIopsWriteRate(Long iopsWriteRate) {
+        this.iopsWriteRate = iopsWriteRate;
+    }
+
+    @Override
+    public Integer getHypervisorSnapshotReserve() {
+        return hypervisorSnapshotReserve;
+    }
+
+    @Override
+    public void setHypervisorSnapshotReserve(Integer hypervisorSnapshotReserve) {
+        this.hypervisorSnapshotReserve = hypervisorSnapshotReserve;
+    }
+
+    @Override
+    public DiskCacheMode getCacheMode() {
+        return cacheMode;
+    }
+
+    @Override
+    public void setCacheMode(DiskCacheMode cacheMode) {
+        this.cacheMode = cacheMode;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     @Transient
@@ -432,8 +431,36 @@ public class DiskOfferingVO implements DiskOffering {
         this.useLocalStorage = useLocalStorage;
     }
 
+    public void setUniqueName(String name) {
+        uniqueName = name;
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    public Date getRemoved() {
+        return removed;
+    }
+
     public void setRemoved(Date removed) {
         this.removed = removed;
+    }
+
+    @Transient
+    public boolean containsTag(String... tags) {
+        if (this.tags == null) {
+            return false;
+        }
+
+        for (String tag : tags) {
+            if (!this.tags.matches(tag)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -445,16 +472,12 @@ public class DiskOfferingVO implements DiskOffering {
         this.uuid = uuid;
     }
 
-    public void setSortKey(int key) {
-        sortKey = key;
-    }
-
     public int getSortKey() {
         return sortKey;
     }
 
-    public void setRecreatable(boolean recreatable) {
-        this.recreatable = recreatable;
+    public void setSortKey(int key) {
+        sortKey = key;
     }
 
     public boolean getDisplayOffering() {
@@ -463,55 +486,5 @@ public class DiskOfferingVO implements DiskOffering {
 
     public void setDisplayOffering(boolean displayOffering) {
         this.displayOffering = displayOffering;
-    }
-
-    @Override
-    public void setBytesReadRate(Long bytesReadRate) {
-        this.bytesReadRate = bytesReadRate;
-    }
-
-    @Override
-    public Long getBytesReadRate() {
-        return bytesReadRate;
-    }
-
-    @Override
-    public void setBytesWriteRate(Long bytesWriteRate) {
-        this.bytesWriteRate = bytesWriteRate;
-    }
-
-    @Override
-    public Long getBytesWriteRate() {
-        return bytesWriteRate;
-    }
-
-    @Override
-    public void setIopsReadRate(Long iopsReadRate) {
-        this.iopsReadRate = iopsReadRate;
-    }
-
-    @Override
-    public Long getIopsReadRate() {
-        return iopsReadRate;
-    }
-
-    @Override
-    public void setIopsWriteRate(Long iopsWriteRate) {
-        this.iopsWriteRate = iopsWriteRate;
-    }
-
-    @Override
-    public Long getIopsWriteRate() {
-        return iopsWriteRate;
-    }
-
-    @Override
-    public void setHypervisorSnapshotReserve(Integer hypervisorSnapshotReserve) {
-        this.hypervisorSnapshotReserve = hypervisorSnapshotReserve;
-    }
-
-    @Override
-    public Integer getHypervisorSnapshotReserve() {
-        return hypervisorSnapshotReserve;
     }
 }

@@ -16,10 +16,6 @@
 // under the License.
 package org.cloud.network.router.deployment;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.HostPodVO;
@@ -68,17 +64,19 @@ import com.cloud.vm.VirtualMachineProfile.Param;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RouterDeploymentDefinition {
-    private static final Logger logger = LoggerFactory.getLogger(RouterDeploymentDefinition.class);
-
     protected static final int LIMIT_NUMBER_OF_ROUTERS = 5;
     protected static final int MAX_NUMBER_OF_ROUTERS = 2;
-
+    private static final Logger logger = LoggerFactory.getLogger(RouterDeploymentDefinition.class);
     protected NetworkDao networkDao;
     protected DomainRouterDao routerDao;
     protected PhysicalNetworkServiceProviderDao physicalProviderDao;
@@ -386,7 +384,8 @@ public class RouterDeploymentDefinition {
     }
 
     protected void findDefaultServiceOfferingId() {
-        ServiceOfferingVO serviceOffering = serviceOfferingDao.findDefaultSystemOffering(ServiceOffering.routerDefaultOffUniqueName, ConfigurationManagerImpl.SystemVMUseLocalStorage.valueIn(dest.getDataCenter().getId()));
+        ServiceOfferingVO serviceOffering = serviceOfferingDao.findDefaultSystemOffering(ServiceOffering.routerDefaultOffUniqueName, ConfigurationManagerImpl
+                .SystemVMUseLocalStorage.valueIn(dest.getDataCenter().getId()));
         serviceOfferingId = serviceOffering.getId();
     }
 
@@ -431,6 +430,7 @@ public class RouterDeploymentDefinition {
     /**
      * Lists all pods given a Data Center Id, a {@link VirtualMachine.Type} and
      * a list of {@link VirtualMachine.State}
+     *
      * @param id
      * @param type
      * @param states

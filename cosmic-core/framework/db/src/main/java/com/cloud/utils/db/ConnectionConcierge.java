@@ -16,6 +16,12 @@
 // under the License.
 package com.cloud.utils.db;
 
+import com.cloud.utils.concurrency.NamedThreadFactory;
+import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.mgmt.JmxUtil;
+import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+
+import javax.management.StandardMBean;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -28,20 +34,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.management.StandardMBean;
-
-import com.cloud.utils.concurrency.NamedThreadFactory;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.mgmt.JmxUtil;
-
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * ConnectionConcierge keeps stand alone database connections alive.  This is
  * needs someone to keep that database connection from being garbage collected
- *
  */
 public class ConnectionConcierge {
 
@@ -87,10 +85,6 @@ public class ConnectionConcierge {
         s_logger.debug("Registering a database connection for " + _name);
     }
 
-    public final Connection conn() {
-        return _conn;
-    }
-
     public void release() {
         s_mgr.unregister(_name);
         try {
@@ -101,6 +95,10 @@ public class ConnectionConcierge {
         } catch (SQLException e) {
             throw new CloudRuntimeException("Problem in closing a connection", e);
         }
+    }
+
+    public final Connection conn() {
+        return _conn;
     }
 
     @Override
@@ -115,9 +113,9 @@ public class ConnectionConcierge {
     }
 
     protected static class ConnectionConciergeManager extends StandardMBean implements ConnectionConciergeMBean {
-        ScheduledExecutorService _executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("ConnectionKeeper"));
         final ConcurrentHashMap<String, ConnectionConcierge> _conns = new ConcurrentHashMap<String, ConnectionConcierge>();
         final AtomicInteger _idGenerator = new AtomicInteger();
+        ScheduledExecutorService _executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("ConnectionKeeper"));
 
         ConnectionConciergeManager() {
             super(ConnectionConciergeMBean.class, false);
@@ -127,18 +125,6 @@ public class ConnectionConcierge {
             } catch (Exception e) {
                 s_logger.error("Unable to register mbean", e);
             }
-        }
-
-        public Integer getNextId() {
-            return _idGenerator.incrementAndGet();
-        }
-
-        public void register(String name, ConnectionConcierge concierge) {
-            _conns.put(name, concierge);
-        }
-
-        public void unregister(String name) {
-            _conns.remove(name);
         }
 
         protected String testValidity(String name, Connection conn) {
@@ -153,6 +139,18 @@ public class ConnectionConcierge {
                 }
             }
             return null;
+        }
+
+        public Integer getNextId() {
+            return _idGenerator.incrementAndGet();
+        }
+
+        public void register(String name, ConnectionConcierge concierge) {
+            _conns.put(name, concierge);
+        }
+
+        public void unregister(String name) {
+            _conns.remove(name);
         }
 
         @Override

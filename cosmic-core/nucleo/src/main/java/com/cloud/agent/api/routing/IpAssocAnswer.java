@@ -22,9 +22,8 @@ package com.cloud.agent.api.routing;
 import com.cloud.agent.api.Answer;
 
 public class IpAssocAnswer extends Answer {
-    String[] results;
-
     public static final String errorResult = "Failed";
+    String[] results;
 
     protected IpAssocAnswer() {
         super();

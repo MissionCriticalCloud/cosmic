@@ -20,13 +20,12 @@ import com.cloud.storage.DataStoreRole;
 import com.cloud.utils.SwiftUtil;
 
 public class SwiftTO implements DataStoreTO, SwiftUtil.SwiftClientCfg {
+    private static final String pathSeparator = "/";
     Long id;
     String url;
     String account;
-
     String userName;
     String key;
-    private static final String pathSeparator = "/";
 
     public SwiftTO() {
     }
@@ -41,11 +40,6 @@ public class SwiftTO implements DataStoreTO, SwiftUtil.SwiftClientCfg {
 
     public Long getId() {
         return id;
-    }
-
-    @Override
-    public String getUrl() {
-        return url;
     }
 
     @Override
@@ -64,18 +58,23 @@ public class SwiftTO implements DataStoreTO, SwiftUtil.SwiftClientCfg {
     }
 
     @Override
-    public DataStoreRole getRole() {
-        return DataStoreRole.Image;
-    }
-
-    @Override
     public String getEndPoint() {
         return this.url;
     }
 
     @Override
+    public DataStoreRole getRole() {
+        return DataStoreRole.Image;
+    }
+
+    @Override
     public String getUuid() {
         return null;
+    }
+
+    @Override
+    public String getUrl() {
+        return url;
     }
 
     @Override

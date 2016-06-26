@@ -43,7 +43,7 @@ class LdapUserManagerFactorySpec extends spock.lang.Specification {
         def result = ldapUserManagerFactory.getInstance(id);
 
         def expected;
-        if(id == LdapUserManager.Provider.MICROSOFTAD) {
+        if (id == LdapUserManager.Provider.MICROSOFTAD) {
             expected = ADLdapUserManagerImpl.class;
         } else {
             expected = OpenLdapUserManagerImpl.class;

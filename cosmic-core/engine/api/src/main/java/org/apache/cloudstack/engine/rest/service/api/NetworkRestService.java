@@ -18,7 +18,7 @@
  */
 package org.apache.cloudstack.engine.rest.service.api;
 
-import java.util.List;
+import org.apache.cloudstack.engine.cloud.entity.api.NetworkEntity;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -27,8 +27,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-
-import org.apache.cloudstack.engine.cloud.entity.api.NetworkEntity;
+import java.util.List;
 
 @Produces("application/json")
 public class NetworkRestService {
@@ -55,5 +54,4 @@ public class NetworkRestService {
     public String deploy(@PathParam("network-id") String networkId) {
         return null;
     }
-
 }

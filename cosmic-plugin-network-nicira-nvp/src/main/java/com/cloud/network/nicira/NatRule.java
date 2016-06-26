@@ -78,53 +78,71 @@ public abstract class NatRule {
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        NatRule other = (NatRule)obj;
+        }
+        final NatRule other = (NatRule) obj;
         if (match == null) {
-            if (other.match != null)
+            if (other.match != null) {
                 return false;
-        } else if (!match.equals(other.match))
+            }
+        } else if (!match.equals(other.match)) {
             return false;
-        if (order != other.order)
+        }
+        if (order != other.order) {
             return false;
+        }
         if (type == null) {
-            if (other.type != null)
+            if (other.type != null) {
                 return false;
-        } else if (!type.equals(other.type))
+            }
+        } else if (!type.equals(other.type)) {
             return false;
+        }
         if (uuid == null) {
-            if (other.uuid != null)
+            if (other.uuid != null) {
                 return false;
-        } else if (!uuid.equals(other.uuid))
+            }
+        } else if (!uuid.equals(other.uuid)) {
             return false;
+        }
         return true;
     }
 
     public boolean equalsIgnoreUuid(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        NatRule other = (NatRule)obj;
+        }
+        final NatRule other = (NatRule) obj;
         if (match == null) {
-            if (other.match != null)
+            if (other.match != null) {
                 return false;
-        } else if (!match.equals(other.match))
+            }
+        } else if (!match.equals(other.match)) {
             return false;
-        if (order != other.order)
+        }
+        if (order != other.order) {
             return false;
+        }
         if (type == null) {
-            if (other.type != null)
+            if (other.type != null) {
                 return false;
-        } else if (!type.equals(other.type))
+            }
+        } else if (!type.equals(other.type)) {
             return false;
+        }
         return true;
     }
 }

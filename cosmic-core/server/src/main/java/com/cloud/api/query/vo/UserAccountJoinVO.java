@@ -16,109 +16,80 @@
 // under the License.
 package com.cloud.api.query.vo;
 
-import java.util.Date;
+import com.cloud.user.UserAccount;
+import com.cloud.utils.db.Encrypt;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.Identity;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.user.UserAccount;
-import com.cloud.utils.db.Encrypt;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "user_view")
 public class UserAccountJoinVO extends BaseViewVO implements InternalIdentity, Identity, ControlledViewEntity {
 
+    @Column(name = "is_registered")
+    boolean registered;
+    @Column(name = "incorrect_login_attempts")
+    int loginAttempts;
+    @Column(name = "default")
+    boolean isDefault;
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "username")
     private String username = null;
-
     @Column(name = "password")
     private String password = null;
-
     @Column(name = "firstname")
     private String firstname = null;
-
     @Column(name = "lastname")
     private String lastname = null;
-
     @Column(name = "email")
     private String email = null;
-
     @Column(name = "state")
     private String state;
-
     @Column(name = "api_key")
     private String apiKey = null;
-
     @Encrypt
     @Column(name = "secret_key")
     private String secretKey = null;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
-
     @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
-
     @Column(name = "timezone")
     private String timezone;
-
     @Column(name = "registration_token")
     private String registrationToken = null;
-
-    @Column(name = "is_registered")
-    boolean registered;
-
-    @Column(name = "incorrect_login_attempts")
-    int loginAttempts;
-
     @Column(name = "account_id")
     private long accountId;
-
     @Column(name = "account_uuid")
     private String accountUuid;
-
     @Column(name = "account_name")
     private String accountName = null;
-
     @Column(name = "account_type")
     private short accountType;
-
     @Column(name = "domain_id")
     private long domainId;
-
     @Column(name = "domain_uuid")
     private String domainUuid;
-
     @Column(name = "domain_name")
     private String domainName = null;
-
     @Column(name = "domain_path")
     private String domainPath = null;
-
     @Column(name = "job_id")
     private Long jobId;
-
     @Column(name = "job_uuid")
     private String jobUuid;
-
     @Column(name = "job_status")
     private int jobStatus;
-
-    @Column(name = "default")
-    boolean isDefault;
 
     public UserAccountJoinVO() {
     }
@@ -137,20 +108,24 @@ public class UserAccountJoinVO extends BaseViewVO implements InternalIdentity, I
         return accountId;
     }
 
-    public String getAccountUuid() {
-        return accountUuid;
+    public long getDomainId() {
+        return domainId;
     }
 
-    public String getAccountName() {
-        return accountName;
+    public String getDomainPath() {
+        return domainPath;
     }
 
     public short getAccountType() {
         return accountType;
     }
 
-    public long getDomainId() {
-        return domainId;
+    public String getAccountUuid() {
+        return accountUuid;
+    }
+
+    public String getAccountName() {
+        return accountName;
     }
 
     public String getDomainUuid() {
@@ -161,8 +136,14 @@ public class UserAccountJoinVO extends BaseViewVO implements InternalIdentity, I
         return domainName;
     }
 
-    public String getDomainPath() {
-        return domainPath;
+    @Override
+    public String getProjectUuid() {
+        return null;
+    }
+
+    @Override
+    public String getProjectName() {
+        return null;
     }
 
     public String getUsername() {
@@ -240,15 +221,5 @@ public class UserAccountJoinVO extends BaseViewVO implements InternalIdentity, I
     @Override
     public Class<?> getEntityType() {
         return UserAccount.class;
-    }
-
-    @Override
-    public String getProjectUuid() {
-        return null;
-    }
-
-    @Override
-    public String getProjectName() {
-        return null;
     }
 }

@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.service;
 
+import org.apache.cloudstack.api.ResourceDetail;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.ResourceDetail;
 
 @Entity
 @Table(name = "service_offering_details")
@@ -75,12 +75,12 @@ public class ServiceOfferingDetailsVO implements ResourceDetail {
     }
 
     @Override
-    public long getId() {
-        return id;
+    public boolean isDisplay() {
+        return display;
     }
 
     @Override
-    public boolean isDisplay() {
-        return display;
+    public long getId() {
+        return id;
     }
 }

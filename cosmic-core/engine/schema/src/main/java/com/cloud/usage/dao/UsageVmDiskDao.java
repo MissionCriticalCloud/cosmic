@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.usage.dao;
 
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.usage.UsageVmDiskVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
+import java.util.Map;
 
 public interface UsageVmDiskDao extends GenericDao<UsageVmDiskVO, Long> {
     Map<String, UsageVmDiskVO> getRecentVmDiskStats();

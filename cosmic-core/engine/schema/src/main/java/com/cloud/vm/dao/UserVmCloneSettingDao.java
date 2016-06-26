@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.vm.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.UserVmCloneSettingVO;
+
+import java.util.List;
 
 public interface UserVmCloneSettingDao extends GenericDao<UserVmCloneSettingVO, Long> {
 
@@ -33,5 +33,4 @@ public interface UserVmCloneSettingDao extends GenericDao<UserVmCloneSettingVO, 
      * cloneType can be full/linked.
      */
     List<UserVmCloneSettingVO> listByCloneType(String cloneType);
-
 }

@@ -19,11 +19,11 @@
 
 package com.cloud.agent.api;
 
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.host.Host;
 import com.cloud.utils.Pair;
+
+import java.util.List;
+import java.util.Map;
 
 public class PingRoutingWithOvsCommand extends PingRoutingCommand {
     List<Pair<String, Long>> states;
@@ -33,7 +33,7 @@ public class PingRoutingWithOvsCommand extends PingRoutingCommand {
     }
 
     public PingRoutingWithOvsCommand(Host.Type type, long id, Map<String, HostVmStateReportEntry> hostVmStateReport,
-            List<Pair<String, Long>> ovsStates) {
+                                     List<Pair<String, Long>> ovsStates) {
         super(type, id, hostVmStateReport);
 
         this.states = ovsStates;

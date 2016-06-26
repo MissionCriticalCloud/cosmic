@@ -2,30 +2,32 @@ package com.cloud.upgrade.dao;
 
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 public class BareMetalRemovalUpdater {
-
-    private static final Logger logger = Logger.getLogger(BareMetalRemovalUpdater.class);
-
-    private static final String BARE_METAL = "baremetal";
-    private static final String VALUE_SEPARATOR = ",";
-    private static final String HYPERVISOR_LIST = "hypervisor.list";
 
     public static final String VALUE = "value";
     public static final String CATEGORY = "category";
     public static final String INSTANCE = "instance";
     public static final String COMPONENT = "component";
     public static final String NAME = "name";
-
     public static final String SELECT_CONFIGURATION_ITEMS = "SELECT category, instance, component, name, value FROM configuration WHERE name = ?";
     public static final String UPDATE_CONFIGURATION_ITEM = "UPDATE configuration SET value = ? WHERE category = ? AND instance = ? AND component = ? AND name = ?";
+    private static final Logger logger = Logger.getLogger(BareMetalRemovalUpdater.class);
+    private static final String BARE_METAL = "baremetal";
+    private static final String VALUE_SEPARATOR = ",";
+    private static final String HYPERVISOR_LIST = "hypervisor.list";
 
     public void updateConfigurationValuesThatReferenceBareMetal(final Connection conn) {
         logger.info("Updating configuration items that reference BareMetal and removing that reference");
@@ -61,20 +63,6 @@ public class BareMetalRemovalUpdater {
         }
     }
 
-    public void updateConfigurationItem(final Connection conn, final String category, final String instance, final String component, final String name, final String value) {
-        try (PreparedStatement preparedStatement = conn.prepareStatement(UPDATE_CONFIGURATION_ITEM)) {
-            preparedStatement.setString(1, value);
-            preparedStatement.setString(2, category);
-            preparedStatement.setString(3, instance);
-            preparedStatement.setString(4, component);
-            preparedStatement.setString(5, name);
-            preparedStatement.executeUpdate();
-        } catch (final SQLException e) {
-            logger.error("Caught exception while updating values: " + e.getMessage());
-            throw new CloudRuntimeException(e);
-        }
-    }
-
     public void findAndUpdateRowsThatReferenceBareMetal(final ResultSet values, final List<Map<String, String>> updatedRows) throws SQLException {
         while (values.next()) {
             final String value = values.getString(VALUE);
@@ -90,17 +78,22 @@ public class BareMetalRemovalUpdater {
         }
     }
 
-    public String createUpdatedValue(final String value) {
-        final String[] splitParts = value.split(VALUE_SEPARATOR);
-        final List<String> filteredParts = new ArrayList<>(splitParts.length);
-        for (final String part : splitParts) {
-            if (!part.toLowerCase().equals(BARE_METAL)) {
-                filteredParts.add(part);
-            }
+    private String printConfigurationItem(final String category, final String instance, final String component, final String name, final String value) {
+        return "category = " + category + ", instance = " + instance + ", component = " + component + ", name = " + name + ", value = " + value;
+    }
+
+    public void updateConfigurationItem(final Connection conn, final String category, final String instance, final String component, final String name, final String value) {
+        try (PreparedStatement preparedStatement = conn.prepareStatement(UPDATE_CONFIGURATION_ITEM)) {
+            preparedStatement.setString(1, value);
+            preparedStatement.setString(2, category);
+            preparedStatement.setString(3, instance);
+            preparedStatement.setString(4, component);
+            preparedStatement.setString(5, name);
+            preparedStatement.executeUpdate();
+        } catch (final SQLException e) {
+            logger.error("Caught exception while updating values: " + e.getMessage());
+            throw new CloudRuntimeException(e);
         }
-        final String updatedValue = StringUtils.join(filteredParts, VALUE_SEPARATOR);
-        logger.info("Updated value (without reference to BareMetal): " + updatedValue);
-        return updatedValue;
     }
 
     public boolean hasReferenceToBareMetal(final String value) {
@@ -117,8 +110,16 @@ public class BareMetalRemovalUpdater {
         return newRow;
     }
 
-    private String printConfigurationItem(final String category, final String instance, final String component, final String name, final String value) {
-        return "category = " + category + ", instance = " + instance + ", component = " + component + ", name = " + name + ", value = " + value;
+    public String createUpdatedValue(final String value) {
+        final String[] splitParts = value.split(VALUE_SEPARATOR);
+        final List<String> filteredParts = new ArrayList<>(splitParts.length);
+        for (final String part : splitParts) {
+            if (!part.toLowerCase().equals(BARE_METAL)) {
+                filteredParts.add(part);
+            }
+        }
+        final String updatedValue = StringUtils.join(filteredParts, VALUE_SEPARATOR);
+        logger.info("Updated value (without reference to BareMetal): " + updatedValue);
+        return updatedValue;
     }
-
 }

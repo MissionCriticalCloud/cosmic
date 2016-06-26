@@ -16,17 +16,13 @@
 // under the License.
 package com.cloud.network;
 
-import java.util.Date;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.api.Displayable;
 import org.apache.cloudstack.api.InternalIdentity;
 
-public interface Site2SiteVpnConnection extends ControlledEntity, InternalIdentity, Displayable {
-    enum State {
-        Pending, Connected, Disconnected, Error,
-    }
+import java.util.Date;
 
+public interface Site2SiteVpnConnection extends ControlledEntity, InternalIdentity, Displayable {
     @Override
     public long getId();
 
@@ -46,4 +42,8 @@ public interface Site2SiteVpnConnection extends ControlledEntity, InternalIdenti
 
     @Override
     boolean isDisplay();
+
+    enum State {
+        Pending, Connected, Disconnected, Error,
+    }
 }

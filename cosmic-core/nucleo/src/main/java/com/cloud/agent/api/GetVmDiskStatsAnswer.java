@@ -19,10 +19,10 @@
 
 package com.cloud.agent.api;
 
+import com.cloud.agent.api.LogLevel.Log4jLevel;
+
 import java.util.HashMap;
 import java.util.List;
-
-import com.cloud.agent.api.LogLevel.Log4jLevel;
 
 @LogLevel(Log4jLevel.Trace)
 public class GetVmDiskStatsAnswer extends Answer {
@@ -36,15 +36,15 @@ public class GetVmDiskStatsAnswer extends Answer {
         this.vmDiskStatsMap = vmDiskStatsMap;
     }
 
+    protected GetVmDiskStatsAnswer() {
+        //no-args constructor for json serialization-deserialization
+    }
+
     public String getHostName() {
         return hostName;
     }
 
     public HashMap<String, List<VmDiskStatsEntry>> getVmDiskStatsMap() {
         return vmDiskStatsMap;
-    }
-
-    protected GetVmDiskStatsAnswer() {
-        //no-args constructor for json serialization-deserialization
     }
 }

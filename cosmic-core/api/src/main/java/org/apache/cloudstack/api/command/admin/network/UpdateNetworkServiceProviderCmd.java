@@ -16,12 +16,9 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.network;
 
-import java.util.List;
-
 import com.cloud.event.EventTypes;
 import com.cloud.network.PhysicalNetworkServiceProvider;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -30,15 +27,18 @@ import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ProviderResponse;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "updateNetworkServiceProvider",
-            description = "Updates a network serviceProvider of a physical network",
-            responseObject = ProviderResponse.class,
-            since = "3.0.0",
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = false)
+        description = "Updates a network serviceProvider of a physical network",
+        responseObject = ProviderResponse.class,
+        since = "3.0.0",
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = false)
 public class UpdateNetworkServiceProviderCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateNetworkServiceProviderCmd.class.getName());
 
@@ -54,40 +54,14 @@ public class UpdateNetworkServiceProviderCmd extends BaseAsyncCmd {
     private Long id;
 
     @Parameter(name = ApiConstants.SERVICE_LIST,
-               type = CommandType.LIST,
-               collectionType = CommandType.STRING,
-               description = "the list of services to be enabled for this physical network service provider")
+            type = CommandType.LIST,
+            collectionType = CommandType.STRING,
+            description = "the list of services to be enabled for this physical network service provider")
     private List<String> enabledServices;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public String getState() {
-        return state;
-    }
-
-    private Long getId() {
-        return id;
-    }
-
-    public List<String> getEnabledServices() {
-        return enabledServices;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
 
     @Override
     public void execute() {
@@ -99,6 +73,32 @@ public class UpdateNetworkServiceProviderCmd extends BaseAsyncCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update service provider");
         }
+    }
+
+    private Long getId() {
+        return id;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public List<String> getEnabledServices() {
+        return enabledServices;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 
     @Override
@@ -115,5 +115,4 @@ public class UpdateNetworkServiceProviderCmd extends BaseAsyncCmd {
     public ApiCommandJobType getInstanceType() {
         return ApiCommandJobType.PhysicalNetworkServiceProvider;
     }
-
 }

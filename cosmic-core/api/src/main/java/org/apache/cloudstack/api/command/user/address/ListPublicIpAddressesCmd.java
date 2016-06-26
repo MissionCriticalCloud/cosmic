@@ -16,12 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.address;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.network.IpAddress;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
@@ -36,11 +32,15 @@ import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
 import org.apache.cloudstack.api.response.VlanIpRangeResponse;
 import org.apache.cloudstack.api.response.VpcResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "listPublicIpAddresses", description = "Lists all public IP addresses", responseObject = IPAddressResponse.class, responseView = ResponseView.Restricted,
- requestHasSensitiveInfo = false, responseHasSensitiveInfo = false, entityType = { IpAddress.class })
+        requestHasSensitiveInfo = false, responseHasSensitiveInfo = false, entityType = {IpAddress.class})
 public class ListPublicIpAddressesCmd extends BaseListTaggedResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListPublicIpAddressesCmd.class.getName());
 
@@ -75,15 +75,15 @@ public class ListPublicIpAddressesCmd extends BaseListTaggedResourcesCmd {
     private Boolean forLoadBalancing;
 
     @Parameter(name = ApiConstants.PHYSICAL_NETWORK_ID,
-               type = CommandType.UUID,
-               entityType = PhysicalNetworkResponse.class,
-               description = "lists all public IP addresses by physical network ID")
+            type = CommandType.UUID,
+            entityType = PhysicalNetworkResponse.class,
+            description = "lists all public IP addresses by physical network ID")
     private Long physicalNetworkId;
 
     @Parameter(name = ApiConstants.ASSOCIATED_NETWORK_ID,
-               type = CommandType.UUID,
-               entityType = NetworkResponse.class,
-               description = "lists all public IP addresses associated to the network specified")
+            type = CommandType.UUID,
+            entityType = NetworkResponse.class,
+            description = "lists all public IP addresses associated to the network specified")
     private Long associatedNetworkId;
 
     @Parameter(name = ApiConstants.IS_SOURCE_NAT, type = CommandType.BOOLEAN, description = "list only source NAT IP addresses")
@@ -95,7 +95,8 @@ public class ListPublicIpAddressesCmd extends BaseListTaggedResourcesCmd {
     @Parameter(name = ApiConstants.VPC_ID, type = CommandType.UUID, entityType = VpcResponse.class, description = "List IPs belonging to the VPC")
     private Long vpcId;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "list resources by display flag; only ROOT admin is eligible to pass this parameter", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "list resources by display flag; only ROOT admin is eligible to pass this parameter",
+            since = "4.4", authorized = {RoleType.Admin})
     private Boolean display;
 
     /////////////////////////////////////////////////////
@@ -169,14 +170,6 @@ public class ListPublicIpAddressesCmd extends BaseListTaggedResourcesCmd {
         return state;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
     @Override
     public void execute() {
         Pair<List<? extends IpAddress>, Integer> result = _mgr.searchForIPAddresses(this);
@@ -191,6 +184,14 @@ public class ListPublicIpAddressesCmd extends BaseListTaggedResourcesCmd {
         response.setResponses(ipAddrResponses, result.second());
         response.setResponseName(getCommandName());
         setResponseObject(response);
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 
     @Override

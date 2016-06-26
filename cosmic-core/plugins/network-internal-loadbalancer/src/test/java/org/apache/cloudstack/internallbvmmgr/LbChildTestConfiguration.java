@@ -16,8 +16,6 @@
 // under the License.
 package org.apache.cloudstack.internallbvmmgr;
 
-import java.io.IOException;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.network.IpAddressManager;
@@ -37,11 +35,13 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.lb.dao.ApplicationLoadBalancerRuleDao;
 import org.apache.cloudstack.test.utils.SpringUtils;
+
+import java.io.IOException;
+
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -54,8 +54,8 @@ import org.springframework.core.type.filter.TypeFilter;
 
 @Configuration
 @ComponentScan(basePackageClasses = {NetUtils.class},
-               includeFilters = {@Filter(value = LbChildTestConfiguration.Library.class, type = FilterType.CUSTOM)},
-               useDefaultFilters = false)
+        includeFilters = {@Filter(value = LbChildTestConfiguration.Library.class, type = FilterType.CUSTOM)},
+        useDefaultFilters = false)
 public class LbChildTestConfiguration {
 
     public static class Library implements TypeFilter {
@@ -171,6 +171,5 @@ public class LbChildTestConfiguration {
             ComponentScan cs = LbChildTestConfiguration.class.getAnnotation(ComponentScan.class);
             return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);
         }
-
     }
 }

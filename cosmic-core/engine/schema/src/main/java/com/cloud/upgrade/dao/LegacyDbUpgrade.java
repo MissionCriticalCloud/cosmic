@@ -19,7 +19,7 @@ package com.cloud.upgrade.dao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class LegacyDbUpgrade implements DbUpgrade{
+public abstract class LegacyDbUpgrade implements DbUpgrade {
 
     final static Logger s_logger = LoggerFactory.getLogger(LegacyDbUpgrade.class);
 
@@ -35,9 +35,8 @@ public abstract class LegacyDbUpgrade implements DbUpgrade{
             try {
                 closable.close();
             } catch (Exception e) {
-                s_logger.info("[ignored]",e);
+                s_logger.info("[ignored]", e);
             }
         }
     }
-
 }

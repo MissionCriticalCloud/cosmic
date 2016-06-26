@@ -28,19 +28,6 @@ public class Main {
 
     }
 
-    public void start() throws Exception {
-        CloudStackSpringContext context = new CloudStackSpringContext();
-        context.registerShutdownHook();
-
-        if (Boolean.getBoolean("force.exit")) {
-            System.exit(0);
-        }
-    }
-
-    public long getTime() {
-        return System.currentTimeMillis() - start;
-    }
-
     public static void main(String... args) {
         Main main = new Main();
 
@@ -53,5 +40,18 @@ public class Main {
             System.err.println("STARTUP FAILED [" + main.getTime() + "] ms");
             System.exit(1);
         }
+    }
+
+    public void start() throws Exception {
+        CloudStackSpringContext context = new CloudStackSpringContext();
+        context.registerShutdownHook();
+
+        if (Boolean.getBoolean("force.exit")) {
+            System.exit(0);
+        }
+    }
+
+    public long getTime() {
+        return System.currentTimeMillis() - start;
     }
 }

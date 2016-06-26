@@ -25,11 +25,9 @@
     CLOUDSTACK/FS-+Dedicate+Public+IP+Addresses+per+tenant
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
+import random
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import (validateList,
-                              cleanup_resources,
-                              random_gen)
+from marvin.codes import PASS
 from marvin.lib.base import (Account,
                              PublicIpRange,
                              Domain,
@@ -43,13 +41,14 @@ from marvin.lib.base import (Account,
 from marvin.lib.common import (get_domain,
                                get_zone,
                                get_free_vlan)
-from marvin.codes import PASS
+from marvin.lib.utils import (validateList,
+                              cleanup_resources,
+                              random_gen)
 from netaddr import IPAddress
-import random
+from nose.plugins.attrib import attr
 
 
 class TestDedicatePublicIPRange(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(
@@ -110,11 +109,11 @@ class TestDedicatePublicIPRange(cloudstackTestCase):
             self.zone.id)[1]
         random_subnet_number = random.randrange(1, 254)
         self.testdata["publiciprange"]["gateway"] = "172.16." + \
-            str(random_subnet_number) + ".1"
+                                                    str(random_subnet_number) + ".1"
         self.testdata["publiciprange"]["startip"] = "172.16." + \
-            str(random_subnet_number) + ".2"
+                                                    str(random_subnet_number) + ".2"
         self.testdata["publiciprange"]["endip"] = "172.16." + \
-            str(random_subnet_number) + ".3"
+                                                  str(random_subnet_number) + ".3"
         self.testdata["publiciprange"]["netmask"] = "255.255.255.0"
         return
 
@@ -645,7 +644,6 @@ class TestDedicatePublicIPRange(cloudstackTestCase):
 
 
 class TestFailureScenarios(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestFailureScenarios, cls).getClsTestClient()
@@ -869,7 +867,6 @@ class TestFailureScenarios(cloudstackTestCase):
 
 
 class TestReleaseIPs(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestReleaseIPs, cls).getClsTestClient()
@@ -914,11 +911,11 @@ class TestReleaseIPs(cloudstackTestCase):
             self.zone.id)[1]
         shared_network_subnet_number = random.randrange(1, 254)
         self.testdata["publiciprange"]["gateway"] = "172.16." + \
-            str(shared_network_subnet_number) + ".1"
+                                                    str(shared_network_subnet_number) + ".1"
         self.testdata["publiciprange"]["startip"] = "172.16." + \
-            str(shared_network_subnet_number) + ".2"
+                                                    str(shared_network_subnet_number) + ".2"
         self.testdata["publiciprange"]["endip"] = "172.16." + \
-            str(shared_network_subnet_number) + ".3"
+                                                  str(shared_network_subnet_number) + ".3"
         self.testdata["publiciprange"]["netmask"] = "255.255.255.0"
         return
 

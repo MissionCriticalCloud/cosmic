@@ -21,7 +21,6 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.snapshot.VMSnapshot;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -33,6 +32,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.api.response.VMSnapshotResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,34 +59,6 @@ public class CreateVMSnapshotCmd extends BaseAsyncCreateCmd {
     @Parameter(name = ApiConstants.VM_SNAPSHOT_QUIESCEVM, type = CommandType.BOOLEAN, required = false, description = "quiesce vm if true")
     private Boolean quiescevm;
 
-    public Boolean snapshotMemory() {
-        if (snapshotMemory == null) {
-            return false;
-        } else {
-            return snapshotMemory;
-        }
-    }
-
-    public Boolean getQuiescevm() {
-        if (quiescevm == null) {
-            return false;
-        } else {
-            return quiescevm;
-        }
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Long getVmId() {
-        return vmId;
-    }
-
     @Override
     public void create() throws ResourceAllocationException {
         VMSnapshot vmsnapshot = _vmSnapshotService.allocVMSnapshot(getVmId(), getDisplayName(), getDescription(), snapshotMemory());
@@ -97,14 +69,34 @@ public class CreateVMSnapshotCmd extends BaseAsyncCreateCmd {
         }
     }
 
-    @Override
-    public String getEventDescription() {
-        return "creating snapshot for VM: " + getVmId();
+    public Long getVmId() {
+        return vmId;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Boolean snapshotMemory() {
+        if (snapshotMemory == null) {
+            return false;
+        } else {
+            return snapshotMemory;
+        }
     }
 
     @Override
     public String getEventType() {
         return EventTypes.EVENT_VM_SNAPSHOT_CREATE;
+    }
+
+    @Override
+    public String getEventDescription() {
+        return "creating snapshot for VM: " + getVmId();
     }
 
     @Override
@@ -120,6 +112,14 @@ public class CreateVMSnapshotCmd extends BaseAsyncCreateCmd {
         }
     }
 
+    public Boolean getQuiescevm() {
+        if (quiescevm == null) {
+            return false;
+        } else {
+            return quiescevm;
+        }
+    }
+
     @Override
     public String getCommandName() {
         return s_name;
@@ -130,5 +130,4 @@ public class CreateVMSnapshotCmd extends BaseAsyncCreateCmd {
         UserVm userVM = _userVmService.getUserVm(vmId);
         return userVM.getAccountId();
     }
-
 }

@@ -20,7 +20,6 @@ package org.apache.cloudstack.api.command.user.vmsnapshot;
 import com.cloud.event.EventTypes;
 import com.cloud.user.Account;
 import com.cloud.vm.snapshot.VMSnapshot;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -32,6 +31,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.api.response.VMSnapshotResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,14 +43,22 @@ public class DeleteVMSnapshotCmd extends BaseAsyncCmd {
 
     @ACL(accessType = AccessType.OperateEntry)
     @Parameter(name = ApiConstants.VM_SNAPSHOT_ID,
-               type = CommandType.UUID,
-               entityType = VMSnapshotResponse.class,
-               required = true,
-               description = "The ID of the VM snapshot")
+            type = CommandType.UUID,
+            entityType = VMSnapshotResponse.class,
+            required = true,
+            description = "The ID of the VM snapshot")
     private Long id;
 
-    public Long getId() {
-        return id;
+    @Override
+    public void execute() {
+        CallContext.current().setEventDetails("vmsnapshot id: " + getId());
+        boolean result = _vmSnapshotService.deleteVMSnapshot(getId());
+        if (result) {
+            SuccessResponse response = new SuccessResponse(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete vm snapshot");
+        }
     }
 
     @Override
@@ -67,21 +75,8 @@ public class DeleteVMSnapshotCmd extends BaseAsyncCmd {
         return Account.ACCOUNT_ID_SYSTEM;
     }
 
-    @Override
-    public void execute() {
-        CallContext.current().setEventDetails("vmsnapshot id: " + getId());
-        boolean result = _vmSnapshotService.deleteVMSnapshot(getId());
-        if (result) {
-            SuccessResponse response = new SuccessResponse(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete vm snapshot");
-        }
-    }
-
-    @Override
-    public String getEventDescription() {
-        return "Delete VM snapshot: " + getId();
+    public Long getId() {
+        return id;
     }
 
     @Override
@@ -89,4 +84,8 @@ public class DeleteVMSnapshotCmd extends BaseAsyncCmd {
         return EventTypes.EVENT_VM_SNAPSHOT_DELETE;
     }
 
+    @Override
+    public String getEventDescription() {
+        return "Delete VM snapshot: " + getId();
+    }
 }

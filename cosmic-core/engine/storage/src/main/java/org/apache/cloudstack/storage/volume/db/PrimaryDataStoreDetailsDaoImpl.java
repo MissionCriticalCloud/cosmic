@@ -19,6 +19,7 @@ package org.apache.cloudstack.storage.volume.db;
 import org.apache.cloudstack.resourcedetail.ResourceDetailsDaoBase;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDetailVO;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDetailsDao;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,5 +29,4 @@ public class PrimaryDataStoreDetailsDaoImpl extends ResourceDetailsDaoBase<Prima
     public void addDetail(long resourceId, String key, String value, boolean display) {
         super.addDetail(new PrimaryDataStoreDetailVO(resourceId, key, value, display));
     }
-
 }

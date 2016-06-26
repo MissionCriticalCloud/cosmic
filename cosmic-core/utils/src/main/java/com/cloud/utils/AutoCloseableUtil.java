@@ -22,16 +22,14 @@ import org.slf4j.LoggerFactory;
 public class AutoCloseableUtil {
     private final static Logger s_logger = LoggerFactory.getLogger(AutoCloseableUtil.class);
 
-    public static void closeAutoCloseable(AutoCloseable ac, String message) {
+    public static void closeAutoCloseable(final AutoCloseable ac, final String message) {
         try {
 
             if (ac != null) {
                 ac.close();
             }
-
-        } catch (Exception e) {
+        } catch (final Exception e) {
             s_logger.warn("[ignored] " + message, e);
         }
     }
-
 }

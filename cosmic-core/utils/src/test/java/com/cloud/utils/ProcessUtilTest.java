@@ -19,19 +19,17 @@
 
 package com.cloud.utils;
 
+import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.IOException;
 
-import javax.naming.ConfigurationException;
-
+import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 public class ProcessUtilTest {
 
@@ -52,10 +50,10 @@ public class ProcessUtilTest {
         Assume.assumeTrue(SystemUtils.IS_OS_LINUX);
         FileUtils.writeStringToFile(pidFile, "123456\n");
         ProcessUtil.pidCheck(pidFile.getParent(), pidFile.getName());
-        String pidStr = FileUtils.readFileToString(pidFile);
+        final String pidStr = FileUtils.readFileToString(pidFile);
         Assert.assertFalse("pid can not be blank", pidStr.isEmpty());
-        int pid = Integer.parseInt(pidStr.trim());
-        int maxPid = Integer.parseInt(FileUtils.readFileToString(new File("/proc/sys/kernel/pid_max")).trim());
+        final int pid = Integer.parseInt(pidStr.trim());
+        final int maxPid = Integer.parseInt(FileUtils.readFileToString(new File("/proc/sys/kernel/pid_max")).trim());
         Assert.assertTrue(pid <= maxPid);
     }
 
@@ -72,5 +70,4 @@ public class ProcessUtilTest {
         FileUtils.writeStringToFile(pidFile, "intentionally not number");
         ProcessUtil.pidCheck(pidFile.getParent(), pidFile.getName());
     }
-
 }

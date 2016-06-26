@@ -16,19 +16,17 @@
 // under the License.
 package org.apache.cloudstack.framework.config.dao;
 
-import java.util.Map;
-
 import com.cloud.utils.db.GenericDao;
-
 import org.apache.cloudstack.framework.config.impl.ConfigurationVO;
+
+import java.util.Map;
 
 public interface ConfigurationDao extends GenericDao<ConfigurationVO, String> {
 
     /**
-     *
-     *    1. params passed in.
-     *    2. configuration for the instance.
-     *    3. configuration for the DEFAULT instance.
+     * 1. params passed in.
+     * 2. configuration for the instance.
+     * 3. configuration for the DEFAULT instance.
      *
      * @param params parameters from the components.xml which will override the database values.
      * @return a consolidated look at the configuration parameters.
@@ -41,6 +39,7 @@ public interface ConfigurationDao extends GenericDao<ConfigurationVO, String> {
 
     /**
      * Updates a configuration value
+     *
      * @param value the new value
      * @return true if success, false if failure
      */
@@ -48,6 +47,7 @@ public interface ConfigurationDao extends GenericDao<ConfigurationVO, String> {
 
     /**
      * Gets the value for the specified configuration name
+     *
      * @return value
      */
     public String getValue(String name);
@@ -58,6 +58,7 @@ public interface ConfigurationDao extends GenericDao<ConfigurationVO, String> {
 
     /**
      * returns whether or not this is a premium configuration
+     *
      * @return true if premium configuration, false otherwise
      */
     boolean isPremium();

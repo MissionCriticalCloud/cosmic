@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface Site2SiteVpnConnectionDao extends GenericDao<Site2SiteVpnConnectionVO, Long> {
     List<Site2SiteVpnConnectionVO> listByCustomerGatewayId(long id);

@@ -19,7 +19,6 @@
 
 package com.cloud.agent.resource.virtualnetwork.model;
 
-
 public class LoadBalancerRule {
 
     private String[] configuration;
@@ -36,7 +35,8 @@ public class LoadBalancerRule {
         // Empty constructor for (de)serialization
     }
 
-    public LoadBalancerRule(final String[] configuration, final String tmpCfgFilePath, final String tmpCfgFileName, final String[] addRules, final String[] removeRules, final String[] statRules, final String routerIp) {
+    public LoadBalancerRule(final String[] configuration, final String tmpCfgFilePath, final String tmpCfgFileName, final String[] addRules, final String[] removeRules, final
+    String[] statRules, final String routerIp) {
         this.configuration = configuration;
         this.tmpCfgFilePath = tmpCfgFilePath;
         this.tmpCfgFileName = tmpCfgFileName;

@@ -42,7 +42,7 @@ public class StateMachine<S, E> {
         _initialStateEntry = new StateEntry(null);
     }
 
-    public void addTransition(S currentState, E event, S toState) {
+    public void addTransition(final S currentState, final E event, final S toState) {
         StateEntry entry = null;
         if (currentState == null) {
             entry = _initialStateEntry;
@@ -64,12 +64,12 @@ public class StateMachine<S, E> {
         entry.addFromTransition(event, currentState);
     }
 
-    public Set<E> getPossibleEvents(S s) {
-        StateEntry entry = _states.get(s);
+    public Set<E> getPossibleEvents(final S s) {
+        final StateEntry entry = _states.get(s);
         return entry.nextStates.keySet();
     }
 
-    public S getNextState(S s, E e) {
+    public S getNextState(final S s, final E e) {
         StateEntry entry = null;
         if (s == null) {
             entry = _initialStateEntry;
@@ -81,10 +81,10 @@ public class StateMachine<S, E> {
         return entry.nextStates.get(e);
     }
 
-    public List<S> getFromStates(S s, E e) {
-        StateEntry entry = _states.get(s);
+    public List<S> getFromStates(final S s, final E e) {
+        final StateEntry entry = _states.get(s);
         if (entry == null) {
-            return new ArrayList<S>();
+            return new ArrayList<>();
         }
 
         return entry.prevStates.get(e);
@@ -92,9 +92,9 @@ public class StateMachine<S, E> {
 
     @Override
     public String toString() {
-        StringBuilder str = new StringBuilder(1024);
+        final StringBuilder str = new StringBuilder(1024);
         _initialStateEntry.buildString(str);
-        for (StateEntry entry : _states.values()) {
+        for (final StateEntry entry : _states.values()) {
             entry.buildString(str);
         }
         return str.toString();
@@ -105,22 +105,26 @@ public class StateMachine<S, E> {
         public HashMap<E, S> nextStates;
         public HashMap<E, List<S>> prevStates;
 
-        public StateEntry(S state) {
+        public StateEntry(final S state) {
             this.state = state;
-            nextStates = new HashMap<E, S>();
-            prevStates = new HashMap<E, List<S>>();
+            nextStates = new HashMap<>();
+            prevStates = new HashMap<>();
         }
 
-        public void addTransition(E e, S s) {
+        public void addTransition(final E e, final S s) {
             assert !nextStates.containsKey(e) : "State " + getStateStr() + " already contains a transition to state " + nextStates.get(e).toString() + " via event " +
-                e.toString() + ".  Please revisit the rule you're adding to state " + s.toString();
+                    e.toString() + ".  Please revisit the rule you're adding to state " + s.toString();
             nextStates.put(e, s);
         }
 
-        public void addFromTransition(E e, S s) {
+        protected String getStateStr() {
+            return state == null ? "Initial" : state.toString();
+        }
+
+        public void addFromTransition(final E e, final S s) {
             List<S> l = prevStates.get(e);
             if (l == null) {
-                l = new ArrayList<S>();
+                l = new ArrayList<>();
                 prevStates.put(e, l);
             }
 
@@ -128,15 +132,11 @@ public class StateMachine<S, E> {
             l.add(s);
         }
 
-        protected String getStateStr() {
-            return state == null ? "Initial" : state.toString();
-        }
-
-        public void buildString(StringBuilder str) {
+        public void buildString(final StringBuilder str) {
             str.append("State: ").append(getStateStr()).append("\n");
-            for (Map.Entry<E, S> nextState : nextStates.entrySet()) {
+            for (final Map.Entry<E, S> nextState : nextStates.entrySet()) {
                 str.append("  --> Event: ");
-                Formatter format = new Formatter();
+                final Formatter format = new Formatter();
                 str.append(format.format("%-30s", nextState.getKey().toString()));
                 str.append("----> State: ");
                 str.append(nextState.getValue().toString());

@@ -17,8 +17,6 @@
 
 package org.apache.cloudstack.lb.dao;
 
-import java.util.List;
-
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.State;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
@@ -29,16 +27,18 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.net.Ip;
-
 import org.apache.cloudstack.lb.ApplicationLoadBalancerRuleVO;
+
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class ApplicationLoadBalancerRuleDaoImpl extends GenericDaoBase<ApplicationLoadBalancerRuleVO, Long> implements ApplicationLoadBalancerRuleDao {
     protected final SearchBuilder<ApplicationLoadBalancerRuleVO> AllFieldsSearch;
+    protected final SearchBuilder<ApplicationLoadBalancerRuleVO> NotRevokedSearch;
     final GenericSearchBuilder<ApplicationLoadBalancerRuleVO, String> listIps;
     final GenericSearchBuilder<ApplicationLoadBalancerRuleVO, Long> CountBy;
-    protected final SearchBuilder<ApplicationLoadBalancerRuleVO> NotRevokedSearch;
     final GenericSearchBuilder<ApplicationLoadBalancerRuleVO, Long> CountNotRevoked;
     final GenericSearchBuilder<ApplicationLoadBalancerRuleVO, Long> CountActive;
 
@@ -143,5 +143,4 @@ public class ApplicationLoadBalancerRuleDaoImpl extends GenericDaoBase<Applicati
         List<Long> results = customSearch(sc, null);
         return results.get(0);
     }
-
 }

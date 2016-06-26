@@ -19,9 +19,9 @@
 
 package com.cloud.agent.api;
 
-import java.util.Map;
-
 import com.cloud.storage.StoragePool;
+
+import java.util.Map;
 
 public class CreateStoragePoolCommand extends ModifyStoragePoolCommand {
     public static final String DATASTORE_NAME = "datastoreName";
@@ -39,19 +39,19 @@ public class CreateStoragePoolCommand extends ModifyStoragePoolCommand {
         super(add, pool);
     }
 
-    public void setCreateDatastore(boolean createDatastore) {
-        _createDatastore = createDatastore;
-    }
-
     public boolean getCreateDatastore() {
         return _createDatastore;
     }
 
-    public void setDetails(Map<String, String> details) {
-        _details = details;
+    public void setCreateDatastore(boolean createDatastore) {
+        _createDatastore = createDatastore;
     }
 
     public Map<String, String> getDetails() {
         return _details;
+    }
+
+    public void setDetails(Map<String, String> details) {
+        _details = details;
     }
 }

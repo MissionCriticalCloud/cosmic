@@ -34,5 +34,4 @@ public class CreateLogicalSwitchAnswer extends Answer {
     public String getLogicalSwitchUuid() {
         return logicalSwitchUuid;
     }
-
 }

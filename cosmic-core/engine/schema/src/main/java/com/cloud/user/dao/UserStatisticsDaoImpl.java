@@ -16,19 +16,19 @@
 // under the License.
 package com.cloud.user.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-
 import com.cloud.user.UserStatisticsVO;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,11 +38,11 @@ import org.springframework.stereotype.Component;
 public class UserStatisticsDaoImpl extends GenericDaoBase<UserStatisticsVO, Long> implements UserStatisticsDao {
     private static final Logger s_logger = LoggerFactory.getLogger(UserStatisticsDaoImpl.class);
     private static final String ACTIVE_AND_RECENTLY_DELETED_SEARCH =
-        "SELECT us.id, us.data_center_id, us.account_id, us.public_ip_address, us.device_id, us.device_type, us.network_id, us.agg_bytes_received, us.agg_bytes_sent "
-            + "FROM user_statistics us, account a " + "WHERE us.account_id = a.id AND (a.removed IS NULL OR a.removed >= ?) " + "ORDER BY us.id";
+            "SELECT us.id, us.data_center_id, us.account_id, us.public_ip_address, us.device_id, us.device_type, us.network_id, us.agg_bytes_received, us.agg_bytes_sent "
+                    + "FROM user_statistics us, account a " + "WHERE us.account_id = a.id AND (a.removed IS NULL OR a.removed >= ?) " + "ORDER BY us.id";
     private static final String UPDATED_STATS_SEARCH =
-        "SELECT id, current_bytes_received, current_bytes_sent, net_bytes_received, net_bytes_sent, agg_bytes_received, agg_bytes_sent from  user_statistics "
-            + "where (agg_bytes_received < net_bytes_received + current_bytes_received) OR (agg_bytes_sent < net_bytes_sent + current_bytes_sent)";
+            "SELECT id, current_bytes_received, current_bytes_sent, net_bytes_received, net_bytes_sent, agg_bytes_received, agg_bytes_sent from  user_statistics "
+                    + "where (agg_bytes_received < net_bytes_received + current_bytes_received) OR (agg_bytes_sent < net_bytes_sent + current_bytes_sent)";
     private final SearchBuilder<UserStatisticsVO> AllFieldsSearch;
     private final SearchBuilder<UserStatisticsVO> AccountSearch;
 
@@ -95,8 +95,9 @@ public class UserStatisticsDaoImpl extends GenericDaoBase<UserStatisticsVO, Long
     @Override
     public List<UserStatisticsVO> listActiveAndRecentlyDeleted(Date minRemovedDate, int startIndex, int limit) {
         List<UserStatisticsVO> userStats = new ArrayList<UserStatisticsVO>();
-        if (minRemovedDate == null)
+        if (minRemovedDate == null) {
             return userStats;
+        }
 
         TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
@@ -131,5 +132,4 @@ public class UserStatisticsDaoImpl extends GenericDaoBase<UserStatisticsVO, Long
         }
         return userStats;
     }
-
 }

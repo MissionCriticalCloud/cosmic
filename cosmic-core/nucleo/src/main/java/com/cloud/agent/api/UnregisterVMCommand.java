@@ -36,11 +36,11 @@ public class UnregisterVMCommand extends Command {
         return vmName;
     }
 
-    public void setCleanupVmFiles(boolean cleanupVmFiles) {
-        this.cleanupVmFiles = cleanupVmFiles;
-    }
-
     public boolean getCleanupVmFiles() {
         return this.cleanupVmFiles;
+    }
+
+    public void setCleanupVmFiles(boolean cleanupVmFiles) {
+        this.cleanupVmFiles = cleanupVmFiles;
     }
 }

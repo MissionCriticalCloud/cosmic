@@ -37,13 +37,6 @@ public class ManagementServerNode extends AdapterBase implements SystemIntegrity
         setRunLevel(ComponentLifecycle.RUN_LEVEL_FRAMEWORK_BOOTSTRAP);
     }
 
-    @Override
-    public void check() {
-        if (s_nodeId <= 0) {
-            throw new CloudRuntimeException("Unable to get the management server node id");
-        }
-    }
-
     public static long getManagementServerId() {
         return s_nodeId;
     }
@@ -57,5 +50,12 @@ public class ManagementServerNode extends AdapterBase implements SystemIntegrity
             System.exit(1);
         }
         return true;
+    }
+
+    @Override
+    public void check() {
+        if (s_nodeId <= 0) {
+            throw new CloudRuntimeException("Unable to get the management server node id");
+        }
     }
 }

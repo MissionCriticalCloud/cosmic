@@ -81,5 +81,4 @@ public class StaticNatImpl implements StaticNat {
     public boolean isForRevoke() {
         return forRevoke;
     }
-
 }

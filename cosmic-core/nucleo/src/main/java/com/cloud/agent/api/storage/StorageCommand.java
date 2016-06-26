@@ -25,5 +25,4 @@ public abstract class StorageCommand extends Command {
     protected StorageCommand() {
         super();
     }
-
 }

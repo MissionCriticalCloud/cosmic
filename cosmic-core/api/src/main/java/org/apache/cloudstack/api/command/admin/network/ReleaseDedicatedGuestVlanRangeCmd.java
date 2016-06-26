@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.admin.network;
 
 import com.cloud.event.EventTypes;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -30,6 +29,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.GuestVlanRangeResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,34 +44,15 @@ public class ReleaseDedicatedGuestVlanRangeCmd extends BaseAsyncCmd {
     // ///////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.ID,
-               type = CommandType.UUID,
-               entityType = GuestVlanRangeResponse.class,
-               required = true,
-               description = "the ID of the dedicated guest vlan range")
+            type = CommandType.UUID,
+            entityType = GuestVlanRangeResponse.class,
+            required = true,
+            description = "the ID of the dedicated guest vlan range")
     private Long id;
 
     // ///////////////////////////////////////////////////
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.DedicatedGuestVlanRange;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
 
     @Override
     public String getEventType() {
@@ -83,9 +64,10 @@ public class ReleaseDedicatedGuestVlanRangeCmd extends BaseAsyncCmd {
         return "Releasing a dedicated guest vlan range.";
     }
 
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
+    @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.DedicatedGuestVlanRange;
+    }
 
     @Override
     public void execute() {
@@ -99,4 +81,21 @@ public class ReleaseDedicatedGuestVlanRangeCmd extends BaseAsyncCmd {
         }
     }
 
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
+    }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
+
+    public Long getId() {
+        return id;
+    }
 }

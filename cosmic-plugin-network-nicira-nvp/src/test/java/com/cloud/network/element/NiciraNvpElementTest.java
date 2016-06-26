@@ -19,6 +19,16 @@
 
 package com.cloud.network.element;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.ConfigurePublicIpsOnLogicalRouterAnswer;
 import com.cloud.agent.api.ConfigurePublicIpsOnLogicalRouterCommand;
@@ -29,12 +39,17 @@ import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
-import com.cloud.network.*;
+import com.cloud.network.IpAddress;
+import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
+import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.TrafficType;
+import com.cloud.network.NiciraNvpDeviceVO;
+import com.cloud.network.NiciraNvpRouterMappingVO;
+import com.cloud.network.PublicIpAddress;
 import com.cloud.network.dao.NetworkServiceMapDao;
 import com.cloud.network.dao.NiciraNvpDao;
 import com.cloud.network.dao.NiciraNvpRouterMappingDao;
@@ -44,19 +59,17 @@ import com.cloud.user.Account;
 import com.cloud.utils.net.Ip;
 import com.cloud.vm.ReservationContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
+
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
-
-import javax.naming.ConfigurationException;
-import java.util.*;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 
 public class NiciraNvpElementTest {
 
@@ -114,7 +127,6 @@ public class NiciraNvpElementTest {
         when(networkModel.isProviderForNetwork(Provider.NiciraNvp, NETWORK_ID)).thenReturn(true);
         // Only service Connectivity is supported
         assertFalse(element.canHandle(net, Service.Dhcp));
-
     }
 
     @Test
@@ -193,8 +205,9 @@ public class NiciraNvpElementTest {
             @Override
             public boolean matches(final Object argument) {
                 final ConfigurePublicIpsOnLogicalRouterCommand command = (ConfigurePublicIpsOnLogicalRouterCommand) argument;
-                if (command.getPublicCidrs().size() == 1)
+                if (command.getPublicCidrs().size() == 1) {
                     return true;
+                }
                 return false;
             }
         }));

@@ -22,7 +22,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.Volume;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotInfo;
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
 
@@ -45,8 +44,7 @@ public interface SnapshotManager {
      * the dir on the secondary storage which contains the backed up snapshots for that volume. This is called during
      * deleteAccount.
      *
-     * @param accountId
-     *            The account which is to be deleted.
+     * @param accountId The account which is to be deleted.
      */
     boolean deleteSnapshotDirsForAccount(long accountId);
 

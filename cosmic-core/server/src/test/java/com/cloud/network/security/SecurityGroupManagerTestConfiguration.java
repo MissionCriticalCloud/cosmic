@@ -17,8 +17,6 @@
 
 package com.cloud.network.security;
 
-import java.io.IOException;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.api.query.dao.SecurityGroupJoinDaoImpl;
 import com.cloud.cluster.agentlb.dao.HostTransferMapDaoImpl;
@@ -54,10 +52,12 @@ import com.cloud.vm.dao.NicDaoImpl;
 import com.cloud.vm.dao.UserVmDaoImpl;
 import com.cloud.vm.dao.UserVmDetailsDaoImpl;
 import com.cloud.vm.dao.VMInstanceDaoImpl;
-
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDaoImpl;
 import org.apache.cloudstack.test.utils.SpringUtils;
+
+import java.io.IOException;
+
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -70,14 +70,14 @@ import org.springframework.core.type.filter.TypeFilter;
 
 @Configuration
 @ComponentScan(basePackageClasses = {SecurityGroupRulesDaoImpl.class, UserVmDaoImpl.class, AccountDaoImpl.class, ConfigurationDaoImpl.class,
-    SecurityGroupWorkDaoImpl.class, VmRulesetLogDaoImpl.class, VMInstanceDaoImpl.class, DomainDaoImpl.class, UsageEventDaoImpl.class,
-    ResourceTagsDaoImpl.class, HostDaoImpl.class, HostDetailsDaoImpl.class, HostTagsDaoImpl.class, ClusterDaoImpl.class, HostPodDaoImpl.class,
-    DataCenterDaoImpl.class, DataCenterIpAddressDaoImpl.class, HostTransferMapDaoImpl.class, SecurityGroupManagerImpl2.class, SecurityGroupDaoImpl.class,
-    SecurityGroupVMMapDaoImpl.class, UserVmDetailsDaoImpl.class, DataCenterIpAddressDaoImpl.class, DataCenterLinkLocalIpAddressDaoImpl.class,
-    DataCenterVnetDaoImpl.class, PodVlanDaoImpl.class, DataCenterDetailsDaoImpl.class, SecurityGroupRuleDaoImpl.class, NicDaoImpl.class,
-    SecurityGroupJoinDaoImpl.class},
-               includeFilters = {@Filter(value = Library.class, type = FilterType.CUSTOM)},
-               useDefaultFilters = false)
+        SecurityGroupWorkDaoImpl.class, VmRulesetLogDaoImpl.class, VMInstanceDaoImpl.class, DomainDaoImpl.class, UsageEventDaoImpl.class,
+        ResourceTagsDaoImpl.class, HostDaoImpl.class, HostDetailsDaoImpl.class, HostTagsDaoImpl.class, ClusterDaoImpl.class, HostPodDaoImpl.class,
+        DataCenterDaoImpl.class, DataCenterIpAddressDaoImpl.class, HostTransferMapDaoImpl.class, SecurityGroupManagerImpl2.class, SecurityGroupDaoImpl.class,
+        SecurityGroupVMMapDaoImpl.class, UserVmDetailsDaoImpl.class, DataCenterIpAddressDaoImpl.class, DataCenterLinkLocalIpAddressDaoImpl.class,
+        DataCenterVnetDaoImpl.class, PodVlanDaoImpl.class, DataCenterDetailsDaoImpl.class, SecurityGroupRuleDaoImpl.class, NicDaoImpl.class,
+        SecurityGroupJoinDaoImpl.class},
+        includeFilters = {@Filter(value = Library.class, type = FilterType.CUSTOM)},
+        useDefaultFilters = false)
 public class SecurityGroupManagerTestConfiguration {
 
     @Bean
@@ -123,11 +123,10 @@ public class SecurityGroupManagerTestConfiguration {
     public static class Library implements TypeFilter {
 
         @Override
-        public boolean match(MetadataReader mdr, MetadataReaderFactory arg1) throws IOException {
+        public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) throws IOException {
             mdr.getClassMetadata().getClassName();
-            ComponentScan cs = SecurityGroupManagerTestConfiguration.class.getAnnotation(ComponentScan.class);
+            final ComponentScan cs = SecurityGroupManagerTestConfiguration.class.getAnnotation(ComponentScan.class);
             return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);
         }
-
     }
 }

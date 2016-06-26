@@ -16,20 +16,25 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.network;
 
-import com.cloud.exception.*;
+import com.cloud.exception.ConcurrentOperationException;
+import com.cloud.exception.InsufficientCapacityException;
+import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.exception.ResourceAllocationException;
+import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.host.Host;
 import com.cloud.utils.exception.CloudRuntimeException;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.NetworkDeviceResponse;
 import org.apache.cloudstack.network.ExternalNetworkDeviceManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @org.apache.cloudstack.api.APICommand(name = "listNetworkDevice", description = "List network devices", responseObject = NetworkDeviceResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
@@ -87,5 +92,4 @@ public class ListNetworkDeviceCmd extends org.apache.cloudstack.api.BaseListCmd 
     public String getCommandName() {
         return s_name;
     }
-
 }

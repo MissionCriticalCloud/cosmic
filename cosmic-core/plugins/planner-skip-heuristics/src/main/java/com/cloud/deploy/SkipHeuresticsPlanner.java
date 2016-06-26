@@ -16,12 +16,11 @@
 // under the License.
 package com.cloud.deploy;
 
-import java.util.List;
-import java.util.Map;
+import com.cloud.vm.VirtualMachineProfile;
 
 import javax.naming.ConfigurationException;
-
-import com.cloud.vm.VirtualMachineProfile;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,16 +28,15 @@ import org.slf4j.LoggerFactory;
 public class SkipHeuresticsPlanner extends FirstFitPlanner implements HAPlanner {
     private static final Logger s_logger = LoggerFactory.getLogger(SkipHeuresticsPlanner.class);
 
-
     /**
      * This method should remove the clusters crossing capacity threshold
      * to avoid further vm allocation on it.
-     *
+     * <p>
      * In case of HA, we shouldn't consider this threshold as we have reserved the capacity for such emergencies.
      */
     @Override
     protected void removeClustersCrossingThreshold(List<Long> clusterListForVmAllocation, ExcludeList avoid,
-                                                   VirtualMachineProfile vmProfile, DeploymentPlan plan){
+                                                   VirtualMachineProfile vmProfile, DeploymentPlan plan) {
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Deploying vm during HA process, so skipping disable threshold check");
         }
@@ -46,16 +44,14 @@ public class SkipHeuresticsPlanner extends FirstFitPlanner implements HAPlanner 
     }
 
     @Override
-    public boolean canHandle(VirtualMachineProfile vm, DeploymentPlan plan, ExcludeList avoid) {
-        return true;
-    }
-
-    @Override
     public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
         super.configure(name, params);
 
         return true;
-
     }
 
+    @Override
+    public boolean canHandle(VirtualMachineProfile vm, DeploymentPlan plan, ExcludeList avoid) {
+        return true;
+    }
 }

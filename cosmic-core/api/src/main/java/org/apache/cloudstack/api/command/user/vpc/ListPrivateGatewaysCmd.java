@@ -16,13 +16,9 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.vpc;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.network.vpc.PrivateGateway;
 import com.cloud.network.vpc.VpcGateway;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
@@ -30,6 +26,10 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.PrivateGatewayResponse;
 import org.apache.cloudstack.api.response.VpcResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,14 +82,6 @@ public class ListPrivateGatewaysCmd extends BaseListProjectAndAccountResourcesCm
         return state;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
     @Override
     public void execute() {
         Pair<List<PrivateGateway>, Integer> gateways = _vpcService.listPrivateGateway(this);
@@ -103,5 +95,13 @@ public class ListPrivateGatewaysCmd extends BaseListProjectAndAccountResourcesCm
         response.setResponseName(getCommandName());
 
         setResponseObject(response);
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

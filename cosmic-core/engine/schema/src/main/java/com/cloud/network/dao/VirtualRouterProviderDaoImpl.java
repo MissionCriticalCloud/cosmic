@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.network.VirtualRouterProvider.Type;
 import com.cloud.network.element.VirtualRouterProviderVO;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 

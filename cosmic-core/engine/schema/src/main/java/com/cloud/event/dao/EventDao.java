@@ -16,13 +16,13 @@
 // under the License.
 package com.cloud.event.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.event.EventVO;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.Date;
+import java.util.List;
 
 public interface EventDao extends GenericDao<EventVO, Long> {
     public List<EventVO> searchAllEvents(SearchCriteria<EventVO> sc, Filter filter);
@@ -34,5 +34,4 @@ public interface EventDao extends GenericDao<EventVO, Long> {
     public List<EventVO> listToArchiveOrDeleteEvents(List<Long> ids, String type, Date startDate, Date endDate, List<Long> accountIds);
 
     public void archiveEvents(List<EventVO> events);
-
 }

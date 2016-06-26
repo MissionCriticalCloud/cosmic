@@ -16,20 +16,19 @@
 // under the License.
 package org.apache.cloudstack.storage.db;
 
-import java.util.Date;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.UpdateBuilder;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
+
+import javax.naming.ConfigurationException;
+import java.util.Date;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -53,7 +52,7 @@ public class ObjectInDataStoreDaoImpl extends GenericDaoBase<ObjectInDataStoreVO
 
     @Override
     public boolean updateState(State currentState, Event event, State nextState, DataObjectInStore dataObj, Object data) {
-        ObjectInDataStoreVO vo = (ObjectInDataStoreVO)dataObj;
+        ObjectInDataStoreVO vo = (ObjectInDataStoreVO) dataObj;
         Long oldUpdated = vo.getUpdatedCount();
         Date oldUpdatedTime = vo.getUpdated();
 
@@ -74,38 +73,37 @@ public class ObjectInDataStoreDaoImpl extends GenericDaoBase<ObjectInDataStoreVO
             if (dbVol != null) {
                 StringBuilder str = new StringBuilder("Unable to update ").append(vo.toString());
                 str.append(": DB Data={id=")
-                    .append(dbVol.getId())
-                    .append("; state=")
-                    .append(dbVol.getState())
-                    .append("; updatecount=")
-                    .append(dbVol.getUpdatedCount())
-                    .append(";updatedTime=")
-                    .append(dbVol.getUpdated());
+                   .append(dbVol.getId())
+                   .append("; state=")
+                   .append(dbVol.getState())
+                   .append("; updatecount=")
+                   .append(dbVol.getUpdatedCount())
+                   .append(";updatedTime=")
+                   .append(dbVol.getUpdated());
                 str.append(": New Data={id=")
-                    .append(vo.getId())
-                    .append("; state=")
-                    .append(nextState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatecount=")
-                    .append(vo.getUpdatedCount())
-                    .append("; updatedTime=")
-                    .append(vo.getUpdated());
+                   .append(vo.getId())
+                   .append("; state=")
+                   .append(nextState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatecount=")
+                   .append(vo.getUpdatedCount())
+                   .append("; updatedTime=")
+                   .append(vo.getUpdated());
                 str.append(": stale Data={id=")
-                    .append(vo.getId())
-                    .append("; state=")
-                    .append(currentState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatecount=")
-                    .append(oldUpdated)
-                    .append("; updatedTime=")
-                    .append(oldUpdatedTime);
+                   .append(vo.getId())
+                   .append("; state=")
+                   .append(currentState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatecount=")
+                   .append(oldUpdated)
+                   .append("; updatedTime=")
+                   .append(oldUpdatedTime);
             } else {
                 s_logger.debug("Unable to update objectIndatastore: id=" + vo.getId() + ", as there is no such object exists in the database anymore");
             }
         }
         return rows > 0;
     }
-
 }

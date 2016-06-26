@@ -26,6 +26,6 @@ public class Upgrade444to450 extends Upgrade442to450 implements DbUpgrade {
 
     @Override
     public String[] getUpgradableVersionRange() {
-        return new String[] {"4.4.4", "4.5.0"};
+        return new String[]{"4.4.4", "4.5.0"};
     }
 }

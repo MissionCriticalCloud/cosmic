@@ -18,8 +18,8 @@ under the License.
 -->
 <components.xml>
     <management-server class="com.cloud.async.TestSyncQueueManager">
-        <dao name="sync queue dao" class="com.cloud.async.dao.SyncQueueDaoImpl"/>
-        <dao name="sync queue item dao" class="com.cloud.async.dao.SyncQueueItemDaoImpl"/>
+        <dao name="sync queue dao" class="com.cloud.async.dao.SyncQueueDaoImpl" />
+        <dao name="sync queue item dao" class="com.cloud.async.dao.SyncQueueItemDaoImpl" />
         <manager name="sync queue manager" class="com.cloud.async.SyncQueueManagerImpl">
         </manager>
     </management-server>

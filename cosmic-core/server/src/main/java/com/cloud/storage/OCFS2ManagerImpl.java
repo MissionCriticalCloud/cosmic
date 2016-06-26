@@ -16,14 +16,6 @@
 // under the License.
 package com.cloud.storage;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.PrepareOCFS2NodesCommand;
@@ -43,8 +35,15 @@ import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -85,19 +84,13 @@ public class OCFS2ManagerImpl extends ManagerBase implements OCFS2Manager, Resou
         return true;
     }
 
-    private List<Ternary<Integer, String, String>> marshalNodes(List<HostVO> hosts) {
-        Integer i = 0;
-        List<Ternary<Integer, String, String>> lst = new ArrayList<Ternary<Integer, String, String>>();
-        for (HostVO h : hosts) {
-            /**
-             * Don't show "node" in node name otherwise OVM's utils/config_o2cb.sh will be going crazy
-             */
-            String nodeName = "ovm_" + h.getPrivateIpAddress().replace(".", "_");
-            Ternary<Integer, String, String> node = new Ternary<Integer, String, String>(i, h.getPrivateIpAddress(), nodeName);
-            lst.add(node);
-            i++;
+    @Override
+    public boolean prepareNodes(List<HostVO> hosts, StoragePool pool) {
+        if (pool.getPoolType() != StoragePoolType.OCFS2) {
+            throw new CloudRuntimeException("None OCFS2 storage pool is getting into OCFS2 manager!");
         }
-        return lst;
+
+        return prepareNodes(getClusterName(pool.getClusterId()), hosts);
     }
 
     private boolean prepareNodes(String clusterName, List<HostVO> hosts) {
@@ -127,13 +120,19 @@ public class OCFS2ManagerImpl extends ManagerBase implements OCFS2Manager, Resou
         return clusterName;
     }
 
-    @Override
-    public boolean prepareNodes(List<HostVO> hosts, StoragePool pool) {
-        if (pool.getPoolType() != StoragePoolType.OCFS2) {
-            throw new CloudRuntimeException("None OCFS2 storage pool is getting into OCFS2 manager!");
+    private List<Ternary<Integer, String, String>> marshalNodes(List<HostVO> hosts) {
+        Integer i = 0;
+        List<Ternary<Integer, String, String>> lst = new ArrayList<Ternary<Integer, String, String>>();
+        for (HostVO h : hosts) {
+            /**
+             * Don't show "node" in node name otherwise OVM's utils/config_o2cb.sh will be going crazy
+             */
+            String nodeName = "ovm_" + h.getPrivateIpAddress().replace(".", "_");
+            Ternary<Integer, String, String> node = new Ternary<Integer, String, String>(i, h.getPrivateIpAddress(), nodeName);
+            lst.add(node);
+            i++;
         }
-
-        return prepareNodes(getClusterName(pool.getClusterId()), hosts);
+        return lst;
     }
 
     @Override

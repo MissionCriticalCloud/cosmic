@@ -16,9 +16,8 @@
 # under the License.
 """ Test case to check if queryAsyncJobResult returns jobinstanceid
 """
-from nose.plugins.attrib import attr
+from marvin.cloudstackAPI import queryAsyncJobResult
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources)
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              VirtualMachine,
@@ -27,12 +26,11 @@ from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template,
                                )
-
-from marvin.cloudstackAPI import queryAsyncJobResult
+from marvin.lib.utils import (cleanup_resources)
+from nose.plugins.attrib import attr
 
 
 class TestJobinstanceid(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestJobinstanceid, cls).getClsTestClient()

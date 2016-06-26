@@ -16,16 +16,6 @@
 // under the License.
 package com.cloud.api.query.vo;
 
-import java.net.URI;
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Networks.TrafficType;
@@ -35,41 +25,42 @@ import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.net.URI;
+import java.util.Date;
+
 @Entity
 @Table(name = "domain_router_view")
 public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEntity {
 
+    @Column(name = "is_redundant_router")
+    boolean isRedundantRouter;
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
-
     @Column(name = "name", updatable = false, nullable = false, length = 255)
     private String name = null;
-
     @Column(name = "account_id")
     private long accountId;
-
     @Column(name = "account_uuid")
     private String accountUuid;
-
     @Column(name = "account_name")
     private String accountName = null;
-
     @Column(name = "account_type")
     private short accountType;
-
     @Column(name = "domain_id")
     private long domainId;
-
     @Column(name = "domain_uuid")
     private String domainUuid;
-
     @Column(name = "domain_name")
     private String domainName = null;
-
     @Column(name = "domain_path")
     private String domainPath = null;
-
     /**
      * Note that state is intentionally missing the setter.  Any updates to
      * the state machine needs to go through the DAO object because someone
@@ -78,169 +69,113 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
     @Enumerated(value = EnumType.STRING)
     @Column(name = "state", updatable = true, nullable = false, length = 32)
     private State state = null;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
-
     @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
-
     @Column(name = "instance_name", updatable = true, nullable = false)
     private String instanceName;
-
     @Column(name = "pod_id", updatable = true, nullable = false)
     private Long podId;
-
     @Column(name = "pod_uuid")
     private String podUuid;
-
     @Column(name = "data_center_id")
     private long dataCenterId;
-
     @Column(name = "data_center_uuid")
     private String dataCenterUuid;
-
     @Column(name = "data_center_name")
     private String dataCenterName = null;
-
     @Column(name = "cluster_id")
     private long clusterId;
-
     @Column(name = "dns1")
     private String dns1 = null;
-
     @Column(name = "dns2")
     private String dns2 = null;
-
     @Column(name = "ip6_dns1")
     private String ip6Dns1 = null;
-
     @Column(name = "ip6_dns2")
     private String ip6Dns2 = null;
-
     @Column(name = "host_id", updatable = true, nullable = true)
     private Long hostId;
-
     @Column(name = "host_uuid")
     private String hostUuid;
-
     @Column(name = "host_name", nullable = false)
     private String hostName;
-
-    @Column(name="hypervisor_type")
-    @Enumerated(value=EnumType.STRING)
+    @Column(name = "hypervisor_type")
+    @Enumerated(value = EnumType.STRING)
     private Hypervisor.HypervisorType hypervisorType;
-
     @Column(name = "template_id", updatable = true, nullable = true, length = 17)
     private long templateId;
-
     @Column(name = "template_uuid")
     private String templateUuid;
-
     @Column(name = "service_offering_id")
     private long serviceOfferingId;
-
     @Column(name = "service_offering_uuid")
     private String serviceOfferingUuid;
-
     @Column(name = "service_offering_name")
     private String serviceOfferingName;
-
     @Column(name = "vpc_id")
     private long vpcId;
-
     @Column(name = "vpc_uuid")
     private String vpcUuid;
-
     @Column(name = "vpc_name")
     private String vpcName;
-
     @Column(name = "nic_id")
     private long nicId;
-
     @Column(name = "nic_uuid")
     private String nicUuid;
-
     @Column(name = "is_default_nic")
     private boolean isDefaultNic;
-
     @Column(name = "ip_address")
     private String ipAddress;
-
     @Column(name = "gateway")
     private String gateway;
-
     @Column(name = "netmask")
     private String netmask;
-
     @Column(name = "ip6_address")
     private String ip6Address;
-
     @Column(name = "ip6_gateway")
     private String ip6Gateway;
-
     @Column(name = "ip6_cidr")
     private String ip6Cidr;
-
     @Column(name = "mac_address")
     private String macAddress;
-
     @Column(name = "broadcast_uri")
     private URI broadcastUri;
-
     @Column(name = "isolation_uri")
     private URI isolationUri;
-
     @Column(name = "network_id")
     private long networkId;
-
     @Column(name = "network_uuid")
     private String networkUuid;
-
     @Column(name = "network_name")
     private String networkName;
-
     @Column(name = "network_domain")
     private String networkDomain;
-
     @Column(name = "traffic_type")
     @Enumerated(value = EnumType.STRING)
     private TrafficType trafficType;
-
     @Column(name = "project_id")
     private long projectId;
-
     @Column(name = "project_uuid")
     private String projectUuid;
-
     @Column(name = "project_name")
     private String projectName;
-
     @Column(name = "job_id")
     private Long jobId;
-
     @Column(name = "job_uuid")
     private String jobUuid;
-
     @Column(name = "job_status")
     private int jobStatus;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "template_version")
     private String templateVersion;
-
     @Column(name = "scripts_version")
     private String scriptsVersion;
-
     @Column(name = "redundant_state")
     @Enumerated(EnumType.STRING)
     private RedundantState redundantState;
-
-    @Column(name = "is_redundant_router")
-    boolean isRedundantRouter;
-
     @Column(name = "guest_type")
     @Enumerated(value = EnumType.STRING)
     private GuestType guestType;
@@ -272,13 +207,13 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
     }
 
     @Override
-    public String getAccountUuid() {
-        return accountUuid;
+    public long getDomainId() {
+        return domainId;
     }
 
     @Override
-    public String getAccountName() {
-        return accountName;
+    public String getDomainPath() {
+        return domainPath;
     }
 
     @Override
@@ -287,8 +222,13 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
     }
 
     @Override
-    public long getDomainId() {
-        return domainId;
+    public String getAccountUuid() {
+        return accountUuid;
+    }
+
+    @Override
+    public String getAccountName() {
+        return accountName;
     }
 
     @Override
@@ -302,8 +242,13 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
     }
 
     @Override
-    public String getDomainPath() {
-        return domainPath;
+    public String getProjectUuid() {
+        return projectUuid;
+    }
+
+    @Override
+    public String getProjectName() {
+        return projectName;
     }
 
     public State getState() {
@@ -432,16 +377,6 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
 
     public long getProjectId() {
         return projectId;
-    }
-
-    @Override
-    public String getProjectUuid() {
-        return projectUuid;
-    }
-
-    @Override
-    public String getProjectName() {
-        return projectName;
     }
 
     public String getVpcUuid() {

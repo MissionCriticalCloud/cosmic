@@ -20,7 +20,6 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -29,6 +28,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.Site2SiteVpnConnectionResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,8 +49,9 @@ public class DeleteVpnConnectionCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
+    @Override
+    public String getEventType() {
+        return EventTypes.EVENT_S2S_VPN_CONNECTION_DELETE;
     }
 
     /////////////////////////////////////////////////////
@@ -58,27 +59,12 @@ public class DeleteVpnConnectionCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Site2SiteVpnConnection conn = _entityMgr.findById(Site2SiteVpnConnection.class, getId());
-        if (conn != null) {
-            return conn.getAccountId();
-        }
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
     public String getEventDescription() {
         return "Delete site-to-site VPN connection for account " + getEntityOwnerId();
     }
 
-    @Override
-    public String getEventType() {
-        return EventTypes.EVENT_S2S_VPN_CONNECTION_DELETE;
+    public Long getId() {
+        return id;
     }
 
     @Override
@@ -95,5 +81,19 @@ public class DeleteVpnConnectionCmd extends BaseAsyncCmd {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.RESOURCE_UNAVAILABLE_ERROR, ex.getMessage());
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        Site2SiteVpnConnection conn = _entityMgr.findById(Site2SiteVpnConnection.class, getId());
+        if (conn != null) {
+            return conn.getAccountId();
+        }
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

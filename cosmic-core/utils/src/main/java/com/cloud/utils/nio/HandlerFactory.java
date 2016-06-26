@@ -24,5 +24,4 @@ package com.cloud.utils.nio;
  */
 public interface HandlerFactory {
     public Task create(Task.Type type, Link link, byte[] data);
-
 }

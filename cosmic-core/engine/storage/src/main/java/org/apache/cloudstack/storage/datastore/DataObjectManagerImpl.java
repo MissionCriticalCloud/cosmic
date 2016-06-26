@@ -18,12 +18,9 @@
  */
 package org.apache.cloudstack.storage.datastore;
 
-import javax.inject.Inject;
-
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.fsm.NoTransitionException;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.CopyCommandResult;
 import org.apache.cloudstack.engine.subsystem.api.storage.CreateCmdResult;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataMotionService;
@@ -36,6 +33,9 @@ import org.apache.cloudstack.framework.async.AsyncCallbackDispatcher;
 import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
 import org.apache.cloudstack.framework.async.AsyncRpcContext;
 import org.apache.cloudstack.storage.command.CommandResult;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -43,51 +43,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataObjectManagerImpl implements DataObjectManager {
     private static final Logger s_logger = LoggerFactory.getLogger(DataObjectManagerImpl.class);
+    protected long waitingTime = 1800; // half an hour
+    protected long waitingRetries = 10;
     @Inject
     ObjectInDataStoreManager objectInDataStoreMgr;
     @Inject
     DataMotionService motionSrv;
-    protected long waitingTime = 1800; // half an hour
-    protected long waitingRetries = 10;
-
-    protected DataObject waitingForCreated(DataObject dataObj, DataStore dataStore) {
-        long retries = this.waitingRetries;
-        DataObjectInStore obj = null;
-        do {
-            try {
-                Thread.sleep(waitingTime);
-            } catch (InterruptedException e) {
-                s_logger.debug("sleep interrupted", e);
-                throw new CloudRuntimeException("sleep interrupted", e);
-            }
-
-            obj = objectInDataStoreMgr.findObject(dataObj, dataStore);
-            if (obj == null) {
-                s_logger.debug("can't find object in db, maybe it's cleaned up already, exit waiting");
-                break;
-            }
-            if (obj.getState() == ObjectInDataStoreStateMachine.State.Ready) {
-                break;
-            }
-            retries--;
-        } while (retries > 0);
-
-        if (obj == null || retries <= 0) {
-            s_logger.debug("waiting too long for template downloading, marked it as failed");
-            throw new CloudRuntimeException("waiting too long for template downloading, marked it as failed");
-        }
-        return objectInDataStoreMgr.get(dataObj, dataStore);
-    }
-
-    class CreateContext<T> extends AsyncRpcContext<T> {
-        final DataObject objInStrore;
-
-        public CreateContext(AsyncCompletionCallback<T> callback, DataObject objInStore) {
-            super(callback);
-            this.objInStrore = objInStore;
-        }
-
-    }
 
     @Override
     public void createAsync(DataObject data, DataStore store, AsyncCompletionCallback<CreateCmdResult> callback, boolean noCopy) {
@@ -166,6 +127,35 @@ public class DataObjectManagerImpl implements DataObjectManager {
         return;
     }
 
+    protected DataObject waitingForCreated(DataObject dataObj, DataStore dataStore) {
+        long retries = this.waitingRetries;
+        DataObjectInStore obj = null;
+        do {
+            try {
+                Thread.sleep(waitingTime);
+            } catch (InterruptedException e) {
+                s_logger.debug("sleep interrupted", e);
+                throw new CloudRuntimeException("sleep interrupted", e);
+            }
+
+            obj = objectInDataStoreMgr.findObject(dataObj, dataStore);
+            if (obj == null) {
+                s_logger.debug("can't find object in db, maybe it's cleaned up already, exit waiting");
+                break;
+            }
+            if (obj.getState() == ObjectInDataStoreStateMachine.State.Ready) {
+                break;
+            }
+            retries--;
+        } while (retries > 0);
+
+        if (obj == null || retries <= 0) {
+            s_logger.debug("waiting too long for template downloading, marked it as failed");
+            throw new CloudRuntimeException("waiting too long for template downloading, marked it as failed");
+        }
+        return objectInDataStoreMgr.get(dataObj, dataStore);
+    }
+
     protected Void createAsynCallback(AsyncCallbackDispatcher<DataObjectManagerImpl, CreateCmdResult> callback, CreateContext<CreateCmdResult> context) {
         CreateCmdResult result = callback.getResult();
         DataObject objInStrore = context.objInStrore;
@@ -204,15 +194,33 @@ public class DataObjectManagerImpl implements DataObjectManager {
         return null;
     }
 
-    class CopyContext<T> extends AsyncRpcContext<T> {
-        DataObject destObj;
-        DataObject srcObj;
-
-        public CopyContext(AsyncCompletionCallback<T> callback, DataObject srcObj, DataObject destObj) {
-            super(callback);
-            this.srcObj = srcObj;
-            this.destObj = destObj;
+    @Override
+    public DataObject createInternalStateOnly(DataObject data, DataStore store) {
+        DataObjectInStore obj = objectInDataStoreMgr.findObject(data, store);
+        DataObject objInStore = null;
+        if (obj == null) {
+            objInStore = objectInDataStoreMgr.create(data, store);
         }
+        try {
+            ObjectInDataStoreStateMachine.Event event = null;
+            event = ObjectInDataStoreStateMachine.Event.CreateRequested;
+            objectInDataStoreMgr.update(objInStore, event);
+
+            objectInDataStoreMgr.update(objInStore, ObjectInDataStoreStateMachine.Event.OperationSuccessed);
+        } catch (NoTransitionException e) {
+            s_logger.debug("Failed to update state", e);
+            throw new CloudRuntimeException("Failed to update state", e);
+        } catch (ConcurrentOperationException e) {
+            s_logger.debug("Failed to update state", e);
+            throw new CloudRuntimeException("Failed to update state", e);
+        }
+
+        return objInStore;
+    }
+
+    @Override
+    public void update(DataObject data, String path, Long size) {
+        throw new CloudRuntimeException("not implemented");
     }
 
     @Override
@@ -293,16 +301,6 @@ public class DataObjectManagerImpl implements DataObjectManager {
         return null;
     }
 
-    class DeleteContext<T> extends AsyncRpcContext<T> {
-        private final DataObject obj;
-
-        public DeleteContext(AsyncCompletionCallback<T> callback, DataObject obj) {
-            super(callback);
-            this.obj = obj;
-        }
-
-    }
-
     @Override
     public void deleteAsync(DataObject data, AsyncCompletionCallback<CommandResult> callback) {
         try {
@@ -337,7 +335,6 @@ public class DataObjectManagerImpl implements DataObjectManager {
             } catch (ConcurrentOperationException e) {
                 s_logger.debug("delete failed", e);
             }
-
         } else {
             try {
                 objectInDataStoreMgr.update(destObj, Event.OperationSuccessed);
@@ -352,32 +349,32 @@ public class DataObjectManagerImpl implements DataObjectManager {
         return null;
     }
 
-    @Override
-    public DataObject createInternalStateOnly(DataObject data, DataStore store) {
-        DataObjectInStore obj = objectInDataStoreMgr.findObject(data, store);
-        DataObject objInStore = null;
-        if (obj == null) {
-            objInStore = objectInDataStoreMgr.create(data, store);
-        }
-        try {
-            ObjectInDataStoreStateMachine.Event event = null;
-            event = ObjectInDataStoreStateMachine.Event.CreateRequested;
-            objectInDataStoreMgr.update(objInStore, event);
+    class CreateContext<T> extends AsyncRpcContext<T> {
+        final DataObject objInStrore;
 
-            objectInDataStoreMgr.update(objInStore, ObjectInDataStoreStateMachine.Event.OperationSuccessed);
-        } catch (NoTransitionException e) {
-            s_logger.debug("Failed to update state", e);
-            throw new CloudRuntimeException("Failed to update state", e);
-        } catch (ConcurrentOperationException e) {
-            s_logger.debug("Failed to update state", e);
-            throw new CloudRuntimeException("Failed to update state", e);
+        public CreateContext(AsyncCompletionCallback<T> callback, DataObject objInStore) {
+            super(callback);
+            this.objInStrore = objInStore;
         }
-
-        return objInStore;
     }
 
-    @Override
-    public void update(DataObject data, String path, Long size) {
-        throw new CloudRuntimeException("not implemented");
+    class CopyContext<T> extends AsyncRpcContext<T> {
+        DataObject destObj;
+        DataObject srcObj;
+
+        public CopyContext(AsyncCompletionCallback<T> callback, DataObject srcObj, DataObject destObj) {
+            super(callback);
+            this.srcObj = srcObj;
+            this.destObj = destObj;
+        }
+    }
+
+    class DeleteContext<T> extends AsyncRpcContext<T> {
+        private final DataObject obj;
+
+        public DeleteContext(AsyncCompletionCallback<T> callback, DataObject obj) {
+            super(callback);
+            this.obj = obj;
+        }
     }
 }

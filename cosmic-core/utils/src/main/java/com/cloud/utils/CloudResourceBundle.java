@@ -24,25 +24,25 @@ import java.util.ResourceBundle;
 
 public class CloudResourceBundle {
 
-    private ResourceBundle _bundle;
+    private final ResourceBundle _bundle;
 
-    public CloudResourceBundle(ResourceBundle bundle) {
+    public CloudResourceBundle(final ResourceBundle bundle) {
         _bundle = bundle;
     }
 
-    public static CloudResourceBundle getBundle(String baseName, Locale locale) {
+    public static CloudResourceBundle getBundle(final String baseName, final Locale locale) {
         return new CloudResourceBundle(ResourceBundle.getBundle(baseName, locale));
     }
 
-    private String getString(String key) {
-        try {
-            return _bundle.getString(key);
-        } catch (Exception e) {
-            return key; //if translation is not found, just return original word (i.e. English).
-        }
+    public String t(final String key) {
+        return getString(key);
     }
 
-    public String t(String key) {
-        return getString(key);
+    private String getString(final String key) {
+        try {
+            return _bundle.getString(key);
+        } catch (final Exception e) {
+            return key; //if translation is not found, just return original word (i.e. English).
+        }
     }
 }

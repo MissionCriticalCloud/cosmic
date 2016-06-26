@@ -62,5 +62,4 @@ public class ConfigurePublicIpsOnLogicalRouterCommand extends Command {
     public boolean executeInSequence() {
         return false;
     }
-
 }

@@ -17,10 +17,8 @@
 
 """ Test case for Multiple Volume Snapshot in ZWPS
 """
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources,
-                              validateList)
+from marvin.codes import PASS, ZONETAG1, ROOT, DATA
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              DiskOffering,
@@ -34,12 +32,12 @@ from marvin.lib.common import (get_domain,
                                list_clusters,
                                get_template
                                )
-
-from marvin.codes import PASS, ZONETAG1, ROOT, DATA
+from marvin.lib.utils import (cleanup_resources,
+                              validateList)
+from nose.plugins.attrib import attr
 
 
 class TestMultipleVolumeSnapshots(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestMultipleVolumeSnapshots, cls).getClsTestClient()
@@ -283,7 +281,7 @@ class TestMultipleVolumeSnapshots(cloudstackTestCase):
                 "snapshot list validation failed due to %s" %
                 snap_list_validation_result[2])
 
-            assert len(snapshots_list) >= 10,\
+            assert len(snapshots_list) >= 10, \
                 "Less than 10 snapshots created...."
             raise Exception("Snapshot creation failed !: %s" % e)
 

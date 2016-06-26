@@ -24,8 +24,11 @@
     Feature Specifications: https://cwiki.apache.org/confluence/display/CLOUDSTACK/Limit+Resources+to+domains+and+accounts
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+from marvin.codes import (PASS,
+                          FAIL,
+                          FAILED,
+                          RESOURCE_PRIMARY_STORAGE)
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              VirtualMachine,
@@ -39,17 +42,12 @@ from marvin.lib.common import (get_domain,
                                get_template,
                                createSnapshotFromVirtualMachineVolume,
                                isVmExpunged,
-                               isDomainResourceCountEqualToExpectedCount,
-                               find_storage_pool_type)
+                               isDomainResourceCountEqualToExpectedCount)
 from marvin.lib.utils import (cleanup_resources)
-from marvin.codes import (PASS,
-                          FAIL,
-                          FAILED,
-                          RESOURCE_PRIMARY_STORAGE)
+from nose.plugins.attrib import attr
 
 
 class TestMultipleChildDomain(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cloudstackTestClient = super(TestMultipleChildDomain,
@@ -581,7 +579,7 @@ class TestMultipleChildDomain(cloudstackTestCase):
                 templatesize = (self.template.size / (1024 ** 3))
 
                 initialResourceCount = expectedCount = templatesize + \
-                    self.disk_offering.disksize
+                                                       self.disk_offering.disksize
                 result = isDomainResourceCountEqualToExpectedCount(
                     self.apiclient, self.domain.id,
                     initialResourceCount, RESOURCE_PRIMARY_STORAGE)

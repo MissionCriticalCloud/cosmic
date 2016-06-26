@@ -18,12 +18,7 @@
  */
 package org.apache.cloudstack.storage.datastore.provider;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import com.cloud.utils.component.ComponentContext;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreLifeCycle;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProvider;
 import org.apache.cloudstack.engine.subsystem.api.storage.HypervisorHostListener;
@@ -31,6 +26,10 @@ import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreDriver
 import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreProvider;
 import org.apache.cloudstack.storage.datastore.driver.CloudStackPrimaryDataStoreDriverImpl;
 import org.apache.cloudstack.storage.datastore.lifecycle.CloudStackPrimaryDataStoreLifeCycleImpl;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class CloudStackPrimaryDataStoreProviderImpl implements PrimaryDataStoreProvider {
 
@@ -43,21 +42,8 @@ public class CloudStackPrimaryDataStoreProviderImpl implements PrimaryDataStoreP
     }
 
     @Override
-    public String getName() {
-        return DataStoreProvider.DEFAULT_PRIMARY;
-    }
-
-    @Override
     public DataStoreLifeCycle getDataStoreLifeCycle() {
         return lifecycle;
-    }
-
-    @Override
-    public boolean configure(Map<String, Object> params) {
-        lifecycle = ComponentContext.inject(CloudStackPrimaryDataStoreLifeCycleImpl.class);
-        driver = ComponentContext.inject(CloudStackPrimaryDataStoreDriverImpl.class);
-        listener = ComponentContext.inject(DefaultHostListener.class);
-        return true;
     }
 
     @Override
@@ -68,6 +54,19 @@ public class CloudStackPrimaryDataStoreProviderImpl implements PrimaryDataStoreP
     @Override
     public HypervisorHostListener getHostListener() {
         return listener;
+    }
+
+    @Override
+    public String getName() {
+        return DataStoreProvider.DEFAULT_PRIMARY;
+    }
+
+    @Override
+    public boolean configure(Map<String, Object> params) {
+        lifecycle = ComponentContext.inject(CloudStackPrimaryDataStoreLifeCycleImpl.class);
+        driver = ComponentContext.inject(CloudStackPrimaryDataStoreDriverImpl.class);
+        listener = ComponentContext.inject(DefaultHostListener.class);
+        return true;
     }
 
     @Override

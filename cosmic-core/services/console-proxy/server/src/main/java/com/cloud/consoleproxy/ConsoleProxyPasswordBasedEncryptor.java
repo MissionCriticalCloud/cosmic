@@ -16,29 +16,25 @@
 // under the License.
 package com.cloud.consoleproxy;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
 /**
- *
  * @author Kelven Yang
- * A simple password based encyrptor based on AES/CBC. It can serialize simple POJO object into URL safe string
- * and deserialize it back.
- *
+ *         A simple password based encyrptor based on AES/CBC. It can serialize simple POJO object into URL safe string
+ *         and deserialize it back.
  */
 public class ConsoleProxyPasswordBasedEncryptor {
     private static final Logger s_logger = Logger.getLogger(ConsoleProxyPasswordBasedEncryptor.class);
@@ -53,9 +49,19 @@ public class ConsoleProxyPasswordBasedEncryptor {
         keyIvPair = gson.fromJson(password, KeyIVPair.class);
     }
 
+    public <T> String encryptObject(Class<?> clz, T obj) {
+        if (obj == null) {
+            return null;
+        }
+
+        String json = gson.toJson(obj);
+        return encryptText(json);
+    }
+
     public String encryptText(String text) {
-        if (text == null || text.isEmpty())
+        if (text == null || text.isEmpty()) {
             return text;
+        }
 
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -86,9 +92,20 @@ public class ConsoleProxyPasswordBasedEncryptor {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> T decryptObject(Class<?> clz, String encrypted) {
+        if (encrypted == null || encrypted.isEmpty()) {
+            return null;
+        }
+
+        String json = decryptText(encrypted);
+        return (T) gson.fromJson(json, clz);
+    }
+
     public String decryptText(String encryptedText) {
-        if (encryptedText == null || encryptedText.isEmpty())
+        if (encryptedText == null || encryptedText.isEmpty()) {
             return encryptedText;
+        }
 
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -116,23 +133,6 @@ public class ConsoleProxyPasswordBasedEncryptor {
             s_logger.error("Unexpected exception ", e);
             return null;
         }
-    }
-
-    public <T> String encryptObject(Class<?> clz, T obj) {
-        if (obj == null)
-            return null;
-
-        String json = gson.toJson(obj);
-        return encryptText(json);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T decryptObject(Class<?> clz, String encrypted) {
-        if (encrypted == null || encrypted.isEmpty())
-            return null;
-
-        String json = decryptText(encrypted);
-        return (T)gson.fromJson(json, clz);
     }
 
     public static class KeyIVPair {
@@ -163,5 +163,4 @@ public class ConsoleProxyPasswordBasedEncryptor {
             base64EncodedIvBytes = Base64.encodeBase64URLSafeString(ivBytes);
         }
     }
-
 }

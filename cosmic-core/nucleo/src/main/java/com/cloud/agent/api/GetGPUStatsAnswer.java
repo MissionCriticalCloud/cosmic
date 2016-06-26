@@ -19,9 +19,9 @@
 
 package com.cloud.agent.api;
 
-import java.util.HashMap;
-
 import com.cloud.agent.api.LogLevel.Log4jLevel;
+
+import java.util.HashMap;
 
 @LogLevel(Log4jLevel.Trace)
 public class GetGPUStatsAnswer extends Answer {

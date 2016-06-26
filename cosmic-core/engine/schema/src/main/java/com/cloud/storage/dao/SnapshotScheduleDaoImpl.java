@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.storage.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotScheduleVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -55,7 +55,6 @@ public class SnapshotScheduleDaoImpl extends GenericDaoBase<SnapshotScheduleVO, 
         VolumeIdPolicyIdSearch.and("volumeId", VolumeIdPolicyIdSearch.entity().getVolumeId(), SearchCriteria.Op.EQ);
         VolumeIdPolicyIdSearch.and("policyId", VolumeIdPolicyIdSearch.entity().getPolicyId(), SearchCriteria.Op.EQ);
         VolumeIdPolicyIdSearch.done();
-
     }
 
     /**
@@ -70,21 +69,6 @@ public class SnapshotScheduleDaoImpl extends GenericDaoBase<SnapshotScheduleVO, 
         // code path.
         sc.addAnd("policyId", SearchCriteria.Op.NEQ, 1L);
         return listBy(sc);
-    }
-
-    @Override
-    public SnapshotScheduleVO findOneByVolume(long volumeId) {
-        SearchCriteria<SnapshotScheduleVO> sc = VolumeIdSearch.create();
-        sc.setParameters("volumeId", volumeId);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public SnapshotScheduleVO findOneByVolumePolicy(long volumeId, long policyId) {
-        SearchCriteria<SnapshotScheduleVO> sc = VolumeIdPolicyIdSearch.create();
-        sc.setParameters("volumeId", volumeId);
-        sc.setParameters("policyId", policyId);
-        return findOneBy(sc);
     }
 
     /**
@@ -128,4 +112,18 @@ public class SnapshotScheduleDaoImpl extends GenericDaoBase<SnapshotScheduleVO, 
         }
     }
 
+    @Override
+    public SnapshotScheduleVO findOneByVolume(long volumeId) {
+        SearchCriteria<SnapshotScheduleVO> sc = VolumeIdSearch.create();
+        sc.setParameters("volumeId", volumeId);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public SnapshotScheduleVO findOneByVolumePolicy(long volumeId, long policyId) {
+        SearchCriteria<SnapshotScheduleVO> sc = VolumeIdPolicyIdSearch.create();
+        sc.setParameters("volumeId", volumeId);
+        sc.setParameters("policyId", policyId);
+        return findOneBy(sc);
+    }
 }

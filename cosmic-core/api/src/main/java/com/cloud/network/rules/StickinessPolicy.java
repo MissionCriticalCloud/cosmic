@@ -16,13 +16,12 @@
 // under the License.
 package com.cloud.network.rules;
 
-import java.util.List;
-
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.Displayable;
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
+
+import java.util.List;
 
 /**
  */
@@ -42,5 +41,4 @@ public interface StickinessPolicy extends InternalIdentity, Identity, Displayabl
 
     @Override
     boolean isDisplay();
-
 }

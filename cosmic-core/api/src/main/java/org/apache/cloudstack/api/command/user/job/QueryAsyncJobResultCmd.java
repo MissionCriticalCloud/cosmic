@@ -17,12 +17,12 @@
 package org.apache.cloudstack.api.command.user.job;
 
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.AsyncJobResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +53,13 @@ public class QueryAsyncJobResultCmd extends BaseCmd {
     /////////////////////////////////////////////////////
 
     @Override
+    public void execute() {
+        AsyncJobResponse response = _responseGenerator.queryJobResult(this);
+        response.setResponseName(getCommandName());
+        this.setResponseObject(response);
+    }
+
+    @Override
     public String getCommandName() {
         return s_name;
     }
@@ -60,12 +67,5 @@ public class QueryAsyncJobResultCmd extends BaseCmd {
     @Override
     public long getEntityOwnerId() {
         return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
-    public void execute() {
-        AsyncJobResponse response = _responseGenerator.queryJobResult(this);
-        response.setResponseName(getCommandName());
-        this.setResponseObject(response);
     }
 }

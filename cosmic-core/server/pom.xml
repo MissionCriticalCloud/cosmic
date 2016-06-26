@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-server</artifactId>
@@ -192,18 +192,18 @@
                             <target>
                                 <copy overwrite="true" todir="${basedir}/target/conf">
                                     <fileset dir="${basedir}/conf">
-                                        <include name="*.in"/>
+                                        <include name="*.in" />
                                     </fileset>
-                                    <globmapper from="*.in" to="*"/>
+                                    <globmapper from="*.in" to="*" />
                                     <filterchain>
                                         <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile" value="${cs.replace.properties}"/>
+                                            <param type="propertiesfile" value="${cs.replace.properties}" />
                                         </filterreader>
                                     </filterchain>
                                 </copy>
                                 <copy todir="${basedir}/target/conf">
                                     <fileset dir="${basedir}/conf">
-                                        <exclude name="*.in"/>
+                                        <exclude name="*.in" />
                                     </fileset>
                                 </copy>
                             </target>

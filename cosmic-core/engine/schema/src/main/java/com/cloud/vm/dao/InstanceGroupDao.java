@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.vm.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.InstanceGroupVO;
+
+import java.util.List;
 
 public interface InstanceGroupDao extends GenericDao<InstanceGroupVO, Long> {
     List<InstanceGroupVO> listByAccountId(long id);
@@ -30,9 +30,9 @@ public interface InstanceGroupDao extends GenericDao<InstanceGroupVO, Long> {
 
     /**
      * Updates name for the vm
-     * @param id - group id
+     *
+     * @param id   - group id
      * @param name
      */
     void updateVmGroup(long id, String name);
-
 }

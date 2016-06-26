@@ -22,7 +22,8 @@ public interface NetworkOrchestrator {
 
     /**
      * Prepares for a VM to join a network
-     * @param vm vm
+     *
+     * @param vm            vm
      * @param reservationId reservation id
      */
     void prepare(String vm, String reservationId);
@@ -34,6 +35,7 @@ public interface NetworkOrchestrator {
 
     /**
      * Cancel a previous reservation
+     *
      * @param reservationId
      */
     void cancel(String reservationId);

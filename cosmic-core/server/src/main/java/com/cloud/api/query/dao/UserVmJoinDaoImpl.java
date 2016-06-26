@@ -16,17 +16,6 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
 import com.cloud.api.query.vo.UserVmJoinVO;
@@ -47,7 +36,6 @@ import com.cloud.vm.VmDetailConstants;
 import com.cloud.vm.VmStats;
 import com.cloud.vm.dao.NicSecondaryIpVO;
 import com.cloud.vm.dao.UserVmDetailsDao;
-
 import org.apache.cloudstack.affinity.AffinityGroupResponse;
 import org.apache.cloudstack.api.ApiConstants.VMDetails;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
@@ -56,6 +44,17 @@ import org.apache.cloudstack.api.response.NicSecondaryIpResponse;
 import org.apache.cloudstack.api.response.SecurityGroupResponse;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -63,18 +62,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implements UserVmJoinDao {
     public static final Logger s_logger = LoggerFactory.getLogger(UserVmJoinDaoImpl.class);
-
-    @Inject
-    private ConfigurationDao  _configDao;
+    private final SearchBuilder<UserVmJoinVO> VmDetailSearch;
+    private final SearchBuilder<UserVmJoinVO> activeVmByIsoSearch;
     @Inject
     public AccountManager _accountMgr;
+    @Inject
+    private ConfigurationDao _configDao;
     @Inject
     private UserVmDetailsDao _userVmDetailsDao;
     @Inject
     private UserDao _userDao;
-
-    private final SearchBuilder<UserVmJoinVO> VmDetailSearch;
-    private final SearchBuilder<UserVmJoinVO> activeVmByIsoSearch;
 
     protected UserVmJoinDaoImpl() {
 
@@ -91,16 +88,6 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
     }
 
     @Override
-    public List<UserVmJoinVO> listActiveByIsoId(Long isoId) {
-        SearchCriteria<UserVmJoinVO> sc = activeVmByIsoSearch.create();
-        sc.setParameters("isoId", isoId);
-        State[] states = new State[2];
-        states[0] = State.Error;
-        states[1] = State.Expunging;
-        return listBy(sc);
-    }
-
-    @Override
     public UserVmResponse newUserVmResponse(ResponseView view, String objectName, UserVmJoinVO userVm, EnumSet<VMDetails> details, Account caller) {
         UserVmResponse userVmResponse = new UserVmResponse();
 
@@ -111,7 +98,7 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
         userVmResponse.setName(userVm.getName());
 
         if (userVm.getDisplayName() != null) {
-        userVmResponse.setDisplayName(userVm.getDisplayName());
+            userVmResponse.setDisplayName(userVm.getDisplayName());
         } else {
             userVmResponse.setDisplayName(userVm.getName());
         }
@@ -203,18 +190,19 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
             if (vmStats != null) {
                 userVmResponse.setCpuUsed(new DecimalFormat("#.##").format(vmStats.getCPUUtilization()) + "%");
 
-                userVmResponse.setNetworkKbsRead((long)vmStats.getNetworkReadKBs());
+                userVmResponse.setNetworkKbsRead((long) vmStats.getNetworkReadKBs());
 
-                userVmResponse.setNetworkKbsWrite((long)vmStats.getNetworkWriteKBs());
+                userVmResponse.setNetworkKbsWrite((long) vmStats.getNetworkWriteKBs());
 
-                if ((userVm.getHypervisorType() != null) && (userVm.getHypervisorType().equals(HypervisorType.KVM) || userVm.getHypervisorType().equals(HypervisorType.XenServer))) { // support KVM and XenServer only util 2013.06.25
-                    userVmResponse.setDiskKbsRead((long)vmStats.getDiskReadKBs());
+                if ((userVm.getHypervisorType() != null) && (userVm.getHypervisorType().equals(HypervisorType.KVM) || userVm.getHypervisorType().equals(HypervisorType.XenServer)
+                )) { // support KVM and XenServer only util 2013.06.25
+                    userVmResponse.setDiskKbsRead((long) vmStats.getDiskReadKBs());
 
-                    userVmResponse.setDiskKbsWrite((long)vmStats.getDiskWriteKBs());
+                    userVmResponse.setDiskKbsWrite((long) vmStats.getDiskWriteKBs());
 
-                    userVmResponse.setDiskIORead((long)vmStats.getDiskReadIOs());
+                    userVmResponse.setDiskIORead((long) vmStats.getDiskReadIOs());
 
-                    userVmResponse.setDiskIOWrite((long)vmStats.getDiskWriteIOs());
+                    userVmResponse.setDiskIOWrite((long) vmStats.getDiskWriteIOs());
                 }
             }
         }
@@ -404,6 +392,28 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
     }
 
     @Override
+    public List<UserVmJoinVO> newUserVmView(UserVm... userVms) {
+
+        Hashtable<Long, UserVm> userVmDataHash = new Hashtable<Long, UserVm>();
+        for (UserVm vm : userVms) {
+            if (!userVmDataHash.containsKey(vm.getId())) {
+                userVmDataHash.put(vm.getId(), vm);
+            }
+        }
+
+        Set<Long> vmIdSet = userVmDataHash.keySet();
+        List<UserVmJoinVO> uvms = searchByIds(vmIdSet.toArray(new Long[vmIdSet.size()]));
+        // populate transit password field from UserVm
+        if (uvms != null) {
+            for (UserVmJoinVO uvm : uvms) {
+                UserVm v = userVmDataHash.get(uvm.getId());
+                uvm.setPassword(v.getPassword());
+            }
+        }
+        return uvms;
+    }
+
+    @Override
     public List<UserVmJoinVO> searchByIds(Long... vmIds) {
         // set detail batch query size
         int DETAILS_BATCH_SIZE = 2000;
@@ -448,25 +458,12 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
     }
 
     @Override
-    public List<UserVmJoinVO> newUserVmView(UserVm... userVms) {
-
-        Hashtable<Long, UserVm> userVmDataHash = new Hashtable<Long, UserVm>();
-        for (UserVm vm : userVms) {
-            if (!userVmDataHash.containsKey(vm.getId())) {
-                userVmDataHash.put(vm.getId(), vm);
-            }
-        }
-
-        Set<Long> vmIdSet = userVmDataHash.keySet();
-        List<UserVmJoinVO> uvms = searchByIds(vmIdSet.toArray(new Long[vmIdSet.size()]));
-        // populate transit password field from UserVm
-        if (uvms != null) {
-            for (UserVmJoinVO uvm : uvms) {
-                UserVm v = userVmDataHash.get(uvm.getId());
-                uvm.setPassword(v.getPassword());
-            }
-        }
-        return uvms;
+    public List<UserVmJoinVO> listActiveByIsoId(Long isoId) {
+        SearchCriteria<UserVmJoinVO> sc = activeVmByIsoSearch.create();
+        sc.setParameters("isoId", isoId);
+        State[] states = new State[2];
+        states[0] = State.Error;
+        states[1] = State.Expunging;
+        return listBy(sc);
     }
-
 }

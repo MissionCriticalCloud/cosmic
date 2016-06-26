@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.agent;
 
+import com.cloud.utils.backoff.BackoffAlgorithm;
+
 import java.util.Map;
 import java.util.Properties;
-
-import com.cloud.utils.backoff.BackoffAlgorithm;
 
 public interface IAgentShell {
     public Map<String, Object> getCmdLineProperties();

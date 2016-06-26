@@ -19,11 +19,10 @@
 
 package com.cloud.agent.api;
 
-import java.util.List;
-
 import com.cloud.vm.snapshot.VMSnapshot;
-
 import org.apache.cloudstack.storage.to.VolumeObjectTO;
+
+import java.util.List;
 
 public class VMSnapshotTO {
     private Long id;
@@ -35,14 +34,6 @@ public class VMSnapshotTO {
     private VMSnapshotTO parent;
     private List<VolumeObjectTO> volumes;
     private boolean quiescevm;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public VMSnapshotTO(Long id, String snapshotName, VMSnapshot.Type type, Long createTime, String description, Boolean current, VMSnapshotTO parent, boolean quiescevm) {
         super();
@@ -58,6 +49,14 @@ public class VMSnapshotTO {
 
     public VMSnapshotTO() {
         this.quiescevm = true;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getDescription() {

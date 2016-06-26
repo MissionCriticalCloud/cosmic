@@ -16,13 +16,12 @@
 // under the License.
 package com.cloud.usage;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.Date;
 
 @Entity
 @Table(name = "usage_network_offering")
@@ -61,7 +60,7 @@ public class UsageNetworkOfferingVO {
     }
 
     public UsageNetworkOfferingVO(long zoneId, long accountId, long domainId, long vmInstanceId, long networkOfferingId, long nicId, boolean isDefault, Date created,
-            Date deleted) {
+                                  Date deleted) {
         this.zoneId = zoneId;
         this.accountId = accountId;
         this.domainId = domainId;

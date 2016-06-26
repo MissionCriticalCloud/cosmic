@@ -19,13 +19,11 @@
 
 package com.cloud.agent.api.routing;
 
-import java.util.HashMap;
-
 import com.cloud.agent.api.Command;
 
-public abstract class NetworkElementCommand extends Command {
-    HashMap<String, String> accessDetails = new HashMap<String, String>(0);
+import java.util.HashMap;
 
+public abstract class NetworkElementCommand extends Command {
     public static final String ACCOUNT_ID = "account.id";
     public static final String GUEST_NETWORK_CIDR = "guest.network.cidr";
     public static final String GUEST_NETWORK_GATEWAY = "guest.network.gateway";
@@ -38,7 +36,7 @@ public abstract class NetworkElementCommand extends Command {
     public static final String VPC_PRIVATE_GATEWAY = "vpc.gateway.private";
     public static final String FIREWALL_EGRESS_DEFAULT = "firewall.egress.default";
     public static final String ROUTER_MONITORING_ENABLE = "router.monitor.enable";
-
+    HashMap<String, String> accessDetails = new HashMap<String, String>(0);
     private String routerAccessIp;
 
     protected NetworkElementCommand() {

@@ -16,14 +16,13 @@
 // under the License.
 package org.apache.cloudstack.ldap;
 
-import java.io.IOException;
-import java.util.Hashtable;
-
 import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
+import java.io.IOException;
+import java.util.Hashtable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,37 +50,18 @@ public class LdapContextFactory {
         return createInitialDirContext(bindPrincipal, bindPassword, providerUrl, true);
     }
 
-    private LdapContext createInitialDirContext(final String principal, final String password, final boolean isSystemContext) throws NamingException, IOException {
-        return createInitialDirContext(principal, password, null, isSystemContext);
-    }
-
     private LdapContext createInitialDirContext(final String principal, final String password, final String providerUrl, final boolean isSystemContext)
-        throws NamingException, IOException {
-        Hashtable<String, String> environment = getEnvironment(principal, password, providerUrl, isSystemContext);
+            throws NamingException, IOException {
+        final Hashtable<String, String> environment = getEnvironment(principal, password, providerUrl, isSystemContext);
         s_logger.debug("initializing ldap with provider url: " + environment.get(Context.PROVIDER_URL));
         return new InitialLdapContext(environment, null);
-    }
-
-    public LdapContext createUserContext(final String principal, final String password) throws NamingException, IOException {
-        return createInitialDirContext(principal, password, false);
-    }
-
-    private void enableSSL(final Hashtable<String, String> environment) {
-        final boolean sslStatus = _ldapConfiguration.getSSLStatus();
-
-        if (sslStatus) {
-            s_logger.info("LDAP SSL enabled.");
-            environment.put(Context.SECURITY_PROTOCOL, "ssl");
-            System.setProperty("javax.net.ssl.trustStore", _ldapConfiguration.getTrustStore());
-            System.setProperty("javax.net.ssl.trustStorePassword", _ldapConfiguration.getTrustStorePassword());
-        }
     }
 
     private Hashtable<String, String> getEnvironment(final String principal, final String password, final String providerUrl, final boolean isSystemContext) {
         final String factory = _ldapConfiguration.getFactory();
         final String url = providerUrl == null ? _ldapConfiguration.getProviderUrl() : providerUrl;
 
-        final Hashtable<String, String> environment = new Hashtable<String, String>();
+        final Hashtable<String, String> environment = new Hashtable<>();
 
         environment.put(Context.INITIAL_CONTEXT_FACTORY, factory);
         environment.put(Context.PROVIDER_URL, url);
@@ -102,6 +82,17 @@ public class LdapContextFactory {
         return environment;
     }
 
+    private void enableSSL(final Hashtable<String, String> environment) {
+        final boolean sslStatus = _ldapConfiguration.getSSLStatus();
+
+        if (sslStatus) {
+            s_logger.info("LDAP SSL enabled.");
+            environment.put(Context.SECURITY_PROTOCOL, "ssl");
+            System.setProperty("javax.net.ssl.trustStore", _ldapConfiguration.getTrustStore());
+            System.setProperty("javax.net.ssl.trustStorePassword", _ldapConfiguration.getTrustStorePassword());
+        }
+    }
+
     private void setAuthentication(final Hashtable<String, String> environment, final boolean isSystemContext) {
         final String authentication = _ldapConfiguration.getAuthentication();
 
@@ -112,4 +103,11 @@ public class LdapContextFactory {
         }
     }
 
+    public LdapContext createUserContext(final String principal, final String password) throws NamingException, IOException {
+        return createInitialDirContext(principal, password, false);
+    }
+
+    private LdapContext createInitialDirContext(final String principal, final String password, final boolean isSystemContext) throws NamingException, IOException {
+        return createInitialDirContext(principal, password, null, isSystemContext);
+    }
 }

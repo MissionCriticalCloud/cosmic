@@ -16,23 +16,21 @@
 // under the License.
 package com.cloud.network.security;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.utils.Profiler;
 import com.cloud.utils.component.ComponentContext;
 
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/SecurityGroupManagerTestContext.xml")
@@ -50,6 +48,11 @@ public class SecurityGroupManagerImpl2Test extends TestCase {
     public void tearDown() throws Exception {
     }
 
+    @Test
+    public void testSchedule() throws ConfigurationException {
+        _schedule(1000);
+    }
+
     protected void _schedule(final int numVms) {
         System.out.println("Starting");
         List<Long> work = new ArrayList<Long>();
@@ -62,11 +65,6 @@ public class SecurityGroupManagerImpl2Test extends TestCase {
         profiler.stop();
 
         System.out.println("Done " + numVms + " in " + profiler.getDurationInMillis() + " ms");
-    }
-
-    @Test
-    public void testSchedule() throws ConfigurationException {
-        _schedule(1000);
     }
 
     @Test

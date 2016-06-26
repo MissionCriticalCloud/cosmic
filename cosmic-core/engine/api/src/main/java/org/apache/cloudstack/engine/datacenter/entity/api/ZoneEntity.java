@@ -18,15 +18,14 @@
  */
 package org.apache.cloudstack.engine.datacenter.entity.api;
 
-import java.util.List;
+import org.apache.cloudstack.engine.service.api.ProvisioningService;
+import org.apache.cloudstack.framework.ws.jackson.Url;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.apache.cloudstack.engine.service.api.ProvisioningService;
-import org.apache.cloudstack.framework.ws.jackson.Url;
+import java.util.List;
 
 /**
  * Describes a zone and operations that can be done in a zone.

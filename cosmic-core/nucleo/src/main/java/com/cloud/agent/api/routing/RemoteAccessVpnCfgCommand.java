@@ -22,25 +22,16 @@ package com.cloud.agent.api.routing;
 public class RemoteAccessVpnCfgCommand extends NetworkElementCommand {
 
     boolean create;
-    private boolean vpcEnabled;
     String vpnServerIp;
     String ipRange;
     String presharedKey;
     String localIp;
+    private boolean vpcEnabled;
     private String localCidr;
     private String publicInterface;
 
     protected RemoteAccessVpnCfgCommand() {
         this.create = false;
-    }
-
-    public boolean isCreate() {
-        return create;
-    }
-
-    @Override
-    public boolean executeInSequence() {
-        return true;
     }
 
     public RemoteAccessVpnCfgCommand(boolean create, String vpnServerAddress, String localIp, String ipRange, String ipsecPresharedKey, boolean vpcEnabled) {
@@ -55,6 +46,15 @@ public class RemoteAccessVpnCfgCommand extends NetworkElementCommand {
         } else {
             this.setPublicInterface("eth2");
         }
+    }
+
+    public boolean isCreate() {
+        return create;
+    }
+
+    @Override
+    public boolean executeInSequence() {
+        return true;
     }
 
     public String getVpnServerIp() {
@@ -108,5 +108,4 @@ public class RemoteAccessVpnCfgCommand extends NetworkElementCommand {
     public void setPublicInterface(String publicInterface) {
         this.publicInterface = publicInterface;
     }
-
 }

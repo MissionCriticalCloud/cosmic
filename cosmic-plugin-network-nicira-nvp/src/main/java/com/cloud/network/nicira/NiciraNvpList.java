@@ -29,7 +29,7 @@ public class NiciraNvpList<T> {
         return this.results;
     }
 
-    public void setResults(List<T> results) {
+    public void setResults(final List<T> results) {
         this.results = results;
     }
 
@@ -37,12 +37,11 @@ public class NiciraNvpList<T> {
         return resultCount;
     }
 
-    public void setResultCount(int resultCount) {
+    public void setResultCount(final int resultCount) {
         this.resultCount = resultCount;
     }
 
     public boolean isEmpty() {
         return this.resultCount == 0;
     }
-
 }

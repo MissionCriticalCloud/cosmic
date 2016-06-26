@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.util.List;
-
 import com.cloud.dc.PodVlanMapVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface PodVlanMapDao extends GenericDao<PodVlanMapVO, Long> {
 
@@ -28,5 +28,4 @@ public interface PodVlanMapDao extends GenericDao<PodVlanMapVO, Long> {
     public PodVlanMapVO listPodVlanMapsByVlan(long vlanDbId);
 
     public PodVlanMapVO findPodVlanMap(long podId, long vlanDbId);
-
 }

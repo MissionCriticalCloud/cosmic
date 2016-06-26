@@ -30,10 +30,10 @@ public class PrivateIpAddress implements PrivateIp {
      * @param broadcastUri
      * @param gateway
      * @param netmask
-     * @param macAddress TODO
+     * @param macAddress        TODO
      * @param physicalNetworkId TODO
      */
-    public PrivateIpAddress(PrivateIpVO privateIp, String broadcastUri, String gateway, String netmask, String macAddress) {
+    public PrivateIpAddress(final PrivateIpVO privateIp, final String broadcastUri, final String gateway, final String netmask, final String macAddress) {
         super();
         this.ipAddress = privateIp.getIpAddress();
         this.broadcastUri = broadcastUri;
@@ -42,6 +42,11 @@ public class PrivateIpAddress implements PrivateIp {
         this.macAddress = macAddress;
         this.networkId = privateIp.getNetworkId();
         this.sourceNat = privateIp.getSourceNat();
+    }
+
+    @Override
+    public String getIpAddress() {
+        return ipAddress;
     }
 
     @Override
@@ -57,11 +62,6 @@ public class PrivateIpAddress implements PrivateIp {
     @Override
     public String getNetmask() {
         return netmask;
-    }
-
-    @Override
-    public String getIpAddress() {
-        return ipAddress;
     }
 
     @Override

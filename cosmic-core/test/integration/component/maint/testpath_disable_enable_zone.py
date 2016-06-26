@@ -17,10 +17,20 @@
 """ Test cases for Disable enable Zone, Pod, Cluster, Host Test Path
 """
 
-from nose.plugins.attrib import attr
+import time
+from marvin.cloudstackAPI import (updateZone,
+                                  updateHost,
+                                  reconnectHost,
+                                  updatePod,
+                                  updateCluster
+                                  )
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources,
-                              validateList)
+from marvin.codes import (ENABLED,
+                          DISABLED,
+                          ENABLE,
+                          DISABLE,
+                          PASS
+                          )
 from marvin.lib.base import (Account,
                              VirtualMachine,
                              ServiceOffering,
@@ -42,26 +52,13 @@ from marvin.lib.common import (get_domain,
                                list_snapshots,
                                get_builtin_template_info
                                )
-
-from marvin.cloudstackAPI import (updateZone,
-                                  updateHost,
-                                  reconnectHost,
-                                  updatePod,
-                                  updateCluster
-                                  )
-
-from marvin.codes import (ENABLED,
-                          DISABLED,
-                          ENABLE,
-                          DISABLE,
-                          PASS
-                          )
-import time
+from marvin.lib.utils import (cleanup_resources,
+                              validateList)
 from marvin.sshClient import SshClient
+from nose.plugins.attrib import attr
 
 
 class TestDisableEnableZone(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestDisableEnableZone, cls).getClsTestClient()
@@ -480,7 +477,6 @@ class TestDisableEnableZone(cloudstackTestCase):
 
 
 class TestDisableEnablePod(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestDisableEnablePod, cls).getClsTestClient()
@@ -874,7 +870,6 @@ class TestDisableEnablePod(cloudstackTestCase):
 
 
 class TestDisableEnableCluster(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestDisableEnableCluster, cls).getClsTestClient()
@@ -1349,7 +1344,6 @@ class TestDisableEnableCluster(cloudstackTestCase):
 
 
 class TestDisableEnableHost(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestDisableEnableHost, cls).getClsTestClient()

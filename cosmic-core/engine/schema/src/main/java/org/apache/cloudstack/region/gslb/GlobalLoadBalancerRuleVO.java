@@ -17,7 +17,7 @@
 
 package org.apache.cloudstack.region.gslb;
 
-import java.util.UUID;
+import com.cloud.region.ha.GlobalLoadBalancerRule;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,8 +27,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.region.ha.GlobalLoadBalancerRule;
+import java.util.UUID;
 
 @Entity
 @Table(name = ("global_load_balancing_rules"))
@@ -38,47 +37,36 @@ public class GlobalLoadBalancerRuleVO implements GlobalLoadBalancerRule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     long id;
-
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "description", length = 4096)
-    private String description;
-
-    @Column(name = "algorithm")
-    private String algorithm;
-
-    @Column(name = "persistence")
-    private String persistence;
-
-    @Column(name = "gslb_domain_name")
-    private String gslbDomain;
-
-    @Column(name = "service_type")
-    private String serviceType;
-
-    @Column(name = "region_id")
-    private int region;
-
     @Column(name = "account_id")
     long accountId;
-
     @Column(name = "domain_id", updatable = false)
     long domainId;
-
     @Column(name = "uuid")
     String uuid;
-
     @Enumerated(value = EnumType.STRING)
     @Column(name = "state")
     GlobalLoadBalancerRule.State state;
+    @Column(name = "name")
+    private String name;
+    @Column(name = "description", length = 4096)
+    private String description;
+    @Column(name = "algorithm")
+    private String algorithm;
+    @Column(name = "persistence")
+    private String persistence;
+    @Column(name = "gslb_domain_name")
+    private String gslbDomain;
+    @Column(name = "service_type")
+    private String serviceType;
+    @Column(name = "region_id")
+    private int region;
 
     public GlobalLoadBalancerRuleVO() {
         uuid = UUID.randomUUID().toString();
     }
 
     public GlobalLoadBalancerRuleVO(String name, String description, String gslbDomain, String algorithm, String persistence, String serviceType, int regionId,
-            long accountId, long domainId, State state) {
+                                    long accountId, long domainId, State state) {
         this.name = name;
         this.description = description;
         region = regionId;
@@ -102,6 +90,15 @@ public class GlobalLoadBalancerRuleVO implements GlobalLoadBalancerRule {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String getGslbDomain() {
+        return gslbDomain;
+    }
+
     @Override
     public String getAlgorithm() {
         return algorithm;
@@ -123,51 +120,8 @@ public class GlobalLoadBalancerRuleVO implements GlobalLoadBalancerRule {
     }
 
     @Override
-    public long getDomainId() {
-        return domainId;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setAlgorithm(String algorithm) {
-        this.algorithm = algorithm;
-    }
-
-    public void setPersistence(String persistence) {
-        this.persistence = persistence;
-    }
-
-    @Override
-    public String getGslbDomain() {
-        return gslbDomain;
-    }
-
-    public void setGslbDomain(String gslbDomain) {
-        this.gslbDomain = gslbDomain;
-    }
-
-    public void setRegion(int region) {
-        this.region = region;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public GlobalLoadBalancerRule.State getState() {
+        return state;
     }
 
     @Override
@@ -183,9 +137,43 @@ public class GlobalLoadBalancerRuleVO implements GlobalLoadBalancerRule {
         this.state = state;
     }
 
+    public void setRegion(int region) {
+        this.region = region;
+    }
+
+    public void setPersistence(String persistence) {
+        this.persistence = persistence;
+    }
+
+    public void setAlgorithm(String algorithm) {
+        this.algorithm = algorithm;
+    }
+
+    public void setGslbDomain(String gslbDomain) {
+        this.gslbDomain = gslbDomain;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
-    public GlobalLoadBalancerRule.State getState() {
-        return state;
+    public long getDomainId() {
+        return domainId;
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    @Override
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     @Override

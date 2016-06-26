@@ -16,18 +16,18 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.network;
 
-import java.util.List;
-
 import com.cloud.event.EventTypes;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,20 +60,26 @@ public class UpdatePhysicalNetworkCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public List<String> getTags() {
-        return tags;
+    @Override
+    public void execute() {
+        PhysicalNetwork result = _networkService.updatePhysicalNetwork(getId(), getNetworkSpeed(), getTags(), getVlan(), getState());
+        if (result != null) {
+            PhysicalNetworkResponse response = _responseGenerator.createPhysicalNetworkResponse(result);
+            response.setResponseName(getCommandName());
+            this.setResponseObject(response);
+        }
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getNetworkSpeed() {
         return speed;
     }
 
-    public String getState() {
-        return state;
-    }
-
-    public Long getId() {
-        return id;
+    public List<String> getTags() {
+        return tags;
     }
 
     public String getVlan() {
@@ -83,6 +89,10 @@ public class UpdatePhysicalNetworkCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
+
+    public String getState() {
+        return state;
+    }
 
     @Override
     public String getCommandName() {
@@ -95,23 +105,13 @@ public class UpdatePhysicalNetworkCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public void execute() {
-        PhysicalNetwork result = _networkService.updatePhysicalNetwork(getId(), getNetworkSpeed(), getTags(), getVlan(), getState());
-        if (result != null) {
-            PhysicalNetworkResponse response = _responseGenerator.createPhysicalNetworkResponse(result);
-            response.setResponseName(getCommandName());
-            this.setResponseObject(response);
-        }
+    public String getEventType() {
+        return EventTypes.EVENT_PHYSICAL_NETWORK_UPDATE;
     }
 
     @Override
     public String getEventDescription() {
         return "Updating Physical network: " + getId();
-    }
-
-    @Override
-    public String getEventType() {
-        return EventTypes.EVENT_PHYSICAL_NETWORK_UPDATE;
     }
 
     @Override

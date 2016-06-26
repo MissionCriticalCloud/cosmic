@@ -16,6 +16,11 @@
 // under the License.
 package com.cloud.utils.db;
 
+import com.cloud.utils.exception.CloudRuntimeException;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
+import javax.persistence.JoinColumn;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -24,12 +29,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.persistence.CollectionTable;
-import javax.persistence.ElementCollection;
-import javax.persistence.JoinColumn;
-
-import com.cloud.utils.exception.CloudRuntimeException;
 
 public class EcInfo {
     protected String insertSql;
@@ -46,12 +45,12 @@ public class EcInfo {
         if (type.isArray()) {
             rawClass = null;
         } else {
-            ParameterizedType pType = (ParameterizedType)attr.field.getGenericType();
+            ParameterizedType pType = (ParameterizedType) attr.field.getGenericType();
             Type rawType = pType.getRawType();
-            Class<?> rawClazz = (Class<?>)rawType;
+            Class<?> rawClazz = (Class<?>) rawType;
             try {
                 if (!Modifier.isAbstract(rawClazz.getModifiers()) && !rawClazz.isInterface() && rawClazz.getConstructors().length != 0 &&
-                    rawClazz.getConstructor() != null) {
+                        rawClazz.getConstructor() != null) {
                     rawClass = rawClazz;
                 } else if (Set.class == rawClazz) {
                     rawClass = HashSet.class;

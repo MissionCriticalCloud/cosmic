@@ -16,14 +16,15 @@
 // under the License.
 package org.apache.cloudstack.network.element;
 
-import java.util.List;
-
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.utils.component.PluggableService;
+
+import java.util.List;
 
 public interface InternalLoadBalancerElementService extends PluggableService {
     /**
      * Configures existing Internal Load Balancer Element (enables or disables it)
+     *
      * @param id
      * @param enable
      * @return
@@ -32,6 +33,7 @@ public interface InternalLoadBalancerElementService extends PluggableService {
 
     /**
      * Adds Internal Load Balancer element to the Network Service Provider
+     *
      * @param ntwkSvcProviderId
      * @return
      */
@@ -39,6 +41,7 @@ public interface InternalLoadBalancerElementService extends PluggableService {
 
     /**
      * Retrieves existing Internal Load Balancer element
+     *
      * @param id
      * @return
      */
@@ -46,6 +49,7 @@ public interface InternalLoadBalancerElementService extends PluggableService {
 
     /**
      * Searches for existing Internal Load Balancer elements based on parameters passed to the call
+     *
      * @param id
      * @param ntwkSvsProviderId
      * @param enabled

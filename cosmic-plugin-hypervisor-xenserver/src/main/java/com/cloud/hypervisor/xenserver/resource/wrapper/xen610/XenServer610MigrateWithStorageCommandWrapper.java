@@ -19,11 +19,6 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xen610;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.MigrateWithStorageAnswer;
 import com.cloud.agent.api.MigrateWithStorageCommand;
@@ -38,6 +33,13 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.exception.CloudRuntimeException;
+import org.apache.cloudstack.storage.to.VolumeObjectTO;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Host;
 import com.xensource.xenapi.Network;
@@ -47,12 +49,10 @@ import com.xensource.xenapi.Types;
 import com.xensource.xenapi.VDI;
 import com.xensource.xenapi.VIF;
 import com.xensource.xenapi.VM;
-
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  MigrateWithStorageCommand.class)
+@ResourceWrapper(handles = MigrateWithStorageCommand.class)
 public final class XenServer610MigrateWithStorageCommandWrapper extends CommandWrapper<MigrateWithStorageCommand, Answer, XenServer610Resource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(XenServer610MigrateWithStorageCommandWrapper.class);
@@ -75,15 +75,15 @@ public final class XenServer610MigrateWithStorageCommandWrapper extends CommandW
                 xenServer610Resource.getNetwork(connection, nicTo);
             }
 
-            final Map<String, String> other = new HashMap<String, String>();
+            final Map<String, String> other = new HashMap<>();
             other.put("live", "true");
 
             final XsLocalNetwork nativeNetworkForTraffic = xenServer610Resource.getNativeNetworkForTraffic(connection, TrafficType.Storage, null);
             final Network networkForSm = nativeNetworkForTraffic.getNetwork();
 
             // Create the vif map. The vm stays in the same cluster so we have to pass an empty vif map.
-            final Map<VIF, Network> vifMap = new HashMap<VIF, Network>();
-            final Map<VDI, SR> vdiMap = new HashMap<VDI, SR>();
+            final Map<VIF, Network> vifMap = new HashMap<>();
+            final Map<VDI, SR> vdiMap = new HashMap<>();
             for (final Map.Entry<VolumeTO, StorageFilerTO> entry : volumeToFiler.entrySet()) {
                 final VolumeTO volume = entry.getKey();
                 final StorageFilerTO sotrageFiler = entry.getValue();

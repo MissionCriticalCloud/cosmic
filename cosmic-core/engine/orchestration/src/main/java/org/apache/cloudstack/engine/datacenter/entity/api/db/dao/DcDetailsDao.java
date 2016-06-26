@@ -16,11 +16,10 @@
 // under the License.
 package org.apache.cloudstack.engine.datacenter.entity.api.db.dao;
 
-import java.util.Map;
-
 import com.cloud.utils.db.GenericDao;
-
 import org.apache.cloudstack.engine.datacenter.entity.api.db.DcDetailVO;
+
+import java.util.Map;
 
 public interface DcDetailsDao extends GenericDao<DcDetailVO, Long> {
     Map<String, String> findDetails(long dcId);

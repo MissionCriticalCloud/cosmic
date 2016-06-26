@@ -17,12 +17,6 @@
 
 package com.cloud.network.rules;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.NetworkUsageCommand;
 import com.cloud.agent.manager.Commands;
@@ -47,8 +41,14 @@ import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.NicDao;
-
 import org.apache.cloudstack.network.topology.NetworkTopologyVisitor;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,14 +144,6 @@ public class NicPlugInOutRules extends RuleApplier {
         return true;
     }
 
-    public List<? extends PublicIpAddress> getIpAddresses() {
-        return _ipAddresses;
-    }
-
-    public Commands getNetUsageCommands() {
-        return _netUsageCommands;
-    }
-
     private Pair<Map<String, PublicIpAddress>, Map<String, PublicIpAddress>> getNicsToChangeOnRouter(final NetworkTopologyVisitor visitor) {
         // 1) check which nics need to be plugged/unplugged and plug/unplug them
 
@@ -215,5 +207,13 @@ public class NicPlugInOutRules extends RuleApplier {
                 nicsToUnplug);
 
         return nicsToChange;
+    }
+
+    public List<? extends PublicIpAddress> getIpAddresses() {
+        return _ipAddresses;
+    }
+
+    public Commands getNetUsageCommands() {
+        return _netUsageCommands;
     }
 }

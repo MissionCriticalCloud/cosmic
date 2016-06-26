@@ -17,23 +17,22 @@
 """ P1 tests for Scaling up Vm
 """
 # Import Local Modules
-from marvin.codes import FAILED
-from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.cloudstackAPI import scaleVirtualMachine
-from marvin.lib.utils import cleanup_resources
+from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import FAILED
 from marvin.lib.base import (Account,
                              VirtualMachine,
                              ServiceOffering)
 from marvin.lib.common import (get_zone,
                                get_template,
                                get_domain)
+from marvin.lib.utils import cleanup_resources
 from nose.plugins.attrib import attr
 
 _multiprocess_shared_ = True
 
 
 class TestScaleVm(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestScaleVm, cls).getClsTestClient()

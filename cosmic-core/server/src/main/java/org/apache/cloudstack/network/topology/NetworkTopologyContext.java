@@ -17,17 +17,18 @@
 
 package org.apache.cloudstack.network.topology;
 
-import java.util.Hashtable;
-
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
+
+import java.util.Hashtable;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 public class NetworkTopologyContext {
 
-    private final Hashtable<NetworkType, NetworkTopology> _flyweight = new Hashtable<DataCenter.NetworkType, NetworkTopology>();;
+    private final Hashtable<NetworkType, NetworkTopology> _flyweight = new Hashtable<DataCenter.NetworkType, NetworkTopology>();
+    ;
 
     @Autowired
     @Qualifier("basicNetworkTopology")
@@ -52,6 +53,7 @@ public class NetworkTopologyContext {
 
     /**
      * Method used for tests purpose only. Please do not use it to set the AdvanceNetworkTopology and it is managed by Spring.
+     *
      * @param advancedNetworkTopology
      */
     public void setAdvancedNetworkTopology(final AdvancedNetworkTopology advancedNetworkTopology) {
@@ -59,7 +61,8 @@ public class NetworkTopologyContext {
     }
 
     /**
-     *  Method used for tests purpose only. Please do not use it to set the BasicNetworkTopology and it is managed by Spring.
+     * Method used for tests purpose only. Please do not use it to set the BasicNetworkTopology and it is managed by Spring.
+     *
      * @param basicNetworkTopology
      */
     public void setBasicNetworkTopology(final BasicNetworkTopology basicNetworkTopology) {

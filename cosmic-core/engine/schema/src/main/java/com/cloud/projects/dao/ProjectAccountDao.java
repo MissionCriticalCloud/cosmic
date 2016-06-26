@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.projects.dao;
 
-import java.util.List;
-
 import com.cloud.projects.ProjectAccount;
 import com.cloud.projects.ProjectAccountVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface ProjectAccountDao extends GenericDao<ProjectAccountVO, Long> {
     ProjectAccountVO getProjectOwner(long projectId);

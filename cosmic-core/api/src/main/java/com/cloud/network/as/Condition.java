@@ -23,13 +23,15 @@ import org.apache.cloudstack.api.InternalIdentity;
 
 public interface Condition extends ControlledEntity, Identity, InternalIdentity {
 
-    static enum Operator {
-        EQ, GT, LT, GE, LE
-    };
-
     long getCounterid();
+
+    ;
 
     long getThreshold();
 
     Operator getRelationalOperator();
+
+    static enum Operator {
+        EQ, GT, LT, GE, LE
+    }
 }

@@ -37,7 +37,6 @@ public interface ImageStore extends Identity, InternalIdentity {
     String getProviderName();
 
     /**
-     *
      * @return data store protocol
      */
     String getProtocol();

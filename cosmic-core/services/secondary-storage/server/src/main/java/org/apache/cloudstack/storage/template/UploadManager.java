@@ -26,7 +26,6 @@ import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Upload.Status;
 import com.cloud.storage.template.TemplateUploader;
 import com.cloud.utils.component.Manager;
-
 import org.apache.cloudstack.storage.resource.SecondaryStorageResource;
 
 public interface UploadManager extends Manager {
@@ -45,6 +44,7 @@ public interface UploadManager extends Manager {
 
     /**
      * Get the upload percent of a upload job
+     *
      * @param jobId job Id
      * @return
      */
@@ -52,6 +52,7 @@ public interface UploadManager extends Manager {
 
     /**
      * Get the upload error if any
+     *
      * @param jobId job Id
      * @return
      */
@@ -60,11 +61,12 @@ public interface UploadManager extends Manager {
     /**
      * Get the local path for the upload
      * @param jobId job Id
-     * @return
-    public String getUploadLocalPath(String jobId);
+     * @return public String getUploadLocalPath(String jobId);
      */
 
-    /** Handle upload commands from the management server
+    /**
+     * Handle upload commands from the management server
+     *
      * @param cmd cmd from server
      * @return answer representing status of upload.
      */
@@ -73,10 +75,9 @@ public interface UploadManager extends Manager {
     public String getPublicTemplateRepo();
 
     String uploadPublicTemplate(long id, String url, String name, ImageFormat format, Long accountId, String descr, String cksum, String installPathPrefix, String user,
-        String password, long maxTemplateSizeInBytes);
+                                String password, long maxTemplateSizeInBytes);
 
     CreateEntityDownloadURLAnswer handleCreateEntityURLCommand(CreateEntityDownloadURLCommand cmd);
 
     Answer handleDeleteEntityDownloadURLCommand(DeleteEntityDownloadURLCommand cmd);
-
 }

@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.network.vpc.dao;
 
-import java.util.List;
-
 import com.cloud.network.vpc.PrivateIpVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface PrivateIpDao extends GenericDao<PrivateIpVO, Long> {
 

@@ -42,18 +42,16 @@ public class SnapshotCommand extends Command {
     }
 
     /**
-     * @param primaryStoragePoolNameLabel
-     *            The primary storage Pool
-     * @param snapshotUuid
-     *            The UUID of the snapshot which is going to be backed up
-     * @param secondaryStoragePoolURL
-     *            This is what shows up in the UI when you click on Secondary
-     *            storage. In the code, it is present as: In the
-     *            vmops.host_details table, there is a field mount.parent. This
-     *            is the value of that field If you have better ideas on how to
-     *            get it, you are welcome.
+     * @param primaryStoragePoolNameLabel The primary storage Pool
+     * @param snapshotUuid                The UUID of the snapshot which is going to be backed up
+     * @param secondaryStoragePoolURL     This is what shows up in the UI when you click on Secondary
+     *                                    storage. In the code, it is present as: In the
+     *                                    vmops.host_details table, there is a field mount.parent. This
+     *                                    is the value of that field If you have better ideas on how to
+     *                                    get it, you are welcome.
      */
-    public SnapshotCommand(final StoragePool pool, final String secondaryStorageUrl, final String snapshotUuid, final String snapshotName, final Long dcId, final Long accountId, final Long volumeId) {
+    public SnapshotCommand(final StoragePool pool, final String secondaryStorageUrl, final String snapshotUuid, final String snapshotName, final Long dcId, final Long accountId,
+                           final Long volumeId) {
         primaryStoragePoolNameLabel = pool.getUuid();
         primaryPool = new StorageFilerTO(pool);
         this.snapshotUuid = snapshotUuid;
@@ -123,5 +121,4 @@ public class SnapshotCommand extends Command {
     public boolean executeInSequence() {
         return false;
     }
-
 }

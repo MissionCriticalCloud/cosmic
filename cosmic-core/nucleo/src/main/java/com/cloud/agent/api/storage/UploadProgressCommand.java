@@ -21,10 +21,6 @@ package com.cloud.agent.api.storage;
 
 public class UploadProgressCommand extends UploadCommand {
 
-    public static enum RequestType {
-        GET_STATUS, ABORT, RESTART, PURGE, GET_OR_RESTART
-    }
-
     private String jobId;
     private RequestType request;
 
@@ -32,7 +28,7 @@ public class UploadProgressCommand extends UploadCommand {
         super();
     }
 
-    public UploadProgressCommand(UploadCommand cmd, String jobId, RequestType req) {
+    public UploadProgressCommand(final UploadCommand cmd, final String jobId, final RequestType req) {
         super(cmd);
 
         this.jobId = jobId;
@@ -43,12 +39,15 @@ public class UploadProgressCommand extends UploadCommand {
         return jobId;
     }
 
-    public void setRequest(RequestType request) {
-        this.request = request;
-    }
-
     public RequestType getRequest() {
         return request;
     }
 
+    public void setRequest(final RequestType request) {
+        this.request = request;
+    }
+
+    public static enum RequestType {
+        GET_STATUS, ABORT, RESTART, PURGE, GET_OR_RESTART
+    }
 }

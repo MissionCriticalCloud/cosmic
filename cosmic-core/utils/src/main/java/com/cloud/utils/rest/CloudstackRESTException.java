@@ -29,5 +29,4 @@ public class CloudstackRESTException extends Exception {
     public CloudstackRESTException(final String message, final Throwable cause) {
         super(message, cause);
     }
-
 }

@@ -16,22 +16,13 @@
 // under the License.
 package com.cloud.projects;
 
-import java.util.Date;
-
 import com.cloud.domain.PartOf;
-
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
 
+import java.util.Date;
+
 public interface Project extends PartOf, Identity, InternalIdentity {
-    public enum State {
-        Active, Disabled, Suspended
-    }
-
-    public enum ListProjectResourcesCriteria {
-        ListProjectResourcesOnly, SkipProjectResources
-    }
-
     String getDisplayText();
 
     @Override
@@ -52,4 +43,11 @@ public interface Project extends PartOf, Identity, InternalIdentity {
 
     void setState(State state);
 
+    public enum State {
+        Active, Disabled, Suspended
+    }
+
+    public enum ListProjectResourcesCriteria {
+        ListProjectResourcesOnly, SkipProjectResources
+    }
 }

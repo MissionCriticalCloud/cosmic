@@ -40,5 +40,4 @@ public class ExternalNetworkResourceUsageAnswer extends Answer {
         this.ipBytes = null;
         this.guestVlanBytes = null;
     }
-
 }

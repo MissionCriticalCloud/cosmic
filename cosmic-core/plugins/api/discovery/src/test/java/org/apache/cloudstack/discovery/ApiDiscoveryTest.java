@@ -24,23 +24,22 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.cloud.user.User;
+import com.cloud.user.UserVO;
+import com.cloud.utils.component.PluggableService;
+import org.apache.cloudstack.acl.APIChecker;
+import org.apache.cloudstack.api.APICommand;
+import org.apache.cloudstack.api.command.user.discovery.ListApisCmd;
+import org.apache.cloudstack.api.response.ApiDiscoveryResponse;
+import org.apache.cloudstack.api.response.ListResponse;
+
+import javax.naming.ConfigurationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.naming.ConfigurationException;
-
-import com.cloud.user.User;
-import com.cloud.user.UserVO;
-import com.cloud.utils.component.PluggableService;
-
-import org.apache.cloudstack.acl.APIChecker;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.command.user.discovery.ListApisCmd;
-import org.apache.cloudstack.api.response.ApiDiscoveryResponse;
-import org.apache.cloudstack.api.response.ListResponse;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -80,7 +79,7 @@ public class ApiDiscoveryTest {
 
     @Test
     public void verifyListSingleApi() throws Exception {
-        ListResponse<ApiDiscoveryResponse> responses = (ListResponse<ApiDiscoveryResponse>)s_discoveryService.listApis(testUser, testApiName);
+        ListResponse<ApiDiscoveryResponse> responses = (ListResponse<ApiDiscoveryResponse>) s_discoveryService.listApis(testUser, testApiName);
         if (responses != null) {
             ApiDiscoveryResponse response = responses.getResponses().get(0);
             assertTrue("No. of response items should be one", responses.getCount() == 1);
@@ -93,7 +92,7 @@ public class ApiDiscoveryTest {
 
     @Test
     public void verifyListApis() throws Exception {
-        ListResponse<ApiDiscoveryResponse> responses = (ListResponse<ApiDiscoveryResponse>)s_discoveryService.listApis(testUser, null);
+        ListResponse<ApiDiscoveryResponse> responses = (ListResponse<ApiDiscoveryResponse>) s_discoveryService.listApis(testUser, null);
         if (responses != null) {
             assertTrue("No. of response items > 1", responses.getCount().intValue() == 1);
             for (ApiDiscoveryResponse response : responses.getResponses()) {

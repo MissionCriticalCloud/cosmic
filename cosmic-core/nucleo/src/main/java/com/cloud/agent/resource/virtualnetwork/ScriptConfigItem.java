@@ -65,5 +65,4 @@ public class ScriptConfigItem extends ConfigItem {
         sb.append(args);
         return sb.toString();
     }
-
 }

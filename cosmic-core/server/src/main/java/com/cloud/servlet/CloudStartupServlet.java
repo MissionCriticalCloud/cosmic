@@ -16,17 +16,16 @@
 // under the License.
 package com.cloud.servlet;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-
 import com.cloud.utils.LogUtils;
 import com.cloud.utils.SerialVersionUID;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.db.TransactionLegacy;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -16,17 +16,13 @@
 // under the License.
 package com.cloud.dc;
 
-import java.util.Date;
-
 import org.apache.cloudstack.acl.InfrastructureEntity;
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
 
-public interface Vlan extends InfrastructureEntity, InternalIdentity, Identity {
-    public enum VlanType {
-        DirectAttached, VirtualNetwork
-    }
+import java.util.Date;
 
+public interface Vlan extends InfrastructureEntity, InternalIdentity, Identity {
     public final static String UNTAGGED = "untagged";
 
     public String getVlanTag();
@@ -54,4 +50,8 @@ public interface Vlan extends InfrastructureEntity, InternalIdentity, Identity {
     public String getIp6Cidr();
 
     public String getIp6Range();
+
+    public enum VlanType {
+        DirectAttached, VirtualNetwork
+    }
 }

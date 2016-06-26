@@ -16,14 +16,6 @@
 // under the License.
 package org.apache.cloudstack.region;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InvalidParameterValueException;
@@ -36,12 +28,19 @@ import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.component.Manager;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.DbProperties;
-
 import org.apache.cloudstack.api.command.admin.account.UpdateAccountCmd;
 import org.apache.cloudstack.api.command.admin.domain.UpdateDomainCmd;
 import org.apache.cloudstack.api.command.admin.user.DeleteUserCmd;
 import org.apache.cloudstack.api.command.admin.user.UpdateUserCmd;
 import org.apache.cloudstack.region.dao.RegionDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -63,6 +62,11 @@ public class RegionManagerImpl extends ManagerBase implements RegionManager, Man
     private int _id;
 
     @Override
+    public String getName() {
+        return _name;
+    }
+
+    @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         _name = name;
         final Properties dbProps = DbProperties.getDbProperties();
@@ -82,11 +86,6 @@ public class RegionManagerImpl extends ManagerBase implements RegionManager, Man
     @Override
     public boolean stop() {
         return true;
-    }
-
-    @Override
-    public String getName() {
-        return _name;
     }
 
     @Override
@@ -198,7 +197,7 @@ public class RegionManagerImpl extends ManagerBase implements RegionManager, Man
      */
     @Override
     public Account disableAccount(String accountName, Long domainId, Long accountId, Boolean lockRequested) throws ConcurrentOperationException,
-        ResourceUnavailableException {
+            ResourceUnavailableException {
         Account account = null;
         if (lockRequested) {
             account = _accountMgr.lockAccount(accountName, domainId, accountId);
@@ -263,5 +262,4 @@ public class RegionManagerImpl extends ManagerBase implements RegionManager, Man
     public UserAccount enableUser(long userId) {
         return _accountMgr.enableUser(userId);
     }
-
 }

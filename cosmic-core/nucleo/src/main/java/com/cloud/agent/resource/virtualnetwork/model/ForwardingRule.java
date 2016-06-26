@@ -87,5 +87,4 @@ public class ForwardingRule {
     public void setDestinationPortRange(String destinationPortRange) {
         this.destinationPortRange = destinationPortRange;
     }
-
 }

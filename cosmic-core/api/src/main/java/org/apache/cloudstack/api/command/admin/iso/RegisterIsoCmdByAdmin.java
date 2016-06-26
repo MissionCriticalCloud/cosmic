@@ -16,11 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.iso;
 
-import java.util.List;
-
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.template.VirtualMachineTemplate;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
@@ -28,6 +25,9 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.iso.RegisterIsoCmd;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.TemplateResponse;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +36,8 @@ import org.slf4j.LoggerFactory;
 public class RegisterIsoCmdByAdmin extends RegisterIsoCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RegisterIsoCmdByAdmin.class.getName());
 
-
     @Override
-    public void execute() throws ResourceAllocationException{
+    public void execute() throws ResourceAllocationException {
         VirtualMachineTemplate template = _templateService.registerIso(this);
         if (template != null) {
             ListResponse<TemplateResponse> response = new ListResponse<TemplateResponse>();
@@ -49,6 +48,5 @@ public class RegisterIsoCmdByAdmin extends RegisterIsoCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to register iso");
         }
-
     }
 }

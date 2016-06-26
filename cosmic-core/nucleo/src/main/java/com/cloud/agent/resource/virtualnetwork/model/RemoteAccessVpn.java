@@ -94,5 +94,4 @@ public class RemoteAccessVpn extends ConfigBase {
     public void setPublicInterface(String publicInterface) {
         this.publicInterface = publicInterface;
     }
-
 }

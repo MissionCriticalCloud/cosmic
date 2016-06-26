@@ -26,14 +26,10 @@ public interface ProjectService {
     /**
      * Creates a new project
      *
-     * @param name
-     *            - project name
-     * @param displayText
-     *            - project display text
-     * @param accountName
-     *            - account name of the project owner
-     * @param domainId
-     *            - domainid of the project owner
+     * @param name        - project name
+     * @param displayText - project display text
+     * @param accountName - account name of the project owner
+     * @param domainId    - domainid of the project owner
      * @return the project if created successfully, null otherwise
      * @throws ResourceAllocationException
      */
@@ -42,8 +38,7 @@ public interface ProjectService {
     /**
      * Deletes a project
      *
-     * @param id
-     *            - project id
+     * @param id - project id
      * @return true if the project was deleted successfully, false otherwise
      */
     boolean deleteProject(long id);
@@ -51,8 +46,7 @@ public interface ProjectService {
     /**
      * Gets a project by id
      *
-     * @param id
-     *            - project id
+     * @param id - project id
      * @return project object
      */
     Project getProject(long id);

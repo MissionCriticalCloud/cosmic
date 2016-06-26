@@ -18,11 +18,6 @@ package org.cloud.network.router.deployment;
 
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.Pod;
@@ -46,6 +41,11 @@ import com.cloud.vm.VirtualMachineProfile.Param;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.VMInstanceDao;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -62,7 +62,7 @@ public class RouterDeploymentDefinitionTestBase {
     protected static final long DEFAULT_OFFERING_ID = 17L;
     protected static final Long DATA_CENTER_ID = 100l;
     protected static final Long NW_ID_1 = 101l;
-    protected static final Long NW_ID_2= 102l;
+    protected static final Long NW_ID_2 = 102l;
     protected static final Long POD_ID1 = 111l;
     protected static final Long POD_ID2 = 112l;
     protected static final Long POD_ID3 = 113l;
@@ -115,19 +115,15 @@ public class RouterDeploymentDefinitionTestBase {
     @Mock
     protected NetworkVO mockNw;
     @Mock
+    protected Account mockOwner;
+    protected List<HostPodVO> mockPods = new ArrayList<>();
+    protected Map<Param, Object> params = new HashMap<>();
+    @InjectMocks
+    protected RouterDeploymentDefinitionBuilder builder = new RouterDeploymentDefinitionBuilder();
+    @Mock
     NetworkOfferingVO mockNwOfferingVO;
     @Mock
     ServiceOfferingVO mockSvcOfferingVO;
-    @Mock
-    protected Account mockOwner;
-
-
-    protected List<HostPodVO> mockPods = new ArrayList<>();
-    protected Map<Param, Object> params = new HashMap<>();
-
-    @InjectMocks
-    protected RouterDeploymentDefinitionBuilder builder = new RouterDeploymentDefinitionBuilder();
-
 
     protected void initMocks() {
         when(mockDestination.getDataCenter()).thenReturn(mockDataCenter);

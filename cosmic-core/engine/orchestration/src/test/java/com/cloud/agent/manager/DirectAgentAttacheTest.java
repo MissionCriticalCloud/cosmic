@@ -28,13 +28,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DirectAgentAttacheTest {
+    long _id = 0L;
     @Mock
     private AgentManagerImpl _agentMgr;
-
     @Mock
     private ServerResource _resource;
-
-    long _id = 0L;
+    private DirectAgentAttache directAgentAttache;
 
     @Before
     public void setup() {
@@ -42,11 +41,10 @@ public class DirectAgentAttacheTest {
 
         MockitoAnnotations.initMocks(directAgentAttache);
     }
-    private DirectAgentAttache directAgentAttache;
 
     @Test
     public void testPingTask() throws Exception {
-        DirectAgentAttache.PingTask pt = directAgentAttache.new PingTask();
+        final DirectAgentAttache.PingTask pt = directAgentAttache.new PingTask();
         Mockito.doReturn(2).when(_agentMgr).getDirectAgentThreadCap();
         pt.runInContext();
         Mockito.verify(_resource, Mockito.times(1)).getCurrentStatus(_id);

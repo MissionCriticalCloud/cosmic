@@ -17,10 +17,9 @@
 """ Test case for Data Disk Attach to VM on ZWPS Test Path
 """
 
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources,
-                              validateList)
+from marvin.codes import (PASS,
+                          ZONETAG1)
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              DiskOffering,
@@ -32,13 +31,12 @@ from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template
                                )
-
-from marvin.codes import (PASS,
-                          ZONETAG1)
+from marvin.lib.utils import (cleanup_resources,
+                              validateList)
+from nose.plugins.attrib import attr
 
 
 class TestAttachDataDisk(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestAttachDataDisk, cls).getClsTestClient()

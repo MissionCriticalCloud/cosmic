@@ -20,7 +20,6 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -30,10 +29,12 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.Site2SiteVpnConnectionResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "resetVpnConnection", description = "Reset site to site vpn connection", responseObject = Site2SiteVpnConnectionResponse.class, entityType = {Site2SiteVpnConnection.class},
+@APICommand(name = "resetVpnConnection", description = "Reset site to site vpn connection", responseObject = Site2SiteVpnConnectionResponse.class, entityType =
+        {Site2SiteVpnConnection.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ResetVpnConnectionCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ResetVpnConnectionCmd.class.getName());
@@ -50,9 +51,9 @@ public class ResetVpnConnectionCmd extends BaseAsyncCmd {
     private String accountName;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               description = "an optional domainId for connection. If the account parameter is used, domainId must also be used.")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            description = "an optional domainId for connection. If the account parameter is used, domainId must also be used.")
     private Long domainId;
 
     /////////////////////////////////////////////////////
@@ -76,27 +77,13 @@ public class ResetVpnConnectionCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, null, true);
-        if (accountId == null) {
-            return CallContext.current().getCallingAccount().getId();
-        }
-        return Account.ACCOUNT_ID_SYSTEM;
+    public String getEventType() {
+        return EventTypes.EVENT_S2S_VPN_CONNECTION_RESET;
     }
 
     @Override
     public String getEventDescription() {
         return "Reset site-to-site VPN connection for account " + getEntityOwnerId();
-    }
-
-    @Override
-    public String getEventType() {
-        return EventTypes.EVENT_S2S_VPN_CONNECTION_RESET;
     }
 
     @Override
@@ -114,5 +101,19 @@ public class ResetVpnConnectionCmd extends BaseAsyncCmd {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.RESOURCE_UNAVAILABLE_ERROR, ex.getMessage());
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, null, true);
+        if (accountId == null) {
+            return CallContext.current().getCallingAccount().getId();
+        }
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

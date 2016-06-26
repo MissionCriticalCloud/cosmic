@@ -16,12 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.zone;
 
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.dc.DataCenter;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -31,6 +27,10 @@ import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,8 +85,8 @@ public class UpdateZoneCmd extends BaseCmd {
     private String dhcpProvider;
 
     @Parameter(name = ApiConstants.DOMAIN,
-               type = CommandType.STRING,
-               description = "Network domain name for the networks in the zone; empty string will update domain with NULL value")
+            type = CommandType.STRING,
+            description = "Network domain name for the networks in the zone; empty string will update domain with NULL value")
     private String domain;
 
     @Parameter(name = ApiConstants.DNS_SEARCH_ORDER, type = CommandType.LIST, collectionType = CommandType.STRING, description = "the dns search order list")
@@ -109,10 +109,6 @@ public class UpdateZoneCmd extends BaseCmd {
 
     public String getGuestCidrAddress() {
         return guestCidrAddress;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public String getIp6Dns1() {
@@ -163,20 +159,6 @@ public class UpdateZoneCmd extends BaseCmd {
         return localStorageEnabled;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
     @Override
     public void execute() {
         CallContext.current().setEventDetails("Zone Id: " + getId());
@@ -188,5 +170,23 @@ public class UpdateZoneCmd extends BaseCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update zone; internal error.");
         }
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

@@ -18,12 +18,6 @@
  */
 package org.apache.cloudstack.framework.sampleserver;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import org.apache.cloudstack.framework.messagebus.MessageBus;
 import org.apache.cloudstack.framework.messagebus.MessageDispatcher;
 import org.apache.cloudstack.framework.messagebus.MessageHandler;
@@ -33,6 +27,12 @@ import org.apache.cloudstack.framework.rpc.RpcProvider;
 import org.apache.cloudstack.framework.rpc.RpcServerCall;
 import org.apache.cloudstack.framework.rpc.RpcServiceDispatcher;
 import org.apache.cloudstack.framework.rpc.RpcServiceHandler;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -67,6 +67,29 @@ public class SampleManagerComponent {
         }, 3000);
     }
 
+    void testRpc() {
+        SampleStoragePrepareCommand cmd = new SampleStoragePrepareCommand();
+        cmd.setStoragePool("Pool1");
+        cmd.setVolumeId("vol1");
+
+        _rpcProvider.newCall()
+                    .setCommand("StoragePrepare")
+                    .setCommandArg(cmd)
+                    .setTimeout(10000)
+                    .addCallbackListener(new RpcCallbackListener<SampleStoragePrepareAnswer>() {
+                        @Override
+                        public void onSuccess(SampleStoragePrepareAnswer result) {
+                            s_logger.info("StoragePrepare return result: " + result.getResult());
+                        }
+
+                        @Override
+                        public void onFailure(RpcException e) {
+                            s_logger.info("StoragePrepare failed");
+                        }
+                    })
+                    .apply();
+    }
+
     @RpcServiceHandler(command = "NetworkPrepare")
     void onStartCommand(RpcServerCall call) {
         call.completeCall("NetworkPrepare completed");
@@ -74,28 +97,5 @@ public class SampleManagerComponent {
 
     @MessageHandler(topic = "network.prepare")
     void onPrepareNetwork(String sender, String topic, Object args) {
-    }
-
-    void testRpc() {
-        SampleStoragePrepareCommand cmd = new SampleStoragePrepareCommand();
-        cmd.setStoragePool("Pool1");
-        cmd.setVolumeId("vol1");
-
-        _rpcProvider.newCall()
-            .setCommand("StoragePrepare")
-            .setCommandArg(cmd)
-            .setTimeout(10000)
-            .addCallbackListener(new RpcCallbackListener<SampleStoragePrepareAnswer>() {
-                @Override
-                public void onSuccess(SampleStoragePrepareAnswer result) {
-                    s_logger.info("StoragePrepare return result: " + result.getResult());
-                }
-
-                @Override
-                public void onFailure(RpcException e) {
-                    s_logger.info("StoragePrepare failed");
-                }
-            })
-            .apply();
     }
 }

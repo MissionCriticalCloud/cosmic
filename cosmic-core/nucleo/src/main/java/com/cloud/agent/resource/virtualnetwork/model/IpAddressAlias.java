@@ -29,7 +29,7 @@ public class IpAddressAlias {
         // Empty constructor for (de)serialization
     }
 
-    public IpAddressAlias(boolean revoke, String ipAddress, String netmask, long count) {
+    public IpAddressAlias(final boolean revoke, final String ipAddress, final String netmask, final long count) {
         super();
         this.revoke = revoke;
         IpAddress = ipAddress;
@@ -41,7 +41,7 @@ public class IpAddressAlias {
         return revoke;
     }
 
-    public void setRevoke(boolean revoke) {
+    public void setRevoke(final boolean revoke) {
         this.revoke = revoke;
     }
 
@@ -49,7 +49,7 @@ public class IpAddressAlias {
         return IpAddress;
     }
 
-    public void setIpAddress(String ipAddress) {
+    public void setIpAddress(final String ipAddress) {
         IpAddress = ipAddress;
     }
 
@@ -57,7 +57,7 @@ public class IpAddressAlias {
         return netmask;
     }
 
-    public void setNetmask(String netmask) {
+    public void setNetmask(final String netmask) {
         this.netmask = netmask;
     }
 
@@ -65,8 +65,7 @@ public class IpAddressAlias {
         return count;
     }
 
-    public void setCount(long count) {
+    public void setCount(final long count) {
         this.count = count;
     }
-
 }

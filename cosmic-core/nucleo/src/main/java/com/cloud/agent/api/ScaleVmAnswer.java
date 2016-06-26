@@ -27,5 +27,4 @@ public class ScaleVmAnswer extends Answer {
     public ScaleVmAnswer(ScaleVmCommand cmd, boolean result, String detail) {
         super(cmd, result, detail);
     }
-
 }

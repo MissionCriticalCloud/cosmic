@@ -26,17 +26,16 @@ public class CheckNetworkAnswer extends Answer {
     public CheckNetworkAnswer() {
     }
 
+    public CheckNetworkAnswer(CheckNetworkCommand cmd, boolean result, String details) {
+        this(cmd, result, details, false);
+    }
+
     public CheckNetworkAnswer(CheckNetworkCommand cmd, boolean result, String details, boolean reconnect) {
         super(cmd, result, details);
         _reconnect = reconnect;
     }
 
-    public CheckNetworkAnswer(CheckNetworkCommand cmd, boolean result, String details) {
-        this(cmd, result, details, false);
-    }
-
     public boolean needReconnect() {
         return _reconnect;
     }
-
 }

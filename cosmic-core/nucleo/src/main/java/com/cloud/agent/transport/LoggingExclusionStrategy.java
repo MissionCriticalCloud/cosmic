@@ -22,13 +22,23 @@ package com.cloud.agent.transport;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.LogLevel;
 import com.cloud.agent.api.LogLevel.Log4jLevel;
+
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
-
 import org.apache.log4j.Logger;
 
 public class LoggingExclusionStrategy implements ExclusionStrategy {
     Logger _logger = null;
+
+    public LoggingExclusionStrategy(Logger logger) {
+        _logger = logger;
+    }
+
+    @Override
+    public boolean shouldSkipField(FieldAttributes field) {
+        LogLevel level = field.getAnnotation(LogLevel.class);
+        return level != null && !level.value().enabled(_logger);
+    }
 
     @Override
     public boolean shouldSkipClass(Class<?> clazz) {
@@ -44,15 +54,5 @@ public class LoggingExclusionStrategy implements ExclusionStrategy {
         }
 
         return !log4jLevel.enabled(_logger);
-    }
-
-    @Override
-    public boolean shouldSkipField(FieldAttributes field) {
-        LogLevel level = field.getAnnotation(LogLevel.class);
-        return level != null && !level.value().enabled(_logger);
-    }
-
-    public LoggingExclusionStrategy(Logger logger) {
-        _logger = logger;
     }
 }

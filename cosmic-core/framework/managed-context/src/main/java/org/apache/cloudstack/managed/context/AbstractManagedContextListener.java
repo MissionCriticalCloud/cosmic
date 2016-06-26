@@ -28,5 +28,4 @@ public class AbstractManagedContextListener<T> implements ManagedContextListener
     @Override
     public void onLeaveContext(T data, boolean reentry) {
     }
-
 }

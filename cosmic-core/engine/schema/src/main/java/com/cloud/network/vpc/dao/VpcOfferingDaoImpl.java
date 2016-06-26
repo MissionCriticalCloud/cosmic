@@ -42,7 +42,6 @@ public class VpcOfferingDaoImpl extends GenericDaoBase<VpcOfferingVO, Long> impl
         AllFieldsSearch.and("displayText", AllFieldsSearch.entity().getDisplayText(), Op.EQ);
         AllFieldsSearch.and("svcOffId", AllFieldsSearch.entity().getServiceOfferingId(), Op.EQ);
         AllFieldsSearch.done();
-
     }
 
     @Override

@@ -19,8 +19,8 @@
 # Import Local Modules
 # import marvin
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (get_process_status, validateList,
-                              cleanup_resources)
+from marvin.codes import FAILED
+from marvin.codes import PASS
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              VirtualMachine)
@@ -29,15 +29,14 @@ from marvin.lib.common import (list_hosts,
                                get_zone,
                                get_domain,
                                get_template)
+from marvin.lib.utils import (get_process_status, validateList,
+                              cleanup_resources)
 from nose.plugins.attrib import attr
-from marvin.codes import FAILED
-from marvin.codes import PASS
 
 _multiprocess_shared_ = True
 
 
 class TestVR(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls._cleanup = []

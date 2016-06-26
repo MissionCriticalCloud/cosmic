@@ -1,4 +1,3 @@
-
 // Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -25,7 +24,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -35,6 +33,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.api.response.SslCertResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,22 +46,22 @@ public class AssignCertToLoadBalancerCmd extends BaseAsyncCmd {
     private static final String s_name = "assigncerttoloadbalancerresponse";
 
     @Parameter(name = ApiConstants.LBID,
-               type = CommandType.UUID,
-               entityType = FirewallRuleResponse.class,
-               required = true,
-               description = "the ID of the load balancer rule")
+            type = CommandType.UUID,
+            entityType = FirewallRuleResponse.class,
+            required = true,
+            description = "the ID of the load balancer rule")
     Long lbRuleId;
 
     @Parameter(name = ApiConstants.CERTIFICATE_ID,
-               type = CommandType.UUID,
-               entityType = SslCertResponse.class,
-               required = true,
-               description = "the ID of the certificate")
+            type = CommandType.UUID,
+            entityType = SslCertResponse.class,
+            required = true,
+            description = "the ID of the certificate")
     Long certId;
 
     @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException, NetworkRuleConflictException {
+            ResourceAllocationException, NetworkRuleConflictException {
         //To change body of implemented methods use File | Settings | File Templates.
         if (_lbService.assignCertToLoadBalancer(getLbRuleId(), getCertId())) {
             SuccessResponse response = new SuccessResponse(getCommandName());
@@ -73,18 +72,8 @@ public class AssignCertToLoadBalancerCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public String getEventType() {
-        return EventTypes.EVENT_LB_CERT_ASSIGN;
-    }
-
-    @Override
     public String getCommandName() {
         return s_name;
-    }
-
-    @Override
-    public String getEventDescription() {
-        return "Assigning a certificate to a load balancer";
     }
 
     @Override
@@ -96,11 +85,21 @@ public class AssignCertToLoadBalancerCmd extends BaseAsyncCmd {
         return lb.getAccountId();
     }
 
+    public Long getLbRuleId() {
+        return lbRuleId;
+    }
+
     public Long getCertId() {
         return certId;
     }
 
-    public Long getLbRuleId() {
-        return lbRuleId;
+    @Override
+    public String getEventType() {
+        return EventTypes.EVENT_LB_CERT_ASSIGN;
+    }
+
+    @Override
+    public String getEventDescription() {
+        return "Assigning a certificate to a load balancer";
     }
 }

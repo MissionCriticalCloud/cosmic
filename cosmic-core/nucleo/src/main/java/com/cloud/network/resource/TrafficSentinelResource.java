@@ -19,21 +19,6 @@
 
 package com.cloud.network.resource;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.agent.IAgentControl;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
@@ -52,11 +37,26 @@ import com.cloud.host.Host;
 import com.cloud.resource.ServerResource;
 import com.cloud.utils.exception.ExecutionException;
 
+import javax.naming.ConfigurationException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TrafficSentinelResource implements ServerResource {
 
+    private static final Logger s_logger = LoggerFactory.getLogger(TrafficSentinelResource.class);
     private String _name;
     private String _zoneId;
     private String _ip;
@@ -65,42 +65,9 @@ public class TrafficSentinelResource implements ServerResource {
     private String _inclZones;
     private String _exclZones;
 
-    private static final Logger s_logger = LoggerFactory.getLogger(TrafficSentinelResource.class);
-
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
-        try {
-
-            _name = name;
-
-            _zoneId = (String)params.get("zone");
-            if (_zoneId == null) {
-                throw new ConfigurationException("Unable to find zone");
-            }
-
-            _ip = (String)params.get("ipaddress");
-            if (_ip == null) {
-                throw new ConfigurationException("Unable to find IP");
-            }
-
-            _guid = (String)params.get("guid");
-            if (_guid == null) {
-                throw new ConfigurationException("Unable to find the guid");
-            }
-
-            _url = (String)params.get("url");
-            if (_url == null) {
-                throw new ConfigurationException("Unable to find url");
-            }
-
-            _inclZones = (String)params.get("inclZones");
-            _exclZones = (String)params.get("exclZones");
-
-            return true;
-        } catch (Exception e) {
-            throw new ConfigurationException(e.getMessage());
-        }
-
+    public Host.Type getType() {
+        return Host.Type.TrafficMonitor;
     }
 
     @Override
@@ -113,17 +80,7 @@ public class TrafficSentinelResource implements ServerResource {
         cmd.setStorageIpAddress("");
         cmd.setVersion(TrafficSentinelResource.class.getPackage().getImplementationVersion());
         cmd.setGuid(_guid);
-        return new StartupCommand[] {cmd};
-    }
-
-    @Override
-    public Host.Type getType() {
-        return Host.Type.TrafficMonitor;
-    }
-
-    @Override
-    public String getName() {
-        return _name;
+        return new StartupCommand[]{cmd};
     }
 
     @Override
@@ -132,13 +89,18 @@ public class TrafficSentinelResource implements ServerResource {
     }
 
     @Override
-    public boolean start() {
-        return true;
-    }
-
-    @Override
-    public boolean stop() {
-        return true;
+    public Answer executeRequest(Command cmd) {
+        if (cmd instanceof ReadyCommand) {
+            return execute((ReadyCommand) cmd);
+        } else if (cmd instanceof MaintainCommand) {
+            return execute((MaintainCommand) cmd);
+        } else if (cmd instanceof DirectNetworkUsageCommand) {
+            return execute((DirectNetworkUsageCommand) cmd);
+        } else if (cmd instanceof RecurringNetworkUsageCommand) {
+            return execute((RecurringNetworkUsageCommand) cmd);
+        } else {
+            return Answer.createUnsupportedCommandAnswer(cmd);
+        }
     }
 
     @Override
@@ -156,27 +118,12 @@ public class TrafficSentinelResource implements ServerResource {
         return;
     }
 
-    @Override
-    public Answer executeRequest(Command cmd) {
-        if (cmd instanceof ReadyCommand) {
-            return execute((ReadyCommand)cmd);
-        } else if (cmd instanceof MaintainCommand) {
-            return execute((MaintainCommand)cmd);
-        } else if (cmd instanceof DirectNetworkUsageCommand) {
-            return execute((DirectNetworkUsageCommand)cmd);
-        } else if (cmd instanceof RecurringNetworkUsageCommand) {
-            return execute((RecurringNetworkUsageCommand)cmd);
-        } else {
-            return Answer.createUnsupportedCommandAnswer(cmd);
-        }
-    }
-
     private Answer execute(ReadyCommand cmd) {
         return new ReadyAnswer(cmd);
     }
 
-    private synchronized RecurringNetworkUsageAnswer execute(RecurringNetworkUsageCommand cmd) {
-        return new RecurringNetworkUsageAnswer(cmd);
+    private Answer execute(MaintainCommand cmd) {
+        return new MaintainAnswer(cmd);
     }
 
     private synchronized DirectNetworkUsageAnswer execute(DirectNetworkUsageCommand cmd) {
@@ -187,8 +134,8 @@ public class TrafficSentinelResource implements ServerResource {
         }
     }
 
-    private Answer execute(MaintainCommand cmd) {
-        return new MaintainAnswer(cmd);
+    private synchronized RecurringNetworkUsageAnswer execute(RecurringNetworkUsageCommand cmd) {
+        return new RecurringNetworkUsageAnswer(cmd);
     }
 
     private DirectNetworkUsageAnswer getPublicIpBytesSentAndReceived(DirectNetworkUsageCommand cmd) throws ExecutionException {
@@ -209,8 +156,8 @@ public class TrafficSentinelResource implements ServerResource {
             try {
                 //Query traffic Sentinel
                 trafficSentinel =
-                    new URL(_url + "/inmsf/Query?script=" + URLEncoder.encode(getScript(cmd.getPublicIps(), cmd.getStart(), cmd.getEnd()), "UTF-8") +
-                        "&authenticate=basic&resultFormat=txt");
+                        new URL(_url + "/inmsf/Query?script=" + URLEncoder.encode(getScript(cmd.getPublicIps(), cmd.getStart(), cmd.getEnd()), "UTF-8") +
+                                "&authenticate=basic&resultFormat=txt");
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(trafficSentinel.openStream()));
 
@@ -314,13 +261,12 @@ public class TrafficSentinelResource implements ServerResource {
     }
 
     @Override
-    public void setName(String name) {
-        // TODO Auto-generated method stub
-
+    public String getName() {
+        return _name;
     }
 
     @Override
-    public void setConfigParams(Map<String, Object> params) {
+    public void setName(String name) {
         // TODO Auto-generated method stub
 
     }
@@ -329,6 +275,12 @@ public class TrafficSentinelResource implements ServerResource {
     public Map<String, Object> getConfigParams() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public void setConfigParams(Map<String, Object> params) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override
@@ -341,5 +293,50 @@ public class TrafficSentinelResource implements ServerResource {
     public void setRunLevel(int level) {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+        try {
+
+            _name = name;
+
+            _zoneId = (String) params.get("zone");
+            if (_zoneId == null) {
+                throw new ConfigurationException("Unable to find zone");
+            }
+
+            _ip = (String) params.get("ipaddress");
+            if (_ip == null) {
+                throw new ConfigurationException("Unable to find IP");
+            }
+
+            _guid = (String) params.get("guid");
+            if (_guid == null) {
+                throw new ConfigurationException("Unable to find the guid");
+            }
+
+            _url = (String) params.get("url");
+            if (_url == null) {
+                throw new ConfigurationException("Unable to find url");
+            }
+
+            _inclZones = (String) params.get("inclZones");
+            _exclZones = (String) params.get("exclZones");
+
+            return true;
+        } catch (Exception e) {
+            throw new ConfigurationException(e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean start() {
+        return true;
+    }
+
+    @Override
+    public boolean stop() {
+        return true;
     }
 }

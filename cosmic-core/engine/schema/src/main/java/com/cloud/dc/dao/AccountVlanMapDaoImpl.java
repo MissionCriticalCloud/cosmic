@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.util.List;
-
 import com.cloud.dc.AccountVlanMapVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -31,6 +31,21 @@ public class AccountVlanMapDaoImpl extends GenericDaoBase<AccountVlanMapVO, Long
     protected SearchBuilder<AccountVlanMapVO> AccountSearch;
     protected SearchBuilder<AccountVlanMapVO> VlanSearch;
     protected SearchBuilder<AccountVlanMapVO> AccountVlanSearch;
+
+    public AccountVlanMapDaoImpl() {
+        AccountSearch = createSearchBuilder();
+        AccountSearch.and("accountId", AccountSearch.entity().getAccountId(), SearchCriteria.Op.EQ);
+        AccountSearch.done();
+
+        VlanSearch = createSearchBuilder();
+        VlanSearch.and("vlanDbId", VlanSearch.entity().getVlanDbId(), SearchCriteria.Op.EQ);
+        VlanSearch.done();
+
+        AccountVlanSearch = createSearchBuilder();
+        AccountVlanSearch.and("accountId", AccountVlanSearch.entity().getAccountId(), SearchCriteria.Op.EQ);
+        AccountVlanSearch.and("vlanDbId", AccountVlanSearch.entity().getVlanDbId(), SearchCriteria.Op.EQ);
+        AccountVlanSearch.done();
+    }
 
     @Override
     public List<AccountVlanMapVO> listAccountVlanMapsByAccount(long accountId) {
@@ -53,20 +68,4 @@ public class AccountVlanMapDaoImpl extends GenericDaoBase<AccountVlanMapVO, Long
         sc.setParameters("vlanDbId", vlanDbId);
         return findOneIncludingRemovedBy(sc);
     }
-
-    public AccountVlanMapDaoImpl() {
-        AccountSearch = createSearchBuilder();
-        AccountSearch.and("accountId", AccountSearch.entity().getAccountId(), SearchCriteria.Op.EQ);
-        AccountSearch.done();
-
-        VlanSearch = createSearchBuilder();
-        VlanSearch.and("vlanDbId", VlanSearch.entity().getVlanDbId(), SearchCriteria.Op.EQ);
-        VlanSearch.done();
-
-        AccountVlanSearch = createSearchBuilder();
-        AccountVlanSearch.and("accountId", AccountVlanSearch.entity().getAccountId(), SearchCriteria.Op.EQ);
-        AccountVlanSearch.and("vlanDbId", AccountVlanSearch.entity().getVlanDbId(), SearchCriteria.Op.EQ);
-        AccountVlanSearch.done();
-    }
-
 }

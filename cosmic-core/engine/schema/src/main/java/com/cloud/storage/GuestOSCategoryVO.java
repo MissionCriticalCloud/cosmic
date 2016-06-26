@@ -16,14 +16,13 @@
 // under the License.
 package com.cloud.storage;
 
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.UUID;
 
 @Entity
 @Table(name = "guest_os_category")
@@ -50,7 +49,7 @@ public class GuestOSCategoryVO implements GuestOsCategory {
     }
 
     @Override
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -59,7 +58,7 @@ public class GuestOSCategoryVO implements GuestOsCategory {
         return this.uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(final String uuid) {
         this.uuid = uuid;
     }
 }

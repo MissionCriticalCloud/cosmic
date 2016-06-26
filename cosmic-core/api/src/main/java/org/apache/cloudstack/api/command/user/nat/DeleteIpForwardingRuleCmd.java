@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.user.nat;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.rules.FirewallRule;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -31,6 +30,7 @@ import org.apache.cloudstack.api.response.AccountResponse;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,11 +65,6 @@ public class DeleteIpForwardingRuleCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
         CallContext.current().setEventDetails("Rule ID: " + id);
         boolean result = _firewallService.revokeRelatedFirewallRule(id, true);
@@ -81,6 +76,11 @@ public class DeleteIpForwardingRuleCmd extends BaseAsyncCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete IP forwarding rule");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 
     @Override
@@ -107,6 +107,11 @@ public class DeleteIpForwardingRuleCmd extends BaseAsyncCmd {
     }
 
     @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.FirewallRule;
+    }
+
+    @Override
     public String getSyncObjType() {
         return BaseAsyncCmd.networkSyncObject;
     }
@@ -115,10 +120,4 @@ public class DeleteIpForwardingRuleCmd extends BaseAsyncCmd {
     public Long getSyncObjId() {
         return _entityMgr.findById(FirewallRule.class, id).getNetworkId();
     }
-
-    @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.FirewallRule;
-    }
-
 }

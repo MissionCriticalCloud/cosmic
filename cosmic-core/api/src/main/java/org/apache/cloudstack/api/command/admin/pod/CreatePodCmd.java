@@ -18,7 +18,6 @@ package org.apache.cloudstack.api.command.admin.pod;
 
 import com.cloud.dc.Pod;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -27,6 +26,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.PodResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,10 +44,10 @@ public class CreatePodCmd extends BaseCmd {
     private String podName;
 
     @Parameter(name = ApiConstants.ZONE_ID,
-               type = CommandType.UUID,
-               entityType = ZoneResponse.class,
-               required = true,
-               description = "the Zone ID in which the Pod will be created")
+            type = CommandType.UUID,
+            entityType = ZoneResponse.class,
+            required = true,
+            description = "the Zone ID in which the Pod will be created")
     private Long zoneId;
 
     @Parameter(name = ApiConstants.START_IP, type = CommandType.STRING, required = true, description = "the starting IP address for the Pod")
@@ -69,48 +69,6 @@ public class CreatePodCmd extends BaseCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public String getNetmask() {
-        return netmask;
-    }
-
-    public String getEndIp() {
-        return endIp;
-    }
-
-    public String getGateway() {
-        return gateway;
-    }
-
-    public String getPodName() {
-        return podName;
-    }
-
-    public String getStartIp() {
-        return startIp;
-    }
-
-    public Long getZoneId() {
-        return zoneId;
-    }
-
-    public String getAllocationState() {
-        return allocationState;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
     @Override
     public void execute() {
         Pod result = _configService.createPod(getZoneId(), getPodName(), getStartIp(), getEndIp(), getGateway(), getNetmask(), getAllocationState());
@@ -121,5 +79,47 @@ public class CreatePodCmd extends BaseCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create pod");
         }
+    }
+
+    public Long getZoneId() {
+        return zoneId;
+    }
+
+    public String getPodName() {
+        return podName;
+    }
+
+    public String getStartIp() {
+        return startIp;
+    }
+
+    public String getEndIp() {
+        return endIp;
+    }
+
+    public String getGateway() {
+        return gateway;
+    }
+
+    public String getNetmask() {
+        return netmask;
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public String getAllocationState() {
+        return allocationState;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

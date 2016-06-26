@@ -16,15 +16,9 @@
 // under the License.
 package org.apache.cloudstack.api.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.DedicatedResources;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.affinity.AffinityGroupResponse;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -37,6 +31,11 @@ import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.HostResponse;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.dedicated.DedicatedService;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,9 +61,9 @@ public class ListDedicatedHostsCmd extends BaseListCmd {
     private String accountName;
 
     @Parameter(name = ApiConstants.AFFINITY_GROUP_ID,
-               type = CommandType.UUID,
-               entityType = AffinityGroupResponse.class,
-               description = "list dedicated hosts by affinity group")
+            type = CommandType.UUID,
+            entityType = AffinityGroupResponse.class,
+            description = "list dedicated hosts by affinity group")
     private Long affinityGroupId;
 
     /////////////////////////////////////////////////////
@@ -92,11 +91,6 @@ public class ListDedicatedHostsCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
         Pair<List<? extends DedicatedResourceVO>, Integer> result = dedicatedService.listDedicatedHosts(this);
         ListResponse<DedicateHostResponse> response = new ListResponse<DedicateHostResponse>();
@@ -112,5 +106,10 @@ public class ListDedicatedHostsCmd extends BaseListCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to list dedicated hosts");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

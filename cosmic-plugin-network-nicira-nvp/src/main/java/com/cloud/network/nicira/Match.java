@@ -102,10 +102,11 @@ public class Match {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        Match other = (Match)obj;
+        final Match other = (Match) obj;
         if (destinationIpAddresses == null) {
-            if (other.destinationIpAddresses != null)
+            if (other.destinationIpAddresses != null) {
                 return false;
+            }
         } else if (!destinationIpAddresses.equals(other.destinationIpAddresses)) {
             return false;
         }
@@ -117,30 +118,33 @@ public class Match {
             return false;
         }
         if (ethertype == null) {
-            if (other.ethertype != null)
+            if (other.ethertype != null) {
                 return false;
+            }
         } else if (!ethertype.equals(other.ethertype)) {
             return false;
         }
         if (protocol == null) {
-            if (other.protocol != null)
+            if (other.protocol != null) {
                 return false;
+            }
         } else if (!protocol.equals(other.protocol)) {
             return false;
         }
         if (sourceIpAddresses == null) {
-            if (other.sourceIpAddresses != null)
+            if (other.sourceIpAddresses != null) {
                 return false;
+            }
         } else if (!sourceIpAddresses.equals(other.sourceIpAddresses)) {
             return false;
         }
         if (sourcePort == null) {
-            if (other.sourcePort != null)
+            if (other.sourcePort != null) {
                 return false;
+            }
         } else if (!sourcePort.equals(other.sourcePort)) {
             return false;
         }
         return true;
     }
-
 }

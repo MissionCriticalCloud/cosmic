@@ -26,7 +26,7 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 
-@ResourceWrapper(handles =  NetworkElementCommand.class)
+@ResourceWrapper(handles = NetworkElementCommand.class)
 public final class CitrixNetworkElementCommandWrapper extends CommandWrapper<NetworkElementCommand, Answer, CitrixResourceBase> {
 
     @Override

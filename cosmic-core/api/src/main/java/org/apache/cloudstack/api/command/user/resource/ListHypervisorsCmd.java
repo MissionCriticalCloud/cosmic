@@ -16,11 +16,7 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.resource;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
@@ -29,6 +25,10 @@ import org.apache.cloudstack.api.command.admin.router.UpgradeRouterCmd;
 import org.apache.cloudstack.api.response.HypervisorResponse;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,34 +37,12 @@ import org.slf4j.LoggerFactory;
 public class ListHypervisorsCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpgradeRouterCmd.class.getName());
     private static final String s_name = "listhypervisorsresponse";
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    // ///////////////////////////////////////////////////
-    // ////////////// API parameters /////////////////////
-    // ///////////////////////////////////////////////////
-
     @Parameter(name = ApiConstants.ZONE_ID, type = CommandType.UUID, entityType = ZoneResponse.class, description = "the zone id for listing hypervisors.")
     private Long zoneId;
 
     // ///////////////////////////////////////////////////
-    // ///////////////// Accessors ///////////////////////
+    // ////////////// API parameters /////////////////////
     // ///////////////////////////////////////////////////
-
-    public Long getZoneId() {
-        return this.zoneId;
-    }
-
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
 
     @Override
     public void execute() {
@@ -82,5 +60,26 @@ public class ListHypervisorsCmd extends BaseCmd {
         response.setResponses(responses);
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+
+    // ///////////////////////////////////////////////////
+    // ///////////////// Accessors ///////////////////////
+    // ///////////////////////////////////////////////////
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
+    }
+
+    public Long getZoneId() {
+        return this.zoneId;
     }
 }

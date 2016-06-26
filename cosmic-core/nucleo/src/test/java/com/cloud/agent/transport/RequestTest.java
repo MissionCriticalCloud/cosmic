@@ -19,8 +19,6 @@
 
 package com.cloud.agent.transport;
 
-import java.nio.ByteBuffer;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.GetHostStatsCommand;
@@ -37,15 +35,16 @@ import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.template.VirtualMachineTemplate;
-
 import org.apache.cloudstack.storage.command.DownloadCommand;
 import org.apache.cloudstack.storage.to.TemplateObjectTO;
+
+import java.nio.ByteBuffer;
+
+import junit.framework.TestCase;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.mockito.Mockito;
-
-import junit.framework.TestCase;
 
 /**
  *
@@ -68,7 +67,7 @@ public class RequestTest extends TestCase {
         GetHostStatsCommand cmd3 = new GetHostStatsCommand("hostguid", "hostname", 101);
         cmd2.addPortConfig("abc", "24", true, "eth0");
         cmd2.addPortConfig("127.0.0.1", "44", false, "eth1");
-        Request sreq = new Request(2, 3, new Command[] {cmd1, cmd2, cmd3}, true, true);
+        Request sreq = new Request(2, 3, new Command[]{cmd1, cmd2, cmd3}, true, true);
         sreq.setSequence(892403717);
 
         Logger logger = Logger.getLogger(GsonHelper.class);
@@ -134,6 +133,23 @@ public class RequestTest extends TestCase {
         compareRequest(cresp, sresp);
     }
 
+    protected void compareRequest(Request req1, Request req2) {
+        assert req1.getSequence() == req2.getSequence();
+        assert req1.getAgentId() == req2.getAgentId();
+        assert req1.getManagementServerId() == req2.getManagementServerId();
+        assert req1.isControl() == req2.isControl();
+        assert req1.isFromServer() == req2.isFromServer();
+        assert req1.executeInSequence() == req2.executeInSequence();
+        assert req1.stopOnError() == req2.stopOnError();
+        assert req1.getVersion().equals(req2.getVersion());
+        assert req1.getViaAgentId() == req2.getViaAgentId();
+        Command[] cmd1 = req1.getCommands();
+        Command[] cmd2 = req2.getCommands();
+        for (int i = 0; i < cmd1.length; i++) {
+            assert cmd1[i].getClass().equals(cmd2[i].getClass());
+        }
+    }
+
     public void testSerDeserTO() {
         s_logger.info("Testing serializing and deserializing interface TO works as expected");
 
@@ -161,7 +177,7 @@ public class RequestTest extends TestCase {
         assert creq != null : "Couldn't get the request back";
 
         compareRequest(creq, sreq);
-        assertEquals("nfs://192.168.56.10/opt/storage/secondary", ((NfsTO)((ListTemplateCommand)creq.getCommand()).getDataStore()).getUrl());
+        assertEquals("nfs://192.168.56.10/opt/storage/secondary", ((NfsTO) ((ListTemplateCommand) creq.getCommand()).getDataStore()).getUrl());
     }
 
     public void testDownload() {
@@ -186,7 +202,6 @@ public class RequestTest extends TestCase {
         DownloadAnswer answer = new DownloadAnswer("jobId", 50, "errorString", Status.ABANDONED, "filesystempath", "installpath", 10000000, 20000000, "chksum");
         Response resp = new Response(req, answer);
         resp.logD("Debug for Download");
-
     }
 
     public void testCompress() {
@@ -212,7 +227,7 @@ public class RequestTest extends TestCase {
     public void testLogging() {
         s_logger.info("Testing Logging");
         GetHostStatsCommand cmd3 = new GetHostStatsCommand("hostguid", "hostname", 101);
-        Request sreq = new Request(2, 3, new Command[] {cmd3}, true, true);
+        Request sreq = new Request(2, 3, new Command[]{cmd3}, true, true);
         sreq.setSequence(1);
         Logger logger = Logger.getLogger(GsonHelper.class);
         Level level = logger.getLevel();
@@ -231,22 +246,4 @@ public class RequestTest extends TestCase {
 
         logger.setLevel(level);
     }
-
-    protected void compareRequest(Request req1, Request req2) {
-        assert req1.getSequence() == req2.getSequence();
-        assert req1.getAgentId() == req2.getAgentId();
-        assert req1.getManagementServerId() == req2.getManagementServerId();
-        assert req1.isControl() == req2.isControl();
-        assert req1.isFromServer() == req2.isFromServer();
-        assert req1.executeInSequence() == req2.executeInSequence();
-        assert req1.stopOnError() == req2.stopOnError();
-        assert req1.getVersion().equals(req2.getVersion());
-        assert req1.getViaAgentId() == req2.getViaAgentId();
-        Command[] cmd1 = req1.getCommands();
-        Command[] cmd2 = req2.getCommands();
-        for (int i = 0; i < cmd1.length; i++) {
-            assert cmd1[i].getClass().equals(cmd2[i].getClass());
-        }
-    }
-
 }

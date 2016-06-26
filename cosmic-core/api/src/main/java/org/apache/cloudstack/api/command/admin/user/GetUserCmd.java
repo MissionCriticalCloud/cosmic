@@ -18,12 +18,12 @@ package org.apache.cloudstack.api.command.admin.user;
 
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.user.UserAccount;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.UserResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,24 +45,6 @@ public class GetUserCmd extends BaseCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public String getApiKey() {
-        return apiKey;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return 0;
-    }
-
     @Override
     public void execute() {
         UserAccount result = _accountService.getUserByApiKey(getApiKey());
@@ -74,5 +56,23 @@ public class GetUserCmd extends BaseCmd {
         } else {
             throw new InvalidParameterValueException("User with specified API key does not exist");
         }
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return 0;
     }
 }

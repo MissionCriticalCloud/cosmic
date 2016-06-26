@@ -16,9 +16,6 @@
 // under the License.
 package org.apache.cloudstack.network.lb;
 
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -30,6 +27,9 @@ import com.cloud.user.Account;
 import com.cloud.utils.net.Ip;
 import com.cloud.vm.VirtualMachineProfile.Param;
 
+import java.util.List;
+import java.util.Map;
+
 public interface InternalLoadBalancerVMManager {
     //RAM/CPU for the system offering used by Internal LB VMs
     public static final int DEFAULT_INTERNALLB_VM_RAMSIZE = 256;            // 256 MB
@@ -37,6 +37,7 @@ public interface InternalLoadBalancerVMManager {
 
     /**
      * Destroys Internal LB vm instance
+     *
      * @param vmId
      * @param caller
      * @param callerUserId
@@ -48,6 +49,7 @@ public interface InternalLoadBalancerVMManager {
 
     /**
      * Deploys internal lb vm
+     *
      * @param guestNetwork
      * @param requestedGuestIp
      * @param dest
@@ -59,10 +61,9 @@ public interface InternalLoadBalancerVMManager {
      * @throws ResourceUnavailableException
      */
     List<? extends VirtualRouter> deployInternalLbVm(Network guestNetwork, Ip requestedGuestIp, DeployDestination dest, Account owner, Map<Param, Object> params)
-        throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException;
+            throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException;
 
     /**
-     *
      * @param network
      * @param rules
      * @param internalLbVms
@@ -73,10 +74,10 @@ public interface InternalLoadBalancerVMManager {
 
     /**
      * Returns existing Internal Load Balancer elements based on guestNetworkId (required) and requestedIp (optional)
+     *
      * @param guestNetworkId
      * @param requestedGuestIp
      * @return
      */
     List<? extends VirtualRouter> findInternalLbVms(long guestNetworkId, Ip requestedGuestIp);
-
 }

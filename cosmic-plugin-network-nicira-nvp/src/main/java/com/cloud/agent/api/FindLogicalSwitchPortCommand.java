@@ -23,7 +23,7 @@ public class FindLogicalSwitchPortCommand extends Command {
     private final String logicalSwitchUuid;
     private final String logicalSwitchPortUuid;
 
-    public FindLogicalSwitchPortCommand(String logicalSwitchUuid, String logicalSwitchPortUuid) {
+    public FindLogicalSwitchPortCommand(final String logicalSwitchUuid, final String logicalSwitchPortUuid) {
         this.logicalSwitchUuid = logicalSwitchUuid;
         this.logicalSwitchPortUuid = logicalSwitchPortUuid;
     }
@@ -40,5 +40,4 @@ public class FindLogicalSwitchPortCommand extends Command {
     public boolean executeInSequence() {
         return false;
     }
-
 }

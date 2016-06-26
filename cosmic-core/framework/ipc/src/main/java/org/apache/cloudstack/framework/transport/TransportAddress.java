@@ -24,12 +24,11 @@ import java.security.SecureRandom;
 public class TransportAddress {
     public final static String LOCAL_SERVICE_NODE = "";
     public final static int LOCAL_SERVICE_CONNECTION = 0;
-
+    private final SecureRandom randomGenerator = new SecureRandom();
     private String _nodeId = LOCAL_SERVICE_NODE;
     private int _connectionId = LOCAL_SERVICE_CONNECTION;
     private String _endpointId;
     private int _magic;
-    private final SecureRandom randomGenerator=new SecureRandom();
 
     public TransportAddress(String nodeId, int connectionId, String endpointId) {
         assert (nodeId != null);
@@ -53,6 +52,23 @@ public class TransportAddress {
         _connectionId = connectionId;
         _endpointId = endpointId;
         _magic = magic;
+    }
+
+    public static TransportAddress fromAddressString(String addressString) {
+        if (addressString == null || addressString.isEmpty()) {
+            return null;
+        }
+
+        String tokens[] = addressString.split("\\.");
+        if (tokens.length != 4) {
+            return null;
+        }
+
+        return new TransportAddress(tokens[0], Integer.parseInt(tokens[1]), tokens[2], Integer.parseInt(tokens[3]));
+    }
+
+    public static TransportAddress getLocalPredefinedTransportAddress(String predefinedIdentifier) {
+        return new TransportAddress(LOCAL_SERVICE_NODE, LOCAL_SERVICE_CONNECTION, predefinedIdentifier, 0);
     }
 
     public String getNodeId() {
@@ -81,21 +97,6 @@ public class TransportAddress {
         return this;
     }
 
-    public static TransportAddress fromAddressString(String addressString) {
-        if (addressString == null || addressString.isEmpty())
-            return null;
-
-        String tokens[] = addressString.split("\\.");
-        if (tokens.length != 4)
-            return null;
-
-        return new TransportAddress(tokens[0], Integer.parseInt(tokens[1]), tokens[2], Integer.parseInt(tokens[3]));
-    }
-
-    public static TransportAddress getLocalPredefinedTransportAddress(String predefinedIdentifier) {
-        return new TransportAddress(LOCAL_SERVICE_NODE, LOCAL_SERVICE_CONNECTION, predefinedIdentifier, 0);
-    }
-
     @Override
     public int hashCode() {
         int hashCode = _magic;
@@ -108,24 +109,28 @@ public class TransportAddress {
 
     @Override
     public boolean equals(Object other) {
-        if (other == null)
+        if (other == null) {
             return false;
+        }
 
-        if (!(other instanceof TransportAddress))
+        if (!(other instanceof TransportAddress)) {
             return false;
+        }
 
-        if (this == other)
+        if (this == other) {
             return true;
+        }
 
-        return _nodeId.equals(((TransportAddress)other)._nodeId) && _connectionId == (((TransportAddress)other)._connectionId) &&
-            _endpointId.equals(((TransportAddress)other)._endpointId) && _magic == ((TransportAddress)other)._magic;
+        return _nodeId.equals(((TransportAddress) other)._nodeId) && _connectionId == (((TransportAddress) other)._connectionId) &&
+                _endpointId.equals(((TransportAddress) other)._endpointId) && _magic == ((TransportAddress) other)._magic;
     }
 
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        if (_nodeId != null)
+        if (_nodeId != null) {
             sb.append(_nodeId);
+        }
         sb.append(".");
         sb.append(_connectionId);
         sb.append(".");

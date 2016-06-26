@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.consoleproxy.vnc.packet.server;
 
+import com.cloud.consoleproxy.vnc.BufferedImageCanvas;
+
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-
-import com.cloud.consoleproxy.vnc.BufferedImageCanvas;
 
 public class FrameBufferSizeChangeRequest extends AbstractRect {
 
@@ -35,5 +35,4 @@ public class FrameBufferSizeChangeRequest extends AbstractRect {
     public void paint(BufferedImage offlineImage, Graphics2D graphics) {
         canvas.setCanvasSize(width, height);
     }
-
 }

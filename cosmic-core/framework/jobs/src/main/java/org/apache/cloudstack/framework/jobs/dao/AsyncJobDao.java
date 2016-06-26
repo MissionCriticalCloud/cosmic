@@ -16,12 +16,11 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs.dao;
 
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.framework.jobs.impl.AsyncJobVO;
+
 import java.util.Date;
 import java.util.List;
-
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.framework.jobs.impl.AsyncJobVO;
 
 public interface AsyncJobDao extends GenericDao<AsyncJobVO, Long> {
     AsyncJobVO findInstancePendingAsyncJob(String instanceType, long instanceId);

@@ -18,13 +18,14 @@
  */
 package org.apache.cloudstack.framework.codestyle;
 
-import java.util.concurrent.ExecutionException;
-
 import org.apache.cloudstack.framework.async.AsyncCallFuture;
 import org.apache.cloudstack.framework.async.AsyncCallbackDispatcher;
 import org.apache.cloudstack.framework.async.AsyncCallbackDriver;
 import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
 import org.apache.cloudstack.framework.async.AsyncRpcContext;
+
+import java.util.concurrent.ExecutionException;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,12 +36,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/SampleManagementServerAppContext.xml")
 public class AsyncSampleEventDrivenStyleCaller {
-    private AsyncSampleCallee _ds;
     AsyncCallbackDriver _callbackDriver;
+    private AsyncSampleCallee _ds;
 
-    @Before
-    public void setup() {
-        _ds = new AsyncSampleCallee();
+    public static void main(String[] args) {
+        AsyncSampleEventDrivenStyleCaller caller = new AsyncSampleEventDrivenStyleCaller();
+        caller.MethodThatWillCallAsyncMethod();
     }
 
     @SuppressWarnings("unchecked")
@@ -61,41 +62,9 @@ public class AsyncSampleEventDrivenStyleCaller {
         }
     }
 
-    private class TestContext<T> extends AsyncRpcContext<T> {
-        private boolean finished;
-        private String result;
-
-        /**
-         * @param callback
-         */
-        public TestContext(AsyncCompletionCallback<T> callback) {
-            super(callback);
-            this.finished = false;
-        }
-
-        public void setResult(String result) {
-            this.result = result;
-            synchronized (this) {
-                this.finished = true;
-                this.notify();
-            }
-        }
-
-        public String getResult() {
-            synchronized (this) {
-                if (!this.finished) {
-                    try {
-                        this.wait();
-
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-                return this.result;
-            }
-        }
-
+    @Before
+    public void setup() {
+        _ds = new AsyncSampleCallee();
     }
 
     @Test
@@ -114,8 +83,38 @@ public class AsyncSampleEventDrivenStyleCaller {
         return null;
     }
 
-    public static void main(String[] args) {
-        AsyncSampleEventDrivenStyleCaller caller = new AsyncSampleEventDrivenStyleCaller();
-        caller.MethodThatWillCallAsyncMethod();
+    private class TestContext<T> extends AsyncRpcContext<T> {
+        private boolean finished;
+        private String result;
+
+        /**
+         * @param callback
+         */
+        public TestContext(AsyncCompletionCallback<T> callback) {
+            super(callback);
+            this.finished = false;
+        }
+
+        public String getResult() {
+            synchronized (this) {
+                if (!this.finished) {
+                    try {
+                        this.wait();
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+                return this.result;
+            }
+        }
+
+        public void setResult(String result) {
+            this.result = result;
+            synchronized (this) {
+                this.finished = true;
+                this.notify();
+            }
+        }
     }
 }

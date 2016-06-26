@@ -17,12 +17,9 @@
 
 package org.apache.cloudstack.api.command.user.autoscale;
 
-import java.util.Map;
-
 import com.cloud.event.EventTypes;
 import com.cloud.network.as.AutoScaleVmProfile;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
@@ -37,10 +34,14 @@ import org.apache.cloudstack.api.response.AutoScaleVmProfileResponse;
 import org.apache.cloudstack.api.response.TemplateResponse;
 import org.apache.cloudstack.api.response.UserResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateAutoScaleVmProfile", description = "Updates an existing autoscale vm profile.", responseObject = AutoScaleVmProfileResponse.class, entityType = {AutoScaleVmProfile.class},
+@APICommand(name = "updateAutoScaleVmProfile", description = "Updates an existing autoscale vm profile.", responseObject = AutoScaleVmProfileResponse.class, entityType =
+        {AutoScaleVmProfile.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateAutoScaleVmProfileCmd extends BaseAsyncCustomIdCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateAutoScaleVmProfileCmd.class.getName());
@@ -53,35 +54,36 @@ public class UpdateAutoScaleVmProfileCmd extends BaseAsyncCustomIdCmd {
 
     @ACL(accessType = AccessType.OperateEntry)
     @Parameter(name = ApiConstants.ID,
-               type = CommandType.UUID,
-               entityType = AutoScaleVmProfileResponse.class,
-               required = true,
-               description = "the ID of the autoscale vm profile")
+            type = CommandType.UUID,
+            entityType = AutoScaleVmProfileResponse.class,
+            required = true,
+            description = "the ID of the autoscale vm profile")
     private Long id;
 
     @Parameter(name = ApiConstants.TEMPLATE_ID,
-               type = CommandType.UUID,
-               entityType = TemplateResponse.class,
-               description = "the template of the auto deployed virtual machine")
+            type = CommandType.UUID,
+            entityType = TemplateResponse.class,
+            description = "the template of the auto deployed virtual machine")
     private Long templateId;
 
     @Parameter(name = ApiConstants.AUTOSCALE_VM_DESTROY_TIME,
-               type = CommandType.INTEGER,
-               description = "the time allowed for existing connections to get closed before a vm is destroyed")
+            type = CommandType.INTEGER,
+            description = "the time allowed for existing connections to get closed before a vm is destroyed")
     private Integer destroyVmGraceperiod;
 
     @Parameter(name = ApiConstants.COUNTERPARAM_LIST,
-               type = CommandType.MAP,
-               description = "counterparam list. Example: counterparam[0].name=snmpcommunity&counterparam[0].value=public&counterparam[1].name=snmpport&counterparam[1].value=161")
+            type = CommandType.MAP,
+            description = "counterparam list. Example: counterparam[0].name=snmpcommunity&counterparam[0].value=public&counterparam[1].name=snmpport&counterparam[1].value=161")
     private Map counterParamList;
 
     @Parameter(name = ApiConstants.AUTOSCALE_USER_ID,
-               type = CommandType.UUID,
-               entityType = UserResponse.class,
-               description = "the ID of the user used to launch and destroy the VMs")
+            type = CommandType.UUID,
+            entityType = UserResponse.class,
+            description = "the ID of the user used to launch and destroy the VMs")
     private Long autoscaleUserId;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the profile to the end user or not", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the profile to the end user or not", since =
+            "4.4", authorized = {RoleType.Admin})
     private Boolean display;
 
     // ///////////////////////////////////////////////////
@@ -107,6 +109,21 @@ public class UpdateAutoScaleVmProfileCmd extends BaseAsyncCustomIdCmd {
 
     public Long getId() {
         return id;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        AutoScaleVmProfile vmProfile = _entityMgr.findById(AutoScaleVmProfile.class, getId());
+        if (vmProfile != null) {
+            return vmProfile.getAccountId();
+        }
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are
+        // tracked
     }
 
     public Long getTemplateId() {
@@ -137,21 +154,6 @@ public class UpdateAutoScaleVmProfileCmd extends BaseAsyncCustomIdCmd {
     @Override
     public String getEventDescription() {
         return "Updating AutoScale Vm Profile. Vm Profile Id: " + getId();
-    }
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        AutoScaleVmProfile vmProfile = _entityMgr.findById(AutoScaleVmProfile.class, getId());
-        if (vmProfile != null) {
-            return vmProfile.getAccountId();
-        }
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are
-        // tracked
     }
 
     @Override

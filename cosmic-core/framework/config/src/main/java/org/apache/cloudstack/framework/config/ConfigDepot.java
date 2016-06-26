@@ -20,7 +20,6 @@ import java.util.Set;
 
 /**
  * ConfigDepot is a repository of configurations.
- *
  */
 public interface ConfigDepot {
 

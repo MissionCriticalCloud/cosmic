@@ -16,15 +16,15 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.List;
-
 import com.cloud.network.PhysicalNetworkServiceProvider;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = PhysicalNetworkServiceProvider.class)
 @SuppressWarnings("unused")
@@ -58,12 +58,12 @@ public class ProviderResponse extends BaseResponse {
     @Param(description = "true if individual services can be enabled/disabled")
     private Boolean canEnableIndividualServices;
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setPhysicalNetworkId(String physicalNetworkId) {
@@ -74,36 +74,36 @@ public class ProviderResponse extends BaseResponse {
         return physicalNetworkId;
     }
 
-    public void setDestinationPhysicalNetworkId(String destPhysicalNetworkId) {
-        this.destinationPhysicalNetworkId = destPhysicalNetworkId;
-    }
-
     public String getDestinationPhysicalNetworkId() {
         return destinationPhysicalNetworkId;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public void setDestinationPhysicalNetworkId(String destPhysicalNetworkId) {
+        this.destinationPhysicalNetworkId = destPhysicalNetworkId;
     }
 
     public String getState() {
         return this.state;
     }
 
-    public void setId(String uuid) {
-        this.id = uuid;
+    public void setState(String state) {
+        this.state = state;
     }
 
     public String getId() {
         return this.id;
     }
 
-    public void setServices(List<String> services) {
-        this.services = services;
+    public void setId(String uuid) {
+        this.id = uuid;
     }
 
     public List<String> getServices() {
         return services;
+    }
+
+    public void setServices(List<String> services) {
+        this.services = services;
     }
 
     public Boolean getCanEnableIndividualServices() {

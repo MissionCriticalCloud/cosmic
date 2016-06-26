@@ -18,6 +18,8 @@ package com.cloud.consoleproxy;
 
 import static com.cloud.utils.AutoCloseableUtil.closeAutoCloseable;
 
+import com.cloud.consoleproxy.util.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cloud.consoleproxy.util.Logger;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -42,15 +43,17 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange t) throws IOException {
         try {
-            if (s_logger.isTraceEnabled())
+            if (s_logger.isTraceEnabled()) {
                 s_logger.trace("AjaxHandler " + t.getRequestURI());
+            }
 
             long startTick = System.currentTimeMillis();
 
             doHandle(t);
 
-            if (s_logger.isTraceEnabled())
+            if (s_logger.isTraceEnabled()) {
                 s_logger.trace(t.getRequestURI() + " process time " + (System.currentTimeMillis() - startTick) + " ms");
+            }
         } catch (IOException e) {
             throw e;
         } catch (IllegalArgumentException e) {
@@ -66,8 +69,9 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
 
     private void doHandle(HttpExchange t) throws Exception, IllegalArgumentException {
         String queries = t.getRequestURI().getQuery();
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("Handle AJAX request: " + queries);
+        }
 
         Map<String, String> queryMap = ConsoleProxyHttpHandlerHelper.getQueryMap(queries);
 
@@ -84,16 +88,18 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
         String username = queryMap.get("username");
         String password = queryMap.get("password");
 
-        if (tag == null)
+        if (tag == null) {
             tag = "";
+        }
 
         long ajaxSessionId = 0;
         int event = 0;
 
         int port;
 
-        if (host == null || portStr == null || sid == null)
+        if (host == null || portStr == null || sid == null) {
             throw new IllegalArgumentException();
+        }
 
         try {
             port = Integer.parseInt(portStr);
@@ -140,12 +146,13 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
             s_logger.warn("Failed to create viewer due to " + e.getMessage(), e);
 
             String[] content =
-                new String[] {"<html><head></head><body>", "<div id=\"main_panel\" tabindex=\"1\">",
-                    "<p>Access is denied for the console session. Please close the window and retry again</p>", "</div></body></html>"};
+                    new String[]{"<html><head></head><body>", "<div id=\"main_panel\" tabindex=\"1\">",
+                            "<p>Access is denied for the console session. Please close the window and retry again</p>", "</div></body></html>"};
 
             StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < content.length; i++)
+            for (int i = 0; i < content.length; i++) {
                 sb.append(content[i]);
+            }
 
             sendResponse(t, "text/html", sb.toString());
             return;
@@ -162,8 +169,9 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
                 }
                 sendResponse(t, "text/html", "OK");
             } else {
-                if (s_logger.isDebugEnabled())
+                if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Ajax request comes from a different session, id in request: " + ajaxSessionId + ", id in viewer: " + viewer.getAjaxSessionId());
+                }
 
                 sendResponse(t, "text/html", "Invalid ajax client session id");
             }
@@ -172,38 +180,22 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
                 s_logger.info("Ajax request comes from a different session, id in request: " + ajaxSessionId + ", id in viewer: " + viewer.getAjaxSessionId());
                 handleClientKickoff(t, viewer);
             } else if (ajaxSessionId == 0) {
-                if (s_logger.isDebugEnabled())
+                if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Ajax request indicates a fresh client start");
+                }
 
                 String title = queryMap.get("t");
                 String guest = queryMap.get("guest");
                 handleClientStart(t, viewer, title != null ? title : "", guest);
             } else {
 
-                if (s_logger.isTraceEnabled())
+                if (s_logger.isTraceEnabled()) {
                     s_logger.trace("Ajax request indicates client update");
+                }
 
                 handleClientUpdate(t, viewer);
             }
         }
-    }
-
-    private static String convertStreamToString(InputStream is, boolean closeStreamAfterRead) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-        } catch (IOException e) {
-            s_logger.warn("Exception while reading request body: ", e);
-        } finally {
-            if (closeStreamAfterRead) {
-                closeAutoCloseable(is, "error closing stream after read");
-            }
-        }
-        return sb.toString();
     }
 
     private void sendResponse(HttpExchange t, String contentType, String response) throws IOException {
@@ -221,14 +213,16 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
 
     @SuppressWarnings("deprecation")
     private void handleClientEventBag(ConsoleProxyClient viewer, String requestData) {
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("Handle event bag, event bag: " + requestData);
+        }
 
         int start = requestData.indexOf("=");
-        if (start < 0)
+        if (start < 0) {
             start = 0;
-        else if (start > 0)
+        } else if (start > 0) {
             start++;
+        }
         String data = URLDecoder.decode(requestData.substring(start));
         String[] tokens = data.split("\\|");
         if (tokens != null && tokens.length > 0) {
@@ -278,6 +272,24 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
         }
     }
 
+    private static String convertStreamToString(InputStream is, boolean closeStreamAfterRead) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+        } catch (IOException e) {
+            s_logger.warn("Exception while reading request body: ", e);
+        } finally {
+            if (closeStreamAfterRead) {
+                closeAutoCloseable(is, "error closing stream after read");
+            }
+        }
+        return sb.toString();
+    }
+
     private void handleClientEvent(ConsoleProxyClient viewer, int event, Map<String, String> queryMap) {
         int code = 0;
         int x = 0, y = 0;
@@ -325,11 +337,13 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
                         throw new IllegalArgumentException(e);
                     }
 
-                    if (s_logger.isTraceEnabled())
+                    if (s_logger.isTraceEnabled()) {
                         s_logger.trace("Handle client mouse event. event: " + event + ", x: " + x + ", y: " + y + ", button: " + code + ", modifier: " + modifiers);
+                    }
                 } else {
-                    if (s_logger.isTraceEnabled())
+                    if (s_logger.isTraceEnabled()) {
                         s_logger.trace("Handle client mouse move event. x: " + x + ", y: " + y);
+                    }
                 }
                 viewer.sendClientMouseEvent(InputEventType.fromEventCode(event), x, y, code, modifiers);
                 break;
@@ -353,8 +367,9 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
                     throw new IllegalArgumentException(e);
                 }
 
-                if (s_logger.isDebugEnabled())
+                if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Handle client keyboard event. event: " + event + ", code: " + code + ", modifier: " + modifiers);
+                }
                 viewer.sendClientRawKeyboardEvent(InputEventType.fromEventCode(event), code, modifiers);
                 break;
 

@@ -16,12 +16,12 @@
 // under the License.
 package org.apache.cloudstack.api;
 
-import java.util.ArrayList;
-
 import com.cloud.exception.CloudException;
 import com.cloud.utils.exception.CSExceptionErrorCode;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionProxyObject;
+
+import java.util.ArrayList;
 
 @SuppressWarnings("serial")
 public class ServerApiException extends CloudRuntimeException {
@@ -46,7 +46,7 @@ public class ServerApiException extends CloudRuntimeException {
         _errorCode = errorCode;
         _description = description;
         if (cause instanceof CloudRuntimeException) {
-            CloudRuntimeException rt = (CloudRuntimeException)cause;
+            CloudRuntimeException rt = (CloudRuntimeException) cause;
             ArrayList<ExceptionProxyObject> idList = rt.getIdProxyList();
             if (idList != null) {
                 for (int i = 0; i < idList.size(); i++) {
@@ -55,7 +55,7 @@ public class ServerApiException extends CloudRuntimeException {
             }
             setCSErrorCode(rt.getCSErrorCode());
         } else if (cause instanceof CloudException) {
-            CloudException rt = (CloudException)cause;
+            CloudException rt = (CloudException) cause;
             ArrayList<String> idList = rt.getIdProxyList();
             if (idList != null) {
                 for (int i = 0; i < idList.size(); i++) {

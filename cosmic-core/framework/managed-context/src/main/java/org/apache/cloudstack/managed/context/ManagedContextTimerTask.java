@@ -33,5 +33,4 @@ public abstract class ManagedContextTimerTask extends TimerTask {
     }
 
     protected abstract void runInContext();
-
 }

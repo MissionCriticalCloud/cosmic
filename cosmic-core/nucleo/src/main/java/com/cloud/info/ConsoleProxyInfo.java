@@ -27,20 +27,22 @@ public class ConsoleProxyInfo {
     private String proxyImageUrl;
     private int proxyUrlPort = 8000;
 
-    public ConsoleProxyInfo(int proxyUrlPort) {
+    public ConsoleProxyInfo(final int proxyUrlPort) {
         this.proxyUrlPort = proxyUrlPort;
     }
 
-    public ConsoleProxyInfo(boolean sslEnabled, String proxyIpAddress, int port, int proxyUrlPort, String consoleProxyUrlDomain) {
+    public ConsoleProxyInfo(final boolean sslEnabled, final String proxyIpAddress, final int port, final int proxyUrlPort, final String consoleProxyUrlDomain) {
         this.sslEnabled = sslEnabled;
 
         if (sslEnabled) {
-            StringBuffer sb = new StringBuffer();
+            final StringBuffer sb = new StringBuffer();
             if (consoleProxyUrlDomain.startsWith("*")) {
                 sb.append(proxyIpAddress);
-                for (int i = 0; i < proxyIpAddress.length(); i++)
-                    if (sb.charAt(i) == '.')
+                for (int i = 0; i < proxyIpAddress.length(); i++) {
+                    if (sb.charAt(i) == '.') {
                         sb.setCharAt(i, '-');
+                    }
+                }
                 sb.append(consoleProxyUrlDomain.substring(1));//skip the *
             } else {
                 //LB address
@@ -51,16 +53,18 @@ public class ConsoleProxyInfo {
             this.proxyUrlPort = proxyUrlPort;
 
             proxyImageUrl = "https://" + proxyAddress;
-            if (proxyUrlPort != 443)
+            if (proxyUrlPort != 443) {
                 proxyImageUrl += ":" + this.proxyUrlPort;
+            }
         } else {
             proxyAddress = proxyIpAddress;
             proxyPort = port;
             this.proxyUrlPort = proxyUrlPort;
 
             proxyImageUrl = "http://" + proxyAddress;
-            if (proxyUrlPort != 80)
+            if (proxyUrlPort != 80) {
                 proxyImageUrl += ":" + proxyUrlPort;
+            }
         }
     }
 
@@ -68,7 +72,7 @@ public class ConsoleProxyInfo {
         return proxyAddress;
     }
 
-    public void setProxyAddress(String proxyAddress) {
+    public void setProxyAddress(final String proxyAddress) {
         this.proxyAddress = proxyAddress;
     }
 
@@ -76,7 +80,7 @@ public class ConsoleProxyInfo {
         return proxyPort;
     }
 
-    public void setProxyPort(int proxyPort) {
+    public void setProxyPort(final int proxyPort) {
         this.proxyPort = proxyPort;
     }
 
@@ -84,7 +88,7 @@ public class ConsoleProxyInfo {
         return proxyImageUrl;
     }
 
-    public void setProxyImageUrl(String proxyImageUrl) {
+    public void setProxyImageUrl(final String proxyImageUrl) {
         this.proxyImageUrl = proxyImageUrl;
     }
 
@@ -92,7 +96,7 @@ public class ConsoleProxyInfo {
         return sslEnabled;
     }
 
-    public void setSslEnabled(boolean sslEnabled) {
+    public void setSslEnabled(final boolean sslEnabled) {
         this.sslEnabled = sslEnabled;
     }
 }

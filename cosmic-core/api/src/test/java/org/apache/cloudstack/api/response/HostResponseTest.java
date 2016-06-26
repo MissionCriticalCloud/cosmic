@@ -19,10 +19,9 @@ package org.apache.cloudstack.api.response;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.TestCase;
 import org.apache.commons.collections.map.HashedMap;
 import org.junit.Test;
-
-import junit.framework.TestCase;
 
 public final class HostResponseTest extends TestCase {
 
@@ -36,7 +35,6 @@ public final class HostResponseTest extends TestCase {
         hostResponse.setDetails(null);
 
         assertEquals(null, hostResponse.getDetails());
-
     }
 
     @Test
@@ -57,7 +55,6 @@ public final class HostResponseTest extends TestCase {
 
         assertTrue(details != actualDetails);
         assertEquals(expectedDetails, actualDetails);
-
     }
 
     @Test
@@ -76,6 +73,5 @@ public final class HostResponseTest extends TestCase {
 
         assertTrue(details != actualDetails);
         assertEquals(expectedDetails, actualDetails);
-
     }
 }

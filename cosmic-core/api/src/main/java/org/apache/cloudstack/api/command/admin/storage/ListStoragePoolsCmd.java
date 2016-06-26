@@ -26,6 +26,7 @@ import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.PodResponse;
 import org.apache.cloudstack.api.response.StoragePoolResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,9 +42,9 @@ public class ListStoragePoolsCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.CLUSTER_ID,
-               type = CommandType.UUID,
-               entityType = ClusterResponse.class,
-               description = "list storage pools belongig to the specific cluster")
+            type = CommandType.UUID,
+            entityType = ClusterResponse.class,
+            description = "list storage pools belongig to the specific cluster")
     private Long clusterId;
 
     @Parameter(name = ApiConstants.IP_ADDRESS, type = CommandType.STRING, description = "the IP address for the storage pool")
@@ -104,11 +105,6 @@ public class ListStoragePoolsCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public ApiCommandJobType getInstanceType() {
         return ApiCommandJobType.StoragePool;
     }
@@ -118,6 +114,11 @@ public class ListStoragePoolsCmd extends BaseListCmd {
         ListResponse<StoragePoolResponse> response = _queryService.searchForStoragePools(this);
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 
     public String getScope() {

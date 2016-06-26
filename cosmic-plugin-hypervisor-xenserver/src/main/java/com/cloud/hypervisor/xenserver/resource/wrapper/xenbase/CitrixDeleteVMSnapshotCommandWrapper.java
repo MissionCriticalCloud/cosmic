@@ -19,10 +19,6 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.DeleteVMSnapshotAnswer;
 import com.cloud.agent.api.DeleteVMSnapshotCommand;
@@ -30,17 +26,21 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.vm.snapshot.VMSnapshot;
+import org.apache.cloudstack.storage.to.VolumeObjectTO;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Types;
 import com.xensource.xenapi.VBD;
 import com.xensource.xenapi.VDI;
 import com.xensource.xenapi.VM;
-
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  DeleteVMSnapshotCommand.class)
+@ResourceWrapper(handles = DeleteVMSnapshotCommand.class)
 public final class CitrixDeleteVMSnapshotCommandWrapper extends CommandWrapper<DeleteVMSnapshotCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixDeleteVMSnapshotCommandWrapper.class);
@@ -51,7 +51,7 @@ public final class CitrixDeleteVMSnapshotCommandWrapper extends CommandWrapper<D
         final Connection conn = citrixResourceBase.getConnection();
 
         try {
-            final List<VDI> vdiList = new ArrayList<VDI>();
+            final List<VDI> vdiList = new ArrayList<>();
             final Set<VM> snapshots = VM.getByNameLabel(conn, snapshotName);
             if (snapshots == null || snapshots.size() == 0) {
                 s_logger.warn("VM snapshot with name " + snapshotName + " does not exist, assume it is already deleted");

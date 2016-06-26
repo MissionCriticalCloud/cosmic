@@ -15,12 +15,13 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from marvin.codes import FAILED
 from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import FAILED
 from marvin.lib.base import Account, VirtualMachine, ServiceOffering, Host, Cluster
 from marvin.lib.common import get_zone, get_domain, get_template
 from marvin.lib.utils import cleanup_resources
 from nose.plugins.attrib import attr
+
 
 class TestDeployVmWithVariedPlanners(cloudstackTestCase):
     """ Test to create services offerings for deployment planners
@@ -64,7 +65,7 @@ class TestDeployVmWithVariedPlanners(cloudstackTestCase):
     def test_deployvm_firstfit(self):
         """Test to deploy vm with a first fit offering
         """
-        #FIXME: How do we know that first fit actually happened?
+        # FIXME: How do we know that first fit actually happened?
         self.service_offering_firstfit = ServiceOffering.create(
             self.apiclient,
             self.services["service_offerings"]["tiny"],
@@ -83,7 +84,7 @@ class TestDeployVmWithVariedPlanners(cloudstackTestCase):
 
         list_vms = VirtualMachine.list(self.apiclient, id=self.virtual_machine.id)
         self.debug(
-            "Verify listVirtualMachines response for virtual machine: %s"\
+            "Verify listVirtualMachines response for virtual machine: %s" \
             % self.virtual_machine.id
         )
         self.assertEqual(
@@ -161,7 +162,7 @@ class TestDeployVmWithVariedPlanners(cloudstackTestCase):
         vm2clusterid = filter(lambda c: c.id == vm2.hostid, self.hosts)[0].clusterid
         if vm1clusterid == vm2clusterid:
             self.debug("VMs (%s, %s) meant to be dispersed are deployed in the same cluster %s" % (
-            vm1.id, vm2.id, vm1clusterid))
+                vm1.id, vm2.id, vm1clusterid))
 
     @attr(tags=["advanced", "basic", "sg"], required_hardware="false")
     def test_deployvm_userconcentrated(self):

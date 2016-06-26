@@ -16,17 +16,6 @@
 // under the License.
 package org.apache.cloudstack.engine.datacenter.entity.api.db.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.org.Grouping;
 import com.cloud.utils.db.GenericDaoBase;
@@ -39,12 +28,22 @@ import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity;
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State;
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineClusterVO;
 import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineHostPodVO;
+
+import javax.inject.Inject;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -52,7 +51,8 @@ import org.springframework.stereotype.Component;
 @Component(value = "EngineClusterDao")
 public class EngineClusterDaoImpl extends GenericDaoBase<EngineClusterVO, Long> implements EngineClusterDao {
     private static final Logger s_logger = LoggerFactory.getLogger(EngineClusterDaoImpl.class);
-
+    private static final String GET_POD_CLUSTER_MAP_PREFIX = "SELECT pod_id, id FROM cloud.cluster WHERE cluster.id IN( ";
+    private static final String GET_POD_CLUSTER_MAP_SUFFIX = " )";
     protected final SearchBuilder<EngineClusterVO> PodSearch;
     protected final SearchBuilder<EngineClusterVO> HyTypeWithoutGuidSearch;
     protected final SearchBuilder<EngineClusterVO> AvailHyperSearch;
@@ -60,10 +60,6 @@ public class EngineClusterDaoImpl extends GenericDaoBase<EngineClusterVO, Long> 
     protected final SearchBuilder<EngineClusterVO> ZoneHyTypeSearch;
     protected SearchBuilder<EngineClusterVO> StateChangeSearch;
     protected SearchBuilder<EngineClusterVO> UUIDSearch;
-
-    private static final String GET_POD_CLUSTER_MAP_PREFIX = "SELECT pod_id, id FROM cloud.cluster WHERE cluster.id IN( ";
-    private static final String GET_POD_CLUSTER_MAP_SUFFIX = " )";
-
     @Inject
     protected EngineHostPodDao _hostPodDao;
 
@@ -106,13 +102,6 @@ public class EngineClusterDaoImpl extends GenericDaoBase<EngineClusterVO, Long> 
     }
 
     @Override
-    public List<EngineClusterVO> listByZoneId(long zoneId) {
-        SearchCriteria<EngineClusterVO> sc = ZoneSearch.create();
-        sc.setParameters("dataCenterId", zoneId);
-        return listBy(sc);
-    }
-
-    @Override
     public List<EngineClusterVO> listByPodId(long podId) {
         SearchCriteria<EngineClusterVO> sc = PodSearch.create();
         sc.setParameters("pod", podId);
@@ -138,10 +127,9 @@ public class EngineClusterDaoImpl extends GenericDaoBase<EngineClusterVO, Long> 
     }
 
     @Override
-    public List<EngineClusterVO> listByDcHyType(long dcId, String hyType) {
-        SearchCriteria<EngineClusterVO> sc = ZoneHyTypeSearch.create();
-        sc.setParameters("dataCenterId", dcId);
-        sc.setParameters("hypervisorType", hyType);
+    public List<EngineClusterVO> listByZoneId(long zoneId) {
+        SearchCriteria<EngineClusterVO> sc = ZoneSearch.create();
+        sc.setParameters("dataCenterId", zoneId);
         return listBy(sc);
     }
 
@@ -158,6 +146,14 @@ public class EngineClusterDaoImpl extends GenericDaoBase<EngineClusterVO, Long> 
         }
 
         return hypers;
+    }
+
+    @Override
+    public List<EngineClusterVO> listByDcHyType(long dcId, String hyType) {
+        SearchCriteria<EngineClusterVO> sc = ZoneHyTypeSearch.create();
+        sc.setParameters("dataCenterId", dcId);
+        sc.setParameters("hypervisorType", hyType);
+        return listBy(sc);
     }
 
     @Override
@@ -230,7 +226,7 @@ public class EngineClusterDaoImpl extends GenericDaoBase<EngineClusterVO, Long> 
         GenericSearchBuilder<EngineClusterVO, Long> clusterIdSearch = createSearchBuilder(Long.class);
         clusterIdSearch.selectFields(clusterIdSearch.entity().getId());
         clusterIdSearch.join("disabledPodIdSearch", disabledPodIdSearch, clusterIdSearch.entity().getPodId(), disabledPodIdSearch.entity().getId(),
-            JoinBuilder.JoinType.INNER);
+                JoinBuilder.JoinType.INNER);
         clusterIdSearch.done();
 
         SearchCriteria<Long> sc = clusterIdSearch.create();
@@ -277,33 +273,31 @@ public class EngineClusterDaoImpl extends GenericDaoBase<EngineClusterVO, Long> 
             if (dbCluster != null) {
                 StringBuilder str = new StringBuilder("Unable to update ").append(vo.toString());
                 str.append(": DB Data={id=")
-                    .append(dbCluster.getId())
-                    .append("; state=")
-                    .append(dbCluster.getState())
-                    .append(";updatedTime=")
-                    .append(dbCluster.getLastUpdated());
+                   .append(dbCluster.getId())
+                   .append("; state=")
+                   .append(dbCluster.getState())
+                   .append(";updatedTime=")
+                   .append(dbCluster.getLastUpdated());
                 str.append(": New Data={id=")
-                    .append(vo.getId())
-                    .append("; state=")
-                    .append(nextState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatedTime=")
-                    .append(vo.getLastUpdated());
+                   .append(vo.getId())
+                   .append("; state=")
+                   .append(nextState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatedTime=")
+                   .append(vo.getLastUpdated());
                 str.append(": stale Data={id=")
-                    .append(vo.getId())
-                    .append("; state=")
-                    .append(currentState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatedTime=")
-                    .append(oldUpdatedTime);
+                   .append(vo.getId())
+                   .append("; state=")
+                   .append(currentState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatedTime=")
+                   .append(oldUpdatedTime);
             } else {
                 s_logger.debug("Unable to update dataCenter: id=" + vo.getId() + ", as there is no such dataCenter exists in the database anymore");
             }
         }
         return rows > 0;
-
     }
-
 }

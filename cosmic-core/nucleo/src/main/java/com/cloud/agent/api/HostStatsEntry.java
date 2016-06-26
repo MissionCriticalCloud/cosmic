@@ -35,7 +35,7 @@ public class HostStatsEntry implements HostStats {
     }
 
     public HostStatsEntry(long hostId, double cpuUtilization, double networkReadKBs, double networkWriteKBs, String entityType, double totalMemoryKBs,
-            double freeMemoryKBs, double xapiMemoryUsageKBs, double averageLoad) {
+                          double freeMemoryKBs, double xapiMemoryUsageKBs, double averageLoad) {
         this.hostId = hostId;
         this.entityType = entityType;
         this.cpuUtilization = cpuUtilization;
@@ -46,12 +46,8 @@ public class HostStatsEntry implements HostStats {
     }
 
     @Override
-    public double getNetworkReadKBs() {
-        return networkReadKBs;
-    }
-
-    public void setNetworkReadKBs(double networkReadKBs) {
-        this.networkReadKBs = networkReadKBs;
+    public double getCpuUtilization() {
+        return this.cpuUtilization;
     }
 
     @Override
@@ -61,15 +57,6 @@ public class HostStatsEntry implements HostStats {
 
     public void setNetworkWriteKBs(double networkWriteKBs) {
         this.networkWriteKBs = networkWriteKBs;
-    }
-
-    @Override
-    public String getEntityType() {
-        return this.entityType;
-    }
-
-    public void setEntityType(String entityType) {
-        this.entityType = entityType;
     }
 
     @Override
@@ -86,17 +73,22 @@ public class HostStatsEntry implements HostStats {
         return this.freeMemoryKBs;
     }
 
-    public void setFreeMemoryKBs(double freeMemoryKBs) {
-        this.freeMemoryKBs = freeMemoryKBs;
+    @Override
+    public double getNetworkReadKBs() {
+        return networkReadKBs;
+    }
+
+    public void setNetworkReadKBs(double networkReadKBs) {
+        this.networkReadKBs = networkReadKBs;
     }
 
     @Override
-    public double getCpuUtilization() {
-        return this.cpuUtilization;
+    public String getEntityType() {
+        return this.entityType;
     }
 
-    public void setCpuUtilization(double cpuUtilization) {
-        this.cpuUtilization = cpuUtilization;
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
     }
 
     @Override
@@ -107,6 +99,14 @@ public class HostStatsEntry implements HostStats {
     @Override
     public HostStats getHostStats() {
         return this;
+    }
+
+    public void setFreeMemoryKBs(double freeMemoryKBs) {
+        this.freeMemoryKBs = freeMemoryKBs;
+    }
+
+    public void setCpuUtilization(double cpuUtilization) {
+        this.cpuUtilization = cpuUtilization;
     }
 
     public void setHostId(long hostId) {

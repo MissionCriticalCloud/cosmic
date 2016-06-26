@@ -16,13 +16,13 @@
 // under the License.
 package org.apache.cloudstack.storage.datastore.db;
 
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.StoragePoolStatus;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Data Access Object for storage_pool table
@@ -41,14 +41,16 @@ public interface PrimaryDataStoreDao extends GenericDao<StoragePoolVO, Long> {
 
     /**
      * Set capacity of storage pool in bytes
-     * @param id pool id.
+     *
+     * @param id            pool id.
      * @param capacityBytes capacity in bytes
      */
     void updateCapacityBytes(long id, long capacityBytes);
 
     /**
      * Set iops capacity of storage pool
-     * @param id pool id.
+     *
+     * @param id           pool id.
      * @param capacityIops iops capacity
      */
     void updateCapacityIops(long id, long capacityIops);
@@ -58,8 +60,7 @@ public interface PrimaryDataStoreDao extends GenericDao<StoragePoolVO, Long> {
     /**
      * Find pool by name.
      *
-     * @param name
-     *            name of pool.
+     * @param name name of pool.
      * @return the single StoragePoolVO
      */
     List<StoragePoolVO> findPoolByName(String name);
@@ -67,10 +68,8 @@ public interface PrimaryDataStoreDao extends GenericDao<StoragePoolVO, Long> {
     /**
      * Find pools by the pod that matches the details.
      *
-     * @param podId
-     *            pod id to find the pools in.
-     * @param details
-     *            details to match. All must match for the pool to be returned.
+     * @param podId   pod id to find the pools in.
+     * @param details details to match. All must match for the pool to be returned.
      * @return List of StoragePoolVO
      */
     List<StoragePoolVO> findPoolsByDetails(long dcId, long podId, Long clusterId, Map<String, String> details, ScopeType scope);
@@ -82,8 +81,7 @@ public interface PrimaryDataStoreDao extends GenericDao<StoragePoolVO, Long> {
     /**
      * Find pool by UUID.
      *
-     * @param uuid
-     *            uuid of pool.
+     * @param uuid uuid of pool.
      * @return the single StoragePoolVO
      */
     StoragePoolVO findPoolByUUID(String uuid);

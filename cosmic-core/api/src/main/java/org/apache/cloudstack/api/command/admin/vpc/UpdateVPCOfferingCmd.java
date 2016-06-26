@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.admin.vpc;
 import com.cloud.event.EventTypes;
 import com.cloud.network.vpc.VpcOffering;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -27,6 +26,7 @@ import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.VpcOfferingResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,16 +56,28 @@ public class UpdateVPCOfferingCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
+    @Override
+    public void execute() {
+        VpcOffering result = _vpcProvSvc.updateVpcOffering(getId(), getVpcOfferingName(), getDisplayText(), getState());
+        if (result != null) {
+            VpcOfferingResponse response = _responseGenerator.createVpcOfferingResponse(result);
+            response.setResponseName(getCommandName());
+            this.setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update VPC offering");
+        }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
     public String getVpcOfferingName() {
         return vpcOffName;
     }
 
     public String getDisplayText() {
         return displayText;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public String getState() {
@@ -83,18 +95,6 @@ public class UpdateVPCOfferingCmd extends BaseAsyncCmd {
     @Override
     public long getEntityOwnerId() {
         return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
-    public void execute() {
-        VpcOffering result = _vpcProvSvc.updateVpcOffering(getId(), getVpcOfferingName(), getDisplayText(), getState());
-        if (result != null) {
-            VpcOfferingResponse response = _responseGenerator.createVpcOfferingResponse(result);
-            response.setResponseName(getCommandName());
-            this.setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update VPC offering");
-        }
     }
 
     @Override

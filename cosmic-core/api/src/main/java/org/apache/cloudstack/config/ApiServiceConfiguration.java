@@ -16,10 +16,10 @@
 // under the License.
 package org.apache.cloudstack.config;
 
-import javax.ejb.Local;
-
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
+
+import javax.ejb.Local;
 
 @Local(value = {ApiServiceConfiguration.class})
 public class ApiServiceConfiguration implements Configurable {
@@ -36,7 +36,6 @@ public class ApiServiceConfiguration implements Configurable {
 
     @Override
     public ConfigKey<?>[] getConfigKeys() {
-        return new ConfigKey<?>[] {ManagementHostIPAdr, ApiServletPath, DefaultUIPageSize};
+        return new ConfigKey<?>[]{ManagementHostIPAdr, ApiServletPath, DefaultUIPageSize};
     }
-
 }

@@ -16,28 +16,28 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilities;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.HypervisorCapabilitiesResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "listHypervisorCapabilities",
-            description = "Lists all hypervisor capabilities.",
-            responseObject = HypervisorCapabilitiesResponse.class,
-            since = "3.0.0",
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = false)
+        description = "Lists all hypervisor capabilities.",
+        responseObject = HypervisorCapabilitiesResponse.class,
+        since = "3.0.0",
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = false)
 public class ListHypervisorCapabilitiesCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListHypervisorCapabilitiesCmd.class.getName());
 
@@ -57,31 +57,10 @@ public class ListHypervisorCapabilitiesCmd extends BaseListCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
-    }
-
-    public HypervisorType getHypervisor() {
-        if (hypervisor != null) {
-            return HypervisorType.getType(hypervisor);
-        } else {
-            return null;
-        }
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
     @Override
     public void execute() {
         Pair<List<? extends HypervisorCapabilities>, Integer> hpvCapabilities =
-            _mgr.listHypervisorCapabilities(getId(), getHypervisor(), getKeyword(), this.getStartIndex(), this.getPageSizeVal());
+                _mgr.listHypervisorCapabilities(getId(), getHypervisor(), getKeyword(), this.getStartIndex(), this.getPageSizeVal());
         ListResponse<HypervisorCapabilitiesResponse> response = new ListResponse<HypervisorCapabilitiesResponse>();
         List<HypervisorCapabilitiesResponse> hpvCapabilitiesResponses = new ArrayList<HypervisorCapabilitiesResponse>();
         for (HypervisorCapabilities capability : hpvCapabilities.first()) {
@@ -93,5 +72,26 @@ public class ListHypervisorCapabilitiesCmd extends BaseListCmd {
         response.setResponses(hpvCapabilitiesResponses, hpvCapabilities.second());
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public HypervisorType getHypervisor() {
+        if (hypervisor != null) {
+            return HypervisorType.getType(hypervisor);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

@@ -41,11 +41,6 @@ public class SecondaryStorageListener implements Listener {
     }
 
     @Override
-    public boolean isRecurring() {
-        return true;
-    }
-
-    @Override
     public boolean processAnswers(long agentId, long seq, Answer[] answers) {
         boolean processed = false;
         if (answers != null) {
@@ -69,7 +64,7 @@ public class SecondaryStorageListener implements Listener {
     @Override
     public void processConnect(Host agent, StartupCommand cmd, boolean forRebalance) {
         if ((cmd instanceof StartupStorageCommand)) {
-            StartupStorageCommand scmd = (StartupStorageCommand)cmd;
+            StartupStorageCommand scmd = (StartupStorageCommand) cmd;
             if (scmd.getResourceType() == Storage.StorageResourceType.SECONDARY_STORAGE) {
                 _ssVmMgr.generateSetupCommand(agent.getId());
                 return;
@@ -93,12 +88,17 @@ public class SecondaryStorageListener implements Listener {
     }
 
     @Override
-    public boolean processTimeout(long agentId, long seq) {
+    public boolean isRecurring() {
         return true;
     }
 
     @Override
     public int getTimeout() {
         return -1;
+    }
+
+    @Override
+    public boolean processTimeout(long agentId, long seq) {
+        return true;
     }
 }

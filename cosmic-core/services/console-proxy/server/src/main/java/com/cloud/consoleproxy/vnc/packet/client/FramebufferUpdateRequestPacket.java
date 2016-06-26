@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.consoleproxy.vnc.packet.client;
 
+import com.cloud.consoleproxy.vnc.RfbConstants;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
-
-import com.cloud.consoleproxy.vnc.RfbConstants;
 
 /**
  * FramebufferUpdateRequestPacket
@@ -49,5 +49,4 @@ public class FramebufferUpdateRequestPacket implements ClientPacket {
         os.writeShort(width);
         os.writeShort(height);
     }
-
 }

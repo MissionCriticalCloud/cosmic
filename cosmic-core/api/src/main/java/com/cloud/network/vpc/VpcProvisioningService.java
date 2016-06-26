@@ -16,11 +16,10 @@
 // under the License.
 package com.cloud.network.vpc;
 
+import com.cloud.utils.Pair;
 
 import java.util.List;
 import java.util.Map;
-
-import com.cloud.utils.Pair;
 
 public interface VpcProvisioningService {
 
@@ -31,8 +30,8 @@ public interface VpcProvisioningService {
                                          Map serviceCapabilitystList,
                                          Long serviceOfferingId);
 
-    Pair<List<? extends VpcOffering>,Integer> listVpcOfferings(Long id, String name, String displayText, List<String> supportedServicesStr, Boolean isDefault, String keyword,
-        String state, Long startIndex, Long pageSizeVal);
+    Pair<List<? extends VpcOffering>, Integer> listVpcOfferings(Long id, String name, String displayText, List<String> supportedServicesStr, Boolean isDefault, String keyword,
+                                                                String state, Long startIndex, Long pageSizeVal);
 
     /**
      * @param offId
@@ -48,5 +47,4 @@ public interface VpcProvisioningService {
      * @return
      */
     public VpcOffering updateVpcOffering(long vpcOffId, String vpcOfferingName, String displayText, String state);
-
 }

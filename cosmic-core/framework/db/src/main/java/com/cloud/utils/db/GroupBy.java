@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.utils.db;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GroupBy<J extends SearchBase<?, T, R>, T, R> {
     J _builder;

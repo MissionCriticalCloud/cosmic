@@ -22,7 +22,6 @@ package com.cloud.agent.resource.virtualnetwork;
 public abstract class ConfigItem {
     private String info;
 
-
     public String getInfo() {
         return info;
     }

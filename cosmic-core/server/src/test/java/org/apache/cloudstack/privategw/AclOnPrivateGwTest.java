@@ -16,10 +16,6 @@
 // under the License.
 package org.apache.cloudstack.privategw;
 
-import java.io.IOException;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.VlanDao;
@@ -51,12 +47,16 @@ import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.vm.dao.DomainRouterDao;
-
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.admin.vpc.CreatePrivateGatewayCmd;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.test.utils.SpringUtils;
+
+import javax.naming.ConfigurationException;
+import java.io.IOException;
+
+import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,8 +73,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-import junit.framework.Assert;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
 public class AclOnPrivateGwTest {
@@ -90,7 +88,6 @@ public class AclOnPrivateGwTest {
                 return 2L;
             }
         };
-
     }
 
     @Test
@@ -105,7 +102,6 @@ public class AclOnPrivateGwTest {
         } catch (ConcurrentOperationException e) {
             e.printStackTrace();
         }
-
     }
 
     @Test
@@ -134,13 +130,12 @@ public class AclOnPrivateGwTest {
         } catch (ResourceUnavailableException e) {
             e.printStackTrace();
         }
-
     }
 
     @Configuration
     @ComponentScan(basePackageClasses = {VpcManagerImpl.class},
-                   includeFilters = {@ComponentScan.Filter(value = TestConfiguration.Library.class, type = FilterType.CUSTOM)},
-                   useDefaultFilters = false)
+            includeFilters = {@ComponentScan.Filter(value = TestConfiguration.Library.class, type = FilterType.CUSTOM)},
+            useDefaultFilters = false)
     public static class TestConfiguration extends SpringUtils.CloudStackTestConfiguration {
         @Bean
         public VpcOfferingDao vpcOfferingDao() {

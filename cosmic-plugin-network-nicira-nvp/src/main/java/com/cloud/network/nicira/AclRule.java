@@ -22,7 +22,6 @@ package com.cloud.network.nicira;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-@SuppressWarnings("serial")
 public class AclRule extends AccessRule {
 
     public static final String ETHERTYPE_ARP = "ARP";
@@ -54,7 +53,6 @@ public class AclRule extends AccessRule {
 
     protected int order;
 
-
     /**
      * Default constructor
      */
@@ -64,11 +62,11 @@ public class AclRule extends AccessRule {
     /**
      * Fully parameterized constructor
      */
-    public AclRule(String ethertype, int protocol, String action, String sourceMacAddress,
-            String destinationMacAddress, String sourceIpPrefix, String destinationIpPrefix,
-            Integer sourcePortRangeMin, Integer sourcePortRangeMax,
-            Integer destinationPortRangeMin, Integer destinationPortRangeMax,
-            int order, Integer icmpProtocolCode, Integer icmpProtocolType) {
+    public AclRule(final String ethertype, final int protocol, final String action, final String sourceMacAddress,
+                   final String destinationMacAddress, final String sourceIpPrefix, final String destinationIpPrefix,
+                   final Integer sourcePortRangeMin, final Integer sourcePortRangeMax,
+                   final Integer destinationPortRangeMin, final Integer destinationPortRangeMax,
+                   final int order, final Integer icmpProtocolCode, final Integer icmpProtocolType) {
         this.ethertype = ethertype;
         this.protocol = protocol;
         this.action = action;
@@ -85,12 +83,11 @@ public class AclRule extends AccessRule {
         this.icmpProtocolType = icmpProtocolType;
     }
 
-
     public String getAction() {
         return action;
     }
 
-    public void setAction(String action) {
+    public void setAction(final String action) {
         this.action = action;
     }
 
@@ -98,7 +95,7 @@ public class AclRule extends AccessRule {
         return sourceIpPrefix;
     }
 
-    public void setSourceIpPrefix(String sourceIpPrefix) {
+    public void setSourceIpPrefix(final String sourceIpPrefix) {
         this.sourceIpPrefix = sourceIpPrefix;
     }
 
@@ -106,7 +103,7 @@ public class AclRule extends AccessRule {
         return destinationIpPrefix;
     }
 
-    public void setDestinationIpPrefix(String destinationIpPrefix) {
+    public void setDestinationIpPrefix(final String destinationIpPrefix) {
         this.destinationIpPrefix = destinationIpPrefix;
     }
 
@@ -114,7 +111,7 @@ public class AclRule extends AccessRule {
         return sourceMacAddress;
     }
 
-    public void setSourceMacAddress(String sourceMacAddress) {
+    public void setSourceMacAddress(final String sourceMacAddress) {
         this.sourceMacAddress = sourceMacAddress;
     }
 
@@ -122,7 +119,7 @@ public class AclRule extends AccessRule {
         return destinationMacAddress;
     }
 
-    public void setDestinationMacAddress(String destinationMacAddress) {
+    public void setDestinationMacAddress(final String destinationMacAddress) {
         this.destinationMacAddress = destinationMacAddress;
     }
 
@@ -130,7 +127,7 @@ public class AclRule extends AccessRule {
         return sourcePortRangeMin;
     }
 
-    public void setSourcePortRangeMin(Integer sourcePortRangeMin) {
+    public void setSourcePortRangeMin(final Integer sourcePortRangeMin) {
         this.sourcePortRangeMin = sourcePortRangeMin;
     }
 
@@ -138,7 +135,7 @@ public class AclRule extends AccessRule {
         return destinationPortRangeMin;
     }
 
-    public void setDestinationPortRangeMin(Integer destinationPortRangeMin) {
+    public void setDestinationPortRangeMin(final Integer destinationPortRangeMin) {
         this.destinationPortRangeMin = destinationPortRangeMin;
     }
 
@@ -146,7 +143,7 @@ public class AclRule extends AccessRule {
         return sourcePortRangeMax;
     }
 
-    public void setSourcePortRangeMax(Integer sourcePortRangeMax) {
+    public void setSourcePortRangeMax(final Integer sourcePortRangeMax) {
         this.sourcePortRangeMax = sourcePortRangeMax;
     }
 
@@ -154,7 +151,7 @@ public class AclRule extends AccessRule {
         return destinationPortRangeMax;
     }
 
-    public void setDestinationPortRangeMax(Integer destinationPortRangeMax) {
+    public void setDestinationPortRangeMax(final Integer destinationPortRangeMax) {
         this.destinationPortRangeMax = destinationPortRangeMax;
     }
 
@@ -162,7 +159,7 @@ public class AclRule extends AccessRule {
         return icmpProtocolCode;
     }
 
-    public void setIcmpProtocolCode(Integer icmpProtocolCode) {
+    public void setIcmpProtocolCode(final Integer icmpProtocolCode) {
         this.icmpProtocolCode = icmpProtocolCode;
     }
 
@@ -170,7 +167,7 @@ public class AclRule extends AccessRule {
         return icmpProtocolType;
     }
 
-    public void setIcmpProtocolType(Integer icmpProtocolType) {
+    public void setIcmpProtocolType(final Integer icmpProtocolType) {
         this.icmpProtocolType = icmpProtocolType;
     }
 
@@ -178,19 +175,19 @@ public class AclRule extends AccessRule {
         return order;
     }
 
-    public void setOrder(int order) {
+    public void setOrder(final int order) {
         this.order = order;
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 31)
-            .append(ethertype).append(protocol)
-            .toHashCode();
+                .append(ethertype).append(protocol)
+                .toHashCode();
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -200,7 +197,7 @@ public class AclRule extends AccessRule {
         if (!(obj instanceof AclRule)) {
             return false;
         }
-        AclRule another = (AclRule) obj;
+        final AclRule another = (AclRule) obj;
         return new EqualsBuilder()
                 .append(ethertype, another.ethertype)
                 .append(protocol, another.protocol)

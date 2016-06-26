@@ -16,31 +16,29 @@
 // under the License.
 package org.apache.cloudstack.ldap;
 
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.naming.directory.SearchControls;
-
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.ldap.dao.LdapConfigurationDao;
 
-public class LdapConfiguration implements Configurable{
+import javax.inject.Inject;
+import javax.naming.directory.SearchControls;
+import java.util.List;
+
+public class LdapConfiguration implements Configurable {
     private final static String factory = "com.sun.jndi.ldap.LdapCtxFactory";
 
-    private static final ConfigKey<Long> ldapReadTimeout = new ConfigKey<Long>(Long.class, "ldap.read.timeout", "Advanced", "1000",
-        "LDAP connection Timeout in milli sec", true, ConfigKey.Scope.Global, 1l);
+    private static final ConfigKey<Long> ldapReadTimeout = new ConfigKey<>(Long.class, "ldap.read.timeout", "Advanced", "1000",
+            "LDAP connection Timeout in milli sec", true, ConfigKey.Scope.Global, 1l);
 
-    private static final ConfigKey<Integer> ldapPageSize = new ConfigKey<Integer>(Integer.class, "ldap.request.page.size", "Advanced", "1000",
-                                                                               "page size sent to ldap server on each request to get user", true, ConfigKey.Scope.Global, 1);
-    private static final ConfigKey<String> ldapProvider = new ConfigKey<String>(String.class, "ldap.provider", "Advanced", "openldap", "ldap provider ex:openldap, microsoftad",
-                                                                                true, ConfigKey.Scope.Global, null);
+    private static final ConfigKey<Integer> ldapPageSize = new ConfigKey<>(Integer.class, "ldap.request.page.size", "Advanced", "1000",
+            "page size sent to ldap server on each request to get user", true, ConfigKey.Scope.Global, 1);
+    private static final ConfigKey<String> ldapProvider = new ConfigKey<>(String.class, "ldap.provider", "Advanced", "openldap", "ldap provider ex:openldap, microsoftad",
+            true, ConfigKey.Scope.Global, null);
 
-    private static final ConfigKey<Boolean> ldapEnableNestedGroups = new ConfigKey<Boolean>(Boolean.class, "ldap.nested.groups.enable", "Advanced", "true",
-                                                                                            "if true, nested groups will also be queried", true, ConfigKey.Scope.Global, null);
+    private static final ConfigKey<Boolean> ldapEnableNestedGroups = new ConfigKey<>(Boolean.class, "ldap.nested.groups.enable", "Advanced", "true",
+            "if true, nested groups will also be queried", true, ConfigKey.Scope.Global, null);
 
     private final static int scope = SearchControls.SUBTREE_SCOPE;
 
@@ -66,35 +64,20 @@ public class LdapConfiguration implements Configurable{
         }
     }
 
-    public String getBaseDn() {
-        return _configDao.getValue("ldap.basedn");
+    public String getBindPrincipal() {
+        return _configDao.getValue("ldap.bind.principal");
     }
 
     public String getBindPassword() {
         return _configDao.getValue("ldap.bind.password");
     }
 
-    public String getBindPrincipal() {
-        return _configDao.getValue("ldap.bind.principal");
-    }
-
-    public String getEmailAttribute() {
-        final String emailAttribute = _configDao.getValue("ldap.email.attribute");
-        return emailAttribute == null ? "mail" : emailAttribute;
+    public String getBaseDn() {
+        return _configDao.getValue("ldap.basedn");
     }
 
     public String getFactory() {
         return factory;
-    }
-
-    public String getFirstnameAttribute() {
-        final String firstnameAttribute = _configDao.getValue("ldap.firstname.attribute");
-        return firstnameAttribute == null ? "givenname" : firstnameAttribute;
-    }
-
-    public String getLastnameAttribute() {
-        final String lastnameAttribute = _configDao.getValue("ldap.lastname.attribute");
-        return lastnameAttribute == null ? "sn" : lastnameAttribute;
     }
 
     public String getProviderUrl() {
@@ -110,19 +93,6 @@ public class LdapConfiguration implements Configurable{
         return providerUrls.toString();
     }
 
-    public String[] getReturnAttributes() {
-        return new String[] {getUsernameAttribute(), getEmailAttribute(), getFirstnameAttribute(), getLastnameAttribute(), getCommonNameAttribute(),
-                getUserAccountControlAttribute()};
-    }
-
-    public int getScope() {
-        return scope;
-    }
-
-    public String getSearchGroupPrinciple() {
-        return _configDao.getValue("ldap.search.group.principle");
-    }
-
     public boolean getSSLStatus() {
         boolean sslStatus = false;
         if (getTrustStore() != null && getTrustStorePassword() != null) {
@@ -131,17 +101,53 @@ public class LdapConfiguration implements Configurable{
         return sslStatus;
     }
 
+    public String getTrustStorePassword() {
+        return _configDao.getValue("ldap.truststore.password");
+    }
+
     public String getTrustStore() {
         return _configDao.getValue("ldap.truststore");
     }
 
-    public String getTrustStorePassword() {
-        return _configDao.getValue("ldap.truststore.password");
+    public String[] getReturnAttributes() {
+        return new String[]{getUsernameAttribute(), getEmailAttribute(), getFirstnameAttribute(), getLastnameAttribute(), getCommonNameAttribute(),
+                getUserAccountControlAttribute()};
     }
 
     public String getUsernameAttribute() {
         final String usernameAttribute = _configDao.getValue("ldap.username.attribute");
         return usernameAttribute == null ? "uid" : usernameAttribute;
+    }
+
+    public String getEmailAttribute() {
+        final String emailAttribute = _configDao.getValue("ldap.email.attribute");
+        return emailAttribute == null ? "mail" : emailAttribute;
+    }
+
+    public String getFirstnameAttribute() {
+        final String firstnameAttribute = _configDao.getValue("ldap.firstname.attribute");
+        return firstnameAttribute == null ? "givenname" : firstnameAttribute;
+    }
+
+    public String getLastnameAttribute() {
+        final String lastnameAttribute = _configDao.getValue("ldap.lastname.attribute");
+        return lastnameAttribute == null ? "sn" : lastnameAttribute;
+    }
+
+    public String getCommonNameAttribute() {
+        return "cn";
+    }
+
+    public String getUserAccountControlAttribute() {
+        return "userAccountControl";
+    }
+
+    public int getScope() {
+        return scope;
+    }
+
+    public String getSearchGroupPrinciple() {
+        return _configDao.getValue("ldap.search.group.principle");
     }
 
     public String getUserObject() {
@@ -159,14 +165,6 @@ public class LdapConfiguration implements Configurable{
         return uniqueMemberAttribute == null ? "uniquemember" : uniqueMemberAttribute;
     }
 
-    public String getCommonNameAttribute() {
-        return "cn";
-    }
-
-    public String getUserAccountControlAttribute() {
-        return "userAccountControl";
-    }
-
     public Long getReadTimeout() {
         return ldapReadTimeout.value();
     }
@@ -179,7 +177,7 @@ public class LdapConfiguration implements Configurable{
         LdapUserManager.Provider provider;
         try {
             provider = LdapUserManager.Provider.valueOf(ldapProvider.value().toUpperCase());
-        } catch (IllegalArgumentException ex) {
+        } catch (final IllegalArgumentException ex) {
             //openldap is the default
             provider = LdapUserManager.Provider.OPENLDAP;
         }
@@ -197,6 +195,6 @@ public class LdapConfiguration implements Configurable{
 
     @Override
     public ConfigKey<?>[] getConfigKeys() {
-        return new ConfigKey<?>[] {ldapReadTimeout, ldapPageSize, ldapProvider, ldapEnableNestedGroups};
+        return new ConfigKey<?>[]{ldapReadTimeout, ldapPageSize, ldapProvider, ldapEnableNestedGroups};
     }
 }

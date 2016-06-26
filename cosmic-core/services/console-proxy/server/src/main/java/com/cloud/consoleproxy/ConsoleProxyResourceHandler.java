@@ -16,6 +16,8 @@
 // under the License.
 package com.cloud.consoleproxy;
 
+import com.cloud.consoleproxy.util.Logger;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,7 +26,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.cloud.consoleproxy.util.Logger;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -33,6 +34,8 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
     private static final Logger s_logger = Logger.getLogger(ConsoleProxyResourceHandler.class);
 
     static Map<String, String> s_mimeTypes;
+    static Map<String, String> s_validResourceFolders;
+
     static {
         s_mimeTypes = new HashMap<String, String>();
         s_mimeTypes.put("jar", "application/java-archive");
@@ -44,7 +47,6 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
         s_mimeTypes.put("log", "text/plain");
     }
 
-    static Map<String, String> s_validResourceFolders;
     static {
         s_validResourceFolders = new HashMap<String, String>();
         s_validResourceFolders.put("applet", "");
@@ -61,15 +63,17 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange t) throws IOException {
         try {
-            if (s_logger.isDebugEnabled())
+            if (s_logger.isDebugEnabled()) {
                 s_logger.debug("Resource Handler " + t.getRequestURI());
+            }
 
             long startTick = System.currentTimeMillis();
 
             doHandle(t);
 
-            if (s_logger.isDebugEnabled())
+            if (s_logger.isDebugEnabled()) {
                 s_logger.debug(t.getRequestURI() + " Process time " + (System.currentTimeMillis() - startTick) + " ms");
+            }
         } catch (IOException e) {
             throw e;
         } catch (Throwable e) {
@@ -84,8 +88,9 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
     private void doHandle(HttpExchange t) throws Exception {
         String path = t.getRequestURI().getPath();
 
-        if (s_logger.isInfoEnabled())
+        if (s_logger.isInfoEnabled()) {
             s_logger.info("Get resource request for " + path);
+        }
 
         int i = path.indexOf("/", 1);
         String filepath = path.substring(i + 1);
@@ -94,8 +99,9 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
         String contentType = getContentType(extension);
 
         if (!validatePath(filepath)) {
-            if (s_logger.isInfoEnabled())
+            if (s_logger.isInfoEnabled()) {
                 s_logger.info("Resource access is forbidden, uri: " + path);
+            }
 
             t.sendResponseHeaders(403, -1);     // forbidden
             return;
@@ -112,8 +118,9 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
                     hds.set("Content-Type", contentType);
                     t.sendResponseHeaders(304, -1);
 
-                    if (s_logger.isInfoEnabled())
+                    if (s_logger.isInfoEnabled()) {
                         s_logger.info("Sent 304 file has not been " + "modified since " + ifModifiedSince);
+                    }
                     return;
                 }
             }
@@ -125,11 +132,13 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
             t.sendResponseHeaders(200, length);
             responseFileContent(t, f);
 
-            if (s_logger.isInfoEnabled())
+            if (s_logger.isInfoEnabled()) {
                 s_logger.info("Sent file " + path + " with content type " + contentType);
+            }
         } else {
-            if (s_logger.isInfoEnabled())
+            if (s_logger.isInfoEnabled()) {
                 s_logger.info("file does not exist" + path);
+            }
             t.sendResponseHeaders(404, -1);
         }
     }
@@ -142,9 +151,29 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
         return "application/octet-stream";
     }
 
+    private static boolean validatePath(String path) {
+        int i = path.indexOf("/");
+        if (i == -1) {
+            if (s_logger.isInfoEnabled()) {
+                s_logger.info("Invalid resource path: can not start at resource root");
+            }
+            return false;
+        }
+
+        if (path.contains("..")) {
+            if (s_logger.isInfoEnabled()) {
+                s_logger.info("Invalid resource path: contains relative up-level navigation");
+            }
+
+            return false;
+        }
+
+        return isValidResourceFolder(path.substring(0, i));
+    }
+
     private static void responseFileContent(HttpExchange t, File f) throws Exception {
-        try(OutputStream os = t.getResponseBody();
-        FileInputStream fis = new FileInputStream(f);) {
+        try (OutputStream os = t.getResponseBody();
+             FileInputStream fis = new FileInputStream(f);) {
             while (true) {
                 byte[] b = new byte[8192];
                 int n = fis.read(b);
@@ -154,24 +183,6 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
                 os.write(b, 0, n);
             }
         }
-    }
-
-    private static boolean validatePath(String path) {
-        int i = path.indexOf("/");
-        if (i == -1) {
-            if (s_logger.isInfoEnabled())
-                s_logger.info("Invalid resource path: can not start at resource root");
-            return false;
-        }
-
-        if (path.contains("..")) {
-            if (s_logger.isInfoEnabled())
-                s_logger.info("Invalid resource path: contains relative up-level navigation");
-
-            return false;
-        }
-
-        return isValidResourceFolder(path.substring(0, i));
     }
 
     private static boolean isValidResourceFolder(String name) {

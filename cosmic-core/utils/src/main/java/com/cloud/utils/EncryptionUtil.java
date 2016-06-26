@@ -18,14 +18,13 @@
  */
 package com.cloud.utils;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
-import com.cloud.utils.exception.CloudRuntimeException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.jasypt.encryption.pbe.PBEStringEncryptor;
@@ -37,28 +36,28 @@ public class EncryptionUtil {
     public static final Logger s_logger = LoggerFactory.getLogger(EncryptionUtil.class.getName());
     private static PBEStringEncryptor encryptor;
 
-    private static void initialize(String key) {
-        StandardPBEStringEncryptor standardPBEStringEncryptor = new StandardPBEStringEncryptor();
-        standardPBEStringEncryptor.setAlgorithm("PBEWITHSHA1ANDDESEDE");
-        standardPBEStringEncryptor.setPassword(key);
-        encryptor = standardPBEStringEncryptor;
-    }
-
-    public static String encodeData(String data, String key) {
+    public static String encodeData(final String data, final String key) {
         if (encryptor == null) {
             initialize(key);
         }
         return encryptor.encrypt(data);
     }
 
-    public static String decodeData(String encodedData, String key) {
+    private static void initialize(final String key) {
+        final StandardPBEStringEncryptor standardPBEStringEncryptor = new StandardPBEStringEncryptor();
+        standardPBEStringEncryptor.setAlgorithm("PBEWITHSHA1ANDDESEDE");
+        standardPBEStringEncryptor.setPassword(key);
+        encryptor = standardPBEStringEncryptor;
+    }
+
+    public static String decodeData(final String encodedData, final String key) {
         if (encryptor == null) {
             initialize(key);
         }
         return encryptor.decrypt(encodedData);
     }
 
-    public static String generateSignature(String data, String key) {
+    public static String generateSignature(final String data, final String key) {
         try {
             final Mac mac = Mac.getInstance("HmacSHA1");
             final SecretKeySpec keySpec = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA1");

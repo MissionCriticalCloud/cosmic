@@ -16,12 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.network;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.network.vpc.NetworkACL;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -31,6 +27,10 @@ import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.NetworkACLResponse;
 import org.apache.cloudstack.api.response.NetworkResponse;
 import org.apache.cloudstack.api.response.VpcResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,8 @@ public class ListNetworkACLListsCmd extends BaseListProjectAndAccountResourcesCm
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "list network ACLs by specified name")
     private String name;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "list resources by display flag; only ROOT admin is eligible to pass this parameter", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "list resources by display flag; only ROOT admin is eligible to pass this parameter",
+            since = "4.4", authorized = {RoleType.Admin})
     private Boolean display;
 
     /////////////////////////////////////////////////////
@@ -91,11 +92,6 @@ public class ListNetworkACLListsCmd extends BaseListProjectAndAccountResourcesCm
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
         Pair<List<? extends NetworkACL>, Integer> result = _networkACLService.listNetworkACLs(this);
         ListResponse<NetworkACLResponse> response = new ListResponse<NetworkACLResponse>();
@@ -108,5 +104,10 @@ public class ListNetworkACLListsCmd extends BaseListProjectAndAccountResourcesCm
         response.setResponses(aclResponses, result.second());
         response.setResponseName(getCommandName());
         setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

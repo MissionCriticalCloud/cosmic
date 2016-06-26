@@ -16,9 +16,9 @@
 // under the License.
 package org.apache.cloudstack.resourcedetail.dao;
 
-
 import org.apache.cloudstack.resourcedetail.ResourceDetailsDaoBase;
 import org.apache.cloudstack.resourcedetail.UserDetailVO;
+
 import org.springframework.stereotype.Component;
 
 @Component

@@ -18,10 +18,10 @@ package org.apache.cloudstack.api.command.user.iso;
 
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.BaseUpdateTemplateOrIsoPermissionsCmd;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,13 +29,13 @@ import org.slf4j.LoggerFactory;
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateIsoPermissionsCmd extends BaseUpdateTemplateOrIsoPermissionsCmd {
     @Override
-    protected String getResponseName() {
-        return "updateisopermissionsresponse";
+    protected Logger getLogger() {
+        return LoggerFactory.getLogger(UpdateIsoPermissionsCmd.class.getName());
     }
 
     @Override
-    protected Logger getLogger() {
-        return LoggerFactory.getLogger(UpdateIsoPermissionsCmd.class.getName());
+    protected String getResponseName() {
+        return "updateisopermissionsresponse";
     }
 
     @Override

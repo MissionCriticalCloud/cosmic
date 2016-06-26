@@ -16,9 +16,9 @@
 // under the License.
 package org.apache.cloudstack.region;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface PortableIpDao extends GenericDao<PortableIpVO, Long> {
 

@@ -53,8 +53,8 @@ import com.cloud.vm.dao.NicIpAliasDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -175,7 +175,8 @@ public class VirtualNetworkApplianceManagerImplTest {
 
     //@Mock private AccountManager _accountMgr;
 
-    @Mock private VirtualMachineManager _itMgr;
+    @Mock
+    private VirtualMachineManager _itMgr;
 
     //    @InjectMocks
     //    private VirtualNetworkApplianceManagerImpl virtualNetworkApplianceManagerImpl;

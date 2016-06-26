@@ -16,15 +16,6 @@
 // under the License.
 package com.cloud.deploy;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.configuration.Config;
 import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.host.HostVO;
@@ -37,6 +28,14 @@ import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachineProfile;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,13 +52,6 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
     private ResourceManager resourceMgr;
 
     private int capacityReleaseInterval;
-
-    @Override
-    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        super.configure(name, params);
-        capacityReleaseInterval = NumbersUtil.parseInt(configDao.getValue(Config.CapacitySkipcountingHours.key()), 3600);
-        return true;
-    }
 
     @Override
     public List<Long> orderClusters(VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoid) throws InsufficientServerCapacityException {
@@ -135,6 +127,18 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
         return clusterList;
     }
 
+    private boolean isServiceOfferingUsingPlannerInPreferredMode(long serviceOfferingId) {
+        boolean preferred = false;
+        Map<String, String> details = serviceOfferingDetailsDao.listDetailsKeyPairs(serviceOfferingId);
+        if (details != null && !details.isEmpty()) {
+            String preferredAttribute = details.get("ImplicitDedicationMode");
+            if (preferredAttribute != null && preferredAttribute.equals("Preferred")) {
+                preferred = true;
+            }
+        }
+        return preferred;
+    }
+
     private List<VMInstanceVO> getVmsOnHost(long hostId) {
         List<VMInstanceVO> vms = vmInstanceDao.listUpByHostId(hostId);
         List<VMInstanceVO> vmsByLastHostId = vmInstanceDao.listByLastHostId(hostId);
@@ -153,8 +157,9 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
 
     private boolean checkHostSuitabilityForImplicitDedication(Long accountId, List<VMInstanceVO> allVmsOnHost) {
         boolean suitable = true;
-        if (allVmsOnHost.isEmpty())
+        if (allVmsOnHost.isEmpty()) {
             return false;
+        }
 
         for (VMInstanceVO vm : allVmsOnHost) {
             if (vm.getAccountId() != accountId) {
@@ -164,7 +169,7 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
             } else {
                 if (!isImplicitPlannerUsedByOffering(vm.getServiceOfferingId())) {
                     s_logger.info("Host " + vm.getHostId() + " found to be unsuitable for implicit dedication as it " +
-                        "is running instances of this account which haven't been created using implicit dedication.");
+                            "is running instances of this account which haven't been created using implicit dedication.");
                     suitable = false;
                     break;
                 }
@@ -175,8 +180,9 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
 
     private boolean checkIfAllVmsCreatedInStrictMode(Long accountId, List<VMInstanceVO> allVmsOnHost) {
         boolean createdByImplicitStrict = true;
-        if (allVmsOnHost.isEmpty())
+        if (allVmsOnHost.isEmpty()) {
             return false;
+        }
         for (VMInstanceVO vm : allVmsOnHost) {
             if (!isImplicitPlannerUsedByOffering(vm.getServiceOfferingId())) {
                 s_logger.info("Host " + vm.getHostId() + " found to be running a vm created by a planner other" + " than implicit.");
@@ -189,6 +195,23 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
             }
         }
         return createdByImplicitStrict;
+    }
+
+    private List<Long> getUpdatedClusterList(List<Long> clusterList, Set<Long> hostsSet) {
+        List<Long> updatedClusterList = new ArrayList<Long>();
+        for (Long cluster : clusterList) {
+            List<HostVO> hosts = resourceMgr.listAllHostsInCluster(cluster);
+            Set<Long> hostsInClusterSet = new HashSet<Long>();
+            for (HostVO host : hosts) {
+                hostsInClusterSet.add(host.getId());
+            }
+
+            if (!hostsSet.containsAll(hostsInClusterSet)) {
+                updatedClusterList.add(cluster);
+            }
+        }
+
+        return updatedClusterList;
     }
 
     private boolean isImplicitPlannerUsedByOffering(long offeringId) {
@@ -208,35 +231,6 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
         }
 
         return implicitPlannerUsed;
-    }
-
-    private boolean isServiceOfferingUsingPlannerInPreferredMode(long serviceOfferingId) {
-        boolean preferred = false;
-        Map<String, String> details = serviceOfferingDetailsDao.listDetailsKeyPairs(serviceOfferingId);
-        if (details != null && !details.isEmpty()) {
-            String preferredAttribute = details.get("ImplicitDedicationMode");
-            if (preferredAttribute != null && preferredAttribute.equals("Preferred")) {
-                preferred = true;
-            }
-        }
-        return preferred;
-    }
-
-    private List<Long> getUpdatedClusterList(List<Long> clusterList, Set<Long> hostsSet) {
-        List<Long> updatedClusterList = new ArrayList<Long>();
-        for (Long cluster : clusterList) {
-            List<HostVO> hosts = resourceMgr.listAllHostsInCluster(cluster);
-            Set<Long> hostsInClusterSet = new HashSet<Long>();
-            for (HostVO host : hosts) {
-                hostsInClusterSet.add(host.getId());
-            }
-
-            if (!hostsSet.containsAll(hostsInClusterSet)) {
-                updatedClusterList.add(cluster);
-            }
-        }
-
-        return updatedClusterList;
     }
 
     @Override
@@ -314,5 +308,12 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
             }
             return PlannerResourceUsage.Shared;
         }
+    }
+
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+        super.configure(name, params);
+        capacityReleaseInterval = NumbersUtil.parseInt(configDao.getValue(Config.CapacitySkipcountingHours.key()), 3600);
+        return true;
     }
 }

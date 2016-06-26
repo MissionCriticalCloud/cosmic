@@ -16,20 +16,19 @@
 // under the License.
 package org.apache.cloudstack.engine.cloud.entity.api.db.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.TransactionLegacy;
-
 import org.apache.cloudstack.engine.cloud.entity.api.db.VMEntityVO;
 import org.apache.cloudstack.engine.cloud.entity.api.db.VMReservationVO;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -63,12 +62,6 @@ public class VMEntityDaoImpl extends GenericDaoBase<VMEntityVO, Long> implements
     }
 
     @Override
-    public void loadVmReservation(VMEntityVO vm) {
-        VMReservationVO vmReservation = _vmReservationDao.findByVmId(vm.getId());
-        vm.setVmReservation(vmReservation);
-    }
-
-    @Override
     @DB
     public VMEntityVO persist(VMEntityVO vm) {
         TransactionLegacy txn = TransactionLegacy.currentTxn();
@@ -90,21 +83,6 @@ public class VMEntityDaoImpl extends GenericDaoBase<VMEntityVO, Long> implements
         return dbVO;
     }
 
-    private void loadVmNetworks(VMEntityVO dbVO) {
-        List<Long> networksIds = _vmNetworkMapDao.getNetworks(dbVO.getId());
-
-        List<String> networks = new ArrayList<String>();
-        for (Long networkId : networksIds) {
-            NetworkVO network = _networkDao.findById(networkId);
-            if (network != null) {
-                networks.add(network.getUuid());
-            }
-        }
-
-        dbVO.setNetworkIds(networks);
-
-    }
-
     private void saveVmNetworks(VMEntityVO vm) {
         List<Long> networks = new ArrayList<Long>();
 
@@ -121,27 +99,32 @@ public class VMEntityDaoImpl extends GenericDaoBase<VMEntityVO, Long> implements
             }
         }
         _vmNetworkMapDao.persist(vm.getId(), networks);
-
     }
 
-    private void loadRootDiskTags(VMEntityVO dbVO) {
-        List<String> rootDiskTags = _vmRootDiskTagsDao.getRootDiskTags(dbVO.getId());
-        dbVO.setRootDiskTags(rootDiskTags);
+    private void loadVmNetworks(VMEntityVO dbVO) {
+        List<Long> networksIds = _vmNetworkMapDao.getNetworks(dbVO.getId());
 
-    }
-
-    private void loadComputeTags(VMEntityVO dbVO) {
-        List<String> computeTags = _vmComputeTagDao.getComputeTags(dbVO.getId());
-        dbVO.setComputeTags(computeTags);
-
-    }
-
-    private void saveRootDiskTags(long vmId, List<String> rootDiskTags) {
-        if (rootDiskTags == null || (rootDiskTags != null && rootDiskTags.isEmpty())) {
-            return;
+        List<String> networks = new ArrayList<String>();
+        for (Long networkId : networksIds) {
+            NetworkVO network = _networkDao.findById(networkId);
+            if (network != null) {
+                networks.add(network.getUuid());
+            }
         }
-        _vmRootDiskTagsDao.persist(vmId, rootDiskTags);
 
+        dbVO.setNetworkIds(networks);
+    }
+
+    private void saveVmReservation(VMEntityVO vm) {
+        if (vm.getVmReservation() != null) {
+            _vmReservationDao.persist(vm.getVmReservation());
+        }
+    }
+
+    @Override
+    public void loadVmReservation(VMEntityVO vm) {
+        VMReservationVO vmReservation = _vmReservationDao.findByVmId(vm.getId());
+        vm.setVmReservation(vmReservation);
     }
 
     private void saveComputeTags(long vmId, List<String> computeTags) {
@@ -152,10 +135,20 @@ public class VMEntityDaoImpl extends GenericDaoBase<VMEntityVO, Long> implements
         _vmComputeTagDao.persist(vmId, computeTags);
     }
 
-    private void saveVmReservation(VMEntityVO vm) {
-        if (vm.getVmReservation() != null) {
-            _vmReservationDao.persist(vm.getVmReservation());
-        }
+    private void loadComputeTags(VMEntityVO dbVO) {
+        List<String> computeTags = _vmComputeTagDao.getComputeTags(dbVO.getId());
+        dbVO.setComputeTags(computeTags);
     }
 
+    private void saveRootDiskTags(long vmId, List<String> rootDiskTags) {
+        if (rootDiskTags == null || (rootDiskTags != null && rootDiskTags.isEmpty())) {
+            return;
+        }
+        _vmRootDiskTagsDao.persist(vmId, rootDiskTags);
+    }
+
+    private void loadRootDiskTags(VMEntityVO dbVO) {
+        List<String> rootDiskTags = _vmRootDiskTagsDao.getRootDiskTags(dbVO.getId());
+        dbVO.setRootDiskTags(rootDiskTags);
+    }
 }

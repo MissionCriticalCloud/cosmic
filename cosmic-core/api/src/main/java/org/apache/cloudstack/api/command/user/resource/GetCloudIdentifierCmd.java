@@ -16,10 +16,7 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.resource;
 
-import java.util.ArrayList;
-
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -28,6 +25,9 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.CloudIdentifierResponse;
 import org.apache.cloudstack.api.response.UserResponse;
+
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,10 +42,10 @@ public class GetCloudIdentifierCmd extends BaseCmd {
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.USER_ID,
-               type = CommandType.UUID,
-               entityType = UserResponse.class,
-               required = true,
-               description = "the user ID for the cloud identifier")
+            type = CommandType.UUID,
+            entityType = UserResponse.class,
+            required = true,
+            description = "the user ID for the cloud identifier")
     private Long userid;
 
     /////////////////////////////////////////////////////
@@ -61,16 +61,6 @@ public class GetCloudIdentifierCmd extends BaseCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
     public void execute() {
         ArrayList<String> result = _mgr.getCloudIdentifierResponse(userid);
         CloudIdentifierResponse response = new CloudIdentifierResponse();
@@ -83,6 +73,15 @@ public class GetCloudIdentifierCmd extends BaseCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to get cloud identifier");
         }
+    }
 
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

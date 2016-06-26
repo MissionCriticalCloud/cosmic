@@ -16,14 +16,13 @@
 // under the License.
 package com.cloud.network.security;
 
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.UUID;
 
 @Entity
 @Table(name = ("security_group_rule"))
@@ -95,21 +94,8 @@ public class SecurityGroupRuleVO implements SecurityRule {
     }
 
     @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
     public long getSecurityGroupId() {
         return securityGroupId;
-    }
-
-    @Override
-    public SecurityRuleType getRuleType() {
-        if ("ingress".equalsIgnoreCase(type))
-            return SecurityRuleType.IngressRule;
-        else
-            return SecurityRuleType.EgressRule;
     }
 
     @Override
@@ -120,6 +106,20 @@ public class SecurityGroupRuleVO implements SecurityRule {
     @Override
     public int getEndPort() {
         return endPort;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public SecurityRuleType getRuleType() {
+        if ("ingress".equalsIgnoreCase(type)) {
+            return SecurityRuleType.IngressRule;
+        } else {
+            return SecurityRuleType.EgressRule;
+        }
     }
 
     @Override

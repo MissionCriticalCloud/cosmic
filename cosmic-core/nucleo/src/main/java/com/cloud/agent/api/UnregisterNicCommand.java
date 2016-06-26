@@ -25,7 +25,6 @@ import java.util.UUID;
  * This command will tell the hypervisor to cleanup any resources dedicated for
  * this particular nic. Orginally implemented to cleanup dedicated portgroups
  * from a vmware standard switch
- *
  */
 public class UnregisterNicCommand extends Command {
     private String vmName;
@@ -54,5 +53,4 @@ public class UnregisterNicCommand extends Command {
     public boolean executeInSequence() {
         return false;
     }
-
 }

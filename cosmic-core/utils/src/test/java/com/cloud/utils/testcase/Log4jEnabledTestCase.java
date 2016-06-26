@@ -24,11 +24,18 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Random;
 
+import junit.framework.TestCase;
 import org.apache.log4j.xml.DOMConfigurator;
 
-import junit.framework.TestCase;
-
 public class Log4jEnabledTestCase extends TestCase {
+    public static int getRandomMilliseconds(int rangeLo, int rangeHi) {
+        int i = new Random().nextInt();
+
+        long pos = (long) i - (long) Integer.MIN_VALUE;
+        long iRange = (long) Integer.MAX_VALUE - (long) Integer.MIN_VALUE;
+        return rangeLo + (int) ((rangeHi - rangeLo) * pos / iRange);
+    }
+
     @Override
     protected void setUp() {
         URL configUrl = System.class.getResource("/conf/log4j-cloud.xml");
@@ -46,13 +53,5 @@ public class Log4jEnabledTestCase extends TestCase {
         } else {
             System.out.println("Configure log4j with default properties");
         }
-    }
-
-    public static int getRandomMilliseconds(int rangeLo, int rangeHi) {
-        int i = new Random().nextInt();
-
-        long pos = (long)i - (long)Integer.MIN_VALUE;
-        long iRange = (long)Integer.MAX_VALUE - (long)Integer.MIN_VALUE;
-        return rangeLo + (int)((rangeHi - rangeLo) * pos / iRange);
     }
 }

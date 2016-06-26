@@ -24,7 +24,6 @@ import static org.junit.Assert.assertTrue;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import org.junit.Test;
 
 public class NatRuleTest {
@@ -32,9 +31,9 @@ public class NatRuleTest {
     @Test
     public void testNatRuleEncoding() {
         final Gson gson =
-            new GsonBuilder().registerTypeAdapter(NatRule.class, new NatRuleAdapter())
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .create();
+                new GsonBuilder().registerTypeAdapter(NatRule.class, new NatRuleAdapter())
+                                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                                 .create();
 
         final DestinationNatRule rn1 = new DestinationNatRule();
         rn1.setToDestinationIpAddress("10.10.10.10");
@@ -51,5 +50,4 @@ public class NatRuleTest {
         assertTrue(dnr instanceof DestinationNatRule);
         assertTrue(rn1.equals(dnr));
     }
-
 }

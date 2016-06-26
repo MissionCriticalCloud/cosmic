@@ -36,5 +36,4 @@ public interface ClusterEntity extends DataCenterResourceEntity, OrganizationSco
     AllocationState getAllocationState();
 
     ManagedState getManagedState();
-
 }

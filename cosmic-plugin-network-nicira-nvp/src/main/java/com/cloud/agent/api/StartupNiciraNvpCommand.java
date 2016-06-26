@@ -26,5 +26,4 @@ public class StartupNiciraNvpCommand extends StartupCommand {
     public StartupNiciraNvpCommand() {
         super(Host.Type.L2Networking);
     }
-
 }

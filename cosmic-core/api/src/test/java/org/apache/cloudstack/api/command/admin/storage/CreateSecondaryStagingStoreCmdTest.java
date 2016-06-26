@@ -16,10 +16,11 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.storage;
 
+import org.apache.cloudstack.api.ApiCmdTestUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.cloudstack.api.ApiCmdTestUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -57,5 +58,4 @@ public class CreateSecondaryStagingStoreCmdTest {
         ApiCmdTestUtil.set(cmd, "details", null);
         Assert.assertNull(cmd.getDetails());
     }
-
 }

@@ -17,14 +17,6 @@
 
 package com.cloud.event;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.configuration.Config;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
@@ -32,10 +24,17 @@ import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.server.ManagementService;
 import com.cloud.utils.component.ComponentContext;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.events.EventBus;
 import org.apache.cloudstack.framework.events.EventBusException;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -45,11 +44,10 @@ import org.springframework.stereotype.Component;
 public class AlertGenerator {
 
     private static final Logger s_logger = LoggerFactory.getLogger(AlertGenerator.class);
-    private static DataCenterDao s_dcDao;
-    private static HostPodDao s_podDao;
     protected static EventBus s_eventBus = null;
     protected static ConfigurationDao s_configDao;
-
+    private static DataCenterDao s_dcDao;
+    private static HostPodDao s_podDao;
     @Inject
     DataCenterDao dcDao;
     @Inject
@@ -60,20 +58,14 @@ public class AlertGenerator {
     public AlertGenerator() {
     }
 
-    @PostConstruct
-    void init() {
-        s_dcDao = dcDao;
-        s_podDao = podDao;
-        s_configDao = configDao;
-    }
-
     public static void publishAlertOnEventBus(String alertType, long dataCenterId, Long podId, String subject, String body) {
 
         String configKey = Config.PublishAlertEvent.key();
         String value = s_configDao.getValue(configKey);
         boolean configValue = Boolean.parseBoolean(value);
-        if(!configValue)
+        if (!configValue) {
             return;
+        }
         try {
             s_eventBus = ComponentContext.getComponent(EventBus.class);
         } catch (NoSuchBeanDefinitionException nbe) {
@@ -81,7 +73,7 @@ public class AlertGenerator {
         }
 
         org.apache.cloudstack.framework.events.Event event =
-            new org.apache.cloudstack.framework.events.Event(ManagementService.Name, EventCategory.ALERT_EVENT.getName(), alertType, null, null);
+                new org.apache.cloudstack.framework.events.Event(ManagementService.Name, EventCategory.ALERT_EVENT.getName(), alertType, null, null);
 
         Map<String, String> eventDescription = new HashMap<String, String>();
         DataCenterVO dc = s_dcDao.findById(dataCenterId);
@@ -111,5 +103,12 @@ public class AlertGenerator {
         } catch (EventBusException e) {
             s_logger.warn("Failed to publish alert on the the event bus.");
         }
+    }
+
+    @PostConstruct
+    void init() {
+        s_dcDao = dcDao;
+        s_podDao = podDao;
+        s_configDao = configDao;
     }
 }

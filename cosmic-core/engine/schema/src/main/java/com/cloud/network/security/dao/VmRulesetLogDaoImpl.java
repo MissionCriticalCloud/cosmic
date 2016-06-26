@@ -16,6 +16,12 @@
 // under the License.
 package com.cloud.network.security.dao;
 
+import com.cloud.network.security.VmRulesetLogVO;
+import com.cloud.utils.db.GenericDaoBase;
+import com.cloud.utils.db.SearchBuilder;
+import com.cloud.utils.db.SearchCriteria;
+import com.cloud.utils.db.TransactionLegacy;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLTransactionRollbackException;
@@ -25,12 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.cloud.network.security.VmRulesetLogVO;
-import com.cloud.utils.db.GenericDaoBase;
-import com.cloud.utils.db.SearchBuilder;
-import com.cloud.utils.db.SearchCriteria;
-import com.cloud.utils.db.TransactionLegacy;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -38,17 +38,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class VmRulesetLogDaoImpl extends GenericDaoBase<VmRulesetLogVO, Long> implements VmRulesetLogDao {
     protected static final Logger s_logger = LoggerFactory.getLogger(VmRulesetLogDaoImpl.class);
-    private SearchBuilder<VmRulesetLogVO> VmIdSearch;
-    private String InsertOrUpdateSQl = "INSERT INTO op_vm_ruleset_log (instance_id, created, logsequence) "
-        + " VALUES(?, now(), 1) ON DUPLICATE KEY UPDATE logsequence=logsequence+1";
-    private static HashMap<Integer, String> cachedPrepStmtStrings = new HashMap<Integer, String>();
     final static private int cacheStringSizes[] = {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
+    private static HashMap<Integer, String> cachedPrepStmtStrings = new HashMap<Integer, String>();
 
     static {
         //prepare the cache.
         for (int size : cacheStringSizes) {
             cachedPrepStmtStrings.put(size, createPrepStatementString(size));
         }
+    }
+
+    private SearchBuilder<VmRulesetLogVO> VmIdSearch;
+    private String InsertOrUpdateSQl = "INSERT INTO op_vm_ruleset_log (instance_id, created, logsequence) "
+            + " VALUES(?, now(), 1) ON DUPLICATE KEY UPDATE logsequence=logsequence+1";
+
+    protected VmRulesetLogDaoImpl() {
+        VmIdSearch = createSearchBuilder();
+        VmIdSearch.and("vmId", VmIdSearch.entity().getInstanceId(), SearchCriteria.Op.EQ);
+
+        VmIdSearch.done();
     }
 
     private static String createPrepStatementString(int numItems) {
@@ -59,14 +67,6 @@ public class VmRulesetLogDaoImpl extends GenericDaoBase<VmRulesetLogVO, Long> im
         builder.append("(?, now(), 1) ");
         builder.append(" ON DUPLICATE KEY UPDATE logsequence=logsequence+1");
         return builder.toString();
-    }
-
-    protected VmRulesetLogDaoImpl() {
-        VmIdSearch = createSearchBuilder();
-        VmIdSearch.and("vmId", VmIdSearch.entity().getInstanceId(), SearchCriteria.Op.EQ);
-
-        VmIdSearch.done();
-
     }
 
     @Override
@@ -80,39 +80,6 @@ public class VmRulesetLogDaoImpl extends GenericDaoBase<VmRulesetLogVO, Long> im
     public int createOrUpdate(Set<Long> workItems) {
         //return createOrUpdateUsingBatch(workItems);
         return createOrUpdateUsingMultiInsert(workItems);
-    }
-
-    private int executeWithRetryOnDeadlock(TransactionLegacy txn, String pstmt, List<Long> vmIds) throws SQLException {
-
-        int numUpdated = 0;
-        final int maxTries = 3;
-        for (int i = 0; i < maxTries; i++) {
-            try {
-                PreparedStatement stmtInsert = txn.prepareAutoCloseStatement(pstmt);
-                int argIndex = 1;
-                for (Long vmId : vmIds) {
-                    stmtInsert.setLong(argIndex++, vmId);
-                }
-                numUpdated = stmtInsert.executeUpdate();
-                i = maxTries;
-            } catch (SQLTransactionRollbackException e1) {
-                if (i < maxTries - 1) {
-                    int delayMs = (i + 1) * 1000;
-                    s_logger.debug("Caught a deadlock exception while inserting security group rule log, retrying in " + delayMs);
-                    try {
-                        Thread.sleep(delayMs);
-                    } catch (InterruptedException ie) {
-                        s_logger.debug("[ignored] interupted while inserting security group rule log.");
-                    }
-                } else
-                    s_logger.warn("Caught another deadlock exception while retrying inserting security group rule log, giving up");
-
-            }
-        }
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("Inserted or updated " + numUpdated + " rows");
-        }
-        return numUpdated;
     }
 
     protected int createOrUpdateUsingMultiInsert(Set<Long> workItems) {
@@ -137,18 +104,51 @@ public class VmRulesetLogDaoImpl extends GenericDaoBase<VmRulesetLogVO, Long> im
                         if (s_logger.isTraceEnabled()) {
                             s_logger.trace("Inserted or updated " + numUpdated + " rows");
                         }
-                        if (numUpdated > 0)
+                        if (numUpdated > 0) {
                             count += stmtSize;
+                        }
                     }
                     remaining = remaining - numStmts * stmtSize;
                 }
-
             }
         } catch (SQLException sqe) {
             s_logger.warn("Failed to execute multi insert ", sqe);
         }
 
         return count;
+    }
+
+    private int executeWithRetryOnDeadlock(TransactionLegacy txn, String pstmt, List<Long> vmIds) throws SQLException {
+
+        int numUpdated = 0;
+        final int maxTries = 3;
+        for (int i = 0; i < maxTries; i++) {
+            try {
+                PreparedStatement stmtInsert = txn.prepareAutoCloseStatement(pstmt);
+                int argIndex = 1;
+                for (Long vmId : vmIds) {
+                    stmtInsert.setLong(argIndex++, vmId);
+                }
+                numUpdated = stmtInsert.executeUpdate();
+                i = maxTries;
+            } catch (SQLTransactionRollbackException e1) {
+                if (i < maxTries - 1) {
+                    int delayMs = (i + 1) * 1000;
+                    s_logger.debug("Caught a deadlock exception while inserting security group rule log, retrying in " + delayMs);
+                    try {
+                        Thread.sleep(delayMs);
+                    } catch (InterruptedException ie) {
+                        s_logger.debug("[ignored] interupted while inserting security group rule log.");
+                    }
+                } else {
+                    s_logger.warn("Caught another deadlock exception while retrying inserting security group rule log, giving up");
+                }
+            }
+        }
+        if (s_logger.isTraceEnabled()) {
+            s_logger.trace("Inserted or updated " + numUpdated + " rows");
+        }
+        return numUpdated;
     }
 
     protected int createOrUpdateUsingBatch(Set<Long> workItems) {
@@ -173,8 +173,9 @@ public class VmRulesetLogDaoImpl extends GenericDaoBase<VmRulesetLogVO, Long> im
             queryResult = stmtInsert.executeBatch();
 
             txn.commit();
-            if (s_logger.isTraceEnabled())
+            if (s_logger.isTraceEnabled()) {
                 s_logger.trace("Updated or inserted " + workItems.size() + " log items");
+            }
         } catch (SQLException e) {
             s_logger.warn("Failed to execute batch update statement for ruleset log: ", e);
             txn.rollback();
@@ -191,5 +192,4 @@ public class VmRulesetLogDaoImpl extends GenericDaoBase<VmRulesetLogVO, Long> im
         }
         return count;
     }
-
 }

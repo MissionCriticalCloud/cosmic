@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.util.List;
-
 import com.cloud.dc.StorageNetworkIpAddressVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface StorageNetworkIpAddressDao extends GenericDao<StorageNetworkIpAddressVO, Long> {
     long countInUseIpByRangeId(long rangeId);

@@ -23,5 +23,4 @@ public interface PaintNotificationListener {
      * frame buffer update request to server.
      */
     void imagePaintedOnScreen();
-
 }

@@ -18,9 +18,6 @@
  */
 package com.cloud.ha;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.FenceAnswer;
 import com.cloud.agent.api.FenceCommand;
@@ -33,6 +30,9 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.vm.VirtualMachine;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -192,5 +192,4 @@ public class KVMFencerTest {
         Mockito.when(resourceManager.listAllHostsInCluster(1l)).thenReturn(Collections.singletonList(host));
         Assert.assertNull(fencer.fenceOff(virtualMachine, host));
     }
-
 }

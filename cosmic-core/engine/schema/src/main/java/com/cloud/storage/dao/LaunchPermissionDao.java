@@ -16,21 +16,19 @@
 // under the License.
 package com.cloud.storage.dao;
 
-import java.util.List;
-
 import com.cloud.storage.LaunchPermissionVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface LaunchPermissionDao extends GenericDao<LaunchPermissionVO, Long> {
     /**
      * remove the ability to launch vms from the given template for the given
      * account names which are valid in the given domain
      *
-     * @param templateId
-     *            id of the template to modify launch permissions
-     * @param accountIds
-     *            list of account ids
+     * @param templateId id of the template to modify launch permissions
+     * @param accountIds list of account ids
      */
     void removePermissions(long templateId, List<Long> accountIds);
 
@@ -44,10 +42,8 @@ public interface LaunchPermissionDao extends GenericDao<LaunchPermissionVO, Long
     /**
      * Find a launch permission by templateId, accountName, and domainId
      *
-     * @param templateId
-     *            the id of the template to search for
-     * @param accountId
-     *            the id of the account for which permission is being searched
+     * @param templateId the id of the template to search for
+     * @param accountId  the id of the account for which permission is being searched
      * @return launch permission if found, null otherwise
      */
     LaunchPermissionVO findByTemplateAndAccount(long templateId, long accountId);
@@ -55,9 +51,8 @@ public interface LaunchPermissionDao extends GenericDao<LaunchPermissionVO, Long
     /**
      * List all launch permissions for the given template
      *
-     * @param templateId
-     *            id of the template for which launch permissions will be
-     *            queried
+     * @param templateId id of the template for which launch permissions will be
+     *                   queried
      * @return list of launch permissions
      */
     List<LaunchPermissionVO> findByTemplate(long templateId);

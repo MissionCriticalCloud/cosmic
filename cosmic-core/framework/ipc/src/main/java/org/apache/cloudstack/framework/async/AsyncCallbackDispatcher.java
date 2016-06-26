@@ -24,28 +24,61 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.Factory;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("rawtypes")
 public class AsyncCallbackDispatcher<T, R> implements AsyncCompletionCallback {
     private static final Logger s_logger = LoggerFactory.getLogger(AsyncCallbackDispatcher.class);
-
-    private Method _callbackMethod;
+    private static Map<Class, Enhancer> enMap = new HashMap<Class, Enhancer>();
     private final T _targetObject;
+    private Method _callbackMethod;
     private Object _contextObject;
     private Object _resultObject;
     private AsyncCallbackDriver _driver = new InplaceAsyncCallbackDriver();
-    private static Map<Class, Enhancer> enMap = new HashMap<Class, Enhancer>();
 
     private AsyncCallbackDispatcher(T target) {
         assert (target != null);
         _targetObject = target;
+    }
+
+    public static <P, R> AsyncCallbackDispatcher<P, R> create(P target) {
+        return new AsyncCallbackDispatcher<P, R>(target);
+    }
+
+    public static boolean dispatch(Object target, AsyncCallbackDispatcher callback) {
+        assert (callback != null);
+        assert (target != null);
+
+        try {
+            callback.getCallbackMethod().invoke(target, callback, callback.getContext());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("IllegalArgumentException when invoking RPC callback for command: " + callback.getCallbackMethod().getName());
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("IllegalAccessException when invoking RPC callback for command: " + callback.getCallbackMethod().getName());
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("InvocationTargetException when invoking RPC callback for command: " + callback.getCallbackMethod().getName(), e);
+        }
+
+        return true;
+    }
+
+    public Method getCallbackMethod() {
+        return _callbackMethod;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <P> P getContext() {
+        return (P) _contextObject;
+    }
+
+    public AsyncCallbackDispatcher<T, R> setContext(Object context) {
+        _contextObject = context;
+        return this;
     }
 
     public AsyncCallbackDispatcher<T, R> attachDriver(AsyncCallbackDriver driver) {
@@ -55,17 +88,13 @@ public class AsyncCallbackDispatcher<T, R> implements AsyncCompletionCallback {
         return this;
     }
 
-    public Method getCallbackMethod() {
-        return _callbackMethod;
-    }
-
     @SuppressWarnings("unchecked")
     public T getTarget() {
         Class<?> clz = _targetObject.getClass();
         String clzName = clz.getName();
-        if (clzName.contains("EnhancerByCloudStack"))
+        if (clzName.contains("EnhancerByCloudStack")) {
             clz = clz.getSuperclass();
-
+        }
 
         Enhancer en = null;
         synchronized (enMap) {
@@ -78,15 +107,15 @@ public class AsyncCallbackDispatcher<T, R> implements AsyncCompletionCallback {
                     @Override
                     public Object intercept(Object arg0, Method arg1, Object[] arg2, MethodProxy arg3) throws Throwable {
                         return null;
-                        }
-                    });
+                    }
+                });
                 enMap.put(clz, en);
             }
         }
 
         try {
-            T t = (T)en.create();
-            Factory factory = (Factory)t;
+            T t = (T) en.create();
+            Factory factory = (Factory) t;
             factory.setCallback(0, new MethodInterceptor() {
                 @Override
                 public Object intercept(Object arg0, Method arg1, Object[] arg2, MethodProxy arg3) throws Throwable {
@@ -111,16 +140,6 @@ public class AsyncCallbackDispatcher<T, R> implements AsyncCompletionCallback {
         return this;
     }
 
-    public AsyncCallbackDispatcher<T, R> setContext(Object context) {
-        _contextObject = context;
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <P> P getContext() {
-        return (P)_contextObject;
-    }
-
     @Override
     public void complete(Object resultObject) {
         _resultObject = resultObject;
@@ -129,32 +148,11 @@ public class AsyncCallbackDispatcher<T, R> implements AsyncCompletionCallback {
 
     @SuppressWarnings("unchecked")
     public R getResult() {
-        return (R)_resultObject;
+        return (R) _resultObject;
     }
 
     // for internal use
     Object getTargetObject() {
         return _targetObject;
-    }
-
-    public static <P, R> AsyncCallbackDispatcher<P, R> create(P target) {
-        return new AsyncCallbackDispatcher<P, R>(target);
-    }
-
-    public static boolean dispatch(Object target, AsyncCallbackDispatcher callback) {
-        assert (callback != null);
-        assert (target != null);
-
-        try {
-            callback.getCallbackMethod().invoke(target, callback, callback.getContext());
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("IllegalArgumentException when invoking RPC callback for command: " + callback.getCallbackMethod().getName());
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("IllegalAccessException when invoking RPC callback for command: " + callback.getCallbackMethod().getName());
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException("InvocationTargetException when invoking RPC callback for command: " + callback.getCallbackMethod().getName(), e);
-        }
-
-        return true;
     }
 }

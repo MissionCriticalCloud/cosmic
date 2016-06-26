@@ -16,18 +16,17 @@
 // under the License.
 package org.apache.cloudstack.storage.datastore.db;
 
-import java.util.List;
-
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
+
+import java.util.List;
 
 public interface TemplateDataStoreDao extends GenericDao<TemplateDataStoreVO, Long>,
         StateDao<ObjectInDataStoreStateMachine.State, ObjectInDataStoreStateMachine.Event, DataObjectInStore> {

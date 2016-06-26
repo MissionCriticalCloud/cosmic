@@ -19,13 +19,12 @@
 
 package org.apache.cloudstack.storage.to;
 
-import java.util.Map;
-
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.Storage.StoragePoolType;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStore;
+
+import java.util.Map;
 
 public class PrimaryDataStoreTO implements DataStoreTO {
     public static final String MANAGED = PrimaryDataStore.MANAGED;
@@ -38,18 +37,17 @@ public class PrimaryDataStoreTO implements DataStoreTO {
     public static final String CHAP_TARGET_USERNAME = PrimaryDataStore.CHAP_TARGET_USERNAME;
     public static final String CHAP_TARGET_SECRET = PrimaryDataStore.CHAP_TARGET_SECRET;
     public static final String VOLUME_SIZE = PrimaryDataStore.VOLUME_SIZE;
-
+    private static final String pathSeparator = "/";
     private final String uuid;
     private final String name;
-    private String type;
     private final long id;
+    private final String url;
+    private String type;
     private StoragePoolType poolType;
     private String host;
     private String path;
     private int port;
-    private final String url;
     private Map<String, String> details;
-    private static final String pathSeparator = "/";
 
     public PrimaryDataStoreTO(PrimaryDataStore dataStore) {
         this.uuid = dataStore.getUuid();
@@ -67,16 +65,6 @@ public class PrimaryDataStoreTO implements DataStoreTO {
         return this.id;
     }
 
-    @Override
-    public String getUuid() {
-        return this.uuid;
-    }
-
-    @Override
-    public String getUrl() {
-        return this.url;
-    }
-
     public Map<String, String> getDetails() {
         return this.details;
     }
@@ -92,6 +80,21 @@ public class PrimaryDataStoreTO implements DataStoreTO {
     @Override
     public DataStoreRole getRole() {
         return DataStoreRole.Primary;
+    }
+
+    @Override
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    @Override
+    public String getUrl() {
+        return this.url;
+    }
+
+    @Override
+    public String getPathSeparator() {
+        return pathSeparator;
     }
 
     public StoragePoolType getPoolType() {
@@ -127,20 +130,15 @@ public class PrimaryDataStoreTO implements DataStoreTO {
     }
 
     @Override
-    public String getPathSeparator() {
-        return pathSeparator;
-    }
-
-    @Override
     public String toString() {
         return new StringBuilder("PrimaryDataStoreTO[uuid=").append(uuid)
-            .append("|name=")
-            .append(name)
-            .append("|id=")
-            .append(id)
-            .append("|pooltype=")
-            .append(poolType)
-            .append("]")
-            .toString();
+                                                            .append("|name=")
+                                                            .append(name)
+                                                            .append("|id=")
+                                                            .append(id)
+                                                            .append("|pooltype=")
+                                                            .append(poolType)
+                                                            .append("]")
+                                                            .toString();
     }
 }

@@ -50,5 +50,4 @@ public class VmData extends ConfigBase {
     public void setVmMetadata(List<String[]> vmMetadata) {
         this.vmMetadata = vmMetadata;
     }
-
 }

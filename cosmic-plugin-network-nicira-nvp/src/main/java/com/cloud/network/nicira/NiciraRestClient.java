@@ -19,16 +19,16 @@
 
 package com.cloud.network.nicira;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.cloud.utils.rest.BasicRestClient;
 import com.cloud.utils.rest.CloudstackRESTException;
 import com.cloud.utils.rest.HttpConstants;
 import com.cloud.utils.rest.HttpMethods;
 import com.cloud.utils.rest.HttpStatusCodeHelper;
 import com.cloud.utils.rest.HttpUriRequestBuilder;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
@@ -98,7 +98,7 @@ public class NiciraRestClient extends BasicRestClient {
     }
 
     private CloseableHttpResponse handleUnauthorizedResponse(final HttpUriRequest request, final int previousStatusCode, final CloseableHttpResponse response, final int statusCode)
-                    throws CloudstackRESTException {
+            throws CloudstackRESTException {
         super.closeResponse(response);
         if (HttpStatusCodeHelper.isUnauthorized(previousStatusCode)) {
             s_logger.error(responseToErrorMessage(response));
@@ -123,10 +123,10 @@ public class NiciraRestClient extends BasicRestClient {
         parameters.put("username", username);
         parameters.put("password", password);
         return HttpUriRequestBuilder.create()
-            .method(HttpMethods.POST)
-            .methodParameters(parameters)
-            .path(loginUrl)
-            .build();
+                                    .method(HttpMethods.POST)
+                                    .methodParameters(parameters)
+                                    .path(loginUrl)
+                                    .build();
     }
 
     private String responseToErrorMessage(final CloseableHttpResponse response) {
@@ -186,6 +186,11 @@ public class NiciraRestClient extends BasicRestClient {
             return this;
         }
 
+        @Override
+        public NiciraRestClient build() {
+            return new NiciraRestClient(this);
+        }
+
         public Builder executionLimit(final int executionLimit) {
             this.executionLimit = executionLimit;
             return this;
@@ -195,11 +200,5 @@ public class NiciraRestClient extends BasicRestClient {
             this.maxResponseErrorMesageLength = maxResponseErrorMesageLength;
             return this;
         }
-
-        @Override
-        public NiciraRestClient build() {
-            return new NiciraRestClient(this);
-        }
-
     }
 }

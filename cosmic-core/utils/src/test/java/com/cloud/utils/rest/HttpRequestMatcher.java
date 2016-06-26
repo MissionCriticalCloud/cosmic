@@ -55,10 +55,34 @@ public class HttpRequestMatcher extends ArgumentMatcher<HttpRequest> {
         }
     }
 
+    private boolean checkMethod(final HttpUriRequest actual) {
+        if (wanted instanceof HttpUriRequest) {
+            final String wantedMethod = ((HttpUriRequest) wanted).getMethod();
+            final String actualMethod = actual.getMethod();
+            return equalsString(wantedMethod, actualMethod);
+        } else {
+            return wanted == actual;
+        }
+    }
+
+    private boolean checkUri(final HttpUriRequest actual) {
+        if (wanted instanceof HttpUriRequest) {
+            final String wantedQuery = ((HttpUriRequest) wanted).getURI().getQuery();
+            final String actualQuery = actual.getURI().getQuery();
+            return equalsString(wantedQuery, actualQuery);
+        } else {
+            return wanted == actual;
+        }
+    }
+
     private boolean checkPayload(final HttpUriRequest actual) {
         final String wantedPayload = getPayload(wanted);
         final String actualPayload = getPayload(actual);
         return equalsString(wantedPayload, actualPayload);
+    }
+
+    private static boolean equalsString(final String a, final String b) {
+        return a == b || a != null && a.equals(b);
     }
 
     private static String getPayload(final HttpRequest request) {
@@ -73,30 +97,6 @@ public class HttpRequestMatcher extends ArgumentMatcher<HttpRequest> {
             }
         }
         return payload;
-    }
-
-    private boolean checkUri(final HttpUriRequest actual) {
-        if (wanted instanceof HttpUriRequest) {
-            final String wantedQuery = ((HttpUriRequest) wanted).getURI().getQuery();
-            final String actualQuery = actual.getURI().getQuery();
-            return equalsString(wantedQuery, actualQuery);
-        } else {
-            return wanted == actual;
-        }
-    }
-
-    private boolean checkMethod(final HttpUriRequest actual) {
-        if (wanted instanceof HttpUriRequest) {
-            final String wantedMethod = ((HttpUriRequest) wanted).getMethod();
-            final String actualMethod = actual.getMethod();
-            return equalsString(wantedMethod, actualMethod);
-        } else {
-            return wanted == actual;
-        }
-    }
-
-    private static boolean equalsString(final String a, final String b) {
-        return a == b || a != null && a.equals(b);
     }
 
     @Override
@@ -116,13 +116,13 @@ public class HttpRequestMatcher extends ArgumentMatcher<HttpRequest> {
     }
 
     @Override
-    public boolean equals(final Object o) {
-        return EqualsBuilder.reflectionEquals(this, o);
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
     }
 
     @Override
-    public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
+    public boolean equals(final Object o) {
+        return EqualsBuilder.reflectionEquals(this, o);
     }
 
     public SelfDescribing withExtraTypeInfo() {
@@ -137,5 +137,4 @@ public class HttpRequestMatcher extends ArgumentMatcher<HttpRequest> {
     public boolean typeMatches(final Object object) {
         return wanted != null && object != null && object.getClass() == wanted.getClass();
     }
-
 }

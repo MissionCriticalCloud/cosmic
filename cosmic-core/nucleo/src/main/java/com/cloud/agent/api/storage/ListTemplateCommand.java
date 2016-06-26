@@ -31,7 +31,7 @@ public class ListTemplateCommand extends StorageCommand {
 
     public ListTemplateCommand(DataStoreTO store) {
         this.store = store;
-//        this.secUrl = url;
+        //        this.secUrl = url;
     }
 
     @Override
@@ -46,5 +46,4 @@ public class ListTemplateCommand extends StorageCommand {
     //   public String getSecUrl() {
     //       return secUrl;
     //   }
-
 }

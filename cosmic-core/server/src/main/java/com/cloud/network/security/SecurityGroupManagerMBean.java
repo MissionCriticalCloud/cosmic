@@ -22,7 +22,6 @@ import java.util.Map;
 
 /**
  * Allows JMX access
- *
  */
 public interface SecurityGroupManagerMBean {
     void enableUpdateMonitor(boolean enable);

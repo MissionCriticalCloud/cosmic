@@ -24,36 +24,32 @@
     Feature Specifications: https://cwiki.apache.org/confluence/display/CLOUDSTACK/Limit+Resources+to+domains+and+accounts
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+from marvin.codes import (PASS,
+                          FAIL,
+                          RESOURCE_SECONDARY_STORAGE)
 from marvin.lib.base import (Account,
                              ServiceOffering,
-                             VirtualMachine,
                              Domain,
                              Project,
                              Template,
-                             Iso,
-                             Resources)
+                             Iso)
 from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template,
                                matchResourceCount,
-                               get_builtin_template_info,
-                               createSnapshotFromVirtualMachineVolume)
+                               get_builtin_template_info)
 from marvin.lib.utils import (cleanup_resources,
                               validateList)
-from marvin.codes import (PASS,
-                          FAIL,
-                          FAILED,
-                          RESOURCE_SECONDARY_STORAGE)
-import time
+from nose.plugins.attrib import attr
+
 
 class TestProjectsVolumeLimits(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cloudstackTestClient = super(TestProjectsVolumeLimits,
-                               cls).getClsTestClient()
+                                     cls).getClsTestClient()
         cls.api_client = cloudstackTestClient.getApiClient()
         # Fill services from the external config file
         cls.services = cloudstackTestClient.getParsedTestDataConfig()
@@ -63,10 +59,10 @@ class TestProjectsVolumeLimits(cloudstackTestCase):
         cls.services["mode"] = cls.zone.networktype
 
         cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.services["ostype"]
-                            )
+            cls.api_client,
+            cls.zone.id,
+            cls.services["ostype"]
+        )
 
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
@@ -111,16 +107,16 @@ class TestProjectsVolumeLimits(cloudstackTestCase):
 
         try:
             self.parentDomain = Domain.create(self.apiclient,
-                                        services=self.services["domain"],
-                                        parentdomainid=self.domain.id)
+                                              services=self.services["domain"],
+                                              parentdomainid=self.domain.id)
             self.domainAdmin = Account.create(
-                            self.apiclient, self.services["account"],
-                            admin=True, domainid=self.parentDomain.id)
+                self.apiclient, self.services["account"],
+                admin=True, domainid=self.parentDomain.id)
 
             # Create project as a domain admin
             self.project = Project.create(
-                            self.apiclient,self.services["project"],
-                            account=self.domainAdmin.name,domainid=self.parentDomain.id)
+                self.apiclient, self.services["project"],
+                account=self.domainAdmin.name, domainid=self.parentDomain.id)
             # Cleanup created project at end of test
             self.cleanup.append(self.project)
             self.cleanup.append(self.domainAdmin)
@@ -149,36 +145,36 @@ class TestProjectsVolumeLimits(cloudstackTestCase):
 
         try:
             template = Template.register(self.apiclient,
-                                            self.services["template_2"],
-                                            zoneid=self.zone.id,
-                                            projectid=self.project.id)
+                                         self.services["template_2"],
+                                         zoneid=self.zone.id,
+                                         projectid=self.project.id)
 
             template.download(self.apiclient)
         except Exception as e:
             self.fail("Failed to register template: %s" % e)
 
         templates = Template.list(self.apiclient,
-                                      templatefilter=\
+                                  templatefilter= \
                                       self.services["template_2"]["templatefilter"],
-                                      id=template.id,
-                                      )
-        self.assertEqual(validateList(templates)[0],PASS,\
-                        "templates list validation failed")
+                                  id=template.id,
+                                  )
+        self.assertEqual(validateList(templates)[0], PASS, \
+                         "templates list validation failed")
 
         templates = Template.list(self.apiclient,
-                                      templatefilter=\
+                                  templatefilter= \
                                       self.services["template_2"]["templatefilter"],
-                                      id=template.id,
-                                      )
-        self.assertEqual(validateList(templates)[0],PASS,\
-                        "templates list validation failed")
+                                  id=template.id,
+                                  )
+        self.assertEqual(validateList(templates)[0], PASS, \
+                         "templates list validation failed")
 
-        templateSize = (templates[0].size / (1024**3))
+        templateSize = (templates[0].size / (1024 ** 3))
         expectedCount = templateSize
         response = matchResourceCount(
-                        self.apiclient, expectedCount,
-                        RESOURCE_SECONDARY_STORAGE,
-                        projectid=self.project.id)
+            self.apiclient, expectedCount,
+            RESOURCE_SECONDARY_STORAGE,
+            projectid=self.project.id)
         self.assertEqual(response[0], PASS, response[1])
 
         try:
@@ -188,13 +184,13 @@ class TestProjectsVolumeLimits(cloudstackTestCase):
 
         expectedCount = 0
         response = matchResourceCount(
-                        self.apiclient, expectedCount,
-                        RESOURCE_SECONDARY_STORAGE,
-                        projectid=self.project.id)
+            self.apiclient, expectedCount,
+            RESOURCE_SECONDARY_STORAGE,
+            projectid=self.project.id)
         self.assertEqual(response[0], PASS, response[1])
         return
 
-    @attr(tags = ["advanced"], required_hardware="true")
+    @attr(tags=["advanced"], required_hardware="true")
     def test_02_register_iso(self):
         """Test register iso
         Steps and validations:
@@ -208,8 +204,8 @@ class TestProjectsVolumeLimits(cloudstackTestCase):
         """
         try:
             self.projectMember = Account.create(
-                            self.apiclient, self.services["account"],
-                            domainid=self.parentDomain.id)
+                self.apiclient, self.services["account"],
+                domainid=self.parentDomain.id)
             self.cleanup.insert(0, self.projectMember)
             self.project.addAccount(self.apiclient, account=self.projectMember.name)
         except Exception as e:
@@ -218,11 +214,11 @@ class TestProjectsVolumeLimits(cloudstackTestCase):
         self.services["iso"]["zoneid"] = self.zone.id
         try:
             iso = Iso.create(
-                         self.apiclient,
-                         self.services["iso"],
-                         account=self.projectMember.name,
-                         domainid=self.projectMember.domainid
-                         )
+                self.apiclient,
+                self.services["iso"],
+                account=self.projectMember.name,
+                domainid=self.projectMember.domainid
+            )
         except Exception as e:
             self.fail("Failed to create Iso: %s" % e)
 
@@ -230,19 +226,19 @@ class TestProjectsVolumeLimits(cloudstackTestCase):
         isoList = None
         while timeout >= 0:
             isoList = Iso.list(self.apiclient,
-                                      isofilter="self",
-                                      id=iso.id)
-            self.assertEqual(validateList(isoList)[0],PASS,\
-                            "iso list validation failed")
+                               isofilter="self",
+                               id=iso.id)
+            self.assertEqual(validateList(isoList)[0], PASS, \
+                             "iso list validation failed")
             if isoList[0].isready:
                 break
             time.sleep(60)
             timeout -= 60
 
-        self.assertNotEqual(timeout, 0,\
-                "template not downloaded completely")
+        self.assertNotEqual(timeout, 0, \
+                            "template not downloaded completely")
 
-        isoSize = (isoList[0].size / (1024**3))
+        isoSize = (isoList[0].size / (1024 ** 3))
         expectedCount = isoSize
         response = matchResourceCount(self.apiclient, expectedCount,
                                       resourceType=RESOURCE_SECONDARY_STORAGE,

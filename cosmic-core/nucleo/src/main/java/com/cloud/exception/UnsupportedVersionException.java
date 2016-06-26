@@ -25,11 +25,9 @@ import com.cloud.utils.SerialVersionUID;
  */
 public class UnsupportedVersionException extends CloudException {
 
-    private static final long serialVersionUID = SerialVersionUID.UnsupportedVersionException;
-
     public static final String UnknownVersion = "unknown.version";
     public static final String IncompatibleVersion = "incompatible.version";
-
+    private static final long serialVersionUID = SerialVersionUID.UnsupportedVersionException;
     String _reason;
 
     public UnsupportedVersionException(String message, String reason) {

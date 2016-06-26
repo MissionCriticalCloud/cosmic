@@ -25,15 +25,15 @@ public class UploadInProgressState extends UploadActiveState {
     }
 
     @Override
-    public String getName() {
-        return Status.UPLOAD_IN_PROGRESS.toString();
+    public void onEntry(String prevState, UploadEvent event, Object evtObj) {
+        super.onEntry(prevState, event, evtObj);
+        if (!prevState.equals(getName())) {
+            getUploadListener().logUploadStart();
+        }
     }
 
     @Override
-    public void onEntry(String prevState, UploadEvent event, Object evtObj) {
-        super.onEntry(prevState, event, evtObj);
-        if (!prevState.equals(getName()))
-            getUploadListener().logUploadStart();
+    public String getName() {
+        return Status.UPLOAD_IN_PROGRESS.toString();
     }
-
 }

@@ -18,7 +18,7 @@
 """
 # All tests inherit from cloudstack TestCase
 
-from marvin.cloudstackTestCase import cloudstackTestCase
+from ddt import ddt, data
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
 from marvin.codes import FAILED, PASS
 from marvin.lib.base import (Account,
@@ -32,15 +32,14 @@ from marvin.lib.base import (Account,
                              StoragePool,
                              Host,
                              Capacities)
-from marvin.lib.utils import cleanup_resources, validateList
 from marvin.lib.common import (get_zone,
                                get_domain,
                                list_clusters,
                                get_template,
                                list_volumes,
                                list_virtual_machines)
+from marvin.lib.utils import cleanup_resources, validateList
 from nose.plugins.attrib import attr
-from ddt import ddt, data
 
 
 def verify_vm_state(self, vmid, state):
@@ -405,7 +404,6 @@ class TestPathDisableStorage_Basic(cloudstackTestCase):
             zoneid=self.zone.id)
         verify_vm_state(self, self.virtual_machine_3.id, 'Running')
 
-
         # Step 9: Create and attach new disk to VM
         self.volume = Volume.create(self.userapiclient,
                                     services=self.testdata['volume'],
@@ -564,7 +562,6 @@ class TestPathDisableStorage_Basic(cloudstackTestCase):
                 self.disk_offering = self.disk_offering_local
             else:
                 self.skipTest("Local storage not enabled")
-
 
         # Keep one storage pool active and disable the rest
         try:
@@ -1350,7 +1347,7 @@ class TestPathDisableStorage_Cross_Cluster(cloudstackTestCase):
         if self.disabled_list:
             for poolid in self.disabled_list:
                 if StoragePool.list(self.userapiclient, id=poolid)[
-                        0].state == 'Disabled':
+                    0].state == 'Disabled':
                     try:
                         StoragePool.update(
                             self.userapiclient, id=poolid, enabled=True)

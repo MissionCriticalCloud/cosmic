@@ -21,7 +21,6 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.projects.Project;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -31,6 +30,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,29 +61,16 @@ public class CreateProjectCmd extends BaseAsyncCreateCmd {
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
 
-    public String getAccountName() {
-        if (accountName != null) {
-            return accountName;
+    @Override
+    public void execute() {
+        Project project = _projectService.enableProject(this.getEntityId());
+        if (project != null) {
+            ProjectResponse response = _responseGenerator.createProjectResponse(project);
+            response.setResponseName(getCommandName());
+            this.setResponseObject(response);
         } else {
-            return CallContext.current().getCallingAccount().getAccountName();
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create a project");
         }
-    }
-
-    public Long getDomainId() {
-        if (domainId != null) {
-            return domainId;
-        } else {
-            return CallContext.current().getCallingAccount().getDomainId();
-        }
-
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDisplayText() {
-        return displayText;
     }
 
     @Override
@@ -106,22 +93,6 @@ public class CreateProjectCmd extends BaseAsyncCreateCmd {
         return caller.getId();
     }
 
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-
-    @Override
-    public void execute() {
-        Project project = _projectService.enableProject(this.getEntityId());
-        if (project != null) {
-            ProjectResponse response = _responseGenerator.createProjectResponse(project);
-            response.setResponseName(getCommandName());
-            this.setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create a project");
-        }
-    }
-
     @Override
     public void create() throws ResourceAllocationException {
         CallContext.current().setEventDetails("Project Name: " + getName());
@@ -134,6 +105,34 @@ public class CreateProjectCmd extends BaseAsyncCreateCmd {
         }
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getDisplayText() {
+        return displayText;
+    }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
+
+    public String getAccountName() {
+        if (accountName != null) {
+            return accountName;
+        } else {
+            return CallContext.current().getCallingAccount().getAccountName();
+        }
+    }
+
+    public Long getDomainId() {
+        if (domainId != null) {
+            return domainId;
+        } else {
+            return CallContext.current().getCallingAccount().getDomainId();
+        }
+    }
+
     @Override
     public String getEventType() {
         return EventTypes.EVENT_PROJECT_CREATE;
@@ -143,5 +142,4 @@ public class CreateProjectCmd extends BaseAsyncCreateCmd {
     public String getEventDescription() {
         return "creating project";
     }
-
 }

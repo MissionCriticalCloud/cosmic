@@ -16,7 +16,11 @@
 // under the License.
 package com.cloud.api.query.vo;
 
-import java.util.Date;
+import com.cloud.projects.Project.State;
+import com.cloud.server.ResourceTag.ResourceObjectType;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.Identity;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,34 +28,23 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.projects.Project.State;
-import com.cloud.server.ResourceTag.ResourceObjectType;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "project_view")
 public class ProjectJoinVO extends BaseViewVO implements InternalIdentity, Identity {
 
+    @Column(name = "display_text")
+    String displayText;
+    @Column(name = "owner")
+    String owner;
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "name")
     private String name;
-
-    @Column(name = "display_text")
-    String displayText;
-
-    @Column(name = "owner")
-    String owner;
-
     @Column(name = "state")
     @Enumerated(value = EnumType.STRING)
     private State state;

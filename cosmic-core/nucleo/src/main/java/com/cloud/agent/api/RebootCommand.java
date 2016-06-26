@@ -27,11 +27,11 @@ public class RebootCommand extends Command {
     protected RebootCommand() {
     }
 
-    public RebootCommand(VirtualMachine vm) {
+    public RebootCommand(final VirtualMachine vm) {
         vmName = vm.getInstanceName();
     }
 
-    public RebootCommand(String vmName) {
+    public RebootCommand(final String vmName) {
         this.vmName = vmName;
     }
 
@@ -43,5 +43,4 @@ public class RebootCommand extends Command {
     public boolean executeInSequence() {
         return true;
     }
-
 }

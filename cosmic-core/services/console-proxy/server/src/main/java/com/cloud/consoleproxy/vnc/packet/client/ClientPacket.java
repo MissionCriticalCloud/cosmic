@@ -22,5 +22,4 @@ import java.io.IOException;
 public interface ClientPacket {
 
     void write(DataOutputStream os) throws IOException;
-
 }

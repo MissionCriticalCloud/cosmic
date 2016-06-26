@@ -32,7 +32,8 @@ public class ServiceOfferingVOTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        offeringCustom = new ServiceOfferingVO("custom", null, null, 500, 10, 10, false, "custom", Storage.ProvisioningType.THIN, false, false, "", false, VirtualMachine.Type.User, false);
+        offeringCustom = new ServiceOfferingVO("custom", null, null, 500, 10, 10, false, "custom", Storage.ProvisioningType.THIN, false, false, "", false, VirtualMachine.Type
+                .User, false);
         offering = new ServiceOfferingVO("normal", 1, 1000, 500, 10, 10, false, "normal", Storage.ProvisioningType.THIN, false, false, "", false, VirtualMachine.Type.User, false);
     }
 
@@ -46,5 +47,4 @@ public class ServiceOfferingVOTest {
     public void notDynamic() {
         Assert.assertTrue(!offering.isDynamic());
     }
-
 }

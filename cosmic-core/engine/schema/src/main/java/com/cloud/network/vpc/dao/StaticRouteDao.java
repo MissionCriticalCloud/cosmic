@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.network.vpc.dao;
 
-import java.util.List;
-
 import com.cloud.network.vpc.StaticRoute;
 import com.cloud.network.vpc.StaticRouteVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface StaticRouteDao extends GenericDao<StaticRouteVO, Long> {
 

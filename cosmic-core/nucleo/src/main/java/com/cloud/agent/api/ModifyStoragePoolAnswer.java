@@ -19,9 +19,9 @@
 
 package com.cloud.agent.api;
 
-import java.util.Map;
-
 import com.cloud.storage.template.TemplateProp;
+
+import java.util.Map;
 
 public class ModifyStoragePoolAnswer extends Answer {
     StoragePoolInfo poolInfo;
@@ -35,7 +35,7 @@ public class ModifyStoragePoolAnswer extends Answer {
         super(cmd);
         this.result = true;
         this.poolInfo =
-            new StoragePoolInfo(null, cmd.getPool().getHost(), cmd.getPool().getPath(), cmd.getLocalPath(), cmd.getPool().getType(), capacityBytes, availableBytes);
+                new StoragePoolInfo(null, cmd.getPool().getHost(), cmd.getPool().getPath(), cmd.getLocalPath(), cmd.getPool().getType(), capacityBytes, availableBytes);
 
         this.templateInfo = tInfo;
     }
@@ -63,5 +63,4 @@ public class ModifyStoragePoolAnswer extends Answer {
     public void setLocalDatastoreName(String localDatastoreName) {
         this.localDatastoreName = localDatastoreName;
     }
-
 }

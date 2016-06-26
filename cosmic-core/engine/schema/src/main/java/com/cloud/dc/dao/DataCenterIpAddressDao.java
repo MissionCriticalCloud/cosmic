@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.util.List;
-
 import com.cloud.dc.DataCenterIpAddressVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface DataCenterIpAddressDao extends GenericDao<DataCenterIpAddressVO, Long> {
 
@@ -46,5 +46,4 @@ public interface DataCenterIpAddressDao extends GenericDao<DataCenterIpAddressVO
     int countIPs(long dcId, boolean onlyCountAllocated);
 
     boolean deleteIpAddressByPod(long podId);
-
 }

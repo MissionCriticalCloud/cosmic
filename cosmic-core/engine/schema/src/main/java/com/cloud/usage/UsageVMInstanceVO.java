@@ -16,13 +16,12 @@
 // under the License.
 package com.cloud.usage;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.Date;
 
 @Entity
 @Table(name = "usage_vm_instance")
@@ -73,7 +72,7 @@ public class UsageVMInstanceVO {
     }
 
     public UsageVMInstanceVO(int usageType, long zoneId, long accountId, long vmInstanceId, String vmName, long serviceOfferingId, long templateId,
-            String hypervisorType, Date startDate, Date endDate) {
+                             String hypervisorType, Date startDate, Date endDate) {
         this.usageType = usageType;
         this.zoneId = zoneId;
         this.accountId = accountId;
@@ -87,7 +86,7 @@ public class UsageVMInstanceVO {
     }
 
     public UsageVMInstanceVO(int usageType, long zoneId, long accountId, long vmInstanceId, String vmName, long serviceOfferingId, long templateId,
-            Long cpuSpeed, Long cpuCores, Long memory, String hypervisorType, Date startDate, Date endDate) {
+                             Long cpuSpeed, Long cpuCores, Long memory, String hypervisorType, Date startDate, Date endDate) {
         this.usageType = usageType;
         this.zoneId = zoneId;
         this.accountId = accountId;

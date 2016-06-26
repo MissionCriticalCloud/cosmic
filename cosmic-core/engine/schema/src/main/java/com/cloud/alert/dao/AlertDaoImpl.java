@@ -16,9 +16,6 @@
 // under the License.
 package com.cloud.alert.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.alert.AlertVO;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDaoBase;
@@ -26,6 +23,9 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.util.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -87,6 +87,36 @@ public class AlertDaoImpl extends GenericDaoBase<AlertVO, Long> implements Alert
     }
 
     @Override
+    public boolean deleteAlert(List<Long> ids, String type, Date startDate, Date endDate, Long zoneId) {
+        SearchCriteria<AlertVO> sc = AlertSearchByIdsAndType.create();
+
+        if (ids != null) {
+            sc.setParameters("id", ids.toArray(new Object[ids.size()]));
+        }
+        if (type != null) {
+            sc.setParameters("type", type);
+        }
+        if (zoneId != null) {
+            sc.setParameters("data_center_id", zoneId);
+        }
+        if (startDate != null && endDate != null) {
+            sc.setParameters("createdDateB", startDate, endDate);
+        } else if (endDate != null) {
+            sc.setParameters("createdDateL", endDate);
+        }
+        sc.setParameters("archived", false);
+
+        boolean result = true;
+        List<AlertVO> alerts = listBy(sc);
+        if (ids != null && alerts.size() < ids.size()) {
+            result = false;
+            return result;
+        }
+        remove(sc);
+        return result;
+    }
+
+    @Override
     public boolean archiveAlert(List<Long> ids, String type, Date startDate, Date endDate, Long zoneId) {
         SearchCriteria<AlertVO> sc = AlertSearchByIdsAndType.create();
 
@@ -128,43 +158,13 @@ public class AlertDaoImpl extends GenericDaoBase<AlertVO, Long> implements Alert
     }
 
     @Override
-    public boolean deleteAlert(List<Long> ids, String type, Date startDate, Date endDate, Long zoneId) {
-        SearchCriteria<AlertVO> sc = AlertSearchByIdsAndType.create();
-
-        if (ids != null) {
-            sc.setParameters("id", ids.toArray(new Object[ids.size()]));
-        }
-        if (type != null) {
-            sc.setParameters("type", type);
-        }
-        if (zoneId != null) {
-            sc.setParameters("data_center_id", zoneId);
-        }
-        if (startDate != null && endDate != null) {
-            sc.setParameters("createdDateB", startDate, endDate);
-        } else if (endDate != null) {
-            sc.setParameters("createdDateL", endDate);
-        }
-        sc.setParameters("archived", false);
-
-        boolean result = true;
-        List<AlertVO> alerts = listBy(sc);
-        if (ids != null && alerts.size() < ids.size()) {
-            result = false;
-            return result;
-        }
-        remove(sc);
-        return result;
-    }
-
-    @Override
     public List<AlertVO> listOlderAlerts(Date oldTime) {
-        if (oldTime == null)
+        if (oldTime == null) {
             return null;
+        }
         SearchCriteria<AlertVO> sc = createSearchCriteria();
         sc.addAnd("createdDate", SearchCriteria.Op.LT, oldTime);
         sc.addAnd("archived", SearchCriteria.Op.EQ, false);
         return listIncludingRemovedBy(sc, null);
     }
-
 }

@@ -16,10 +16,6 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.ViewResponseHelper;
 import com.cloud.api.query.vo.AccountJoinVO;
@@ -30,11 +26,14 @@ import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.response.AccountResponse;
 import org.apache.cloudstack.api.response.ResourceLimitAndCountResponse;
 import org.apache.cloudstack.api.response.UserResponse;
+
+import javax.inject.Inject;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -101,6 +100,15 @@ public class AccountJoinDaoImpl extends GenericDaoBase<AccountJoinVO, Long> impl
         accountResponse.setObjectName("account");
 
         return accountResponse;
+    }
+
+    @Override
+    public AccountJoinVO newAccountView(Account acct) {
+        SearchCriteria<AccountJoinVO> sc = acctIdSearch.create();
+        sc.setParameters("id", acct.getId());
+        List<AccountJoinVO> accounts = searchIncludingRemoved(sc, null, null, false);
+        assert accounts != null && accounts.size() == 1 : "No account found for account id " + acct.getId();
+        return accounts.get(0);
     }
 
     @Override
@@ -198,7 +206,7 @@ public class AccountJoinDaoImpl extends GenericDaoBase<AccountJoinVO, Long> impl
         response.setMemoryTotal(memoryTotal);
         response.setMemoryAvailable(memoryAvail);
 
-      //get resource limits for primary storage space and convert it from Bytes to GiB
+        //get resource limits for primary storage space and convert it from Bytes to GiB
         long primaryStorageLimit = ApiDBUtils.findCorrectResourceLimit(account.getPrimaryStorageLimit(), account.getId(), ResourceType.primary_storage);
         String primaryStorageLimitDisplay = (fullView || primaryStorageLimit == -1) ? "Unlimited" : String.valueOf(primaryStorageLimit / ResourceType.bytesToGiB);
         long primaryStorageTotal = (account.getPrimaryStorageTotal() == null) ? 0 : (account.getPrimaryStorageTotal() / ResourceType.bytesToGiB);
@@ -219,15 +227,4 @@ public class AccountJoinDaoImpl extends GenericDaoBase<AccountJoinVO, Long> impl
         response.setSecondaryStorageTotal(secondaryStorageTotal);
         response.setSecondaryStorageAvailable(secondaryStorageAvail);
     }
-
-    @Override
-    public AccountJoinVO newAccountView(Account acct) {
-        SearchCriteria<AccountJoinVO> sc = acctIdSearch.create();
-        sc.setParameters("id", acct.getId());
-        List<AccountJoinVO> accounts = searchIncludingRemoved(sc, null, null, false);
-        assert accounts != null && accounts.size() == 1 : "No account found for account id " + acct.getId();
-        return accounts.get(0);
-
-    }
-
 }

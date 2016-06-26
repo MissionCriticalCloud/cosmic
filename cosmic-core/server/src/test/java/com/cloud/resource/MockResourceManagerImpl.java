@@ -17,12 +17,6 @@
 
 package com.cloud.resource;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.agent.api.VgpuTypesInfo;
@@ -45,7 +39,6 @@ import com.cloud.org.Cluster;
 import com.cloud.resource.ResourceState.Event;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.fsm.NoTransitionException;
-
 import org.apache.cloudstack.api.command.admin.cluster.AddClusterCmd;
 import org.apache.cloudstack.api.command.admin.cluster.DeleteClusterCmd;
 import org.apache.cloudstack.api.command.admin.host.AddHostCmd;
@@ -55,6 +48,11 @@ import org.apache.cloudstack.api.command.admin.host.PrepareForMaintenanceCmd;
 import org.apache.cloudstack.api.command.admin.host.ReconnectHostCmd;
 import org.apache.cloudstack.api.command.admin.host.UpdateHostCmd;
 import org.apache.cloudstack.api.command.admin.host.UpdateHostPasswordCmd;
+
+import javax.naming.ConfigurationException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MockResourceManagerImpl extends ManagerBase implements ResourceManager {
 
@@ -181,6 +179,12 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
         return null;
     }
 
+    @Override
+    public boolean releaseHostReservation(final Long hostId) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
     /* (non-Javadoc)
      * @see com.cloud.resource.ResourceManager#registerResourceEvent(java.lang.Integer, com.cloud.resource.ResourceListener)
      */
@@ -221,7 +225,8 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
      * @see com.cloud.resource.ResourceManager#createHostAndAgent(java.lang.Long, com.cloud.resource.ServerResource, java.util.Map, boolean, java.util.List, boolean)
      */
     @Override
-    public Host createHostAndAgent(final Long hostId, final ServerResource resource, final Map<String, String> details, final boolean old, final List<String> hostTags, final boolean forRebalance) {
+    public Host createHostAndAgent(final Long hostId, final ServerResource resource, final Map<String, String> details, final boolean old, final List<String> hostTags, final
+    boolean forRebalance) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -254,10 +259,12 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#fillRoutingHostVO(com.cloud.host.HostVO, com.cloud.agent.api.StartupRoutingCommand, com.cloud.hypervisor.Hypervisor.HypervisorType, java.util.Map, java.util.List)
+     * @see com.cloud.resource.ResourceManager#fillRoutingHostVO(com.cloud.host.HostVO, com.cloud.agent.api.StartupRoutingCommand, com.cloud.hypervisor.Hypervisor
+     * .HypervisorType, java.util.Map, java.util.List)
      */
     @Override
-    public HostVO fillRoutingHostVO(final HostVO host, final StartupRoutingCommand ssCmd, final HypervisorType hyType, final Map<String, String> details, final List<String> hostTags) {
+    public HostVO fillRoutingHostVO(final HostVO host, final StartupRoutingCommand ssCmd, final HypervisorType hyType, final Map<String, String> details, final List<String>
+            hostTags) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -375,6 +382,18 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
      */
     @Override
     public List<HostVO> listAllUpAndEnabledHostsInOneZoneByType(final Type type, final long dcId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<HostVO> listAllUpAndEnabledHostsInOneZoneByHypervisor(final HypervisorType type, final long dcId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<HostVO> listAllUpAndEnabledHostsInOneZone(final long dcId) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -514,56 +533,8 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see com.cloud.utils.component.Manager#configure(java.lang.String, java.util.Map)
-     */
     @Override
-    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        // TODO Auto-generated method stub
-        return true;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.utils.component.Manager#start()
-     */
-    @Override
-    public boolean start() {
-        // TODO Auto-generated method stub
-        return true;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.utils.component.Manager#stop()
-     */
-    @Override
-    public boolean stop() {
-        // TODO Auto-generated method stub
-        return true;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.utils.component.Manager#getName()
-     */
-    @Override
-    public String getName() {
-        // TODO Auto-generated method stub
-        return "MockResourceManagerImpl";
-    }
-
-    @Override
-    public List<HostVO> listAllUpAndEnabledHostsInOneZoneByHypervisor(final HypervisorType type, final long dcId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<HostVO> listAllUpAndEnabledHostsInOneZone(final long dcId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean releaseHostReservation(final Long hostId) {
+    public boolean isHostGpuEnabled(final long hostId) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -597,9 +568,39 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see com.cloud.utils.component.Manager#getName()
+     */
     @Override
-    public boolean isHostGpuEnabled(final long hostId) {
+    public String getName() {
         // TODO Auto-generated method stub
-        return false;
+        return "MockResourceManagerImpl";
+    }
+
+    /* (non-Javadoc)
+     * @see com.cloud.utils.component.Manager#configure(java.lang.String, java.util.Map)
+     */
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+        // TODO Auto-generated method stub
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see com.cloud.utils.component.Manager#start()
+     */
+    @Override
+    public boolean start() {
+        // TODO Auto-generated method stub
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see com.cloud.utils.component.Manager#stop()
+     */
+    @Override
+    public boolean stop() {
+        // TODO Auto-generated method stub
+        return true;
     }
 }

@@ -40,10 +40,10 @@ from nose.plugins.attrib import attr
 
 
 class TestDeployvGPUenabledVM(cloudstackTestCase):
-
     """
     Test deploy a vGPU enabled VM into a user account
     """
+
     @classmethod
     def setUpClass(self):
         testClient = super(TestDeployvGPUenabledVM, self).getClsTestClient()
@@ -59,9 +59,9 @@ class TestDeployvGPUenabledVM(cloudstackTestCase):
             hypervisor="XenServer"
         )
         if hosts is None:
-             # GPU feature is supported only on XenServer.Check listhosts response
-             self.unsupportedHypervisor = True
-             return
+            # GPU feature is supported only on XenServer.Check listhosts response
+            self.unsupportedHypervisor = True
+            return
         else:
             gpuhosts = 0
             for ghost in hosts:
@@ -130,8 +130,8 @@ class TestDeployvGPUenabledVM(cloudstackTestCase):
 
         self.testdata["service_offerings"]["vgpu260qwin"]["serviceofferingdetails"] = [
             {
-                'pciDevice': 'Group of NVIDIA Corporation GK107GL [GRID K1] GPUs'}, {
-                'vgpuType': 'GRID K120Q'}]
+                'pciDevice': 'Group of NVIDIA Corporation GK107GL [GRID K1] GPUs' }, {
+                'vgpuType': 'GRID K120Q' }]
         # create a service offering
         self.service_offering = ServiceOffering.create(
             self.apiclient,

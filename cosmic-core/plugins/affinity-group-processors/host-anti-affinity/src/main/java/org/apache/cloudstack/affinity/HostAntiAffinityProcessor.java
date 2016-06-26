@@ -16,12 +16,6 @@
 // under the License.
 package org.apache.cloudstack.affinity;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.configuration.Config;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
@@ -34,12 +28,17 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.affinity.dao.AffinityGroupDao;
 import org.apache.cloudstack.affinity.dao.AffinityGroupVMMapDao;
 import org.apache.cloudstack.engine.cloud.entity.api.db.VMReservationVO;
 import org.apache.cloudstack.engine.cloud.entity.api.db.dao.VMReservationDao;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,12 +53,11 @@ public class HostAntiAffinityProcessor extends AffinityProcessorBase implements 
     protected AffinityGroupDao _affinityGroupDao;
     @Inject
     protected AffinityGroupVMMapDao _affinityGroupVMMapDao;
-    private int _vmCapacityReleaseInterval;
     @Inject
     protected ConfigurationDao _configDao;
-
     @Inject
     protected VMReservationDao _reservationDao;
+    private int _vmCapacityReleaseInterval;
 
     @Override
     public void process(VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoid) throws AffinityConflictException {
@@ -91,7 +89,7 @@ public class HostAntiAffinityProcessor extends AffinityProcessorBase implements 
                                 avoid.addHost(groupVM.getLastHostId());
                                 if (s_logger.isDebugEnabled()) {
                                     s_logger.debug("Added host " + groupVM.getLastHostId() + " to avoid set, since VM " + groupVM.getId() +
-                                        " is present on the host, in Stopped state but has reserved capacity");
+                                            " is present on the host, in Stopped state but has reserved capacity");
                                 }
                             }
                         }
@@ -99,14 +97,6 @@ public class HostAntiAffinityProcessor extends AffinityProcessorBase implements 
                 }
             }
         }
-
-    }
-
-    @Override
-    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        super.configure(name, params);
-        _vmCapacityReleaseInterval = NumbersUtil.parseInt(_configDao.getValue(Config.CapacitySkipcountingHours.key()), 3600);
-        return true;
     }
 
     @Override
@@ -132,7 +122,7 @@ public class HostAntiAffinityProcessor extends AffinityProcessorBase implements 
                 if (vmReservation != null && vmReservation.getHostId() != null && vmReservation.getHostId().equals(plannedHostId)) {
                     if (s_logger.isDebugEnabled()) {
                         s_logger.debug("Planned destination for VM " + vm.getId() + " conflicts with an existing VM " + vmReservation.getVmId() +
-                            " reserved on the same host " + plannedHostId);
+                                " reserved on the same host " + plannedHostId);
                     }
                     return false;
                 }
@@ -141,4 +131,10 @@ public class HostAntiAffinityProcessor extends AffinityProcessorBase implements 
         return true;
     }
 
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+        super.configure(name, params);
+        _vmCapacityReleaseInterval = NumbersUtil.parseInt(_configDao.getValue(Config.CapacitySkipcountingHours.key()), 3600);
+        return true;
+    }
 }

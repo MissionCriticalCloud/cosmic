@@ -17,10 +17,10 @@
 
 package com.cloud.event.dao;
 
-import java.util.Map;
-
 import com.cloud.event.UsageEventDetailsVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Map;
 
 public interface UsageEventDetailsDao extends GenericDao<UsageEventDetailsVO, Long> {
 

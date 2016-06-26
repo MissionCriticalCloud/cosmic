@@ -16,16 +16,15 @@
 // under the License.
 package com.cloud.api.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.storage.snapshot.SnapshotSchedule;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.SnapshotScheduleResponse;
+
+import java.util.ArrayList;
+import java.util.List;
 
 //@APICommand(description="Lists recurring snapshot schedule", responseObject=SnapshotScheduleResponse.class)
 public class ListRecurringSnapshotScheduleCmd extends BaseListCmd {
@@ -58,11 +57,6 @@ public class ListRecurringSnapshotScheduleCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
         List<? extends SnapshotSchedule> snapshotSchedules = _snapshotService.findRecurringSnapshotSchedule(this);
         ListResponse<SnapshotScheduleResponse> response = new ListResponse<SnapshotScheduleResponse>();
@@ -75,5 +69,10 @@ public class ListRecurringSnapshotScheduleCmd extends BaseListCmd {
         response.setResponses(snapshotScheduleResponses);
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

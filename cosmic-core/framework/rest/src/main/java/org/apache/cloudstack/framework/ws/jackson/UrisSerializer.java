@@ -18,22 +18,19 @@
  */
 package org.apache.cloudstack.framework.ws.jackson;
 
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.ws.rs.core.UriBuilder;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalUriInfo;
 
 /**
  * Serializer for a list of ids.
- *
  */
 public class UrisSerializer extends JsonSerializer<List<? extends Object>> {
     Url _annotation;

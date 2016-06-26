@@ -16,45 +16,22 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.util.List;
-
-import javax.ejb.Local;
-
 import com.cloud.dc.DomainVlanMapVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 
+import javax.ejb.Local;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
-@Local(value={DomainVlanMapDao.class})
+@Local(value = {DomainVlanMapDao.class})
 public class DomainVlanMapDaoImpl extends GenericDaoBase<DomainVlanMapVO, Long> implements DomainVlanMapDao {
     protected SearchBuilder<DomainVlanMapVO> DomainSearch;
     protected SearchBuilder<DomainVlanMapVO> VlanSearch;
     protected SearchBuilder<DomainVlanMapVO> DomainVlanSearch;
-
-    @Override
-    public List<DomainVlanMapVO> listDomainVlanMapsByDomain(long domainId) {
-            SearchCriteria<DomainVlanMapVO> sc = DomainSearch.create();
-            sc.setParameters("domainId", domainId);
-            return listIncludingRemovedBy(sc);
-    }
-
-    @Override
-    public List<DomainVlanMapVO> listDomainVlanMapsByVlan(long vlanDbId) {
-        SearchCriteria<DomainVlanMapVO> sc = VlanSearch.create();
-        sc.setParameters("vlanDbId", vlanDbId);
-        return listIncludingRemovedBy(sc);
-    }
-
-    @Override
-    public DomainVlanMapVO findDomainVlanMap(long domainId, long vlanDbId) {
-        SearchCriteria<DomainVlanMapVO> sc = DomainVlanSearch.create();
-        sc.setParameters("domainId", domainId);
-        sc.setParameters("vlanDbId", vlanDbId);
-        return findOneIncludingRemovedBy(sc);
-    }
 
     public DomainVlanMapDaoImpl() {
         DomainSearch = createSearchBuilder();
@@ -71,4 +48,25 @@ public class DomainVlanMapDaoImpl extends GenericDaoBase<DomainVlanMapVO, Long> 
         DomainVlanSearch.done();
     }
 
+    @Override
+    public List<DomainVlanMapVO> listDomainVlanMapsByDomain(long domainId) {
+        SearchCriteria<DomainVlanMapVO> sc = DomainSearch.create();
+        sc.setParameters("domainId", domainId);
+        return listIncludingRemovedBy(sc);
+    }
+
+    @Override
+    public List<DomainVlanMapVO> listDomainVlanMapsByVlan(long vlanDbId) {
+        SearchCriteria<DomainVlanMapVO> sc = VlanSearch.create();
+        sc.setParameters("vlanDbId", vlanDbId);
+        return listIncludingRemovedBy(sc);
+    }
+
+    @Override
+    public DomainVlanMapVO findDomainVlanMap(long domainId, long vlanDbId) {
+        SearchCriteria<DomainVlanMapVO> sc = DomainVlanSearch.create();
+        sc.setParameters("domainId", domainId);
+        sc.setParameters("vlanDbId", vlanDbId);
+        return findOneIncludingRemovedBy(sc);
+    }
 }

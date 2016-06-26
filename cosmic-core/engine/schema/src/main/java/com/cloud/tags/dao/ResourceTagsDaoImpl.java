@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.tags.dao;
 
-import java.util.List;
-
 import com.cloud.server.ResourceTag;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.ResourceTagVO;
@@ -25,6 +23,8 @@ import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -57,11 +57,12 @@ public class ResourceTagsDaoImpl extends GenericDaoBase<ResourceTagVO, Long> imp
         return listBy(sc);
     }
 
-    @Override public void updateResourceId(long srcId, long destId, ResourceObjectType resourceType) {
+    @Override
+    public void updateResourceId(long srcId, long destId, ResourceObjectType resourceType) {
         SearchCriteria<ResourceTagVO> sc = AllFieldsSearch.create();
         sc.setParameters("resourceId", srcId);
         sc.setParameters("resourceType", resourceType);
-        for( ResourceTagVO tag : listBy(sc)) {
+        for (ResourceTagVO tag : listBy(sc)) {
             tag.setResourceId(destId);
             update(tag.getId(), tag);
         }

@@ -23,11 +23,11 @@ package com.cloud.network.nicira;
  *
  */
 public class L3GatewayAttachment extends Attachment {
-    private String l3GatewayServiceUuid;
     private final String type = "L3GatewayAttachment";
+    private String l3GatewayServiceUuid;
     private Long vlanId;
 
-    public L3GatewayAttachment(String l3GatewayServiceUuid) {
+    public L3GatewayAttachment(final String l3GatewayServiceUuid) {
         this.l3GatewayServiceUuid = l3GatewayServiceUuid;
     }
 
@@ -48,8 +48,7 @@ public class L3GatewayAttachment extends Attachment {
         return vlanId;
     }
 
-    public void setVlanId(long vlanId) {
+    public void setVlanId(final long vlanId) {
         this.vlanId = vlanId;
     }
-
 }

@@ -41,14 +41,6 @@ public class RegionVO implements Region {
     @Column(name = "portableip_service_enabled")
     private boolean portableipEnabled;
 
-    public boolean getGslbEnabled() {
-        return gslbEnabled;
-    }
-
-    public void setGslbEnabled(boolean gslbEnabled) {
-        this.gslbEnabled = gslbEnabled;
-    }
-
     public RegionVO() {
     }
 
@@ -57,6 +49,14 @@ public class RegionVO implements Region {
         this.name = name;
         this.endPoint = endPoint;
         this.gslbEnabled = true;
+    }
+
+    public boolean getGslbEnabled() {
+        return gslbEnabled;
+    }
+
+    public void setGslbEnabled(boolean gslbEnabled) {
+        this.gslbEnabled = gslbEnabled;
     }
 
     @Override

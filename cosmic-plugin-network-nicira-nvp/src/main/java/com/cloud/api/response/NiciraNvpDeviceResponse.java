@@ -21,11 +21,11 @@ package com.cloud.api.response;
 
 import com.cloud.network.NiciraNvpDeviceVO;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = NiciraNvpDeviceVO.class)
 public class NiciraNvpDeviceResponse extends BaseResponse {
@@ -57,7 +57,7 @@ public class NiciraNvpDeviceResponse extends BaseResponse {
     @Param(description = "this L3 gateway service Uuid")
     private String l3GatewayServiceUuid;
 
-    public void setId(String nvpDeviceId) {
+    public void setId(final String nvpDeviceId) {
         this.id = nvpDeviceId;
     }
 
@@ -84,5 +84,4 @@ public class NiciraNvpDeviceResponse extends BaseResponse {
     public void setL3GatewayServiceUuid(final String l3GatewayServiceUuid) {
         this.l3GatewayServiceUuid = l3GatewayServiceUuid;
     }
-
 }

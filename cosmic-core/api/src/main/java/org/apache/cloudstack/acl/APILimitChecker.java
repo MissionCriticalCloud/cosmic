@@ -18,7 +18,6 @@ package org.apache.cloudstack.acl;
 
 import com.cloud.user.Account;
 import com.cloud.utils.component.Adapter;
-
 import org.apache.cloudstack.api.ServerApiException;
 
 /**

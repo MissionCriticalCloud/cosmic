@@ -20,10 +20,11 @@ package org.apache.cloudstack.spring.module.locator.impl;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.cloudstack.spring.module.model.ModuleDefinition;
+
 import java.io.IOException;
 import java.util.Collection;
 
-import org.apache.cloudstack.spring.module.model.ModuleDefinition;
 import org.junit.Test;
 
 public class ClasspathModuleDefinitionSetLocatorTest {
@@ -36,5 +37,4 @@ public class ClasspathModuleDefinitionSetLocatorTest {
 
         assertEquals(8, modules.size());
     }
-
 }

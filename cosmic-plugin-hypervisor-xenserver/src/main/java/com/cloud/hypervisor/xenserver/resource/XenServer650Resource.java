@@ -18,11 +18,11 @@
  */
 package com.cloud.hypervisor.xenserver.resource;
 
-import javax.ejb.Local;
-
 import com.cloud.resource.ServerResource;
 
-@Local(value=ServerResource.class)
+import javax.ejb.Local;
+
+@Local(value = ServerResource.class)
 public class XenServer650Resource extends Xenserver625Resource {
 
     @Override

@@ -16,6 +16,12 @@
 // under the License.
 package org.apache.cloudstack.region;
 
+import com.cloud.domain.DomainVO;
+import com.cloud.user.UserAccount;
+import com.cloud.user.UserAccountVO;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -27,15 +33,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import com.cloud.domain.DomainVO;
-import com.cloud.user.UserAccount;
-import com.cloud.user.UserAccountVO;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -47,13 +46,13 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for making API calls between peer Regions
- *
  */
 public class RegionsApiUtil {
     public static final Logger s_logger = LoggerFactory.getLogger(RegionsApiUtil.class);
 
     /**
      * Makes an api call using region service end_point, api command and params
+     *
      * @param region
      * @param command
      * @param params
@@ -80,135 +79,8 @@ public class RegionsApiUtil {
     }
 
     /**
-     * Makes an api call using region service end_point, api command and params
-     * Returns Account object on success
-     * @param region
-     * @param command
-     * @param params
-     * @return
-     */
-    protected static RegionAccount makeAccountAPICall(Region region, String command, List<NameValuePair> params) {
-        try {
-            String url = buildUrl(buildParams(command, params), region);
-            HttpClient client = new HttpClient();
-            HttpMethod method = new GetMethod(url);
-            if (client.executeMethod(method) == 200) {
-                InputStream is = method.getResponseBodyAsStream();
-                //Translate response to Account object
-                XStream xstream = new XStream(new DomDriver());
-                xstream.alias("account", RegionAccount.class);
-                xstream.alias("user", RegionUser.class);
-                xstream.aliasField("id", RegionAccount.class, "uuid");
-                xstream.aliasField("name", RegionAccount.class, "accountName");
-                xstream.aliasField("accounttype", RegionAccount.class, "type");
-                xstream.aliasField("domainid", RegionAccount.class, "domainUuid");
-                xstream.aliasField("networkdomain", RegionAccount.class, "networkDomain");
-                xstream.aliasField("id", RegionUser.class, "uuid");
-                xstream.aliasField("accountId", RegionUser.class, "accountUuid");
-                try(ObjectInputStream in = xstream.createObjectInputStream(is);) {
-                    return (RegionAccount) in.readObject();
-                }catch (IOException e) {
-                    s_logger.error(e.getMessage());
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        } catch (HttpException e) {
-            s_logger.error(e.getMessage());
-            return null;
-        } catch (IOException e) {
-            s_logger.error(e.getMessage());
-            return null;
-        } catch (ClassNotFoundException e) {
-            s_logger.error(e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Makes an api call using region service end_point, api command and params
-     * Returns Domain object on success
-     * @param region
-     * @param command
-     * @param params
-     * @return
-     */
-    protected static RegionDomain makeDomainAPICall(Region region, String command, List<NameValuePair> params) {
-        try {
-            String url = buildUrl(buildParams(command, params), region);
-            HttpClient client = new HttpClient();
-            HttpMethod method = new GetMethod(url);
-            if (client.executeMethod(method) == 200) {
-                InputStream is = method.getResponseBodyAsStream();
-                XStream xstream = new XStream(new DomDriver());
-                //Translate response to Domain object
-                xstream.alias("domain", RegionDomain.class);
-                xstream.aliasField("id", RegionDomain.class, "uuid");
-                xstream.aliasField("parentdomainid", RegionDomain.class, "parentUuid");
-                xstream.aliasField("networkdomain", DomainVO.class, "networkDomain");
-                try(ObjectInputStream in = xstream.createObjectInputStream(is);) {
-                    return (RegionDomain) in.readObject();
-                }catch (IOException e) {
-                    s_logger.error(e.getMessage());
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        } catch (HttpException e) {
-            s_logger.error(e.getMessage());
-            return null;
-        } catch (IOException e) {
-            s_logger.error(e.getMessage());
-            return null;
-        } catch (ClassNotFoundException e) {
-            s_logger.error(e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Makes an api call using region service end_point, api command and params
-     * Returns UserAccount object on success
-     * @param region
-     * @param command
-     * @param params
-     * @return
-     */
-    protected static UserAccount makeUserAccountAPICall(Region region, String command, List<NameValuePair> params) {
-        try {
-            String url = buildUrl(buildParams(command, params), region);
-            HttpClient client = new HttpClient();
-            HttpMethod method = new GetMethod(url);
-            if (client.executeMethod(method) == 200) {
-                InputStream is = method.getResponseBodyAsStream();
-                XStream xstream = new XStream(new DomDriver());
-                xstream.alias("useraccount", UserAccountVO.class);
-                xstream.aliasField("id", UserAccountVO.class, "uuid");
-                try(ObjectInputStream in = xstream.createObjectInputStream(is);) {
-                    return (UserAccountVO)in.readObject();
-                } catch (IOException e) {
-                    s_logger.error(e.getMessage());
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        } catch (HttpException e) {
-            s_logger.error(e.getMessage());
-            return null;
-        } catch (IOException e) {
-            s_logger.error(e.getMessage());
-            return null;
-        } catch (ClassNotFoundException e) {
-            s_logger.error(e.getMessage());
-            return null;
-        }
-    }
-
-    /**
      * Builds parameters string with command and encoded param values
+     *
      * @param command
      * @param params
      * @return
@@ -233,6 +105,7 @@ public class RegionsApiUtil {
     /**
      * Build URL for api call using region end_point
      * Parameters are sorted and signed using secret_key
+     *
      * @param apiParams
      * @param region
      * @return
@@ -280,7 +153,6 @@ public class RegionsApiUtil {
             String finalUrl = region.getEndPoint() + "?" + apiParams + "&apiKey=" + apiKey + "&signature=" + encodedSignature;
 
             return finalUrl;
-
         } catch (UnsupportedEncodingException e) {
             s_logger.error(e.getMessage());
             return null;
@@ -308,4 +180,134 @@ public class RegionsApiUtil {
         }
     }
 
+    /**
+     * Makes an api call using region service end_point, api command and params
+     * Returns Account object on success
+     *
+     * @param region
+     * @param command
+     * @param params
+     * @return
+     */
+    protected static RegionAccount makeAccountAPICall(Region region, String command, List<NameValuePair> params) {
+        try {
+            String url = buildUrl(buildParams(command, params), region);
+            HttpClient client = new HttpClient();
+            HttpMethod method = new GetMethod(url);
+            if (client.executeMethod(method) == 200) {
+                InputStream is = method.getResponseBodyAsStream();
+                //Translate response to Account object
+                XStream xstream = new XStream(new DomDriver());
+                xstream.alias("account", RegionAccount.class);
+                xstream.alias("user", RegionUser.class);
+                xstream.aliasField("id", RegionAccount.class, "uuid");
+                xstream.aliasField("name", RegionAccount.class, "accountName");
+                xstream.aliasField("accounttype", RegionAccount.class, "type");
+                xstream.aliasField("domainid", RegionAccount.class, "domainUuid");
+                xstream.aliasField("networkdomain", RegionAccount.class, "networkDomain");
+                xstream.aliasField("id", RegionUser.class, "uuid");
+                xstream.aliasField("accountId", RegionUser.class, "accountUuid");
+                try (ObjectInputStream in = xstream.createObjectInputStream(is);) {
+                    return (RegionAccount) in.readObject();
+                } catch (IOException e) {
+                    s_logger.error(e.getMessage());
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } catch (HttpException e) {
+            s_logger.error(e.getMessage());
+            return null;
+        } catch (IOException e) {
+            s_logger.error(e.getMessage());
+            return null;
+        } catch (ClassNotFoundException e) {
+            s_logger.error(e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Makes an api call using region service end_point, api command and params
+     * Returns Domain object on success
+     *
+     * @param region
+     * @param command
+     * @param params
+     * @return
+     */
+    protected static RegionDomain makeDomainAPICall(Region region, String command, List<NameValuePair> params) {
+        try {
+            String url = buildUrl(buildParams(command, params), region);
+            HttpClient client = new HttpClient();
+            HttpMethod method = new GetMethod(url);
+            if (client.executeMethod(method) == 200) {
+                InputStream is = method.getResponseBodyAsStream();
+                XStream xstream = new XStream(new DomDriver());
+                //Translate response to Domain object
+                xstream.alias("domain", RegionDomain.class);
+                xstream.aliasField("id", RegionDomain.class, "uuid");
+                xstream.aliasField("parentdomainid", RegionDomain.class, "parentUuid");
+                xstream.aliasField("networkdomain", DomainVO.class, "networkDomain");
+                try (ObjectInputStream in = xstream.createObjectInputStream(is);) {
+                    return (RegionDomain) in.readObject();
+                } catch (IOException e) {
+                    s_logger.error(e.getMessage());
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } catch (HttpException e) {
+            s_logger.error(e.getMessage());
+            return null;
+        } catch (IOException e) {
+            s_logger.error(e.getMessage());
+            return null;
+        } catch (ClassNotFoundException e) {
+            s_logger.error(e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Makes an api call using region service end_point, api command and params
+     * Returns UserAccount object on success
+     *
+     * @param region
+     * @param command
+     * @param params
+     * @return
+     */
+    protected static UserAccount makeUserAccountAPICall(Region region, String command, List<NameValuePair> params) {
+        try {
+            String url = buildUrl(buildParams(command, params), region);
+            HttpClient client = new HttpClient();
+            HttpMethod method = new GetMethod(url);
+            if (client.executeMethod(method) == 200) {
+                InputStream is = method.getResponseBodyAsStream();
+                XStream xstream = new XStream(new DomDriver());
+                xstream.alias("useraccount", UserAccountVO.class);
+                xstream.aliasField("id", UserAccountVO.class, "uuid");
+                try (ObjectInputStream in = xstream.createObjectInputStream(is);) {
+                    return (UserAccountVO) in.readObject();
+                } catch (IOException e) {
+                    s_logger.error(e.getMessage());
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } catch (HttpException e) {
+            s_logger.error(e.getMessage());
+            return null;
+        } catch (IOException e) {
+            s_logger.error(e.getMessage());
+            return null;
+        } catch (ClassNotFoundException e) {
+            s_logger.error(e.getMessage());
+            return null;
+        }
+    }
 }

@@ -43,21 +43,38 @@ public abstract class NetworkTopologyVisitor {
     public abstract VirtualNetworkApplianceFactory getVirtualNetworkApplianceFactory();
 
     public abstract boolean visit(StaticNatRules nat) throws ResourceUnavailableException;
+
     public abstract boolean visit(LoadBalancingRules loadbalancing) throws ResourceUnavailableException;
+
     public abstract boolean visit(FirewallRules firewall) throws ResourceUnavailableException;
+
     public abstract boolean visit(IpAssociationRules ipAddresses) throws ResourceUnavailableException;
+
     public abstract boolean visit(UserdataPwdRules userdata) throws ResourceUnavailableException;
+
     public abstract boolean visit(DhcpEntryRules dhcp) throws ResourceUnavailableException;
+
     public abstract boolean visit(SshKeyToRouterRules ssh) throws ResourceUnavailableException;
+
     public abstract boolean visit(PasswordToRouterRules pwd) throws ResourceUnavailableException;
+
     public abstract boolean visit(NetworkAclsRules acl) throws ResourceUnavailableException;
+
     public abstract boolean visit(VpcIpAssociationRules vpcIp) throws ResourceUnavailableException;
+
     public abstract boolean visit(UserdataToRouterRules userdata) throws ResourceUnavailableException;
+
     public abstract boolean visit(BasicVpnRules vpnRules) throws ResourceUnavailableException;
+
     public abstract boolean visit(AdvancedVpnRules vpnRules) throws ResourceUnavailableException;
+
     public abstract boolean visit(PrivateGatewayRules pvtGatewayRules) throws ResourceUnavailableException;
+
     public abstract boolean visit(DhcpPvlanRules dhcpRules) throws ResourceUnavailableException;
+
     public abstract boolean visit(DhcpSubNetRules dhcpRules) throws ResourceUnavailableException;
+
     public abstract boolean visit(NicPlugInOutRules nicPlugInOutRules) throws ResourceUnavailableException;
+
     public abstract boolean visit(StaticRoutesRules staticRoutesRules) throws ResourceUnavailableException;
 }

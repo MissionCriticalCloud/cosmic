@@ -16,9 +16,9 @@
 // under the License.
 package org.apache.cloudstack.engine.cloud.entity.api.db;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.Identity;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,51 +27,39 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
 
 @Entity
 @Table(name = "vm_reservation")
 public class VMReservationVO implements Identity, InternalIdentity {
 
+    // VolumeId -> poolId
+    @Transient
+    Map<Long, Long> volumeReservationMap;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
     @Column(name = "vm_id")
     private long vmId;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "data_center_id")
     private long dataCenterId;
-
     @Column(name = "pod_id")
     private long podId;
-
     @Column(name = "cluster_id")
     private long clusterId;
-
     @Column(name = "host_id")
     private long hostId;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
-
     @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
-
     @Column(name = "deployment_planner")
     private String deploymentPlanner;
-
-    // VolumeId -> poolId
-    @Transient
-    Map<Long, Long> volumeReservationMap;
 
     /**
      * There should never be a public constructor for this class. Since it's
@@ -127,12 +115,11 @@ public class VMReservationVO implements Identity, InternalIdentity {
         this.volumeReservationMap = volumeReservationMap;
     }
 
-    public void setDeploymentPlanner(String planner) {
-        this.deploymentPlanner = planner;
-    }
-
     public String getDeploymentPlanner() {
         return this.deploymentPlanner;
     }
 
+    public void setDeploymentPlanner(String planner) {
+        this.deploymentPlanner = planner;
+    }
 }

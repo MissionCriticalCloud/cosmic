@@ -25,16 +25,16 @@ import com.cloud.agent.api.to.DataTO;
 public class CopyCmdAnswer extends Answer {
     private DataTO newData;
 
-    public CopyCmdAnswer(DataTO newData) {
+    public CopyCmdAnswer(final DataTO newData) {
         super(null);
         this.newData = newData;
     }
 
-    public DataTO getNewData() {
-        return this.newData;
+    public CopyCmdAnswer(final String errMsg) {
+        super(null, false, errMsg);
     }
 
-    public CopyCmdAnswer(String errMsg) {
-        super(null, false, errMsg);
+    public DataTO getNewData() {
+        return this.newData;
     }
 }

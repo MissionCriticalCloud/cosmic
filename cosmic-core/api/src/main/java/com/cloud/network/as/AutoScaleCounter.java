@@ -22,12 +22,39 @@ import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
 public class AutoScaleCounter {
-    public static class AutoScaleCounterType {
-        private String _name;
+    @SerializedName("methodname")
+    private String _counterName;
+    @SerializedName("paramlist")
+    private List<AutoScaleCounterParam> _paramList;
 
+    public AutoScaleCounter(AutoScaleCounterType methodType) {
+        this._counterName = methodType.getName();
+        this._paramList = new ArrayList<AutoScaleCounterParam>(1);
+    }
+
+    public void addParam(String name, Boolean required, String description, Boolean isFlag) {
+        AutoScaleCounterParam param = new AutoScaleCounterParam(name, required, description, isFlag);
+        _paramList.add(param);
+        return;
+    }
+
+    public String getName() {
+        return _counterName;
+    }
+
+    public List<AutoScaleCounterParam> getParamList() {
+        return _paramList;
+    }
+
+    public void setParamList(List<AutoScaleCounterParam> paramList) {
+        this._paramList = paramList;
+    }
+
+    public static class AutoScaleCounterType {
         public static final AutoScaleCounterType Snmp = new AutoScaleCounterType("snmp");
         public static final AutoScaleCounterType Cpu = new AutoScaleCounterType("cpu");
         public static final AutoScaleCounterType Memory = new AutoScaleCounterType("memory");
+        private String _name;
 
         public AutoScaleCounterType(String name) {
             _name = name;
@@ -89,34 +116,5 @@ public class AutoScaleCounter {
         public void setDescription(String description) {
             this._description = description;
         }
-    }
-
-    @SerializedName("methodname")
-    private String _counterName;
-
-    @SerializedName("paramlist")
-    private List<AutoScaleCounterParam> _paramList;
-
-    public AutoScaleCounter(AutoScaleCounterType methodType) {
-        this._counterName = methodType.getName();
-        this._paramList = new ArrayList<AutoScaleCounterParam>(1);
-    }
-
-    public void addParam(String name, Boolean required, String description, Boolean isFlag) {
-        AutoScaleCounterParam param = new AutoScaleCounterParam(name, required, description, isFlag);
-        _paramList.add(param);
-        return;
-    }
-
-    public String getName() {
-        return _counterName;
-    }
-
-    public List<AutoScaleCounterParam> getParamList() {
-        return _paramList;
-    }
-
-    public void setParamList(List<AutoScaleCounterParam> paramList) {
-        this._paramList = paramList;
     }
 }

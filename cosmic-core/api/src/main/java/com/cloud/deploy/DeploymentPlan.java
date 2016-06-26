@@ -51,16 +51,14 @@ public interface DeploymentPlan {
     public Long getPoolId();
 
     /**
-     * @param avoids
-     *            Set the ExcludeList to avoid for deployment
-     */
-    public void setAvoids(ExcludeList avoids);
-
-    /**
-     * @return
-     *         the ExcludeList to avoid for deployment
+     * @return the ExcludeList to avoid for deployment
      */
     public ExcludeList getAvoids();
+
+    /**
+     * @param avoids Set the ExcludeList to avoid for deployment
+     */
+    public void setAvoids(ExcludeList avoids);
 
     Long getPhysicalNetworkId();
 

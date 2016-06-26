@@ -17,13 +17,10 @@
 
 package org.apache.cloudstack.api.command.user.region.ha.gslb;
 
-import javax.inject.Inject;
-
 import com.cloud.event.EventTypes;
 import com.cloud.region.ha.GlobalLoadBalancerRule;
 import com.cloud.region.ha.GlobalLoadBalancingRulesService;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -34,6 +31,9 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.GlobalLoadBalancerResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,43 +48,22 @@ public class DeleteGlobalLoadBalancerRuleCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
-
-    @Parameter(name = ApiConstants.ID,
-               type = CommandType.UUID,
-               entityType = GlobalLoadBalancerResponse.class,
-               required = true,
-               description = "the ID of the global load balancer rule")
-    private Long id;
+    @Inject
+    public GlobalLoadBalancingRulesService _gslbService;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public Long getGlobalLoadBalancerId() {
-        return id;
-    }
+    @Parameter(name = ApiConstants.ID,
+            type = CommandType.UUID,
+            entityType = GlobalLoadBalancerResponse.class,
+            required = true,
+            description = "the ID of the global load balancer rule")
+    private Long id;
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Inject
-    public GlobalLoadBalancingRulesService _gslbService;
-
-    @Override
-    public long getEntityOwnerId() {
-        GlobalLoadBalancerRule lb = _entityMgr.findById(GlobalLoadBalancerRule.class, getGlobalLoadBalancerId());
-        if (lb != null) {
-            return lb.getAccountId();
-        }
-
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
 
     @Override
     public String getEventType() {
@@ -97,15 +76,8 @@ public class DeleteGlobalLoadBalancerRuleCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public void execute() {
-        CallContext.current().setEventDetails("Deleting global Load balancer rule Id: " + getGlobalLoadBalancerId());
-        boolean result = _gslbService.deleteGlobalLoadBalancerRule(this);
-        if (result) {
-            SuccessResponse response = new SuccessResponse(getCommandName());
-            this.setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete Global Load Balancer rule.");
-        }
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.GlobalLoadBalancerRule;
     }
 
     @Override
@@ -118,8 +90,34 @@ public class DeleteGlobalLoadBalancerRuleCmd extends BaseAsyncCmd {
         return null;
     }
 
+    public Long getGlobalLoadBalancerId() {
+        return id;
+    }
+
     @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.GlobalLoadBalancerRule;
+    public void execute() {
+        CallContext.current().setEventDetails("Deleting global Load balancer rule Id: " + getGlobalLoadBalancerId());
+        final boolean result = _gslbService.deleteGlobalLoadBalancerRule(this);
+        if (result) {
+            final SuccessResponse response = new SuccessResponse(getCommandName());
+            this.setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete Global Load Balancer rule.");
+        }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final GlobalLoadBalancerRule lb = _entityMgr.findById(GlobalLoadBalancerRule.class, getGlobalLoadBalancerId());
+        if (lb != null) {
+            return lb.getAccountId();
+        }
+
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 }

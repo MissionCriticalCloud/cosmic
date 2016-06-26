@@ -18,7 +18,6 @@
 package org.apache.cloudstack.api.command.user.tag;
 
 import com.cloud.server.ResourceTag;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
@@ -58,6 +57,11 @@ public class ListTagsCmd extends BaseListProjectAndAccountResourcesCmd {
         setResponseObject(response);
     }
 
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
     public String getResourceType() {
         return resourceType;
     }
@@ -72,11 +76,6 @@ public class ListTagsCmd extends BaseListProjectAndAccountResourcesCmd {
 
     public String getValue() {
         return value;
-    }
-
-    @Override
-    public String getCommandName() {
-        return s_name;
     }
 
     public String getCustomer() {

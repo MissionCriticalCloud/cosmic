@@ -50,5 +50,4 @@ public class ImageStoreUtilTest {
         Assert.assertEquals(url.getHost(), domain);
         Assert.assertEquals(url.getPath(), "/upload/" + uuid);
     }
-
 }

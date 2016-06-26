@@ -16,10 +16,6 @@
 // under the License.
 package com.cloud.network.vpc.dao;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.network.vpc.NetworkACLItem.State;
 import com.cloud.network.vpc.NetworkACLItemCidrsDao;
 import com.cloud.network.vpc.NetworkACLItemDao;
@@ -31,8 +27,11 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
-import com.google.common.collect.Lists;
 
+import javax.inject.Inject;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -98,6 +97,27 @@ public class NetworkACLItemDaoImpl extends GenericDaoBase<NetworkACLItemVO, Long
     }
 
     @Override
+    @DB
+    public NetworkACLItemVO persist(NetworkACLItemVO networkAclItem) {
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        txn.start();
+
+        NetworkACLItemVO dbNetworkACLItem = super.persist(networkAclItem);
+        saveCidrs(networkAclItem, networkAclItem.getSourceCidrList());
+        loadCidrs(dbNetworkACLItem);
+
+        txn.commit();
+        return dbNetworkACLItem;
+    }
+
+    public void saveCidrs(NetworkACLItemVO networkACLItem, List<String> cidrList) {
+        if (cidrList == null) {
+            return;
+        }
+        _networkACLItemCidrsDao.persist(networkACLItem.getId(), cidrList);
+    }
+
+    @Override
     public boolean setStateToAdd(NetworkACLItemVO rule) {
         SearchCriteria<NetworkACLItemVO> sc = AllFieldsSearch.create();
         sc.setParameters("id", rule.getId());
@@ -116,12 +136,14 @@ public class NetworkACLItemDaoImpl extends GenericDaoBase<NetworkACLItemVO, Long
 
     @Override
     public List<NetworkACLItemVO> listByACL(Long aclId) {
-        if (aclId == null) return Lists.newArrayList();
+        if (aclId == null) {
+            return Lists.newArrayList();
+        }
 
         SearchCriteria<NetworkACLItemVO> sc = AllFieldsSearch.create();
         sc.setParameters("aclId", aclId);
         List<NetworkACLItemVO> list = listBy(sc);
-        for(NetworkACLItemVO item :list) {
+        for (NetworkACLItemVO item : list) {
             loadCidrs(item);
         }
         return list;
@@ -141,31 +163,10 @@ public class NetworkACLItemDaoImpl extends GenericDaoBase<NetworkACLItemVO, Long
         sc.setParameters("aclId", aclId);
         sc.setParameters("number", number);
         NetworkACLItemVO vo = findOneBy(sc);
-        if(vo != null) {
+        if (vo != null) {
             loadCidrs(vo);
         }
         return vo;
-    }
-
-    @Override
-    @DB
-    public NetworkACLItemVO persist(NetworkACLItemVO networkAclItem) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-
-        NetworkACLItemVO dbNetworkACLItem = super.persist(networkAclItem);
-        saveCidrs(networkAclItem, networkAclItem.getSourceCidrList());
-        loadCidrs(dbNetworkACLItem);
-
-        txn.commit();
-        return dbNetworkACLItem;
-    }
-
-    public void saveCidrs(NetworkACLItemVO networkACLItem, List<String> cidrList) {
-        if (cidrList == null) {
-            return;
-        }
-        _networkACLItemCidrsDao.persist(networkACLItem.getId(), cidrList);
     }
 
     @Override

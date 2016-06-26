@@ -16,14 +16,11 @@
 // under the License.
 package org.apache.cloudstack.region;
 
-import java.util.List;
-
 import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.user.Account;
 import com.cloud.user.UserAccount;
-
 import org.apache.cloudstack.api.command.admin.account.DeleteAccountCmd;
 import org.apache.cloudstack.api.command.admin.account.DisableAccountCmd;
 import org.apache.cloudstack.api.command.admin.account.EnableAccountCmd;
@@ -36,9 +33,12 @@ import org.apache.cloudstack.api.command.admin.user.EnableUserCmd;
 import org.apache.cloudstack.api.command.admin.user.UpdateUserCmd;
 import org.apache.cloudstack.api.command.user.region.ListRegionsCmd;
 
+import java.util.List;
+
 public interface RegionService {
     /**
      * Adds a Region to the local Region
+     *
      * @param id
      * @param name
      * @param endPoint
@@ -48,6 +48,7 @@ public interface RegionService {
 
     /**
      * Update details of the Region with specified Id
+     *
      * @param id
      * @param name
      * @param endPoint
@@ -61,7 +62,9 @@ public interface RegionService {
      */
     public boolean removeRegion(int id);
 
-    /** List all Regions or by Id/Name
+    /**
+     * List all Regions or by Id/Name
+     *
      * @param id
      * @param name
      * @return List of Regions
@@ -71,8 +74,8 @@ public interface RegionService {
     /**
      * Deletes a user by userId
      * isPopagate flag is set to true if sent from peer Region
-     * @param cmd
      *
+     * @param cmd
      * @return true if delete was successful, false otherwise
      */
     boolean deleteUserAccount(DeleteAccountCmd cmd);
@@ -81,14 +84,14 @@ public interface RegionService {
      * Updates an account
      * isPopagate falg is set to true if sent from peer Region
      *
-     * @param cmd
-     *            - the parameter containing accountId or account nameand domainId
+     * @param cmd - the parameter containing accountId or account nameand domainId
      * @return updated account object
      */
     Account updateAccount(UpdateAccountCmd cmd);
 
     /**
      * Disables an account by accountName and domainId or accountId
+     *
      * @param cmd
      * @return
      * @throws ResourceUnavailableException
@@ -98,6 +101,7 @@ public interface RegionService {
 
     /**
      * Enables an account by accountId
+     *
      * @param cmd
      * @return
      */
@@ -105,6 +109,7 @@ public interface RegionService {
 
     /**
      * Deletes user by Id
+     *
      * @param deleteUserCmd
      * @return true if delete was successful, false otherwise
      */
@@ -113,14 +118,14 @@ public interface RegionService {
     /**
      * update an existing domain
      *
-     * @param cmd
-     *            - the command containing domainId and new domainName
+     * @param cmd - the command containing domainId and new domainName
      * @return Domain object if the command succeeded
      */
     public Domain updateDomain(UpdateDomainCmd updateDomainCmd);
 
     /**
      * Deletes domain
+     *
      * @param cmd
      * @return true if delete was successful, false otherwise
      */

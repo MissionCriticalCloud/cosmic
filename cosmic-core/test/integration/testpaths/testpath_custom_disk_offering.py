@@ -17,17 +17,16 @@
 """ Test case for Create Custom DiskOffering with size Test Path
 """
 
-from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.cloudstackAPI import (createDiskOffering, deleteDiskOffering)
-from marvin.lib.utils import (cleanup_resources)
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.common import (get_domain,
                                get_zone,
                                )
+from marvin.lib.utils import (cleanup_resources)
+from nose.plugins.attrib import attr
 
 
 class TestCustomDiskOfferingWithSize(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(

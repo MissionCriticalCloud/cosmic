@@ -19,10 +19,10 @@
 
 package org.apache.cloudstack.storage.command;
 
+import com.cloud.agent.api.to.DataTO;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import com.cloud.agent.api.to.DataTO;
 
 public final class CopyCommand extends StorageSubSystemCommand {
     private DataTO srcTO;
@@ -44,16 +44,16 @@ public final class CopyCommand extends StorageSubSystemCommand {
         return destTO;
     }
 
-    public void setSrcTO(final DataTO srcTO) {
-        this.srcTO = srcTO;
-    }
-
     public void setDestTO(final DataTO destTO) {
         this.destTO = destTO;
     }
 
     public DataTO getSrcTO() {
         return srcTO;
+    }
+
+    public void setSrcTO(final DataTO srcTO) {
+        this.srcTO = srcTO;
     }
 
     @Override
@@ -73,20 +73,20 @@ public final class CopyCommand extends StorageSubSystemCommand {
         return getWait() * 1000;
     }
 
-    public void setOptions(final Map<String, String> options) {
-        this.options = options;
-    }
-
     public Map<String, String> getOptions() {
         return options;
     }
 
-    public void setOptions2(final Map<String, String> options2) {
-        this.options2 = options2;
+    public void setOptions(final Map<String, String> options) {
+        this.options = options;
     }
 
     public Map<String, String> getOptions2() {
         return options2;
+    }
+
+    public void setOptions2(final Map<String, String> options2) {
+        this.options2 = options2;
     }
 
     @Override

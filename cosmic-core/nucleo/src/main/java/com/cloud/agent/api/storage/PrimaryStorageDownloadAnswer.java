@@ -47,12 +47,11 @@ public class PrimaryStorageDownloadAnswer extends Answer {
         this.installPath = installPath;
     }
 
-    public void setTemplateSize(long templateSize) {
-        this.templateSize = templateSize;
-    }
-
     public Long getTemplateSize() {
         return templateSize;
     }
 
+    public void setTemplateSize(long templateSize) {
+        this.templateSize = templateSize;
+    }
 }

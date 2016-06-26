@@ -19,65 +19,13 @@
 
 package com.cloud.agent.api.routing;
 
-import java.util.List;
-
 import com.cloud.agent.api.LogLevel;
 import com.cloud.agent.api.LogLevel.Log4jLevel;
 import com.cloud.network.VpnUser;
 
+import java.util.List;
+
 public class VpnUsersCfgCommand extends NetworkElementCommand {
-    public static class UsernamePassword {
-        private String username;
-        @LogLevel(Log4jLevel.Off)
-        private String password;
-        boolean add = true;
-
-        public boolean isAdd() {
-            return add;
-        }
-
-        public void setAdd(boolean add) {
-            this.add = add;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-
-        public UsernamePassword(String username, String password) {
-            super();
-            this.username = username;
-            this.password = password;
-        }
-
-        public UsernamePassword(String username, String password, boolean add) {
-            super();
-            this.username = username;
-            this.password = password;
-            this.add = add;
-        }
-
-        protected UsernamePassword() {
-            //for Gson
-        }
-
-        public String getUsernamePassword() {
-            return getUsername() + "," + getPassword();
-        }
-    }
-
     UsernamePassword[] userpwds;
 
     protected VpnUsersCfgCommand() {
@@ -104,4 +52,55 @@ public class VpnUsersCfgCommand extends NetworkElementCommand {
         return userpwds;
     }
 
+    public static class UsernamePassword {
+        boolean add = true;
+        private String username;
+        @LogLevel(Log4jLevel.Off)
+        private String password;
+
+        public UsernamePassword(String username, String password) {
+            super();
+            this.username = username;
+            this.password = password;
+        }
+
+        public UsernamePassword(String username, String password, boolean add) {
+            super();
+            this.username = username;
+            this.password = password;
+            this.add = add;
+        }
+
+        protected UsernamePassword() {
+            //for Gson
+        }
+
+        public boolean isAdd() {
+            return add;
+        }
+
+        public void setAdd(boolean add) {
+            this.add = add;
+        }
+
+        public String getUsernamePassword() {
+            return getUsername() + "," + getPassword();
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+    }
 }

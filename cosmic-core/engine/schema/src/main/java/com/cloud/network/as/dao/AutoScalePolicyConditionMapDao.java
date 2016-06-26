@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.network.as.dao;
 
-import java.util.List;
-
 import com.cloud.network.as.AutoScalePolicyConditionMapVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface AutoScalePolicyConditionMapDao extends GenericDao<AutoScalePolicyConditionMapVO, Long> {
     List<AutoScalePolicyConditionMapVO> listByAll(Long policyId, Long conditionId);

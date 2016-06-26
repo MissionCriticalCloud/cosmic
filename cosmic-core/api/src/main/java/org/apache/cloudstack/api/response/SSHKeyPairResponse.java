@@ -17,10 +17,10 @@
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 public class SSHKeyPairResponse extends BaseResponse {
 
@@ -28,13 +28,16 @@ public class SSHKeyPairResponse extends BaseResponse {
     @Param(description = "Name of the keypair")
     private String name;
 
-    @SerializedName(ApiConstants.ACCOUNT) @Param(description="the owner of the keypair")
+    @SerializedName(ApiConstants.ACCOUNT)
+    @Param(description = "the owner of the keypair")
     private String accountName;
 
-    @SerializedName(ApiConstants.DOMAIN_ID) @Param(description="the domain id of the keypair owner")
+    @SerializedName(ApiConstants.DOMAIN_ID)
+    @Param(description = "the domain id of the keypair owner")
     private String domainId;
 
-    @SerializedName(ApiConstants.DOMAIN) @Param(description="the domain name of the keypair owner")
+    @SerializedName(ApiConstants.DOMAIN)
+    @Param(description = "the domain name of the keypair owner")
     private String domain;
 
     @SerializedName("fingerprint")

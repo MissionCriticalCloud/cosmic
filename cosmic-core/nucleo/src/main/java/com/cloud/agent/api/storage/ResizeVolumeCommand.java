@@ -78,5 +78,4 @@ public class ResizeVolumeCommand extends Command {
     public boolean executeInSequence() {
         return false;
     }
-
 }

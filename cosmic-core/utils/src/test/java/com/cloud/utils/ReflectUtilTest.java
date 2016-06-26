@@ -19,12 +19,11 @@
 
 package com.cloud.utils;
 
+import static com.cloud.utils.ReflectUtil.flattenProperties;
+
+import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
-
-import static com.cloud.utils.ReflectUtil.flattenProperties;
-import static com.google.common.collect.Lists.newArrayList;
-
 import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Field;
@@ -44,7 +43,6 @@ public final class ReflectUtilTest {
         final Bean bean = new Bean(1, true, "foo");
 
         assertEquals(expectedResult, flattenProperties(bean, Bean.class));
-
     }
 
     @Test
@@ -55,12 +53,47 @@ public final class ReflectUtilTest {
         final Bean bean = new Bean(1, true, null);
 
         assertEquals(expectedResult, flattenProperties(bean, Bean.class));
-
     }
 
     @Test
     public void testFlattenPropertiesNullTarget() throws Exception {
         assertEquals(emptyList(), flattenProperties(null, Bean.class));
+    }
+
+    @Test
+    public void getAllFieldsForClassWithFoo() throws NoSuchFieldException, SecurityException {
+        final Set<Field> fooFields = ReflectUtil.getAllFieldsForClass(Foo.class, new Class<?>[]{});
+        Assert.assertNotNull(fooFields);
+        Assert.assertTrue(fooFields.contains(Foo.class.getDeclaredField("fooField")));
+        Assert.assertTrue(fooFields.contains(Foo.class.getDeclaredField("fooIntField")));
+    }
+
+    @Test
+    public void getAllFieldsForClassWithBar() throws NoSuchFieldException, SecurityException {
+        final Set<Field> barFields = ReflectUtil.getAllFieldsForClass(Bar.class, new Class<?>[]{});
+        Assert.assertNotNull(barFields);
+        Assert.assertTrue(barFields.contains(Foo.class.getDeclaredField("fooField")));
+        Assert.assertTrue(barFields.contains(Foo.class.getDeclaredField("fooIntField")));
+        Assert.assertTrue(barFields.contains(Bar.class.getDeclaredField("barField")));
+        Assert.assertTrue(barFields.contains(Bar.class.getDeclaredField("barIntField")));
+    }
+
+    @Test
+    public void getAllFieldsForClassWithBarWithoutFoo() throws NoSuchFieldException, SecurityException {
+        final Set<Field> barFields = ReflectUtil.getAllFieldsForClass(Bar.class, new Class<?>[]{Foo.class});
+        Assert.assertNotNull(barFields);
+        Assert.assertTrue(barFields.contains(Bar.class.getDeclaredField("barField")));
+        Assert.assertTrue(barFields.contains(Bar.class.getDeclaredField("barIntField")));
+    }
+
+    @Test
+    public void getAllFieldsForClassWithBazWithoutBar() throws NoSuchFieldException, SecurityException {
+        final Set<Field> bazFields = ReflectUtil.getAllFieldsForClass(Baz.class, new Class<?>[]{Bar.class});
+        Assert.assertNotNull(bazFields);
+        Assert.assertTrue(bazFields.contains(Foo.class.getDeclaredField("fooField")));
+        Assert.assertTrue(bazFields.contains(Foo.class.getDeclaredField("fooIntField")));
+        Assert.assertTrue(bazFields.contains(Baz.class.getDeclaredField("bazField")));
+        Assert.assertTrue(bazFields.contains(Baz.class.getDeclaredField("bazIntField")));
     }
 
     public static final class Bean {
@@ -76,7 +109,6 @@ public final class ReflectUtilTest {
             this.intProperty = intProperty;
             this.booleanProperty = booleanProperty;
             this.stringProperty = stringProperty;
-
         }
 
         public int getIntProperty() {
@@ -90,7 +122,6 @@ public final class ReflectUtilTest {
         public String getStringProperty() {
             return stringProperty;
         }
-
     }
 
     static class Empty {
@@ -110,41 +141,4 @@ public final class ReflectUtilTest {
         String bazField;
         int bazIntField;
     }
-
-    @Test
-    public void getAllFieldsForClassWithFoo() throws NoSuchFieldException, SecurityException {
-        Set<Field> fooFields = ReflectUtil.getAllFieldsForClass(Foo.class, new Class<?>[] {});
-        Assert.assertNotNull(fooFields);
-        Assert.assertTrue(fooFields.contains(Foo.class.getDeclaredField("fooField")));
-        Assert.assertTrue(fooFields.contains(Foo.class.getDeclaredField("fooIntField")));
-    }
-
-    @Test
-    public void getAllFieldsForClassWithBar() throws NoSuchFieldException, SecurityException {
-        Set<Field> barFields = ReflectUtil.getAllFieldsForClass(Bar.class, new Class<?>[] {});
-        Assert.assertNotNull(barFields);
-        Assert.assertTrue(barFields.contains(Foo.class.getDeclaredField("fooField")));
-        Assert.assertTrue(barFields.contains(Foo.class.getDeclaredField("fooIntField")));
-        Assert.assertTrue(barFields.contains(Bar.class.getDeclaredField("barField")));
-        Assert.assertTrue(barFields.contains(Bar.class.getDeclaredField("barIntField")));
-    }
-
-    @Test
-    public void getAllFieldsForClassWithBarWithoutFoo() throws NoSuchFieldException, SecurityException {
-        Set<Field> barFields = ReflectUtil.getAllFieldsForClass(Bar.class, new Class<?>[] {Foo.class});
-        Assert.assertNotNull(barFields);
-        Assert.assertTrue(barFields.contains(Bar.class.getDeclaredField("barField")));
-        Assert.assertTrue(barFields.contains(Bar.class.getDeclaredField("barIntField")));
-    }
-
-    @Test
-    public void getAllFieldsForClassWithBazWithoutBar() throws NoSuchFieldException, SecurityException {
-        Set<Field> bazFields = ReflectUtil.getAllFieldsForClass(Baz.class, new Class<?>[] {Bar.class});
-        Assert.assertNotNull(bazFields);
-        Assert.assertTrue(bazFields.contains(Foo.class.getDeclaredField("fooField")));
-        Assert.assertTrue(bazFields.contains(Foo.class.getDeclaredField("fooIntField")));
-        Assert.assertTrue(bazFields.contains(Baz.class.getDeclaredField("bazField")));
-        Assert.assertTrue(bazFields.contains(Baz.class.getDeclaredField("bazIntField")));
-    }
-
 }

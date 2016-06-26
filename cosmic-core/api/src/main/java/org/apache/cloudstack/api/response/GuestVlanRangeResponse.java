@@ -18,11 +18,11 @@ package org.apache.cloudstack.api.response;
 
 import com.cloud.network.GuestVlan;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = GuestVlan.class)
 @SuppressWarnings("unused")
@@ -73,6 +73,16 @@ public class GuestVlanRangeResponse extends BaseResponse implements ControlledEn
     }
 
     @Override
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    @Override
     public void setDomainId(String domainId) {
         this.domainId = domainId;
     }
@@ -86,16 +96,6 @@ public class GuestVlanRangeResponse extends BaseResponse implements ControlledEn
         this.guestVlanRange = guestVlanRange;
     }
 
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
     public void setPhysicalNetworkId(Long physicalNetworkId) {
         this.physicalNetworkId = physicalNetworkId;
     }
@@ -103,5 +103,4 @@ public class GuestVlanRangeResponse extends BaseResponse implements ControlledEn
     public void setZoneId(Long zoneId) {
         this.zoneId = zoneId;
     }
-
 }

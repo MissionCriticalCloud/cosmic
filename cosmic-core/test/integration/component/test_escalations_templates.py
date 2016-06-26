@@ -16,26 +16,24 @@
 # under the License.
 
 # Import Local Modules
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import (cleanup_resources,
-                              validateList)
+from marvin.codes import PASS
 from marvin.lib.base import (Account,
                              Zone,
                              Template,
-                             Hypervisor,
-                             ServiceOffering)
+                             Hypervisor)
 from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template,
                                list_os_types,
                                get_builtin_template_info)
-from marvin.codes import PASS
+from marvin.lib.utils import (cleanup_resources,
+                              validateList)
 from nose.plugins.attrib import attr
-import time
 
 
 class TestTemplates(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         try:
@@ -922,6 +920,3 @@ class TestTemplates(cloudstackTestCase):
             )
         del self.services["privatetemplate"]["ostype"]
         return
-
-
-

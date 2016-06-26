@@ -27,10 +27,10 @@ import com.cloud.vm.VirtualMachineProfile;
 
 public interface DhcpServiceProvider extends NetworkElement {
     boolean addDhcpEntry(Network network, NicProfile nic, VirtualMachineProfile vm, DeployDestination dest, ReservationContext context)
-        throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException;
+            throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException;
 
     boolean configDhcpSupportForSubnet(Network network, NicProfile nic, VirtualMachineProfile vm, DeployDestination dest, ReservationContext context)
-        throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException;
+            throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException;
 
     boolean removeDhcpSupportForSubnet(Network network) throws ResourceUnavailableException;
 }

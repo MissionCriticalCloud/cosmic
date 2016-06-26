@@ -21,14 +21,6 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.exception.InsufficientCapacityException;
@@ -54,11 +46,18 @@ import com.cloud.vm.NicVO;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.UserVmDao;
-
 import org.apache.cloudstack.api.ResponseGenerator;
 import org.apache.cloudstack.api.command.user.loadbalancer.AssignToLoadBalancerRuleCmd;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -70,41 +69,36 @@ import org.mockito.Spy;
 
 public class AssignLoadBalancerTest {
 
+    private static long domainId = 5L;
+    private static long accountId = 5L;
+    private static String accountName = "admin";
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
     @Inject
     AccountManager _accountMgr;
-
     @Inject
     AccountManager _acctMgr;
-
     @Inject
     AccountDao _accountDao;
-
     @Inject
     DomainDao _domainDao;
-
     @Mock
     List<LoadBalancerVMMapVO> _lbvmMapList;
-
     @Mock
     List<Nic> nic;
-
     @Mock
     UserVmDao userDao;
-
     @Spy
     RulesManagerImpl _rulesMgr = new RulesManagerImpl() {
         @Override
-        public void checkRuleAndUserVm (FirewallRule rule, UserVm userVm, Account caller) {
+        public void checkRuleAndUserVm(FirewallRule rule, UserVm userVm, Account caller) {
 
         }
     };
-
-
     @Spy
     NicVO nicvo = new NicVO() {
 
     };
-
     @Spy
     NetworkModelImpl _networkModel = new NetworkModelImpl() {
         @Override
@@ -115,20 +109,10 @@ public class AssignLoadBalancerTest {
             return nic;
         }
     };
-
-
     LoadBalancingRulesManagerImpl _lbMgr = new LoadBalancingRulesManagerImpl();
-
     private AssignToLoadBalancerRuleCmd assignToLbRuleCmd;
     private ResponseGenerator responseGenerator;
     private SuccessResponse successResponseGenerator;
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    private static long domainId = 5L;
-    private static long accountId = 5L;
-    private static String accountName = "admin";
 
     @Before
     public void setUp() {
@@ -142,7 +126,6 @@ public class AssignLoadBalancerTest {
         UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
 
         CallContext.register(user, account);
-
     }
 
     @Test(expected = InvalidParameterValueException.class)
@@ -151,12 +134,11 @@ public class AssignLoadBalancerTest {
         Map<Long, List<String>> emptyMap = new HashMap<Long, List<String>>();
 
         LoadBalancerDao lbdao = Mockito.mock(LoadBalancerDao.class);
-        _lbMgr._lbDao =  lbdao;
+        _lbMgr._lbDao = lbdao;
 
         when(lbdao.findById(anyLong())).thenReturn(Mockito.mock(LoadBalancerVO.class));
 
         _lbMgr.assignToLoadBalancer(1L, null, emptyMap);
-
     }
 
     @Test(expected = InvalidParameterValueException.class)
@@ -165,7 +147,7 @@ public class AssignLoadBalancerTest {
         Map<Long, List<String>> vmIdIpMap = new HashMap<Long, List<String>>();
         List<String> secIp = new ArrayList<String>();
         secIp.add("10.1.1.175");
-        vmIdIpMap.put(1L,secIp);
+        vmIdIpMap.put(1L, secIp);
 
         List<Long> vmIds = new ArrayList<Long>();
         vmIds.add(2L);
@@ -188,7 +170,6 @@ public class AssignLoadBalancerTest {
         _lbMgr.assignToLoadBalancer(1L, null, vmIdIpMap);
     }
 
-
     @Test(expected = InvalidParameterValueException.class)
     public void tesSecIpNotSetToVm() throws ResourceAllocationException, ResourceUnavailableException, InsufficientCapacityException {
 
@@ -197,7 +178,7 @@ public class AssignLoadBalancerTest {
         Map<Long, List<String>> vmIdIpMap = new HashMap<Long, List<String>>();
         List<String> secIp = new ArrayList<String>();
         secIp.add("10.1.1.175");
-        vmIdIpMap.put(1L,secIp);
+        vmIdIpMap.put(1L, secIp);
 
         List<Long> vmIds = new ArrayList<Long>();
         vmIds.add(2L);
@@ -207,7 +188,7 @@ public class AssignLoadBalancerTest {
         LoadBalancerDao lbDao = Mockito.mock(LoadBalancerDao.class);
         LoadBalancerVMMapDao lb2VmMapDao = Mockito.mock(LoadBalancerVMMapDao.class);
         UserVmDao userVmDao = Mockito.mock(UserVmDao.class);
-        NicSecondaryIpDao nicSecIpDao =  Mockito.mock(NicSecondaryIpDao.class);
+        NicSecondaryIpDao nicSecIpDao = Mockito.mock(NicSecondaryIpDao.class);
 
         _lbMgr._lbDao = lbDao;
         _lbMgr._lb2VmMapDao = lb2VmMapDao;
@@ -220,12 +201,10 @@ public class AssignLoadBalancerTest {
         when(lbDao.findById(anyLong())).thenReturn(lbVO);
         when(userVmDao.findById(anyLong())).thenReturn(Mockito.mock(UserVmVO.class));
         when(lb2VmMapDao.listByLoadBalancerId(anyLong(), anyBoolean())).thenReturn(_lbvmMapList);
-        when (nicSecIpDao.findByIp4AddressAndNicId(anyString(), anyLong())).thenReturn(null);
+        when(nicSecIpDao.findByIp4AddressAndNicId(anyString(), anyLong())).thenReturn(null);
 
         _lbMgr.assignToLoadBalancer(1L, null, vmIdIpMap);
     }
-
-
 
     @Test(expected = InvalidParameterValueException.class)
     public void testVmIdAlreadyExist() throws ResourceAllocationException, ResourceUnavailableException, InsufficientCapacityException {
@@ -235,7 +214,7 @@ public class AssignLoadBalancerTest {
         Map<Long, List<String>> vmIdIpMap = new HashMap<Long, List<String>>();
         List<String> secIp = new ArrayList<String>();
         secIp.add("10.1.1.175");
-        vmIdIpMap.put(1L,secIp);
+        vmIdIpMap.put(1L, secIp);
 
         List<Long> vmIds = new ArrayList<Long>();
         vmIds.add(2L);
@@ -245,7 +224,7 @@ public class AssignLoadBalancerTest {
         LoadBalancerDao lbDao = Mockito.mock(LoadBalancerDao.class);
         LoadBalancerVMMapDao lb2VmMapDao = Mockito.mock(LoadBalancerVMMapDao.class);
         UserVmDao userVmDao = Mockito.mock(UserVmDao.class);
-        NicSecondaryIpDao nicSecIpDao =  Mockito.mock(NicSecondaryIpDao.class);
+        NicSecondaryIpDao nicSecIpDao = Mockito.mock(NicSecondaryIpDao.class);
         LoadBalancerVMMapVO lbVmMapVO = new LoadBalancerVMMapVO(1L, 1L, "10.1.1.175", false);
 
         _lbMgr._lbDao = lbDao;
@@ -260,7 +239,7 @@ public class AssignLoadBalancerTest {
         when(lbDao.findById(anyLong())).thenReturn(lbVO);
         when(userVmDao.findById(anyLong())).thenReturn(Mockito.mock(UserVmVO.class));
         when(lb2VmMapDao.listByLoadBalancerId(anyLong(), anyBoolean())).thenReturn(_lbvmMapList);
-        when (nicSecIpDao.findByIp4AddressAndNicId(anyString(), anyLong())).thenReturn(null);
+        when(nicSecIpDao.findByIp4AddressAndNicId(anyString(), anyLong())).thenReturn(null);
 
         _lbMgr.assignToLoadBalancer(1L, null, vmIdIpMap);
     }
@@ -269,5 +248,4 @@ public class AssignLoadBalancerTest {
     public void tearDown() {
         CallContext.unregister();
     }
-
 }

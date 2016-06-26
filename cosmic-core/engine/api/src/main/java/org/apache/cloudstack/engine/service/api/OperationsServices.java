@@ -18,21 +18,21 @@
  */
 package org.apache.cloudstack.engine.service.api;
 
+import com.cloud.alert.Alert;
+
 import java.net.URL;
 import java.util.List;
 
-import com.cloud.alert.Alert;
-
 public interface OperationsServices {
-//    List<AsyncJob> listJobs();
-//
-//    List<AsyncJob> listJobsInProgress();
-//
-//    List<AsyncJob> listJobsCompleted();
-//
-//    List<AsyncJob> listJobsCompleted(Long from);
-//
-//    List<AsyncJob> listJobsInWaiting();
+    //    List<AsyncJob> listJobs();
+    //
+    //    List<AsyncJob> listJobsInProgress();
+    //
+    //    List<AsyncJob> listJobsCompleted();
+    //
+    //    List<AsyncJob> listJobsCompleted(Long from);
+    //
+    //    List<AsyncJob> listJobsInWaiting();
 
     void cancelJob(String job);
 
@@ -52,5 +52,4 @@ public interface OperationsServices {
      * @return the list of event topics someone can register for
      */
     List<String> listEventTopics();
-
 }

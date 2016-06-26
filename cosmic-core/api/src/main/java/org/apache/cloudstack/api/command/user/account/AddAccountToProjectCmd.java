@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.user.account;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.projects.Project;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -29,6 +28,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,10 +44,10 @@ public class AddAccountToProjectCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.PROJECT_ID,
-               type = CommandType.UUID,
-               entityType = ProjectResponse.class,
-               required = true,
-               description = "ID of the project to add the account to")
+            type = CommandType.UUID,
+            entityType = ProjectResponse.class,
+            required = true,
+            description = "ID of the project to add the account to")
     private Long projectId;
 
     @Parameter(name = ApiConstants.ACCOUNT, type = CommandType.STRING, description = "name of the account to be added to the project")
@@ -58,27 +58,6 @@ public class AddAccountToProjectCmd extends BaseAsyncCmd {
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
-    /////////////////////////////////////////////////////
-
-    public String getAccountName() {
-        return accountName;
-    }
-
-    public Long getProjectId() {
-        return projectId;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
 
     @Override
@@ -95,6 +74,27 @@ public class AddAccountToProjectCmd extends BaseAsyncCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to add account to the project");
         }
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 
     @Override

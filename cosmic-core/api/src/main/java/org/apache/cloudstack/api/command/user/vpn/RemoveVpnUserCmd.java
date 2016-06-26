@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.user.vpn;
 import com.cloud.event.EventTypes;
 import com.cloud.network.VpnUser;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -30,6 +29,7 @@ import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,9 +53,9 @@ public class RemoveVpnUserCmd extends BaseAsyncCmd {
     private Long projectId;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               description = "an optional domainId for the vpn user. If the account parameter is used, domainId must also be used.")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            description = "an optional domainId for the vpn user. If the account parameter is used, domainId must also be used.")
     private Long domainId;
 
     /////////////////////////////////////////////////////
@@ -70,12 +70,13 @@ public class RemoveVpnUserCmd extends BaseAsyncCmd {
         return domainId;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
     public Long getProjecId() {
         return projectId;
+    }
+
+    @Override
+    public String getEventType() {
+        return EventTypes.EVENT_VPN_USER_REMOVE;
     }
 
     /////////////////////////////////////////////////////
@@ -83,28 +84,12 @@ public class RemoveVpnUserCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, projectId, true);
-        if (accountId == null) {
-            return CallContext.current().getCallingAccount().getId();
-        }
-
-        return accountId;
-    }
-
-    @Override
     public String getEventDescription() {
         return "Remove Remote Access VPN user for account " + getEntityOwnerId() + " username= " + getUserName();
     }
 
-    @Override
-    public String getEventType() {
-        return EventTypes.EVENT_VPN_USER_REMOVE;
+    public String getUserName() {
+        return userName;
     }
 
     @Override
@@ -120,5 +105,20 @@ public class RemoveVpnUserCmd extends BaseAsyncCmd {
         }
         SuccessResponse response = new SuccessResponse(getCommandName());
         setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, projectId, true);
+        if (accountId == null) {
+            return CallContext.current().getCallingAccount().getId();
+        }
+
+        return accountId;
     }
 }

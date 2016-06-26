@@ -22,9 +22,9 @@ package org.apache.cloudstack.framework.messagebus;
 import org.apache.cloudstack.framework.serializer.MessageSerializer;
 
 public interface MessageBus {
-    void setMessageSerializer(MessageSerializer messageSerializer);
-
     MessageSerializer getMessageSerializer();
+
+    void setMessageSerializer(MessageSerializer messageSerializer);
 
     void subscribe(String subject, MessageSubscriber subscriber);
 

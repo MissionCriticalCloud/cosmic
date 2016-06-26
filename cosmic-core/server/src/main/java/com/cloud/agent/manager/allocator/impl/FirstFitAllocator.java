@@ -16,15 +16,6 @@
 // under the License.
 package com.cloud.agent.manager.allocator.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.agent.manager.allocator.HostAllocator;
 import com.cloud.capacity.CapacityManager;
 import com.cloud.capacity.CapacityVO;
@@ -57,8 +48,16 @@ import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -72,6 +71,9 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
     @Inject
     protected HostDao _hostDao = null;
     @Inject
+    protected ResourceManager _resourceMgr;
+    protected String _allocationAlgorithm = "random";
+    @Inject
     HostDetailsDao _hostDetailsDao = null;
     @Inject
     ConfigurationDao _configDao = null;
@@ -82,8 +84,6 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
     @Inject
     VMInstanceDao _vmInstanceDao = null;
     @Inject
-    protected ResourceManager _resourceMgr;
-    @Inject
     ClusterDao _clusterDao;
     @Inject
     ClusterDetailsDao _clusterDetailsDao;
@@ -93,10 +93,14 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
     CapacityManager _capacityMgr;
     @Inject
     CapacityDao _capacityDao;
-
     boolean _checkHvm = true;
-    protected String _allocationAlgorithm = "random";
 
+    @Override
+    public boolean isVirtualMachineUpgradable(VirtualMachine vm, ServiceOffering offering) {
+        // currently we do no special checks to rule out a VM being upgradable to an offering, so
+        // return true
+        return true;
+    }
 
     @Override
     public List<Host> allocateTo(VirtualMachineProfile vmProfile, DeploymentPlan plan, Type type, ExcludeList avoid, int returnUpTo) {
@@ -110,7 +114,7 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
         Long podId = plan.getPodId();
         Long clusterId = plan.getClusterId();
         ServiceOffering offering = vmProfile.getServiceOffering();
-        VMTemplateVO template = (VMTemplateVO)vmProfile.getTemplate();
+        VMTemplateVO template = (VMTemplateVO) vmProfile.getTemplate();
         Account account = vmProfile.getOwner();
 
         if (type == Host.Type.Storage) {
@@ -130,7 +134,7 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
 
         List<HostVO> clusterHosts = new ArrayList<HostVO>();
 
-        String haVmTag = (String)vmProfile.getParameter(VirtualMachineProfile.Param.HaTag);
+        String haVmTag = (String) vmProfile.getParameter(VirtualMachineProfile.Param.HaTag);
         if (haVmTag != null) {
             clusterHosts = _hostDao.listByHostTag(type, clusterId, podId, dcId, haVmTag);
         } else {
@@ -188,12 +192,12 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
 
     @Override
     public List<Host> allocateTo(VirtualMachineProfile vmProfile, DeploymentPlan plan, Type type, ExcludeList avoid, List<? extends Host> hosts, int returnUpTo,
-        boolean considerReservedCapacity) {
+                                 boolean considerReservedCapacity) {
         long dcId = plan.getDataCenterId();
         Long podId = plan.getPodId();
         Long clusterId = plan.getClusterId();
         ServiceOffering offering = vmProfile.getServiceOffering();
-        VMTemplateVO template = (VMTemplateVO)vmProfile.getTemplate();
+        VMTemplateVO template = (VMTemplateVO) vmProfile.getTemplate();
         Account account = vmProfile.getOwner();
         List<Host> suitableHosts = new ArrayList<Host>();
         List<Host> hostsCopy = new ArrayList<Host>(hosts);
@@ -209,7 +213,7 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
         boolean hasSvcOfferingTag = hostTagOnOffering != null ? true : false;
         boolean hasTemplateTag = hostTagOnTemplate != null ? true : false;
 
-        String haVmTag = (String)vmProfile.getParameter(VirtualMachineProfile.Param.HaTag);
+        String haVmTag = (String) vmProfile.getParameter(VirtualMachineProfile.Param.HaTag);
         if (haVmTag != null) {
             hostsCopy.retainAll(_hostDao.listByHostTag(type, clusterId, podId, dcId, haVmTag));
         } else {
@@ -249,13 +253,13 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
     }
 
     protected List<Host> allocateTo(DeploymentPlan plan, ServiceOffering offering, VMTemplateVO template, ExcludeList avoid, List<? extends Host> hosts, int returnUpTo,
-        boolean considerReservedCapacity, Account account) {
+                                    boolean considerReservedCapacity, Account account) {
         if (_allocationAlgorithm.equals("random") || _allocationAlgorithm.equals("userconcentratedpod_random")) {
             // Shuffle this so that we don't check the hosts in the same order.
             Collections.shuffle(hosts);
         } else if (_allocationAlgorithm.equals("userdispersing")) {
             hosts = reorderHostsByNumberOfVms(plan, hosts, account);
-        }else if(_allocationAlgorithm.equals("firstfitleastconsumed")){
+        } else if (_allocationAlgorithm.equals("firstfitleastconsumed")) {
             hosts = reorderHostsByCapacity(plan, hosts);
         }
 
@@ -294,17 +298,17 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
             if (_capacityMgr.checkIfHostReachMaxGuestLimit(host)) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Host name: " + host.getName() + ", hostId: " + host.getId() +
-                        " already has max Running VMs(count includes system VMs), skipping this and trying other available hosts");
+                            " already has max Running VMs(count includes system VMs), skipping this and trying other available hosts");
                 }
                 avoid.addHost(host.getId());
                 continue;
             }
 
             // Check if GPU device is required by offering and host has the availability
-            if ((offeringDetails   = _serviceOfferingDetailsDao.findDetail(serviceOfferingId, GPU.Keys.vgpuType.toString())) != null) {
+            if ((offeringDetails = _serviceOfferingDetailsDao.findDetail(serviceOfferingId, GPU.Keys.vgpuType.toString())) != null) {
                 ServiceOfferingDetailsVO groupName = _serviceOfferingDetailsDao.findDetail(serviceOfferingId, GPU.Keys.pciDevice.toString());
-                if(!_resourceMgr.isGPUDeviceAvailable(host.getId(), groupName.getValue(), offeringDetails.getValue())){
-                    s_logger.info("Host name: " + host.getName() + ", hostId: "+ host.getId() +" does not have required GPU devices available");
+                if (!_resourceMgr.isGPUDeviceAvailable(host.getId(), groupName.getValue(), offeringDetails.getValue())) {
+                    s_logger.info("Host name: " + host.getName() + ", hostId: " + host.getId() + " does not have required GPU devices available");
                     avoid.addHost(host.getId());
                     continue;
                 }
@@ -320,7 +324,7 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
 
             boolean hostHasCpuCapability = _capacityMgr.checkIfHostHasCpuCapability(host.getId(), offering.getCpu(), offering.getSpeed());
             boolean hostHasCapacity = _capacityMgr.checkIfHostHasCapacity(host.getId(), cpu_requested, ram_requested, false, cpuOvercommitRatio, memoryOvercommitRatio,
-                considerReservedCapacity);
+                    considerReservedCapacity);
 
             if (hostHasCpuCapability && hostHasCapacity) {
                 if (s_logger.isDebugEnabled()) {
@@ -340,37 +344,6 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
         }
 
         return suitableHosts;
-    }
-
-    // Reorder hosts in the decreasing order of free capacity.
-    private List<? extends Host> reorderHostsByCapacity(DeploymentPlan plan, List<? extends Host> hosts) {
-        Long clusterId = plan.getClusterId();
-        //Get capacity by which we should reorder
-        String capacityTypeToOrder = _configDao.getValue(Config.HostCapacityTypeToOrderClusters.key());
-        short capacityType = CapacityVO.CAPACITY_TYPE_CPU;
-        if("RAM".equalsIgnoreCase(capacityTypeToOrder)){
-            capacityType = CapacityVO.CAPACITY_TYPE_MEMORY;
-        }
-        List<Long> hostIdsByFreeCapacity = _capacityDao.orderHostsByFreeCapacity(clusterId, capacityType);
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("List of hosts in descending order of free capacity in the cluster: "+ hostIdsByFreeCapacity);
-        }
-
-        //now filter the given list of Hosts by this ordered list
-        Map<Long, Host> hostMap = new HashMap<Long, Host>();
-        for (Host host : hosts) {
-            hostMap.put(host.getId(), host);
-        }
-        List<Long> matchingHostIds = new ArrayList<Long>(hostMap.keySet());
-
-        hostIdsByFreeCapacity.retainAll(matchingHostIds);
-
-        List<Host> reorderedHosts = new ArrayList<Host>();
-        for(Long id: hostIdsByFreeCapacity){
-            reorderedHosts.add(hostMap.get(id));
-        }
-
-        return reorderedHosts;
     }
 
     private List<? extends Host> reorderHostsByNumberOfVms(DeploymentPlan plan, List<? extends Host> hosts, Account account) {
@@ -403,11 +376,35 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
         return reorderedHosts;
     }
 
-    @Override
-    public boolean isVirtualMachineUpgradable(VirtualMachine vm, ServiceOffering offering) {
-        // currently we do no special checks to rule out a VM being upgradable to an offering, so
-        // return true
-        return true;
+    // Reorder hosts in the decreasing order of free capacity.
+    private List<? extends Host> reorderHostsByCapacity(DeploymentPlan plan, List<? extends Host> hosts) {
+        Long clusterId = plan.getClusterId();
+        //Get capacity by which we should reorder
+        String capacityTypeToOrder = _configDao.getValue(Config.HostCapacityTypeToOrderClusters.key());
+        short capacityType = CapacityVO.CAPACITY_TYPE_CPU;
+        if ("RAM".equalsIgnoreCase(capacityTypeToOrder)) {
+            capacityType = CapacityVO.CAPACITY_TYPE_MEMORY;
+        }
+        List<Long> hostIdsByFreeCapacity = _capacityDao.orderHostsByFreeCapacity(clusterId, capacityType);
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("List of hosts in descending order of free capacity in the cluster: " + hostIdsByFreeCapacity);
+        }
+
+        //now filter the given list of Hosts by this ordered list
+        Map<Long, Host> hostMap = new HashMap<Long, Host>();
+        for (Host host : hosts) {
+            hostMap.put(host.getId(), host);
+        }
+        List<Long> matchingHostIds = new ArrayList<Long>(hostMap.keySet());
+
+        hostIdsByFreeCapacity.retainAll(matchingHostIds);
+
+        List<Host> reorderedHosts = new ArrayList<Host>();
+        for (Long id : hostIdsByFreeCapacity) {
+            reorderedHosts.add(hostMap.get(id));
+        }
+
+        return reorderedHosts;
     }
 
     protected List<? extends Host> prioritizeHosts(VMTemplateVO template, ServiceOffering offering, List<? extends Host> hosts) {
@@ -484,12 +481,20 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
                 }
             }
             // Move GPU enabled hosts to the end of list
-            if(!gpuEnabledHosts.isEmpty()) {
+            if (!gpuEnabledHosts.isEmpty()) {
                 prioritizedHosts.removeAll(gpuEnabledHosts);
                 prioritizedHosts.addAll(gpuEnabledHosts);
             }
         }
         return prioritizedHosts;
+    }
+
+    protected String getTemplateGuestOSCategory(VMTemplateVO template) {
+        long guestOSId = template.getGuestOSId();
+        GuestOSVO guestOS = _guestOSDao.findById(guestOSId);
+        long guestOSCategoryId = guestOS.getCategoryId();
+        GuestOSCategoryVO guestOSCategory = _guestOSCategoryDao.findById(guestOSCategoryId);
+        return guestOSCategory.getName();
     }
 
     protected boolean hostSupportsHVM(Host host) {
@@ -535,14 +540,6 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
         }
     }
 
-    protected String getTemplateGuestOSCategory(VMTemplateVO template) {
-        long guestOSId = template.getGuestOSId();
-        GuestOSVO guestOS = _guestOSDao.findById(guestOSId);
-        long guestOSCategoryId = guestOS.getCategoryId();
-        GuestOSCategoryVO guestOSCategory = _guestOSCategoryDao.findById(guestOSCategoryId);
-        return guestOSCategory.getName();
-    }
-
     @Override
     public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
         if (_configDao != null) {
@@ -567,5 +564,4 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
     public boolean stop() {
         return true;
     }
-
 }

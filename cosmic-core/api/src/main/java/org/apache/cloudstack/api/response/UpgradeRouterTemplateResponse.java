@@ -17,12 +17,12 @@
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
 import org.apache.cloudstack.jobs.JobInfo;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = JobInfo.class)
 @SuppressWarnings("unused")

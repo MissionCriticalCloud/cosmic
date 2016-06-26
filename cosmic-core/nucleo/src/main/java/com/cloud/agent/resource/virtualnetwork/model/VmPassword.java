@@ -48,5 +48,4 @@ public class VmPassword extends ConfigBase {
     public void setPassword(String password) {
         this.password = password;
     }
-
 }

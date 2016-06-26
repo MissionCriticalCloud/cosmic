@@ -19,8 +19,8 @@ package org.apache.cloudstack.region.dao;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.region.RegionVO;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -38,8 +38,8 @@ public class RegionDaoImpl extends GenericDaoBase<RegionVO, Integer> implements 
     }
 
     @Override
-    public RegionVO findByName(String name) {
-        SearchCriteria<RegionVO> sc = NameSearch.create();
+    public RegionVO findByName(final String name) {
+        final SearchCriteria<RegionVO> sc = NameSearch.create();
         sc.setParameters("name", name);
         return findOneBy(sc);
     }

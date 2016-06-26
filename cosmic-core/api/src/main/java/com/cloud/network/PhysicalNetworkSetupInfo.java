@@ -37,31 +37,31 @@ public class PhysicalNetworkSetupInfo {
         return privateNetworkName;
     }
 
+    public void setPrivateNetworkName(final String privateNetworkName) {
+        this.privateNetworkName = privateNetworkName;
+    }
+
     public String getPublicNetworkName() {
         return publicNetworkName;
+    }
+
+    public void setPublicNetworkName(final String publicNetworkName) {
+        this.publicNetworkName = publicNetworkName;
     }
 
     public String getGuestNetworkName() {
         return guestNetworkName;
     }
 
+    public void setGuestNetworkName(final String guestNetworkName) {
+        this.guestNetworkName = guestNetworkName;
+    }
+
     public String getStorageNetworkName() {
         return storageNetworkName;
     }
 
-    public void setPrivateNetworkName(String privateNetworkName) {
-        this.privateNetworkName = privateNetworkName;
-    }
-
-    public void setPublicNetworkName(String publicNetworkName) {
-        this.publicNetworkName = publicNetworkName;
-    }
-
-    public void setGuestNetworkName(String guestNetworkName) {
-        this.guestNetworkName = guestNetworkName;
-    }
-
-    public void setStorageNetworkName(String storageNetworkName) {
+    public void setStorageNetworkName(final String storageNetworkName) {
         this.storageNetworkName = storageNetworkName;
     }
 
@@ -69,7 +69,7 @@ public class PhysicalNetworkSetupInfo {
         return physicalNetworkId;
     }
 
-    public void setPhysicalNetworkId(Long physicalNetworkId) {
+    public void setPhysicalNetworkId(final Long physicalNetworkId) {
         this.physicalNetworkId = physicalNetworkId;
     }
 
@@ -77,8 +77,7 @@ public class PhysicalNetworkSetupInfo {
         return mgmtVlan;
     }
 
-    public void setMgmtVlan(String mgmtVlan) {
+    public void setMgmtVlan(final String mgmtVlan) {
         this.mgmtVlan = mgmtVlan;
     }
-
 }

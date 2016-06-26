@@ -19,9 +19,9 @@
 
 package com.cloud.agent.api;
 
-import java.util.List;
-
 import com.cloud.agent.api.to.PortForwardingRuleTO;
+
+import java.util.List;
 
 /**
  *
@@ -59,5 +59,4 @@ public class ConfigurePortForwardingRulesOnLogicalRouterCommand extends Command 
     public boolean executeInSequence() {
         return false;
     }
-
 }

@@ -16,14 +16,6 @@
 // under the License.
 package org.apache.cloudstack.internallbvmmgr;
 
-import java.lang.reflect.Field;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.manager.Commands;
@@ -61,9 +53,17 @@ import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-
 import org.apache.cloudstack.lb.ApplicationLoadBalancerRuleVO;
 import org.apache.cloudstack.network.lb.InternalLoadBalancerVMManager;
+
+import javax.inject.Inject;
+import java.lang.reflect.Field;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,11 +72,8 @@ import org.mockito.Mockito;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import junit.framework.TestCase;
-
 /**
  * Set of unittests for InternalLoadBalancerVMManager
- *
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -176,7 +173,40 @@ public class InternalLBVMManagerTest extends TestCase {
 
         Mockito.when(_domainRouterDao.findById(validVmId)).thenReturn(vm);
         Mockito.when(_domainRouterDao.findById(invalidVmId)).thenReturn(null);
+    }
 
+    private static ServiceOfferingVO setId(final ServiceOfferingVO vo, final long id) {
+        final ServiceOfferingVO voToReturn = vo;
+        final Class<?> c = voToReturn.getClass();
+        try {
+            final Field f = c.getSuperclass().getDeclaredField("id");
+            f.setAccessible(true);
+            f.setLong(voToReturn, id);
+        } catch (final NoSuchFieldException ex) {
+            return null;
+        } catch (final IllegalAccessException ex) {
+            return null;
+        }
+
+        return voToReturn;
+    }
+
+    //TESTS FOR findInternalLbVms METHOD
+
+    private static DomainRouterVO setId(final DomainRouterVO vo, final long id) {
+        final DomainRouterVO voToReturn = vo;
+        final Class<?> c = voToReturn.getClass();
+        try {
+            final Field f = c.getSuperclass().getDeclaredField("id");
+            f.setAccessible(true);
+            f.setLong(voToReturn, id);
+        } catch (final NoSuchFieldException ex) {
+            return null;
+        } catch (final IllegalAccessException ex) {
+            return null;
+        }
+
+        return voToReturn;
     }
 
     protected NetworkVO createNetwork() {
@@ -191,7 +221,21 @@ public class InternalLBVMManagerTest extends TestCase {
         return ntwk;
     }
 
-    //TESTS FOR findInternalLbVms METHOD
+    private static NetworkVO setId(final NetworkVO vo, final long id) {
+        final NetworkVO voToReturn = vo;
+        final Class<?> c = voToReturn.getClass();
+        try {
+            final Field f = c.getDeclaredField("id");
+            f.setAccessible(true);
+            f.setLong(voToReturn, id);
+        } catch (final NoSuchFieldException ex) {
+            return null;
+        } catch (final IllegalAccessException ex) {
+            return null;
+        }
+
+        return voToReturn;
+    }
 
     @Test
     public void findInternalLbVmsForInvalidNetwork() {
@@ -335,53 +379,4 @@ public class InternalLBVMManagerTest extends TestCase {
             assertTrue("Failed to destroy valid vm", result);
         }
     }
-
-    private static ServiceOfferingVO setId(final ServiceOfferingVO vo, final long id) {
-        final ServiceOfferingVO voToReturn = vo;
-        final Class<?> c = voToReturn.getClass();
-        try {
-            final Field f = c.getSuperclass().getDeclaredField("id");
-            f.setAccessible(true);
-            f.setLong(voToReturn, id);
-        } catch (final NoSuchFieldException ex) {
-            return null;
-        } catch (final IllegalAccessException ex) {
-            return null;
-        }
-
-        return voToReturn;
-    }
-
-    private static NetworkVO setId(final NetworkVO vo, final long id) {
-        final NetworkVO voToReturn = vo;
-        final Class<?> c = voToReturn.getClass();
-        try {
-            final Field f = c.getDeclaredField("id");
-            f.setAccessible(true);
-            f.setLong(voToReturn, id);
-        } catch (final NoSuchFieldException ex) {
-            return null;
-        } catch (final IllegalAccessException ex) {
-            return null;
-        }
-
-        return voToReturn;
-    }
-
-    private static DomainRouterVO setId(final DomainRouterVO vo, final long id) {
-        final DomainRouterVO voToReturn = vo;
-        final Class<?> c = voToReturn.getClass();
-        try {
-            final Field f = c.getSuperclass().getDeclaredField("id");
-            f.setAccessible(true);
-            f.setLong(voToReturn, id);
-        } catch (final NoSuchFieldException ex) {
-            return null;
-        } catch (final IllegalAccessException ex) {
-            return null;
-        }
-
-        return voToReturn;
-    }
-
 }

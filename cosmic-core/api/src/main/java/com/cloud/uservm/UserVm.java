@@ -17,7 +17,6 @@
 package com.cloud.uservm;
 
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 
 /**
@@ -31,9 +30,9 @@ public interface UserVm extends VirtualMachine, ControlledEntity {
 
     String getUserData();
 
-    String getPassword();
-
     void setUserData(String userData);
+
+    String getPassword();
 
     String getDetail(String name);
 

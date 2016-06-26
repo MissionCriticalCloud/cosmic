@@ -29,7 +29,7 @@ public class ValidateSnapshotAnswer extends Answer {
     }
 
     public ValidateSnapshotAnswer(ValidateSnapshotCommand cmd, boolean success, String result, String expectedSnapshotBackupUuid, String actualSnapshotBackupUuid,
-            String actualSnapshotUuid) {
+                                  String actualSnapshotUuid) {
         super(cmd, success, result);
         this.expectedSnapshotBackupUuid = expectedSnapshotBackupUuid;
         this.actualSnapshotBackupUuid = actualSnapshotBackupUuid;

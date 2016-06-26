@@ -25,7 +25,6 @@ import com.cloud.exception.VirtualMachineMigrationException;
 import com.cloud.host.Host;
 import com.cloud.user.Account;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -37,10 +36,12 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.HostResponse;
 import org.apache.cloudstack.api.response.SystemVmResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "migrateSystemVm", description = "Attempts Migration of a system virtual machine to the host specified.", responseObject = SystemVmResponse.class, entityType = {VirtualMachine.class},
+@APICommand(name = "migrateSystemVm", description = "Attempts Migration of a system virtual machine to the host specified.", responseObject = SystemVmResponse.class, entityType
+        = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class MigrateSystemVMCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(MigrateSystemVMCmd.class.getName());
@@ -52,50 +53,23 @@ public class MigrateSystemVMCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.HOST_ID,
-               type = CommandType.UUID,
-               entityType = HostResponse.class,
-               required = true,
-               description = "destination Host ID to migrate VM to")
+            type = CommandType.UUID,
+            entityType = HostResponse.class,
+            required = true,
+            description = "destination Host ID to migrate VM to")
     private Long hostId;
 
     @ACL(accessType = AccessType.OperateEntry)
     @Parameter(name = ApiConstants.VIRTUAL_MACHINE_ID,
-               type = CommandType.UUID,
-               entityType = SystemVmResponse.class,
-               required = true,
-               description = "the ID of the virtual machine")
+            type = CommandType.UUID,
+            entityType = SystemVmResponse.class,
+            required = true,
+            description = "the ID of the virtual machine")
     private Long virtualMachineId;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public Long getHostId() {
-        return hostId;
-    }
-
-    public Long getVirtualMachineId() {
-        return virtualMachineId;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Account account = CallContext.current().getCallingAccount();
-        if (account != null) {
-            return account.getId();
-        }
-
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
 
     @Override
     public String getEventType() {
@@ -105,6 +79,18 @@ public class MigrateSystemVMCmd extends BaseAsyncCmd {
     @Override
     public String getEventDescription() {
         return "Attempting to migrate VM Id: " + getVirtualMachineId() + " to host Id: " + getHostId();
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public Long getVirtualMachineId() {
+        return virtualMachineId;
+    }
+
+    public Long getHostId() {
+        return hostId;
     }
 
     @Override
@@ -139,5 +125,20 @@ public class MigrateSystemVMCmd extends BaseAsyncCmd {
             s_logger.warn("Exception: ", e);
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, e.getMessage());
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        Account account = CallContext.current().getCallingAccount();
+        if (account != null) {
+            return account.getId();
+        }
+
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 }

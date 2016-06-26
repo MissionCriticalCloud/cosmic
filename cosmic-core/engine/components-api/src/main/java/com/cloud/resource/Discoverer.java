@@ -16,18 +16,17 @@
 // under the License.
 package com.cloud.resource;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.exception.DiscoveryException;
 import com.cloud.host.HostVO;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.utils.component.Adapter;
 
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Discoverer encapsulates interfaces that will discover resources.
- *
  */
 public interface Discoverer extends Adapter {
     /**
@@ -39,7 +38,7 @@ public interface Discoverer extends Adapter {
      * @return ServerResource
      */
     Map<? extends ServerResource, Map<String, String>> find(long dcId, Long podId, Long clusterId, URI uri, String username, String password, List<String> hostTags)
-        throws DiscoveryException;
+            throws DiscoveryException;
 
     void postDiscovery(List<HostVO> hosts, long msId) throws DiscoveryException;
 
@@ -50,5 +49,4 @@ public interface Discoverer extends Adapter {
     public void putParam(Map<String, String> params);
 
     ServerResource reloadResource(HostVO host);
-
 }

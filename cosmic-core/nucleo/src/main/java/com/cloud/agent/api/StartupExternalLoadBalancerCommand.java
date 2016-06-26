@@ -25,5 +25,4 @@ public class StartupExternalLoadBalancerCommand extends StartupCommand {
     public StartupExternalLoadBalancerCommand() {
         super(Host.Type.ExternalLoadBalancer);
     }
-
 }

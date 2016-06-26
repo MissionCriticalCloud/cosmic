@@ -19,10 +19,10 @@
 
 package com.cloud.agent.api.storage;
 
-import java.util.Map;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.storage.template.TemplateProp;
+
+import java.util.Map;
 
 public class ListVolumeAnswer extends Answer {
     private String secUrl;
@@ -46,11 +46,11 @@ public class ListVolumeAnswer extends Answer {
         this.templateInfos = templateInfos;
     }
 
-    public void setSecUrl(String secUrl) {
-        this.secUrl = secUrl;
-    }
-
     public String getSecUrl() {
         return secUrl;
+    }
+
+    public void setSecUrl(String secUrl) {
+        this.secUrl = secUrl;
     }
 }

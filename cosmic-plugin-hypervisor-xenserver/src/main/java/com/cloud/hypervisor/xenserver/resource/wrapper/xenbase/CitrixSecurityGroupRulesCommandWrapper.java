@@ -25,12 +25,12 @@ import com.cloud.agent.api.SecurityGroupRulesCmd;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.xensource.xenapi.Connection;
 
+import com.xensource.xenapi.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  SecurityGroupRulesCmd.class)
+@ResourceWrapper(handles = SecurityGroupRulesCmd.class)
 public final class CitrixSecurityGroupRulesCommandWrapper extends CommandWrapper<SecurityGroupRulesCmd, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixSecurityGroupRulesCommandWrapper.class);

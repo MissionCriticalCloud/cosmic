@@ -17,14 +17,15 @@
 
 package com.cloud.api.dispatch;
 
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseCmd;
+import org.apache.cloudstack.api.Parameter;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.Parameter;
 import org.apache.log4j.Logger;
 
 /**
@@ -37,9 +38,9 @@ import org.apache.log4j.Logger;
  */
 public class ParamGenericValidationWorker implements DispatchWorker {
 
-    static Logger s_logger = Logger.getLogger(ParamGenericValidationWorker.class.getName());
-
     protected static final List<String> defaultParamNames = new ArrayList<String>();
+    protected static final String ERROR_MSG_PREFIX = "Unknown parameters :";
+    static Logger s_logger = Logger.getLogger(ParamGenericValidationWorker.class.getName());
 
     static {
         defaultParamNames.add(ApiConstants.ACCOUNT_ID);
@@ -69,8 +70,6 @@ public class ParamGenericValidationWorker implements DispatchWorker {
         defaultParamNames.add("_");
     }
 
-    protected static final String ERROR_MSG_PREFIX = "Unknown parameters :";
-
     @SuppressWarnings("rawtypes")
     @Override
     public void handle(final DispatchTask task) {
@@ -90,9 +89,9 @@ public class ParamGenericValidationWorker implements DispatchWorker {
                     break;
                 }
             }
-            if (!matchedCurrentParam && !((String)actualParamName).equalsIgnoreCase("expires") && !((String)actualParamName).equalsIgnoreCase("signatureversion")) {
+            if (!matchedCurrentParam && !((String) actualParamName).equalsIgnoreCase("expires") && !((String) actualParamName).equalsIgnoreCase("signatureversion")) {
                 errorMsg.append(" ").append(actualParamName);
-                foundUnknownParam= true;
+                foundUnknownParam = true;
             }
         }
 

@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.offerings.dao;
 
-import java.util.Map;
-
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Detail;
 import com.cloud.offerings.NetworkOfferingDetailsVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Map;
 
 public interface NetworkOfferingDetailsDao extends GenericDao<NetworkOfferingDetailsVO, Long> {
 

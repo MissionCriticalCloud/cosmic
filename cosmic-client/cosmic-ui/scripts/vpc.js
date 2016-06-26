@@ -14,12 +14,12 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-(function($, cloudStack) {
-    var assignVMAction = function() {
+(function ($, cloudStack) {
+    var assignVMAction = function () {
         return {
             label: 'label.assign.vms',
             messages: {
-                notification: function(args) {
+                notification: function (args) {
                     return 'label.assign.vms';
                 }
             },
@@ -31,7 +31,7 @@
                 subselect: {
                     isMultiple: true,
                     label: 'label.use.vm.ip',
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var instance = args.context.instances[0];
                         var network = args.context.networks[0];
 
@@ -41,13 +41,15 @@
                                 virtualmachineid: instance.id,
                                 nicId: instance.nic[0].id
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 var nic = json.listnicsresponse.nic[0];
                                 var primaryIp = nic.ipaddress;
                                 var secondaryIps = nic.secondaryip ? nic.secondaryip : [];
                                 var ipSelection = [];
                                 var existingIps = $(args.context.subItemData).map(
-                                    function(index, item) { return item.itemIp; }
+                                    function (index, item) {
+                                        return item.itemIp;
+                                    }
                                 );
 
                                 // Add primary IP as default
@@ -59,7 +61,7 @@
                                 }
 
                                 // Add secondary IPs
-                                $(secondaryIps).map(function(index, secondaryIp) {
+                                $(secondaryIps).map(function (index, secondaryIp) {
                                     if ($.inArray(secondaryIp.ipaddress, existingIps) == -1) {
                                         ipSelection.push({
                                             id: secondaryIp.ipaddress,
@@ -75,7 +77,7 @@
                         });
                     }
                 },
-                dataProvider: function(args) {
+                dataProvider: function (args) {
                     var assignedInstances;
                     $.ajax({
                         url: createURL('listLoadBalancers'),
@@ -83,7 +85,7 @@
                             id: args.context.internalLoadBalancers[0].id
                         },
                         async: false,
-                        success: function(json) {
+                        success: function (json) {
                             assignedInstances = json.listloadbalancersresponse.loadbalancer[0].loadbalancerinstance;
                             if (assignedInstances == null)
                                 assignedInstances = [];
@@ -96,16 +98,16 @@
                             networkid: args.context.networks[0].id,
                             listAll: true
                         },
-                        success: function(json) {
+                        success: function (json) {
                             var instances = json.listvirtualmachinesresponse.virtualmachine;
 
                             // Pre-select existing instances in LB rule
-                            $(instances).map(function(index, instance) {
+                            $(instances).map(function (index, instance) {
                                 instance._isSelected = $.grep(assignedInstances,
-                                                              function(assignedInstance) {
-                                                                  return assignedInstance.id == instance.id;
-                                                              }
-                                                             ).length ? true : false;
+                                    function (assignedInstance) {
+                                        return assignedInstance.id == instance.id;
+                                    }
+                                ).length ? true : false;
                             });
 
                             //remove assigned VMs (i.e. instance._isSelected == true)
@@ -126,7 +128,7 @@
                     });
                 }
             }),
-            action: function(args) {
+            action: function (args) {
                 /*
                  * path 1: Network > VPC (list) > click "Configure" > pick an internal LB tier > click "Internal LB" (list) > click on a grid row (Details tab) > click "Assign VMs" tab > click Assign VMs" button on top of list
                  * path 2: Network > VPC (list) > click "Configure" > pick an internal LB tier > click "Internal LB" (list) > "QuickView" on a grid row > click "Assign VMs" button in QuickView
@@ -135,12 +137,12 @@
                 var vms = args.context.instances;
 
                 // Assign subselect values
-                $(vms).each(function() {
+                $(vms).each(function () {
                     var vm = this;
-                    var $vmRow = $rows.filter(function() {
+                    var $vmRow = $rows.filter(function () {
                         return $(this).data('json-obj') === vm;
                     });
-                    $.extend(vm, { _subselect: $vmRow.find('.subselect select').val() });
+                    $.extend(vm, {_subselect: $vmRow.find('.subselect select').val()});
                 });
 
                 var inputData = {
@@ -174,7 +176,7 @@
                     data: inputData,
                     dataType: 'json',
                     async: true,
-                    success: function(data) {
+                    success: function (data) {
                         var jid = data.assigntoloadbalancerruleresponse.jobid;
                         args.response.success({
                             _custom: {
@@ -195,7 +197,7 @@
 
         reorder: {
             moveDrag: {
-                action: function(args) {
+                action: function (args) {
                     var rule = args.context.multiRule[0];
                     var number = 0;
                     var prevItem = args.prevItem ? args.prevItem.number : null;
@@ -217,17 +219,17 @@
                             id: rule.id,
                             number: number
                         },
-                        success: function(json) {
-                            var pollTimer = setInterval(function() {
+                        success: function (json) {
+                            var pollTimer = setInterval(function () {
                                 pollAsyncJobResult({
                                     _custom: {
                                         jobId: json.createnetworkaclresponse.jobid
                                     },
-                                    complete: function() {
+                                    complete: function () {
                                         clearInterval(pollTimer);
                                         args.response.success();
                                     },
-                                    error: function(errorMsg) {
+                                    error: function (errorMsg) {
                                         clearInterval(pollTimer);
                                         args.response.error(errorMsg);
                                     }
@@ -255,7 +257,7 @@
             action: {
                 label: 'label.action',
                 isEditable: true,
-                select: function(args) {
+                select: function (args) {
                     args.response.success({
                         data: [{
                             name: 'Allow',
@@ -270,10 +272,10 @@
             'protocol': {
                 label: 'label.protocol',
                 isEditable: true,
-                select: function(args) {
+                select: function (args) {
                     var isEditDialog = args.type === 'createForm';
 
-                    args.$select.change(function() {
+                    args.$select.change(function () {
                         var $inputs, $icmpFields, $otherFields, $portFields, $protocolFields, $protocolinput;
 
                         //
@@ -281,15 +283,15 @@
                         //
                         if (isEditDialog) {
                             $inputs = args.$form.find('.form-item');
-                            $icmpFields = $inputs.filter(function() {
+                            $icmpFields = $inputs.filter(function () {
                                 var name = $(this).attr('rel');
 
                                 return $.inArray(name, [
-                                    'icmptype',
-                                    'icmpcode'
-                                ]) > -1;
+                                        'icmptype',
+                                        'icmpcode'
+                                    ]) > -1;
                             });
-                            $otherFields = $inputs.filter(function() {
+                            $otherFields = $inputs.filter(function () {
                                 var name = $(this).attr('rel');
 
                                 return name != 'protocolnumber' &&
@@ -298,14 +300,14 @@
                                     name != 'cidrlist' &&
                                     name != 'number';
                             });
-                            $portFields = $inputs.filter(function() {
+                            $portFields = $inputs.filter(function () {
                                 var name = $(this).attr('rel');
                                 return $.inArray(name, [
-                                    'startport',
-                                    'endport'
-                                ]) > -1;
+                                        'startport',
+                                        'endport'
+                                    ]) > -1;
                             });
-                            $protocolFields = $inputs.filter(function() {
+                            $protocolFields = $inputs.filter(function () {
                                 var name = $(this).attr('rel');
 
                                 return $.inArray(name, ['protocolnumber']) > -1;
@@ -333,15 +335,15 @@
                             // Add new form
                             //
                             $inputs = args.$form.find('input');
-                            $icmpFields = $inputs.filter(function() {
+                            $icmpFields = $inputs.filter(function () {
                                 var name = $(this).attr('name');
 
                                 return $.inArray(name, [
-                                    'icmptype',
-                                    'icmpcode'
-                                ]) > -1;
+                                        'icmptype',
+                                        'icmpcode'
+                                    ]) > -1;
                             });
-                            $otherFields = $inputs.filter(function() {
+                            $otherFields = $inputs.filter(function () {
                                 var name = $(this).attr('name');
 
                                 return name != 'protocolnumber' &&
@@ -350,16 +352,16 @@
                                     name != 'cidrlist' &&
                                     name != 'number';
                             });
-                            $portFields = $inputs.filter(function() {
+                            $portFields = $inputs.filter(function () {
                                 var name = $(this).attr('name');
                                 return $.inArray(name, [
-                                    'startport',
-                                    'endport'
-                                ]) > -1;
+                                        'startport',
+                                        'endport'
+                                    ]) > -1;
                             });
 
                             $protocolinput = args.$form.find('td input');
-                            $protocolFields = $protocolinput.filter(function() {
+                            $protocolFields = $protocolinput.filter(function () {
                                 var name = $(this).attr('name');
 
                                 return $.inArray(name, ['protocolnumber']) > -1;
@@ -394,26 +396,26 @@
 
                     args.response.success({
                         data: [{
-                                name: 'tcp',
-                                description: 'TCP'
-                            }, {
-                                name: 'udp',
-                                description: 'UDP'
-                            }, {
-                                name: 'icmp',
-                                description: 'ICMP'
-                            }, {
-                                name: 'all',
-                                description: 'ALL'
-                            }, {
-                                name: 'protocolnumber',
-                                description: 'Protocol Number'
-                            }
+                            name: 'tcp',
+                            description: 'TCP'
+                        }, {
+                            name: 'udp',
+                            description: 'UDP'
+                        }, {
+                            name: 'icmp',
+                            description: 'ICMP'
+                        }, {
+                            name: 'all',
+                            description: 'ALL'
+                        }, {
+                            name: 'protocolnumber',
+                            description: 'Protocol Number'
+                        }
 
                         ]
                     });
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         args.$select.trigger('change');
                     }, 100);
                 }
@@ -438,7 +440,7 @@
             },
             'networkid': {
                 label: 'label.select.tier',
-                select: function(args) {
+                select: function (args) {
                     var data = {
                         listAll: true,
                         vpcid: args.context.vpc[0].id
@@ -457,11 +459,11 @@
                     $.ajax({
                         url: createURL('listNetworks'),
                         data: data,
-                        success: function(json) {
+                        success: function (json) {
                             var networks = json.listnetworksresponse.network;
 
                             args.response.success({
-                                data: $(networks).map(function(index, network) {
+                                data: $(networks).map(function (index, network) {
                                     return {
                                         name: network.id,
                                         description: network.name
@@ -491,7 +493,7 @@
             'traffictype': {
                 label: 'label.traffic.type',
                 isEditable: true,
-                select: function(args) {
+                select: function (args) {
                     args.response.success({
                         data: [{
                             name: 'Ingress',
@@ -516,7 +518,7 @@
 
         add: {
             label: 'label.add',
-            action: function(args) {
+            action: function (args) {
                 var $multi = args.$multi;
                 //Support for Protocol Number between 0 to 255
                 if (args.data.protocol === 'protocolnumber') {
@@ -547,11 +549,11 @@
                             aclid: args.context.aclLists[0].id
                         }),
                         dataType: 'json',
-                        success: function(data) {
+                        success: function (data) {
                             args.response.success({
                                 _custom: {
                                     jobId: data.createnetworkaclresponse.jobid,
-                                    getUpdatedItem: function(json) {
+                                    getUpdatedItem: function (json) {
                                         $(window).trigger('cloudStack.fullRefresh');
 
                                         return data;
@@ -563,7 +565,7 @@
                                 }
                             });
                         },
-                        error: function(data) {
+                        error: function (data) {
                             args.response.error(parseXMLHttpResponse(data));
                         }
                     });
@@ -573,7 +575,7 @@
         actions: {
             edit: {
                 label: 'label.edit',
-                action: function(args) {
+                action: function (args) {
                     var data = {
                         id: args.context.multiRule[0].id,
                         cidrlist: args.data.cidrlist,
@@ -606,7 +608,7 @@
                     $.ajax({
                         url: createURL('updateNetworkACLItem'),
                         data: data,
-                        success: function(json) {
+                        success: function (json) {
                             args.response.success({
                                 _custom: {
                                     jobId: json.createnetworkaclresponse.jobid
@@ -617,7 +619,7 @@
                                 }
                             });
                         },
-                        error: function(error) {
+                        error: function (error) {
                             args.response.error(parseXMLHttpResponse(error));
                         }
                     });
@@ -625,7 +627,7 @@
             },
             destroy: {
                 label: 'label.remove.ACL',
-                action: function(args) {
+                action: function (args) {
                     $.ajax({
                         url: createURL('deleteNetworkACL'),
                         data: {
@@ -633,12 +635,12 @@
                         },
                         dataType: 'json',
                         async: true,
-                        success: function(data) {
+                        success: function (data) {
                             var jobID = data.deletenetworkaclresponse.jobid;
                             args.response.success({
                                 _custom: {
                                     jobId: jobID,
-                                    getUpdatedItem: function() {
+                                    getUpdatedItem: function () {
                                         $(window).trigger('cloudStack.fullRefresh');
                                     }
                                 },
@@ -648,14 +650,14 @@
                                 }
                             });
                         },
-                        error: function(data) {
+                        error: function (data) {
                             args.response.error(parseXMLHttpResponse(data));
                         }
                     });
                 }
             }
         },
-        dataProvider: function(args) {
+        dataProvider: function (args) {
             var $multi = args.$multi;
             var data = {
                 vpcid: args.context.vpc[0].id,
@@ -676,16 +678,16 @@
                     data: data,
                     dataType: 'json',
                     async: true,
-                    success: function(json) {
+                    success: function (json) {
                         args.response.success({
-                            data: $(json.listnetworkaclsresponse.networkacl).map(function(index, acl) {
+                            data: $(json.listnetworkaclsresponse.networkacl).map(function (index, acl) {
                                 return $.extend(acl, {
                                     networkid: args.context.networks[0].name
                                 });
                             })
                         });
                     },
-                    error: function(XMLHttpResponse) {
+                    error: function (XMLHttpResponse) {
                         args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                     }
                 });
@@ -700,7 +702,7 @@
     cloudStack.vpc = {
         // nTier sections
         sections: {
-            tierVMs: function() {
+            tierVMs: function () {
                 var list = $.extend(true, {}, cloudStack.sections.instances);
 
                 list.listView.actions.add.action.custom = cloudStack.uiCustom.instanceWizard(
@@ -714,11 +716,11 @@
                 return list;
             },
 
-            tierPortForwarders: function() {
+            tierPortForwarders: function () {
                 return cloudStack.vpc.ipAddresses.listView();
             },
 
-            tierStaticNATs: function() {
+            tierStaticNATs: function () {
                 return cloudStack.vpc.staticNatIpAddresses.listView();
             },
 
@@ -744,14 +746,14 @@
                             label: 'label.algorithm'
                         }
                     },
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         $.ajax({
                             url: createURL('listLoadBalancers'),
                             data: {
                                 networkid: args.context.networks[0].id,
                                 listAll: true
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listloadbalancersresponse.loadbalancer;
                                 if (items != null) {
                                     for (var i = 0; i < items.length; i++) {
@@ -808,7 +810,7 @@
                                         validation: {
                                             required: true
                                         },
-                                        select: function(args) {
+                                        select: function (args) {
                                             args.response.success({
                                                 data: [{
                                                     id: 'source',
@@ -826,11 +828,11 @@
                                 }
                             },
                             messages: {
-                                notification: function(args) {
+                                notification: function (args) {
                                     return 'label.add.internal.lb';
                                 }
                             },
-                            action: function(args) {
+                            action: function (args) {
                                 var data = {
                                     name: args.data.name,
                                     sourceport: args.data.sourceport,
@@ -853,12 +855,12 @@
                                 $.ajax({
                                     url: createURL('createLoadBalancer'),
                                     data: data,
-                                    success: function(json) {
+                                    success: function (json) {
                                         var jid = json.createloadbalancerresponse.jobid;
                                         args.response.success({
                                             _custom: {
                                                 jobId: jid,
-                                                getUpdatedItem: function(json) {
+                                                getUpdatedItem: function (json) {
                                                     return json.queryasyncjobresultresponse.jobresult.loadbalancer;
                                                 }
                                             }
@@ -881,14 +883,14 @@
                             remove: {
                                 label: 'label.delete.internal.lb',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.confirm.delete.internal.lb';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.delete.internal.lb';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.internalLoadBalancers[0].id
                                     };
@@ -896,7 +898,7 @@
                                         url: createURL('deleteLoadBalancer'),
                                         data: data,
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.deleteloadbalancerresponse.jobid;
                                             args.response.success({
                                                 _custom: {
@@ -904,7 +906,7 @@
                                                 }
                                             });
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
@@ -942,7 +944,7 @@
                                     },
                                     loadbalancerinstance: {
                                         label: 'label.assigned.vms',
-                                        converter: function(objArray) {
+                                        converter: function (objArray) {
                                             var s = '';
                                             if (objArray != null) {
                                                 for (var i = 0; i < objArray.length; i++) {
@@ -956,13 +958,13 @@
                                         }
                                     }
                                 }],
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     $.ajax({
                                         url: createURL('listLoadBalancers'),
                                         data: {
                                             id: args.context.internalLoadBalancers[0].id
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.listloadbalancersresponse.loadbalancer[0];
 
                                             //remove Rules tab and add sourceport, instanceport at Details tab because there is only one element in loadbalancerrul array property.
@@ -978,29 +980,29 @@
                             },
 
                             /*
-              rules: {
-                title: 'label.rules',
-                multiple: true,
-                fields: [
-                  {
-                    sourceport: { label: 'Source Port' },
-                    instanceport: { label: 'Instance Port' }
-                  }
-                ],
-                dataProvider: function(args) {
-                  $.ajax({
-                    url: createURL('listLoadBalancers'),
-                    data: {
-                      id: args.context.internalLoadBalancers[0].id
-                    },
-                    success: function(json) {
-                      var item = json.listloadbalancersresponse.loadbalancer[0];
-                      args.response.success({ data: item.loadbalancerrule });
-                    }
-                  });
-                }
-              },
-              */
+                             rules: {
+                             title: 'label.rules',
+                             multiple: true,
+                             fields: [
+                             {
+                             sourceport: { label: 'Source Port' },
+                             instanceport: { label: 'Instance Port' }
+                             }
+                             ],
+                             dataProvider: function(args) {
+                             $.ajax({
+                             url: createURL('listLoadBalancers'),
+                             data: {
+                             id: args.context.internalLoadBalancers[0].id
+                             },
+                             success: function(json) {
+                             var item = json.listloadbalancersresponse.loadbalancer[0];
+                             args.response.success({ data: item.loadbalancerrule });
+                             }
+                             });
+                             }
+                             },
+                             */
 
                             assignedVms: {
                                 title: 'label.assigned.vms',
@@ -1014,13 +1016,13 @@
                                             label: 'label.ip.address'
                                         }
                                     },
-                                    dataProvider: function(args) {
+                                    dataProvider: function (args) {
                                         $.ajax({
                                             url: createURL('listLoadBalancers'),
                                             data: {
                                                 id: args.context.internalLoadBalancers[0].id
                                             },
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var item = json.listloadbalancersresponse.loadbalancer[0];
                                                 args.response.success({
                                                     data: item.loadbalancerinstance
@@ -1037,21 +1039,21 @@
                                                 label: 'label.remove.vm.load.balancer',
                                                 addRow: 'false',
                                                 messages: {
-                                                    confirm: function(args) {
+                                                    confirm: function (args) {
                                                         return 'message.confirm.remove.load.balancer';
                                                     },
-                                                    notification: function(args) {
+                                                    notification: function (args) {
                                                         return 'label.remove.vm.load.balancer';
                                                     }
                                                 },
-                                                action: function(args) {
+                                                action: function (args) {
                                                     $.ajax({
                                                         url: createURL('removeFromLoadBalancerRule'),
                                                         data: {
                                                             id: args.context.internalLoadBalancers[0].id,
                                                             virtualmachineids: args.context.assignedVms[0].id
                                                         },
-                                                        success: function(json) {
+                                                        success: function (json) {
                                                             var jid = json.removefromloadbalancerruleresponse.jobid;
                                                             args.response.success({
                                                                 _custom: {
@@ -1078,8 +1080,8 @@
                                                         label: 'label.ip.address'
                                                     }
                                                 }],
-                                                dataProvider: function(args) {
-                                                    setTimeout(function() {
+                                                dataProvider: function (args) {
+                                                    setTimeout(function () {
                                                         args.response.success({
                                                             data: args.context.assignedVms[0]
                                                         });
@@ -1101,7 +1103,7 @@
                     fields: {
                         ipaddress: {
                             label: 'label.ips',
-                            converter: function(text, item) {
+                            converter: function (text, item) {
                                 if (item.issourcenat) {
                                     return text + ' [' + _l('label.source.nat') + ']';
                                 }
@@ -1116,7 +1118,7 @@
                             label: 'label.vm.name'
                         },
                         state: {
-                            converter: function(str) {
+                            converter: function (str) {
                                 // For localization
                                 return str;
                             },
@@ -1127,7 +1129,7 @@
                             }
                         }
                     },
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         $.ajax({
                             url: createURL('listPublicIpAddresses'),
                             async: false,
@@ -1136,7 +1138,7 @@
                                 forloadbalancing: true,
                                 listall: true
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listpublicipaddressesresponse.publicipaddress;
                                 args.response.success({
                                     data: items
@@ -1148,12 +1150,12 @@
             },
 
             // Private gateways
-            privateGateways: function() {
+            privateGateways: function () {
                 return cloudStack.vpc.gateways.listView()
             },
 
             // Public IP Addresses
-            publicIPs: function() {
+            publicIPs: function () {
                 return cloudStack.vpc.ipAddresses.listView()
             },
 
@@ -1172,7 +1174,7 @@
                             label: 'label.id'
                         }
                     },
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var data = {
                             vpcid: args.context.vpc[0].id
                         };
@@ -1181,7 +1183,7 @@
                         $.ajax({
                             url: createURL('listNetworkACLLists'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listnetworkacllistsresponse.networkacllist;
 
                                 args.response.success({
@@ -1212,11 +1214,11 @@
                                 }
                             },
                             messages: {
-                                notification: function(args) {
+                                notification: function (args) {
                                     return 'label.add.network.acl.list';
                                 }
                             },
-                            action: function(args) {
+                            action: function (args) {
                                 var data = {
                                     name: args.data.name,
                                     description: args.data.description
@@ -1226,11 +1228,11 @@
                                 $.ajax({
                                     url: createURL('createNetworkACLList&vpcid=' + args.context.vpc[0].id),
                                     data: data,
-                                    success: function(json) {
+                                    success: function (json) {
                                         args.response.success({
                                             _custom: {
                                                 jobId: json.createnetworkacllistresponse.jobid,
-                                                getUpdatedItem: function(json) {
+                                                getUpdatedItem: function (json) {
                                                     return json.queryasyncjobresultresponse.jobresult.networkacllist;
                                                 }
                                             }
@@ -1250,28 +1252,28 @@
                             remove: {
                                 label: 'label.delete.acl.list',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.confirm.delete.acl.list';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.delete.acl.list';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL('deleteNetworkACLList&id=' + args.context.aclLists[0].id),
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.deletenetworkacllistresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function() {
+                                                    getUpdatedItem: function () {
                                                         $(window).trigger('cloudStack.fullRefresh');
                                                     }
                                                 }
                                             });
                                         },
-                                        error: function(json) {
+                                        error: function (json) {
                                             args.response.error(parseXMLHttpResponse(json));
                                         }
                                     });
@@ -1297,12 +1299,12 @@
                                         label: 'label.id'
                                     }
                                 }],
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     var items = args.context.aclLists[0];
-                                    setTimeout(function() {
+                                    setTimeout(function () {
                                         args.response.success({
                                             data: items,
-                                            actionFilter: function(args) {
+                                            actionFilter: function (args) {
                                                 var allowedActions = [];
                                                 if (items.vpcid != null) {
                                                     allowedActions.push("remove");
@@ -1316,19 +1318,19 @@
 
                             aclRules: {
                                 title: 'label.acl.list.rules',
-                                custom: function(args) {
+                                custom: function (args) {
                                     return $('<div>').multiEdit($.extend(true, {}, aclMultiEdit, {
                                         context: args.context,
                                         fields: {
                                             networkid: false
                                         },
-                                        dataProvider: function(args) {
+                                        dataProvider: function (args) {
                                             $.ajax({
                                                 url: createURL('listNetworkACLs&aclid=' + args.context.aclLists[0].id),
-                                                success: function(json) {
-                                                    var items = json.listnetworkaclsresponse.networkacl.sort(function(a, b) {
+                                                success: function (json) {
+                                                    var items = json.listnetworkaclsresponse.networkacl.sort(function (a, b) {
                                                         return a.number >= b.number;
-                                                    }).map(function(acl) {
+                                                    }).map(function (acl) {
                                                         if (parseInt(acl.protocol)) { // protocol number
                                                             acl.protocolnumber = acl.protocol;
                                                             acl.protocol = "protocolnumber";
@@ -1340,20 +1342,20 @@
                                                     args.response.success({
                                                         data: items
                                                         /* {
-                               cidrlist: '10.1.1.0/24',
-                               protocol: 'TCP',
-                               startport: 22, endport: 22,
-                               networkid: 0,
-                               traffictype: 'Egress'
-                               },
-                               {
-                               cidrlist: '10.2.1.0/24',
-                               protocol: 'UDP',
-                               startport: 56, endport: 72,
-                               networkid: 0,
-                               trafficType: 'Ingress'
-                               }
-                               ]*/
+                                                         cidrlist: '10.1.1.0/24',
+                                                         protocol: 'TCP',
+                                                         startport: 22, endport: 22,
+                                                         networkid: 0,
+                                                         traffictype: 'Egress'
+                                                         },
+                                                         {
+                                                         cidrlist: '10.2.1.0/24',
+                                                         protocol: 'UDP',
+                                                         startport: 56, endport: 72,
+                                                         networkid: 0,
+                                                         trafficType: 'Ingress'
+                                                         }
+                                                         ]*/
                                                     });
                                                 }
                                             });
@@ -1365,7 +1367,7 @@
                     }
                 }
             },
-            siteToSiteVPNs: function() {
+            siteToSiteVPNs: function () {
                 return $.extend(true, {}, cloudStack.vpc.siteToSiteVPN, {
                     // siteToSiteVPN is multi-section so doesn't have an explicit
                     // 'listView' block
@@ -1377,7 +1379,7 @@
                             confirm: 'Please confirm that you would like to create a site-to-site VPN gateway for this VPC.',
                             notification: 'Create site-to-site VPN gateway'
                         },
-                        check: function(args) {
+                        check: function (args) {
                             var items;
 
                             $.ajax({
@@ -1385,27 +1387,27 @@
                                 data: {
                                     vpcid: args.context.vpc[0].id
                                 },
-                                success: function(json) {
+                                success: function (json) {
                                     var items = json.listvpngatewaysresponse.vpngateway;
 
                                     args.response.success(items && items.length);
                                 }
                             });
                         },
-                        action: function(args) {
+                        action: function (args) {
                             $.ajax({
                                 url: createURL("createVpnGateway"),
                                 data: {
                                     vpcid: args.context.vpc[0].id
                                 },
-                                success: function(json) {
+                                success: function (json) {
                                     var jid = json.createvpngatewayresponse.jobid;
-                                    var pollTimer = setInterval(function() {
+                                    var pollTimer = setInterval(function () {
                                         pollAsyncJobResult({
                                             _custom: {
                                                 jobId: jid
                                             },
-                                            complete: function() {
+                                            complete: function () {
                                                 clearInterval(pollTimer);
                                                 args.response.success();
                                             }
@@ -1419,17 +1421,17 @@
             }
         },
 
-        routerDetailView: function() {
+        routerDetailView: function () {
             return {
                 title: 'label.VPC.router.details',
-                updateContext: function(args) {
+                updateContext: function (args) {
                     var router;
 
                     $.ajax({
                         url: createURL("listRouters&listAll=true&vpcid=" + args.context.vpc[0].id),
                         dataType: "json",
                         async: false,
-                        success: function(json) {
+                        success: function (json) {
                             router = json.listroutersresponse.router[0];
                         }
                     });
@@ -1488,20 +1490,20 @@
                 actions: {
                     start: {
                         label: 'label.action.start.instance',
-                        action: function(args) {
+                        action: function (args) {
                             $.ajax({
                                 url: createURL("startVirtualMachine&id=" + args.context.vpcTierInstances[0].id),
                                 dataType: "json",
                                 async: true,
-                                success: function(json) {
+                                success: function (json) {
                                     var jid = json.startvirtualmachineresponse.jobid;
                                     args.response.success({
                                         _custom: {
                                             jobId: jid,
-                                            getUpdatedItem: function(json) {
+                                            getUpdatedItem: function (json) {
                                                 return json.queryasyncjobresultresponse.jobresult.virtualmachine;
                                             },
-                                            getActionFilter: function() {
+                                            getActionFilter: function () {
                                                 return cloudStack.actionFilter.vmActionFilter;
                                             }
                                         }
@@ -1510,13 +1512,13 @@
                             });
                         },
                         messages: {
-                            confirm: function(args) {
+                            confirm: function (args) {
                                 return 'message.action.start.instance';
                             },
-                            notification: function(args) {
+                            notification: function (args) {
                                 return 'label.action.start.instance';
                             },
-                            complete: function(args) {
+                            complete: function (args) {
                                 if (args.password != null) {
                                     cloudStack.dialog.notice({
                                         message: 'Password of the VM is ' + args.password
@@ -1543,22 +1545,22 @@
                                 }
                             }
                         },
-                        action: function(args) {
+                        action: function (args) {
                             var array1 = [];
                             array1.push("&forced=" + (args.data.forced == "on"));
                             $.ajax({
                                 url: createURL("stopVirtualMachine&id=" + args.context.vpcTierInstances[0].id + array1.join("")),
                                 dataType: "json",
                                 async: true,
-                                success: function(json) {
+                                success: function (json) {
                                     var jid = json.stopvirtualmachineresponse.jobid;
                                     args.response.success({
                                         _custom: {
                                             jobId: jid,
-                                            getUpdatedItem: function(json) {
+                                            getUpdatedItem: function (json) {
                                                 return json.queryasyncjobresultresponse.jobresult.virtualmachine;
                                             },
-                                            getActionFilter: function() {
+                                            getActionFilter: function () {
                                                 return cloudStack.actionFilter.vmActionFilter;
                                             }
                                         }
@@ -1567,11 +1569,11 @@
                             });
                         },
                         messages: {
-                            confirm: function(args) {
+                            confirm: function (args) {
                                 return 'message.action.stop.instance';
                             },
 
-                            notification: function(args) {
+                            notification: function (args) {
                                 return 'label.action.stop.instance';
                             }
                         },
@@ -1581,20 +1583,20 @@
                     },
                     restart: {
                         label: 'instances.actions.reboot.label',
-                        action: function(args) {
+                        action: function (args) {
                             $.ajax({
                                 url: createURL("rebootVirtualMachine&id=" + args.context.vpcTierInstances[0].id),
                                 dataType: "json",
                                 async: true,
-                                success: function(json) {
+                                success: function (json) {
                                     var jid = json.rebootvirtualmachineresponse.jobid;
                                     args.response.success({
                                         _custom: {
                                             jobId: jid,
-                                            getUpdatedItem: function(json) {
+                                            getUpdatedItem: function (json) {
                                                 return json.queryasyncjobresultresponse.jobresult.virtualmachine;
                                             },
-                                            getActionFilter: function() {
+                                            getActionFilter: function () {
                                                 return cloudStack.actionFilter.vmActionFilter;
                                             }
                                         }
@@ -1603,10 +1605,10 @@
                             });
                         },
                         messages: {
-                            confirm: function(args) {
+                            confirm: function (args) {
                                 return 'message.action.reboot.instance';
                             },
-                            notification: function(args) {
+                            notification: function (args) {
                                 return 'instances.actions.reboot.label';
                             }
                         },
@@ -1617,27 +1619,27 @@
                     destroy: {
                         label: 'label.action.destroy.instance',
                         messages: {
-                            confirm: function(args) {
+                            confirm: function (args) {
                                 return 'message.action.destroy.instance';
                             },
-                            notification: function(args) {
+                            notification: function (args) {
                                 return 'label.action.destroy.instance';
                             }
                         },
-                        action: function(args) {
+                        action: function (args) {
                             $.ajax({
                                 url: createURL("destroyVirtualMachine&id=" + args.context.vpcTierInstances[0].id),
                                 dataType: "json",
                                 async: true,
-                                success: function(json) {
+                                success: function (json) {
                                     var jid = json.destroyvirtualmachineresponse.jobid;
                                     args.response.success({
                                         _custom: {
                                             jobId: jid,
-                                            getUpdatedItem: function(json) {
+                                            getUpdatedItem: function (json) {
                                                 return json.queryasyncjobresultresponse.jobresult.virtualmachine;
                                             },
-                                            getActionFilter: function() {
+                                            getActionFilter: function () {
                                                 return cloudStack.actionFilter.vmActionFilter;
                                             }
                                         }
@@ -1652,19 +1654,19 @@
                     restore: {
                         label: 'label.action.restore.instance',
                         messages: {
-                            confirm: function(args) {
+                            confirm: function (args) {
                                 return 'message.action.restore.instance';
                             },
-                            notification: function(args) {
+                            notification: function (args) {
                                 return 'label.action.restore.instance';
                             }
                         },
-                        action: function(args) {
+                        action: function (args) {
                             $.ajax({
                                 url: createURL("recoverVirtualMachine&id=" + args.context.vpcTierInstances[0].id),
                                 dataType: "json",
                                 async: true,
-                                success: function(json) {
+                                success: function (json) {
                                     var item = json.recovervirtualmachineresponse.virtualmachine;
                                     args.response.success({
                                         data: item
@@ -1677,10 +1679,10 @@
                         label: 'label.view.console',
                         action: {
                             externalLink: {
-                                url: function(args) {
+                                url: function (args) {
                                     return clientConsoleUrl + '?cmd=access&vm=' + args.context.vpcTierInstances[0].id;
                                 },
-                                title: function(args) {
+                                title: function (args) {
                                     return args.context.vpcTierInstances[0].id.substr(0, 8); //title in window.open() can't have space nor longer than 8 characters. Otherwise, IE browser will have error.
                                 },
                                 width: 820,
@@ -1689,7 +1691,7 @@
                         }
                     }
                 },
-                dataProvider: function(args) {
+                dataProvider: function (args) {
                     var array1 = [];
                     if (args.filterBy != null) {
                         if (args.filterBy.kind != null) {
@@ -1726,7 +1728,7 @@
                         data: {
                             networkid: args.context.networks[0].id
                         },
-                        success: function(json) {
+                        success: function (json) {
                             args.response.success({
                                 data: json.listvirtualmachinesresponse.virtualmachine,
                                 actionFilter: cloudStack.actionFilter.vmActionFilter
@@ -1737,7 +1739,7 @@
             }
         },
         ipAddresses: {
-            listView: function() {
+            listView: function () {
                 var listView = $.extend(true, {}, cloudStack.sections.network.sections.ipAddresses);
 
                 listView.listView.fields = {
@@ -1753,7 +1755,7 @@
             }
         },
         staticNatIpAddresses: {
-            listView: function() {
+            listView: function () {
                 var listView = $.extend(true, {}, cloudStack.sections.network.sections.ipAddresses);
 
                 listView.listView.fields = {
@@ -1765,7 +1767,7 @@
                     state: listView.listView.fields.state
                 };
 
-                listView.listView.dataProvider = function(args) {
+                listView.listView.dataProvider = function (args) {
                     $.ajax({
                         url: createURL('listPublicIpAddresses'),
                         data: {
@@ -1773,12 +1775,12 @@
                             isstaticnat: true,
                             listall: true
                         },
-                        success: function(json) {
+                        success: function (json) {
                             args.response.success({
                                 data: json.listpublicipaddressesresponse.publicipaddress
                             });
                         },
-                        error: function(json) {
+                        error: function (json) {
                             args.response.error(parseXMLHttpResponse(json));
                         }
                     });
@@ -1801,19 +1803,19 @@
                             label: 'label.network.ACL.total'
                         }
                     },
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         $.ajax({
                             url: createURL('listNetworks'),
                             data: {
                                 listAll: true,
                                 vpcid: args.context.vpc[0].id
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 var networks = json.listnetworksresponse.network ?
                                     json.listnetworksresponse.network : [];
 
                                 args.response.success({
-                                    data: $.map(networks, function(tier) {
+                                    data: $.map(networks, function (tier) {
                                         var aclTotal = 0;
 
                                         // Get ACL total
@@ -1824,7 +1826,7 @@
                                                 listAll: true,
                                                 networkid: tier.id
                                             },
-                                            success: function(json) {
+                                            success: function (json) {
                                                 aclTotal = json.listnetworkaclsresponse.networkacl ?
                                                     json.listnetworkaclsresponse.networkacl.length : 0;
                                             }
@@ -1845,7 +1847,7 @@
         gateways: {
 
             add: {
-                preCheck: function(args) {
+                preCheck: function (args) {
                     if (isAdmin()) { //root-admin
                         var items;
                         $.ajax({
@@ -1855,7 +1857,7 @@
                                 vpcid: args.context.vpc[0].id,
                                 listAll: true
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 items = json.listprivategatewaysresponse.privategateway;
                             }
                         });
@@ -1870,7 +1872,7 @@
                 },
                 label: 'label.add.new.gateway',
                 messages: {
-                    notification: function(args) {
+                    notification: function (args) {
                         return 'label.add.new.gateway';
                     }
                 },
@@ -1881,16 +1883,16 @@
                         physicalnetworkid: {
                             docID: 'helpVPCGatewayPhysicalNetwork',
                             label: 'label.physical.network',
-                            select: function(args) {
+                            select: function (args) {
                                 $.ajax({
                                     url: createURL("listPhysicalNetworks"),
                                     data: {
                                         zoneid: args.context.vpc[0].zoneid
                                     },
-                                    success: function(json) {
+                                    success: function (json) {
                                         var objs = json.listphysicalnetworksresponse.physicalnetwork;
                                         var items = [];
-                                        $(objs).each(function() {
+                                        $(objs).each(function () {
                                             items.push({
                                                 id: this.id,
                                                 description: this.name
@@ -1940,15 +1942,15 @@
 
                         aclid: {
                             label: 'label.acl',
-                            select: function(args) {
+                            select: function (args) {
                                 $.ajax({
                                     url: createURL('listNetworkACLLists'),
                                     dataType: 'json',
                                     async: true,
-                                    success: function(json) {
+                                    success: function (json) {
                                         var objs = json.listnetworkacllistsresponse.networkacllist;
                                         var items = [];
-                                        $(objs).each(function() {
+                                        $(objs).each(function () {
                                             if (this.name == "default_deny")
                                                 items.unshift({
                                                     id: this.id,
@@ -1972,7 +1974,7 @@
                         }
                     }
                 },
-                action: function(args) {
+                action: function (args) {
                     var array1 = [];
                     if (args.$form.find('.form-item[rel=sourceNat]').find('input[type=checkbox]').is(':Checked') == true) {
                         array1.push("&sourcenatsupported=true");
@@ -1992,18 +1994,18 @@
                             aclid: args.data.aclid
 
                         },
-                        success: function(json) {
+                        success: function (json) {
                             var jid = json.createprivategatewayresponse.jobid;
                             args.response.success({
                                 _custom: {
                                     jobId: jid,
-                                    getUpdatedItem: function(json) {
+                                    getUpdatedItem: function (json) {
                                         return json.queryasyncjobresultresponse.jobresult.privategateway;
                                     }
                                 }
                             });
                         },
-                        error: function(json) {
+                        error: function (json) {
                             args.response.error(parseXMLHttpResponse(json));
                         }
                     });
@@ -2012,7 +2014,7 @@
                     poll: pollAsyncJobResult
                 }
             },
-            listView: function() {
+            listView: function () {
                 return {
                     listView: {
                         id: 'vpcGateways',
@@ -2046,7 +2048,7 @@
                         actions: {
                             add: {
                                 label: 'label.add.private.gateway',
-                                preFilter: function(args) {
+                                preFilter: function (args) {
                                     if (isAdmin() || isDomainAdmin())
                                         return true;
                                     else
@@ -2059,16 +2061,16 @@
                                         physicalnetworkid: {
                                             docID: 'helpVPCGatewayPhysicalNetwork',
                                             label: 'label.physical.network',
-                                            select: function(args) {
+                                            select: function (args) {
                                                 $.ajax({
                                                     url: createURL("listPhysicalNetworks"),
                                                     data: {
                                                         zoneid: args.context.vpc[0].zoneid
                                                     },
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         var objs = json.listphysicalnetworksresponse.physicalnetwork;
                                                         var items = [];
-                                                        $(objs).each(function() {
+                                                        $(objs).each(function () {
                                                             items.push({
                                                                 id: this.id,
                                                                 description: this.name
@@ -2119,16 +2121,16 @@
 
                                         aclid: {
                                             label: 'label.acl',
-                                            select: function(args) {
+                                            select: function (args) {
                                                 $.ajax({
                                                     url: createURL('listNetworkACLLists'),
                                                     data: {
                                                         vpcid: args.context.vpc[0].id
                                                     },
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         var objs = json.listnetworkacllistsresponse.networkacllist;
                                                         var items = [];
-                                                        $(objs).each(function() {
+                                                        $(objs).each(function () {
                                                             if (this.name == "default_deny")
                                                                 items.unshift({
                                                                     id: this.id,
@@ -2154,7 +2156,7 @@
                                     }
 
                                 },
-                                action: function(args) {
+                                action: function (args) {
 
                                     var array1 = [];
                                     if (args.$form.find('.form-item[rel=sourceNat]').find('input[type=checkbox]').is(':Checked') == true) {
@@ -2175,18 +2177,18 @@
                                             aclid: args.data.aclid
 
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.createprivategatewayresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function(json) {
+                                                    getUpdatedItem: function (json) {
                                                         return json.queryasyncjobresultresponse.jobresult.privategateway;
                                                     }
                                                 }
                                             });
                                         },
-                                        error: function(json) {
+                                        error: function (json) {
                                             args.response.error(parseXMLHttpResponse(json));
                                         }
                                     });
@@ -2200,14 +2202,14 @@
                             }
                         },
 
-                        dataProvider: function(args) {
+                        dataProvider: function (args) {
                             $.ajax({
                                 url: createURL('listPrivateGateways'),
                                 data: {
                                     vpcid: args.context.vpc[0].id,
                                     listAll: true
                                 },
-                                success: function(json) {
+                                success: function (json) {
                                     var items = json.listprivategatewaysresponse.privategateway;
                                     args.response.success({
                                         data: items
@@ -2221,19 +2223,19 @@
                                 remove: {
                                     label: 'label.delete.gateway',
                                     messages: {
-                                        confirm: function(args) {
+                                        confirm: function (args) {
                                             return 'message.delete.gateway';
                                         },
-                                        notification: function(args) {
+                                        notification: function (args) {
                                             return 'label.delete.gateway';
                                         }
                                     },
-                                    action: function(args) {
+                                    action: function (args) {
                                         $.ajax({
                                             url: createURL("deletePrivateGateway&id=" + args.context.vpcGateways[0].id),
                                             dataType: "json",
                                             async: true,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var jid = json.deleteprivategatewayresponse.jobid;
                                                 args.response.success({
                                                     _custom: {
@@ -2256,7 +2258,7 @@
                                         fields: {
                                             aclid: {
                                                 label: 'label.acl',
-                                                select: function(args) {
+                                                select: function (args) {
                                                     $.ajax({
                                                         url: createURL('listNetworkACLLists'),
                                                         data: {
@@ -2264,11 +2266,11 @@
                                                         },
                                                         dataType: 'json',
                                                         async: true,
-                                                        success: function(json) {
+                                                        success: function (json) {
                                                             var objs = json.listnetworkacllistsresponse.networkacllist;
                                                             var items = [];
 
-                                                            $(objs).each(function() {
+                                                            $(objs).each(function () {
                                                                 if (this.id == args.context.vpcGateways[0].aclid) {
                                                                     return true;
                                                                 }
@@ -2291,18 +2293,17 @@
                                         }
                                     },
 
-                                    action: function(args) {
+                                    action: function (args) {
                                         $.ajax({
                                             url: createURL("replaceNetworkACLList&gatewayid=" + args.context.vpcGateways[0].id + "&aclid=" + args.data.aclid),
                                             dataType: "json",
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var jid = json.replacenetworkacllistresponse.jobid;
                                                 args.response.success(
-
                                                     {
                                                         _custom: {
                                                             jobId: jid,
-                                                            getUpdatedItem: function(json) {
+                                                            getUpdatedItem: function (json) {
                                                                 var item = json.queryasyncjobresultresponse.jobresult.aclid;
                                                                 return {
                                                                     aclid: args.data.aclid
@@ -2310,11 +2311,10 @@
                                                             }
                                                         }
                                                     }
-
                                                 )
                                             },
 
-                                            error: function(json) {
+                                            error: function (json) {
 
                                                 args.response.error(parseXMLHttpResponse(json));
                                             }
@@ -2326,10 +2326,10 @@
                                     },
 
                                     messages: {
-                                        confirm: function(args) {
+                                        confirm: function (args) {
                                             return 'message.confirm.replace.acl.new.one';
                                         },
-                                        notification: function(args) {
+                                        notification: function (args) {
                                             return 'label.acl.replaced';
                                         }
                                     }
@@ -2369,7 +2369,7 @@
                                         },
                                         sourcenatsupported: {
                                             label: 'label.source.nat.supported',
-                                            converter: function(str) {
+                                            converter: function (str) {
                                                 return str ? 'Yes' : 'No';
                                             }
                                         },
@@ -2382,14 +2382,14 @@
 
 
                                     }],
-                                    dataProvider: function(args) {
+                                    dataProvider: function (args) {
                                         $.ajax({
                                             url: createURL('listPrivateGateways'),
                                             data: {
                                                 id: args.context.vpcGateways[0].id,
                                                 listAll: true
                                             },
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var item = json.listprivategatewaysresponse.privategateway[0];
 
 
@@ -2400,9 +2400,9 @@
                                                     data: {
                                                         vpcid: args.context.vpc[0].id
                                                     },
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         var objs = json.listnetworkacllistsresponse.networkacllist;
-                                                        var acl = $.grep(objs, function(obj) {
+                                                        var acl = $.grep(objs, function (obj) {
                                                             return obj.id === args.context.vpcGateways[0].aclid;
                                                         });
 
@@ -2412,7 +2412,7 @@
 
                                                 args.response.success({
                                                     data: item,
-                                                    actionFilter: function(args) {
+                                                    actionFilter: function (args) {
                                                         var allowedActions = [];
                                                         if (isAdmin()) {
                                                             allowedActions.push("remove");
@@ -2428,7 +2428,7 @@
                                 },
                                 staticRoutes: {
                                     title: 'label.static.routes',
-                                    custom: function(args) {
+                                    custom: function (args) {
                                         return $('<div>').multiEdit({
                                             noSelect: true,
                                             context: args.context,
@@ -2450,7 +2450,7 @@
 
                                             add: {
                                                 label: 'label.add',
-                                                action: function(args) {
+                                                action: function (args) {
                                                     $.ajax({
                                                         url: createURL('createStaticRoute'),
                                                         data: {
@@ -2458,7 +2458,7 @@
                                                             cidr: args.data.cidr,
                                                             nexthop: args.context.vpcGateways[0].gateway
                                                         },
-                                                        success: function(data) {
+                                                        success: function (data) {
                                                             args.response.success({
                                                                 _custom: {
                                                                     jobId: data.createstaticrouteresponse.jobid
@@ -2469,7 +2469,7 @@
                                                                 }
                                                             });
                                                         },
-                                                        error: function(data) {
+                                                        error: function (data) {
                                                             args.response.error(parseXMLHttpResponse(data));
                                                         }
                                                     });
@@ -2478,7 +2478,7 @@
                                             actions: {
                                                 destroy: {
                                                     label: 'label.remove.static.route',
-                                                    action: function(args) {
+                                                    action: function (args) {
                                                         $.ajax({
                                                             url: createURL('deleteStaticRoute'),
                                                             data: {
@@ -2486,7 +2486,7 @@
                                                             },
                                                             dataType: 'json',
                                                             async: true,
-                                                            success: function(data) {
+                                                            success: function (data) {
                                                                 var jobID = data.deletestaticrouteresponse.jobid;
 
                                                                 args.response.success({
@@ -2503,7 +2503,7 @@
                                                     }
                                                 }
                                             },
-                                            dataProvider: function(args) {
+                                            dataProvider: function (args) {
                                                 $.ajax({
                                                     url: createURL('listStaticRoutes'),
                                                     data: {
@@ -2511,7 +2511,7 @@
                                                         vpcid: args.context.vpc[0].id,
                                                         listAll: true
                                                     },
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         var items = json.liststaticroutesresponse.staticroute;
                                                         args.response.success({
                                                             data: items
@@ -2532,7 +2532,7 @@
             title: 'label.site.to.site.VPN',
             id: 'siteToSiteVpn',
             sectionSelect: {
-                preFilter: function(args) {
+                preFilter: function (args) {
                     return ["vpnGateway", "vpnConnection"];
                 },
                 label: 'label.select-view'
@@ -2542,7 +2542,7 @@
             add: {
                 // Check if VPN gateways exist
                 // -- if false, don't show list view
-                preCheck: function(args) {
+                preCheck: function (args) {
                     var items;
 
                     $.ajax({
@@ -2551,7 +2551,7 @@
                             vpcid: args.context.vpc[0].id
                         },
                         async: false,
-                        success: function(json) {
+                        success: function (json) {
                             items = json.listvpngatewaysresponse.vpngateway;
                         }
                     });
@@ -2564,7 +2564,7 @@
                 },
                 label: 'label.add.VPN.gateway',
                 messages: {
-                    notification: function(args) {
+                    notification: function (args) {
                         return 'label.add.VPN.gateway';
                     }
                 },
@@ -2573,18 +2573,18 @@
                     desc: 'message.add.VPN.gateway',
                     fields: {}
                 },
-                action: function(args) {
+                action: function (args) {
                     $.ajax({
                         url: createURL("createVpnGateway"),
                         data: {
                             vpcid: args.context.vpc[0].id
                         },
-                        success: function(json) {
+                        success: function (json) {
                             var jid = json.createvpngatewayresponse.jobid;
                             args.response.success({
                                 _custom: {
                                     jobId: jid,
-                                    getUpdatedItem: function(json) {
+                                    getUpdatedItem: function (json) {
                                         return json.queryasyncjobresultresponse.jobresult.vpngateway;
                                     }
                                 }
@@ -2615,7 +2615,7 @@
                                 label: 'label.domain'
                             }
                         },
-                        dataProvider: function(args) {
+                        dataProvider: function (args) {
                             var array1 = [];
                             if (args.filterBy != null) {
                                 if (args.filterBy.search != null && args.filterBy.search.by != null && args.filterBy.search.value != null) {
@@ -2633,7 +2633,7 @@
                                     vpcid: args.context.vpc[0].id
                                 },
                                 async: false,
-                                success: function(json) {
+                                success: function (json) {
                                     var items = json.listvpngatewaysresponse.vpngateway;
                                     args.response.success({
                                         data: items
@@ -2647,20 +2647,20 @@
                                 remove: {
                                     label: 'label.delete.VPN.gateway',
                                     messages: {
-                                        confirm: function(args) {
+                                        confirm: function (args) {
                                             return 'message.delete.VPN.gateway';
                                         },
-                                        notification: function(args) {
+                                        notification: function (args) {
                                             return 'label.delete.VPN.gateway';
                                         }
                                     },
-                                    action: function(args) {
+                                    action: function (args) {
                                         $.ajax({
                                             url: createURL("deleteVpnGateway"),
                                             data: {
                                                 id: args.context.vpnGateway[0].id
                                             },
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var jid = json.deletevpngatewayresponse.jobid;
                                                 args.response.success({
                                                     _custom: {
@@ -2693,7 +2693,7 @@
                                             label: 'label.account'
                                         }
                                     }],
-                                    dataProvider: function(args) {
+                                    dataProvider: function (args) {
                                         $.ajax({
                                             url: createURL("listVpnGateways"),
                                             data: {
@@ -2701,7 +2701,7 @@
                                                 id: args.context.vpnGateway[0].id
                                             },
                                             async: true,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var item = json.listvpngatewaysresponse.vpngateway[0];
                                                 args.response.success({
                                                     data: item
@@ -2745,7 +2745,7 @@
                                 label: 'label.ESP.policy'
                             }
                         },
-                        dataProvider: function(args) {
+                        dataProvider: function (args) {
                             var array1 = [];
                             if (args.filterBy != null) {
                                 if (args.filterBy.search != null && args.filterBy.search.by != null && args.filterBy.search.value != null) {
@@ -2762,7 +2762,7 @@
                                 data: {
                                     vpcid: args.context.vpc[0].id
                                 },
-                                success: function(json) {
+                                success: function (json) {
                                     var items = json.listvpnconnectionsresponse.vpnconnection;
                                     args.response.success({
                                         data: items
@@ -2775,7 +2775,7 @@
                             add: {
                                 label: 'label.create.VPN.connection',
                                 messages: {
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.create.VPN.connection';
                                     }
                                 },
@@ -2787,16 +2787,16 @@
                                             validation: {
                                                 required: true
                                             },
-                                            select: function(args) {
+                                            select: function (args) {
                                                 $.ajax({
                                                     url: createURL("listVpnCustomerGateways"),
                                                     data: {
                                                         listAll: true
                                                     },
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         var items = json.listvpncustomergatewaysresponse.vpncustomergateway ? json.listvpncustomergatewaysresponse.vpncustomergateway : [];
                                                         args.response.success({
-                                                            data: $.map(items, function(item) {
+                                                            data: $.map(items, function (item) {
                                                                 return {
                                                                     id: item.id,
                                                                     description: item.name
@@ -2815,7 +2815,7 @@
                                         }
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var vpngatewayid = null;
                                     $.ajax({
                                         url: createURL('listVpnGateways'),
@@ -2824,7 +2824,7 @@
                                             vpcid: args.context.vpc[0].id
                                         },
                                         async: false,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var items = json.listvpngatewaysresponse.vpngateway;
                                             if (items != null && items.length > 0) {
                                                 vpngatewayid = items[0].id;
@@ -2841,20 +2841,20 @@
                                         data: {
                                             s2svpngatewayid: vpngatewayid,
                                             s2scustomergatewayid: args.data.vpncustomergatewayid,
-                                            passive: (args.data.passive == 'on'? true: false)
+                                            passive: (args.data.passive == 'on' ? true : false)
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.createvpnconnectionresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function(json) {
+                                                    getUpdatedItem: function (json) {
                                                         return json.queryasyncjobresultresponse.jobresult.vpnconnection;
                                                     }
                                                 }
                                             });
                                         },
-                                        error: function(xmlHttpResponse) {
+                                        error: function (xmlHttpResponse) {
                                             args.response.error(parseXMLHttpResponse(xmlHttpResponse));
                                         }
                                     });
@@ -2904,13 +2904,13 @@
                                         },
                                         dpd: {
                                             label: 'label.dead.peer.detection',
-                                            converter: function(str) {
+                                            converter: function (str) {
                                                 return str ? 'Yes' : 'No';
                                             }
                                         },
                                         forceencap: {
                                             label: 'label.vpn.force.encapsulation',
-                                            converter: function(str) {
+                                            converter: function (str) {
                                                 return str ? 'Yes' : 'No';
                                             }
                                         },
@@ -2923,12 +2923,12 @@
                                         }
                                     }],
 
-                                    dataProvider: function(args) {
+                                    dataProvider: function (args) {
                                         $.ajax({
                                             url: createURL("listVpnConnections&id=" + args.context.vpnConnection[0].id),
                                             dataType: "json",
                                             async: true,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var item = json.listvpnconnectionsresponse.vpnconnection[0];
                                                 args.response.success({
                                                     data: item
@@ -2942,14 +2942,14 @@
                                 restart: {
                                     label: 'label.reset.VPN.connection',
                                     messages: {
-                                        confirm: function(args) {
+                                        confirm: function (args) {
                                             return 'message.reset.VPN.connection';
                                         },
-                                        notification: function(args) {
+                                        notification: function (args) {
                                             return 'label.reset.VPN.connection';
                                         }
                                     },
-                                    action: function(args) {
+                                    action: function (args) {
                                         $.ajax({
                                             url: createURL("resetVpnConnection"),
                                             data: {
@@ -2957,12 +2957,12 @@
                                             },
                                             dataType: "json",
                                             async: true,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var jid = json.resetvpnconnectionresponse.jobid;
                                                 args.response.success({
                                                     _custom: {
                                                         jobId: jid,
-                                                        getUpdatedItem: function(json) {
+                                                        getUpdatedItem: function (json) {
                                                             return json.queryasyncjobresultresponse.jobresult.vpnconnection;
                                                         }
                                                     }
@@ -2978,14 +2978,14 @@
                                 remove: {
                                     label: 'label.delete.VPN.connection',
                                     messages: {
-                                        confirm: function(args) {
+                                        confirm: function (args) {
                                             return 'message.delete.VPN.connection';
                                         },
-                                        notification: function(args) {
+                                        notification: function (args) {
                                             return 'label.delete.VPN.connection';
                                         }
                                     },
-                                    action: function(args) {
+                                    action: function (args) {
                                         $.ajax({
                                             url: createURL("deleteVpnConnection"),
                                             dataType: "json",
@@ -2993,12 +2993,12 @@
                                                 id: args.context.vpnConnection[0].id
                                             },
                                             async: true,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var jid = json.deletevpnconnectionresponse.jobid;
                                                 args.response.success({
                                                     _custom: {
                                                         jobId: jid,
-                                                        getUpdatedItem: function(json) {
+                                                        getUpdatedItem: function (json) {
                                                             return json.queryasyncjobresultresponse.jobresult.vpnconnection;
                                                         }
                                                     }
@@ -3023,7 +3023,7 @@
                 viewAll: {
                     path: 'network.ipAddresses',
                     label: 'label.menu.ipaddresses',
-                    preFilter: function(args) {
+                    preFilter: function (args) {
                         return false;
 
                         /// Disabled
@@ -3051,14 +3051,14 @@
                                 if (service.name == "SecurityGroup") {
                                     havingSecurityGroupService = true;
                                 } else if (service.name == "StaticNat") {
-                                    $(service.capability).each(function() {
+                                    $(service.capability).each(function () {
                                         if (this.name == "ElasticIp" && this.value == "true") {
                                             havingElasticIpCapability = true;
                                             return false; //break $.each() loop
                                         }
                                     });
                                 } else if (service.name == "Lb") {
-                                    $(service.capability).each(function() {
+                                    $(service.capability).each(function () {
                                         if (this.name == "ElasticLb" && this.value == "true") {
                                             havingElasticLbCapability = true;
                                             return false; //break $.each() loop
@@ -3080,11 +3080,11 @@
                     edit: {
                         label: 'label.edit',
                         messages: {
-                            notification: function(args) {
+                            notification: function (args) {
                                 return 'label.edit.network.details';
                             }
                         },
-                        action: function(args) {
+                        action: function (args) {
                             var array1 = [];
                             array1.push("&name=" + todb(args.data.name));
                             array1.push("&displaytext=" + todb(args.data.displaytext));
@@ -3100,17 +3100,17 @@
                                 if (args.context.networks[0].type == "Isolated") { //Isolated network
                                     cloudStack.dialog.confirm({
                                         message: 'message.confirm.current.guest.CIDR.unchanged',
-                                        action: function() { //"Yes"    button is clicked
+                                        action: function () { //"Yes"    button is clicked
                                             array1.push("&changecidr=false");
                                             $.ajax({
                                                 url: createURL("updateNetwork&id=" + args.context.networks[0].id + array1.join("")),
                                                 dataType: "json",
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var jid = json.updatenetworkresponse.jobid;
                                                     args.response.success({
                                                         _custom: {
                                                             jobId: jid,
-                                                            getUpdatedItem: function(json) {
+                                                            getUpdatedItem: function (json) {
                                                                 var item = json.queryasyncjobresultresponse.jobresult.network;
                                                                 return {
                                                                     data: item
@@ -3119,22 +3119,22 @@
                                                         }
                                                     });
                                                 },
-                                                error: function(json) {
+                                                error: function (json) {
                                                     args.response.error(parseXMLHttpResponse(json));
                                                 }
                                             });
                                         },
-                                        cancelAction: function() { //"Cancel" button is clicked
+                                        cancelAction: function () { //"Cancel" button is clicked
                                             array1.push("&changecidr=true");
                                             $.ajax({
                                                 url: createURL("updateNetwork&id=" + args.context.networks[0].id + array1.join("")),
                                                 dataType: "json",
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var jid = json.updatenetworkresponse.jobid;
                                                     args.response.success({
                                                         _custom: {
                                                             jobId: jid,
-                                                            getUpdatedItem: function(json) {
+                                                            getUpdatedItem: function (json) {
                                                                 var item = json.queryasyncjobresultresponse.jobresult.network;
                                                                 return {
                                                                     data: item
@@ -3143,7 +3143,7 @@
                                                         }
                                                     });
                                                 },
-                                                error: function(json) {
+                                                error: function (json) {
                                                     args.response.error(parseXMLHttpResponse(json));
                                                 }
                                             });
@@ -3156,12 +3156,12 @@
                             $.ajax({
                                 url: createURL("updateNetwork&id=" + args.context.networks[0].id + array1.join("")),
                                 dataType: "json",
-                                success: function(json) {
+                                success: function (json) {
                                     var jid = json.updatenetworkresponse.jobid;
                                     args.response.success({
                                         _custom: {
                                             jobId: jid,
-                                            getUpdatedItem: function(json) {
+                                            getUpdatedItem: function (json) {
                                                 var item = json.queryasyncjobresultresponse.jobresult.network;
                                                 return {
                                                     data: item
@@ -3170,7 +3170,7 @@
                                         }
                                     });
                                 },
-                                error: function(json) {
+                                error: function (json) {
                                     args.response.error(parseXMLHttpResponse(json));
                                 }
                             });
@@ -3185,13 +3185,13 @@
                         createForm: {
                             title: 'label.restart.network',
                             desc: 'message.restart.network',
-                            preFilter: function(args) {
+                            preFilter: function (args) {
                                 var zoneObj;
                                 $.ajax({
                                     url: createURL("listZones&id=" + args.context.networks[0].zoneid),
                                     dataType: "json",
                                     async: false,
-                                    success: function(json) {
+                                    success: function (json) {
                                         zoneObj = json.listzonesresponse.zone[0];
                                     }
                                 });
@@ -3211,23 +3211,23 @@
                             }
                         },
                         messages: {
-                            notification: function(args) {
+                            notification: function (args) {
                                 return 'label.restart.network';
                             }
                         },
-                        action: function(args) {
+                        action: function (args) {
                             var array1 = [];
                             array1.push("&cleanup=" + (args.data.cleanup == "on"));
                             $.ajax({
                                 url: createURL("restartNetwork&id=" + args.context.networks[0].id + array1.join("")),
                                 dataType: "json",
                                 async: true,
-                                success: function(json) {
+                                success: function (json) {
                                     var jid = json.restartnetworkresponse.jobid;
                                     args.response.success({
                                         _custom: {
                                             jobId: jid,
-                                            getUpdatedItem: function(json) {
+                                            getUpdatedItem: function (json) {
                                                 return json.queryasyncjobresultresponse.jobresult.network;
                                             }
                                         }
@@ -3243,19 +3243,19 @@
                     remove: {
                         label: 'label.action.delete.network',
                         messages: {
-                            confirm: function(args) {
+                            confirm: function (args) {
                                 return 'message.action.delete.network';
                             },
-                            notification: function(args) {
+                            notification: function (args) {
                                 return 'label.action.delete.network';
                             }
                         },
-                        action: function(args) {
+                        action: function (args) {
                             $.ajax({
                                 url: createURL("deleteNetwork&id=" + args.context.networks[0].id),
                                 dataType: "json",
                                 async: true,
-                                success: function(json) {
+                                success: function (json) {
                                     var jid = json.deletenetworkresponse.jobid;
                                     args.response.success({
                                         _custom: {
@@ -3278,16 +3278,16 @@
                             fields: {
                                 aclid: {
                                     label: 'label.acl',
-                                    select: function(args) {
+                                    select: function (args) {
                                         $.ajax({
                                             url: createURL('listNetworkACLLists&vpcid=' + args.context.vpc[0].id),
                                             dataType: 'json',
                                             async: true,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var objs = json.listnetworkacllistsresponse.networkacllist;
                                                 var items = [];
 
-                                                $(objs).each(function() {
+                                                $(objs).each(function () {
                                                     if (this.id == args.context.networks[0].aclid) {
                                                         return true;
                                                     }
@@ -3308,17 +3308,17 @@
                                 }
                             }
                         },
-                        action: function(args) {
+                        action: function (args) {
                             $.ajax({
                                 url: createURL("replaceNetworkACLList&networkid=" + args.context.networks[0].id + "&aclid=" + args.data.aclid),
                                 dataType: "json",
-                                success: function(json) {
+                                success: function (json) {
                                     var jid = json.replacenetworkacllistresponse.jobid;
 
                                     args.response.success({
                                         _custom: {
                                             jobId: jid,
-                                            getUpdatedItem: function(json) {
+                                            getUpdatedItem: function (json) {
                                                 var network = args.context.networks[0];
 
                                                 network.aclid = args.data.aclid;
@@ -3331,7 +3331,7 @@
                                     });
                                 },
 
-                                error: function(json) {
+                                error: function (json) {
 
                                     args.response.error(parseXMLHttpResponse(json));
                                 }
@@ -3342,28 +3342,28 @@
                         },
 
                         messages: {
-                            confirm: function(args) {
+                            confirm: function (args) {
                                 return 'message.confirm.replace.acl.new.one';
                             },
-                            notification: function(args) {
+                            notification: function (args) {
                                 return 'label.acl.replaced';
                             }
                         }
                     }
                 },
 
-                tabFilter: function(args) {
+                tabFilter: function (args) {
                     var hiddenTabs = ['ipAddresses', 'acl']; // Disable IP address tab; it is redundant with 'view all' button
 
                     var networkOfferingHavingELB = false;
                     var services = args.context.networks[0].service;
-                    if(services != null) {
-                        for(var i = 0; i < services.length; i++) {
+                    if (services != null) {
+                        for (var i = 0; i < services.length; i++) {
                             if (services[i].name == "Lb") {
                                 var capabilities = services[i].capability;
-                                if(capabilities != null) {
-                                    for(var k = 0; k < capabilities.length; k++) {
-                                        if(capabilities[k].name == "ElasticLb") {
+                                if (capabilities != null) {
+                                    for (var k = 0; k < capabilities.length; k++) {
+                                        if (capabilities[k].name == "ElasticLb") {
                                             networkOfferingHavingELB = true;
                                             break;
                                         }
@@ -3384,7 +3384,7 @@
                 tabs: {
                     details: {
                         title: 'label.network.details',
-                        preFilter: function(args) {
+                        preFilter: function (args) {
                             var hiddenFields = [];
                             var zone;
 
@@ -3394,7 +3394,7 @@
                                     id: args.context.networks[0].zoneid
                                 },
                                 async: false,
-                                success: function(json) {
+                                success: function (json) {
                                     zone = json.listzonesresponse.zone[0];
                                 }
                             });
@@ -3471,7 +3471,7 @@
 
                             restartrequired: {
                                 label: 'label.restart.required',
-                                converter: function(booleanValue) {
+                                converter: function (booleanValue) {
                                     if (booleanValue == true)
                                         return "<font color='red'>Yes</font>";
                                     else if (booleanValue == false)
@@ -3484,7 +3484,7 @@
                             networkofferingid: {
                                 label: 'label.network.offering',
                                 isEditable: true,
-                                select: function(args) {
+                                select: function (args) {
                                     if (args.context.networks[0].state == 'Destroyed') {
                                         args.response.success({
                                             data: []
@@ -3497,9 +3497,9 @@
                                         url: createURL("listNetworkOfferings&networkid=" + args.context.networks[0].id),
                                         dataType: "json",
                                         async: false,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var networkOfferingObjs = json.listnetworkofferingsresponse.networkoffering;
-                                            $(networkOfferingObjs).each(function() {
+                                            $(networkOfferingObjs).each(function () {
                                                 items.push({
                                                     id: this.id,
                                                     description: this.displaytext
@@ -3523,7 +3523,7 @@
                                 label: 'label.id'
                             }
                         }],
-                        dataProvider: function(args) {
+                        dataProvider: function (args) {
                             $.ajax({
                                 url: createURL("listNetworks&id=" + args.context.networks[0].id + "&listAll=true"), //pass "&listAll=true" to "listNetworks&id=xxxxxxxx" for now before API gets fixed.
                                 data: {
@@ -3531,14 +3531,14 @@
                                 },
                                 dataType: "json",
                                 async: true,
-                                success: function(json) {
+                                success: function (json) {
                                     var jsonObj = json.listnetworksresponse.network[0];
                                     if (jsonObj.aclid != null) {
 
                                         $.ajax({
                                             url: createURL("listNetworkACLLists&id=" + jsonObj.aclid),
                                             dataType: "json",
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var aclObj = json.listnetworkacllistsresponse.networkacllist[0];
                                                 args.response.success({
                                                     actionFilter: cloudStack.actionFilter.guestNetwork,
@@ -3548,7 +3548,7 @@
 
                                                 });
                                             },
-                                            error: function(json) {
+                                            error: function (json) {
 
                                                 args.response.error(parseXMLHttpResponse(json));
                                             }
@@ -3570,7 +3570,7 @@
 
                     acl: {
                         title: 'label.network.ACL',
-                        custom: function(args) {
+                        custom: function (args) {
                             // Widget renders ACL multi-edit, overriding this fn
                             return $('<div>');
                         }
@@ -3578,7 +3578,7 @@
 
                     ipAddresses: {
                         title: 'label.menu.ipaddresses',
-                        custom: function(args) {
+                        custom: function (args) {
                             // Widget renders IP addresses, overriding this fn
                             return $('<div>');
                         }
@@ -3586,14 +3586,14 @@
 
                     addloadBalancer: {
                         title: 'label.add.load.balancer',
-                        custom: function(args) {
+                        custom: function (args) {
                             var context = args.context;
 
                             return $('<div>').multiEdit({
                                 context: context,
                                 listView: $.extend(true, {}, cloudStack.sections.instances, {
                                     listView: {
-                                        dataProvider: function(args) {
+                                        dataProvider: function (args) {
                                             var networkid;
                                             if ('vpc' in args.context)
                                                 networkid = args.context.multiData.tier;
@@ -3612,20 +3612,20 @@
                                                 data: data,
                                                 dataType: 'json',
                                                 async: true,
-                                                success: function(data) {
+                                                success: function (data) {
                                                     args.response.success({
                                                         data: $.grep(
                                                             data.listvirtualmachinesresponse.virtualmachine ?
-                                                            data.listvirtualmachinesresponse.virtualmachine : [],
-                                                            function(instance) {
+                                                                data.listvirtualmachinesresponse.virtualmachine : [],
+                                                            function (instance) {
                                                                 return $.inArray(instance.state, [
-                                                                    'Destroyed'
-                                                                ]) == -1;
+                                                                        'Destroyed'
+                                                                    ]) == -1;
                                                             }
                                                         )
                                                     });
                                                 },
-                                                error: function(data) {
+                                                error: function (data) {
                                                     args.response.error(parseXMLHttpResponse(data));
                                                 }
                                             });
@@ -3648,7 +3648,7 @@
                                     },
                                     'algorithm': {
                                         label: 'label.algorithm',
-                                        select: function(args) {
+                                        select: function (args) {
                                             args.response.success({
                                                 data: [{
                                                     name: 'roundrobin',
@@ -3677,7 +3677,7 @@
                                 },
                                 add: {
                                     label: 'label.add.vm',
-                                    action: function(args) {
+                                    action: function (args) {
                                         var data = {
                                             algorithm: args.data.algorithm,
                                             name: args.data.name,
@@ -3709,7 +3709,7 @@
                                             data: data,
                                             dataType: 'json',
                                             async: true,
-                                            success: function(data) {
+                                            success: function (data) {
                                                 var itemData = args.itemData;
                                                 var jobID = data.createloadbalancerruleresponse.jobid;
 
@@ -3717,13 +3717,13 @@
                                                     url: createURL('assignToLoadBalancerRule'),
                                                     data: {
                                                         id: data.createloadbalancerruleresponse.id,
-                                                        virtualmachineids: $.map(itemData, function(elem) {
+                                                        virtualmachineids: $.map(itemData, function (elem) {
                                                             return elem.id;
                                                         }).join(',')
                                                     },
                                                     dataType: 'json',
                                                     async: true,
-                                                    success: function(data) {
+                                                    success: function (data) {
                                                         var lbCreationComplete = false;
 
                                                         args.response.success({
@@ -3732,13 +3732,13 @@
                                                             },
                                                             notification: {
                                                                 label: 'label.add.load.balancer',
-                                                                poll: function(args) {
+                                                                poll: function (args) {
                                                                     var complete = args.complete;
                                                                     var error = args.error;
 
                                                                     pollAsyncJobResult({
                                                                         _custom: args._custom,
-                                                                        complete: function(args) {
+                                                                        complete: function (args) {
                                                                             if (lbCreationComplete) {
                                                                                 return;
                                                                             }
@@ -3767,18 +3767,18 @@
                                                             }
                                                         });
                                                     },
-                                                    error: function(data) {
+                                                    error: function (data) {
                                                         args.response.error(parseXMLHttpResponse(data));
                                                     }
                                                 });
                                             },
-                                            error: function(data) {
+                                            error: function (data) {
                                                 args.response.error(parseXMLHttpResponse(data));
                                             }
                                         });
                                     }
                                 },
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     args.response.success({ //no LB listing in AddLoadBalancer tab
                                         data: []
                                     });
@@ -3789,7 +3789,7 @@
                 }
             }, //duplicate from cloudStack.sections.network.sections.networks.listView.detailView (begin)
 
-            actionPreFilter: function(args) {
+            actionPreFilter: function (args) {
                 var tier = args.context.networks[0];
                 var state = tier.state;
 
@@ -3815,7 +3815,7 @@
                                     required: true
                                 },
                                 dependsOn: 'zoneId',
-                                select: function(args) {
+                                select: function (args) {
                                     var publicLbNetworkExists = false;
                                     $.ajax({
                                         url: createURL('listNetworks'),
@@ -3823,7 +3823,7 @@
                                             vpcid: args.context.vpc[0].id,
                                             supportedservices: 'LB'
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             var publicLbNetworkExists = false;
 
                                             var lbNetworks = json.listnetworksresponse.network;
@@ -3836,9 +3836,9 @@
                                                             id: lbNetworks[i].networkofferingid
                                                         },
                                                         async: false,
-                                                        success: function(json) {
+                                                        success: function (json) {
                                                             var networkOffering = json.listnetworkofferingsresponse.networkoffering[0];
-                                                            $(networkOffering.service).each(function() {
+                                                            $(networkOffering.service).each(function () {
                                                                 var thisService = this;
                                                                 if (thisService.name == "Lb" && lbProviderMap.publicLb.vpc.indexOf(thisService.provider[0].name) != -1) {
                                                                     thisNetworkOfferingIncludesPublicLbService = true;
@@ -3862,12 +3862,12 @@
                                                     guestiptype: 'Isolated',
                                                     state: 'Enabled'
                                                 },
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var networkOfferings = json.listnetworkofferingsresponse.networkoffering;
-                                                    args.$select.change(function() {
+                                                    args.$select.change(function () {
                                                         var $vlan = args.$select.closest('form').find('[rel=vlan]');
                                                         var networkOffering = $.grep(
-                                                            networkOfferings, function(netoffer) {
+                                                            networkOfferings, function (netoffer) {
                                                                 return netoffer.id == args.$select.val();
                                                             }
                                                         )[0];
@@ -3882,9 +3882,9 @@
                                                     //only one network(tier) is allowed to have PublicLb (i.e. provider is PublicLb provider like "VpcVirtualRouter") in a VPC
                                                     var items;
                                                     if (publicLbNetworkExists == true) { //so, if a PublicLb network(tier) already exists in the vpc, exclude PublicLb network offerings from dropdown
-                                                        items = $.grep(networkOfferings, function(networkOffering) {
+                                                        items = $.grep(networkOfferings, function (networkOffering) {
                                                             var thisNetworkOfferingIncludesPublicLbService = false;
-                                                            $(networkOffering.service).each(function() {
+                                                            $(networkOffering.service).each(function () {
                                                                 var thisService = this;
                                                                 if (thisService.name == "Lb" && lbProviderMap.publicLb.vpc.indexOf(thisService.provider[0].name) != -1) {
                                                                     thisNetworkOfferingIncludesPublicLbService = true;
@@ -3898,7 +3898,7 @@
                                                     }
 
                                                     args.response.success({
-                                                        data: $.map(items, function(item) {
+                                                        data: $.map(items, function (item) {
                                                             return {
                                                                 id: item.id,
                                                                 description: item.name
@@ -3935,19 +3935,19 @@
 
                             aclid: {
                                 label: 'label.acl',
-                                select: function(args) {
+                                select: function (args) {
                                     $.ajax({
                                         url: createURL('listNetworkACLLists&vpcid=' + args.context.vpc[0].id),
                                         dataType: 'json',
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var objs = json.listnetworkacllistsresponse.networkacllist;
                                             var items = [];
                                             items.push({
                                                 id: '',
                                                 description: ''
                                             });
-                                            $(objs).each(function() {
+                                            $(objs).each(function () {
 
                                                 items.push({
                                                     id: this.id,
@@ -3969,7 +3969,7 @@
                                 },
                                 isHidden: true,
 
-                                select: function(args) {
+                                select: function (args) {
                                     //var $zoneSelect = $(".ui-dialog-content").find('select.zoneid');
                                     var $zoneSelect = args.$select.closest('form').find('[rel=zoneid]');
                                     if (!args.context.regions) {
@@ -3983,19 +3983,19 @@
                                         $zoneSelect.css('display', 'inline-block');
                                         $.ajax({
                                             url: createURL('listZones'),
-                                            success: function(json) {
-                                               var zones = $.grep(json.listzonesresponse.zone, function(zone) {
-                                                   return (zone.networktype == 'Advanced');
-                                               });
+                                            success: function (json) {
+                                                var zones = $.grep(json.listzonesresponse.zone, function (zone) {
+                                                    return (zone.networktype == 'Advanced');
+                                                });
 
-                                               args.response.success({
-                                                   data: $.map(zones, function(zone) {
-                                                       return {
-                                                           id: zone.id,
-                                                           description: zone.name
-                                                       };
-                                                   })
-                                               });
+                                                args.response.success({
+                                                    data: $.map(zones, function (zone) {
+                                                        return {
+                                                            id: zone.id,
+                                                            description: zone.name
+                                                        };
+                                                    })
+                                                });
                                             }
                                         });
                                     }
@@ -4003,7 +4003,7 @@
                             }
                         }
                     },
-                    action: function(args) {
+                    action: function (args) {
                         var dataObj = {
                             vpcid: args.context.vpc[0].id,
                             domainid: args.context.vpc[0].domainid,
@@ -4018,11 +4018,11 @@
                         if (args.context.regions)
                             $.extend(dataObj, {
                                 zoneId: args.data.zoneid
-                        })
+                            })
                         else
                             $.extend(dataObj, {
                                 zoneId: args.context.vpc[0].zoneid
-                        });
+                            });
 
 
                         if (args.data.aclid != '')
@@ -4040,48 +4040,48 @@
                             url: createURL('createNetwork'),
                             dataType: 'json',
                             data: dataObj,
-                            success: function(json) {
+                            success: function (json) {
                                 args.response.success({
                                     data: json.createnetworkresponse.network
                                 });
                             },
-                            error: function(XMLHttpResponse) {
+                            error: function (XMLHttpResponse) {
                                 args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                             }
                         });
                     },
                     messages: {
-                        notification: function() {
+                        notification: function () {
                             return 'label.add.new.tier';
                         }
                     }
                 },
 
                 /*
-         start: {
-         label: 'Start tier',
-         shortLabel: 'Start',
-         action: function(args) {
-         args.response.success();
-         },
-         notification: {
-         poll: function(args) { args.complete({ data: { state: 'Running' } }); }
-         }
-         },
-         */
+                 start: {
+                 label: 'Start tier',
+                 shortLabel: 'Start',
+                 action: function(args) {
+                 args.response.success();
+                 },
+                 notification: {
+                 poll: function(args) { args.complete({ data: { state: 'Running' } }); }
+                 }
+                 },
+                 */
 
                 /*
-         stop: {
-         label: 'Stop tier',
-         shortLabel: 'Stop',
-         action: function(args) {
-         args.response.success();
-         },
-         notification: {
-         poll: function(args) { args.complete({ data: { state: 'Stopped' } }); }
-         }
-         },
-         */
+                 stop: {
+                 label: 'Stop tier',
+                 shortLabel: 'Stop',
+                 action: function(args) {
+                 args.response.success();
+                 },
+                 notification: {
+                 poll: function(args) { args.complete({ data: { state: 'Stopped' } }); }
+                 }
+                 },
+                 */
 
                 addVM: {
                     label: 'label.add.VM.to.tier',
@@ -4100,21 +4100,21 @@
 
                 // Removing ACL buttons from the tier chart
                 /* acl: {
-          label: 'Configure ACL for tier',
-          shortLabel: 'ACL',
-         multiEdit: aclMultiEdit
-        }, */
+                 label: 'Configure ACL for tier',
+                 shortLabel: 'ACL',
+                 multiEdit: aclMultiEdit
+                 }, */
 
                 remove: {
                     label: 'label.remove.tier',
-                    action: function(args) {
+                    action: function (args) {
                         $.ajax({
                             url: createURL('deleteNetwork'),
                             dataType: "json",
                             data: {
                                 id: args.context.networks[0].id
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 var jid = json.deletenetworkresponse.jobid;
                                 args.response.success({
                                     _custom: {
@@ -4131,7 +4131,7 @@
             },
 
             // Get tiers
-            dataProvider: function(args) {
+            dataProvider: function (args) {
                 $.ajax({
                     url: createURL("listNetworks"),
                     dataType: "json",
@@ -4142,7 +4142,7 @@
                         account: args.context.vpc[0].account
                     },
                     async: true,
-                    success: function(json) {
+                    success: function (json) {
                         var networks = json.listnetworksresponse.network;
                         var networkACLLists, publicIpAddresses, privateGateways, vpnGateways;
                         var error = false;
@@ -4154,10 +4154,10 @@
                                 'vpcid': args.context.vpc[0].id
                             },
                             async: false,
-                            success: function(json) {
+                            success: function (json) {
                                 networkACLLists = json.listnetworkacllistsresponse;
                             },
-                            error: function(json) {
+                            error: function (json) {
                                 error = true;
                             }
                         });
@@ -4170,10 +4170,10 @@
                                 vpcid: args.context.vpc[0].id,
                                 listAll: true
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 publicIpAddresses = json.listpublicipaddressesresponse;
                             },
-                            error: function(json) {
+                            error: function (json) {
                                 error = true;
                             }
                         });
@@ -4186,10 +4186,10 @@
                                 'vpcid': args.context.vpc[0].id,
                                 listAll: true
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 privateGateways = json.listprivategatewaysresponse;
                             },
-                            error: function(json) {
+                            error: function (json) {
                                 error = true;
                             }
                         });
@@ -4202,10 +4202,10 @@
                                 listAll: true,
                                 'vpcid': args.context.vpc[0].id
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 vpnGateways = json.listvpngatewaysresponse;
                             },
-                            error: function(json) {
+                            error: function (json) {
                                 error = true;
                             }
                         });
@@ -4228,7 +4228,7 @@
                                 name: 'Network ACL lists',
                                 total: networkACLLists.count
                             }],
-                            tiers: $(networks).map(function(index, tier) {
+                            tiers: $(networks).map(function (index, tier) {
                                 var internalLoadBalancers, publicLbIps, virtualMachines, staticNatIps;
 
                                 // Get internal load balancers
@@ -4238,10 +4238,10 @@
                                     data: {
                                         networkid: tier.id
                                     },
-                                    success: function(json) {
+                                    success: function (json) {
                                         internalLoadBalancers = json.listloadbalancersresponse;
                                     },
-                                    error: function(json) {
+                                    error: function (json) {
                                         error = true;
                                     }
                                 });
@@ -4254,10 +4254,10 @@
                                         associatednetworkid: tier.id,
                                         forloadbalancing: true
                                     },
-                                    success: function(json) {
+                                    success: function (json) {
                                         publicLbIps = json.listpublicipaddressesresponse;
                                     },
-                                    error: function(json) {
+                                    error: function (json) {
                                         error = true;
                                     }
                                 });
@@ -4270,10 +4270,10 @@
                                         associatednetworkid: tier.id,
                                         isstaticnat: true
                                     },
-                                    success: function(json) {
+                                    success: function (json) {
                                         staticNatIps = json.listpublicipaddressesresponse;
                                     },
-                                    error: function(json) {
+                                    error: function (json) {
                                         error = true;
                                     }
                                 });
@@ -4285,10 +4285,10 @@
                                     data: {
                                         networkid: tier.id
                                     },
-                                    success: function(json) {
+                                    success: function (json) {
                                         virtualMachines = json.listvirtualmachinesresponse;
                                     },
-                                    error: function(json) {
+                                    error: function (json) {
                                         error = true;
                                     }
                                 });
@@ -4296,9 +4296,9 @@
                                 // Highlight if any tier VM contains guest network
                                 $.grep(
                                     virtualMachines.virtualmachine ? virtualMachines.virtualmachine : [],
-                                    function(vm) {
+                                    function (vm) {
                                         return $.grep(vm.nic,
-                                            function(nic) {
+                                            function (nic) {
                                                 return nic.type == 'Shared';
                                             }).length;
                                     }
@@ -4308,34 +4308,34 @@
 
                                 var lbSchemes = $.grep(
                                     tier.service,
-                                    function(service) {
+                                    function (service) {
                                         return service.name == 'Lb';
                                     }
                                 ).length ? $.grep($.grep(
                                     tier.service,
-                                    function(service) {
+                                    function (service) {
                                         return service.name == 'Lb';
                                     }
-                                )[0].capability, function(capability) {
+                                )[0].capability, function (capability) {
                                     return capability.name == 'LbSchemes';
                                 }) : [];
 
                                 /*      var lbSchemes = $.grep(
-                  $.grep(
-                    tier.service,
-                    function(service) {
-                      return service.name == 'Lb';
-                    }
-                  )[0].capability,
-                  function(capability) {
-                    return capability.name == 'LbSchemes';
-                  }
-                );*/
+                                 $.grep(
+                                 tier.service,
+                                 function(service) {
+                                 return service.name == 'Lb';
+                                 }
+                                 )[0].capability,
+                                 function(capability) {
+                                 return capability.name == 'LbSchemes';
+                                 }
+                                 );*/
 
-                                var hasLbScheme = function(schemeVal) {
+                                var hasLbScheme = function (schemeVal) {
                                     return $.grep(
                                         lbSchemes,
-                                        function(scheme) {
+                                        function (scheme) {
                                             return scheme.value == schemeVal;
                                         }
                                     ).length ? true : false;

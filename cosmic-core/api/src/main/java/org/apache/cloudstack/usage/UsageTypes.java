@@ -16,10 +16,10 @@
 // under the License.
 package org.apache.cloudstack.usage;
 
+import org.apache.cloudstack.api.response.UsageTypeResponse;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.cloudstack.api.response.UsageTypeResponse;
 
 public class UsageTypes {
     /* Any changes here should also reflect in cloud_usage.quota_mapping table */

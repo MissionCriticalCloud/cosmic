@@ -20,10 +20,6 @@
 package com.cloud.agent.api;
 
 public class SecurityGroupRuleAnswer extends Answer {
-    public static enum FailureReason {
-        NONE, UNKNOWN, PROGRAMMING_FAILED, CANNOT_BRIDGE_FIREWALL
-    }
-
     Long logSequenceNumber = null;
     Long vmId = null;
     FailureReason reason = FailureReason.NONE;
@@ -31,20 +27,20 @@ public class SecurityGroupRuleAnswer extends Answer {
     protected SecurityGroupRuleAnswer() {
     }
 
-    public SecurityGroupRuleAnswer(SecurityGroupRulesCmd cmd) {
+    public SecurityGroupRuleAnswer(final SecurityGroupRulesCmd cmd) {
         super(cmd);
         this.logSequenceNumber = cmd.getSeqNum();
         this.vmId = cmd.getVmId();
     }
 
-    public SecurityGroupRuleAnswer(SecurityGroupRulesCmd cmd, boolean result, String detail) {
+    public SecurityGroupRuleAnswer(final SecurityGroupRulesCmd cmd, final boolean result, final String detail) {
         super(cmd, result, detail);
         this.logSequenceNumber = cmd.getSeqNum();
         this.vmId = cmd.getVmId();
         reason = FailureReason.PROGRAMMING_FAILED;
     }
 
-    public SecurityGroupRuleAnswer(SecurityGroupRulesCmd cmd, boolean result, String detail, FailureReason r) {
+    public SecurityGroupRuleAnswer(final SecurityGroupRulesCmd cmd, final boolean result, final String detail, final FailureReason r) {
         super(cmd, result, detail);
         this.logSequenceNumber = cmd.getSeqNum();
         this.vmId = cmd.getVmId();
@@ -63,8 +59,11 @@ public class SecurityGroupRuleAnswer extends Answer {
         return reason;
     }
 
-    public void setReason(FailureReason reason) {
+    public void setReason(final FailureReason reason) {
         this.reason = reason;
     }
 
+    public static enum FailureReason {
+        NONE, UNKNOWN, PROGRAMMING_FAILED, CANNOT_BRIDGE_FIREWALL
+    }
 }

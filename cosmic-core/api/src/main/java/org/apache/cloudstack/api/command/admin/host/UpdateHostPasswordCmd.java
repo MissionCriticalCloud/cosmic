@@ -17,7 +17,6 @@
 package org.apache.cloudstack.api.command.admin.host;
 
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
@@ -25,11 +24,12 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ClusterResponse;
 import org.apache.cloudstack.api.response.HostResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "updateHostPassword", description = "Update password of a host/pool on management server.", responseObject = SuccessResponse.class,
-requestHasSensitiveInfo = true, responseHasSensitiveInfo = false)
+        requestHasSensitiveInfo = true, responseHasSensitiveInfo = false)
 public class UpdateHostPasswordCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateHostPasswordCmd.class.getName());
 
@@ -54,17 +54,12 @@ public class UpdateHostPasswordCmd extends BaseCmd {
     @Parameter(name = ApiConstants.PASSWORD, type = CommandType.STRING, required = true, description = "the new password for the host/cluster")
     private String password;
 
-
     // ///////////////////////////////////////////////////
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
 
     public Long getHostId() {
         return hostId;
-    }
-
-    public Long getClusterId() {
-        return clusterId;
     }
 
     public Boolean getUpdatePasswdOnHost() {
@@ -79,20 +74,6 @@ public class UpdateHostPasswordCmd extends BaseCmd {
         return username;
     }
 
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
     @Override
     public void execute() {
         if (getClusterId() == null) {
@@ -104,5 +85,23 @@ public class UpdateHostPasswordCmd extends BaseCmd {
         }
 
         setResponseObject(new SuccessResponse(getCommandName()));
+    }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
+
+    public Long getClusterId() {
+        return clusterId;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

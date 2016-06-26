@@ -19,6 +19,8 @@
 
 package com.cloud.network.resource.wrapper;
 
+import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
+
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.DeleteLogicalSwitchAnswer;
 import com.cloud.agent.api.DeleteLogicalSwitchCommand;
@@ -28,8 +30,6 @@ import com.cloud.network.resource.NiciraNvpResource;
 import com.cloud.network.utils.CommandRetryUtility;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-
-import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
 
 @ResourceWrapper(handles = DeleteLogicalSwitchCommand.class)
 public final class NiciraNvpDeleteLogicalSwitchCommandWrapper extends CommandWrapper<DeleteLogicalSwitchCommand, Answer, NiciraNvpResource> {

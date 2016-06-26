@@ -18,7 +18,7 @@ package com.cloud.api.doc;
 
 import java.io.Serializable;
 
-public class Alert implements Serializable{
+public class Alert implements Serializable {
     /**
      *
      */
@@ -38,5 +38,4 @@ public class Alert implements Serializable{
     public int getValue() {
         return value;
     }
-
 }

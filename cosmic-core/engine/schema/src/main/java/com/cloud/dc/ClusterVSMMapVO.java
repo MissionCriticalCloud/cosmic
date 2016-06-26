@@ -47,12 +47,12 @@ public class ClusterVSMMapVO {
         return clusterId;
     }
 
-    public long getVsmId() {
-        return vsmId;
-    }
-
     public void setClusterId(long clusterId) {
         this.clusterId = clusterId;
+    }
+
+    public long getVsmId() {
+        return vsmId;
     }
 
     public void setVsmId(long vsmId) {

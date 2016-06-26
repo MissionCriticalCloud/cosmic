@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 public class FtpTemplateUploader implements TemplateUploader {
 
     public static final Logger s_logger = LoggerFactory.getLogger(FtpTemplateUploader.class.getName());
+    private static final int CHUNK_SIZE = 1024 * 1024; //1M
     public TemplateUploader.Status status = TemplateUploader.Status.NOT_STARTED;
     public String errorString = "";
     public long totalBytes = 0;
@@ -44,7 +45,6 @@ public class FtpTemplateUploader implements TemplateUploader {
     private UploadCompleteCallback completionCallback;
     private BufferedInputStream inputStream = null;
     private BufferedOutputStream outputStream = null;
-    private static final int CHUNK_SIZE = 1024 * 1024; //1M
 
     public FtpTemplateUploader(String sourcePath, String url, UploadCompleteCallback callback, long entitySizeinBytes) {
 
@@ -52,7 +52,17 @@ public class FtpTemplateUploader implements TemplateUploader {
         ftpUrl = url;
         completionCallback = callback;
         this.entitySizeinBytes = entitySizeinBytes;
+    }
 
+    @Override
+    public void run() {
+        try {
+            upload(completionCallback);
+        } catch (Throwable t) {
+            s_logger.warn("Caught exception during upload " + t.getMessage(), t);
+            errorString = "Failed to install: " + t.getMessage();
+            status = TemplateUploader.Status.UNRECOVERABLE_ERROR;
+        }
     }
 
     @Override
@@ -64,7 +74,6 @@ public class FtpTemplateUploader implements TemplateUploader {
             case UPLOAD_FINISHED:
                 return 0;
             default:
-
         }
 
         new Date();
@@ -136,67 +145,6 @@ public class FtpTemplateUploader implements TemplateUploader {
     }
 
     @Override
-    public void run() {
-        try {
-            upload(completionCallback);
-        } catch (Throwable t) {
-            s_logger.warn("Caught exception during upload " + t.getMessage(), t);
-            errorString = "Failed to install: " + t.getMessage();
-            status = TemplateUploader.Status.UNRECOVERABLE_ERROR;
-        }
-
-    }
-
-    @Override
-    public Status getStatus() {
-        return status;
-    }
-
-    @Override
-    public String getUploadError() {
-        return errorString;
-    }
-
-    @Override
-    public String getUploadLocalPath() {
-        return sourcePath;
-    }
-
-    @Override
-    public int getUploadPercent() {
-        if (entitySizeinBytes == 0) {
-            return 0;
-        }
-        return (int)(100.0 * totalBytes / entitySizeinBytes);
-    }
-
-    @Override
-    public long getUploadTime() {
-        // TODO
-        return 0;
-    }
-
-    @Override
-    public long getUploadedBytes() {
-        return totalBytes;
-    }
-
-    @Override
-    public void setResume(boolean resume) {
-
-    }
-
-    @Override
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    @Override
-    public void setUploadError(String string) {
-        errorString = string;
-    }
-
-    @Override
     public boolean stopUpload() {
         switch (getStatus()) {
             case IN_PROGRESS:
@@ -226,4 +174,52 @@ public class FtpTemplateUploader implements TemplateUploader {
         }
     }
 
+    @Override
+    public int getUploadPercent() {
+        if (entitySizeinBytes == 0) {
+            return 0;
+        }
+        return (int) (100.0 * totalBytes / entitySizeinBytes);
+    }
+
+    @Override
+    public Status getStatus() {
+        return status;
+    }
+
+    @Override
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    @Override
+    public long getUploadTime() {
+        // TODO
+        return 0;
+    }
+
+    @Override
+    public long getUploadedBytes() {
+        return totalBytes;
+    }
+
+    @Override
+    public String getUploadError() {
+        return errorString;
+    }
+
+    @Override
+    public void setUploadError(String string) {
+        errorString = string;
+    }
+
+    @Override
+    public String getUploadLocalPath() {
+        return sourcePath;
+    }
+
+    @Override
+    public void setResume(boolean resume) {
+
+    }
 }

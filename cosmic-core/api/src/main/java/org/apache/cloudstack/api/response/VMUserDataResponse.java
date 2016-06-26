@@ -19,10 +19,10 @@
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 public class VMUserDataResponse extends BaseResponse {
     @SerializedName(ApiConstants.VIRTUAL_MACHINE_ID)
@@ -40,5 +40,4 @@ public class VMUserDataResponse extends BaseResponse {
     public void setVmId(String vmId) {
         this.vmId = vmId;
     }
-
 }

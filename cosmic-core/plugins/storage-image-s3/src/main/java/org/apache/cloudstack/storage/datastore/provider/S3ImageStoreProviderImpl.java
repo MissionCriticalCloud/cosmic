@@ -18,15 +18,8 @@
  */
 package org.apache.cloudstack.storage.datastore.provider;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import com.cloud.storage.ScopeType;
 import com.cloud.utils.component.ComponentContext;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreDriver;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreLifeCycle;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProvider;
@@ -38,23 +31,38 @@ import org.apache.cloudstack.storage.image.ImageStoreDriver;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreHelper;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreProviderManager;
 import org.apache.cloudstack.storage.image.store.lifecycle.ImageStoreLifeCycle;
+
+import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class S3ImageStoreProviderImpl implements ImageStoreProvider {
 
+    private final String providerName = DataStoreProvider.S3_IMAGE;
+    protected ImageStoreLifeCycle lifeCycle;
+    protected ImageStoreDriver driver;
     @Inject
     ImageStoreProviderManager storeMgr;
     @Inject
     ImageStoreHelper helper;
 
-    private final String providerName = DataStoreProvider.S3_IMAGE;
-    protected ImageStoreLifeCycle lifeCycle;
-    protected ImageStoreDriver driver;
-
     @Override
     public DataStoreLifeCycle getDataStoreLifeCycle() {
         return lifeCycle;
+    }
+
+    @Override
+    public DataStoreDriver getDataStoreDriver() {
+        return this.driver;
+    }
+
+    @Override
+    public HypervisorHostListener getHostListener() {
+        return null;
     }
 
     @Override
@@ -71,16 +79,6 @@ public class S3ImageStoreProviderImpl implements ImageStoreProvider {
     }
 
     @Override
-    public DataStoreDriver getDataStoreDriver() {
-        return this.driver;
-    }
-
-    @Override
-    public HypervisorHostListener getHostListener() {
-        return null;
-    }
-
-    @Override
     public Set<DataStoreProviderType> getTypes() {
         Set<DataStoreProviderType> types = new HashSet<DataStoreProviderType>();
         types.add(DataStoreProviderType.IMAGE);
@@ -89,8 +87,9 @@ public class S3ImageStoreProviderImpl implements ImageStoreProvider {
 
     @Override
     public boolean isScopeSupported(ScopeType scope) {
-        if (scope == ScopeType.REGION)
+        if (scope == ScopeType.REGION) {
             return true;
+        }
         return false;
     }
 
@@ -98,5 +97,4 @@ public class S3ImageStoreProviderImpl implements ImageStoreProvider {
     public boolean needDownloadSysTemplate() {
         return true;
     }
-
 }

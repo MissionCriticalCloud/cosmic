@@ -16,12 +16,6 @@
 // under the License.
 package com.cloud.ha;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.FenceAnswer;
 import com.cloud.agent.api.FenceCommand;
@@ -37,6 +31,11 @@ import com.cloud.resource.ResourceManager;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.VirtualMachine;
 
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +50,10 @@ public class KVMFencer extends AdapterBase implements FenceBuilder {
     AlertManager _alertMgr;
     @Inject
     ResourceManager _resourceMgr;
+
+    public KVMFencer() {
+        super();
+    }
 
     @Override
     public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
@@ -68,10 +71,6 @@ public class KVMFencer extends AdapterBase implements FenceBuilder {
     public boolean stop() {
         // TODO Auto-generated method stub
         return true;
-    }
-
-    public KVMFencer() {
-        super();
     }
 
     @Override
@@ -98,7 +97,7 @@ public class KVMFencer extends AdapterBase implements FenceBuilder {
                 }
                 FenceAnswer answer;
                 try {
-                    answer = (FenceAnswer)_agentMgr.send(h.getId(), fence);
+                    answer = (FenceAnswer) _agentMgr.send(h.getId(), fence);
                 } catch (AgentUnavailableException e) {
                     s_logger.info("Moving on to the next host because " + h.toString() + " is unavailable");
                     continue;
@@ -113,9 +112,9 @@ public class KVMFencer extends AdapterBase implements FenceBuilder {
         }
 
         _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_HOST, host.getDataCenterId(), host.getPodId(),
-                            "Unable to fence off host: " + host.getId(),
-                            "Fencing off host " + host.getId() + " did not succeed after asking " + i + " hosts. " +
-                            "Check Agent logs for more information.");
+                "Unable to fence off host: " + host.getId(),
+                "Fencing off host " + host.getId() + " did not succeed after asking " + i + " hosts. " +
+                        "Check Agent logs for more information.");
 
         s_logger.error("Unable to fence off " + vm.toString() + " on " + host.toString());
 

@@ -16,6 +16,8 @@
 // under the License.
 package com.cloud.gpu;
 
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,48 +25,46 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.apache.cloudstack.api.InternalIdentity;
-
 @Entity
-@Table(name="vgpu_types")
+@Table(name = "vgpu_types")
 public class VGPUTypesVO implements InternalIdentity {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name="id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private long id;
 
-    @Column(name="gpu_group_id")
+    @Column(name = "gpu_group_id")
     private long gpuGroupId;
 
-    @Column(name="vgpu_type")
+    @Column(name = "vgpu_type")
     private String vgpuType;
 
-    @Column(name="video_ram")
+    @Column(name = "video_ram")
     private long videoRam;
 
-    @Column(name="max_heads")
+    @Column(name = "max_heads")
     private long maxHeads;
 
-    @Column(name="max_resolution_x")
+    @Column(name = "max_resolution_x")
     private long maxResolutionX;
 
-    @Column(name="max_resolution_y")
+    @Column(name = "max_resolution_y")
     private long maxResolutionY;
 
-    @Column(name="max_vgpu_per_pgpu")
+    @Column(name = "max_vgpu_per_pgpu")
     private long maxVgpuPerPgpu;
 
-    @Column(name="remaining_capacity")
+    @Column(name = "remaining_capacity")
     private long remainingCapacity;
 
-    @Column(name="max_capacity")
+    @Column(name = "max_capacity")
     private long maxCapacity;
 
     protected VGPUTypesVO() {
     }
 
     public VGPUTypesVO(long gpuGroupId, String vgpuType, long videoRam, long maxHeads, long maxResolutionX, long maxResolutionY, long maxVgpuPerPgpu,
-            long remainingCapacity, long maxCapacity) {
+                       long remainingCapacity, long maxCapacity) {
         this.gpuGroupId = gpuGroupId;
         this.vgpuType = vgpuType;
         this.videoRam = videoRam;

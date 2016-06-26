@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.util.List;
-
 import com.cloud.dc.StorageNetworkIpRangeVO;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
@@ -26,6 +24,8 @@ import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -41,16 +41,16 @@ public class StorageNetworkIpRangeDaoImpl extends GenericDaoBase<StorageNetworkI
     }
 
     @Override
-    public List<StorageNetworkIpRangeVO> listByPodId(long podId) {
+    public List<StorageNetworkIpRangeVO> listByRangeId(long rangeId) {
         QueryBuilder<StorageNetworkIpRangeVO> sc = QueryBuilder.create(StorageNetworkIpRangeVO.class);
-        sc.and(sc.entity().getPodId(), Op.EQ, podId);
+        sc.and(sc.entity().getId(), Op.EQ, rangeId);
         return sc.list();
     }
 
     @Override
-    public List<StorageNetworkIpRangeVO> listByRangeId(long rangeId) {
+    public List<StorageNetworkIpRangeVO> listByPodId(long podId) {
         QueryBuilder<StorageNetworkIpRangeVO> sc = QueryBuilder.create(StorageNetworkIpRangeVO.class);
-        sc.and(sc.entity().getId(), Op.EQ, rangeId);
+        sc.and(sc.entity().getPodId(), Op.EQ, podId);
         return sc.list();
     }
 
@@ -66,5 +66,4 @@ public class StorageNetworkIpRangeDaoImpl extends GenericDaoBase<StorageNetworkI
         SearchCriteria<Long> sc = countRanges.create();
         return customSearch(sc, null).get(0);
     }
-
 }

@@ -17,10 +17,10 @@
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 public class ApiLimitResponse extends BaseResponse {
     @SerializedName(ApiConstants.ACCOUNT_ID)
@@ -43,44 +43,43 @@ public class ApiLimitResponse extends BaseResponse {
     @Param(description = "seconds left to reset counters")
     private long expireAfter;
 
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
-
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-    }
-
-    public void setApiIssued(int apiIssued) {
-        this.apiIssued = apiIssued;
-    }
-
-    public void setApiAllowed(int apiAllowed) {
-        this.apiAllowed = apiAllowed;
-    }
-
-    public void setExpireAfter(long duration) {
-        this.expireAfter = duration;
-    }
-
     public String getAccountId() {
         return accountId;
+    }
+
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
     }
 
     public String getAccountName() {
         return accountName;
     }
 
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
     public int getApiIssued() {
         return apiIssued;
+    }
+
+    public void setApiIssued(int apiIssued) {
+        this.apiIssued = apiIssued;
     }
 
     public int getApiAllowed() {
         return apiAllowed;
     }
 
+    public void setApiAllowed(int apiAllowed) {
+        this.apiAllowed = apiAllowed;
+    }
+
     public long getExpireAfter() {
         return expireAfter;
     }
 
+    public void setExpireAfter(long duration) {
+        this.expireAfter = duration;
+    }
 }

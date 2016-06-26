@@ -16,10 +16,10 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.List;
-
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.ResponseObject;
+
+import java.util.List;
 
 public class ListResponse<T extends ResponseObject> extends BaseResponse {
     List<T> responses;

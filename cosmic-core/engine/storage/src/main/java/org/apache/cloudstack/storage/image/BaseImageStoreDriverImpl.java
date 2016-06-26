@@ -18,13 +18,6 @@
  */
 package org.apache.cloudstack.storage.image;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Date;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.agent.api.to.DataObjectType;
@@ -39,7 +32,6 @@ import com.cloud.storage.dao.VMTemplateZoneDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.download.DownloadMonitor;
 import com.cloud.utils.net.Proxy;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.CopyCommandResult;
 import org.apache.cloudstack.engine.subsystem.api.storage.CreateCmdResult;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
@@ -56,6 +48,13 @@ import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
 import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreVO;
+
+import javax.inject.Inject;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Date;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +62,7 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
     private static final Logger s_logger = LoggerFactory.getLogger(BaseImageStoreDriverImpl.class);
     @Inject
     protected VMTemplateDao _templateDao;
+    protected String _proxy = null;
     @Inject
     DownloadMonitor _downloadMonitor;
     @Inject
@@ -79,7 +79,6 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
     VMTemplateZoneDao _vmTemplateZoneDao;
     @Inject
     AlertManager _alertMgr;
-    protected String _proxy = null;
 
     protected Proxy getHttpProxy() {
         if (_proxy == null) {
@@ -104,23 +103,6 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
         return null;
     }
 
-    protected class CreateContext<T> extends AsyncRpcContext<T> {
-        final DataObject data;
-
-        public CreateContext(AsyncCompletionCallback<T> callback, DataObject data) {
-            super(callback);
-            this.data = data;
-        }
-    }
-
-    protected Long getMaxTemplateSizeInBytes() {
-        try {
-            return Long.parseLong(configDao.getValue("max.template.iso.size")) * 1024L * 1024L * 1024L;
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
     @Override
     public void createAsync(DataStore dataStore, DataObject data, AsyncCompletionCallback<CreateCmdResult> callback) {
         CreateContext<CreateCmdResult> context = new CreateContext<CreateCmdResult>(callback, data);
@@ -142,7 +124,7 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
     }
 
     protected Void createTemplateAsyncCallback(AsyncCallbackDispatcher<? extends BaseImageStoreDriverImpl, DownloadAnswer> callback,
-        CreateContext<CreateCmdResult> context) {
+                                               CreateContext<CreateCmdResult> context) {
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Performing image store createTemplate async callback");
         }
@@ -178,7 +160,7 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
         AsyncCompletionCallback<CreateCmdResult> caller = context.getParentCallback();
 
         if (answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.DOWNLOAD_ERROR ||
-            answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.ABANDONED || answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.UNKNOWN) {
+                answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.ABANDONED || answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.UNKNOWN) {
             CreateCmdResult result = new CreateCmdResult(null, null);
             result.setSuccess(false);
             result.setResult(answer.getErrorString());
@@ -200,7 +182,7 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
     }
 
     protected Void
-        createVolumeAsyncCallback(AsyncCallbackDispatcher<? extends BaseImageStoreDriverImpl, DownloadAnswer> callback, CreateContext<CreateCmdResult> context) {
+    createVolumeAsyncCallback(AsyncCallbackDispatcher<? extends BaseImageStoreDriverImpl, DownloadAnswer> callback, CreateContext<CreateCmdResult> context) {
         DownloadAnswer answer = callback.getResult();
         DataObject obj = context.data;
         DataStore store = obj.getDataStore();
@@ -233,7 +215,7 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
         AsyncCompletionCallback<CreateCmdResult> caller = context.getParentCallback();
 
         if (answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.DOWNLOAD_ERROR ||
-            answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.ABANDONED || answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.UNKNOWN) {
+                answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.ABANDONED || answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.UNKNOWN) {
             CreateCmdResult result = new CreateCmdResult(null, null);
             result.setSuccess(false);
             result.setResult(answer.getErrorString());
@@ -286,7 +268,24 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
     public void resize(DataObject data, AsyncCompletionCallback<CreateCmdResult> callback) {
     }
 
+    protected Long getMaxTemplateSizeInBytes() {
+        try {
+            return Long.parseLong(configDao.getValue("max.template.iso.size")) * 1024L * 1024L * 1024L;
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     @Override
-    public void deleteEntityExtractUrl(DataStore store, String installPath, String url, Upload.Type entityType){
+    public void deleteEntityExtractUrl(DataStore store, String installPath, String url, Upload.Type entityType) {
+    }
+
+    protected class CreateContext<T> extends AsyncRpcContext<T> {
+        final DataObject data;
+
+        public CreateContext(AsyncCompletionCallback<T> callback, DataObject data) {
+            super(callback);
+            this.data = data;
+        }
     }
 }

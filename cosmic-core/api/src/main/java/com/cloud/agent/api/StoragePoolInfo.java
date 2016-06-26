@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.agent.api;
 
-import java.util.Map;
-
 import com.cloud.storage.Storage.StoragePoolType;
+
+import java.util.Map;
 
 public class StoragePoolInfo {
     String uuid;
@@ -34,6 +34,12 @@ public class StoragePoolInfo {
         super();
     }
 
+    public StoragePoolInfo(String uuid, String host, String hostPath, String localPath, StoragePoolType poolType, long capacityBytes, long availableBytes,
+                           Map<String, String> details) {
+        this(uuid, host, hostPath, localPath, poolType, capacityBytes, availableBytes);
+        this.details = details;
+    }
+
     public StoragePoolInfo(String uuid, String host, String hostPath, String localPath, StoragePoolType poolType, long capacityBytes, long availableBytes) {
         super();
         this.uuid = uuid;
@@ -43,12 +49,6 @@ public class StoragePoolInfo {
         this.poolType = poolType;
         this.capacityBytes = capacityBytes;
         this.availableBytes = availableBytes;
-    }
-
-    public StoragePoolInfo(String uuid, String host, String hostPath, String localPath, StoragePoolType poolType, long capacityBytes, long availableBytes,
-            Map<String, String> details) {
-        this(uuid, host, hostPath, localPath, poolType, capacityBytes, availableBytes);
-        this.details = details;
     }
 
     public long getCapacityBytes() {
@@ -61,6 +61,10 @@ public class StoragePoolInfo {
 
     public String getUuid() {
         return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getHost() {
@@ -77,10 +81,6 @@ public class StoragePoolInfo {
 
     public StoragePoolType getPoolType() {
         return poolType;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 
     public Map<String, String> getDetails() {

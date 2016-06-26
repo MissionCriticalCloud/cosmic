@@ -27,10 +27,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import junit.framework.TestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import junit.framework.TestCase;
 
 public class ElementCollectionTest extends TestCase {
     static final Logger s_logger = LoggerFactory.getLogger(ElementCollectionTest.class);
@@ -48,11 +47,11 @@ public class ElementCollectionTest extends TestCase {
             Class<?> type1 = field.getType();
             Object collection = null;
             if (!type1.isArray()) {
-                ParameterizedType type = (ParameterizedType)field.getGenericType();
+                ParameterizedType type = (ParameterizedType) field.getGenericType();
                 Type rawType = type.getRawType();
-                Class<?> rawClazz = (Class<?>)rawType;
+                Class<?> rawClazz = (Class<?>) rawType;
                 if (!Modifier.isAbstract(rawClazz.getModifiers()) && !rawClazz.isInterface() && rawClazz.getConstructors().length != 0 &&
-                    rawClazz.getConstructor() != null) {
+                        rawClazz.getConstructor() != null) {
                     collection = rawClazz.newInstance();
                 }
 

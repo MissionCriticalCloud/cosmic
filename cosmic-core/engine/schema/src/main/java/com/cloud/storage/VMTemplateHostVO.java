@@ -16,7 +16,10 @@
 // under the License.
 package com.cloud.storage;
 
-import java.util.Date;
+import com.cloud.utils.db.GenericDaoBase;
+import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
+import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
+import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,93 +31,92 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.utils.db.GenericDaoBase;
-
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
+import java.util.Date;
 
 /**
  * Join table for storage hosts and templates
- *
  */
 @Entity
 @Table(name = "template_host_ref")
 public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObjectInStore {
+    @Column(name = "update_count", updatable = true, nullable = false)
+    protected long updatedCount;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
-    @Column(name = "host_id")
-    private long hostId;
-
-    @Column(name = "template_id")
-    private long templateId;
-
-    @Column(name = GenericDaoBase.CREATED_COLUMN)
-    private Date created = null;
-
-    @Column(name = "last_updated")
-    @Temporal(value = TemporalType.TIMESTAMP)
-    private Date lastUpdated = null;
-
-    @Column(name = "download_pct")
-    private int downloadPercent;
-
-    @Column(name = "size")
-    private long size;
-
-    @Column(name = "physical_size")
-    private long physicalSize;
-
-    @Column(name = "download_state")
-    @Enumerated(EnumType.STRING)
-    private Status downloadState;
-
-    @Column(name = "local_path")
-    private String localDownloadPath;
-
-    @Column(name = "error_str")
-    private String errorString;
-
-    @Column(name = "job_id")
-    private String jobId;
-
-    @Column(name = "install_path")
-    private String installPath;
-
-    @Column(name = "url", length = 2048)
-    private String downloadUrl;
-
-    @Column(name = "is_copy")
-    private boolean isCopy = false;
-
     @Column(name = "destroyed")
     boolean destroyed = false;
-
-    @Column(name = "update_count", updatable = true, nullable = false)
-    protected long updatedCount;
-
     @Column(name = "updated")
     @Temporal(value = TemporalType.TIMESTAMP)
     Date updated;
-
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     ObjectInDataStoreStateMachine.State state;
+    @Column(name = "host_id")
+    private long hostId;
+    @Column(name = "template_id")
+    private long templateId;
+    @Column(name = GenericDaoBase.CREATED_COLUMN)
+    private Date created = null;
+    @Column(name = "last_updated")
+    @Temporal(value = TemporalType.TIMESTAMP)
+    private Date lastUpdated = null;
+    @Column(name = "download_pct")
+    private int downloadPercent;
+    @Column(name = "size")
+    private long size;
+    @Column(name = "physical_size")
+    private long physicalSize;
+    @Column(name = "download_state")
+    @Enumerated(EnumType.STRING)
+    private Status downloadState;
+    @Column(name = "local_path")
+    private String localDownloadPath;
+    @Column(name = "error_str")
+    private String errorString;
+    @Column(name = "job_id")
+    private String jobId;
+    @Column(name = "install_path")
+    private String installPath;
+    @Column(name = "url", length = 2048)
+    private String downloadUrl;
+    @Column(name = "is_copy")
+    private boolean isCopy = false;
+
+    public VMTemplateHostVO(long hostId, long templateId) {
+        super();
+        this.hostId = hostId;
+        this.templateId = templateId;
+        this.state = ObjectInDataStoreStateMachine.State.Allocated;
+    }
+
+    public VMTemplateHostVO(long hostId, long templateId, Date lastUpdated, int downloadPercent, Status downloadState, String localDownloadPath, String errorString,
+                            String jobId, String installPath, String downloadUrl) {
+        super();
+        this.hostId = hostId;
+        this.templateId = templateId;
+        this.lastUpdated = lastUpdated;
+        this.downloadPercent = downloadPercent;
+        this.downloadState = downloadState;
+        this.localDownloadPath = localDownloadPath;
+        this.errorString = errorString;
+        this.jobId = jobId;
+        this.installPath = installPath;
+        this.setDownloadUrl(downloadUrl);
+    }
+
+    protected VMTemplateHostVO() {
+
+    }
 
     @Override
     public String getInstallPath() {
         return installPath;
     }
 
-    public long getHostId() {
-        return hostId;
-    }
-
-    public void setHostId(long hostId) {
-        this.hostId = hostId;
+    @Override
+    public void setInstallPath(String installPath) {
+        this.installPath = installPath;
     }
 
     @Override
@@ -138,16 +140,6 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
     }
 
     @Override
-    public void setDownloadState(Status downloadState) {
-        this.downloadState = downloadState;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
     public Date getCreated() {
         return created;
     }
@@ -163,44 +155,13 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
     }
 
     @Override
-    public void setInstallPath(String installPath) {
-        this.installPath = installPath;
-    }
-
-    @Override
     public Status getDownloadState() {
         return downloadState;
     }
 
-    public VMTemplateHostVO(long hostId, long templateId) {
-        super();
-        this.hostId = hostId;
-        this.templateId = templateId;
-        this.state = ObjectInDataStoreStateMachine.State.Allocated;
-    }
-
-    public VMTemplateHostVO(long hostId, long templateId, Date lastUpdated, int downloadPercent, Status downloadState, String localDownloadPath, String errorString,
-            String jobId, String installPath, String downloadUrl) {
-        super();
-        this.hostId = hostId;
-        this.templateId = templateId;
-        this.lastUpdated = lastUpdated;
-        this.downloadPercent = downloadPercent;
-        this.downloadState = downloadState;
-        this.localDownloadPath = localDownloadPath;
-        this.errorString = errorString;
-        this.jobId = jobId;
-        this.installPath = installPath;
-        this.setDownloadUrl(downloadUrl);
-    }
-
-    protected VMTemplateHostVO() {
-
-    }
-
     @Override
-    public void setLocalDownloadPath(String localPath) {
-        this.localDownloadPath = localPath;
+    public void setDownloadState(Status downloadState) {
+        this.downloadState = downloadState;
     }
 
     @Override
@@ -209,8 +170,8 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
     }
 
     @Override
-    public void setErrorString(String errorString) {
-        this.errorString = errorString;
+    public void setLocalDownloadPath(String localPath) {
+        this.localDownloadPath = localPath;
     }
 
     @Override
@@ -219,8 +180,8 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
     }
 
     @Override
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
+    public void setErrorString(String errorString) {
+        this.errorString = errorString;
     }
 
     @Override
@@ -229,12 +190,18 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof VMTemplateHostVO) {
-            VMTemplateHostVO other = (VMTemplateHostVO)obj;
-            return (this.templateId == other.getTemplateId() && this.hostId == other.getHostId());
-        }
-        return false;
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
+
+    @Override
+    public long getTemplateSize() {
+        return -1;
+    }
+
+    @Override
+    public long getId() {
+        return id;
     }
 
     @Override
@@ -244,54 +211,66 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
         return tid.hashCode() + hid.hashCode();
     }
 
-    public void setSize(long size) {
-        this.size = size;
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof VMTemplateHostVO) {
+            VMTemplateHostVO other = (VMTemplateHostVO) obj;
+            return (this.templateId == other.getTemplateId() && this.hostId == other.getHostId());
+        }
+        return false;
+    }
+
+    public long getHostId() {
+        return hostId;
+    }
+
+    public void setHostId(long hostId) {
+        this.hostId = hostId;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("TmplHost[").append(id).append("-").append(templateId).append("-").append(hostId).append(installPath).append("]").toString();
     }
 
     public long getSize() {
         return size;
     }
 
-    public void setPhysicalSize(long physicalSize) {
-        this.physicalSize = physicalSize;
+    public void setSize(long size) {
+        this.size = size;
     }
 
     public long getPhysicalSize() {
         return physicalSize;
     }
 
-    public void setDestroyed(boolean destroyed) {
-        this.destroyed = destroyed;
+    public void setPhysicalSize(long physicalSize) {
+        this.physicalSize = physicalSize;
     }
 
     public boolean getDestroyed() {
         return destroyed;
     }
 
-    public void setDownloadUrl(String downloadUrl) {
-        this.downloadUrl = downloadUrl;
+    public void setDestroyed(boolean destroyed) {
+        this.destroyed = destroyed;
     }
 
     public String getDownloadUrl() {
         return downloadUrl;
     }
 
-    public void setCopy(boolean isCopy) {
-        this.isCopy = isCopy;
+    public void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl = downloadUrl;
     }
 
     public boolean isCopy() {
         return isCopy;
     }
 
-    @Override
-    public long getTemplateSize() {
-        return -1;
-    }
-
-    @Override
-    public String toString() {
-        return new StringBuilder("TmplHost[").append(id).append("-").append(templateId).append("-").append(hostId).append(installPath).append("]").toString();
+    public void setCopy(boolean isCopy) {
+        this.isCopy = isCopy;
     }
 
     @Override
@@ -330,5 +309,4 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
     public State getObjectInStoreState() {
         return this.state;
     }
-
 }

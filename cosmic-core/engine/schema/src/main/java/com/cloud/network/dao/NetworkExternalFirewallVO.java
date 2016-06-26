@@ -16,8 +16,8 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,37 +25,30 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * NetworkExternalFirewallVO contains information on the networks that are using external firewall
-  */
+ */
 
 @Entity
 @Table(name = "network_external_firewall_device_map")
 public class NetworkExternalFirewallVO implements InternalIdentity {
+    @Column(name = GenericDao.CREATED_COLUMN)
+    Date created;
+    @Column(name = GenericDao.REMOVED_COLUMN)
+    Date removed;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "network_id")
     private long networkId;
-
     @Column(name = "external_firewall_device_id")
     private long externalFirewallDeviceId;
-
-    @Column(name = GenericDao.CREATED_COLUMN)
-    Date created;
-
-    @Column(name = GenericDao.REMOVED_COLUMN)
-    Date removed;
 
     public NetworkExternalFirewallVO(long networkId, long externalFirewallDeviceId) {
         this.networkId = networkId;

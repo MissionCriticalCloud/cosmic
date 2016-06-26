@@ -19,9 +19,9 @@
 
 package com.cloud.agent.api;
 
-import java.util.Map;
-
 import com.cloud.host.Host;
+
+import java.util.Map;
 
 public class PingRoutingCommand extends PingCommand {
 
@@ -33,7 +33,7 @@ public class PingRoutingCommand extends PingCommand {
     protected PingRoutingCommand() {
     }
 
-    public PingRoutingCommand(Host.Type type, long id, Map<String, HostVmStateReportEntry> hostVmStateReport) {
+    public PingRoutingCommand(final Host.Type type, final long id, final Map<String, HostVmStateReportEntry> hostVmStateReport) {
         super(type, id);
         this._hostVmStateReport = hostVmStateReport;
     }
@@ -46,7 +46,7 @@ public class PingRoutingCommand extends PingCommand {
         return _gatewayAccessible;
     }
 
-    public void setGatewayAccessible(boolean gatewayAccessible) {
+    public void setGatewayAccessible(final boolean gatewayAccessible) {
         _gatewayAccessible = gatewayAccessible;
     }
 
@@ -54,7 +54,7 @@ public class PingRoutingCommand extends PingCommand {
         return _vnetAccessible;
     }
 
-    public void setVnetAccessible(boolean vnetAccessible) {
+    public void setVnetAccessible(final boolean vnetAccessible) {
         _vnetAccessible = vnetAccessible;
     }
 }

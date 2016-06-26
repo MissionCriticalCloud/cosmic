@@ -31,5 +31,4 @@ public interface SslCert extends InternalIdentity, Identity, ControlledEntity {
     public String getPassword();
 
     public String getFingerPrint();
-
 }

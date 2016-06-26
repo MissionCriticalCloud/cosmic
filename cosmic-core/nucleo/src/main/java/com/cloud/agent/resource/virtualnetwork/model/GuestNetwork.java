@@ -34,8 +34,9 @@ public class GuestNetwork extends ConfigBase {
         super(ConfigBase.GUEST_NETWORK);
     }
 
-    public GuestNetwork(final boolean add, final String macAddress, final String device, final String routerGuestIp, final String routerGuestNetmask, final String routerGuestGateway,
-            final String cidr, final String dns, final String domainName) {
+    public GuestNetwork(final boolean add, final String macAddress, final String device, final String routerGuestIp, final String routerGuestNetmask, final String
+            routerGuestGateway,
+                        final String cidr, final String dns, final String domainName) {
         super(ConfigBase.GUEST_NETWORK);
         this.add = add;
         this.macAddress = macAddress;

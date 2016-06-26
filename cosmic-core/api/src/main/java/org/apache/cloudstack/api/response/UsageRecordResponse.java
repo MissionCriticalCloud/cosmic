@@ -17,10 +17,10 @@
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 @SuppressWarnings("unused")
 public class UsageRecordResponse extends BaseResponse implements ControlledEntityResponse {
@@ -141,13 +141,28 @@ public class UsageRecordResponse extends BaseResponse implements ControlledEntit
         this.accountName = accountName;
     }
 
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
+    @Override
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 
     @Override
     public void setDomainId(String domainId) {
         this.domainId = domainId;
+    }
+
+    @Override
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
     }
 
     public void setZoneId(String zoneId) {
@@ -212,21 +227,6 @@ public class UsageRecordResponse extends BaseResponse implements ControlledEntit
 
     public void setSystem(Boolean isSystem) {
         this.isSystem = isSystem;
-    }
-
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    @Override
-    public void setDomainName(String domainName) {
-        this.domainName = domainName;
     }
 
     public void setNetworkId(String networkId) {

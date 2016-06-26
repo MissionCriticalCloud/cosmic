@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.util.List;
-
 import com.cloud.dc.ClusterVSMMapVO;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -47,6 +47,20 @@ public class ClusterVSMMapDaoImpl extends GenericDaoBase<ClusterVSMMapVO, Long> 
     }
 
     @Override
+    public ClusterVSMMapVO findByClusterId(long clusterId) {
+        SearchCriteria<ClusterVSMMapVO> sc = ClusterSearch.create();
+        sc.setParameters("clusterId", clusterId);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public List<ClusterVSMMapVO> listByVSMId(long vsmId) {
+        SearchCriteria<ClusterVSMMapVO> sc = VsmSearch.create();
+        sc.setParameters("vsmId", vsmId);
+        return listBy(sc);
+    }
+
+    @Override
     public boolean removeByVsmId(long vsmId) {
         SearchCriteria<ClusterVSMMapVO> sc = VsmSearch.create();
         sc.setParameters("vsmId", vsmId);
@@ -63,20 +77,6 @@ public class ClusterVSMMapDaoImpl extends GenericDaoBase<ClusterVSMMapVO, Long> 
     }
 
     @Override
-    public ClusterVSMMapVO findByClusterId(long clusterId) {
-        SearchCriteria<ClusterVSMMapVO> sc = ClusterSearch.create();
-        sc.setParameters("clusterId", clusterId);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public List<ClusterVSMMapVO> listByVSMId(long vsmId) {
-        SearchCriteria<ClusterVSMMapVO> sc = VsmSearch.create();
-        sc.setParameters("vsmId", vsmId);
-        return listBy(sc);
-    }
-
-    @Override
     public boolean remove(Long id) {
         TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
@@ -90,5 +90,4 @@ public class ClusterVSMMapDaoImpl extends GenericDaoBase<ClusterVSMMapVO, Long> 
         txn.commit();
         return result;
     }
-
 }

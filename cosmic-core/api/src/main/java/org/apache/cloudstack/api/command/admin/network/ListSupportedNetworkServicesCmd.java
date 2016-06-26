@@ -16,29 +16,29 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.network;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Service;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.ServiceResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "listSupportedNetworkServices",
-            description = "Lists all network services provided by CloudStack or for the given Provider.",
-            responseObject = ServiceResponse.class,
-            since = "3.0.0",
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = false)
+        description = "Lists all network services provided by CloudStack or for the given Provider.",
+        responseObject = ServiceResponse.class,
+        since = "3.0.0",
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = false)
 public class ListSupportedNetworkServicesCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListSupportedNetworkServicesCmd.class.getName());
     private static final String s_name = "listsupportednetworkservicesresponse";
@@ -56,26 +56,6 @@ public class ListSupportedNetworkServicesCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public void setProviderName(String providerName) {
-        this.providerName = providerName;
-    }
-
-    public String getProviderName() {
-        return providerName;
-    }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
 
     @Override
     public long getEntityOwnerId() {
@@ -114,5 +94,25 @@ public class ListSupportedNetworkServicesCmd extends BaseListCmd {
         response.setResponses(servicesResponses);
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public String getProviderName() {
+        return providerName;
+    }
+
+    public void setProviderName(String providerName) {
+        this.providerName = providerName;
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.network.security.dao;
 
-import java.util.List;
-
 import com.cloud.network.security.SecurityGroupRuleVO;
 import com.cloud.network.security.SecurityRule.SecurityRuleType;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface SecurityGroupRuleDao extends GenericDao<SecurityGroupRuleVO, Long> {
     List<SecurityGroupRuleVO> listBySecurityGroupId(long securityGroupId, SecurityRuleType type);
@@ -38,5 +38,4 @@ public interface SecurityGroupRuleDao extends GenericDao<SecurityGroupRuleVO, Lo
     int deleteByPortProtoAndGroup(long securityGroupId, String protocol, int startPort, int endPort, Long id);
 
     int deleteByPortProtoAndCidr(long securityGroupId, String protocol, int startPort, int endPort, String cidr);
-
 }

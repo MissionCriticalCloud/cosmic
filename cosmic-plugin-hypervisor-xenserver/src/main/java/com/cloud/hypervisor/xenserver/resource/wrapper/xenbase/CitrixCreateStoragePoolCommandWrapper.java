@@ -26,12 +26,12 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.storage.Storage.StoragePoolType;
-import com.xensource.xenapi.Connection;
 
+import com.xensource.xenapi.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  CreateStoragePoolCommand.class)
+@ResourceWrapper(handles = CreateStoragePoolCommand.class)
 public final class CitrixCreateStoragePoolCommandWrapper extends CommandWrapper<CreateStoragePoolCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixCreateStoragePoolCommandWrapper.class);

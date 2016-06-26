@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.network.addr;
 
-import java.util.Date;
-
 import com.cloud.dc.VlanVO;
 import com.cloud.network.IpAddress;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
+
+import java.util.Date;
 
 /**
  */
@@ -43,96 +43,8 @@ public class PublicIp implements PublicIpAddress {
     }
 
     @Override
-    public Ip getAddress() {
-        return _addr.getAddress();
-    }
-
-    @Override
-    public String getNetmask() {
-        return _vlan.getVlanNetmask();
-    }
-
-    @Override
-    public String getGateway() {
-        return _vlan.getVlanGateway();
-    }
-
-    @Override
     public String getVlanTag() {
         return _vlan.getVlanTag();
-    }
-
-    @Override
-    public long getDataCenterId() {
-        return _addr.getDataCenterId();
-    }
-
-    @Override
-    public boolean readyToUse() {
-        return _addr.getAllocatedTime() != null && _addr.getState() == State.Allocated;
-    }
-
-    @Override
-    public boolean isSourceNat() {
-        return _addr.isSourceNat();
-    }
-
-    @Override
-    public boolean isOneToOneNat() {
-        return _addr.isOneToOneNat();
-    }
-
-    @Override
-    public Long getAssociatedWithVmId() {
-        return _addr.getAssociatedWithVmId();
-    }
-
-    @Override
-    public Date getAllocatedTime() {
-        return _addr.getAllocatedTime();
-    }
-
-    @Override
-    public long getAccountId() {
-        return _addr.getAccountId();
-    }
-
-    @Override
-    public long getDomainId() {
-        return _addr.getDomainId();
-    }
-
-    @Override
-    public long getVlanId() {
-        return _vlan.getId();
-    }
-
-    @Override
-    public State getState() {
-        return _addr.getState();
-    }
-
-    public IPAddressVO ip() {
-        return _addr;
-    }
-
-    public VlanVO vlan() {
-        return _vlan;
-    }
-
-    @Override
-    public String getMacAddress() {
-        return macAddress;
-    }
-
-    @Override
-    public Long getAssociatedWithNetworkId() {
-        return _addr.getAssociatedWithNetworkId();
-    }
-
-    @Override
-    public Long getNetworkId() {
-        return _vlan.getNetworkId();
     }
 
     @Override
@@ -156,28 +68,78 @@ public class PublicIp implements PublicIpAddress {
     }
 
     @Override
-    public long getId() {
-        return _addr.getId();
+    public String getIp6Gateway() {
+        return _vlan.getIp6Gateway();
     }
 
     @Override
-    public String getUuid() {
-        return _addr.getUuid();
+    public String getIp6Cidr() {
+        return _vlan.getIp6Cidr();
     }
 
     @Override
-    public String toString() {
-        return _addr.getAddress().toString();
+    public String getIp6Range() {
+        return _vlan.getIp6Range();
     }
 
     @Override
-    public Long getPhysicalNetworkId() {
-        return _vlan.getPhysicalNetworkId();
+    public long getDataCenterId() {
+        return _addr.getDataCenterId();
+    }
+
+    @Override
+    public Ip getAddress() {
+        return _addr.getAddress();
+    }
+
+    @Override
+    public Date getAllocatedTime() {
+        return _addr.getAllocatedTime();
+    }
+
+    @Override
+    public boolean isSourceNat() {
+        return _addr.isSourceNat();
+    }
+
+    @Override
+    public long getVlanId() {
+        return _vlan.getId();
+    }
+
+    @Override
+    public boolean isOneToOneNat() {
+        return _addr.isOneToOneNat();
+    }
+
+    @Override
+    public State getState() {
+        return _addr.getState();
     }
 
     @Override
     public void setState(State state) {
         _addr.setState(state);
+    }
+
+    @Override
+    public boolean readyToUse() {
+        return _addr.getAllocatedTime() != null && _addr.getState() == State.Allocated;
+    }
+
+    @Override
+    public Long getAssociatedWithNetworkId() {
+        return _addr.getAssociatedWithNetworkId();
+    }
+
+    @Override
+    public Long getAssociatedWithVmId() {
+        return _addr.getAssociatedWithVmId();
+    }
+
+    @Override
+    public Long getPhysicalNetworkId() {
+        return _vlan.getPhysicalNetworkId();
     }
 
     @Override
@@ -197,22 +159,7 @@ public class PublicIp implements PublicIpAddress {
 
     @Override
     public Long getVpcId() {
-       return _addr.getVpcId();
-    }
-
-    @Override
-    public String getIp6Gateway() {
-        return _vlan.getIp6Gateway();
-    }
-
-    @Override
-    public String getIp6Cidr() {
-        return _vlan.getIp6Cidr();
-    }
-
-    @Override
-    public String getIp6Range() {
-        return _vlan.getIp6Range();
+        return _addr.getVpcId();
     }
 
     @Override
@@ -225,12 +172,9 @@ public class PublicIp implements PublicIpAddress {
         return _addr.isPortable();
     }
 
-    public void setPortable(boolean portable) {
-        _addr.setPortable(portable);
-    }
-
-    public Long getIpMacAddress() {
-        return  _addr.getMacAddress();
+    @Override
+    public Long getNetworkId() {
+        return _vlan.getNetworkId();
     }
 
     @Override
@@ -246,6 +190,62 @@ public class PublicIp implements PublicIpAddress {
     @Override
     public Date getCreated() {
         return _addr.getCreated();
+    }
+
+    public void setPortable(boolean portable) {
+        _addr.setPortable(portable);
+    }
+
+    @Override
+    public long getAccountId() {
+        return _addr.getAccountId();
+    }
+
+    @Override
+    public long getDomainId() {
+        return _addr.getDomainId();
+    }
+
+    public IPAddressVO ip() {
+        return _addr;
+    }
+
+    public VlanVO vlan() {
+        return _vlan;
+    }
+
+    @Override
+    public String getMacAddress() {
+        return macAddress;
+    }
+
+    @Override
+    public String getNetmask() {
+        return _vlan.getVlanNetmask();
+    }
+
+    @Override
+    public String getGateway() {
+        return _vlan.getVlanGateway();
+    }
+
+    @Override
+    public long getId() {
+        return _addr.getId();
+    }
+
+    @Override
+    public String getUuid() {
+        return _addr.getUuid();
+    }
+
+    @Override
+    public String toString() {
+        return _addr.getAddress().toString();
+    }
+
+    public Long getIpMacAddress() {
+        return _addr.getMacAddress();
     }
 
     @Override

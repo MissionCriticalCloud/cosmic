@@ -16,16 +16,15 @@
 // under the License.
 package org.apache.cloudstack.framework.security.keystore;
 
+import com.cloud.utils.db.Encrypt;
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.Encrypt;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = "keystore")
@@ -95,11 +94,11 @@ public class KeystoreVO implements InternalIdentity {
         this.domainSuffix = domainSuffix;
     }
 
-    public void setIndex(Integer index) {
-        this.index = index;
-    }
-
     public Integer getIndex() {
         return this.index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
     }
 }

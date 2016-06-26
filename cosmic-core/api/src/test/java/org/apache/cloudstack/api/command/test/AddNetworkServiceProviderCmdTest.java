@@ -16,15 +16,17 @@
 // under the License.
 package org.apache.cloudstack.api.command.test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.network.NetworkService;
 import com.cloud.network.PhysicalNetworkServiceProvider;
-
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.admin.network.AddNetworkServiceProviderCmd;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.Assert;
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,15 +34,11 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 public class AddNetworkServiceProviderCmdTest extends TestCase {
-
-    private AddNetworkServiceProviderCmd addNetworkServiceProviderCmd;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+    private AddNetworkServiceProviderCmd addNetworkServiceProviderCmd;
 
     @Override
     @Before
@@ -73,9 +71,7 @@ public class AddNetworkServiceProviderCmdTest extends TestCase {
             public Long getEntityId() {
                 return 2L;
             }
-
         };
-
     }
 
     @Test
@@ -86,14 +82,13 @@ public class AddNetworkServiceProviderCmdTest extends TestCase {
 
         PhysicalNetworkServiceProvider physicalNetworkServiceProvider = Mockito.mock(PhysicalNetworkServiceProvider.class);
         Mockito.when(networkService.addProviderToPhysicalNetwork(Matchers.anyLong(), Matchers.anyString(), Matchers.anyLong(), Matchers.anyList())).thenReturn(
-            physicalNetworkServiceProvider);
+                physicalNetworkServiceProvider);
 
         try {
             addNetworkServiceProviderCmd.create();
         } catch (ResourceAllocationException e) {
             e.printStackTrace();
         }
-
     }
 
     @Test
@@ -109,7 +104,5 @@ public class AddNetworkServiceProviderCmdTest extends TestCase {
         } catch (ServerApiException exception) {
             Assert.assertEquals("Failed to add service provider entity to physical network", exception.getDescription());
         }
-
     }
-
 }

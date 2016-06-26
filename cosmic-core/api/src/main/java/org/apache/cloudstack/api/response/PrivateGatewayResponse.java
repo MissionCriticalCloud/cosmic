@@ -18,11 +18,11 @@ package org.apache.cloudstack.api.response;
 
 import com.cloud.network.vpc.VpcGateway;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = VpcGateway.class)
 @SuppressWarnings("unused")
@@ -143,16 +143,6 @@ public class PrivateGatewayResponse extends BaseResponse implements ControlledEn
     }
 
     @Override
-    public void setDomainId(String domainId) {
-        this.domainId = domainId;
-    }
-
-    @Override
-    public void setDomainName(String domainName) {
-        this.domainName = domainName;
-    }
-
-    @Override
     public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
@@ -160,6 +150,16 @@ public class PrivateGatewayResponse extends BaseResponse implements ControlledEn
     @Override
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    @Override
+    public void setDomainId(String domainId) {
+        this.domainId = domainId;
+    }
+
+    @Override
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
     }
 
     public void setState(String state) {
@@ -173,5 +173,4 @@ public class PrivateGatewayResponse extends BaseResponse implements ControlledEn
     public void setAclId(String aclId) {
         this.aclId = aclId;
     }
-
 }

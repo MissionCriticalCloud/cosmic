@@ -19,11 +19,11 @@
 
 package com.cloud.storage.template;
 
+import com.cloud.storage.StorageLayer;
+import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+
 import java.io.File;
 
-import com.cloud.storage.StorageLayer;
-
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,51 +56,6 @@ public abstract class TemplateDownloaderBase extends ManagedContextRunnable impl
     }
 
     @Override
-    public String getDownloadError() {
-        return _errorString;
-    }
-
-    @Override
-    public String getDownloadLocalPath() {
-        File file = new File(_toFile);
-        return file.getAbsolutePath();
-    }
-
-    @Override
-    public int getDownloadPercent() {
-        if (_remoteSize == 0) {
-            return 0;
-        }
-
-        return (int)(100.0 * _totalBytes / _remoteSize);
-    }
-
-    @Override
-    public long getDownloadTime() {
-        return _downloadTime;
-    }
-
-    @Override
-    public long getDownloadedBytes() {
-        return _totalBytes;
-    }
-
-    @Override
-    public Status getStatus() {
-        return _status;
-    }
-
-    @Override
-    public void setDownloadError(String string) {
-        _errorString = string;
-    }
-
-    @Override
-    public void setStatus(Status status) {
-        _status = status;
-    }
-
-    @Override
     public boolean stopDownload() {
         switch (getStatus()) {
             case IN_PROGRESS:
@@ -124,6 +79,61 @@ public abstract class TemplateDownloaderBase extends ManagedContextRunnable impl
     }
 
     @Override
+    public int getDownloadPercent() {
+        if (_remoteSize == 0) {
+            return 0;
+        }
+
+        return (int) (100.0 * _totalBytes / _remoteSize);
+    }
+
+    @Override
+    public Status getStatus() {
+        return _status;
+    }
+
+    @Override
+    public void setStatus(Status status) {
+        _status = status;
+    }
+
+    @Override
+    public long getDownloadTime() {
+        return _downloadTime;
+    }
+
+    @Override
+    public long getDownloadedBytes() {
+        return _totalBytes;
+    }
+
+    @Override
+    public String getDownloadError() {
+        return _errorString;
+    }
+
+    @Override
+    public void setDownloadError(String string) {
+        _errorString = string;
+    }
+
+    @Override
+    public String getDownloadLocalPath() {
+        File file = new File(_toFile);
+        return file.getAbsolutePath();
+    }
+
+    @Override
+    public void setResume(boolean resume) {
+        _resume = resume;
+    }
+
+    @Override
+    public boolean isInited() {
+        return _inited;
+    }
+
+    @Override
     public long getMaxTemplateSizeInBytes() {
         return this.maxTemplateSizeInBytes;
     }
@@ -137,16 +147,5 @@ public abstract class TemplateDownloaderBase extends ManagedContextRunnable impl
             _errorString = "Failed to install: " + e.getMessage();
             _status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
         }
-    }
-
-    @Override
-    public void setResume(boolean resume) {
-        _resume = resume;
-
-    }
-
-    @Override
-    public boolean isInited() {
-        return _inited;
     }
 }

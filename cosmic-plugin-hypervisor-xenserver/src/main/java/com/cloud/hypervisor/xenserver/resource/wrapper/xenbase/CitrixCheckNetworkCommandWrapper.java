@@ -19,8 +19,6 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import java.util.List;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CheckNetworkAnswer;
 import com.cloud.agent.api.CheckNetworkCommand;
@@ -28,12 +26,14 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.network.PhysicalNetworkSetupInfo;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.xensource.xenapi.Types.XenAPIException;
 
+import java.util.List;
+
+import com.xensource.xenapi.Types.XenAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  CheckNetworkCommand.class)
+@ResourceWrapper(handles = CheckNetworkCommand.class)
 public final class CitrixCheckNetworkCommandWrapper extends CommandWrapper<CheckNetworkCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixCheckNetworkCommandWrapper.class);
@@ -83,7 +83,6 @@ public final class CitrixCheckNetworkCommandWrapper extends CommandWrapper<Check
             } else {
                 return new CheckNetworkAnswer(command, true, "Network Setup check by names is done");
             }
-
         } catch (final XenAPIException e) {
             final String msg = "CheckNetworkCommand failed with XenAPIException:" + e.toString() + " host:" + citrixResourceBase.getHost().getUuid();
             s_logger.warn(msg, e);

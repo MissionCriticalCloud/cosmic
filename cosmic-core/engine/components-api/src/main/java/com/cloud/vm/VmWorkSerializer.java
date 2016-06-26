@@ -16,6 +16,8 @@
 // under the License.
 package com.cloud.vm;
 
+import org.apache.cloudstack.framework.jobs.impl.JobSerializerHelper;
+
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,26 +31,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-import org.apache.cloudstack.framework.jobs.impl.JobSerializerHelper;
-
 public class VmWorkSerializer {
-    static class StringMapTypeAdapter implements JsonDeserializer<Map> {
-
-        @Override
-        public Map deserialize(JsonElement src, Type srcType, JsonDeserializationContext context) throws JsonParseException {
-
-            Map<String, String> obj = new HashMap<String, String>();
-            JsonObject json = src.getAsJsonObject();
-
-            for (Entry<String, JsonElement> entry : json.entrySet()) {
-                obj.put(entry.getKey(), entry.getValue().getAsString());
-            }
-
-            return obj;
-        }
-    }
-
     protected static Gson s_gson;
+
     static {
         GsonBuilder gBuilder = new GsonBuilder();
         gBuilder.setVersion(1.3);
@@ -68,7 +53,23 @@ public class VmWorkSerializer {
         // TODO: there are way many generics, too tedious to get serialization work under GSON
         // use java binary serialization instead
         //
-        return (T)JobSerializerHelper.fromObjectSerializedString(workInJsonText);
+        return (T) JobSerializerHelper.fromObjectSerializedString(workInJsonText);
         // return (T)s_gson.fromJson(workInJsonText, clazz);
+    }
+
+    static class StringMapTypeAdapter implements JsonDeserializer<Map> {
+
+        @Override
+        public Map deserialize(JsonElement src, Type srcType, JsonDeserializationContext context) throws JsonParseException {
+
+            Map<String, String> obj = new HashMap<String, String>();
+            JsonObject json = src.getAsJsonObject();
+
+            for (Entry<String, JsonElement> entry : json.entrySet()) {
+                obj.put(entry.getKey(), entry.getValue().getAsString());
+            }
+
+            return obj;
+        }
     }
 }

@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.alert.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.alert.AlertVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Date;
+import java.util.List;
 
 public interface AlertDao extends GenericDao<AlertVO, Long> {
     AlertVO getLastAlert(short type, long dataCenterId, Long podId, Long clusterId);

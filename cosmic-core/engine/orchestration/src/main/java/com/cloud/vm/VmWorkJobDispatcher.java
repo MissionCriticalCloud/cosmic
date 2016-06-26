@@ -16,30 +16,31 @@
 // under the License.
 package com.cloud.vm;
 
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.jobs.AsyncJob;
 import org.apache.cloudstack.framework.jobs.AsyncJobDispatcher;
 import org.apache.cloudstack.framework.jobs.AsyncJobManager;
 import org.apache.cloudstack.jobs.JobInfo;
+
+import javax.inject.Inject;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class VmWorkJobDispatcher extends AdapterBase implements AsyncJobDispatcher {
     private static final Logger s_logger = LoggerFactory.getLogger(VmWorkJobDispatcher.class);
 
-    @Inject private VirtualMachineManagerImpl _vmMgr;
+    @Inject
+    private VirtualMachineManagerImpl _vmMgr;
     @Inject
     private AsyncJobManager _asyncJobMgr;
-    @Inject private VMInstanceDao _instanceDao;
+    @Inject
+    private VMInstanceDao _instanceDao;
 
     private Map<String, VmWorkJobHandler> _handlers;
 
@@ -71,14 +72,15 @@ public class VmWorkJobDispatcher extends AdapterBase implements AsyncJobDispatch
             }
 
             work = VmWorkSerializer.deserialize(workClz, job.getCmdInfo());
-            if(work == null) {
+            if (work == null) {
                 s_logger.error("Unable to deserialize VM work " + job.getCmd() + ", job info: " + job.getCmdInfo() + ", job origin: " + job.getRelated());
                 _asyncJobMgr.completeAsyncJob(job.getId(), JobInfo.Status.FAILED, 0, "Unable to deserialize VM work");
                 return;
             }
 
-            if (s_logger.isDebugEnabled())
+            if (s_logger.isDebugEnabled()) {
                 s_logger.debug("Run VM work job: " + cmd + " for VM " + work.getVmId() + ", job origin: " + job.getRelated());
+            }
             try {
                 if (_handlers == null || _handlers.isEmpty()) {
                     s_logger.error("Invalid startup configuration, no work job handler is found. cmd: " + job.getCmd() + ", job info: " + job.getCmdInfo()
@@ -105,13 +107,14 @@ public class VmWorkJobDispatcher extends AdapterBase implements AsyncJobDispatch
                     CallContext.unregister();
                 }
             } finally {
-                if (s_logger.isDebugEnabled())
+                if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Done with run of VM work job: " + cmd + " for VM " + work.getVmId() + ", job origin: " + job.getRelated());
+                }
             }
-        } catch(InvalidParameterValueException e) {
+        } catch (InvalidParameterValueException e) {
             s_logger.error("Unable to complete " + job + ", job origin:" + job.getRelated());
             _asyncJobMgr.completeAsyncJob(job.getId(), JobInfo.Status.FAILED, 0, _asyncJobMgr.marshallResultObject(e));
-        } catch(Throwable e) {
+        } catch (Throwable e) {
             s_logger.error("Unable to complete " + job + ", job origin:" + job.getRelated(), e);
 
             //RuntimeException ex = new RuntimeException("Job failed due to exception " + e.getMessage());

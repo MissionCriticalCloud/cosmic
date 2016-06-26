@@ -32,7 +32,7 @@ import com.cloud.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  UpdateHostPasswordCommand.class)
+@ResourceWrapper(handles = UpdateHostPasswordCommand.class)
 public final class CitrixUpdateHostPasswordCommandWrapper extends CommandWrapper<UpdateHostPasswordCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixUpdateHostPasswordCommandWrapper.class);
@@ -46,7 +46,7 @@ public final class CitrixUpdateHostPasswordCommandWrapper extends CommandWrapper
         final XenServerUtilitiesHelper xenServerUtilitiesHelper = citrixResourceBase.getXenServerUtilitiesHelper();
         final String cmdLine = xenServerUtilitiesHelper.buildCommandLine(SCRIPT_CMD_PATH, VRScripts.UPDATE_HOST_PASSWD, username, newPassword);
 
-        Pair<Boolean, String> result;
+        final Pair<Boolean, String> result;
         try {
             s_logger.debug("Executing command in Host: " + cmdLine);
             final String hostPassword = citrixResourceBase.getPwdFromQueue();

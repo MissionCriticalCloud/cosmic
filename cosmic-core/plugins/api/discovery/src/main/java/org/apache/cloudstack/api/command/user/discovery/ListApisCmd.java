@@ -16,10 +16,7 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.discovery;
 
-import javax.inject.Inject;
-
 import com.cloud.user.User;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -30,15 +27,18 @@ import org.apache.cloudstack.api.response.ApiDiscoveryResponse;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.discovery.ApiDiscoveryService;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "listApis",
-            responseObject = ApiDiscoveryResponse.class,
-            description = "lists all available apis on the server, provided by the Api Discovery plugin",
-            since = "4.1.0",
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = false)
+        responseObject = ApiDiscoveryResponse.class,
+        description = "lists all available apis on the server, provided by the Api Discovery plugin",
+        since = "4.1.0",
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = false)
 public class ListApisCmd extends BaseCmd {
 
     public static final Logger s_logger = LoggerFactory.getLogger(ListApisCmd.class.getName());
@@ -54,7 +54,7 @@ public class ListApisCmd extends BaseCmd {
     public void execute() throws ServerApiException {
         if (_apiDiscoveryService != null) {
             User user = CallContext.current().getCallingUser();
-            ListResponse<ApiDiscoveryResponse> response = (ListResponse<ApiDiscoveryResponse>)_apiDiscoveryService.listApis(user, name);
+            ListResponse<ApiDiscoveryResponse> response = (ListResponse<ApiDiscoveryResponse>) _apiDiscoveryService.listApis(user, name);
             if (response == null) {
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Api Discovery plugin was unable to find an api by that name or process any apis");
             }

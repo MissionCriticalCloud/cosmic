@@ -53,5 +53,4 @@ public class CreateLogicalSwitchCommand extends Command {
     public String getOwnerName() {
         return ownerName;
     }
-
 }

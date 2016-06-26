@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.agent.api.to;
 
-import java.net.URI;
-
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.TrafficType;
+
+import java.net.URI;
 
 /**
  * Transfer object to transfer network settings.
@@ -42,68 +42,12 @@ public class NetworkTO {
     public NetworkTO() {
     }
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public BroadcastDomainType getBroadcastType() {
-        return broadcastType;
-    }
-
-    public void setBroadcastType(BroadcastDomainType broadcastType) {
-        this.broadcastType = broadcastType;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public void setNetmask(String netmask) {
-        this.netmask = netmask;
-    }
-
-    public void setGateway(String gateway) {
-        this.gateway = gateway;
-    }
-
-    public void setMac(String mac) {
-        this.mac = mac;
-    }
-
-    public void setDns1(String dns1) {
-        this.dns1 = dns1;
-    }
-
-    public void setDns2(String dns2) {
-        this.dns2 = dns2;
-    }
-
-    public void setType(TrafficType type) {
-        this.type = type;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setSecurityGroupEnabled(boolean enabled) {
-        this.isSecurityGroupEnabled = enabled;
-    }
-
     /**
      * This constructor is usually for hosts where the other information are not important.
      *
-     * @param ip ip address
+     * @param ip      ip address
      * @param netmask netmask
-     * @param mac mac address
+     * @param mac     mac address
      */
     public NetworkTO(String ip, String netmask, String mac) {
         this(ip, netmask, mac, null, null, null);
@@ -130,32 +74,76 @@ public class NetworkTO {
         this.dns2 = dns2;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getIp() {
         return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     public String getNetmask() {
         return netmask;
     }
 
+    public void setNetmask(String netmask) {
+        this.netmask = netmask;
+    }
+
     public String getGateway() {
         return gateway;
+    }
+
+    public void setGateway(String gateway) {
+        this.gateway = gateway;
     }
 
     public String getMac() {
         return mac;
     }
 
+    public void setMac(String mac) {
+        this.mac = mac;
+    }
+
     public String getDns1() {
         return dns1;
+    }
+
+    public void setDns1(String dns1) {
+        this.dns1 = dns1;
     }
 
     public String getDns2() {
         return dns2;
     }
 
+    public void setDns2(String dns2) {
+        this.dns2 = dns2;
+    }
+
     public TrafficType getType() {
         return type;
+    }
+
+    public void setType(TrafficType type) {
+        this.type = type;
     }
 
     public URI getBroadcastUri() {
@@ -170,6 +158,14 @@ public class NetworkTO {
         this.broadcastUri = broadcastUri;
     }
 
+    public BroadcastDomainType getBroadcastType() {
+        return broadcastType;
+    }
+
+    public void setBroadcastType(BroadcastDomainType broadcastType) {
+        this.broadcastType = broadcastType;
+    }
+
     public URI getIsolationUri() {
         return isolationUri;
     }
@@ -180,5 +176,9 @@ public class NetworkTO {
 
     public boolean isSecurityGroupEnabled() {
         return this.isSecurityGroupEnabled;
+    }
+
+    public void setSecurityGroupEnabled(boolean enabled) {
+        this.isSecurityGroupEnabled = enabled;
     }
 }

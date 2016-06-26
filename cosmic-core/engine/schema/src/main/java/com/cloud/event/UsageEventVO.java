@@ -16,7 +16,7 @@
 // under the License.
 package com.cloud.event;
 
-import java.util.Date;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,16 +24,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
 
 @Entity
 @Table(name = "usage_event")
 public class UsageEventVO implements UsageEvent {
-    public enum DynamicParameters {
-        cpuSpeed, cpuNumber, memory
-    };
+    @Column(name = "processed")
+    boolean processed;
 
+    ;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -68,10 +67,6 @@ public class UsageEventVO implements UsageEvent {
 
     @Column(name = "resource_type")
     private String resourceType;
-
-    @Column(name = "processed")
-    boolean processed;
-
     @Column(name = "virtual_size")
     private Long virtualSize;
 
@@ -162,10 +157,6 @@ public class UsageEventVO implements UsageEvent {
         return createDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
-        createDate = createdDate;
-    }
-
     @Override
     public long getAccountId() {
         return accountId;
@@ -175,43 +166,9 @@ public class UsageEventVO implements UsageEvent {
         this.accountId = accountId;
     }
 
-    public void setZoneId(long zoneId) {
-        this.zoneId = zoneId;
-    }
-
     @Override
-    public long getZoneId() {
-        return zoneId;
-    }
-
-    public void setResourceId(long resourceId) {
-        this.resourceId = resourceId;
-    }
-
-    @Override
-    public long getResourceId() {
-        return resourceId;
-    }
-
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
-    }
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public void setOfferingId(long offeringId) {
-        this.offeringId = offeringId;
-    }
-
-    @Override
-    public Long getOfferingId() {
-        return offeringId;
-    }
-
-    public void setTemplateId(long templateId) {
-        this.templateId = templateId;
+    public Long getSize() {
+        return size;
     }
 
     @Override
@@ -219,13 +176,51 @@ public class UsageEventVO implements UsageEvent {
         return templateId;
     }
 
+    @Override
+    public Long getOfferingId() {
+        return offeringId;
+    }
+
+    @Override
+    public long getResourceId() {
+        return resourceId;
+    }
+
+    @Override
+    public long getZoneId() {
+        return zoneId;
+    }
+
+    public void setZoneId(long zoneId) {
+        this.zoneId = zoneId;
+    }
+
+    public void setResourceId(long resourceId) {
+        this.resourceId = resourceId;
+    }
+
+    public void setOfferingId(long offeringId) {
+        this.offeringId = offeringId;
+    }
+
+    public void setTemplateId(long templateId) {
+        this.templateId = templateId;
+    }
+
     public void setSize(long size) {
         this.size = size;
     }
 
-    @Override
-    public Long getSize() {
-        return size;
+    public void setCreatedDate(Date createdDate) {
+        createDate = createdDate;
+    }
+
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
     }
 
     public boolean isProcessed() {
@@ -248,4 +243,7 @@ public class UsageEventVO implements UsageEvent {
         this.virtualSize = virtualSize;
     }
 
+    public enum DynamicParameters {
+        cpuSpeed, cpuNumber, memory
+    }
 }

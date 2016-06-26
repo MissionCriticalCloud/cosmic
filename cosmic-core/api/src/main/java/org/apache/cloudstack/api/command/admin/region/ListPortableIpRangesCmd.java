@@ -16,11 +16,7 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.region;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
@@ -30,6 +26,10 @@ import org.apache.cloudstack.api.response.PortableIpRangeResponse;
 import org.apache.cloudstack.api.response.PortableIpResponse;
 import org.apache.cloudstack.region.PortableIp;
 import org.apache.cloudstack.region.PortableIpRange;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,11 +68,6 @@ public class ListPortableIpRangesCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public long getEntityOwnerId() {
         return Account.ACCOUNT_ID_SYSTEM;
     }
@@ -102,5 +97,10 @@ public class ListPortableIpRangesCmd extends BaseListCmd {
         }
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

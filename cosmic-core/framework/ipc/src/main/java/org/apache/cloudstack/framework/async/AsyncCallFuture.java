@@ -38,10 +38,22 @@ public class AsyncCallFuture<T> implements Future<T>, AsyncCompletionCallback<T>
     }
 
     @Override
+    public boolean isCancelled() {
+        // TODO we don't support cancel yet
+        return false;
+    }
+
+    @Override
+    public boolean isDone() {
+        return _done;
+    }
+
+    @Override
     public T get() throws InterruptedException, ExecutionException {
         synchronized (_completed) {
-            if (!_done)
+            if (!_done) {
                 _completed.wait();
+            }
         }
 
         return _resultObject;
@@ -53,22 +65,12 @@ public class AsyncCallFuture<T> implements Future<T>, AsyncCompletionCallback<T>
         TimeUnit milliSecondsUnit = TimeUnit.MILLISECONDS;
 
         synchronized (_completed) {
-            if (!_done)
+            if (!_done) {
                 _completed.wait(milliSecondsUnit.convert(timeout, timeUnit));
+            }
         }
 
         return _resultObject;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        // TODO we don't support cancel yet
-        return false;
-    }
-
-    @Override
-    public boolean isDone() {
-        return _done;
     }
 
     @Override

@@ -19,18 +19,17 @@
 
 package org.apache.cloudstack.storage.command;
 
-
 public final class AttachPrimaryDataStoreCmd extends StorageSubSystemCommand {
-    @Override
-    public void setExecuteInSequence(final boolean inSeq) {
-
-    }
-
     private final String dataStore;
 
     public AttachPrimaryDataStoreCmd(final String uri) {
         super();
         dataStore = uri;
+    }
+
+    @Override
+    public void setExecuteInSequence(final boolean inSeq) {
+
     }
 
     public String getDataStore() {

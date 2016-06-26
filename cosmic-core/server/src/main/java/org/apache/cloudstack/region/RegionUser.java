@@ -72,5 +72,4 @@ public class RegionUser extends UserVO {
     public void setDomain(String domain) {
         this.domain = domain;
     }
-
 }

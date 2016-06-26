@@ -40,25 +40,29 @@ public interface VolumeEntity extends CloudStackEntity {
 
     /**
      * Migrate using a reservation.
+     *
      * @param reservationToken reservation token
      */
     void migrate(String reservationToken);
 
     /**
      * Setup for a copy of this volume.
+     *
      * @return destination to copy to
      */
     VolumeEntity setupForCopy();
 
     /**
      * Perform the copy
+     *
      * @param dest copy to this volume
      */
     void copy(VolumeEntity dest);
 
     /**
      * Attach to the vm
-     * @param vm vm to attach to
+     *
+     * @param vm       vm to attach to
      * @param deviceId device id to use
      */
     void attachTo(String vm, long deviceId);

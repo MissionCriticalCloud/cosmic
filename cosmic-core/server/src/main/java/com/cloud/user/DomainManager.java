@@ -16,15 +16,17 @@
 // under the License.
 package com.cloud.user;
 
+import com.cloud.domain.Domain;
+import com.cloud.domain.DomainVO;
+import org.apache.cloudstack.api.command.admin.domain.UpdateDomainCmd;
+
 import java.util.List;
 import java.util.Set;
 
-import com.cloud.domain.Domain;
-import com.cloud.domain.DomainVO;
-
-import org.apache.cloudstack.api.command.admin.domain.UpdateDomainCmd;
-
 public interface DomainManager extends DomainService {
+    public static final String MESSAGE_ADD_DOMAIN_EVENT = "Message.AddDomain.Event";
+    public static final String MESSAGE_REMOVE_DOMAIN_EVENT = "Message.RemoveDomain.Event";
+
     Set<Long> getDomainChildrenIds(String parentDomainPath);
 
     Domain createDomain(String name, Long parentId, Long ownerId, String networkDomain, String domainUUID);
@@ -42,12 +44,8 @@ public interface DomainManager extends DomainService {
     /**
      * update an existing domain
      *
-     * @param cmd
-     *            - the command containing domainId and new domainName
+     * @param cmd - the command containing domainId and new domainName
      * @return Domain object if the command succeeded
      */
     Domain updateDomain(UpdateDomainCmd cmd);
-
-    public static final String MESSAGE_ADD_DOMAIN_EVENT = "Message.AddDomain.Event";
-    public static final String MESSAGE_REMOVE_DOMAIN_EVENT = "Message.RemoveDomain.Event";
 }

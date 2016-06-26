@@ -18,22 +18,21 @@
  */
 package org.apache.cloudstack.spring.lifecycle;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import com.cloud.utils.component.ComponentLifecycle;
+import com.cloud.utils.component.SystemIntegrityChecker;
+import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.mgmt.JmxUtil;
+import com.cloud.utils.mgmt.ManagementBean;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.naming.ConfigurationException;
-
-import com.cloud.utils.component.ComponentLifecycle;
-import com.cloud.utils.component.SystemIntegrityChecker;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.mgmt.JmxUtil;
-import com.cloud.utils.mgmt.ManagementBean;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,7 @@ public class CloudStackExtendedLifeCycle extends AbstractBeanCollector {
 
     public CloudStackExtendedLifeCycle() {
         super();
-        setTypeClasses(new Class<?>[] {ComponentLifecycle.class, SystemIntegrityChecker.class});
+        setTypeClasses(new Class<?>[]{ComponentLifecycle.class, SystemIntegrityChecker.class});
     }
 
     @Override
@@ -58,12 +57,63 @@ public class CloudStackExtendedLifeCycle extends AbstractBeanCollector {
         super.start();
     }
 
+    private void sortBeans() {
+        for (ComponentLifecycle lifecycle : getBeans(ComponentLifecycle.class)) {
+            Set<ComponentLifecycle> set = sorted.get(lifecycle.getRunLevel());
+
+            if (set == null) {
+                set = new HashSet<ComponentLifecycle>();
+                sorted.put(lifecycle.getRunLevel(), set);
+            }
+
+            set.add(lifecycle);
+        }
+    }
+
     protected void checkIntegrity() {
         for (SystemIntegrityChecker checker : getBeans(SystemIntegrityChecker.class)) {
             log.info("Running system integrity checker {}", checker);
 
             checker.check();
         }
+    }
+
+    private void configure() {
+        log.info("Configuring CloudStack Components");
+
+        with(new WithComponentLifeCycle() {
+            @Override
+            public void with(ComponentLifecycle lifecycle) {
+                try {
+                    lifecycle.configure(lifecycle.getName(), lifecycle.getConfigParams());
+                } catch (ConfigurationException e) {
+                    log.error("Failed to configure {}", lifecycle.getName(), e);
+                    throw new CloudRuntimeException(e);
+                }
+            }
+        });
+
+        log.info("Done Configuring CloudStack Components");
+    }
+
+    protected void with(WithComponentLifeCycle with) {
+        for (Set<ComponentLifecycle> lifecycles : sorted.values()) {
+            for (ComponentLifecycle lifecycle : lifecycles) {
+                with.with(lifecycle);
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        with(new WithComponentLifeCycle() {
+            @Override
+            public void with(ComponentLifecycle lifecycle) {
+                lifecycle.stop();
+            }
+        });
+
+        super.stop();
     }
 
     public void startBeans() {
@@ -75,7 +125,7 @@ public class CloudStackExtendedLifeCycle extends AbstractBeanCollector {
                 lifecycle.start();
 
                 if (lifecycle instanceof ManagementBean) {
-                    ManagementBean mbean = (ManagementBean)lifecycle;
+                    ManagementBean mbean = (ManagementBean) lifecycle;
                     try {
                         JmxUtil.registerMBean(mbean);
                     } catch (MalformedObjectNameException e) {
@@ -103,57 +153,6 @@ public class CloudStackExtendedLifeCycle extends AbstractBeanCollector {
                 lifecycle.stop();
             }
         });
-    }
-
-    private void configure() {
-        log.info("Configuring CloudStack Components");
-
-        with(new WithComponentLifeCycle() {
-            @Override
-            public void with(ComponentLifecycle lifecycle) {
-                try {
-                    lifecycle.configure(lifecycle.getName(), lifecycle.getConfigParams());
-                } catch (ConfigurationException e) {
-                    log.error("Failed to configure {}", lifecycle.getName(), e);
-                    throw new CloudRuntimeException(e);
-                }
-            }
-        });
-
-        log.info("Done Configuring CloudStack Components");
-    }
-
-    private void sortBeans() {
-        for (ComponentLifecycle lifecycle : getBeans(ComponentLifecycle.class)) {
-            Set<ComponentLifecycle> set = sorted.get(lifecycle.getRunLevel());
-
-            if (set == null) {
-                set = new HashSet<ComponentLifecycle>();
-                sorted.put(lifecycle.getRunLevel(), set);
-            }
-
-            set.add(lifecycle);
-        }
-    }
-
-    @Override
-    public void stop() {
-        with(new WithComponentLifeCycle() {
-            @Override
-            public void with(ComponentLifecycle lifecycle) {
-                lifecycle.stop();
-            }
-        });
-
-        super.stop();
-    }
-
-    protected void with(WithComponentLifeCycle with) {
-        for (Set<ComponentLifecycle> lifecycles : sorted.values()) {
-            for (ComponentLifecycle lifecycle : lifecycles) {
-                with.with(lifecycle);
-            }
-        }
     }
 
     @Override

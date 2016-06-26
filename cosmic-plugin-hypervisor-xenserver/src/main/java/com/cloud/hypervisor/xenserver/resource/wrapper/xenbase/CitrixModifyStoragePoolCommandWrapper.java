@@ -19,9 +19,6 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.ModifyStoragePoolAnswer;
 import com.cloud.agent.api.ModifyStoragePoolCommand;
@@ -31,14 +28,17 @@ import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.storage.template.TemplateProp;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.SR;
 import com.xensource.xenapi.Types.XenAPIException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  ModifyStoragePoolCommand.class)
+@ResourceWrapper(handles = ModifyStoragePoolCommand.class)
 public final class CitrixModifyStoragePoolCommandWrapper extends CommandWrapper<ModifyStoragePoolCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixModifyStoragePoolCommandWrapper.class);
@@ -59,7 +59,7 @@ public final class CitrixModifyStoragePoolCommandWrapper extends CommandWrapper<
                     s_logger.warn(msg);
                     return new Answer(command, false, msg);
                 }
-                final Map<String, TemplateProp> tInfo = new HashMap<String, TemplateProp>();
+                final Map<String, TemplateProp> tInfo = new HashMap<>();
                 final ModifyStoragePoolAnswer answer = new ModifyStoragePoolAnswer(command, capacity, available, tInfo);
                 return answer;
             } catch (final XenAPIException e) {

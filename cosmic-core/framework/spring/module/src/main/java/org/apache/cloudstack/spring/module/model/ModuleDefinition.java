@@ -44,5 +44,4 @@ public interface ModuleDefinition {
     Collection<ModuleDefinition> getChildren();
 
     void addChild(ModuleDefinition childDef);
-
 }

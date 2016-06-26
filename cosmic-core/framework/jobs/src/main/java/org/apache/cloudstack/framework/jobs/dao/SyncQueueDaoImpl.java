@@ -17,18 +17,18 @@
 
 package org.apache.cloudstack.framework.jobs.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.TimeZone;
-
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-
 import org.apache.cloudstack.framework.jobs.impl.SyncQueueVO;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.TimeZone;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,5 +73,4 @@ public class SyncQueueDaoImpl extends GenericDaoBase<SyncQueueVO, Long> implemen
         sc.setParameters("syncObjId", syncObjId);
         return findOneBy(sc);
     }
-
 }

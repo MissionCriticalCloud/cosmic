@@ -51,15 +51,16 @@ import org.apache.cloudstack.api.command.user.network.CreateNetworkACLCmd;
 import org.apache.cloudstack.api.command.user.network.ListNetworkACLListsCmd;
 import org.apache.cloudstack.api.command.user.network.ListNetworkACLsCmd;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 @Component
 public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLService {
@@ -224,46 +225,6 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
     }
 
     @Override
-    public boolean replaceNetworkACLonPrivateGw(final long aclId, final long privateGatewayId) throws ResourceUnavailableException {
-        final Account caller = CallContext.current().getCallingAccount();
-        final VpcGateway gateway = _vpcGatewayDao.findById(privateGatewayId);
-        if (gateway == null) {
-            throw new InvalidParameterValueException("Unable to find specified private gateway");
-        }
-
-        final VpcGatewayVO vo = _vpcGatewayDao.findById(privateGatewayId);
-        if (vo.getState() != VpcGateway.State.Ready) {
-            throw new InvalidParameterValueException("Gateway is not in Ready state");
-        }
-
-        final NetworkACL acl = _networkACLDao.findById(aclId);
-        if (acl == null) {
-            throw new InvalidParameterValueException("Unable to find specified NetworkACL");
-        }
-
-        if (gateway.getVpcId() == null) {
-            throw new InvalidParameterValueException("Unable to find specified vpc id");
-        }
-
-        if (aclId != NetworkACL.DEFAULT_DENY && aclId != NetworkACL.DEFAULT_ALLOW) {
-            final Vpc vpc = _entityMgr.findById(Vpc.class, acl.getVpcId());
-            if (vpc == null) {
-                throw new InvalidParameterValueException("Unable to find Vpc associated with the NetworkACL");
-            }
-            _accountMgr.checkAccess(caller, null, true, vpc);
-            if (!gateway.getVpcId().equals(acl.getVpcId())) {
-                throw new InvalidParameterValueException("private gateway: " + privateGatewayId + " and ACL: " + aclId + " do not belong to the same VPC");
-            }
-        }
-
-        final PrivateGateway privateGateway = _vpcSvc.getVpcPrivateGateway(gateway.getId());
-        _accountMgr.checkAccess(caller, null, true, privateGateway);
-
-        return _networkAclMgr.replaceNetworkACLForPrivateGw(acl, privateGateway);
-
-    }
-
-    @Override
     public boolean replaceNetworkACL(final long aclId, final long networkId) throws ResourceUnavailableException {
         final Account caller = CallContext.current().getCallingAccount();
 
@@ -300,6 +261,12 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
         }
 
         return _networkAclMgr.replaceNetworkACL(acl, network);
+    }
+
+    @Override
+    @ActionEvent(eventType = EventTypes.EVENT_NETWORK_ACL_ITEM_CREATE, eventDescription = "Applying Network ACL Item", async = true)
+    public boolean applyNetworkACL(final long aclId) throws ResourceUnavailableException {
+        return _networkAclMgr.applyNetworkACL(aclId);
     }
 
     @Override
@@ -382,7 +349,8 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
                 aclItemCmd.getNumber(), aclItemCmd.getDisplay());
     }
 
-    private void validateNetworkACLItem(final Integer portStart, final Integer portEnd, final List<String> sourceCidrList, final String protocol, final Integer icmpCode, final Integer icmpType,
+    private void validateNetworkACLItem(final Integer portStart, final Integer portEnd, final List<String> sourceCidrList, final String protocol, final Integer icmpCode, final
+    Integer icmpType,
                                         final String action, final Integer number) {
 
         if (portStart != null && !NetUtils.isValidPort(portStart)) {
@@ -469,12 +437,6 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
     }
 
     @Override
-    @ActionEvent(eventType = EventTypes.EVENT_NETWORK_ACL_ITEM_CREATE, eventDescription = "Applying Network ACL Item", async = true)
-    public boolean applyNetworkACL(final long aclId) throws ResourceUnavailableException {
-        return _networkAclMgr.applyNetworkACL(aclId);
-    }
-
-    @Override
     public Pair<List<? extends NetworkACLItem>, Integer> listNetworkACLItems(final ListNetworkACLsCmd cmd) {
         final Long networkId = cmd.getNetworkId();
         final Long id = cmd.getId();
@@ -547,7 +509,6 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
         } else {
             //ToDo: Add accountId to network_acl_item table for permission check
 
-
             // aclId is not specified
             // List permitted VPCs and filter aclItems
             final List<Long> permittedAccounts = new ArrayList<>();
@@ -618,14 +579,15 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
             final Account caller = CallContext.current().getCallingAccount();
 
             _accountMgr.checkAccess(caller, null, true, vpc);
-
         }
         return _networkAclMgr.revokeNetworkACLItem(ruleId);
     }
 
     @Override
-    public NetworkACLItem updateNetworkACLItem(final Long id, final String protocol, final List<String> sourceCidrList, final NetworkACLItem.TrafficType trafficType, final String action,
-                                               final Integer number, final Integer sourcePortStart, final Integer sourcePortEnd, final Integer icmpCode, final Integer icmpType, final String newUUID, final Boolean forDisplay) throws ResourceUnavailableException {
+    public NetworkACLItem updateNetworkACLItem(final Long id, final String protocol, final List<String> sourceCidrList, final NetworkACLItem.TrafficType trafficType, final
+    String action,
+                                               final Integer number, final Integer sourcePortStart, final Integer sourcePortEnd, final Integer icmpCode, final Integer icmpType,
+                                               final String newUUID, final Boolean forDisplay) throws ResourceUnavailableException {
         final NetworkACLItemVO aclItem = _networkACLItemDao.findById(id);
         if (aclItem == null) {
             throw new InvalidParameterValueException("Unable to find ACL Item cannot be found");
@@ -654,7 +616,47 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
         validateNetworkACLItem(sourcePortStart == null ? aclItem.getSourcePortStart() : sourcePortStart, sourcePortEnd == null ? aclItem.getSourcePortEnd()
                 : sourcePortEnd, sourceCidrList, protocol, icmpCode, icmpType == null ? aclItem.getIcmpType() : icmpType, action, number);
 
-        return _networkAclMgr.updateNetworkACLItem(id, protocol, sourceCidrList, trafficType, action, number, sourcePortStart, sourcePortEnd, icmpCode, icmpType, newUUID, forDisplay);
+        return _networkAclMgr.updateNetworkACLItem(id, protocol, sourceCidrList, trafficType, action, number, sourcePortStart, sourcePortEnd, icmpCode, icmpType, newUUID,
+                forDisplay);
+    }
+
+    @Override
+    public boolean replaceNetworkACLonPrivateGw(final long aclId, final long privateGatewayId) throws ResourceUnavailableException {
+        final Account caller = CallContext.current().getCallingAccount();
+        final VpcGateway gateway = _vpcGatewayDao.findById(privateGatewayId);
+        if (gateway == null) {
+            throw new InvalidParameterValueException("Unable to find specified private gateway");
+        }
+
+        final VpcGatewayVO vo = _vpcGatewayDao.findById(privateGatewayId);
+        if (vo.getState() != VpcGateway.State.Ready) {
+            throw new InvalidParameterValueException("Gateway is not in Ready state");
+        }
+
+        final NetworkACL acl = _networkACLDao.findById(aclId);
+        if (acl == null) {
+            throw new InvalidParameterValueException("Unable to find specified NetworkACL");
+        }
+
+        if (gateway.getVpcId() == null) {
+            throw new InvalidParameterValueException("Unable to find specified vpc id");
+        }
+
+        if (aclId != NetworkACL.DEFAULT_DENY && aclId != NetworkACL.DEFAULT_ALLOW) {
+            final Vpc vpc = _entityMgr.findById(Vpc.class, acl.getVpcId());
+            if (vpc == null) {
+                throw new InvalidParameterValueException("Unable to find Vpc associated with the NetworkACL");
+            }
+            _accountMgr.checkAccess(caller, null, true, vpc);
+            if (!gateway.getVpcId().equals(acl.getVpcId())) {
+                throw new InvalidParameterValueException("private gateway: " + privateGatewayId + " and ACL: " + aclId + " do not belong to the same VPC");
+            }
+        }
+
+        final PrivateGateway privateGateway = _vpcSvc.getVpcPrivateGateway(gateway.getId());
+        _accountMgr.checkAccess(caller, null, true, privateGateway);
+
+        return _networkAclMgr.replaceNetworkACLForPrivateGw(acl, privateGateway);
     }
 
     @Override
@@ -676,5 +678,4 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
         _networkACLDao.update(id, acl);
         return _networkACLDao.findById(id);
     }
-
 }

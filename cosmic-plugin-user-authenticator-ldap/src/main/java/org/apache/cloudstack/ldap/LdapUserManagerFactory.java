@@ -30,14 +30,13 @@ import org.springframework.context.ApplicationContextAware;
 
 public class LdapUserManagerFactory implements ApplicationContextAware {
 
-
     public static final Logger s_logger = LoggerFactory.getLogger(LdapUserManagerFactory.class.getName());
 
-    private static Map<LdapUserManager.Provider, LdapUserManager> ldapUserManagerMap = new HashMap<>();
+    private static final Map<LdapUserManager.Provider, LdapUserManager> ldapUserManagerMap = new HashMap<>();
 
     private ApplicationContext applicationCtx;
 
-    public LdapUserManager getInstance(LdapUserManager.Provider provider) {
+    public LdapUserManager getInstance(final LdapUserManager.Provider provider) {
         LdapUserManager ldapUserManager;
         if (provider == LdapUserManager.Provider.MICROSOFTAD) {
             ldapUserManager = ldapUserManagerMap.get(LdapUserManager.Provider.MICROSOFTAD);
@@ -59,7 +58,7 @@ public class LdapUserManagerFactory implements ApplicationContextAware {
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
         applicationCtx = applicationContext;
     }
 }

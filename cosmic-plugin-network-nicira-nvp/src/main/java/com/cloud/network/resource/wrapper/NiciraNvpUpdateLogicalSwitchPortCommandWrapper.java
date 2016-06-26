@@ -19,6 +19,8 @@
 
 package com.cloud.network.resource.wrapper;
 
+import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
+
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.UpdateLogicalSwitchPortAnswer;
 import com.cloud.agent.api.UpdateLogicalSwitchPortCommand;
@@ -34,8 +36,6 @@ import com.cloud.resource.ResourceWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
 
 @ResourceWrapper(handles = UpdateLogicalSwitchPortCommand.class)
 public final class NiciraNvpUpdateLogicalSwitchPortCommandWrapper extends CommandWrapper<UpdateLogicalSwitchPortCommand, Answer, NiciraNvpResource> {

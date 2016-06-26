@@ -19,9 +19,6 @@
 
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.cloud.agent.api.routing.IpAssocCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.to.IpAddressTO;
@@ -30,6 +27,9 @@ import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.IpAddress;
 import com.cloud.agent.resource.virtualnetwork.model.IpAssociation;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class IpAssociationConfigItem extends AbstractConfigItemFacade {
 

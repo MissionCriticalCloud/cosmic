@@ -51,12 +51,12 @@ public class UsageEventDetailsVO {
         return id;
     }
 
-    public void setUsageEventId(long usageEventId) {
-        this.usageEventId = usageEventId;
-    }
-
     public long getUsageEventId() {
         return usageEventId;
+    }
+
+    public void setUsageEventId(long usageEventId) {
+        this.usageEventId = usageEventId;
     }
 
     public String getKey() {
@@ -66,5 +66,4 @@ public class UsageEventDetailsVO {
     public String getValue() {
         return this.value;
     }
-
 }

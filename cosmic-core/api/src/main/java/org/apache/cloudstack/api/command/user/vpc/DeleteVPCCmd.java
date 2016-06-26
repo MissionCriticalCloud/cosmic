@@ -21,7 +21,6 @@ import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -32,6 +31,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.api.response.VpcResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +52,9 @@ public class DeleteVPCCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
+    @Override
+    public String getEventType() {
+        return EventTypes.EVENT_VPC_DELETE;
     }
 
     /////////////////////////////////////////////////////
@@ -61,13 +62,22 @@ public class DeleteVPCCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getEventType() {
-        return EventTypes.EVENT_VPC_DELETE;
+    public String getEventDescription() {
+        return "Deleting VPC id=" + getId();
+    }
+
+    public Long getId() {
+        return id;
     }
 
     @Override
-    public String getEventDescription() {
-        return "Deleting VPC id=" + getId();
+    public String getSyncObjType() {
+        return BaseAsyncCmd.vpcSyncObject;
+    }
+
+    @Override
+    public Long getSyncObjId() {
+        return getId();
     }
 
     @Override
@@ -102,15 +112,5 @@ public class DeleteVPCCmd extends BaseAsyncCmd {
         }
 
         return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
-
-    @Override
-    public String getSyncObjType() {
-        return BaseAsyncCmd.vpcSyncObject;
-    }
-
-    @Override
-    public Long getSyncObjId() {
-        return getId();
     }
 }

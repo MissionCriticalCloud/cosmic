@@ -59,8 +59,9 @@ public class JsonMessageSerializer implements MessageSerializer {
         StringBuffer sbuf = new StringBuffer();
 
         OnwireName onwire = clz.getAnnotation(OnwireName.class);
-        if (onwire == null)
+        if (onwire == null) {
             throw new RuntimeException("Class " + clz.getCanonicalName() + " is not declared to be onwire");
+        }
 
         sbuf.append(onwire.name()).append("|");
         sbuf.append(_gson.toJson(object));
@@ -73,14 +74,16 @@ public class JsonMessageSerializer implements MessageSerializer {
     public <T> T serializeFrom(String message) {
         assert (message != null);
         int contentStartPos = message.indexOf('|');
-        if (contentStartPos < 0)
+        if (contentStartPos < 0) {
             throw new RuntimeException("Invalid on-wire message format");
+        }
 
         String onwireName = message.substring(0, contentStartPos);
         Class<?> clz = _clzRegistry.getOnwireClass(onwireName);
-        if (clz == null)
+        if (clz == null) {
             throw new RuntimeException("Onwire class is not registered. name: " + onwireName);
+        }
 
-        return (T)_gson.fromJson(message.substring(contentStartPos + 1), clz);
+        return (T) _gson.fromJson(message.substring(contentStartPos + 1), clz);
     }
 }

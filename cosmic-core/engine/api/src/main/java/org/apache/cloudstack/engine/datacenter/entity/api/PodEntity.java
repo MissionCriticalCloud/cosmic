@@ -18,10 +18,10 @@
  */
 package org.apache.cloudstack.engine.datacenter.entity.api;
 
-import java.util.List;
-
 import com.cloud.org.Cluster;
 import com.cloud.org.Grouping.AllocationState;
+
+import java.util.List;
 
 public interface PodEntity extends DataCenterResourceEntity {
 
@@ -38,5 +38,4 @@ public interface PodEntity extends DataCenterResourceEntity {
     AllocationState getAllocationState();
 
     boolean getExternalDhcp();
-
 }

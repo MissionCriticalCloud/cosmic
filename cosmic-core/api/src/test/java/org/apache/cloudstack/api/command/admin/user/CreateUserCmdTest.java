@@ -22,10 +22,10 @@ package org.apache.cloudstack.api.command.admin.user;
 import com.cloud.user.Account;
 import com.cloud.user.AccountService;
 import com.cloud.user.User;
-
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.context.CallContext;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -76,7 +76,7 @@ public class CreateUserCmdTest {
             createUserCmd.execute();
             Assert.fail("should throw exception for a null password");
         } catch (ServerApiException e) {
-            Assert.assertEquals(ApiErrorCode.PARAM_ERROR,e.getErrorCode());
+            Assert.assertEquals(ApiErrorCode.PARAM_ERROR, e.getErrorCode());
             Assert.assertEquals("Empty passwords are not allowed", e.getMessage());
         }
         Mockito.verify(accountService, Mockito.never()).createUser(null, null, null, null, null, null, null, null, null);
@@ -89,7 +89,7 @@ public class CreateUserCmdTest {
             createUserCmd.execute();
             Assert.fail("should throw exception for a empty password");
         } catch (ServerApiException e) {
-            Assert.assertEquals(ApiErrorCode.PARAM_ERROR,e.getErrorCode());
+            Assert.assertEquals(ApiErrorCode.PARAM_ERROR, e.getErrorCode());
             Assert.assertEquals("Empty passwords are not allowed", e.getMessage());
         }
         Mockito.verify(accountService, Mockito.never()).createUser(null, null, null, null, null, null, null, null, null);

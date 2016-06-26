@@ -26,7 +26,7 @@ public class TransportZoneBinding {
     public TransportZoneBinding() {
     }
 
-    public TransportZoneBinding(String zoneUuid, String transportType) {
+    public TransportZoneBinding(final String zoneUuid, final String transportType) {
         this.zoneUuid = zoneUuid;
         this.transportType = transportType;
     }
@@ -35,7 +35,7 @@ public class TransportZoneBinding {
         return zoneUuid;
     }
 
-    public void setZoneUuid(String zoneUuid) {
+    public void setZoneUuid(final String zoneUuid) {
         this.zoneUuid = zoneUuid;
     }
 
@@ -43,8 +43,7 @@ public class TransportZoneBinding {
         return transportType;
     }
 
-    public void setTransportType(String transportType) {
+    public void setTransportType(final String transportType) {
         this.transportType = transportType;
     }
-
 }

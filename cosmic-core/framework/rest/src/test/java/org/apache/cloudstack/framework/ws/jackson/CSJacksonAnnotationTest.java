@@ -16,6 +16,8 @@
 // under the License.
 package org.apache.cloudstack.framework.ws.jackson;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -23,15 +25,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule.Priority;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -74,7 +72,6 @@ public class CSJacksonAnnotationTest {
         }
 
         System.out.print(writer.getBuffer().toString());
-
     }
 
     @XmlRootElement(name = "xml-test2")
@@ -111,7 +108,5 @@ public class CSJacksonAnnotationTest {
         public List<String> getNames() {
             return names;
         }
-
     }
-
 }

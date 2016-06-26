@@ -17,9 +17,9 @@
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 public class SuccessResponse extends BaseResponse {
     @SerializedName("success")
@@ -30,11 +30,18 @@ public class SuccessResponse extends BaseResponse {
     @Param(description = "any text associated with the success or failure")
     private String displayText;
 
+    public SuccessResponse() {
+    }
+
+    public SuccessResponse(final String responseName) {
+        super.setResponseName(responseName);
+    }
+
     public Boolean getSuccess() {
         return success;
     }
 
-    public void setSuccess(Boolean success) {
+    public void setSuccess(final Boolean success) {
         this.success = success;
     }
 
@@ -42,14 +49,7 @@ public class SuccessResponse extends BaseResponse {
         return displayText;
     }
 
-    public void setDisplayText(String displayText) {
+    public void setDisplayText(final String displayText) {
         this.displayText = displayText;
-    }
-
-    public SuccessResponse() {
-    }
-
-    public SuccessResponse(String responseName) {
-        super.setResponseName(responseName);
     }
 }

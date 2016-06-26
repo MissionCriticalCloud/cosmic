@@ -19,6 +19,10 @@
 
 package com.cloud.utils.nio;
 
+import org.apache.cloudstack.utils.security.SSLUtils;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
@@ -26,10 +30,6 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.security.GeneralSecurityException;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-
-import org.apache.cloudstack.utils.security.SSLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

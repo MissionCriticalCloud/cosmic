@@ -35,5 +35,4 @@ public class NotUploadedState extends UploadActiveState {
         super.onEntry(prevState, event, evtObj);
         getUploadListener().scheduleStatusCheck(RequestType.GET_STATUS);
     }
-
 }

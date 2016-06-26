@@ -30,6 +30,16 @@ public class StartCommand extends Command {
     boolean executeInSequence = false;
     String secondaryStorage;
 
+    protected StartCommand() {
+    }
+
+    public StartCommand(VirtualMachineTO vm, Host host, boolean executeInSequence) {
+        this.vm = vm;
+        this.hostIp = host.getPrivateIpAddress();
+        this.executeInSequence = executeInSequence;
+        this.secondaryStorage = null;
+    }
+
     public VirtualMachineTO getVirtualMachine() {
         return vm;
     }
@@ -41,16 +51,6 @@ public class StartCommand extends Command {
             return false;
         }
         return executeInSequence;
-    }
-
-    protected StartCommand() {
-    }
-
-    public StartCommand(VirtualMachineTO vm, Host host, boolean executeInSequence) {
-        this.vm = vm;
-        this.hostIp = host.getPrivateIpAddress();
-        this.executeInSequence = executeInSequence;
-        this.secondaryStorage = null;
     }
 
     public String getHostIp() {

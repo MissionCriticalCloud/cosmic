@@ -16,17 +16,16 @@
 // under the License.
 package com.cloud.cluster.agentlb.dao;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
 import com.cloud.cluster.agentlb.HostTransferMapVO;
 import com.cloud.cluster.agentlb.HostTransferMapVO.HostTransferState;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import javax.annotation.PostConstruct;
+import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,39 +64,38 @@ public class HostTransferMapDaoImpl extends GenericDaoBase<HostTransferMapVO, Lo
         ActiveSearch.and("id", ActiveSearch.entity().getId(), SearchCriteria.Op.EQ);
         ActiveSearch.and("state", ActiveSearch.entity().getState(), SearchCriteria.Op.EQ);
         ActiveSearch.done();
-
     }
 
     @Override
-    public List<HostTransferMapVO> listHostsLeavingCluster(long currentOwnerId) {
-        SearchCriteria<HostTransferMapVO> sc = IntermediateStateSearch.create();
+    public List<HostTransferMapVO> listHostsLeavingCluster(final long currentOwnerId) {
+        final SearchCriteria<HostTransferMapVO> sc = IntermediateStateSearch.create();
         sc.setParameters("initialOwner", currentOwnerId);
 
         return listBy(sc);
     }
 
     @Override
-    public List<HostTransferMapVO> listHostsJoiningCluster(long futureOwnerId) {
-        SearchCriteria<HostTransferMapVO> sc = IntermediateStateSearch.create();
+    public List<HostTransferMapVO> listHostsJoiningCluster(final long futureOwnerId) {
+        final SearchCriteria<HostTransferMapVO> sc = IntermediateStateSearch.create();
         sc.setParameters("futureOwner", futureOwnerId);
 
         return listBy(sc);
     }
 
     @Override
-    public HostTransferMapVO startAgentTransfering(long hostId, long initialOwner, long futureOwner) {
-        HostTransferMapVO transfer = new HostTransferMapVO(hostId, initialOwner, futureOwner);
+    public HostTransferMapVO startAgentTransfering(final long hostId, final long initialOwner, final long futureOwner) {
+        final HostTransferMapVO transfer = new HostTransferMapVO(hostId, initialOwner, futureOwner);
         return persist(transfer);
     }
 
     @Override
-    public boolean completeAgentTransfer(long hostId) {
+    public boolean completeAgentTransfer(final long hostId) {
         return remove(hostId);
     }
 
     @Override
-    public List<HostTransferMapVO> listBy(long futureOwnerId, HostTransferState state) {
-        SearchCriteria<HostTransferMapVO> sc = AllFieldsSearch.create();
+    public List<HostTransferMapVO> listBy(final long futureOwnerId, final HostTransferState state) {
+        final SearchCriteria<HostTransferMapVO> sc = AllFieldsSearch.create();
         sc.setParameters("futureOwner", futureOwnerId);
         sc.setParameters("state", state);
 
@@ -105,26 +103,25 @@ public class HostTransferMapDaoImpl extends GenericDaoBase<HostTransferMapVO, Lo
     }
 
     @Override
-    public HostTransferMapVO findActiveHostTransferMapByHostId(long hostId, Date cutTime) {
-        SearchCriteria<HostTransferMapVO> sc = ActiveSearch.create();
+    public HostTransferMapVO findActiveHostTransferMapByHostId(final long hostId, final Date cutTime) {
+        final SearchCriteria<HostTransferMapVO> sc = ActiveSearch.create();
         sc.setParameters("id", hostId);
         sc.setParameters("state", HostTransferState.TransferRequested);
         sc.setParameters("created", cutTime);
 
         return findOneBy(sc);
-
     }
 
     @Override
-    public boolean startAgentTransfer(long hostId) {
-        HostTransferMapVO transfer = findById(hostId);
+    public boolean startAgentTransfer(final long hostId) {
+        final HostTransferMapVO transfer = findById(hostId);
         transfer.setState(HostTransferState.TransferStarted);
         return update(hostId, transfer);
     }
 
     @Override
-    public HostTransferMapVO findByIdAndFutureOwnerId(long id, long futureOwnerId) {
-        SearchCriteria<HostTransferMapVO> sc = AllFieldsSearch.create();
+    public HostTransferMapVO findByIdAndFutureOwnerId(final long id, final long futureOwnerId) {
+        final SearchCriteria<HostTransferMapVO> sc = AllFieldsSearch.create();
         sc.setParameters("futureOwner", futureOwnerId);
         sc.setParameters("id", id);
 
@@ -132,12 +129,11 @@ public class HostTransferMapDaoImpl extends GenericDaoBase<HostTransferMapVO, Lo
     }
 
     @Override
-    public HostTransferMapVO findByIdAndCurrentOwnerId(long id, long currentOwnerId) {
-        SearchCriteria<HostTransferMapVO> sc = AllFieldsSearch.create();
+    public HostTransferMapVO findByIdAndCurrentOwnerId(final long id, final long currentOwnerId) {
+        final SearchCriteria<HostTransferMapVO> sc = AllFieldsSearch.create();
         sc.setParameters("initialOwner", currentOwnerId);
         sc.setParameters("id", id);
 
         return findOneBy(sc);
     }
-
 }

@@ -34,5 +34,4 @@ public interface BackoffAlgorithm extends Adapter {
      * no longer need to backoff.  reset to beginning.
      */
     void reset();
-
 }

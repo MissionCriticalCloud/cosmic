@@ -18,17 +18,9 @@
  */
 package org.apache.cloudstack.engine.service.api;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.ws.rs.Path;
-
 import com.cloud.host.Host;
 import com.cloud.host.Status;
 import com.cloud.storage.StoragePool;
-
 import org.apache.cloudstack.engine.datacenter.entity.api.ClusterEntity;
 import org.apache.cloudstack.engine.datacenter.entity.api.ClusterEntityImpl;
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceManager;
@@ -39,6 +31,13 @@ import org.apache.cloudstack.engine.datacenter.entity.api.PodEntityImpl;
 import org.apache.cloudstack.engine.datacenter.entity.api.StorageEntity;
 import org.apache.cloudstack.engine.datacenter.entity.api.ZoneEntity;
 import org.apache.cloudstack.engine.datacenter.entity.api.ZoneEntityImpl;
+
+import javax.inject.Inject;
+import javax.ws.rs.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -117,7 +116,6 @@ public class ProvisioningServiceImpl implements ProvisioningService {
     public void deregisterCluster(final String uuid) {
         ClusterEntityImpl clusterEntity = new ClusterEntityImpl(uuid, manager);
         clusterEntity.disable();
-
     }
 
     @Override
@@ -168,5 +166,4 @@ public class ProvisioningServiceImpl implements ProvisioningService {
         ZoneEntityImpl impl = new ZoneEntityImpl(uuid, manager);
         return impl;
     }
-
 }

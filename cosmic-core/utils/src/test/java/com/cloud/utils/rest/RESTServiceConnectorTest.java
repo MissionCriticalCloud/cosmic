@@ -43,7 +43,6 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.http.HttpEntity;
@@ -61,6 +60,7 @@ public class RESTServiceConnectorTest {
     private static final BasicStatusLine HTTP_200_STATUS_LINE = new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 200, "OK");
     private static final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
     private static final Map<String, String> DEFAULT_TEST_PARAMETERS = new HashMap<String, String>();
+
     static {
         DEFAULT_TEST_PARAMETERS.put("arg1", "val1");
         DEFAULT_TEST_PARAMETERS.put("arg2", "val2");
@@ -221,9 +221,9 @@ public class RESTServiceConnectorTest {
         when(httpClient.execute(any(HttpHost.class), any(HttpRequest.class), any(HttpClientContext.class))).thenReturn(response);
         final RestClient restClient = new BasicRestClient(httpClient, HttpClientContext.create(), "localhost");
         final RESTServiceConnector connector = new RESTServiceConnector.Builder()
-            .client(restClient)
-            .classToDeserializerEntry(TestPojo.class, new TestPojoDeserializer())
-            .build();
+                .client(restClient)
+                .classToDeserializerEntry(TestPojo.class, new TestPojoDeserializer())
+                .build();
 
         connector.executeRetrieveObject(TestPojo.class, "/somepath");
     }
@@ -238,9 +238,9 @@ public class RESTServiceConnectorTest {
         final RestClient restClient = new BasicRestClient(httpClient, HttpClientContext.create(), "localhost");
         final Class<? extends CollectionType> clazzListOfTestPojo = new ObjectMapper().getTypeFactory().constructCollectionType(List.class, TestPojo.class).getClass();
         final RESTServiceConnector connector = new RESTServiceConnector.Builder()
-            .client(restClient)
-            .classToDeserializerEntry(clazzListOfTestPojo, new CustomListDeserializer<TestPojoDeserializer>())
-            .build();
+                .client(restClient)
+                .classToDeserializerEntry(clazzListOfTestPojo, new CustomListDeserializer<TestPojoDeserializer>())
+                .build();
 
         connector.executeRetrieveObject(TestPojo.class, "/somepath");
     }
@@ -264,7 +264,6 @@ public class RESTServiceConnectorTest {
         public void setResultCount(final int resultCount) {
             this.resultCount = resultCount;
         }
-
     }
 
     class TestPojo {
@@ -287,7 +286,6 @@ public class RESTServiceConnectorTest {
         public boolean equals(final Object obj) {
             return EqualsBuilder.reflectionEquals(this, obj);
         }
-
     }
 
     private final class TestPojoDeserializer implements JsonDeserializer<TestPojo> {

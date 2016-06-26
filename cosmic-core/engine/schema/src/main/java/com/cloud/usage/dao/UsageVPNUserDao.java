@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.usage.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.usage.UsageVPNUserVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Date;
+import java.util.List;
 
 public interface UsageVPNUserDao extends GenericDao<UsageVPNUserVO, Long> {
     public void update(UsageVPNUserVO usage);

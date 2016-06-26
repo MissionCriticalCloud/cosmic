@@ -36,5 +36,4 @@ public class TransactionContextInterceptor implements MethodInterceptor {
             txn.close();
         }
     }
-
 }

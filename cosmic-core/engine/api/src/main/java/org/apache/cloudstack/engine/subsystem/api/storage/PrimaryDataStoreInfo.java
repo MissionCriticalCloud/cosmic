@@ -18,17 +18,16 @@
  */
 package org.apache.cloudstack.engine.subsystem.api.storage;
 
-import java.util.Map;
-
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StoragePool;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.disktype.DiskFormat;
+
+import java.util.Map;
 
 public interface PrimaryDataStoreInfo extends StoragePool {
     static final String MANAGED = "managed";
-    static final String STORAGE_HOST= "storageHost";
+    static final String STORAGE_HOST = "storageHost";
     static final String STORAGE_PORT = "storagePort";
     static final String MANAGED_STORE_TARGET = "managedStoreTarget";
     static final String MANAGED_STORE_TARGET_ROOT_VOLUME = "managedStoreTargetRootVolume";
@@ -52,9 +51,9 @@ public interface PrimaryDataStoreInfo extends StoragePool {
 
     boolean isManaged();
 
-    void setDetails(Map<String, String> details);
-
     Map<String, String> getDetails();
+
+    void setDetails(Map<String, String> details);
 
     PrimaryDataStoreLifeCycle getLifeCycle();
 }

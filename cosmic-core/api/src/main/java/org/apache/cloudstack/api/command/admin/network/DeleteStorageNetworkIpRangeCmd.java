@@ -22,7 +22,6 @@ import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -31,6 +30,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.StorageNetworkIpRangeResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,19 +46,15 @@ public class DeleteStorageNetworkIpRangeCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.ID,
-               type = CommandType.UUID,
-               entityType = StorageNetworkIpRangeResponse.class,
-               required = true,
-               description = "the uuid of the storage network ip range")
+            type = CommandType.UUID,
+            entityType = StorageNetworkIpRangeResponse.class,
+            required = true,
+            description = "the uuid of the storage network ip range")
     private Long id;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public Long getId() {
-        return id;
-    }
 
     @Override
     public String getEventType() {
@@ -70,9 +66,13 @@ public class DeleteStorageNetworkIpRangeCmd extends BaseAsyncCmd {
         return "Deleting storage ip range " + getId();
     }
 
+    public Long getId() {
+        return id;
+    }
+
     @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException {
+            ResourceAllocationException {
         try {
             _storageNetworkService.deleteIpRange(this);
             SuccessResponse response = new SuccessResponse(getCommandName());
@@ -92,5 +92,4 @@ public class DeleteStorageNetworkIpRangeCmd extends BaseAsyncCmd {
     public long getEntityOwnerId() {
         return Account.ACCOUNT_ID_SYSTEM;
     }
-
 }

@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface LoadBalancerDao extends GenericDao<LoadBalancerVO, Long> {
 
@@ -28,5 +28,4 @@ public interface LoadBalancerDao extends GenericDao<LoadBalancerVO, Long> {
     List<LoadBalancerVO> listByNetworkIdAndScheme(long networkId, Scheme scheme);
 
     List<LoadBalancerVO> listInTransitionStateByNetworkIdAndScheme(long networkId, Scheme scheme);
-
 }

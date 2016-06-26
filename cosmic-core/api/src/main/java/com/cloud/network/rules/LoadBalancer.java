@@ -24,5 +24,4 @@ public interface LoadBalancer extends FirewallRule, LoadBalancerContainer {
     int getDefaultPortStart();
 
     int getDefaultPortEnd();
-
 }

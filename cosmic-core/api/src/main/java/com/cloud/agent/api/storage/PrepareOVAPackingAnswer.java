@@ -22,5 +22,4 @@ public class PrepareOVAPackingAnswer extends Answer {
     public PrepareOVAPackingAnswer(PrepareOVAPackingCommand cmd, boolean result, String details) {
         super(cmd, result, details);
     }
-
 }

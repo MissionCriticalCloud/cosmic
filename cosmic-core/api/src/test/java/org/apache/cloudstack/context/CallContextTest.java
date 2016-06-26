@@ -22,6 +22,9 @@ package org.apache.cloudstack.context;
 import com.cloud.dao.EntityManager;
 import com.cloud.user.Account;
 import com.cloud.user.User;
+
+import java.util.UUID;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,8 +33,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CallContextTest {
@@ -78,5 +79,4 @@ public class CallContextTest {
         Assert.assertEquals("it should return objectUUID: " + objectUUID, objectUUID, currentContext.getContextParameter(Account.class));
         Assert.assertEquals("current context map should have exactly three entries", 3, currentContext.getContextParameters().size());
     }
-
 }

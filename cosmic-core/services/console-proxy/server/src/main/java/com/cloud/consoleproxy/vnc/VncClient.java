@@ -16,6 +16,16 @@
 // under the License.
 package com.cloud.consoleproxy.vnc;
 
+import com.cloud.consoleproxy.ConsoleProxyClientListener;
+import com.cloud.consoleproxy.util.Logger;
+import com.cloud.consoleproxy.util.RawHTTP;
+import com.cloud.consoleproxy.vnc.packet.client.KeyboardEventPacket;
+import com.cloud.consoleproxy.vnc.packet.client.MouseEventPacket;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
 import java.awt.Frame;
 import java.awt.ScrollPane;
 import java.awt.event.WindowAdapter;
@@ -27,63 +37,17 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.spec.KeySpec;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESKeySpec;
-
-import com.cloud.consoleproxy.ConsoleProxyClientListener;
-import com.cloud.consoleproxy.util.Logger;
-import com.cloud.consoleproxy.util.RawHTTP;
-import com.cloud.consoleproxy.vnc.packet.client.KeyboardEventPacket;
-import com.cloud.consoleproxy.vnc.packet.client.MouseEventPacket;
-
 public class VncClient {
     private static final Logger s_logger = Logger.getLogger(VncClient.class);
-
+    private final VncScreenDescription screen = new VncScreenDescription();
     private Socket socket;
     private DataInputStream is;
     private DataOutputStream os;
-
-    private final VncScreenDescription screen = new VncScreenDescription();
-
     private VncClientPacketSender sender;
     private VncServerPacketReceiver receiver;
 
     private boolean noUI = false;
     private ConsoleProxyClientListener clientListener = null;
-
-    public static void main(String args[]) {
-        if (args.length < 3) {
-            printHelpMessage();
-            System.exit(1);
-        }
-
-        String host = args[0];
-        String port = args[1];
-        String password = args[2];
-
-        try {
-            new VncClient(host, Integer.parseInt(port), password, false, null);
-        } catch (NumberFormatException e) {
-            s_logger.error("Incorrect VNC server port number: " + port + ".");
-            System.exit(1);
-        } catch (UnknownHostException e) {
-            s_logger.error("Incorrect VNC server host name: " + host + ".");
-            System.exit(1);
-        } catch (IOException e) {
-            s_logger.error("Cannot communicate with VNC server: " + e.getMessage());
-            System.exit(1);
-        } catch (Throwable e) {
-            s_logger.error("An error happened: " + e.getMessage());
-            System.exit(1);
-        }
-        System.exit(0);
-    }
-
-    private static void printHelpMessage() {
-        /* LOG */s_logger.info("Usage: HOST PORT PASSWORD.");
-    }
 
     public VncClient(ConsoleProxyClientListener clientListener) {
         noUI = true;
@@ -95,58 +59,6 @@ public class VncClient {
         this.noUI = noUI;
         this.clientListener = clientListener;
         connectTo(host, port, password);
-    }
-
-    public void shutdown() {
-        if (sender != null)
-            sender.closeConnection();
-
-        if (receiver != null)
-            receiver.closeConnection();
-
-        if (is != null) {
-            try {
-                is.close();
-            } catch (Throwable e) {
-                s_logger.info("[ignored]"
-                        + "failed to close resource for input: " + e.getLocalizedMessage());
-            }
-        }
-
-        if (os != null) {
-            try {
-                os.close();
-            } catch (Throwable e) {
-                s_logger.info("[ignored]"
-                        + "failed to get close resource for output: " + e.getLocalizedMessage());
-            }
-        }
-
-        if (socket != null) {
-            try {
-                socket.close();
-            } catch (Throwable e) {
-                s_logger.info("[ignored]"
-                        + "failed to get close resource for socket: " + e.getLocalizedMessage());
-            }
-        }
-    }
-
-    public ConsoleProxyClientListener getClientListener() {
-        return clientListener;
-    }
-
-    public void connectTo(String host, int port, String path, String session, boolean useSSL, String sid) throws UnknownHostException, IOException {
-        if (port < 0) {
-            if (useSSL)
-                port = 443;
-            else
-                port = 80;
-        }
-
-        RawHTTP tunnel = new RawHTTP("CONNECT", host, port, path, session, useSSL);
-        socket = tunnel.connect();
-        doConnect(sid);
     }
 
     public void connectTo(String host, int port, String password) throws UnknownHostException, IOException {
@@ -179,8 +91,9 @@ public class VncClient {
         canvas.addKeyListener(sender);
 
         Frame frame = null;
-        if (!noUI)
+        if (!noUI) {
             frame = createVncClientMainWindow(canvas, screen.getDesktopName());
+        }
 
         new Thread(sender).start();
 
@@ -195,30 +108,6 @@ public class VncClient {
             }
             shutdown();
         }
-    }
-
-    private Frame createVncClientMainWindow(BufferedImageCanvas canvas, String title) {
-        // Create AWT windows
-        final Frame frame = new Frame(title + " - VNCle");
-
-        // Use scrolling pane to support screens, which are larger than ours
-        ScrollPane scroller = new ScrollPane(ScrollPane.SCROLLBARS_AS_NEEDED);
-        scroller.add(canvas);
-        scroller.setSize(screen.getFramebufferWidth(), screen.getFramebufferHeight());
-
-        frame.add(scroller);
-        frame.pack();
-        frame.setVisible(true);
-
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent evt) {
-                frame.setVisible(false);
-                shutdown();
-            }
-        });
-
-        return frame;
     }
 
     /**
@@ -280,6 +169,118 @@ public class VncClient {
         }
     }
 
+    private void initialize() throws IOException {
+        // Send client initialization message
+        {
+            // Send shared flag
+            os.writeByte(RfbConstants.EXCLUSIVE_ACCESS);
+            os.flush();
+        }
+
+        // Read server initialization message
+        {
+            // Read frame buffer size
+            int framebufferWidth = is.readUnsignedShort();
+            int framebufferHeight = is.readUnsignedShort();
+            screen.setFramebufferSize(framebufferWidth, framebufferHeight);
+            if (clientListener != null) {
+                clientListener.onFramebufferSizeChange(framebufferWidth, framebufferHeight);
+            }
+        }
+
+        // Read pixel format
+        {
+            int bitsPerPixel = is.readUnsignedByte();
+            int depth = is.readUnsignedByte();
+
+            int bigEndianFlag = is.readUnsignedByte();
+            int trueColorFlag = is.readUnsignedByte();
+
+            int redMax = is.readUnsignedShort();
+            int greenMax = is.readUnsignedShort();
+            int blueMax = is.readUnsignedShort();
+
+            int redShift = is.readUnsignedByte();
+            int greenShift = is.readUnsignedByte();
+            int blueShift = is.readUnsignedByte();
+
+            // Skip padding
+            is.skipBytes(3);
+
+            screen.setPixelFormat(bitsPerPixel, depth, bigEndianFlag, trueColorFlag, redMax, greenMax, blueMax, redShift, greenShift, blueShift);
+        }
+
+        // Read desktop name
+        {
+            int length = is.readInt();
+            byte buf[] = new byte[length];
+            is.readFully(buf);
+            String desktopName = new String(buf, RfbConstants.CHARSET);
+            screen.setDesktopName(desktopName);
+        }
+    }
+
+    private Frame createVncClientMainWindow(BufferedImageCanvas canvas, String title) {
+        // Create AWT windows
+        final Frame frame = new Frame(title + " - VNCle");
+
+        // Use scrolling pane to support screens, which are larger than ours
+        ScrollPane scroller = new ScrollPane(ScrollPane.SCROLLBARS_AS_NEEDED);
+        scroller.add(canvas);
+        scroller.setSize(screen.getFramebufferWidth(), screen.getFramebufferHeight());
+
+        frame.add(scroller);
+        frame.pack();
+        frame.setVisible(true);
+
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent evt) {
+                frame.setVisible(false);
+                shutdown();
+            }
+        });
+
+        return frame;
+    }
+
+    public void shutdown() {
+        if (sender != null) {
+            sender.closeConnection();
+        }
+
+        if (receiver != null) {
+            receiver.closeConnection();
+        }
+
+        if (is != null) {
+            try {
+                is.close();
+            } catch (Throwable e) {
+                s_logger.info("[ignored]"
+                        + "failed to close resource for input: " + e.getLocalizedMessage());
+            }
+        }
+
+        if (os != null) {
+            try {
+                os.close();
+            } catch (Throwable e) {
+                s_logger.info("[ignored]"
+                        + "failed to get close resource for output: " + e.getLocalizedMessage());
+            }
+        }
+
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (Throwable e) {
+                s_logger.info("[ignored]"
+                        + "failed to get close resource for socket: " + e.getLocalizedMessage());
+            }
+        }
+    }
+
     /**
      * Encode client password and send it to server.
      */
@@ -328,10 +329,8 @@ public class VncClient {
     /**
      * Encode password using DES encryption with given challenge.
      *
-     * @param challenge
-     *            a random set of bytes.
-     * @param password
-     *            a password
+     * @param challenge a random set of bytes.
+     * @param password  a password
      * @return DES hash of password and challenge
      */
     public byte[] encodePassword(byte[] challenge, String password) throws Exception {
@@ -358,13 +357,12 @@ public class VncClient {
     /**
      * Reverse bits in byte, so least significant bit will be most significant
      * bit. E.g. 01001100 will become 00110010.
-     *
+     * <p>
      * See also: http://www.vidarholen.net/contents/junk/vnc.html ,
      * http://bytecrafter
      * .blogspot.com/2010/09/des-encryption-as-used-in-vnc.html
      *
-     * @param b
-     *            a byte
+     * @param b a byte
      * @return byte in reverse order
      */
     private static byte flipByte(byte b) {
@@ -376,72 +374,75 @@ public class VncClient {
         int b6_3 = (b & 0x20) >>> 3;
         int b7_2 = (b & 0x40) >>> 5;
         int b8_1 = (b & 0x80) >>> 7;
-        byte c = (byte)(b1_8 | b2_7 | b3_6 | b4_5 | b5_4 | b6_3 | b7_2 | b8_1);
+        byte c = (byte) (b1_8 | b2_7 | b3_6 | b4_5 | b5_4 | b6_3 | b7_2 | b8_1);
         return c;
     }
 
-    private void initialize() throws IOException {
-        // Send client initialization message
-        {
-            // Send shared flag
-            os.writeByte(RfbConstants.EXCLUSIVE_ACCESS);
-            os.flush();
+    public static void main(String args[]) {
+        if (args.length < 3) {
+            printHelpMessage();
+            System.exit(1);
         }
 
-        // Read server initialization message
-        {
-            // Read frame buffer size
-            int framebufferWidth = is.readUnsignedShort();
-            int framebufferHeight = is.readUnsignedShort();
-            screen.setFramebufferSize(framebufferWidth, framebufferHeight);
-            if (clientListener != null)
-                clientListener.onFramebufferSizeChange(framebufferWidth, framebufferHeight);
+        String host = args[0];
+        String port = args[1];
+        String password = args[2];
+
+        try {
+            new VncClient(host, Integer.parseInt(port), password, false, null);
+        } catch (NumberFormatException e) {
+            s_logger.error("Incorrect VNC server port number: " + port + ".");
+            System.exit(1);
+        } catch (UnknownHostException e) {
+            s_logger.error("Incorrect VNC server host name: " + host + ".");
+            System.exit(1);
+        } catch (IOException e) {
+            s_logger.error("Cannot communicate with VNC server: " + e.getMessage());
+            System.exit(1);
+        } catch (Throwable e) {
+            s_logger.error("An error happened: " + e.getMessage());
+            System.exit(1);
+        }
+        System.exit(0);
+    }
+
+    private static void printHelpMessage() {
+        /* LOG */
+        s_logger.info("Usage: HOST PORT PASSWORD.");
+    }
+
+    public ConsoleProxyClientListener getClientListener() {
+        return clientListener;
+    }
+
+    public void connectTo(String host, int port, String path, String session, boolean useSSL, String sid) throws UnknownHostException, IOException {
+        if (port < 0) {
+            if (useSSL) {
+                port = 443;
+            } else {
+                port = 80;
+            }
         }
 
-        // Read pixel format
-        {
-            int bitsPerPixel = is.readUnsignedByte();
-            int depth = is.readUnsignedByte();
-
-            int bigEndianFlag = is.readUnsignedByte();
-            int trueColorFlag = is.readUnsignedByte();
-
-            int redMax = is.readUnsignedShort();
-            int greenMax = is.readUnsignedShort();
-            int blueMax = is.readUnsignedShort();
-
-            int redShift = is.readUnsignedByte();
-            int greenShift = is.readUnsignedByte();
-            int blueShift = is.readUnsignedByte();
-
-            // Skip padding
-            is.skipBytes(3);
-
-            screen.setPixelFormat(bitsPerPixel, depth, bigEndianFlag, trueColorFlag, redMax, greenMax, blueMax, redShift, greenShift, blueShift);
-        }
-
-        // Read desktop name
-        {
-            int length = is.readInt();
-            byte buf[] = new byte[length];
-            is.readFully(buf);
-            String desktopName = new String(buf, RfbConstants.CHARSET);
-            screen.setDesktopName(desktopName);
-        }
+        RawHTTP tunnel = new RawHTTP("CONNECT", host, port, path, session, useSSL);
+        socket = tunnel.connect();
+        doConnect(sid);
     }
 
     public FrameBufferCanvas getFrameBufferCanvas() {
-        if (receiver != null)
+        if (receiver != null) {
             return receiver.getCanvas();
+        }
 
         return null;
     }
 
     public void requestUpdate(boolean fullUpdate) {
-        if (fullUpdate)
+        if (fullUpdate) {
             sender.requestFullScreenUpdate();
-        else
+        } else {
             sender.imagePaintedOnScreen();
+        }
     }
 
     public void sendClientKeyboardEvent(int event, int code, int modifiers) {

@@ -18,7 +18,6 @@ package org.apache.cloudstack.api.command.admin.usage;
 
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -27,6 +26,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.HostResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,16 +56,6 @@ public class DeleteTrafficMonitorCmd extends BaseCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
     public void execute() {
         try {
             boolean result = _networkUsageService.deleteTrafficMonitor(this);
@@ -79,5 +69,15 @@ public class DeleteTrafficMonitorCmd extends BaseCmd {
         } catch (InvalidParameterValueException e) {
             throw new ServerApiException(ApiErrorCode.PARAM_ERROR, "Failed to delete traffic monitor.");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

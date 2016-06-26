@@ -16,7 +16,7 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.UUID;
+import com.cloud.network.MonitoringService;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,12 +24,30 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.network.MonitoringService;
+import java.util.UUID;
 
 @Entity
 @Table(name = "monitoring_services")
 public class MonitoringServiceVO implements MonitoringService {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    long id;
+    @Column(name = "service")
+    String service;
+    @Column(name = "process_name", updatable = false)
+    String processName;
+    @Column(name = "service_name", updatable = false)
+    String serviceName;
+    @Column(name = "uuid")
+    String uuid = UUID.randomUUID().toString();
+    @Column(name = "service_path", updatable = false)
+    private String servicePath;
+    @Column(name = "pidFile", updatable = false)
+    private String servicePidFile;
+    @Column(name = "isDefault")
+    private boolean defaultService;
 
     public MonitoringServiceVO(String service, String processName, String serviceName, String servicePath, String servicePidFile, boolean defaultService) {
         this.service = service;
@@ -42,32 +60,6 @@ public class MonitoringServiceVO implements MonitoringService {
 
     protected MonitoringServiceVO() {
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    long id;
-
-    @Column(name = "service")
-    String service;
-
-    @Column(name = "process_name", updatable = false)
-    String processName;
-
-    @Column(name = "service_name", updatable = false)
-    String serviceName;
-
-    @Column(name = "service_path", updatable = false)
-    private String servicePath;
-
-    @Column(name = "pidFile", updatable = false)
-    private String servicePidFile;
-
-    @Column(name = "isDefault")
-    private boolean defaultService;
-
-    @Column(name = "uuid")
-    String uuid = UUID.randomUUID().toString();
 
     @Override
     public long getId() {

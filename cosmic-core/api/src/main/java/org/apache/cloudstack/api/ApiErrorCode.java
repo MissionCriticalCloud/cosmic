@@ -18,7 +18,6 @@ package org.apache.cloudstack.api;
 
 /**
  * Enum class for various API error code used in CloudStack
- *
  */
 public enum ApiErrorCode {
 
@@ -40,7 +39,7 @@ public enum ApiErrorCode {
 
     private int httpCode;
 
-    private ApiErrorCode(int httpStatusCode) {
+    private ApiErrorCode(final int httpStatusCode) {
         httpCode = httpStatusCode;
     }
 
@@ -48,7 +47,7 @@ public enum ApiErrorCode {
         return httpCode;
     }
 
-    public void setHttpCode(int httpCode) {
+    public void setHttpCode(final int httpCode) {
         this.httpCode = httpCode;
     }
 

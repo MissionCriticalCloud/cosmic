@@ -15,12 +15,11 @@
 # specific language governing permissions and limitations
 # under the License.
 from merge import DataBag
-import CsHelper
 
 
 class CsGuestNetwork:
     def __init__(self, device, config):
-        self.data = {}
+        self.data = { }
         self.guest = True
         db = DataBag()
         db.setKey("guestnetwork")

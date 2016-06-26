@@ -16,7 +16,6 @@
 // under the License.
 package com.cloud.vpc.dao;
 
-
 import com.cloud.network.vpc.VpcOfferingVO;
 import com.cloud.network.vpc.dao.VpcOfferingDao;
 import com.cloud.utils.db.DB;
@@ -37,5 +36,4 @@ public class MockVpcOfferingDaoImpl extends GenericDaoBase<VpcOfferingVO, Long> 
     public VpcOfferingVO persist(VpcOfferingVO vo) {
         return vo;
     }
-
 }

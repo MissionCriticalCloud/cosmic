@@ -16,10 +16,6 @@
 // under the License.
 package com.cloud.projects.dao;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectVO;
 import com.cloud.server.ResourceTag.ResourceObjectType;
@@ -31,6 +27,9 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.TransactionLegacy;
+
+import javax.inject.Inject;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +60,8 @@ public class ProjectDaoImpl extends GenericDaoBase<ProjectVO, Long> implements P
     }
 
     @Override
-    public ProjectVO findByNameAndDomain(String name, long domainId) {
-        SearchCriteria<ProjectVO> sc = AllFieldsSearch.create();
+    public ProjectVO findByNameAndDomain(final String name, final long domainId) {
+        final SearchCriteria<ProjectVO> sc = AllFieldsSearch.create();
         sc.setParameters("name", name);
         sc.setParameters("domainId", domainId);
 
@@ -70,12 +69,42 @@ public class ProjectDaoImpl extends GenericDaoBase<ProjectVO, Long> implements P
     }
 
     @Override
+    public Long countProjectsForDomain(final long domainId) {
+        final SearchCriteria<Long> sc = CountByDomain.create();
+        sc.setParameters("domainId", domainId);
+        return customSearch(sc, null).get(0);
+    }
+
+    @Override
+    public ProjectVO findByProjectAccountId(final long projectAccountId) {
+        final SearchCriteria<ProjectVO> sc = AllFieldsSearch.create();
+        sc.setParameters("projectAccountId", projectAccountId);
+
+        return findOneBy(sc);
+    }
+
+    @Override
+    public List<ProjectVO> listByState(final Project.State state) {
+        final SearchCriteria<ProjectVO> sc = AllFieldsSearch.create();
+        sc.setParameters("state", state);
+        return listBy(sc);
+    }
+
+    @Override
+    public ProjectVO findByProjectAccountIdIncludingRemoved(final long projectAccountId) {
+        final SearchCriteria<ProjectVO> sc = AllFieldsSearch.create();
+        sc.setParameters("projectAccountId", projectAccountId);
+
+        return findOneIncludingRemovedBy(sc);
+    }
+
+    @Override
     @DB
-    public boolean remove(Long projectId) {
+    public boolean remove(final Long projectId) {
         boolean result = false;
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
-        ProjectVO projectToRemove = findById(projectId);
+        final ProjectVO projectToRemove = findById(projectId);
         projectToRemove.setName(null);
         if (!update(projectId, projectToRemove)) {
             s_logger.warn("Failed to reset name for the project id=" + projectId + " as a part of project remove");
@@ -87,36 +116,5 @@ public class ProjectDaoImpl extends GenericDaoBase<ProjectVO, Long> implements P
         txn.commit();
 
         return result;
-
-    }
-
-    @Override
-    public Long countProjectsForDomain(long domainId) {
-        SearchCriteria<Long> sc = CountByDomain.create();
-        sc.setParameters("domainId", domainId);
-        return customSearch(sc, null).get(0);
-    }
-
-    @Override
-    public ProjectVO findByProjectAccountId(long projectAccountId) {
-        SearchCriteria<ProjectVO> sc = AllFieldsSearch.create();
-        sc.setParameters("projectAccountId", projectAccountId);
-
-        return findOneBy(sc);
-    }
-
-    @Override
-    public List<ProjectVO> listByState(Project.State state) {
-        SearchCriteria<ProjectVO> sc = AllFieldsSearch.create();
-        sc.setParameters("state", state);
-        return listBy(sc);
-    }
-
-    @Override
-    public ProjectVO findByProjectAccountIdIncludingRemoved(long projectAccountId) {
-        SearchCriteria<ProjectVO> sc = AllFieldsSearch.create();
-        sc.setParameters("projectAccountId", projectAccountId);
-
-        return findOneIncludingRemovedBy(sc);
     }
 }

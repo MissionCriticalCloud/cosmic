@@ -16,9 +16,6 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.dc.StorageNetworkIpAddressVO;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
@@ -28,6 +25,9 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.util.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -63,27 +63,27 @@ public class StorageNetworkIpAddressDaoImpl extends GenericDaoBase<StorageNetwor
     }
 
     @Override
-    public long countInUseIpByRangeId(long rangeId) {
-        SearchCriteria<Long> sc = countInUserIp.create();
+    public long countInUseIpByRangeId(final long rangeId) {
+        final SearchCriteria<Long> sc = countInUserIp.create();
         sc.setParameters("rangeId", rangeId);
         return customSearch(sc, null).get(0);
     }
 
     @Override
-    public List<String> listInUseIpByRangeId(long rangeId) {
-        SearchCriteria<String> sc = listInUseIp.create();
+    public List<String> listInUseIpByRangeId(final long rangeId) {
+        final SearchCriteria<String> sc = listInUseIp.create();
         sc.setParameters("rangeId", rangeId);
         return customSearch(sc, null);
     }
 
     @Override
     @DB
-    public StorageNetworkIpAddressVO takeIpAddress(long rangeId) {
-        SearchCriteria<StorageNetworkIpAddressVO> sc = untakenIp.create();
+    public StorageNetworkIpAddressVO takeIpAddress(final long rangeId) {
+        final SearchCriteria<StorageNetworkIpAddressVO> sc = untakenIp.create();
         sc.setParameters("rangeId", rangeId);
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
-        StorageNetworkIpAddressVO ip = lockOneRandomRow(sc, true);
+        final StorageNetworkIpAddressVO ip = lockOneRandomRow(sc, true);
         if (ip == null) {
             txn.rollback();
             return null;
@@ -95,10 +95,10 @@ public class StorageNetworkIpAddressDaoImpl extends GenericDaoBase<StorageNetwor
     }
 
     @Override
-    public void releaseIpAddress(String ip) {
-        SearchCriteria<StorageNetworkIpAddressVO> sc = ipSearch.create();
+    public void releaseIpAddress(final String ip) {
+        final SearchCriteria<StorageNetworkIpAddressVO> sc = ipSearch.create();
         sc.setParameters("ipAddress", ip);
-        StorageNetworkIpAddressVO vo = createForUpdate();
+        final StorageNetworkIpAddressVO vo = createForUpdate();
         vo.setTakenAt(null);
         update(vo, sc);
     }

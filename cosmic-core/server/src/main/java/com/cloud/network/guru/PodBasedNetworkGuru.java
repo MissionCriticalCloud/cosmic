@@ -16,10 +16,6 @@
 // under the License.
 package com.cloud.network.guru;
 
-import java.util.Random;
-
-import javax.inject.Inject;
-
 import com.cloud.dc.Pod;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
@@ -45,32 +41,23 @@ import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachineProfile;
 
+import javax.inject.Inject;
+import java.util.Random;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PodBasedNetworkGuru extends AdapterBase implements NetworkGuru {
     private static final Logger s_logger = LoggerFactory.getLogger(PodBasedNetworkGuru.class);
+    private static final TrafficType[] TrafficTypes = {TrafficType.Management};
     @Inject
     DataCenterDao _dcDao;
     @Inject
     StorageNetworkManager _sNwMgr;
     Random _rand = new Random(System.currentTimeMillis());
 
-    private static final TrafficType[] TrafficTypes = {TrafficType.Management};
-
-    @Override
-    public boolean isMyTrafficType(TrafficType type) {
-        for (TrafficType t : TrafficTypes) {
-            if (t == type) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public TrafficType[] getSupportedTrafficType() {
-        return TrafficTypes;
+    protected PodBasedNetworkGuru() {
+        super();
     }
 
     @Override
@@ -82,22 +69,20 @@ public class PodBasedNetworkGuru extends AdapterBase implements NetworkGuru {
         }
 
         NetworkVO config =
-            new NetworkVO(type, Mode.Static, BroadcastDomainType.Native, offering.getId(), Network.State.Setup, plan.getDataCenterId(),
-                    plan.getPhysicalNetworkId(), offering.getRedundantRouter());
+                new NetworkVO(type, Mode.Static, BroadcastDomainType.Native, offering.getId(), Network.State.Setup, plan.getDataCenterId(),
+                        plan.getPhysicalNetworkId(), offering.getRedundantRouter());
         return config;
     }
 
-    protected PodBasedNetworkGuru() {
-        super();
-    }
-
     @Override
-    public void deallocate(Network config, NicProfile nic, VirtualMachineProfile vm) {
+    public Network implement(Network config, NetworkOffering offering, DeployDestination destination, ReservationContext context)
+            throws InsufficientVirtualNetworkCapacityException {
+        return config;
     }
 
     @Override
     public NicProfile allocate(Network config, NicProfile nic, VirtualMachineProfile vm) throws InsufficientVirtualNetworkCapacityException,
-        InsufficientAddressCapacityException {
+            InsufficientAddressCapacityException {
         TrafficType trafficType = config.getTrafficType();
         assert trafficType == TrafficType.Management || trafficType == TrafficType.Storage : "Well, I can't take care of this config now can I? " + config;
 
@@ -115,7 +100,7 @@ public class PodBasedNetworkGuru extends AdapterBase implements NetworkGuru {
 
     @Override
     public void reserve(NicProfile nic, Network config, VirtualMachineProfile vm, DeployDestination dest, ReservationContext context)
-        throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
+            throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
         Pod pod = dest.getPod();
 
         Pair<String, Long> ip = _dcDao.allocatePrivateIpAddress(dest.getDataCenter().getId(), dest.getPod().getId(), nic.getId(), context.getReservationId());
@@ -137,14 +122,6 @@ public class PodBasedNetworkGuru extends AdapterBase implements NetworkGuru {
     }
 
     @Override
-    public void updateNicProfile(NicProfile profile, Network network) {
-    }
-
-    @Override
-    public void updateNetworkProfile(NetworkProfile networkProfile) {
-    }
-
-    @Override
     public boolean release(NicProfile nic, VirtualMachineProfile vm, String reservationId) {
         _dcDao.releasePrivateIpAddress(nic.getId(), nic.getReservationId());
 
@@ -158,9 +135,11 @@ public class PodBasedNetworkGuru extends AdapterBase implements NetworkGuru {
     }
 
     @Override
-    public Network implement(Network config, NetworkOffering offering, DeployDestination destination, ReservationContext context)
-        throws InsufficientVirtualNetworkCapacityException {
-        return config;
+    public void deallocate(Network config, NicProfile nic, VirtualMachineProfile vm) {
+    }
+
+    @Override
+    public void updateNicProfile(NicProfile profile, Network network) {
     }
 
     @Override
@@ -170,5 +149,24 @@ public class PodBasedNetworkGuru extends AdapterBase implements NetworkGuru {
     @Override
     public boolean trash(Network config, NetworkOffering offering) {
         return true;
+    }
+
+    @Override
+    public void updateNetworkProfile(NetworkProfile networkProfile) {
+    }
+
+    @Override
+    public TrafficType[] getSupportedTrafficType() {
+        return TrafficTypes;
+    }
+
+    @Override
+    public boolean isMyTrafficType(TrafficType type) {
+        for (TrafficType t : TrafficTypes) {
+            if (t == type) {
+                return true;
+            }
+        }
+        return false;
     }
 }

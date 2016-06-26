@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.consoleproxy;
 
+import com.cloud.consoleproxy.util.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.cloud.consoleproxy.util.Logger;
 
 import org.apache.log4j.xml.DOMConfigurator;
 
@@ -56,6 +56,41 @@ public class ConsoleProxyMonitor {
         }
     }
 
+    public static void main(String[] argv) {
+        configLog4j();
+        (new ConsoleProxyMonitor(argv)).run();
+    }
+
+    private static void configLog4j() {
+        URL configUrl = System.class.getResource("/conf/log4j-cloud.xml");
+        if (configUrl == null) {
+            configUrl = ClassLoader.getSystemResource("log4j-cloud.xml");
+        }
+
+        if (configUrl == null) {
+            configUrl = ClassLoader.getSystemResource("conf/log4j-cloud.xml");
+        }
+
+        if (configUrl != null) {
+            try {
+                System.out.println("Configure log4j using " + configUrl.toURI().toString());
+            } catch (URISyntaxException e1) {
+                e1.printStackTrace();
+            }
+
+            try {
+                File file = new File(configUrl.toURI());
+
+                System.out.println("Log4j configuration from : " + file.getAbsolutePath());
+                DOMConfigurator.configureAndWatch(file.getAbsolutePath(), 10000);
+            } catch (URISyntaxException e) {
+                System.out.println("Unable to convert log4j configuration Url to URI");
+            }
+        } else {
+            System.out.println("Configure log4j with default properties");
+        }
+    }
+
     private void run() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -84,13 +119,24 @@ public class ConsoleProxyMonitor {
                     exitCode = _process.waitFor();
                     waitSucceeded = true;
 
-                    if (s_logger.isInfoEnabled())
+                    if (s_logger.isInfoEnabled()) {
                         s_logger.info("Console proxy process exits with code: " + exitCode);
+                    }
                 } catch (InterruptedException e) {
-                    if (s_logger.isInfoEnabled())
+                    if (s_logger.isInfoEnabled()) {
                         s_logger.info("InterruptedException while waiting for termination of console proxy, will retry");
+                    }
                 }
             }
+        }
+    }
+
+    private void onShutdown() {
+        if (_process != null) {
+            if (s_logger.isInfoEnabled()) {
+                s_logger.info("Console proxy monitor shuts dwon, terminate console proxy process");
+            }
+            _process.destroy();
         }
     }
 
@@ -98,55 +144,16 @@ public class ConsoleProxyMonitor {
         StringBuffer sb = new StringBuffer("java ");
         String jvmOptions = _argMap.get("jvmoptions");
 
-        if (jvmOptions != null)
+        if (jvmOptions != null) {
             sb.append(jvmOptions);
+        }
 
         for (Map.Entry<String, String> entry : _argMap.entrySet()) {
-            if (!"jvmoptions".equalsIgnoreCase(entry.getKey()))
+            if (!"jvmoptions".equalsIgnoreCase(entry.getKey())) {
                 sb.append(" ").append(entry.getKey()).append("=").append(entry.getValue());
+            }
         }
 
         return sb.toString();
-    }
-
-    private void onShutdown() {
-        if (_process != null) {
-            if (s_logger.isInfoEnabled())
-                s_logger.info("Console proxy monitor shuts dwon, terminate console proxy process");
-            _process.destroy();
-        }
-    }
-
-    private static void configLog4j() {
-        URL configUrl = System.class.getResource("/conf/log4j-cloud.xml");
-        if (configUrl == null)
-            configUrl = ClassLoader.getSystemResource("log4j-cloud.xml");
-
-        if (configUrl == null)
-            configUrl = ClassLoader.getSystemResource("conf/log4j-cloud.xml");
-
-        if (configUrl != null) {
-            try {
-                System.out.println("Configure log4j using " + configUrl.toURI().toString());
-            } catch (URISyntaxException e1) {
-                e1.printStackTrace();
-            }
-
-            try {
-                File file = new File(configUrl.toURI());
-
-                System.out.println("Log4j configuration from : " + file.getAbsolutePath());
-                DOMConfigurator.configureAndWatch(file.getAbsolutePath(), 10000);
-            } catch (URISyntaxException e) {
-                System.out.println("Unable to convert log4j configuration Url to URI");
-            }
-        } else {
-            System.out.println("Configure log4j with default properties");
-        }
-    }
-
-    public static void main(String[] argv) {
-        configLog4j();
-        (new ConsoleProxyMonitor(argv)).run();
     }
 }

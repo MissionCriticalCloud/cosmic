@@ -16,33 +16,6 @@
 // under the License.
 package com.cloud.server;
 
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.UUID;
-import java.util.regex.Pattern;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.Resource;
@@ -107,13 +80,39 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.nio.Link;
 import com.cloud.utils.script.Script;
-
 import org.apache.cloudstack.config.ApiServiceConfiguration;
 import org.apache.cloudstack.framework.config.ConfigDepot;
 import org.apache.cloudstack.framework.config.ConfigDepotAdmin;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.config.impl.ConfigurationVO;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.UUID;
+import java.util.regex.Pattern;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -122,7 +121,14 @@ import org.slf4j.LoggerFactory;
 
 public class ConfigurationServerImpl extends ManagerBase implements ConfigurationServer {
     public static final Logger s_logger = LoggerFactory.getLogger(ConfigurationServerImpl.class);
-
+    @Inject
+    protected ConfigDepotAdmin _configDepotAdmin;
+    @Inject
+    protected ConfigDepot _configDepot;
+    @Inject
+    protected ConfigurationManager _configMgr;
+    @Inject
+    protected ManagementService _mgrService;
     @Inject
     private ConfigurationDao _configDao;
     @Inject
@@ -149,15 +155,6 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
     private ResourceCountDao _resourceCountDao;
     @Inject
     private NetworkOfferingServiceMapDao _ntwkOfferingServiceMapDao;
-    @Inject
-    protected ConfigDepotAdmin _configDepotAdmin;
-    @Inject
-    protected ConfigDepot _configDepot;
-    @Inject
-    protected ConfigurationManager _configMgr;
-    @Inject
-    protected ManagementService _mgrService;
-
 
     public ConfigurationServerImpl() {
         setRunLevel(ComponentLifecycle.RUN_LEVEL_FRAMEWORK_BOOTSTRAP);
@@ -299,7 +296,6 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                                     vlan.getPhysicalNetworkId());
                         }
                     });
-
                 }
             }
         }
@@ -335,111 +331,6 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
 
         // invalidate cache in DAO as we have changed DB status
         _configDao.invalidateCache();
-    }
-
-    private void templateDetailsInitIfNotExist(long id, String name, String value) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement stmt = null;
-        PreparedStatement stmtInsert = null;
-        boolean insert = false;
-        try {
-            txn.start();
-            stmt = txn.prepareAutoCloseStatement("SELECT id FROM vm_template_details WHERE template_id=? and name=?");
-            stmt.setLong(1, id);
-            stmt.setString(2, name);
-            ResultSet rs = stmt.executeQuery();
-            if (rs == null || !rs.next()) {
-                insert = true;
-            }
-            stmt.close();
-
-            if (insert) {
-                stmtInsert = txn.prepareAutoCloseStatement("INSERT INTO vm_template_details(template_id, name, value) VALUES(?, ?, ?)");
-                stmtInsert.setLong(1, id);
-                stmtInsert.setString(2, name);
-                stmtInsert.setString(3, value);
-                if (stmtInsert.executeUpdate() < 1) {
-                    throw new CloudRuntimeException("Unable to init template " + id + " datails: " + name);
-                }
-            }
-            txn.commit();
-        } catch (Exception e) {
-            s_logger.warn("Unable to init template " + id + " datails: " + name, e);
-            throw new CloudRuntimeException("Unable to init template " + id + " datails: " + name);
-        }
-    }
-
-    private void initiateXenServerPVDriverVersion() {
-        Transaction.execute(new TransactionCallbackNoReturn() {
-            @Override
-            public void doInTransactionWithoutResult(TransactionStatus status) {
-                TransactionLegacy txn = TransactionLegacy.currentTxn();
-                String pvdriverversion = Config.XenServerPVdriverVersion.getDefaultValue();
-                PreparedStatement pstmt = null;
-                ResultSet rs1 = null;
-                ResultSet rs2 = null;
-                try {
-                    String oldValue = _configDao.getValue(Config.XenServerPVdriverVersion.key());
-                    if (oldValue == null) {
-                        String sql = "select resource from host where hypervisor_type='XenServer' and removed is null and status not in ('Error', 'Removed') group by resource";
-                        pstmt = txn.prepareAutoCloseStatement(sql);
-                        rs1 = pstmt.executeQuery();
-                        while (rs1.next()) {
-                            String resouce = rs1.getString(1); //resource column
-                            if (resouce == null)
-                                continue;
-                            if (resouce.equalsIgnoreCase("com.cloud.hypervisor.xenserver.resource.XenServer56Resource")
-                                    || resouce.equalsIgnoreCase("com.cloud.hypervisor.xenserver.resource.XenServer56FP1Resource")
-                                    || resouce.equalsIgnoreCase("com.cloud.hypervisor.xenserver.resource.XenServer56SP2Resource")
-                                    || resouce.equalsIgnoreCase("com.cloud.hypervisor.xenserver.resource.XenServer600Resource")
-                                    || resouce.equalsIgnoreCase("com.cloud.hypervisor.xenserver.resource.XenServer602Resource")) {
-                                pvdriverversion = "xenserver56";
-                                break;
-                            }
-                        }
-                        _configDao.getValueAndInitIfNotExist(Config.XenServerPVdriverVersion.key(), Config.XenServerPVdriverVersion.getCategory(), pvdriverversion,
-                                Config.XenServerPVdriverVersion.getDescription());
-                        sql = "select id from vm_template where hypervisor_type='XenServer'  and format!='ISO' and removed is null";
-                        pstmt = txn.prepareAutoCloseStatement(sql);
-                        rs2 = pstmt.executeQuery();
-                        List<Long> tmpl_ids = new ArrayList<Long>();
-                        while (rs2.next()) {
-                            tmpl_ids.add(rs2.getLong(1));
-                        }
-                        for (Long tmpl_id : tmpl_ids) {
-                            templateDetailsInitIfNotExist(tmpl_id, "hypervisortoolsversion", pvdriverversion);
-                        }
-                    }
-                } catch (Exception e) {
-                    s_logger.debug("initiateXenServerPVDriverVersion failed due to " + e.toString());
-                    // ignore
-                }
-            }
-        });
-    }
-
-    private String getMountParent() {
-        return getEnvironmentProperty("mount.parent");
-    }
-
-    private String getEnvironmentProperty(String name) {
-        try {
-            final File propsFile = PropertiesUtil.findConfigFile("environment.properties");
-
-            if (propsFile == null) {
-                return null;
-            } else {
-                final Properties props = new Properties();
-                try(final FileInputStream finputstream = new FileInputStream(propsFile);) {
-                    props.load(finputstream);
-                }catch (IOException e) {
-                    s_logger.error("getEnvironmentProperty:Exception:" + e.getMessage());
-                }
-                return props.getProperty("mount.parent");
-            }
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     @DB
@@ -535,520 +426,18 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         });
     }
 
-    protected void updateCloudIdentifier() {
-        // Creates and saves a UUID as the cloud identifier
-        String currentCloudIdentifier = _configDao.getValue("cloud.identifier");
-        if (currentCloudIdentifier == null || currentCloudIdentifier.isEmpty()) {
-            String uuid = UUID.randomUUID().toString();
-            _configDao.update(Config.CloudIdentifier.key(), Config.CloudIdentifier.getCategory(), uuid);
-        }
-    }
-
-    static String getBase64Keystore(String keystorePath) throws IOException {
-        byte[] storeBytes = FileUtils.readFileToByteArray(new File(keystorePath));
-        if (storeBytes.length > 3000) { // Base64 codec would enlarge data by 1/3, and we have 4094 bytes in database entry at most
-            throw new IOException("KeyStore is too big for database! Length " + storeBytes.length);
-        }
-
-        return new String(Base64.encodeBase64(storeBytes));
-    }
-
-    private void generateDefaultKeystore(String keystorePath) throws IOException {
-        String cn = "Cloudstack User";
-        String ou;
-
-        try {
-            ou = InetAddress.getLocalHost().getCanonicalHostName();
-            String[] group = ou.split("\\.");
-
-            // Simple check to see if we got IP Address...
-            boolean isIPAddress = Pattern.matches("[0-9]$", group[group.length - 1]);
-            if (isIPAddress) {
-                ou = "cloud.com";
-            } else {
-                ou = group[group.length - 1];
-                for (int i = group.length - 2; i >= 0 && i >= group.length - 3; i--)
-                    ou = group[i] + "." + ou;
-            }
-        } catch (UnknownHostException ex) {
-            s_logger.info("Fail to get user's domain name. Would use cloud.com. ", ex);
-            ou = "cloud.com";
-        }
-
-        String o = ou;
-        String c = "Unknown";
-        String dname = "cn=\"" + cn + "\",ou=\"" + ou + "\",o=\"" + o + "\",c=\"" + c + "\"";
-        Script script = new Script(true, "keytool", 5000, null);
-        script.add("-genkey");
-        script.add("-keystore", keystorePath);
-        script.add("-storepass", "vmops.com");
-        script.add("-keypass", "vmops.com");
-        script.add("-keyalg", "RSA");
-        script.add("-validity", "3650");
-        script.add("-dname", dname);
-        String result = script.execute();
-        if (result != null) {
-            throw new IOException("Fail to generate certificate!: " + result);
-        }
-    }
-
-    protected void updateSSLKeystore() {
-        if (s_logger.isInfoEnabled()) {
-            s_logger.info("Processing updateSSLKeyStore");
-        }
-
-        String dbString = _configDao.getValue("ssl.keystore");
-
-        File confFile = PropertiesUtil.findConfigFile("db.properties");
-        String confPath = null;
-        String keystorePath = null;
-        File keystoreFile = null;
-
-        if (null != confFile) {
-            confPath = confFile.getParent();
-            keystorePath = confPath + Link.keystoreFile;
-            keystoreFile = new File(keystorePath);
-        }
-
-        boolean dbExisted = (dbString != null && !dbString.isEmpty());
-
-        s_logger.info("SSL keystore located at " + keystorePath);
-        try {
-            if (!dbExisted && null != confFile) {
-                if (!keystoreFile.exists()) {
-                    generateDefaultKeystore(keystorePath);
-                    s_logger.info("Generated SSL keystore.");
-                }
-                String base64Keystore = getBase64Keystore(keystorePath);
-                ConfigurationVO configVO =
-                        new ConfigurationVO("Hidden", "DEFAULT", "management-server", "ssl.keystore", base64Keystore,
-                                "SSL Keystore for the management servers");
-                _configDao.persist(configVO);
-                s_logger.info("Stored SSL keystore to database.");
-            } else { // !keystoreFile.exists() and dbExisted
-                // Export keystore to local file
-                byte[] storeBytes = Base64.decodeBase64(dbString);
-                String tmpKeystorePath = "/tmp/tmpkey";
-                try (
-                        FileOutputStream fo = new FileOutputStream(tmpKeystorePath);
-                    ) {
-                    fo.write(storeBytes);
-                    Script script = new Script(true, "cp", 5000, null);
-                    script.add("-f");
-                    script.add(tmpKeystorePath);
-
-                    //There is a chance, although small, that the keystorePath is null. In that case, do not add it to the script.
-                    if (null != keystorePath) {
-                        script.add(keystorePath);
-                    }
-                    String result = script.execute();
-                    if (result != null) {
-                        throw new IOException();
-                    }
-                } catch (Exception e) {
-                    throw new IOException("Fail to create keystore file!", e);
-                }
-                s_logger.info("Stored database keystore to local.");
-            }
-        } catch (Exception ex) {
-            s_logger.warn("Would use fail-safe keystore to continue.", ex);
-        }
-    }
-
-    @DB
-    protected void updateSystemvmPassword() {
-        String userid = System.getProperty("user.name");
-        if (!userid.startsWith("cloud")) {
-            return;
-        }
-
-        if (!Boolean.valueOf(_configDao.getValue("system.vm.random.password"))) {
-            return;
-        }
-
-        String already = _configDao.getValue("system.vm.password");
-        if (already == null) {
-            TransactionLegacy txn = TransactionLegacy.currentTxn();
-            try {
-                String rpassword = _mgrService.generateRandomPassword();
-                String wSql = "INSERT INTO `cloud`.`configuration` (category, instance, component, name, value, description) "
-                + "VALUES ('Secure','DEFAULT', 'management-server','system.vm.password', ?,'randmon password generated each management server starts for system vm')";
-                PreparedStatement stmt = txn.prepareAutoCloseStatement(wSql);
-                stmt.setString(1, DBEncryptionUtil.encrypt(rpassword));
-                stmt.executeUpdate();
-                s_logger.info("Updated systemvm password in database");
-            } catch (SQLException e) {
-                s_logger.error("Cannot retrieve systemvm password", e);
-            }
-        }
-
-    }
-
-    @Override
-    @DB
-    public void updateKeyPairs() {
-        // Grab the SSH key pair and insert it into the database, if it is not present
-
-        String username = System.getProperty("user.name");
-        Boolean devel = Boolean.valueOf(_configDao.getValue("developer"));
-        if (!username.equalsIgnoreCase("cloud") && !devel) {
-            s_logger.warn("Systemvm keypairs could not be set. Management server should be run as cloud user, or in development mode.");
-            return;
-        }
-        String already = _configDao.getValue("ssh.privatekey");
-        String homeDir = System.getProperty("user.home");
-        if (homeDir == null) {
-            throw new CloudRuntimeException("Cannot get home directory for account: " + username);
-        }
-
-        if (s_logger.isInfoEnabled()) {
-            s_logger.info("Processing updateKeyPairs");
-        }
-
-        if (homeDir != null && homeDir.startsWith("~")) {
-            s_logger.error("No home directory was detected for the user '" + username + "'. Please check the profile of this user.");
-            throw new CloudRuntimeException("No home directory was detected for the user '" + username + "'. Please check the profile of this user.");
-        }
-
-        // Using non-default file names (id_rsa.cloud and id_rsa.cloud.pub) in developer mode. This is to prevent SSH keys overwritten for user running management server
-        File privkeyfile = null;
-        File pubkeyfile = null;
-        if (devel) {
-            privkeyfile = new File(homeDir + "/.ssh/id_rsa.cloud");
-            pubkeyfile = new File(homeDir + "/.ssh/id_rsa.cloud.pub");
-        } else {
-            privkeyfile = new File(homeDir + "/.ssh/id_rsa");
-            pubkeyfile = new File(homeDir + "/.ssh/id_rsa.pub");
-        }
-
-        if (already == null || already.isEmpty()) {
-            if (s_logger.isInfoEnabled()) {
-                s_logger.info("Systemvm keypairs not found in database. Need to store them in the database");
-            }
-            // FIXME: take a global database lock here for safety.
-            boolean onWindows = isOnWindows();
-            if(!onWindows) {
-                Script.runSimpleBashScript("if [ -f " + privkeyfile + " ]; then rm -f " + privkeyfile + "; fi; ssh-keygen -t rsa -N '' -f " + privkeyfile + " -q");
-            }
-
-            byte[] arr1 = new byte[4094]; // configuration table column value size
-            try (DataInputStream dis = new DataInputStream(new FileInputStream(privkeyfile))) {
-                dis.readFully(arr1);
-            } catch (EOFException e) {
-                s_logger.info("[ignored] eof reached");
-            } catch (Exception e) {
-                s_logger.error("Cannot read the private key file", e);
-                throw new CloudRuntimeException("Cannot read the private key file");
-            }
-            String privateKey = new String(arr1).trim();
-            byte[] arr2 = new byte[4094]; // configuration table column value size
-            try (DataInputStream dis = new DataInputStream(new FileInputStream(pubkeyfile))) {
-                dis.readFully(arr2);
-            } catch (EOFException e) {
-                s_logger.info("[ignored] eof reached");
-            } catch (Exception e) {
-                s_logger.warn("Cannot read the public key file", e);
-                throw new CloudRuntimeException("Cannot read the public key file");
-            }
-            String publicKey = new String(arr2).trim();
-
-            final String insertSql1 =
-                    "INSERT INTO `cloud`.`configuration` (category, instance, component, name, value, description) " +
-                            "VALUES ('Hidden','DEFAULT', 'management-server','ssh.privatekey', '" + DBEncryptionUtil.encrypt(privateKey) +
-                            "','Private key for the entire CloudStack')";
-            final String insertSql2 =
-                    "INSERT INTO `cloud`.`configuration` (category, instance, component, name, value, description) " +
-                            "VALUES ('Hidden','DEFAULT', 'management-server','ssh.publickey', '" + DBEncryptionUtil.encrypt(publicKey) +
-                            "','Public key for the entire CloudStack')";
-
-            Transaction.execute(new TransactionCallbackNoReturn() {
-                @Override
-                public void doInTransactionWithoutResult(TransactionStatus status) {
-
-                    TransactionLegacy txn = TransactionLegacy.currentTxn();
-                    try {
-                        PreparedStatement stmt1 = txn.prepareAutoCloseStatement(insertSql1);
-                        stmt1.executeUpdate();
-                        if (s_logger.isDebugEnabled()) {
-                            s_logger.debug("Private key inserted into database");
-                        }
-                    } catch (SQLException ex) {
-                        s_logger.error("SQL of the private key failed", ex);
-                        throw new CloudRuntimeException("SQL of the private key failed");
-                    }
-
-                    try {
-                        PreparedStatement stmt2 = txn.prepareAutoCloseStatement(insertSql2);
-                        stmt2.executeUpdate();
-                        if (s_logger.isDebugEnabled()) {
-                            s_logger.debug("Public key inserted into database");
-                        }
-                    } catch (SQLException ex) {
-                        s_logger.error("SQL of the public key failed", ex);
-                        throw new CloudRuntimeException("SQL of the public key failed");
-                    }
-                }
-            });
-
-        } else {
-            s_logger.info("Keypairs already in database, updating local copy");
-            updateKeyPairsOnDisk(homeDir);
-        }
-        s_logger.info("Going to update systemvm iso with generated keypairs if needed");
-        try {
-            injectSshKeysIntoSystemVmIsoPatch(pubkeyfile.getAbsolutePath(), privkeyfile.getAbsolutePath());
-        } catch (CloudRuntimeException e) {
-            if (!devel) {
-                throw new CloudRuntimeException(e.getMessage());
-            }
-        }
-    }
-
-    @Override
-    public List<ConfigurationVO> getConfigListByScope(String scope, Long resourceId) {
-
-        // Getting the list of parameters defined at the scope
-        Set<ConfigKey<?>> configList = _configDepot.getConfigListByScope(scope);
-        List<ConfigurationVO> configVOList = new ArrayList<ConfigurationVO>();
-        for (ConfigKey<?> param : configList) {
-            ConfigurationVO configVo = _configDao.findByName(param.toString());
-            configVo.setValue(_configDepot.get(param.toString()).valueIn(resourceId).toString());
-            configVOList.add(configVo);
-        }
-        return configVOList;
-    }
-
-    private void writeKeyToDisk(String key, String keyPath) {
-        File keyfile = new File(keyPath);
-        if (!keyfile.exists()) {
-            try {
-                keyfile.createNewFile();
-            } catch (IOException e) {
-                s_logger.warn("Failed to create file: " + e.toString());
-                throw new CloudRuntimeException("Failed to update keypairs on disk: cannot create  key file " + keyPath);
-            }
-        }
-
-        if (keyfile.exists()) {
-            try (FileOutputStream kStream = new FileOutputStream(keyfile);){
-                if (kStream != null) {
-                    kStream.write(key.getBytes());
-                }
-            } catch (FileNotFoundException e) {
-                s_logger.warn("Failed to write  key to " + keyfile.getAbsolutePath());
-                throw new CloudRuntimeException("Failed to update keypairs on disk: cannot find  key file " + keyPath);
-            } catch (IOException e) {
-                s_logger.warn("Failed to write  key to " + keyfile.getAbsolutePath());
-                throw new CloudRuntimeException("Failed to update keypairs on disk: cannot write to  key file " + keyPath);
-            }
-        }
-
-    }
-
-    private void updateKeyPairsOnDisk(String homeDir) {
-        File keyDir = new File(homeDir + "/.ssh");
-        Boolean devel = Boolean.valueOf(_configDao.getValue("developer"));
-        if (!keyDir.isDirectory()) {
-            s_logger.warn("Failed to create " + homeDir + "/.ssh for storing the SSH keypars");
-            keyDir.mkdir();
-        }
-        String pubKey = _configDao.getValue("ssh.publickey");
-        String prvKey = _configDao.getValue("ssh.privatekey");
-
-        // Using non-default file names (id_rsa.cloud and id_rsa.cloud.pub) in developer mode. This is to prevent SSH keys overwritten for user running management server
-        if (devel) {
-            writeKeyToDisk(prvKey, homeDir + "/.ssh/id_rsa.cloud");
-            writeKeyToDisk(pubKey, homeDir + "/.ssh/id_rsa.cloud.pub");
-        } else {
-            writeKeyToDisk(prvKey, homeDir + "/.ssh/id_rsa");
-            writeKeyToDisk(pubKey, homeDir + "/.ssh/id_rsa.pub");
-        }
-    }
-
-    protected void injectSshKeysIntoSystemVmIsoPatch(String publicKeyPath, String privKeyPath) {
-        s_logger.info("Trying to inject public and private keys into systemvm iso");
-        String injectScript = getInjectScript();
-        String scriptPath = Script.findScript("", injectScript);
-        String systemVmIsoPath = Script.findScript("", "vms/systemvm.iso");
-        if (scriptPath == null) {
-            throw new CloudRuntimeException("Unable to find key inject script " + injectScript);
-        }
-        if (systemVmIsoPath == null) {
-            throw new CloudRuntimeException("Unable to find systemvm iso vms/systemvm.iso");
-        }
-        Script command = null;
-        if(isOnWindows()) {
-            command = new Script("python", s_logger);
-        } else {
-            command = new Script("/bin/bash", s_logger);
-        }
-        if (isOnWindows()) {
-            scriptPath = scriptPath.replaceAll("\\\\" ,"/" );
-            systemVmIsoPath = systemVmIsoPath.replaceAll("\\\\" ,"/" );
-            publicKeyPath = publicKeyPath.replaceAll("\\\\" ,"/" );
-            privKeyPath = privKeyPath.replaceAll("\\\\" ,"/" );
-        }
-        command.add(scriptPath);
-        command.add(publicKeyPath);
-        command.add(privKeyPath);
-        command.add(systemVmIsoPath);
-
-        final String result = command.execute();
-        s_logger.info("Injected public and private keys into systemvm iso with result : " + result);
-        if (result != null) {
-            s_logger.warn("Failed to inject generated public key into systemvm iso " + result);
-            throw new CloudRuntimeException("Failed to inject generated public key into systemvm iso " + result);
-        }
-    }
-
-    protected String getInjectScript() {
-        String injectScript = null;
-        boolean onWindows = isOnWindows();
-        if(onWindows) {
-            injectScript = "scripts/vm/systemvm/injectkeys.py";
-        } else {
-            injectScript = "scripts/vm/systemvm/injectkeys.sh";
-        }
-        return injectScript;
-    }
-
-    protected boolean isOnWindows() {
-        String os = System.getProperty("os.name", "generic").toLowerCase();
-        boolean onWindows = (os != null && os.startsWith("windows"));
-        return onWindows;
-    }
-
-    @DB
-    protected void generateSecStorageVmCopyPassword() {
-        String already = _configDao.getValue("secstorage.copy.password");
-
-        if (already == null) {
-
-            s_logger.info("Need to store secondary storage vm copy password in the database");
-            String password = PasswordGenerator.generateRandomPassword(12);
-
-            final String insertSql1 =
-                    "INSERT INTO `cloud`.`configuration` (category, instance, component, name, value, description) " +
-                            "VALUES ('Hidden','DEFAULT', 'management-server','secstorage.copy.password', '" + DBEncryptionUtil.encrypt(password) +
-                            "','Password used to authenticate zone-to-zone template copy requests')";
-            Transaction.execute(new TransactionCallbackNoReturn() {
-                @Override
-                public void doInTransactionWithoutResult(TransactionStatus status) {
-
-                    TransactionLegacy txn = TransactionLegacy.currentTxn();
-                    try {
-                        PreparedStatement stmt1 = txn.prepareAutoCloseStatement(insertSql1);
-                        stmt1.executeUpdate();
-                        s_logger.debug("secondary storage vm copy password inserted into database");
-                    } catch (SQLException ex) {
-                        s_logger.warn("Failed to insert secondary storage vm copy password", ex);
-                    }
-                }
-            });
-        }
-    }
-
-    private void updateSSOKey() {
-        try {
-            _configDao.update(Config.SSOKey.key(), Config.SSOKey.getCategory(), getPrivateKey());
-        } catch (NoSuchAlgorithmException ex) {
-            s_logger.error("error generating sso key", ex);
-        }
-    }
-
-    /**
-     * preshared key to be used by management server to communicate with SSVM during volume/template upload
-     */
-    private void updateSecondaryStorageVMSharedKey() {
-        try {
-            ConfigurationVO configInDB = _configDao.findByName(Config.SSVMPSK.key());
-            if(configInDB == null) {
-                ConfigurationVO configVO = new ConfigurationVO(Config.SSVMPSK.getCategory(), "DEFAULT", Config.SSVMPSK.getComponent(), Config.SSVMPSK.key(), getPrivateKey(),
-                        Config.SSVMPSK.getDescription());
-                s_logger.info("generating a new SSVM PSK. This goes to SSVM on Start");
-                _configDao.persist(configVO);
-            } else if (StringUtils.isEmpty(configInDB.getValue())) {
-                s_logger.info("updating the SSVM PSK with new value. This goes to SSVM on Start");
-                _configDao.update(Config.SSVMPSK.key(), Config.SSVMPSK.getCategory(), getPrivateKey());
-            }
-        } catch (NoSuchAlgorithmException ex) {
-            s_logger.error("error generating ssvm psk", ex);
-        }
-    }
-
-    private String getPrivateKey() throws NoSuchAlgorithmException {
-        String encodedKey = null;
-        // Algorithm for generating Key is SHA1, should this be configurable?
-        KeyGenerator generator = KeyGenerator.getInstance("HmacSHA1");
-        SecretKey key = generator.generateKey();
-        encodedKey = Base64.encodeBase64URLSafeString(key.getEncoded());
-        return encodedKey;
-
-    }
-
-
-    @DB
-    protected HostPodVO createPod(long userId, String podName, final long zoneId, String gateway, String cidr, final String startIp, String endIp)
-            throws InternalErrorException {
-        String[] cidrPair = cidr.split("\\/");
-        String cidrAddress = cidrPair[0];
-        int cidrSize = Integer.parseInt(cidrPair[1]);
-
-        if (startIp != null) {
-            if (endIp == null) {
-                endIp = NetUtils.getIpRangeEndIpFromCidr(cidrAddress, cidrSize);
-            }
-        }
-
-        // Create the new pod in the database
-        String ipRange;
-        if (startIp != null) {
-            ipRange = startIp + "-";
-            if (endIp != null) {
-                ipRange += endIp;
-            }
-        } else {
-            ipRange = "";
-        }
-
-        final HostPodVO pod = new HostPodVO(podName, zoneId, gateway, cidrAddress, cidrSize, ipRange);
-        try {
-            final String endIpFinal = endIp;
-            Transaction.execute(new TransactionCallbackWithExceptionNoReturn<InternalErrorException>() {
-                @Override
-                public void doInTransactionWithoutResult(TransactionStatus status) throws InternalErrorException {
-                    if (_podDao.persist(pod) == null) {
-                        throw new InternalErrorException("Failed to create new pod. Please contact Cloud Support.");
-                    }
-
-                    if (startIp != null) {
-                        _zoneDao.addPrivateIpAddress(zoneId, pod.getId(), startIp, endIpFinal);
-                    }
-
-                    String ipNums = _configDao.getValue("linkLocalIp.nums");
-                    int nums = Integer.parseInt(ipNums);
-                    if (nums > 16 || nums <= 0) {
-                        throw new InvalidParameterValueException("The linkLocalIp.nums: " + nums + "is wrong, should be 1~16");
-                    }
-                    /* local link ip address starts from 169.254.0.2 - 169.254.(nums) */
-                    String[] linkLocalIpRanges = NetUtils.getLinkLocalIPRange(nums);
-                    if (linkLocalIpRanges == null) {
-                        throw new InvalidParameterValueException("The linkLocalIp.nums: " + nums + "may be wrong, should be 1~16");
-                    } else {
-                        _zoneDao.addLinkLocalIpAddress(zoneId, pod.getId(), linkLocalIpRanges[0], linkLocalIpRanges[1]);
-                    }
-                }
-            });
-        } catch (Exception e) {
-            s_logger.error("Unable to create new pod due to " + e.getMessage(), e);
-            throw new InternalErrorException("Failed to create new pod. Please contact Cloud Support.");
-        }
-
-        return pod;
+    private ServiceOfferingVO createServiceOffering(long userId, String name, int cpu, int ramSize, int speed, String displayText,
+                                                    ProvisioningType provisioningType, boolean localStorageRequired, boolean offerHA, String tags) {
+        tags = cleanupTags(tags);
+        ServiceOfferingVO offering =
+                new ServiceOfferingVO(name, cpu, ramSize, speed, null, null, offerHA, displayText, provisioningType, localStorageRequired, false, tags, false, null, false);
+        offering.setUniqueName("Cloud.Com-" + name);
+        offering = _serviceOfferingDao.persistSystemServiceOffering(offering);
+        return offering;
     }
 
     private DiskOfferingVO createdefaultDiskOffering(Long domainId, String name, String description, ProvisioningType provisioningType,
-            int numGibibytes, String tags, boolean isCustomized, boolean isSystemUse) {
+                                                     int numGibibytes, String tags, boolean isCustomized, boolean isSystemUse) {
         long diskSize = numGibibytes;
         diskSize = diskSize * 1024 * 1024 * 1024;
         tags = cleanupTags(tags);
@@ -1060,28 +449,16 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         return newDiskOffering;
     }
 
-    private ServiceOfferingVO createServiceOffering(long userId, String name, int cpu, int ramSize, int speed, String displayText,
-            ProvisioningType provisioningType, boolean localStorageRequired, boolean offerHA, String tags) {
-        tags = cleanupTags(tags);
-        ServiceOfferingVO offering =
-                new ServiceOfferingVO(name, cpu, ramSize, speed, null, null, offerHA, displayText, provisioningType, localStorageRequired, false, tags, false, null, false);
-        offering.setUniqueName("Cloud.Com-" + name);
-        offering = _serviceOfferingDao.persistSystemServiceOffering(offering);
-        return offering;
+    private String getMountParent() {
+        return getEnvironmentProperty("mount.parent");
     }
 
-    private String cleanupTags(String tags) {
-        if (tags != null) {
-            String[] tokens = tags.split(",");
-            StringBuilder t = new StringBuilder();
-            for (int i = 0; i < tokens.length; i++) {
-                t.append(tokens[i].trim()).append(",");
-            }
-            t.delete(t.length() - 1, t.length());
-            tags = t.toString();
+    private void updateSSOKey() {
+        try {
+            _configDao.update(Config.SSOKey.key(), Config.SSOKey.getCategory(), getPrivateKey());
+        } catch (NoSuchAlgorithmException ex) {
+            s_logger.error("error generating sso key", ex);
         }
-
-        return tags;
     }
 
     @DB
@@ -1212,8 +589,8 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                 defaultVpcNetworkOfferingProviders.put(Service.PortForwarding, Provider.VPCVirtualRouter);
                 defaultVpcNetworkOfferingProviders.put(Service.Vpn, Provider.VPCVirtualRouter);
 
-                for (Map.Entry<Service,Provider> entry : defaultVpcNetworkOfferingProviders.entrySet()) {
-                     NetworkOfferingServiceMapVO offService =
+                for (Map.Entry<Service, Provider> entry : defaultVpcNetworkOfferingProviders.entrySet()) {
+                    NetworkOfferingServiceMapVO offService =
                             new NetworkOfferingServiceMapVO(defaultNetworkOfferingForVpcNetworks.getId(), entry.getKey(), entry.getValue());
                     _ntwkOfferingServiceMapDao.persist(offService);
                     s_logger.trace("Added service for the network offering: " + offService);
@@ -1239,7 +616,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                 defaultVpcNetworkOfferingProvidersNoLB.put(Service.PortForwarding, Provider.VPCVirtualRouter);
                 defaultVpcNetworkOfferingProvidersNoLB.put(Service.Vpn, Provider.VPCVirtualRouter);
 
-                for (Map.Entry<Service,Provider> entry : defaultVpcNetworkOfferingProvidersNoLB.entrySet()) {
+                for (Map.Entry<Service, Provider> entry : defaultVpcNetworkOfferingProvidersNoLB.entrySet()) {
                     NetworkOfferingServiceMapVO offService =
                             new NetworkOfferingServiceMapVO(defaultNetworkOfferingForVpcNetworksNoLB.getId(), entry.getKey(), entry.getValue());
                     _ntwkOfferingServiceMapDao.persist(offService);
@@ -1354,28 +731,6 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         _vlanDao.update(vlan.getId(), vlan);
     }
 
-    private long getSystemNetworkIdByZoneAndTrafficType(long zoneId, TrafficType trafficType) {
-        // find system public network offering
-        Long networkOfferingId = null;
-        List<NetworkOfferingVO> offerings = _networkOfferingDao.listSystemNetworkOfferings();
-        for (NetworkOfferingVO offering : offerings) {
-            if (offering.getTrafficType() == trafficType) {
-                networkOfferingId = offering.getId();
-                break;
-            }
-        }
-
-        if (networkOfferingId == null) {
-            throw new InvalidParameterValueException("Unable to find system network offering with traffic type " + trafficType);
-        }
-
-        List<NetworkVO> networks = _networkDao.listBy(Account.ACCOUNT_ID_SYSTEM, networkOfferingId, zoneId);
-        if (networks == null || networks.isEmpty()) {
-            throw new InvalidParameterValueException("Unable to find network with traffic type " + trafficType + " in zone " + zoneId);
-        }
-        return networks.get(0).getId();
-    }
-
     @DB
     public void updateResourceCount() {
         ResourceType[] resourceTypes = Resource.ResourceType.values();
@@ -1424,7 +779,6 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                         }
                     }
                 });
-
             }
         }
 
@@ -1457,6 +811,249 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         }
     }
 
+    protected void updateSSLKeystore() {
+        if (s_logger.isInfoEnabled()) {
+            s_logger.info("Processing updateSSLKeyStore");
+        }
+
+        String dbString = _configDao.getValue("ssl.keystore");
+
+        File confFile = PropertiesUtil.findConfigFile("db.properties");
+        String confPath = null;
+        String keystorePath = null;
+        File keystoreFile = null;
+
+        if (null != confFile) {
+            confPath = confFile.getParent();
+            keystorePath = confPath + Link.keystoreFile;
+            keystoreFile = new File(keystorePath);
+        }
+
+        boolean dbExisted = (dbString != null && !dbString.isEmpty());
+
+        s_logger.info("SSL keystore located at " + keystorePath);
+        try {
+            if (!dbExisted && null != confFile) {
+                if (!keystoreFile.exists()) {
+                    generateDefaultKeystore(keystorePath);
+                    s_logger.info("Generated SSL keystore.");
+                }
+                String base64Keystore = getBase64Keystore(keystorePath);
+                ConfigurationVO configVO =
+                        new ConfigurationVO("Hidden", "DEFAULT", "management-server", "ssl.keystore", base64Keystore,
+                                "SSL Keystore for the management servers");
+                _configDao.persist(configVO);
+                s_logger.info("Stored SSL keystore to database.");
+            } else { // !keystoreFile.exists() and dbExisted
+                // Export keystore to local file
+                byte[] storeBytes = Base64.decodeBase64(dbString);
+                String tmpKeystorePath = "/tmp/tmpkey";
+                try (
+                        FileOutputStream fo = new FileOutputStream(tmpKeystorePath);
+                ) {
+                    fo.write(storeBytes);
+                    Script script = new Script(true, "cp", 5000, null);
+                    script.add("-f");
+                    script.add(tmpKeystorePath);
+
+                    //There is a chance, although small, that the keystorePath is null. In that case, do not add it to the script.
+                    if (null != keystorePath) {
+                        script.add(keystorePath);
+                    }
+                    String result = script.execute();
+                    if (result != null) {
+                        throw new IOException();
+                    }
+                } catch (Exception e) {
+                    throw new IOException("Fail to create keystore file!", e);
+                }
+                s_logger.info("Stored database keystore to local.");
+            }
+        } catch (Exception ex) {
+            s_logger.warn("Would use fail-safe keystore to continue.", ex);
+        }
+    }
+
+    /**
+     * preshared key to be used by management server to communicate with SSVM during volume/template upload
+     */
+    private void updateSecondaryStorageVMSharedKey() {
+        try {
+            ConfigurationVO configInDB = _configDao.findByName(Config.SSVMPSK.key());
+            if (configInDB == null) {
+                ConfigurationVO configVO = new ConfigurationVO(Config.SSVMPSK.getCategory(), "DEFAULT", Config.SSVMPSK.getComponent(), Config.SSVMPSK.key(), getPrivateKey(),
+                        Config.SSVMPSK.getDescription());
+                s_logger.info("generating a new SSVM PSK. This goes to SSVM on Start");
+                _configDao.persist(configVO);
+            } else if (StringUtils.isEmpty(configInDB.getValue())) {
+                s_logger.info("updating the SSVM PSK with new value. This goes to SSVM on Start");
+                _configDao.update(Config.SSVMPSK.key(), Config.SSVMPSK.getCategory(), getPrivateKey());
+            }
+        } catch (NoSuchAlgorithmException ex) {
+            s_logger.error("error generating ssvm psk", ex);
+        }
+    }
+
+    @DB
+    protected void updateSystemvmPassword() {
+        String userid = System.getProperty("user.name");
+        if (!userid.startsWith("cloud")) {
+            return;
+        }
+
+        if (!Boolean.valueOf(_configDao.getValue("system.vm.random.password"))) {
+            return;
+        }
+
+        String already = _configDao.getValue("system.vm.password");
+        if (already == null) {
+            TransactionLegacy txn = TransactionLegacy.currentTxn();
+            try {
+                String rpassword = _mgrService.generateRandomPassword();
+                String wSql = "INSERT INTO `cloud`.`configuration` (category, instance, component, name, value, description) "
+                        + "VALUES ('Secure','DEFAULT', 'management-server','system.vm.password', ?,'randmon password generated each management server starts for system vm')";
+                PreparedStatement stmt = txn.prepareAutoCloseStatement(wSql);
+                stmt.setString(1, DBEncryptionUtil.encrypt(rpassword));
+                stmt.executeUpdate();
+                s_logger.info("Updated systemvm password in database");
+            } catch (SQLException e) {
+                s_logger.error("Cannot retrieve systemvm password", e);
+            }
+        }
+    }
+
+    @DB
+    protected void generateSecStorageVmCopyPassword() {
+        String already = _configDao.getValue("secstorage.copy.password");
+
+        if (already == null) {
+
+            s_logger.info("Need to store secondary storage vm copy password in the database");
+            String password = PasswordGenerator.generateRandomPassword(12);
+
+            final String insertSql1 =
+                    "INSERT INTO `cloud`.`configuration` (category, instance, component, name, value, description) " +
+                            "VALUES ('Hidden','DEFAULT', 'management-server','secstorage.copy.password', '" + DBEncryptionUtil.encrypt(password) +
+                            "','Password used to authenticate zone-to-zone template copy requests')";
+            Transaction.execute(new TransactionCallbackNoReturn() {
+                @Override
+                public void doInTransactionWithoutResult(TransactionStatus status) {
+
+                    TransactionLegacy txn = TransactionLegacy.currentTxn();
+                    try {
+                        PreparedStatement stmt1 = txn.prepareAutoCloseStatement(insertSql1);
+                        stmt1.executeUpdate();
+                        s_logger.debug("secondary storage vm copy password inserted into database");
+                    } catch (SQLException ex) {
+                        s_logger.warn("Failed to insert secondary storage vm copy password", ex);
+                    }
+                }
+            });
+        }
+    }
+
+    protected void updateCloudIdentifier() {
+        // Creates and saves a UUID as the cloud identifier
+        String currentCloudIdentifier = _configDao.getValue("cloud.identifier");
+        if (currentCloudIdentifier == null || currentCloudIdentifier.isEmpty()) {
+            String uuid = UUID.randomUUID().toString();
+            _configDao.update(Config.CloudIdentifier.key(), Config.CloudIdentifier.getCategory(), uuid);
+        }
+    }
+
+    private void initiateXenServerPVDriverVersion() {
+        Transaction.execute(new TransactionCallbackNoReturn() {
+            @Override
+            public void doInTransactionWithoutResult(TransactionStatus status) {
+                TransactionLegacy txn = TransactionLegacy.currentTxn();
+                String pvdriverversion = Config.XenServerPVdriverVersion.getDefaultValue();
+                PreparedStatement pstmt = null;
+                ResultSet rs1 = null;
+                ResultSet rs2 = null;
+                try {
+                    String oldValue = _configDao.getValue(Config.XenServerPVdriverVersion.key());
+                    if (oldValue == null) {
+                        String sql = "select resource from host where hypervisor_type='XenServer' and removed is null and status not in ('Error', 'Removed') group by resource";
+                        pstmt = txn.prepareAutoCloseStatement(sql);
+                        rs1 = pstmt.executeQuery();
+                        while (rs1.next()) {
+                            String resouce = rs1.getString(1); //resource column
+                            if (resouce == null) {
+                                continue;
+                            }
+                            if (resouce.equalsIgnoreCase("com.cloud.hypervisor.xenserver.resource.XenServer56Resource")
+                                    || resouce.equalsIgnoreCase("com.cloud.hypervisor.xenserver.resource.XenServer56FP1Resource")
+                                    || resouce.equalsIgnoreCase("com.cloud.hypervisor.xenserver.resource.XenServer56SP2Resource")
+                                    || resouce.equalsIgnoreCase("com.cloud.hypervisor.xenserver.resource.XenServer600Resource")
+                                    || resouce.equalsIgnoreCase("com.cloud.hypervisor.xenserver.resource.XenServer602Resource")) {
+                                pvdriverversion = "xenserver56";
+                                break;
+                            }
+                        }
+                        _configDao.getValueAndInitIfNotExist(Config.XenServerPVdriverVersion.key(), Config.XenServerPVdriverVersion.getCategory(), pvdriverversion,
+                                Config.XenServerPVdriverVersion.getDescription());
+                        sql = "select id from vm_template where hypervisor_type='XenServer'  and format!='ISO' and removed is null";
+                        pstmt = txn.prepareAutoCloseStatement(sql);
+                        rs2 = pstmt.executeQuery();
+                        List<Long> tmpl_ids = new ArrayList<Long>();
+                        while (rs2.next()) {
+                            tmpl_ids.add(rs2.getLong(1));
+                        }
+                        for (Long tmpl_id : tmpl_ids) {
+                            templateDetailsInitIfNotExist(tmpl_id, "hypervisortoolsversion", pvdriverversion);
+                        }
+                    }
+                } catch (Exception e) {
+                    s_logger.debug("initiateXenServerPVDriverVersion failed due to " + e.toString());
+                    // ignore
+                }
+            }
+        });
+    }
+
+    private String cleanupTags(String tags) {
+        if (tags != null) {
+            String[] tokens = tags.split(",");
+            StringBuilder t = new StringBuilder();
+            for (int i = 0; i < tokens.length; i++) {
+                t.append(tokens[i].trim()).append(",");
+            }
+            t.delete(t.length() - 1, t.length());
+            tags = t.toString();
+        }
+
+        return tags;
+    }
+
+    private String getEnvironmentProperty(String name) {
+        try {
+            final File propsFile = PropertiesUtil.findConfigFile("environment.properties");
+
+            if (propsFile == null) {
+                return null;
+            } else {
+                final Properties props = new Properties();
+                try (final FileInputStream finputstream = new FileInputStream(propsFile);) {
+                    props.load(finputstream);
+                } catch (IOException e) {
+                    s_logger.error("getEnvironmentProperty:Exception:" + e.getMessage());
+                }
+                return props.getProperty("mount.parent");
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String getPrivateKey() throws NoSuchAlgorithmException {
+        String encodedKey = null;
+        // Algorithm for generating Key is SHA1, should this be configurable?
+        KeyGenerator generator = KeyGenerator.getInstance("HmacSHA1");
+        SecretKey key = generator.generateKey();
+        encodedKey = Base64.encodeBase64URLSafeString(key.getEncoded());
+        return encodedKey;
+    }
+
     public Map<String, String> getServicesAndProvidersForNetwork(long networkOfferingId) {
         Map<String, String> svcProviders = new HashMap<String, String>();
         List<NetworkOfferingServiceMapVO> servicesMap = _ntwkOfferingServiceMapDao.listByNetworkOfferingId(networkOfferingId);
@@ -1471,4 +1068,398 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         return svcProviders;
     }
 
+    private long getSystemNetworkIdByZoneAndTrafficType(long zoneId, TrafficType trafficType) {
+        // find system public network offering
+        Long networkOfferingId = null;
+        List<NetworkOfferingVO> offerings = _networkOfferingDao.listSystemNetworkOfferings();
+        for (NetworkOfferingVO offering : offerings) {
+            if (offering.getTrafficType() == trafficType) {
+                networkOfferingId = offering.getId();
+                break;
+            }
+        }
+
+        if (networkOfferingId == null) {
+            throw new InvalidParameterValueException("Unable to find system network offering with traffic type " + trafficType);
+        }
+
+        List<NetworkVO> networks = _networkDao.listBy(Account.ACCOUNT_ID_SYSTEM, networkOfferingId, zoneId);
+        if (networks == null || networks.isEmpty()) {
+            throw new InvalidParameterValueException("Unable to find network with traffic type " + trafficType + " in zone " + zoneId);
+        }
+        return networks.get(0).getId();
+    }
+
+    private void generateDefaultKeystore(String keystorePath) throws IOException {
+        String cn = "Cloudstack User";
+        String ou;
+
+        try {
+            ou = InetAddress.getLocalHost().getCanonicalHostName();
+            String[] group = ou.split("\\.");
+
+            // Simple check to see if we got IP Address...
+            boolean isIPAddress = Pattern.matches("[0-9]$", group[group.length - 1]);
+            if (isIPAddress) {
+                ou = "cloud.com";
+            } else {
+                ou = group[group.length - 1];
+                for (int i = group.length - 2; i >= 0 && i >= group.length - 3; i--) {
+                    ou = group[i] + "." + ou;
+                }
+            }
+        } catch (UnknownHostException ex) {
+            s_logger.info("Fail to get user's domain name. Would use cloud.com. ", ex);
+            ou = "cloud.com";
+        }
+
+        String o = ou;
+        String c = "Unknown";
+        String dname = "cn=\"" + cn + "\",ou=\"" + ou + "\",o=\"" + o + "\",c=\"" + c + "\"";
+        Script script = new Script(true, "keytool", 5000, null);
+        script.add("-genkey");
+        script.add("-keystore", keystorePath);
+        script.add("-storepass", "vmops.com");
+        script.add("-keypass", "vmops.com");
+        script.add("-keyalg", "RSA");
+        script.add("-validity", "3650");
+        script.add("-dname", dname);
+        String result = script.execute();
+        if (result != null) {
+            throw new IOException("Fail to generate certificate!: " + result);
+        }
+    }
+
+    static String getBase64Keystore(String keystorePath) throws IOException {
+        byte[] storeBytes = FileUtils.readFileToByteArray(new File(keystorePath));
+        if (storeBytes.length > 3000) { // Base64 codec would enlarge data by 1/3, and we have 4094 bytes in database entry at most
+            throw new IOException("KeyStore is too big for database! Length " + storeBytes.length);
+        }
+
+        return new String(Base64.encodeBase64(storeBytes));
+    }
+
+    protected boolean isOnWindows() {
+        String os = System.getProperty("os.name", "generic").toLowerCase();
+        boolean onWindows = (os != null && os.startsWith("windows"));
+        return onWindows;
+    }
+
+    private void updateKeyPairsOnDisk(String homeDir) {
+        File keyDir = new File(homeDir + "/.ssh");
+        Boolean devel = Boolean.valueOf(_configDao.getValue("developer"));
+        if (!keyDir.isDirectory()) {
+            s_logger.warn("Failed to create " + homeDir + "/.ssh for storing the SSH keypars");
+            keyDir.mkdir();
+        }
+        String pubKey = _configDao.getValue("ssh.publickey");
+        String prvKey = _configDao.getValue("ssh.privatekey");
+
+        // Using non-default file names (id_rsa.cloud and id_rsa.cloud.pub) in developer mode. This is to prevent SSH keys overwritten for user running management server
+        if (devel) {
+            writeKeyToDisk(prvKey, homeDir + "/.ssh/id_rsa.cloud");
+            writeKeyToDisk(pubKey, homeDir + "/.ssh/id_rsa.cloud.pub");
+        } else {
+            writeKeyToDisk(prvKey, homeDir + "/.ssh/id_rsa");
+            writeKeyToDisk(pubKey, homeDir + "/.ssh/id_rsa.pub");
+        }
+    }
+
+    protected void injectSshKeysIntoSystemVmIsoPatch(String publicKeyPath, String privKeyPath) {
+        s_logger.info("Trying to inject public and private keys into systemvm iso");
+        String injectScript = getInjectScript();
+        String scriptPath = Script.findScript("", injectScript);
+        String systemVmIsoPath = Script.findScript("", "vms/systemvm.iso");
+        if (scriptPath == null) {
+            throw new CloudRuntimeException("Unable to find key inject script " + injectScript);
+        }
+        if (systemVmIsoPath == null) {
+            throw new CloudRuntimeException("Unable to find systemvm iso vms/systemvm.iso");
+        }
+        Script command = null;
+        if (isOnWindows()) {
+            command = new Script("python", s_logger);
+        } else {
+            command = new Script("/bin/bash", s_logger);
+        }
+        if (isOnWindows()) {
+            scriptPath = scriptPath.replaceAll("\\\\", "/");
+            systemVmIsoPath = systemVmIsoPath.replaceAll("\\\\", "/");
+            publicKeyPath = publicKeyPath.replaceAll("\\\\", "/");
+            privKeyPath = privKeyPath.replaceAll("\\\\", "/");
+        }
+        command.add(scriptPath);
+        command.add(publicKeyPath);
+        command.add(privKeyPath);
+        command.add(systemVmIsoPath);
+
+        final String result = command.execute();
+        s_logger.info("Injected public and private keys into systemvm iso with result : " + result);
+        if (result != null) {
+            s_logger.warn("Failed to inject generated public key into systemvm iso " + result);
+            throw new CloudRuntimeException("Failed to inject generated public key into systemvm iso " + result);
+        }
+    }
+
+    private void templateDetailsInitIfNotExist(long id, String name, String value) {
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        PreparedStatement stmt = null;
+        PreparedStatement stmtInsert = null;
+        boolean insert = false;
+        try {
+            txn.start();
+            stmt = txn.prepareAutoCloseStatement("SELECT id FROM vm_template_details WHERE template_id=? and name=?");
+            stmt.setLong(1, id);
+            stmt.setString(2, name);
+            ResultSet rs = stmt.executeQuery();
+            if (rs == null || !rs.next()) {
+                insert = true;
+            }
+            stmt.close();
+
+            if (insert) {
+                stmtInsert = txn.prepareAutoCloseStatement("INSERT INTO vm_template_details(template_id, name, value) VALUES(?, ?, ?)");
+                stmtInsert.setLong(1, id);
+                stmtInsert.setString(2, name);
+                stmtInsert.setString(3, value);
+                if (stmtInsert.executeUpdate() < 1) {
+                    throw new CloudRuntimeException("Unable to init template " + id + " datails: " + name);
+                }
+            }
+            txn.commit();
+        } catch (Exception e) {
+            s_logger.warn("Unable to init template " + id + " datails: " + name, e);
+            throw new CloudRuntimeException("Unable to init template " + id + " datails: " + name);
+        }
+    }
+
+    private void writeKeyToDisk(String key, String keyPath) {
+        File keyfile = new File(keyPath);
+        if (!keyfile.exists()) {
+            try {
+                keyfile.createNewFile();
+            } catch (IOException e) {
+                s_logger.warn("Failed to create file: " + e.toString());
+                throw new CloudRuntimeException("Failed to update keypairs on disk: cannot create  key file " + keyPath);
+            }
+        }
+
+        if (keyfile.exists()) {
+            try (FileOutputStream kStream = new FileOutputStream(keyfile);) {
+                if (kStream != null) {
+                    kStream.write(key.getBytes());
+                }
+            } catch (FileNotFoundException e) {
+                s_logger.warn("Failed to write  key to " + keyfile.getAbsolutePath());
+                throw new CloudRuntimeException("Failed to update keypairs on disk: cannot find  key file " + keyPath);
+            } catch (IOException e) {
+                s_logger.warn("Failed to write  key to " + keyfile.getAbsolutePath());
+                throw new CloudRuntimeException("Failed to update keypairs on disk: cannot write to  key file " + keyPath);
+            }
+        }
+    }
+
+    protected String getInjectScript() {
+        String injectScript = null;
+        boolean onWindows = isOnWindows();
+        if (onWindows) {
+            injectScript = "scripts/vm/systemvm/injectkeys.py";
+        } else {
+            injectScript = "scripts/vm/systemvm/injectkeys.sh";
+        }
+        return injectScript;
+    }
+
+    @Override
+    @DB
+    public void updateKeyPairs() {
+        // Grab the SSH key pair and insert it into the database, if it is not present
+
+        String username = System.getProperty("user.name");
+        Boolean devel = Boolean.valueOf(_configDao.getValue("developer"));
+        if (!username.equalsIgnoreCase("cloud") && !devel) {
+            s_logger.warn("Systemvm keypairs could not be set. Management server should be run as cloud user, or in development mode.");
+            return;
+        }
+        String already = _configDao.getValue("ssh.privatekey");
+        String homeDir = System.getProperty("user.home");
+        if (homeDir == null) {
+            throw new CloudRuntimeException("Cannot get home directory for account: " + username);
+        }
+
+        if (s_logger.isInfoEnabled()) {
+            s_logger.info("Processing updateKeyPairs");
+        }
+
+        if (homeDir != null && homeDir.startsWith("~")) {
+            s_logger.error("No home directory was detected for the user '" + username + "'. Please check the profile of this user.");
+            throw new CloudRuntimeException("No home directory was detected for the user '" + username + "'. Please check the profile of this user.");
+        }
+
+        // Using non-default file names (id_rsa.cloud and id_rsa.cloud.pub) in developer mode. This is to prevent SSH keys overwritten for user running management server
+        File privkeyfile = null;
+        File pubkeyfile = null;
+        if (devel) {
+            privkeyfile = new File(homeDir + "/.ssh/id_rsa.cloud");
+            pubkeyfile = new File(homeDir + "/.ssh/id_rsa.cloud.pub");
+        } else {
+            privkeyfile = new File(homeDir + "/.ssh/id_rsa");
+            pubkeyfile = new File(homeDir + "/.ssh/id_rsa.pub");
+        }
+
+        if (already == null || already.isEmpty()) {
+            if (s_logger.isInfoEnabled()) {
+                s_logger.info("Systemvm keypairs not found in database. Need to store them in the database");
+            }
+            // FIXME: take a global database lock here for safety.
+            boolean onWindows = isOnWindows();
+            if (!onWindows) {
+                Script.runSimpleBashScript("if [ -f " + privkeyfile + " ]; then rm -f " + privkeyfile + "; fi; ssh-keygen -t rsa -N '' -f " + privkeyfile + " -q");
+            }
+
+            byte[] arr1 = new byte[4094]; // configuration table column value size
+            try (DataInputStream dis = new DataInputStream(new FileInputStream(privkeyfile))) {
+                dis.readFully(arr1);
+            } catch (EOFException e) {
+                s_logger.info("[ignored] eof reached");
+            } catch (Exception e) {
+                s_logger.error("Cannot read the private key file", e);
+                throw new CloudRuntimeException("Cannot read the private key file");
+            }
+            String privateKey = new String(arr1).trim();
+            byte[] arr2 = new byte[4094]; // configuration table column value size
+            try (DataInputStream dis = new DataInputStream(new FileInputStream(pubkeyfile))) {
+                dis.readFully(arr2);
+            } catch (EOFException e) {
+                s_logger.info("[ignored] eof reached");
+            } catch (Exception e) {
+                s_logger.warn("Cannot read the public key file", e);
+                throw new CloudRuntimeException("Cannot read the public key file");
+            }
+            String publicKey = new String(arr2).trim();
+
+            final String insertSql1 =
+                    "INSERT INTO `cloud`.`configuration` (category, instance, component, name, value, description) " +
+                            "VALUES ('Hidden','DEFAULT', 'management-server','ssh.privatekey', '" + DBEncryptionUtil.encrypt(privateKey) +
+                            "','Private key for the entire CloudStack')";
+            final String insertSql2 =
+                    "INSERT INTO `cloud`.`configuration` (category, instance, component, name, value, description) " +
+                            "VALUES ('Hidden','DEFAULT', 'management-server','ssh.publickey', '" + DBEncryptionUtil.encrypt(publicKey) +
+                            "','Public key for the entire CloudStack')";
+
+            Transaction.execute(new TransactionCallbackNoReturn() {
+                @Override
+                public void doInTransactionWithoutResult(TransactionStatus status) {
+
+                    TransactionLegacy txn = TransactionLegacy.currentTxn();
+                    try {
+                        PreparedStatement stmt1 = txn.prepareAutoCloseStatement(insertSql1);
+                        stmt1.executeUpdate();
+                        if (s_logger.isDebugEnabled()) {
+                            s_logger.debug("Private key inserted into database");
+                        }
+                    } catch (SQLException ex) {
+                        s_logger.error("SQL of the private key failed", ex);
+                        throw new CloudRuntimeException("SQL of the private key failed");
+                    }
+
+                    try {
+                        PreparedStatement stmt2 = txn.prepareAutoCloseStatement(insertSql2);
+                        stmt2.executeUpdate();
+                        if (s_logger.isDebugEnabled()) {
+                            s_logger.debug("Public key inserted into database");
+                        }
+                    } catch (SQLException ex) {
+                        s_logger.error("SQL of the public key failed", ex);
+                        throw new CloudRuntimeException("SQL of the public key failed");
+                    }
+                }
+            });
+        } else {
+            s_logger.info("Keypairs already in database, updating local copy");
+            updateKeyPairsOnDisk(homeDir);
+        }
+        s_logger.info("Going to update systemvm iso with generated keypairs if needed");
+        try {
+            injectSshKeysIntoSystemVmIsoPatch(pubkeyfile.getAbsolutePath(), privkeyfile.getAbsolutePath());
+        } catch (CloudRuntimeException e) {
+            if (!devel) {
+                throw new CloudRuntimeException(e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public List<ConfigurationVO> getConfigListByScope(String scope, Long resourceId) {
+
+        // Getting the list of parameters defined at the scope
+        Set<ConfigKey<?>> configList = _configDepot.getConfigListByScope(scope);
+        List<ConfigurationVO> configVOList = new ArrayList<ConfigurationVO>();
+        for (ConfigKey<?> param : configList) {
+            ConfigurationVO configVo = _configDao.findByName(param.toString());
+            configVo.setValue(_configDepot.get(param.toString()).valueIn(resourceId).toString());
+            configVOList.add(configVo);
+        }
+        return configVOList;
+    }
+
+    @DB
+    protected HostPodVO createPod(long userId, String podName, final long zoneId, String gateway, String cidr, final String startIp, String endIp)
+            throws InternalErrorException {
+        String[] cidrPair = cidr.split("\\/");
+        String cidrAddress = cidrPair[0];
+        int cidrSize = Integer.parseInt(cidrPair[1]);
+
+        if (startIp != null) {
+            if (endIp == null) {
+                endIp = NetUtils.getIpRangeEndIpFromCidr(cidrAddress, cidrSize);
+            }
+        }
+
+        // Create the new pod in the database
+        String ipRange;
+        if (startIp != null) {
+            ipRange = startIp + "-";
+            if (endIp != null) {
+                ipRange += endIp;
+            }
+        } else {
+            ipRange = "";
+        }
+
+        final HostPodVO pod = new HostPodVO(podName, zoneId, gateway, cidrAddress, cidrSize, ipRange);
+        try {
+            final String endIpFinal = endIp;
+            Transaction.execute(new TransactionCallbackWithExceptionNoReturn<InternalErrorException>() {
+                @Override
+                public void doInTransactionWithoutResult(TransactionStatus status) throws InternalErrorException {
+                    if (_podDao.persist(pod) == null) {
+                        throw new InternalErrorException("Failed to create new pod. Please contact Cloud Support.");
+                    }
+
+                    if (startIp != null) {
+                        _zoneDao.addPrivateIpAddress(zoneId, pod.getId(), startIp, endIpFinal);
+                    }
+
+                    String ipNums = _configDao.getValue("linkLocalIp.nums");
+                    int nums = Integer.parseInt(ipNums);
+                    if (nums > 16 || nums <= 0) {
+                        throw new InvalidParameterValueException("The linkLocalIp.nums: " + nums + "is wrong, should be 1~16");
+                    }
+                    /* local link ip address starts from 169.254.0.2 - 169.254.(nums) */
+                    String[] linkLocalIpRanges = NetUtils.getLinkLocalIPRange(nums);
+                    if (linkLocalIpRanges == null) {
+                        throw new InvalidParameterValueException("The linkLocalIp.nums: " + nums + "may be wrong, should be 1~16");
+                    } else {
+                        _zoneDao.addLinkLocalIpAddress(zoneId, pod.getId(), linkLocalIpRanges[0], linkLocalIpRanges[1]);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            s_logger.error("Unable to create new pod due to " + e.getMessage(), e);
+            throw new InternalErrorException("Failed to create new pod. Please contact Cloud Support.");
+        }
+
+        return pod;
+    }
 }

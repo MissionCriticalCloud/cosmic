@@ -40,9 +40,8 @@ public class NiciraNvpNicMappingDaoImpl extends GenericDaoBase<NiciraNvpNicMappi
 
     @Override
     public NiciraNvpNicMappingVO findByNicUuid(final String nicUuid) {
-        SearchCriteria<NiciraNvpNicMappingVO> sc = nicSearch.create();
+        final SearchCriteria<NiciraNvpNicMappingVO> sc = nicSearch.create();
         sc.setParameters("nicUuid", nicUuid);
         return findOneBy(sc);
     }
-
 }

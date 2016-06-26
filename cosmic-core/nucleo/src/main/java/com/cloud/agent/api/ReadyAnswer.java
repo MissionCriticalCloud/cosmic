@@ -30,5 +30,4 @@ public class ReadyAnswer extends Answer {
     public ReadyAnswer(ReadyCommand cmd, String details) {
         super(cmd, false, details);
     }
-
 }

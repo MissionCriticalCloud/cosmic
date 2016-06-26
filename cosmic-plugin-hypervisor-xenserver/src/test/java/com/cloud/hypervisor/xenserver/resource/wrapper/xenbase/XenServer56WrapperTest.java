@@ -34,8 +34,8 @@ import com.cloud.hypervisor.xenserver.resource.XenServer56Resource;
 import com.cloud.hypervisor.xenserver.resource.XsHost;
 import com.cloud.utils.ExecutionResult;
 import com.cloud.vm.VMInstanceVO;
-import com.xensource.xenapi.Connection;
 
+import com.xensource.xenapi.Connection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

@@ -16,14 +16,14 @@
 // under the License.
 package org.apache.cloudstack.engine.cloud.entity.api.db;
 
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = "vm_root_disk_tags")
@@ -64,5 +64,4 @@ public class VMRootDiskTagVO implements InternalIdentity {
     public String getRootDiskTag() {
         return rootDiskTag;
     }
-
 }

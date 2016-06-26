@@ -16,14 +16,14 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.usage;
 
-import java.util.List;
-
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.UsageTypeResponse;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +34,15 @@ public class ListUsageTypesCmd extends BaseCmd {
     private static final String s_name = "listusagetypesresponse";
 
     @Override
+    public void execute() {
+        List<UsageTypeResponse> result = _usageService.listUsageTypes();
+        ListResponse<UsageTypeResponse> response = new ListResponse<UsageTypeResponse>();
+        response.setResponses(result);
+        response.setResponseName(getCommandName());
+        this.setResponseObject(response);
+    }
+
+    @Override
     public String getCommandName() {
         return s_name;
     }
@@ -41,14 +50,5 @@ public class ListUsageTypesCmd extends BaseCmd {
     @Override
     public long getEntityOwnerId() {
         return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
-    public void execute() {
-        List<UsageTypeResponse> result = _usageService.listUsageTypes();
-        ListResponse<UsageTypeResponse> response = new ListResponse<UsageTypeResponse>();
-        response.setResponses(result);
-        response.setResponseName(getCommandName());
-        this.setResponseObject(response);
     }
 }

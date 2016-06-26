@@ -42,11 +42,10 @@ public interface Region {
      */
     public static class Service {
 
-        private String name;
-        private static List<Service> regionServices = new ArrayList<Service>();
-
         public static final Service Gslb = new Service("Gslb");
         public static final Service PortableIp = new Service("PortableIp");
+        private static List<Service> regionServices = new ArrayList<Service>();
+        private String name;
 
         public Service(String name) {
             this.name = name;
@@ -56,7 +55,6 @@ public interface Region {
         public String getName() {
             return name;
         }
-
     }
 
     /**

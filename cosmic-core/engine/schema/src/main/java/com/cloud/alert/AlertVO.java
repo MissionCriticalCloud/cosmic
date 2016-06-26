@@ -16,8 +16,7 @@
 // under the License.
 package com.cloud.alert;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,8 +26,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "alert")
@@ -103,14 +102,6 @@ public class AlertVO implements Alert {
         this.subject = subject;
     }
 
-    public Long getClusterId() {
-        return clusterId;
-    }
-
-    public void setClusterId(Long clusterId) {
-        this.clusterId = clusterId;
-    }
-
     @Override
     public Long getPodId() {
         return podId;
@@ -166,15 +157,6 @@ public class AlertVO implements Alert {
     }
 
     @Override
-    public String getUuid() {
-        return this.uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    @Override
     public boolean getArchived() {
         return archived;
     }
@@ -190,5 +172,22 @@ public class AlertVO implements Alert {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getClusterId() {
+        return clusterId;
+    }
+
+    public void setClusterId(Long clusterId) {
+        this.clusterId = clusterId;
+    }
+
+    @Override
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }

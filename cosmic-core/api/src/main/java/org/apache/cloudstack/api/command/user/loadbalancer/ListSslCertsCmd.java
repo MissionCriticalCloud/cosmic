@@ -16,13 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.loadbalancer;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.network.lb.CertService;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
@@ -33,6 +28,10 @@ import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.api.response.SslCertResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import javax.inject.Inject;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +95,6 @@ public class ListSslCertsCmd extends BaseCmd {
             response.setResponses(certResponseList);
             response.setResponseName(getCommandName());
             this.setResponseObject(response);
-
         } catch (Exception e) {
             throw new CloudRuntimeException(e);
         }

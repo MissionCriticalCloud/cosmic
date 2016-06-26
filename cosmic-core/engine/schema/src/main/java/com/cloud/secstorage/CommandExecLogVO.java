@@ -16,7 +16,8 @@
 // under the License.
 package com.cloud.secstorage;
 
-import java.util.Date;
+import com.cloud.utils.DateUtil;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,10 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.utils.DateUtil;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "cmd_exec_log")

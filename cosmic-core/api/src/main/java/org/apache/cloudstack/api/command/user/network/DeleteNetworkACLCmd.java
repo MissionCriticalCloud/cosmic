@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.user.network;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -29,6 +28,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.NetworkACLItemResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,14 +53,6 @@ public class DeleteNetworkACLCmd extends BaseAsyncCmd {
         return id;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
     @Override
     public String getEventType() {
         return EventTypes.EVENT_NETWORK_ACL_ITEM_DELETE;
@@ -69,12 +61,6 @@ public class DeleteNetworkACLCmd extends BaseAsyncCmd {
     @Override
     public String getEventDescription() {
         return ("Deleting Network ACL ID=" + id);
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Account caller = CallContext.current().getCallingAccount();
-        return caller.getAccountId();
     }
 
     @Override
@@ -90,4 +76,17 @@ public class DeleteNetworkACLCmd extends BaseAsyncCmd {
         }
     }
 
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        Account caller = CallContext.current().getCallingAccount();
+        return caller.getAccountId();
+    }
 }

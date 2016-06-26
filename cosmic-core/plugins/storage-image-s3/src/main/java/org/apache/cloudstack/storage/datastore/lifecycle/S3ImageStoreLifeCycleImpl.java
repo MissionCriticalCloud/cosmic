@@ -16,19 +16,12 @@
 // under the License.
 package org.apache.cloudstack.storage.datastore.lifecycle;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.resource.Discoverer;
 import com.cloud.resource.ResourceManager;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.ScopeType;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.engine.subsystem.api.storage.ClusterScope;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
@@ -39,6 +32,12 @@ import org.apache.cloudstack.storage.datastore.db.ImageStoreVO;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreHelper;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreProviderManager;
 import org.apache.cloudstack.storage.image.store.lifecycle.ImageStoreLifeCycle;
+
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,12 +48,14 @@ public class S3ImageStoreLifeCycleImpl implements ImageStoreLifeCycle {
     protected ResourceManager _resourceMgr;
     @Inject
     protected ImageStoreDao imageStoreDao;
+    protected List<? extends Discoverer> _discoverers;
     @Inject
     ImageStoreHelper imageStoreHelper;
     @Inject
     ImageStoreProviderManager imageStoreMgr;
 
-    protected List<? extends Discoverer> _discoverers;
+    public S3ImageStoreLifeCycleImpl() {
+    }
 
     public List<? extends Discoverer> getDiscoverers() {
         return _discoverers;
@@ -64,19 +65,16 @@ public class S3ImageStoreLifeCycleImpl implements ImageStoreLifeCycle {
         this._discoverers = discoverers;
     }
 
-    public S3ImageStoreLifeCycleImpl() {
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public DataStore initialize(Map<String, Object> dsInfos) {
 
-        String url = (String)dsInfos.get("url");
-        String name = (String)dsInfos.get("name");
-        String providerName = (String)dsInfos.get("providerName");
-        ScopeType scope = (ScopeType)dsInfos.get("scope");
-        DataStoreRole role = (DataStoreRole)dsInfos.get("role");
-        Map<String, String> details = (Map<String, String>)dsInfos.get("details");
+        String url = (String) dsInfos.get("url");
+        String name = (String) dsInfos.get("name");
+        String providerName = (String) dsInfos.get("providerName");
+        ScopeType scope = (ScopeType) dsInfos.get("scope");
+        DataStoreRole role = (DataStoreRole) dsInfos.get("role");
+        Map<String, String> details = (Map<String, String>) dsInfos.get("details");
 
         s_logger.info("Trying to add a S3 store with endpoint: " + details.get(ApiConstants.S3_END_POINT));
 
@@ -138,5 +136,4 @@ public class S3ImageStoreLifeCycleImpl implements ImageStoreLifeCycle {
     public boolean migrateToObjectStore(DataStore store) {
         return false;
     }
-
 }

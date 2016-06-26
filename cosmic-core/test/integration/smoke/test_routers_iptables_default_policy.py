@@ -17,7 +17,9 @@
 
 """ Test VPC nics after router is destroyed """
 
-from nose.plugins.attrib import attr
+import logging
+import socket
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (stopRouter,
                              startRouter,
@@ -31,8 +33,7 @@ from marvin.lib.base import (stopRouter,
                              PublicIPAddress,
                              NetworkOffering,
                              Network,
-                             VirtualMachine,
-                             LoadBalancerRule)
+                             VirtualMachine)
 from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template,
@@ -40,10 +41,7 @@ from marvin.lib.common import (get_domain,
                                list_hosts)
 from marvin.lib.utils import (cleanup_resources,
                               get_process_status)
-import socket
-import time
-import inspect
-import logging
+from nose.plugins.attrib import attr
 
 
 class Services:
@@ -154,15 +152,15 @@ class Services:
                 "displaytext": 'Redundant VPC off',
                 "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat',
                 "serviceProviderList": {
-                        "Vpn": 'VpcVirtualRouter',
-                        "Dhcp": 'VpcVirtualRouter',
-                        "Dns": 'VpcVirtualRouter',
-                        "SourceNat": 'VpcVirtualRouter',
-                        "PortForwarding": 'VpcVirtualRouter',
-                        "Lb": 'VpcVirtualRouter',
-                        "UserData": 'VpcVirtualRouter',
-                        "StaticNat": 'VpcVirtualRouter',
-                        "NetworkACL": 'VpcVirtualRouter'
+                    "Vpn": 'VpcVirtualRouter',
+                    "Dhcp": 'VpcVirtualRouter',
+                    "Dns": 'VpcVirtualRouter',
+                    "SourceNat": 'VpcVirtualRouter',
+                    "PortForwarding": 'VpcVirtualRouter',
+                    "Lb": 'VpcVirtualRouter',
+                    "UserData": 'VpcVirtualRouter',
+                    "StaticNat": 'VpcVirtualRouter',
+                    "NetworkACL": 'VpcVirtualRouter'
                 },
                 "serviceCapabilityList": {
                     "SourceNat": {
@@ -203,7 +201,6 @@ class Services:
 
 
 class TestVPCIpTablesPolicies(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         # We want to fail quicker if it's failure
@@ -229,11 +226,10 @@ class TestVPCIpTablesPolicies(cloudstackTestCase):
             cls.services["account"],
             admin=True,
             domainid=cls.domain.id)
-        
+
         cls.service_offering = ServiceOffering.create(
             cls.apiclient,
             cls.services["service_offering"])
-        
 
         cls.logger = logging.getLogger('TestVPCIpTablesPolicies')
         cls.stream_handler = logging.StreamHandler()
@@ -288,7 +284,7 @@ class TestVPCIpTablesPolicies(cloudstackTestCase):
     def test_01_single_VPC_iptables_policies(self):
         """ Test iptables default INPUT/FORWARD policies on VPC router """
         self.logger.debug("Starting test_01_single_VPC_iptables_policies")
-        
+
         routers = self.entity_manager.query_routers()
 
         self.assertEqual(
@@ -310,13 +306,13 @@ class TestVPCIpTablesPolicies(cloudstackTestCase):
                     isinstance(hosts, list),
                     True,
                     "Check for list hosts response return valid data")
-    
+
                 host = hosts[0]
                 host.user = self.services["configurableData"]["host"]["username"]
                 host.passwd = self.services["configurableData"]["host"]["password"]
                 host.port = self.services["configurableData"]["host"]["port"]
                 tables = [self.services["configurableData"]["input"], self.services["configurableData"]["forward"]]
-                
+
                 for table in tables:
                     try:
                         result = get_process_status(
@@ -331,10 +327,10 @@ class TestVPCIpTablesPolicies(cloudstackTestCase):
                             "Provide a marvin config file with host\
                                     credentials to run %s" %
                             self._testMethodName)
-        
+
                     self.logger.debug("iptables -L %s: %s" % (table, result))
                     res = str(result)
-                    
+
                     self.assertEqual(
                         res.count("DROP"),
                         1,
@@ -342,7 +338,6 @@ class TestVPCIpTablesPolicies(cloudstackTestCase):
 
 
 class TestRouterIpTablesPolicies(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         # We want to fail quicker if it's failure
@@ -359,7 +354,7 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
             cls.apiclient,
             cls.zone.id,
             cls.services["ostype"])
-        
+
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
 
@@ -368,11 +363,11 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
             cls.services["account"],
             admin=True,
             domainid=cls.domain.id)
-        
+
         cls.service_offering = ServiceOffering.create(
             cls.apiclient,
             cls.services["service_offering"])
-        
+
         cls.logger = logging.getLogger('TestRouterIpTablesPolicies')
         cls.stream_handler = logging.StreamHandler()
         cls.logger.setLevel(logging.DEBUG)
@@ -458,7 +453,6 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
 
 
 class EntityManager(object):
-
     def __init__(self, apiclient, services, service_offering, account, zone, logger):
         self.apiclient = apiclient
         self.services = services
@@ -471,7 +465,7 @@ class EntityManager(object):
         self.networks = []
         self.routers = []
         self.ips = []
-    
+
     def set_cleanup(self, cleanup):
         self.cleanup = cleanup
 
@@ -514,13 +508,13 @@ class EntityManager(object):
         return nat_rule
 
     def check_ssh_into_vm(self, vm, public_ip):
-        self.logger.debug("Checking if we can SSH into VM=%s on public_ip=%s" % 
-            (vm.name, public_ip.ipaddress.ipaddress))
+        self.logger.debug("Checking if we can SSH into VM=%s on public_ip=%s" %
+                          (vm.name, public_ip.ipaddress.ipaddress))
         vm.ssh_client = None
         try:
             vm.get_ssh_client(ipaddress=public_ip.ipaddress.ipaddress)
             self.logger.debug("SSH into VM=%s on public_ip=%s is successful" %
-                       (vm.name, public_ip.ipaddress.ipaddress))
+                              (vm.name, public_ip.ipaddress.ipaddress))
         except:
             raise Exception("Failed to SSH into VM - %s" % (public_ip.ipaddress.ipaddress))
 

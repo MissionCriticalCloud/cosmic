@@ -26,7 +26,7 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 
-@ResourceWrapper(handles =  CheckHealthCommand.class)
+@ResourceWrapper(handles = CheckHealthCommand.class)
 public final class CitrixCheckHealthCommandWrapper extends CommandWrapper<CheckHealthCommand, Answer, CitrixResourceBase> {
 
     @Override

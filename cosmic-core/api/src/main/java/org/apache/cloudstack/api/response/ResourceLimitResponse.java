@@ -18,11 +18,11 @@ package org.apache.cloudstack.api.response;
 
 import com.cloud.configuration.ResourceLimit;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = ResourceLimit.class)
 @SuppressWarnings("unused")
@@ -61,6 +61,11 @@ public class ResourceLimitResponse extends BaseResponse implements ControlledEnt
     }
 
     @Override
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
     public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
@@ -81,10 +86,5 @@ public class ResourceLimitResponse extends BaseResponse implements ControlledEnt
 
     public void setMax(Long max) {
         this.max = max;
-    }
-
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
     }
 }

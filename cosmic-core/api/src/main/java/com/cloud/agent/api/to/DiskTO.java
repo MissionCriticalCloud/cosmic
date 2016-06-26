@@ -18,9 +18,9 @@
  */
 package com.cloud.agent.api.to;
 
-import java.util.Map;
-
 import com.cloud.storage.Volume;
+
+import java.util.Map;
 
 public class DiskTO {
     public static final String CHAP_INITIATOR_USERNAME = "chapInitiatorUsername";
@@ -86,11 +86,11 @@ public class DiskTO {
         this.type = type;
     }
 
-    public void setDetails(Map<String, String> details) {
-        _details = details;
-    }
-
     public Map<String, String> getDetails() {
         return _details;
+    }
+
+    public void setDetails(Map<String, String> details) {
+        _details = details;
     }
 }

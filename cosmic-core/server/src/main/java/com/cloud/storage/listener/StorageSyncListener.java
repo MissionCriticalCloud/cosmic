@@ -35,11 +35,6 @@ public class StorageSyncListener implements Listener {
     }
 
     @Override
-    public boolean isRecurring() {
-        return false;
-    }
-
-    @Override
     public boolean processAnswers(long agentId, long seq, Answer[] answers) {
         for (Answer answer : answers) {
             if (answer.getResult() == false) {
@@ -48,16 +43,6 @@ public class StorageSyncListener implements Listener {
                 s_logger.debug("Sync command executed: " + answer.toString());
             }
         }
-        return true;
-    }
-
-    @Override
-    public void processConnect(Host agent, StartupCommand cmd, boolean forRebalance) {
-    }
-
-    @Override
-    public boolean processDisconnect(long agentId, Status state) {
-        s_logger.debug("Disconnecting");
         return true;
     }
 
@@ -72,12 +57,27 @@ public class StorageSyncListener implements Listener {
     }
 
     @Override
-    public boolean processTimeout(long agentId, long seq) {
+    public void processConnect(Host agent, StartupCommand cmd, boolean forRebalance) {
+    }
+
+    @Override
+    public boolean processDisconnect(long agentId, Status state) {
+        s_logger.debug("Disconnecting");
         return true;
+    }
+
+    @Override
+    public boolean isRecurring() {
+        return false;
     }
 
     @Override
     public int getTimeout() {
         return -1;
+    }
+
+    @Override
+    public boolean processTimeout(long agentId, long seq) {
+        return true;
     }
 }

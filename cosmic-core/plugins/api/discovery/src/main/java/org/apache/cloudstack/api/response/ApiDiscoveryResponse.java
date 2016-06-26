@@ -16,14 +16,14 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
+import com.cloud.serializer.Param;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import com.cloud.serializer.Param;
 import com.google.gson.annotations.SerializedName;
-
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
 
 @SuppressWarnings("unused")
 public class ApiDiscoveryResponse extends BaseResponse {
@@ -65,36 +65,36 @@ public class ApiDiscoveryResponse extends BaseResponse {
         isAsync = false;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setSince(String since) {
-        this.since = since;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getSince() {
         return since;
     }
 
-    public void setAsync(Boolean isAsync) {
-        this.isAsync = isAsync;
+    public void setSince(String since) {
+        this.since = since;
     }
 
     public boolean getAsync() {
         return isAsync;
+    }
+
+    public void setAsync(Boolean isAsync) {
+        this.isAsync = isAsync;
     }
 
     public String getRelated() {

@@ -52,9 +52,20 @@ public class SubscriptionMgr {
             Class<?> clazz = subscriber.getClass();
             SubscriberInfo subscribeInfo = new SubscriberInfo(clazz, subscriber, listenerMethod);
 
-            if (!l.contains(subscribeInfo))
+            if (!l.contains(subscribeInfo)) {
                 l.add(subscribeInfo);
+            }
         }
+    }
+
+    private List<SubscriberInfo> getAndSetSubscriberList(String subject) {
+        List<SubscriberInfo> l = registry.get(subject);
+        if (l == null) {
+            l = new ArrayList<SubscriberInfo>();
+            registry.put(subject, l);
+        }
+
+        return l;
     }
 
     public <T> void unsubscribe(String subject, T subscriber, String listenerMethod) {
@@ -69,6 +80,10 @@ public class SubscriptionMgr {
                 }
             }
         }
+    }
+
+    private List<SubscriberInfo> getSubscriberList(String subject) {
+        return registry.get(subject);
     }
 
     public void notifySubscribers(String subject, Object sender, EventArgs args) {
@@ -89,27 +104,14 @@ public class SubscriptionMgr {
         }
     }
 
-    private List<SubscriberInfo> getAndSetSubscriberList(String subject) {
-        List<SubscriberInfo> l = registry.get(subject);
-        if (l == null) {
-            l = new ArrayList<SubscriberInfo>();
-            registry.put(subject, l);
-        }
-
-        return l;
-    }
-
-    private List<SubscriberInfo> getSubscriberList(String subject) {
-        return registry.get(subject);
-    }
-
     private synchronized List<SubscriberInfo> getExecutableSubscriberList(String subject) {
         List<SubscriberInfo> l = registry.get(subject);
         if (l != null) {
             // do a shadow clone
             ArrayList<SubscriberInfo> clonedList = new ArrayList<SubscriberInfo>(l.size());
-            for (SubscriberInfo info : l)
+            for (SubscriberInfo info : l) {
                 clonedList.add(info);
+            }
 
             return clonedList;
         }
@@ -137,8 +139,9 @@ public class SubscriptionMgr {
                     }
                 }
             }
-            if (this.method == null)
+            if (this.method == null) {
                 throw new NoSuchMethodException();
+            }
         }
 
         public void execute(Object sender, EventArgs args) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
@@ -152,12 +155,13 @@ public class SubscriptionMgr {
 
         @Override
         public boolean equals(Object o) {
-            if (o == null)
+            if (o == null) {
                 return false;
+            }
 
             if (o instanceof SubscriberInfo) {
-                return this.clazz == ((SubscriberInfo)o).clazz && this.subscriber == ((SubscriberInfo)o).subscriber &&
-                    this.methodName.equals(((SubscriberInfo)o).methodName);
+                return this.clazz == ((SubscriberInfo) o).clazz && this.subscriber == ((SubscriberInfo) o).subscriber &&
+                        this.methodName.equals(((SubscriberInfo) o).methodName);
             }
             return false;
         }

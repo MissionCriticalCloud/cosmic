@@ -17,10 +17,6 @@
 package com.cloud.projects;
 
 public interface ProjectAccount {
-    public enum Role {
-        Admin, Regular
-    };
-
     long getAccountId();
 
     long getProjectId();
@@ -28,4 +24,8 @@ public interface ProjectAccount {
     Role getAccountRole();
 
     long getProjectAccountId();
+
+    public enum Role {
+        Admin, Regular
+    }
 }

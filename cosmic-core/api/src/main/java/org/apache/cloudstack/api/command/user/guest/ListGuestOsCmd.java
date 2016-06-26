@@ -16,12 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.guest;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.storage.GuestOS;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
@@ -30,6 +26,10 @@ import org.apache.cloudstack.api.command.user.iso.ListIsosCmd;
 import org.apache.cloudstack.api.response.GuestOSCategoryResponse;
 import org.apache.cloudstack.api.response.GuestOSResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,11 +74,6 @@ public class ListGuestOsCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
         Pair<List<? extends GuestOS>, Integer> result = _mgr.listGuestOSByCriteria(this);
         ListResponse<GuestOSResponse> response = new ListResponse<GuestOSResponse>();
@@ -91,5 +86,10 @@ public class ListGuestOsCmd extends BaseListCmd {
         response.setResponses(osResponses, result.second());
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

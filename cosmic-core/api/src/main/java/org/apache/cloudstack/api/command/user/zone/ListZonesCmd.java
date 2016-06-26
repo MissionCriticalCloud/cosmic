@@ -16,13 +16,7 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.zone;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import com.cloud.exception.InvalidParameterValueException;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
@@ -31,6 +25,12 @@ import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,9 +48,9 @@ public class ListZonesCmd extends BaseListCmd {
     private Long id;
 
     @Parameter(name = ApiConstants.AVAILABLE,
-               type = CommandType.BOOLEAN,
-               description = "true if you want to retrieve all available Zones. False if you only want to return the Zones"
-                   + " from which you have at least one VM. Default is false.")
+            type = CommandType.BOOLEAN,
+            description = "true if you want to retrieve all available Zones. False if you only want to return the Zones"
+                    + " from which you have at least one VM. Default is false.")
     private Boolean available;
 
     @Parameter(name = ApiConstants.DOMAIN_ID, type = CommandType.UUID, entityType = DomainResponse.class, description = "the ID of the domain associated with the zone")
@@ -103,7 +103,7 @@ public class ListZonesCmd extends BaseListCmd {
             Collection<?> servicesCollection = tags.values();
             Iterator<?> iter = servicesCollection.iterator();
             while (iter.hasNext()) {
-                HashMap<String, String> services = (HashMap<String, String>)iter.next();
+                HashMap<String, String> services = (HashMap<String, String>) iter.next();
                 String key = services.get("key");
                 String value = services.get("value");
                 if (value == null) {
@@ -120,15 +120,15 @@ public class ListZonesCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
 
         ListResponse<ZoneResponse> response = _queryService.listDataCenters(this);
         response.setResponseName(getCommandName());
         setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

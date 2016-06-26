@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.network.dao;
 
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = ("firewall_rules_cidrs"))
@@ -67,5 +67,4 @@ public class FirewallRulesCidrsVO implements InternalIdentity {
     public void setSourceCidrList(String sourceCidrList) {
         this.sourceCidrList = sourceCidrList;
     }
-
 }

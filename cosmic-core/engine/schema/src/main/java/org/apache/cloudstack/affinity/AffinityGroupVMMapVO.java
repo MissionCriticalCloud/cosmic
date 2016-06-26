@@ -16,14 +16,14 @@
 // under the License.
 package org.apache.cloudstack.affinity;
 
+import org.apache.cloudstack.api.InternalIdentity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = ("affinity_group_vm_map"))
@@ -59,5 +59,4 @@ public class AffinityGroupVMMapVO implements InternalIdentity {
     public long getInstanceId() {
         return instanceId;
     }
-
 }

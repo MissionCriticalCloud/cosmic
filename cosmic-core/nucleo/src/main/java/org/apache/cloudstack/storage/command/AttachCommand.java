@@ -19,9 +19,9 @@
 
 package org.apache.cloudstack.storage.command;
 
-import java.util.Map;
-
 import com.cloud.agent.api.to.DiskTO;
+
+import java.util.Map;
 
 public final class AttachCommand extends StorageSubSystemCommand {
     private DiskTO disk;
@@ -34,6 +34,7 @@ public final class AttachCommand extends StorageSubSystemCommand {
         this.disk = disk;
         this.vmName = vmName;
     }
+
     public AttachCommand(DiskTO disk, String vmName, Map<String, String> controllerInfo) {
         super();
         this.disk = disk;
@@ -44,6 +45,7 @@ public final class AttachCommand extends StorageSubSystemCommand {
     public Map<String, String> getControllerInfo() {
         return controllerInfo;
     }
+
     public void setControllerInfo(Map<String, String> controllerInfo) {
         this.controllerInfo = controllerInfo;
     }

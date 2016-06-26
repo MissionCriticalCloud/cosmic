@@ -16,16 +16,16 @@
 // under the License.
 package org.apache.cloudstack.engine.datacenter.entity.api.db.dao;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-
 import org.apache.cloudstack.engine.datacenter.entity.api.db.DcDetailVO;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component(value = "EngineDcDetailsDao")
@@ -45,15 +45,6 @@ public class DcDetailsDaoImpl extends GenericDaoBase<DcDetailVO, Long> implement
     }
 
     @Override
-    public DcDetailVO findDetail(long dcId, String name) {
-        SearchCriteria<DcDetailVO> sc = DetailSearch.create();
-        sc.setParameters("dcId", dcId);
-        sc.setParameters("name", name);
-
-        return findOneIncludingRemovedBy(sc);
-    }
-
-    @Override
     public Map<String, String> findDetails(long dcId) {
         SearchCriteria<DcDetailVO> sc = DcSearch.create();
         sc.setParameters("dcId", dcId);
@@ -64,17 +55,6 @@ public class DcDetailsDaoImpl extends GenericDaoBase<DcDetailVO, Long> implement
             details.put(result.getName(), result.getValue());
         }
         return details;
-    }
-
-    @Override
-    public void deleteDetails(long dcId) {
-        SearchCriteria sc = DcSearch.create();
-        sc.setParameters("dcId", dcId);
-
-        List<DcDetailVO> results = search(sc, null);
-        for (DcDetailVO result : results) {
-            remove(result.getId());
-        }
     }
 
     @Override
@@ -90,5 +70,25 @@ public class DcDetailsDaoImpl extends GenericDaoBase<DcDetailVO, Long> implement
             persist(vo);
         }
         txn.commit();
+    }
+
+    @Override
+    public DcDetailVO findDetail(long dcId, String name) {
+        SearchCriteria<DcDetailVO> sc = DetailSearch.create();
+        sc.setParameters("dcId", dcId);
+        sc.setParameters("name", name);
+
+        return findOneIncludingRemovedBy(sc);
+    }
+
+    @Override
+    public void deleteDetails(long dcId) {
+        SearchCriteria sc = DcSearch.create();
+        sc.setParameters("dcId", dcId);
+
+        List<DcDetailVO> results = search(sc, null);
+        for (DcDetailVO result : results) {
+            remove(result.getId());
+        }
     }
 }

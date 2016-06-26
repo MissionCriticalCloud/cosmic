@@ -41,5 +41,4 @@ public interface NiciraNvpElementService extends PluggableService {
     List<? extends Network> listNiciraNvpDeviceNetworks(ListNiciraNvpDeviceNetworksCmd cmd);
 
     List<NiciraNvpDeviceVO> listNiciraNvpDevices(ListNiciraNvpDevicesCmd cmd);
-
 }

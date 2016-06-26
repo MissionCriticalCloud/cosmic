@@ -21,6 +21,16 @@ import com.cloud.agent.api.LogLevel.Log4jLevel;
 import com.cloud.utils.component.Manager;
 
 public interface KeystoreManager extends Manager {
+    boolean validateCertificate(String certificate, String key, String domainSuffix);
+
+    void saveCertificate(String name, String certificate, String key, String domainSuffix);
+
+    byte[] getKeystoreBits(String name, String aliasForCertificateInStore, String storePassword);
+
+    void saveCertificate(String name, String certificate, Integer index, String domainSuffix);
+
+    Certificates getCertificates(String name);
+
     public static class Certificates {
         @LogLevel(Log4jLevel.Off)
         private String privKey;
@@ -58,14 +68,4 @@ public interface KeystoreManager extends Manager {
             return rootCACert;
         }
     }
-
-    boolean validateCertificate(String certificate, String key, String domainSuffix);
-
-    void saveCertificate(String name, String certificate, String key, String domainSuffix);
-
-    byte[] getKeystoreBits(String name, String aliasForCertificateInStore, String storePassword);
-
-    void saveCertificate(String name, String certificate, Integer index, String domainSuffix);
-
-    Certificates getCertificates(String name);
 }

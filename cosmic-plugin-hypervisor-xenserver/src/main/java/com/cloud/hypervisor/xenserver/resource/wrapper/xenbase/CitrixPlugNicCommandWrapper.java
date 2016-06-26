@@ -19,8 +19,6 @@
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import java.util.Set;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.PlugNicAnswer;
 import com.cloud.agent.api.PlugNicCommand;
@@ -28,14 +26,16 @@ import com.cloud.agent.api.to.NicTO;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
+
+import java.util.Set;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.VIF;
 import com.xensource.xenapi.VM;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  PlugNicCommand.class)
+@ResourceWrapper(handles = PlugNicCommand.class)
 public final class CitrixPlugNicCommandWrapper extends CommandWrapper<PlugNicCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixPlugNicCommandWrapper.class);

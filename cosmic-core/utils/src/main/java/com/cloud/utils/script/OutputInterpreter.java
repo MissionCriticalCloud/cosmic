@@ -28,12 +28,19 @@ import org.slf4j.LoggerFactory;
 /**
  */
 public abstract class OutputInterpreter {
+    public static final OutputInterpreter NoOutputParser = new OutputInterpreter() {
+        @Override
+        public String interpret(final BufferedReader reader) throws IOException {
+            return null;
+        }
+    };
+
     public boolean drain() {
         return false;
     }
 
-    public String processError(BufferedReader reader) throws IOException {
-        StringBuilder buff = new StringBuilder();
+    public String processError(final BufferedReader reader) throws IOException {
+        final StringBuilder buff = new StringBuilder();
         String line = null;
         while ((line = reader.readLine()) != null) {
             buff.append(line);
@@ -43,18 +50,11 @@ public abstract class OutputInterpreter {
 
     public abstract String interpret(BufferedReader reader) throws IOException;
 
-    public static final OutputInterpreter NoOutputParser = new OutputInterpreter() {
-        @Override
-        public String interpret(BufferedReader reader) throws IOException {
-            return null;
-        }
-    };
-
     public static class TimedOutLogger extends OutputInterpreter {
         private static final Logger s_logger = LoggerFactory.getLogger(TimedOutLogger.class);
         Process _process;
 
-        public TimedOutLogger(Process process) {
+        public TimedOutLogger(final Process process) {
             _process = process;
         }
 
@@ -64,8 +64,8 @@ public abstract class OutputInterpreter {
         }
 
         @Override
-        public String interpret(BufferedReader reader) throws IOException {
-            StringBuilder buff = new StringBuilder();
+        public String interpret(final BufferedReader reader) throws IOException {
+            final StringBuilder buff = new StringBuilder();
 
             while (reader.ready()) {
                 buff.append(reader.readLine());
@@ -77,8 +77,8 @@ public abstract class OutputInterpreter {
                 while (reader.ready()) {
                     buff.append(reader.readLine());
                 }
-            } catch (IOException e) {
-                s_logger.info("[ignored] can not append line to buffer",e);
+            } catch (final IOException e) {
+                s_logger.info("[ignored] can not append line to buffer", e);
             }
 
             return buff.toString();
@@ -88,13 +88,13 @@ public abstract class OutputInterpreter {
     public static class OutputLogger extends OutputInterpreter {
         Logger _logger;
 
-        public OutputLogger(Logger logger) {
+        public OutputLogger(final Logger logger) {
             _logger = logger;
         }
 
         @Override
-        public String interpret(BufferedReader reader) throws IOException {
-            StringBuilder builder = new StringBuilder();
+        public String interpret(final BufferedReader reader) throws IOException {
+            final StringBuilder builder = new StringBuilder();
             String line = null;
             while ((line = reader.readLine()) != null) {
                 builder.append(line).append("\n");
@@ -109,23 +109,27 @@ public abstract class OutputInterpreter {
     public static class OneLineParser extends OutputInterpreter {
         String line = null;
 
-        @Override
-        public String interpret(BufferedReader reader) throws IOException {
-            line = reader.readLine();
-            return null;
-        }
-
         public String getLine() {
             return line;
         }
-    };
+
+        @Override
+        public String interpret(final BufferedReader reader) throws IOException {
+            line = reader.readLine();
+            return null;
+        }
+    }
 
     public static class AllLinesParser extends OutputInterpreter {
         String allLines = null;
 
+        public String getLines() {
+            return allLines;
+        }
+
         @Override
-        public String interpret(BufferedReader reader) throws IOException {
-            StringBuilder builder = new StringBuilder();
+        public String interpret(final BufferedReader reader) throws IOException {
+            final StringBuilder builder = new StringBuilder();
             String line = null;
             while ((line = reader.readLine()) != null) {
                 builder.append(line).append("\n");
@@ -133,10 +137,5 @@ public abstract class OutputInterpreter {
             allLines = builder.toString();
             return null;
         }
-
-        public String getLines() {
-            return allLines;
-        }
     }
-
 }

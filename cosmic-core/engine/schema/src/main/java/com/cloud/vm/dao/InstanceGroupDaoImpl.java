@@ -16,19 +16,19 @@
 // under the License.
 package com.cloud.vm.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.vm.InstanceGroupVO;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class InstanceGroupDaoImpl extends GenericDaoBase<InstanceGroupVO, Long> implements InstanceGroupDao {
-    private SearchBuilder<InstanceGroupVO> AccountIdNameSearch;
     protected final SearchBuilder<InstanceGroupVO> AccountSearch;
+    private SearchBuilder<InstanceGroupVO> AccountIdNameSearch;
 
     protected InstanceGroupDaoImpl() {
         AccountSearch = createSearchBuilder();
@@ -39,7 +39,13 @@ public class InstanceGroupDaoImpl extends GenericDaoBase<InstanceGroupVO, Long> 
         AccountIdNameSearch.and("accountId", AccountIdNameSearch.entity().getAccountId(), SearchCriteria.Op.EQ);
         AccountIdNameSearch.and("groupName", AccountIdNameSearch.entity().getName(), SearchCriteria.Op.EQ);
         AccountIdNameSearch.done();
+    }
 
+    @Override
+    public List<InstanceGroupVO> listByAccountId(long id) {
+        SearchCriteria<InstanceGroupVO> sc = AccountSearch.create();
+        sc.setParameters("account", id);
+        return listBy(sc);
     }
 
     @Override
@@ -66,12 +72,5 @@ public class InstanceGroupDaoImpl extends GenericDaoBase<InstanceGroupVO, Long> 
         InstanceGroupVO vo = createForUpdate();
         vo.setName(name);
         update(id, vo);
-    }
-
-    @Override
-    public List<InstanceGroupVO> listByAccountId(long id) {
-        SearchCriteria<InstanceGroupVO> sc = AccountSearch.create();
-        sc.setParameters("account", id);
-        return listBy(sc);
     }
 }

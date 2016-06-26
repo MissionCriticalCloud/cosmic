@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.vm.snapshot.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;
 import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotVO;
+
+import java.util.List;
 
 public interface VMSnapshotDao extends GenericDao<VMSnapshotVO, Long>, StateDao<VMSnapshot.State, VMSnapshot.Event, VMSnapshot> {
 

@@ -29,6 +29,7 @@ import com.cloud.storage.StoragePool;
  * This currently assumes that both primary and secondary storage are mounted on the XenServer.
  */
 public class BackupSnapshotCommand extends SnapshotCommand {
+    StorageFilerTO pool;
     private String prevSnapshotUuid;
     private String prevBackupUuid;
     private boolean isVolumeInactive;
@@ -37,7 +38,6 @@ public class BackupSnapshotCommand extends SnapshotCommand {
     @LogLevel(Log4jLevel.Off)
     private SwiftTO swift;
     private S3TO s3;
-    StorageFilerTO pool;
     private Long secHostId;
 
     protected BackupSnapshotCommand() {
@@ -45,18 +45,19 @@ public class BackupSnapshotCommand extends SnapshotCommand {
     }
 
     /**
-     * @param primaryStoragePoolNameLabel   The UUID of the primary storage Pool
-     * @param secondaryStoragePoolURL  This is what shows up in the UI when you click on Secondary storage.
-     * @param snapshotUuid             The UUID of the snapshot which is going to be backed up
-     * @param prevSnapshotUuid         The UUID of the previous snapshot for this volume. This will be destroyed on the primary storage.
-     * @param prevBackupUuid           This is the UUID of the vhd file which was last backed up on secondary storage.
-     * @param firstBackupUuid          This is the backup of the first ever snapshot taken by the volume.
+     * @param primaryStoragePoolNameLabel The UUID of the primary storage Pool
+     * @param secondaryStoragePoolURL     This is what shows up in the UI when you click on Secondary storage.
+     * @param snapshotUuid                The UUID of the snapshot which is going to be backed up
+     * @param prevSnapshotUuid            The UUID of the previous snapshot for this volume. This will be destroyed on the primary storage.
+     * @param prevBackupUuid              This is the UUID of the vhd file which was last backed up on secondary storage.
+     * @param firstBackupUuid             This is the backup of the first ever snapshot taken by the volume.
      * @param isFirstSnapshotOfRootVolume true if this is the first snapshot of a root volume. Set the parent of the backup to null.
-     * @param isVolumeInactive         True if the volume belongs to a VM that is not running or is detached.
-     * @param secHostId                This is the Id of the secondary storage.
+     * @param isVolumeInactive            True if the volume belongs to a VM that is not running or is detached.
+     * @param secHostId                   This is the Id of the secondary storage.
      */
     public BackupSnapshotCommand(String secondaryStoragePoolURL, Long dcId, Long accountId, Long volumeId, Long snapshotId, Long secHostId, String volumePath,
-            StoragePool pool, String snapshotUuid, String snapshotName, String prevSnapshotUuid, String prevBackupUuid, boolean isVolumeInactive, String vmName, int wait) {
+                                 StoragePool pool, String snapshotUuid, String snapshotName, String prevSnapshotUuid, String prevBackupUuid, boolean isVolumeInactive, String
+                                         vmName, int wait) {
         super(pool, secondaryStoragePoolURL, snapshotUuid, snapshotName, dcId, accountId, volumeId);
         this.snapshotId = snapshotId;
         this.prevSnapshotUuid = prevSnapshotUuid;

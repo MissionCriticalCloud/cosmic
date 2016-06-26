@@ -16,7 +16,10 @@
 // under the License.
 package com.cloud.offerings;
 
-import java.util.Date;
+import com.cloud.network.Network.Provider;
+import com.cloud.network.Network.Service;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,12 +27,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "ntwk_offering_service_map")
@@ -52,6 +50,17 @@ public class NetworkOfferingServiceMapVO implements InternalIdentity {
     @Column(name = GenericDao.CREATED_COLUMN)
     Date created;
 
+    public NetworkOfferingServiceMapVO() {
+    }
+
+    public NetworkOfferingServiceMapVO(long networkOfferingId, Service service, Provider provider) {
+        this.networkOfferingId = networkOfferingId;
+        this.service = service.getName();
+        if (provider != null) {
+            this.provider = provider.getName();
+        }
+    }
+
     @Override
     public long getId() {
         return id;
@@ -71,17 +80,6 @@ public class NetworkOfferingServiceMapVO implements InternalIdentity {
 
     public Date getCreated() {
         return created;
-    }
-
-    public NetworkOfferingServiceMapVO() {
-    }
-
-    public NetworkOfferingServiceMapVO(long networkOfferingId, Service service, Provider provider) {
-        this.networkOfferingId = networkOfferingId;
-        this.service = service.getName();
-        if (provider != null) {
-            this.provider = provider.getName();
-        }
     }
 
     @Override

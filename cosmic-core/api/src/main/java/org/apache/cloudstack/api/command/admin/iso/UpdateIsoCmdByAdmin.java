@@ -17,13 +17,13 @@
 package org.apache.cloudstack.api.command.admin.iso;
 
 import com.cloud.template.VirtualMachineTemplate;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.iso.UpdateIsoCmd;
 import org.apache.cloudstack.api.response.TemplateResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public class UpdateIsoCmdByAdmin extends UpdateIsoCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateIsoCmdByAdmin.class.getName());
 
     @Override
-    public void execute(){
+    public void execute() {
         VirtualMachineTemplate result = _templateService.updateTemplate(this);
         if (result != null) {
             TemplateResponse response = _responseGenerator.createTemplateUpdateResponse(ResponseView.Full, result);

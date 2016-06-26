@@ -18,14 +18,13 @@
  */
 package org.apache.cloudstack.engine.datacenter.entity.api;
 
+import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.StateObject;
+import org.apache.cloudstack.engine.entity.api.CloudStackEntity;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
-
-import com.cloud.utils.fsm.StateMachine2;
-import com.cloud.utils.fsm.StateObject;
-
-import org.apache.cloudstack.engine.entity.api.CloudStackEntity;
 
 /**
  * This interface specifies the states and operations all physical
@@ -33,34 +32,6 @@ import org.apache.cloudstack.engine.entity.api.CloudStackEntity;
  */
 @Produces({"application/json", "application/xml"})
 public interface DataCenterResourceEntity extends CloudStackEntity, StateObject<DataCenterResourceEntity.State> {
-
-    /**
-     * This is the state machine for how CloudStack should interact with
-     *
-     */
-    public enum State {
-        Disabled("The resource is disabled so CloudStack should not use it.  This is the initial state of all resources added to CloudStack."), Enabled(
-                "The resource is now enabled for CloudStack to use."), Deactivated("The resource is deactivated so CloudStack should not use it for new resource needs.");
-
-        String _description;
-
-        private State(String description) {
-            _description = description;
-        }
-
-        public enum Event {
-            EnableRequest, DisableRequest, DeactivateRequest, ActivatedRequest
-        }
-
-        protected static final StateMachine2<State, Event, DataCenterResourceEntity> s_fsm = new StateMachine2<State, Event, DataCenterResourceEntity>();
-        static {
-            s_fsm.addTransition(Disabled, Event.EnableRequest, Enabled);
-            s_fsm.addTransition(Enabled, Event.DisableRequest, Disabled);
-            s_fsm.addTransition(Enabled, Event.DeactivateRequest, Deactivated);
-            s_fsm.addTransition(Deactivated, Event.ActivatedRequest, Enabled);
-        }
-
-    }
 
     /**
      * Prepare the resource to take new on new demands.
@@ -93,4 +64,32 @@ public interface DataCenterResourceEntity extends CloudStackEntity, StateObject<
     public void persist();
 
     String getName();
+
+    /**
+     * This is the state machine for how CloudStack should interact with
+     */
+    public enum State {
+        Disabled("The resource is disabled so CloudStack should not use it.  This is the initial state of all resources added to CloudStack."), Enabled(
+                "The resource is now enabled for CloudStack to use."), Deactivated("The resource is deactivated so CloudStack should not use it for new resource needs.");
+
+        protected static final StateMachine2<State, Event, DataCenterResourceEntity> s_fsm = new StateMachine2<State, Event, DataCenterResourceEntity>();
+
+        static {
+            s_fsm.addTransition(Disabled, Event.EnableRequest, Enabled);
+            s_fsm.addTransition(Enabled, Event.DisableRequest, Disabled);
+            s_fsm.addTransition(Enabled, Event.DeactivateRequest, Deactivated);
+            s_fsm.addTransition(Deactivated, Event.ActivatedRequest, Enabled);
+        }
+
+        String _description;
+
+        private State(String description) {
+            _description = description;
+        }
+
+        public enum Event {
+            EnableRequest, DisableRequest, DeactivateRequest, ActivatedRequest
+        }
+
+    }
 }

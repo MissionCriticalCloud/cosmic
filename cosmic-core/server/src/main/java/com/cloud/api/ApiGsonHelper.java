@@ -16,14 +16,15 @@
 // under the License.
 package com.cloud.api;
 
+import org.apache.cloudstack.api.ResponseObject;
+
 import java.util.Map;
 
 import com.google.gson.GsonBuilder;
 
-import org.apache.cloudstack.api.ResponseObject;
-
 public class ApiGsonHelper {
     private static final GsonBuilder s_gBuilder;
+
     static {
         s_gBuilder = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         s_gBuilder.setVersion(1.3);

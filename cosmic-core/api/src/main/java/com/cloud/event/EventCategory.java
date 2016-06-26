@@ -23,24 +23,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EventCategory {
-    private static List<EventCategory> eventCategories = new ArrayList<EventCategory>();
-    private String eventCategoryName;
+    public static final EventCategory ACTION_EVENT = new EventCategory("ActionEvent");
+    public static final EventCategory ALERT_EVENT = new EventCategory("AlertEvent");
+    public static final EventCategory USAGE_EVENT = new EventCategory("UsageEvent");
+    public static final EventCategory RESOURCE_STATE_CHANGE_EVENT = new EventCategory("ResourceStateEvent");
+    public static final EventCategory ASYNC_JOB_CHANGE_EVENT = new EventCategory("AsyncJobEvent");
+    private static final List<EventCategory> eventCategories = new ArrayList<>();
+    private final String eventCategoryName;
 
-    public EventCategory(String categoryName) {
+    public EventCategory(final String categoryName) {
         this.eventCategoryName = categoryName;
         eventCategories.add(this);
-    }
-
-    public String getName() {
-        return eventCategoryName;
     }
 
     public static List<EventCategory> listAllEventCategories() {
         return eventCategories;
     }
 
-    public static EventCategory getEventCategory(String categoryName) {
-        for (EventCategory category : eventCategories) {
+    public static EventCategory getEventCategory(final String categoryName) {
+        for (final EventCategory category : eventCategories) {
             if (category.getName().equalsIgnoreCase(categoryName)) {
                 return category;
             }
@@ -48,9 +49,7 @@ public class EventCategory {
         return null;
     }
 
-    public static final EventCategory ACTION_EVENT = new EventCategory("ActionEvent");
-    public static final EventCategory ALERT_EVENT = new EventCategory("AlertEvent");
-    public static final EventCategory USAGE_EVENT = new EventCategory("UsageEvent");
-    public static final EventCategory RESOURCE_STATE_CHANGE_EVENT = new EventCategory("ResourceStateEvent");
-    public static final EventCategory ASYNC_JOB_CHANGE_EVENT = new EventCategory("AsyncJobEvent");
+    public String getName() {
+        return eventCategoryName;
+    }
 }

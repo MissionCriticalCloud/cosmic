@@ -19,11 +19,6 @@
 
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-
 import com.cloud.agent.api.BumpUpPriorityCommand;
 import com.cloud.agent.api.SetupGuestNetworkCommand;
 import com.cloud.agent.api.routing.CreateIpAliasCommand;
@@ -53,10 +48,15 @@ import com.cloud.agent.resource.virtualnetwork.ScriptConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,13 +66,13 @@ public abstract class AbstractConfigItemFacade {
 
     private final static Gson gson;
 
-    private static Hashtable<Class<? extends NetworkElementCommand>, AbstractConfigItemFacade> flyweight = new Hashtable<Class<? extends NetworkElementCommand>, AbstractConfigItemFacade>();
+    private static final Hashtable<Class<? extends NetworkElementCommand>, AbstractConfigItemFacade> flyweight = new Hashtable<>();
 
     static {
         gson = new GsonBuilder()
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-            .disableHtmlEscaping()
-            .create();
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .disableHtmlEscaping()
+                .create();
 
         flyweight.put(SetPortForwardingRulesVpcCommand.class, new SetPortForwardingRulesVpcConfigItem());
         flyweight.put(SetPortForwardingRulesCommand.class, new SetPortForwardingRulesConfigItem());
@@ -110,15 +110,6 @@ public abstract class AbstractConfigItemFacade {
         return instance;
     }
 
-
-    private static String appendUuidToJsonFiles(final String filename) {
-        String remoteFileName = new String(filename);
-        if (remoteFileName.endsWith("json")) {
-            remoteFileName += "." + UUID.randomUUID().toString();
-        }
-        return remoteFileName;
-    }
-
     protected List<ConfigItem> generateConfigItems(final ConfigBase configuration) {
         final List<ConfigItem> cfg = new LinkedList<>();
 
@@ -132,6 +123,14 @@ public abstract class AbstractConfigItemFacade {
         cfg.add(updateCommand);
 
         return cfg;
+    }
+
+    private static String appendUuidToJsonFiles(final String filename) {
+        String remoteFileName = new String(filename);
+        if (remoteFileName.endsWith("json")) {
+            remoteFileName += "." + UUID.randomUUID().toString();
+        }
+        return remoteFileName;
     }
 
     public abstract List<ConfigItem> generateConfig(NetworkElementCommand cmd);

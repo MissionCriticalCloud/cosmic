@@ -16,12 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.pod;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.dc.Pod;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
@@ -29,6 +25,10 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.PodResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,11 +87,6 @@ public class ListPodsByCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
         Pair<List<? extends Pod>, Integer> result = _mgr.searchForPods(this);
         ListResponse<PodResponse> response = new ListResponse<PodResponse>();
@@ -105,5 +100,10 @@ public class ListPodsByCmd extends BaseListCmd {
         response.setResponses(podResponses, result.second());
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

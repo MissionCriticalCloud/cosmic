@@ -17,13 +17,13 @@
 # specific language governing permissions and limitations
 # under the License.
 
+import sys
+
 from CsDatabag import CsDataBag
 from CsRedundant import *
-import sys
 
 
 class CsStaticRoutes(CsDataBag):
-
     def process(self):
         is_master = self.cl.is_master()
         if self.cl.is_redundant() and not is_master:
@@ -53,7 +53,7 @@ class CsStaticRoutes(CsDataBag):
     def set_routes(self):
         command = "ip route show | grep via | awk '{print $1, $3}'"
         output = CsHelper.get_output_of_command(command)
-        self.routes = {}
+        self.routes = { }
         for line in output.split('\n'):
             data = line.split()
             if data:

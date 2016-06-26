@@ -16,13 +16,9 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.nat;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.StaticNatRule;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
@@ -32,6 +28,10 @@ import org.apache.cloudstack.api.response.IPAddressResponse;
 import org.apache.cloudstack.api.response.IpForwardingRuleResponse;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.UserVmResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,31 +47,23 @@ public class ListIpForwardingRulesCmd extends BaseListProjectAndAccountResources
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.IP_ADDRESS_ID,
-               type = CommandType.UUID,
-               entityType = IPAddressResponse.class,
-               description = "list the rule belonging to this public IP address")
+            type = CommandType.UUID,
+            entityType = IPAddressResponse.class,
+            description = "list the rule belonging to this public IP address")
     private Long publicIpAddressId;
 
     @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = FirewallRuleResponse.class, description = "Lists rule with the specified ID.")
     private Long id;
 
     @Parameter(name = ApiConstants.VIRTUAL_MACHINE_ID,
-               type = CommandType.UUID,
-               entityType = UserVmResponse.class,
-               description = "Lists all rules applied to the specified VM.")
+            type = CommandType.UUID,
+            entityType = UserVmResponse.class,
+            description = "Lists all rules applied to the specified VM.")
     private Long vmId;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
 
     public Long getPublicIpAddressId() {
         return publicIpAddressId;
@@ -88,8 +80,8 @@ public class ListIpForwardingRulesCmd extends BaseListProjectAndAccountResources
     @Override
     public void execute() {
         Pair<List<? extends FirewallRule>, Integer> result =
-            _rulesService.searchStaticNatRules(publicIpAddressId, id, vmId, this.getStartIndex(), this.getPageSizeVal(), this.getAccountName(), this.getDomainId(),
-                this.getProjectId(), this.isRecursive(), this.listAll());
+                _rulesService.searchStaticNatRules(publicIpAddressId, id, vmId, this.getStartIndex(), this.getPageSizeVal(), this.getAccountName(), this.getDomainId(),
+                        this.getProjectId(), this.isRecursive(), this.listAll());
         ListResponse<IpForwardingRuleResponse> response = new ListResponse<IpForwardingRuleResponse>();
         List<IpForwardingRuleResponse> ipForwardingResponses = new ArrayList<IpForwardingRuleResponse>();
         for (FirewallRule rule : result.first()) {
@@ -104,4 +96,11 @@ public class ListIpForwardingRulesCmd extends BaseListProjectAndAccountResources
         this.setResponseObject(response);
     }
 
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
 }

@@ -16,15 +16,12 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.loadbalancer;
 
-import javax.inject.Inject;
-
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.lb.CertService;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -35,6 +32,9 @@ import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.api.response.SslCertResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +111,7 @@ public class UploadSslCertCmd extends BaseCmd {
 
     @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException, NetworkRuleConflictException {
+            ResourceAllocationException, NetworkRuleConflictException {
 
         try {
             SslCertResponse response = _certService.uploadSslCert(this);
@@ -120,7 +120,6 @@ public class UploadSslCertCmd extends BaseCmd {
         } catch (Exception e) {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, e.getMessage());
         }
-
     }
 
     @Override
@@ -132,5 +131,4 @@ public class UploadSslCertCmd extends BaseCmd {
     public long getEntityOwnerId() {
         return CallContext.current().getCallingAccount().getId();
     }
-
 }

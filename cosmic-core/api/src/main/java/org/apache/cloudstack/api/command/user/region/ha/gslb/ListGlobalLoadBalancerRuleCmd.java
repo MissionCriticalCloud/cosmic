@@ -17,14 +17,8 @@
 
 package org.apache.cloudstack.api.command.user.region.ha.gslb;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.region.ha.GlobalLoadBalancerRule;
 import com.cloud.region.ha.GlobalLoadBalancingRulesService;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListTaggedResourcesCmd;
@@ -32,6 +26,11 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.GlobalLoadBalancerResponse;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.RegionResponse;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,35 +44,27 @@ public class ListGlobalLoadBalancerRuleCmd extends BaseListTaggedResourcesCmd {
     // ///////////////////////////////////////////////////
     // ////////////// API parameters /////////////////////
     // ///////////////////////////////////////////////////
-
+    @Inject
+    public GlobalLoadBalancingRulesService _gslbService;
     @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = GlobalLoadBalancerResponse.class, description = "the ID of the global load balancer rule")
     private Long id;
-
-    @Parameter(name = ApiConstants.REGION_ID, type = CommandType.INTEGER, entityType = RegionResponse.class, description = "region ID")
-    private Integer regionId;
 
     // ///////////////////////////////////////////////////
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
+    @Parameter(name = ApiConstants.REGION_ID, type = CommandType.INTEGER, entityType = RegionResponse.class, description = "region ID")
+    private Integer regionId;
 
     public Long getId() {
         return id;
-    }
-
-    public Integer getRegionId() {
-        return regionId;
     }
 
     // ///////////////////////////////////////////////////
     // ///////////// API Implementation///////////////////
     // ///////////////////////////////////////////////////
 
-    @Inject
-    public GlobalLoadBalancingRulesService _gslbService;
-
-    @Override
-    public String getCommandName() {
-        return s_name;
+    public Integer getRegionId() {
+        return regionId;
     }
 
     @Override
@@ -93,4 +84,8 @@ public class ListGlobalLoadBalancerRuleCmd extends BaseListTaggedResourcesCmd {
         this.setResponseObject(gslbRuleResponse);
     }
 
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
 }

@@ -37,14 +37,14 @@ public abstract class UploadInactiveState extends UploadState {
     }
 
     @Override
-    public String handleDisconnect() {
-        //ignore and stay put
+    public String handleTimeout(long updateMs) {
+        // ignore and stay put
         return getName();
     }
 
     @Override
-    public String handleTimeout(long updateMs) {
-        // ignore and stay put
+    public String handleDisconnect() {
+        //ignore and stay put
         return getName();
     }
 }

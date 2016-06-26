@@ -16,8 +16,10 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs.impl;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.UuidUtils;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.framework.jobs.AsyncJob;
+import org.apache.cloudstack.jobs.JobInfo;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -34,12 +36,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-
-import com.cloud.utils.UuidUtils;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.framework.jobs.AsyncJob;
-import org.apache.cloudstack.jobs.JobInfo;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "async_job")
@@ -49,21 +47,16 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
 
     public static final String JOB_DISPATCHER_PSEUDO = "pseudoJobDispatcher";
     public static final String PSEUDO_JOB_INSTANCE_TYPE = "Thread";
-
+    @Column(name = "job_type", length = 32)
+    protected String type;
+    @Column(name = "job_dispatcher", length = 64)
+    protected String dispatcher;
+    @Column(name = "job_pending_signals")
+    protected int pendingSignals;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
-    @Column(name = "job_type", length = 32)
-    protected String type;
-
-    @Column(name = "job_dispatcher", length = 64)
-    protected String dispatcher;
-
-    @Column(name = "job_pending_signals")
-    protected int pendingSignals;
-
     @Column(name = "user_id")
     private long userId;
 
@@ -141,34 +134,11 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         this.accountId = accountId;
         this.cmd = cmd;
         this.cmdInfo = cmdInfo;
-        uuid = ( injectedUuid == null ? UUID.randomUUID().toString() : injectedUuid );
+        uuid = (injectedUuid == null ? UUID.randomUUID().toString() : injectedUuid);
         this.related = related;
         this.instanceId = instanceId;
         this.instanceType = instanceType;
         status = Status.IN_PROGRESS;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getShortUuid() {
-        return UuidUtils.first(uuid);
-    }
-
-    public void setRelated(String related) {
-        this.related = related;
-    }
-
-    @Override
-    public String getRelated() {
-        return related;
     }
 
     @Override
@@ -349,8 +319,9 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return instanceId;
     }
 
-    public void setInstanceId(Long instanceId) {
-        this.instanceId = instanceId;
+    @Override
+    public String getShortUuid() {
+        return UuidUtils.first(uuid);
     }
 
     @Override
@@ -361,6 +332,19 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
     @Override
     public void setSyncSource(SyncQueueItem syncSource) {
         this.syncSource = syncSource;
+    }
+
+    @Override
+    public String getRelated() {
+        return related;
+    }
+
+    public void setRelated(String related) {
+        this.related = related;
+    }
+
+    public void setInstanceId(Long instanceId) {
+        this.instanceId = instanceId;
     }
 
     @Override
@@ -394,5 +378,14 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         sb.append(", created: ").append(getCreated());
         sb.append("}");
         return sb.toString();
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

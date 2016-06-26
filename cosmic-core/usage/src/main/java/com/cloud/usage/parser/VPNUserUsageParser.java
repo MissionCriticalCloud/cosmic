@@ -16,23 +16,22 @@
 // under the License.
 package com.cloud.usage.parser;
 
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.usage.UsageVO;
 import com.cloud.usage.UsageVPNUserVO;
 import com.cloud.usage.dao.UsageDao;
 import com.cloud.usage.dao.UsageVPNUserDao;
 import com.cloud.user.AccountVO;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.usage.UsageTypes;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.text.DecimalFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -48,12 +47,6 @@ public class VPNUserUsageParser {
     private UsageDao _usageDao;
     @Inject
     private UsageVPNUserDao _usageVPNUserDao;
-
-    @PostConstruct
-    void init() {
-        s_usageDao = _usageDao;
-        s_usageVPNUserDao = _usageVPNUserDao;
-    }
 
     public static boolean parse(AccountVO account, Date startDate, Date endDate) {
         if (s_logger.isDebugEnabled()) {
@@ -99,7 +92,8 @@ public class VPNUserUsageParser {
                 continue;
             }
 
-            long currentDuration = (vuDeleteDate.getTime() - vuCreateDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to find total number of millis to charge)
+            long currentDuration = (vuDeleteDate.getTime() - vuCreateDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to find
+            // total number of millis to charge)
 
             updateVUUsageData(usageMap, key, usageVU.getUserId(), currentDuration);
         }
@@ -143,16 +137,22 @@ public class VPNUserUsageParser {
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Creating VPN user:" + userId + " usage record, usage: " + usageDisplay + ", startDate: " + startDate + ", endDate: " + endDate +
-                ", for account: " + account.getId());
+                    ", for account: " + account.getId());
         }
 
         // Create the usage record
         String usageDesc = "VPN User: " + userName + ", Id: " + userId + " usage time";
 
         UsageVO usageRecord =
-            new UsageVO(zoneId, account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", type, new Double(usage), null, null, null, null, userId, null,
-                startDate, endDate);
+                new UsageVO(zoneId, account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", type, new Double(usage), null, null, null, null, userId, null,
+                        startDate, endDate);
         s_usageDao.persist(usageRecord);
+    }
+
+    @PostConstruct
+    void init() {
+        s_usageDao = _usageDao;
+        s_usageVPNUserDao = _usageVPNUserDao;
     }
 
     private static class VUInfo {
@@ -178,5 +178,4 @@ public class VPNUserUsageParser {
             return userName;
         }
     }
-
 }

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-(function(cloudStack, $) {
+(function (cloudStack, $) {
     var rootDomainId;
 
 
@@ -78,13 +78,13 @@
                 validation: {
                     required: true
                 },
-                select: function(args) {
+                select: function (args) {
                     $.ajax({
                         url: createURL("listDomains"),
-                        success: function(json) {
+                        success: function (json) {
                             var items = [];
                             domainObjs = json.listdomainsresponse.domain;
-                            $(domainObjs).each(function() {
+                            $(domainObjs).each(function () {
                                 items.push({
                                     id: this.id,
                                     description: this.path
@@ -93,7 +93,7 @@
                                 if (this.level === 0)
                                     rootDomainId = this.id;
                             });
-                            items.sort(function(a, b) {
+                            items.sort(function (a, b) {
                                 return a.description.localeCompare(b.description);
                             });
                             args.response.success({
@@ -116,7 +116,7 @@
                 validation: {
                     required: true
                 },
-                select: function(args) {
+                select: function (args) {
                     var items = [];
                     items.push({
                         id: 0,
@@ -134,7 +134,7 @@
             timezone: {
                 label: 'label.timezone',
                 docID: 'helpAccountTimezone',
-                select: function(args) {
+                select: function (args) {
                     var items = [];
                     items.push({
                         id: "",
@@ -178,9 +178,9 @@
                 validation: {
                     required: false
                 },
-                select: function(args) {
+                select: function (args) {
                     var items = [];
-                    $(g_idpList).each(function() {
+                    $(g_idpList).each(function () {
                         items.push({
                             id: this.id,
                             description: this.orgName
@@ -193,7 +193,7 @@
             }
         },
 
-        action: function(args) {
+        action: function (args) {
             var array1 = [];
             var ldapStatus = args.isLdap;
             if (args.username) {
@@ -228,7 +228,7 @@
 
             var accountType = args.data.accounttype;
             if (accountType == "1") { //if "admin" is selected in account type dropdown
-                if (rootDomainId == undefined || args.data.domainid != rootDomainId ) { //but current login has no visibility to root domain object, or the selected domain is not root domain
+                if (rootDomainId == undefined || args.data.domainid != rootDomainId) { //but current login has no visibility to root domain object, or the selected domain is not root domain
                     accountType = "2"; // change accountType from root-domain("1") to domain-admin("2")
                 }
             }
@@ -249,7 +249,7 @@
                 for (var i = 0; i < users.length; i++) {
                     $.ajax({
                         url: createURL('authorizeSamlSso&enable=true&userid=' + users[i].id + "&entityid=" + entity),
-                        error: function(XMLHttpResponse) {
+                        error: function (XMLHttpResponse) {
                             args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                         }
                     });
@@ -271,7 +271,7 @@
                                 });
                             }
                         },
-                        error: function(XMLHttpResponse) {
+                        error: function (XMLHttpResponse) {
                             args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                         }
                     });
@@ -281,7 +281,7 @@
                         dataType: "json",
                         type: "POST",
                         async: false,
-                        success: function(json) {
+                        success: function (json) {
                             if (args.data.samlEnable && args.data.samlEnable === 'on') {
                                 var users = json.createaccountresponse.account.user;
                                 var entity = args.data.samlEntity;
@@ -289,7 +289,7 @@
                                     authorizeUsersForSamlSSO(users, entity);
                             }
                         },
-                        error: function(XMLHttpResponse) {
+                        error: function (XMLHttpResponse) {
                             args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                         }
                     });
@@ -300,7 +300,7 @@
                     dataType: "json",
                     type: "POST",
                     async: false,
-                    success: function(json) {
+                    success: function (json) {
                         if (args.data.samlEnable && args.data.samlEnable === 'on') {
                             var users = json.createaccountresponse.account.user;
                             var entity = args.data.samlEntity;
@@ -308,7 +308,7 @@
                                 authorizeUsersForSamlSSO(users, entity);
                         }
                     },
-                    error: function(XMLHttpResponse) {
+                    error: function (XMLHttpResponse) {
                         args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                     }
                 });

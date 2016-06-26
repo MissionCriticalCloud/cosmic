@@ -19,7 +19,7 @@ package com.cloud.api.doc;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Command implements Serializable{
+public class Command implements Serializable {
 
     /**
      *
@@ -57,22 +57,6 @@ public class Command implements Serializable{
         this.description = description;
     }
 
-    public ArrayList<Argument> getRequest() {
-        return request;
-    }
-
-    public void setRequest(ArrayList<Argument> request) {
-        this.request = request;
-    }
-
-    public ArrayList<Argument> getResponse() {
-        return response;
-    }
-
-    public void setResponse(ArrayList<Argument> response) {
-        this.response = response;
-    }
-
     public boolean isAsync() {
         return isAsync;
     }
@@ -98,6 +82,14 @@ public class Command implements Serializable{
         return null;
     }
 
+    public ArrayList<Argument> getRequest() {
+        return request;
+    }
+
+    public void setRequest(ArrayList<Argument> request) {
+        this.request = request;
+    }
+
     public Argument getResArgByName(String name) {
         for (Argument a : getResponse()) {
             if (a.getName().equals(name)) {
@@ -105,6 +97,14 @@ public class Command implements Serializable{
             }
         }
         return null;
+    }
+
+    public ArrayList<Argument> getResponse() {
+        return response;
+    }
+
+    public void setResponse(ArrayList<Argument> response) {
+        this.response = response;
     }
 
     public String getUsage() {

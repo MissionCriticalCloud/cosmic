@@ -16,9 +16,14 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.net.URI;
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.network.Network;
+import com.cloud.network.Networks.BroadcastDomainType;
+import com.cloud.network.Networks.Mode;
+import com.cloud.network.Networks.TrafficType;
+import com.cloud.utils.NumbersUtil;
+import com.cloud.utils.db.GenericDao;
+import com.cloud.utils.net.NetUtils;
+import org.apache.cloudstack.acl.ControlledEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,144 +33,100 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Transient;
-
-import com.cloud.network.Network;
-import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.Networks.Mode;
-import com.cloud.network.Networks.TrafficType;
-import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.db.GenericDao;
-import com.cloud.utils.net.NetUtils;
-
-import org.apache.cloudstack.acl.ControlledEntity;
+import java.net.URI;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * NetworkConfigurationVO contains information about a specific network.
- *
  */
 @Entity
 @Table(name = "networks")
 public class NetworkVO implements Network {
+    @Column(name = "display_network", updatable = true, nullable = false)
+    protected boolean displayNetwork = true;
     @Id
     @TableGenerator(name = "networks_sq", table = "sequence", pkColumnName = "name", valueColumnName = "value", pkColumnValue = "networks_seq", allocationSize = 1)
     @Column(name = "id")
     long id;
-
     @Column(name = "mode")
     @Enumerated(value = EnumType.STRING)
     Mode mode;
-
     @Column(name = "broadcast_domain_type")
     @Enumerated(value = EnumType.STRING)
     BroadcastDomainType broadcastDomainType;
-
     @Column(name = "traffic_type")
     @Enumerated(value = EnumType.STRING)
     TrafficType trafficType;
-
     @Column(name = "name")
     String name;
-
+    ;
     @Column(name = "display_text")
-    String displayText;;
-
+    String displayText;
     @Column(name = "broadcast_uri")
     URI broadcastUri;
-
     @Column(name = "gateway")
     String gateway;
-
     @Column(name = "cidr")
     String cidr;
-
     @Column(name = "network_cidr")
     String networkCidr;
-
     @Column(name = "network_offering_id")
     long networkOfferingId;
-
     @Column(name = "vpc_id")
     Long vpcId;
-
     @Column(name = "physical_network_id")
     Long physicalNetworkId;
-
     @Column(name = "data_center_id")
     long dataCenterId;
-
     @Column(name = "related")
     long related;
-
     @Column(name = "guru_name")
     String guruName;
-
     @Column(name = "state")
     @Enumerated(value = EnumType.STRING)
     State state;
-
     @Column(name = "redundant")
     boolean isRedundant;
-
     @Column(name = "dns1")
     String dns1;
-
     @Column(name = "domain_id")
     long domainId;
-
     @Column(name = "account_id")
     long accountId;
-
     @Column(name = "set_fields")
     long setFields;
-
     @TableGenerator(name = "mac_address_seq", table = "op_networks", pkColumnName = "id", valueColumnName = "mac_address_seq", allocationSize = 1)
     @Transient
     long macAddress = 1;
-
     @Column(name = "guru_data", length = 1024)
     String guruData;
-
     @Column(name = "dns2")
     String dns2;
-
     @Column(name = "network_domain")
     String networkDomain;
-
     @Column(name = GenericDao.REMOVED_COLUMN)
     Date removed;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     Date created;
-
     @Column(name = "reservation_id")
     String reservationId;
-
     @Column(name = "uuid")
     String uuid;
-
     @Column(name = "guest_type")
     @Enumerated(value = EnumType.STRING)
     Network.GuestType guestType;
-
     @Column(name = "acl_type")
     @Enumerated(value = EnumType.STRING)
     ControlledEntity.ACLType aclType;
-
     @Column(name = "restart_required")
     boolean restartRequired = false;
-
     @Column(name = "specify_ip_ranges")
     boolean specifyIpRanges = false;
-
     @Column(name = "ip6_gateway")
     String ip6Gateway;
-
     @Column(name = "ip6_cidr")
     String ip6Cidr;
-
-    @Column(name = "display_network", updatable = true, nullable = false)
-    protected boolean displayNetwork = true;
-
     @Column(name = "network_acl_id")
     Long networkACLId;
 
@@ -176,54 +137,27 @@ public class NetworkVO implements Network {
         uuid = UUID.randomUUID().toString();
     }
 
-    /**
-     * Constructor to be used for the adapters because it only initializes what's needed.
-     * @param trafficType
-     * @param mode
-     * @param broadcastDomainType
-     * @param networkOfferingId
-     * @param state TODO
-     * @param dataCenterId
-     * @param physicalNetworkId TODO
-     */
-    public NetworkVO(TrafficType trafficType, Mode mode, BroadcastDomainType broadcastDomainType, long networkOfferingId, State state, long dataCenterId,
-            Long physicalNetworkId, final boolean isRedundant) {
-        this.trafficType = trafficType;
-        this.mode = mode;
-        this.broadcastDomainType = broadcastDomainType;
-        this.networkOfferingId = networkOfferingId;
-        this.dataCenterId = dataCenterId;
-        this.physicalNetworkId = physicalNetworkId;
-        this.isRedundant = isRedundant;
-        if (state == null) {
-            this.state = State.Allocated;
-        } else {
-            this.state = state;
-        }
-        id = -1;
-        uuid = UUID.randomUUID().toString();
-    }
-
     public NetworkVO(long id, Network that, long offeringId, String guruName, long domainId, long accountId, long related, String name, String displayText,
-            String networkDomain, GuestType guestType, long dcId, Long physicalNetworkId, ACLType aclType, boolean specifyIpRanges, Long vpcId, final boolean isRedundant) {
+                     String networkDomain, GuestType guestType, long dcId, Long physicalNetworkId, ACLType aclType, boolean specifyIpRanges, Long vpcId, final boolean
+                             isRedundant) {
         this(id,
-            that.getTrafficType(),
-            that.getMode(),
-            that.getBroadcastDomainType(),
-            offeringId,
-            domainId,
-            accountId,
-            related,
-            name,
-            displayText,
-            networkDomain,
-            guestType,
-            dcId,
-            physicalNetworkId,
-            aclType,
-            specifyIpRanges,
-            vpcId,
-            isRedundant);
+                that.getTrafficType(),
+                that.getMode(),
+                that.getBroadcastDomainType(),
+                offeringId,
+                domainId,
+                accountId,
+                related,
+                name,
+                displayText,
+                networkDomain,
+                guestType,
+                dcId,
+                physicalNetworkId,
+                aclType,
+                specifyIpRanges,
+                vpcId,
+                isRedundant);
         gateway = that.getGateway();
         cidr = that.getCidr();
         networkCidr = that.getNetworkCidr();
@@ -241,6 +175,7 @@ public class NetworkVO implements Network {
 
     /**
      * Constructor for the actual DAO object.
+     *
      * @param trafficType
      * @param mode
      * @param broadcastDomainType
@@ -250,15 +185,15 @@ public class NetworkVO implements Network {
      * @param name
      * @param displayText
      * @param networkDomain
-     * @param guestType TODO
-     * @param aclType TODO
-     * @param specifyIpRanges TODO
-     * @param vpcId TODO
+     * @param guestType           TODO
+     * @param aclType             TODO
+     * @param specifyIpRanges     TODO
+     * @param vpcId               TODO
      * @param dataCenterId
      */
     public NetworkVO(long id, TrafficType trafficType, Mode mode, BroadcastDomainType broadcastDomainType, long networkOfferingId, long domainId, long accountId,
-            long related, String name, String displayText, String networkDomain, GuestType guestType, long dcId, Long physicalNetworkId, ACLType aclType,
-            boolean specifyIpRanges, Long vpcId, final boolean isRedundant) {
+                     long related, String name, String displayText, String networkDomain, GuestType guestType, long dcId, Long physicalNetworkId, ACLType aclType,
+                     boolean specifyIpRanges, Long vpcId, final boolean isRedundant) {
         this(trafficType, mode, broadcastDomainType, networkOfferingId, State.Allocated, dcId, physicalNetworkId, isRedundant);
         this.domainId = domainId;
         this.accountId = accountId;
@@ -274,43 +209,38 @@ public class NetworkVO implements Network {
         this.vpcId = vpcId;
     }
 
-    @Override
-    public String getReservationId() {
-        return reservationId;
-    }
-
-    public void setReservationId(String reservationId) {
-        this.reservationId = reservationId;
-    }
-
-    @Override
-    public State getState() {
-        return state;
-    }
-
-    @Override
-    public boolean isRedundant() {
-        return this.isRedundant;
-    }
-
-    // don't use this directly when possible, use Network state machine instead
-    public void setState(State state) {
-        this.state = state;
-    }
-
-    @Override
-    public long getRelated() {
-        return related;
+    /**
+     * Constructor to be used for the adapters because it only initializes what's needed.
+     *
+     * @param trafficType
+     * @param mode
+     * @param broadcastDomainType
+     * @param networkOfferingId
+     * @param state               TODO
+     * @param dataCenterId
+     * @param physicalNetworkId   TODO
+     */
+    public NetworkVO(TrafficType trafficType, Mode mode, BroadcastDomainType broadcastDomainType, long networkOfferingId, State state, long dataCenterId,
+                     Long physicalNetworkId, final boolean isRedundant) {
+        this.trafficType = trafficType;
+        this.mode = mode;
+        this.broadcastDomainType = broadcastDomainType;
+        this.networkOfferingId = networkOfferingId;
+        this.dataCenterId = dataCenterId;
+        this.physicalNetworkId = physicalNetworkId;
+        this.isRedundant = isRedundant;
+        if (state == null) {
+            this.state = State.Allocated;
+        } else {
+            this.state = state;
+        }
+        id = -1;
+        uuid = UUID.randomUUID().toString();
     }
 
     @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    public Mode getMode() {
-        return mode;
     }
 
     @Override
@@ -323,13 +253,71 @@ public class NetworkVO implements Network {
         return domainId;
     }
 
-    @Override
-    public long getNetworkOfferingId() {
-        return networkOfferingId;
+    public String getGuruData() {
+        return guruData;
     }
 
-    public void setNetworkOfferingId(long networkOfferingId) {
-        this.networkOfferingId = networkOfferingId;
+    public void setGuruData(String guruData) {
+        this.guruData = guruData;
+    }
+
+    @Override
+    public int hashCode() {
+        return NumbersUtil.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof NetworkVO)) {
+            return false;
+        }
+        NetworkVO that = (NetworkVO) obj;
+        if (trafficType != that.trafficType) {
+            return false;
+        }
+
+        if ((cidr == null && that.cidr != null) || (cidr != null && that.cidr == null)) {
+            return false;
+        }
+
+        if (cidr == null && that.cidr == null) {
+            return true;
+        }
+
+        return NetUtils.isNetworkAWithinNetworkB(cidr, that.cidr);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder("Ntwk[");
+        buf.append(id).append("|").append(trafficType).append("|").append(networkOfferingId).append("]");
+        return buf.toString();
+    }
+
+    public String getDns1() {
+        return dns1;
+    }
+
+    public void setDns1(String dns) {
+        dns1 = dns;
+    }
+
+    public String getDns2() {
+        return dns2;
+    }
+
+    public void setDns2(String dns) {
+        dns2 = dns;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public Mode getMode() {
+        return mode;
     }
 
     public void setMode(Mode mode) {
@@ -341,34 +329,8 @@ public class NetworkVO implements Network {
         return broadcastDomainType;
     }
 
-    public String getGuruData() {
-        return guruData;
-    }
-
-    public void setGuruData(String guruData) {
-        this.guruData = guruData;
-    }
-
-    @Override
-    public String getGuruName() {
-        return guruName;
-    }
-
-    public void setGuruName(String guruName) {
-        this.guruName = guruName;
-    }
-
     public void setBroadcastDomainType(BroadcastDomainType broadcastDomainType) {
         this.broadcastDomainType = broadcastDomainType;
-    }
-
-    @Override
-    public String getNetworkDomain() {
-        return networkDomain;
-    }
-
-    public void setNetworkDomain(String networkDomain) {
-        this.networkDomain = networkDomain;
     }
 
     @Override
@@ -416,6 +378,41 @@ public class NetworkVO implements Network {
     }
 
     @Override
+    public String getIp6Gateway() {
+        return ip6Gateway;
+    }
+
+    @Override
+    public String getIp6Cidr() {
+        return ip6Cidr;
+    }
+
+    @Override
+    public long getDataCenterId() {
+        return dataCenterId;
+    }
+
+    @Override
+    public long getNetworkOfferingId() {
+        return networkOfferingId;
+    }
+
+    @Override
+    public State getState() {
+        return state;
+    }
+
+    @Override
+    public boolean isRedundant() {
+        return this.isRedundant;
+    }
+
+    @Override
+    public long getRelated() {
+        return related;
+    }
+
+    @Override
     public URI getBroadcastUri() {
         return broadcastUri;
     }
@@ -425,8 +422,31 @@ public class NetworkVO implements Network {
     }
 
     @Override
-    public int hashCode() {
-        return NumbersUtil.hash(id);
+    public String getDisplayText() {
+        return displayText;
+    }
+
+    @Override
+    public String getReservationId() {
+        return reservationId;
+    }
+
+    public void setReservationId(String reservationId) {
+        this.reservationId = reservationId;
+    }
+
+    @Override
+    public String getNetworkDomain() {
+        return networkDomain;
+    }
+
+    public void setNetworkDomain(String networkDomain) {
+        this.networkDomain = networkDomain;
+    }
+
+    @Override
+    public Network.GuestType getGuestType() {
+        return guestType;
     }
 
     @Override
@@ -440,42 +460,98 @@ public class NetworkVO implements Network {
     }
 
     @Override
-    public long getDataCenterId() {
-        return dataCenterId;
-    }
-
-    public String getDns1() {
-        return dns1;
-    }
-
-    public void setDns1(String dns) {
-        dns1 = dns;
-    }
-
-    public String getDns2() {
-        return dns2;
-    }
-
-    public void setDns2(String dns) {
-        dns2 = dns;
+    public ControlledEntity.ACLType getAclType() {
+        return aclType;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public boolean isRestartRequired() {
+        return restartRequired;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setRestartRequired(boolean restartRequired) {
+        this.restartRequired = restartRequired;
     }
 
     @Override
-    public String getDisplayText() {
-        return displayText;
+    public boolean getSpecifyIpRanges() {
+        return specifyIpRanges;
+    }
+
+    @Override()
+    public boolean getDisplayNetwork() {
+        return displayNetwork;
+    }
+
+    public void setDisplayNetwork(boolean displayNetwork) {
+        this.displayNetwork = displayNetwork;
+    }
+
+    @Override
+    public boolean isDisplay() {
+        return displayNetwork;
+    }
+
+    @Override
+    public String getGuruName() {
+        return guruName;
+    }
+
+    public void setGuruName(String guruName) {
+        this.guruName = guruName;
+    }
+
+    @Override
+    public Long getVpcId() {
+        return vpcId;
+    }
+
+    @Override
+    public Long getNetworkACLId() {
+        return networkACLId;
+    }
+
+    @Override
+    public void setNetworkACLId(Long networkACLId) {
+        this.networkACLId = networkACLId;
+    }
+
+    @Override
+    public boolean isStrechedL2Network() {
+        return strechedL2Network;
+    }
+
+    public void setStrechedL2Network(boolean strechedL2Network) {
+        this.strechedL2Network = strechedL2Network;
+    }
+
+    public void setVpcId(Long vpcId) {
+        this.vpcId = vpcId;
     }
 
     public void setDisplayText(String displayText) {
         this.displayText = displayText;
+    }
+
+    // don't use this directly when possible, use Network state machine instead
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    public void setNetworkOfferingId(long networkOfferingId) {
+        this.networkOfferingId = networkOfferingId;
+    }
+
+    public void setIp6Cidr(String ip6Cidr) {
+        this.ip6Cidr = ip6Cidr;
+    }
+
+    public void setIp6Gateway(String ip6Gateway) {
+        this.ip6Gateway = ip6Gateway;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Date getRemoved() {
@@ -495,39 +571,6 @@ public class NetworkVO implements Network {
     }
 
     @Override
-    public Network.GuestType getGuestType() {
-        return guestType;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof NetworkVO)) {
-            return false;
-        }
-        NetworkVO that = (NetworkVO)obj;
-        if (trafficType != that.trafficType) {
-            return false;
-        }
-
-        if ((cidr == null && that.cidr != null) || (cidr != null && that.cidr == null)) {
-            return false;
-        }
-
-        if (cidr == null && that.cidr == null) {
-            return true;
-        }
-
-        return NetUtils.isNetworkAWithinNetworkB(cidr, that.cidr);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder buf = new StringBuilder("Ntwk[");
-        buf.append(id).append("|").append(trafficType).append("|").append(networkOfferingId).append("]");
-        return buf.toString();
-    }
-
-    @Override
     public String getUuid() {
         return uuid;
     }
@@ -537,91 +580,11 @@ public class NetworkVO implements Network {
     }
 
     @Override
-    public ControlledEntity.ACLType getAclType() {
-        return aclType;
-    }
-
-    public void setRestartRequired(boolean restartRequired) {
-        this.restartRequired = restartRequired;
-    }
-
-    @Override
-    public boolean isRestartRequired() {
-        return restartRequired;
-    }
-
-    @Override
-    public boolean getSpecifyIpRanges() {
-        return specifyIpRanges;
-    }
-
-    @Override
-    public Long getVpcId() {
-        return vpcId;
-    }
-
-    @Override
-    public String getIp6Cidr() {
-        return ip6Cidr;
-    }
-
-    public void setIp6Cidr(String ip6Cidr) {
-        this.ip6Cidr = ip6Cidr;
-    }
-
-    @Override
-    public String getIp6Gateway() {
-        return ip6Gateway;
-    }
-
-    public void setIp6Gateway(String ip6Gateway) {
-        this.ip6Gateway = ip6Gateway;
-    }
-
-    @Override()
-    public boolean getDisplayNetwork() {
-        return displayNetwork;
-    }
-
-    public void setDisplayNetwork(boolean displayNetwork) {
-        this.displayNetwork = displayNetwork;
-    }
-
-    @Override
-    public boolean isDisplay(){
-        return displayNetwork;
-    }
-
-    @Override
-    public void setNetworkACLId(Long networkACLId) {
-        this.networkACLId = networkACLId;
-    }
-
-    @Override
-    public Long getNetworkACLId() {
-        return networkACLId;
-    }
-
-    @Override
     public Class<?> getEntityType() {
         return Network.class;
-    }
-
-    @Override
-    public boolean isStrechedL2Network() {
-        return strechedL2Network;
-    }
-
-    public void setStrechedL2Network(boolean strechedL2Network) {
-        this.strechedL2Network = strechedL2Network;
-    }
-
-    public void setVpcId(Long vpcId) {
-        this.vpcId = vpcId;
     }
 
     public void setIsReduntant(boolean reduntant) {
         this.isRedundant = reduntant;
     }
-
 }

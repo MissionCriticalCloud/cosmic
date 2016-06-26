@@ -16,18 +16,16 @@
 // under the License.
 package org.apache.cloudstack.engine.subsystem.api.storage.type;
 
+import javax.inject.Inject;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 public class VolumeTypeHelper {
 
     private static VolumeType defaultType = new Unknown();
-
-    private List<VolumeType> types;
     private final Map<String, VolumeType> mapTypes = new Hashtable<String, VolumeType>();
+    private List<VolumeType> types;
 
     @Inject
     public void setTypes(List<VolumeType> types) {

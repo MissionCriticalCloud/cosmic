@@ -21,17 +21,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Region {
-    private Rectangle bound;
-    private List<Rectangle> rectList;
+    private final Rectangle bound;
+    private final List<Rectangle> rectList;
 
     public Region() {
         bound = new Rectangle(0, 0, 0, 0);
-        rectList = new ArrayList<Rectangle>();
+        rectList = new ArrayList<>();
     }
 
-    public Region(Rectangle rect) {
+    public Region(final Rectangle rect) {
         bound = new Rectangle(rect.x, rect.y, rect.width, rect.height);
-        rectList = new ArrayList<Rectangle>();
+        rectList = new ArrayList<>();
         rectList.add(rect);
     }
 
@@ -48,7 +48,7 @@ public class Region {
         return rectList;
     }
 
-    public boolean add(Rectangle rect) {
+    public boolean add(final Rectangle rect) {
         if (bound.isEmpty()) {
             assert (rectList.size() == 0);
             bound.x = rect.x;
@@ -60,11 +60,12 @@ public class Region {
             return true;
         }
 
-        Rectangle rcInflated = new Rectangle(rect.x - 1, rect.y - 1, rect.width + 2, rect.height + 2);
-        if (!bound.intersects(rcInflated))
+        final Rectangle rcInflated = new Rectangle(rect.x - 1, rect.y - 1, rect.width + 2, rect.height + 2);
+        if (!bound.intersects(rcInflated)) {
             return false;
+        }
 
-        for (Rectangle r : rectList) {
+        for (final Rectangle r : rectList) {
             if (r.intersects(rcInflated)) {
                 if (!r.contains(rect)) {
                     enlargeBound(rect);
@@ -76,11 +77,11 @@ public class Region {
         return false;
     }
 
-    private void enlargeBound(Rectangle rect) {
-        int boundLeft = Math.min(bound.x, rect.x);
-        int boundTop = Math.min(bound.y, rect.y);
-        int boundRight = Math.max(bound.x + bound.width, rect.x + rect.width);
-        int boundBottom = Math.max(bound.y + bound.height, rect.y + rect.height);
+    private void enlargeBound(final Rectangle rect) {
+        final int boundLeft = Math.min(bound.x, rect.x);
+        final int boundTop = Math.min(bound.y, rect.y);
+        final int boundRight = Math.max(bound.x + bound.width, rect.x + rect.width);
+        final int boundBottom = Math.max(bound.y + bound.height, rect.y + rect.height);
 
         bound.x = boundLeft;
         bound.y = boundTop;

@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface AccountGuestVlanMapDao extends GenericDao<AccountGuestVlanMapVO, Long> {
 
@@ -29,5 +29,4 @@ public interface AccountGuestVlanMapDao extends GenericDao<AccountGuestVlanMapVO
     public List<AccountGuestVlanMapVO> listAccountGuestVlanMapsByPhysicalNetwork(long physicalNetworkId);
 
     public int removeByAccountId(long accountId);
-
 }

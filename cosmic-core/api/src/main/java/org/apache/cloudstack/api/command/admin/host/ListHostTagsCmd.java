@@ -23,6 +23,7 @@ import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.response.HostTagResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,11 +46,6 @@ public class ListHostTagsCmd extends BaseListCmd {
     // ///////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public ApiCommandJobType getInstanceType() {
         return ApiCommandJobType.Host;
     }
@@ -61,5 +57,10 @@ public class ListHostTagsCmd extends BaseListCmd {
         response.setResponseName(getCommandName());
 
         setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

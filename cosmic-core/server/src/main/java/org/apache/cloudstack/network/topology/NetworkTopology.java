@@ -17,8 +17,6 @@
 
 package org.apache.cloudstack.network.topology;
 
-import java.util.List;
-
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
@@ -38,6 +36,8 @@ import com.cloud.network.vpc.StaticRouteProfile;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.VirtualMachineProfile;
+
+import java.util.List;
 
 public interface NetworkTopology {
 
@@ -80,11 +80,11 @@ public interface NetworkTopology {
     boolean savePasswordToRouter(final Network network, final NicProfile nic, final VirtualMachineProfile profile, final VirtualRouter router) throws ResourceUnavailableException;
 
     boolean saveSSHPublicKeyToRouter(final Network network, final NicProfile nic, final VirtualMachineProfile profile, final VirtualRouter router,
-            final String sshPublicKey) throws ResourceUnavailableException;
+                                     final String sshPublicKey) throws ResourceUnavailableException;
 
     boolean saveUserDataToRouter(final Network network, final NicProfile nic, final VirtualMachineProfile profile, final VirtualRouter router)
             throws ResourceUnavailableException;
 
     boolean applyRules(final Network network, final VirtualRouter router, final String typeString, final boolean isPodLevelException, final Long podId,
-            final boolean failWhenDisconnect, RuleApplierWrapper<RuleApplier> ruleApplier) throws ResourceUnavailableException;
+                       final boolean failWhenDisconnect, RuleApplierWrapper<RuleApplier> ruleApplier) throws ResourceUnavailableException;
 }

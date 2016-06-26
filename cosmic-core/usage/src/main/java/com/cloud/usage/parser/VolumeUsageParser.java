@@ -16,23 +16,22 @@
 // under the License.
 package com.cloud.usage.parser;
 
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import com.cloud.usage.UsageVO;
 import com.cloud.usage.UsageVolumeVO;
 import com.cloud.usage.dao.UsageDao;
 import com.cloud.usage.dao.UsageVolumeDao;
 import com.cloud.user.AccountVO;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.usage.UsageTypes;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.text.DecimalFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -48,12 +47,6 @@ public class VolumeUsageParser {
     private UsageDao _usageDao;
     @Inject
     private UsageVolumeDao _usageVolumeDao;
-
-    @PostConstruct
-    void init() {
-        s_usageDao = _usageDao;
-        s_usageVolumeDao = _usageVolumeDao;
-    }
 
     public static boolean parse(AccountVO account, Date startDate, Date endDate) {
         if (s_logger.isDebugEnabled()) {
@@ -108,7 +101,8 @@ public class VolumeUsageParser {
                 continue;
             }
 
-            long currentDuration = (volDeleteDate.getTime() - volCreateDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to find total number of millis to charge)
+            long currentDuration = (volDeleteDate.getTime() - volCreateDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to find
+            // total number of millis to charge)
 
             updateVolUsageData(usageMap, key, usageVol.getId(), currentDuration);
         }
@@ -121,7 +115,7 @@ public class VolumeUsageParser {
             if (useTime > 0L) {
                 VolInfo info = diskOfferingMap.get(volIdKey);
                 createUsageRecord(UsageTypes.VOLUME, useTime, startDate, endDate, account, info.getVolumeId(), info.getZoneId(), info.getDiskOfferingId(),
-                    info.getTemplateId(), info.getSize());
+                        info.getTemplateId(), info.getSize());
             }
         }
 
@@ -141,7 +135,7 @@ public class VolumeUsageParser {
     }
 
     private static void createUsageRecord(int type, long runningTime, Date startDate, Date endDate, AccountVO account, long volId, long zoneId, Long doId,
-        Long templateId, long size) {
+                                          Long templateId, long size) {
         // Our smallest increment is hourly for now
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Total running time " + runningTime + "ms");
@@ -154,7 +148,7 @@ public class VolumeUsageParser {
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Creating Volume usage record for vol: " + volId + ", usage: " + usageDisplay + ", startDate: " + startDate + ", endDate: " + endDate +
-                ", for account: " + account.getId());
+                    ", for account: " + account.getId());
         }
 
         // Create the usage record
@@ -167,9 +161,15 @@ public class VolumeUsageParser {
         }
 
         UsageVO usageRecord =
-            new UsageVO(zoneId, account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", type, new Double(usage), null, null, doId, templateId, volId,
-                size, startDate, endDate);
+                new UsageVO(zoneId, account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", type, new Double(usage), null, null, doId, templateId, volId,
+                        size, startDate, endDate);
         s_usageDao.persist(usageRecord);
+    }
+
+    @PostConstruct
+    void init() {
+        s_usageDao = _usageDao;
+        s_usageVolumeDao = _usageVolumeDao;
     }
 
     private static class VolInfo {

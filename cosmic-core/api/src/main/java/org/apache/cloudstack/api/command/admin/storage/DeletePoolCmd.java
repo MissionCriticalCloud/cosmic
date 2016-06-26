@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.admin.storage;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.StoragePoolStatus;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -28,6 +27,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.StoragePoolResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +45,7 @@ public class DeletePoolCmd extends BaseCmd {
     private Long id;
 
     @Parameter(name = ApiConstants.FORCED, type = CommandType.BOOLEAN, required = false, description = "Force destroy storage pool "
-        + "(force expunge volumes in Destroyed state as a part of pool removal)")
+            + "(force expunge volumes in Destroyed state as a part of pool removal)")
     private Boolean forced;
 
     // ///////////////////////////////////////////////////
@@ -65,16 +65,6 @@ public class DeletePoolCmd extends BaseCmd {
     // ///////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
     public void execute() {
         boolean result = _storageService.deletePool(this);
         if (result) {
@@ -84,10 +74,20 @@ public class DeletePoolCmd extends BaseCmd {
             StoragePool pool = _storageService.getStoragePool(id);
             if (pool != null && pool.getStatus() == StoragePoolStatus.Removed) {
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR,
-                    "Failed to finish storage pool removal. The storage pool will not be used but cleanup is needed");
+                        "Failed to finish storage pool removal. The storage pool will not be used but cleanup is needed");
             } else {
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete storage pool");
             }
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

@@ -19,15 +19,14 @@
 
 package com.cloud.storage.template;
 
-import java.io.File;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.exception.InternalErrorException;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.StorageLayer;
 import com.cloud.utils.component.AdapterBase;
+
+import javax.naming.ConfigurationException;
+import java.io.File;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,7 @@ public class RawImageProcessor extends AdapterBase implements Processor {
 
     @Override
     public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
-        _storage = (StorageLayer)params.get(StorageLayer.InstanceConfigKey);
+        _storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
         if (_storage == null) {
             throw new ConfigurationException("Unable to get storage implementation");
         }
@@ -71,5 +70,4 @@ public class RawImageProcessor extends AdapterBase implements Processor {
     public long getVirtualSize(File file) {
         return file.length();
     }
-
 }

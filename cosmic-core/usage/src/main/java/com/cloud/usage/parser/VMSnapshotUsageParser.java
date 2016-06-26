@@ -16,22 +16,21 @@
 // under the License.
 package com.cloud.usage.parser;
 
+import com.cloud.usage.UsageVMSnapshotVO;
+import com.cloud.usage.UsageVO;
+import com.cloud.usage.dao.UsageDao;
+import com.cloud.usage.dao.UsageVMSnapshotDao;
+import com.cloud.user.AccountVO;
+import org.apache.cloudstack.usage.UsageTypes;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import com.cloud.usage.UsageVMSnapshotVO;
-import com.cloud.usage.UsageVO;
-import com.cloud.usage.dao.UsageDao;
-import com.cloud.usage.dao.UsageVMSnapshotDao;
-import com.cloud.user.AccountVO;
-
-import org.apache.cloudstack.usage.UsageTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -47,12 +46,6 @@ public class VMSnapshotUsageParser {
     private UsageDao _usageDao;
     @Inject
     private UsageVMSnapshotDao _usageVMSnapshotDao;
-
-    @PostConstruct
-    void init() {
-        s_usageDao = _usageDao;
-        s_usageVMSnapshotDao = _usageVMSnapshotDao;
-    }
 
     public static boolean parse(AccountVO account, Date startDate, Date endDate) {
         if (s_logger.isDebugEnabled()) {
@@ -94,15 +87,16 @@ public class VMSnapshotUsageParser {
             long duration = (createDate.getTime() - previousCreated.getTime()) + 1;
 
             createUsageRecord(UsageTypes.VM_SNAPSHOT, duration, previousCreated, createDate, account, volId, zoneId, previousEvent.getDiskOfferingId(), vmId,
-                previousEvent.getSize());
+                    previousEvent.getSize());
             previousEvent.setProcessed(new Date());
             s_usageVMSnapshotDao.update(previousEvent);
 
             if (usageRec.getSize() == 0) {
                 usageRec.setProcessed(new Date());
                 s_usageVMSnapshotDao.update(usageRec);
-            } else
+            } else {
                 unprocessedUsage.put(key, usageRec);
+            }
         }
 
         for (String key : unprocessedUsage.keySet()) {
@@ -113,14 +107,14 @@ public class VMSnapshotUsageParser {
             }
             long duration = (endDate.getTime() - created.getTime()) + 1;
             createUsageRecord(UsageTypes.VM_SNAPSHOT, duration, created, endDate, account, usageRec.getId(), usageRec.getZoneId(), usageRec.getDiskOfferingId(),
-                usageRec.getVmId(), usageRec.getSize());
+                    usageRec.getVmId(), usageRec.getSize());
         }
 
         return true;
     }
 
     private static void createUsageRecord(int type, long runningTime, Date startDate, Date endDate, AccountVO account, long volId, long zoneId, Long doId, Long vmId,
-        long size) {
+                                          long size) {
         // Our smallest increment is hourly for now
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Total running time " + runningTime + "ms");
@@ -133,7 +127,7 @@ public class VMSnapshotUsageParser {
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Creating VMSnapshot Volume usage record for vol: " + volId + ", usage: " + usageDisplay + ", startDate: " + startDate + ", endDate: " +
-                endDate + ", for account: " + account.getId());
+                    endDate + ", for account: " + account.getId());
         }
 
         // Create the usage record
@@ -146,9 +140,14 @@ public class VMSnapshotUsageParser {
         usageDesc += " Size: " + size;
 
         UsageVO usageRecord =
-            new UsageVO(zoneId, account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", type, new Double(usage), vmId, null, doId, null, volId, size,
-                startDate, endDate);
+                new UsageVO(zoneId, account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", type, new Double(usage), vmId, null, doId, null, volId, size,
+                        startDate, endDate);
         s_usageDao.persist(usageRecord);
     }
 
+    @PostConstruct
+    void init() {
+        s_usageDao = _usageDao;
+        s_usageVMSnapshotDao = _usageVMSnapshotDao;
+    }
 }

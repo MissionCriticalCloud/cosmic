@@ -19,11 +19,6 @@
 
 package com.cloud.api.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.api.response.NiciraNvpDeviceResponse;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
@@ -32,7 +27,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.NiciraNvpDeviceVO;
 import com.cloud.network.element.NiciraNvpElementService;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -41,6 +35,10 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 @APICommand(name = "listNiciraNvpDevices", responseObject = NiciraNvpDeviceResponse.class, description = "Lists Nicira NVP devices",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
@@ -79,13 +77,13 @@ public class ListNiciraNvpDevicesCmd extends BaseListCmd {
     @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ResourceAllocationException {
         try {
-            List<NiciraNvpDeviceVO> niciraDevices = niciraNvpElementService.listNiciraNvpDevices(this);
-            ListResponse<NiciraNvpDeviceResponse> response = new ListResponse<NiciraNvpDeviceResponse>();
-            List<NiciraNvpDeviceResponse> niciraDevicesResponse = new ArrayList<NiciraNvpDeviceResponse>();
+            final List<NiciraNvpDeviceVO> niciraDevices = niciraNvpElementService.listNiciraNvpDevices(this);
+            final ListResponse<NiciraNvpDeviceResponse> response = new ListResponse<>();
+            final List<NiciraNvpDeviceResponse> niciraDevicesResponse = new ArrayList<>();
 
             if (niciraDevices != null && !niciraDevices.isEmpty()) {
-                for (NiciraNvpDeviceVO niciraDeviceVO : niciraDevices) {
-                    NiciraNvpDeviceResponse niciraDeviceResponse = niciraNvpElementService.createNiciraNvpDeviceResponse(niciraDeviceVO);
+                for (final NiciraNvpDeviceVO niciraDeviceVO : niciraDevices) {
+                    final NiciraNvpDeviceResponse niciraDeviceResponse = niciraNvpElementService.createNiciraNvpDeviceResponse(niciraDeviceVO);
                     niciraDevicesResponse.add(niciraDeviceResponse);
                 }
             }
@@ -93,9 +91,9 @@ public class ListNiciraNvpDevicesCmd extends BaseListCmd {
             response.setResponses(niciraDevicesResponse);
             response.setResponseName(getCommandName());
             setResponseObject(response);
-        } catch (InvalidParameterValueException invalidParamExcp) {
+        } catch (final InvalidParameterValueException invalidParamExcp) {
             throw new ServerApiException(ApiErrorCode.PARAM_ERROR, invalidParamExcp.getMessage());
-        } catch (CloudRuntimeException runtimeExcp) {
+        } catch (final CloudRuntimeException runtimeExcp) {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, runtimeExcp.getMessage());
         }
     }
@@ -104,5 +102,4 @@ public class ListNiciraNvpDevicesCmd extends BaseListCmd {
     public String getCommandName() {
         return s_name;
     }
-
 }

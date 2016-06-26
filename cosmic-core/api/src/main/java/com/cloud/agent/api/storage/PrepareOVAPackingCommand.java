@@ -42,5 +42,4 @@ public class PrepareOVAPackingCommand extends Command {
     public String getSecondaryStorageUrl() {
         return this.secUrl;
     }
-
 }

@@ -19,9 +19,6 @@
 
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.VpnUsersCfgCommand;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
@@ -29,6 +26,9 @@ import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.VpnUser;
 import com.cloud.agent.resource.virtualnetwork.model.VpnUserList;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class VpnUsersConfigItem extends AbstractConfigItemFacade {
 

@@ -16,9 +16,6 @@
 // under the License.
 package com.cloud.host.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.host.Host;
 import com.cloud.host.Host.Type;
 import com.cloud.host.HostVO;
@@ -28,9 +25,11 @@ import com.cloud.resource.ResourceState;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;
 
+import java.util.Date;
+import java.util.List;
+
 /**
  * Data Access Object for server
- *
  */
 public interface HostDao extends GenericDao<HostVO, Long>, StateDao<Status, Status.Event, Host> {
     long countBy(long clusterId, ResourceState... states);
@@ -76,7 +75,7 @@ public interface HostDao extends GenericDao<HostVO, Long>, StateDao<Status, Stat
      * @param clusterId
      * @param podId
      * @param dcId
-     * @param haTag TODO
+     * @param haTag     TODO
      * @return
      */
     List<HostVO> listAllUpAndEnabledNonHAHosts(Type type, Long clusterId, Long podId, long dcId, String haTag);

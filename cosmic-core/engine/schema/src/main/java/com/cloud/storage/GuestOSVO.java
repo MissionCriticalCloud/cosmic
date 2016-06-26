@@ -16,8 +16,7 @@
 // under the License.
 package com.cloud.storage;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,8 +24,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "guest_os")
@@ -35,19 +34,14 @@ public class GuestOSVO implements GuestOS {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     long id;
-
-    @Column(name = "category_id")
-    private long categoryId;
-
     @Column(name = "name")
     String name;
-
     @Column(name = "display_name")
     String displayName;
-
     @Column(name = "uuid")
     String uuid = UUID.randomUUID().toString();
-
+    @Column(name = "category_id")
+    private long categoryId;
     @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
 
@@ -60,15 +54,6 @@ public class GuestOSVO implements GuestOS {
     @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    public long getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(long categoryId) {
-        this.categoryId = categoryId;
     }
 
     @Override
@@ -85,6 +70,38 @@ public class GuestOSVO implements GuestOS {
         return displayName;
     }
 
+    @Override
+    public long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    @Override
+    public Date getCreated() {
+        return created;
+    }
+
+    @Override
+    public Date getRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(Date removed) {
+        this.removed = removed;
+    }
+
+    @Override
+    public boolean getIsUserDefined() {
+        return isUserDefined;
+    }
+
+    public void setIsUserDefined(boolean isUserDefined) {
+        this.isUserDefined = isUserDefined;
+    }
+
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
@@ -96,28 +113,5 @@ public class GuestOSVO implements GuestOS {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    @Override
-    public Date getCreated() {
-        return created;
-    }
-
-    public void setRemoved(Date removed) {
-        this.removed = removed;
-    }
-
-    @Override
-    public Date getRemoved() {
-        return removed;
-    }
-
-    @Override
-    public boolean getIsUserDefined() {
-        return isUserDefined;
-    }
-
-    public void setIsUserDefined(boolean isUserDefined) {
-        this.isUserDefined = isUserDefined;
     }
 }

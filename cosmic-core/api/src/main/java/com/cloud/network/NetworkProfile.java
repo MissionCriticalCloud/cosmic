@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.network;
 
-import java.net.URI;
-
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.Mode;
 import com.cloud.network.Networks.TrafficType;
+
+import java.net.URI;
 
 public class NetworkProfile implements Network {
     private final long id;
@@ -28,15 +28,10 @@ public class NetworkProfile implements Network {
     private final long dataCenterId;
     private final long ownerId;
     private final long domainId;
-    private String dns1;
-    private String dns2;
-    private URI broadcastUri;
     private final State state;
-    private boolean isRedundant;
     private final String name;
     private final Mode mode;
     private final BroadcastDomainType broadcastDomainType;
-    private TrafficType trafficType;
     private final String gateway;
     private final String cidr;
     private final String networkCidr;
@@ -48,17 +43,22 @@ public class NetworkProfile implements Network {
     private final String reservationId;
     private final String networkDomain;
     private final Network.GuestType guestType;
-    private Long physicalNetworkId;
     private final ACLType aclType;
     private final boolean restartRequired;
     private final boolean specifyIpRanges;
     private final Long vpcId;
     private final boolean displayNetwork;
-    private Long networkAclId;
     private final String guruName;
-    private boolean strechedL2Subnet;
+    private final boolean isRedundant;
+    private final boolean strechedL2Subnet;
+    private String dns1;
+    private String dns2;
+    private URI broadcastUri;
+    private TrafficType trafficType;
+    private Long physicalNetworkId;
+    private Long networkAclId;
 
-    public NetworkProfile(Network network) {
+    public NetworkProfile(final Network network) {
         id = network.getId();
         uuid = network.getUuid();
         broadcastUri = network.getBroadcastUri();
@@ -97,30 +97,16 @@ public class NetworkProfile implements Network {
         return dns1;
     }
 
+    public void setDns1(final String dns1) {
+        this.dns1 = dns1;
+    }
+
     public String getDns2() {
         return dns2;
     }
 
-    public void setDns1(String dns1) {
-        this.dns1 = dns1;
-    }
-
-    public void setDns2(String dns2) {
+    public void setDns2(final String dns2) {
         this.dns2 = dns2;
-    }
-
-    @Override
-    public String getGuruName() {
-        return guruName;
-    }
-
-    public void setBroadcastUri(URI broadcastUri) {
-        this.broadcastUri = broadcastUri;
-    }
-
-    @Override
-    public URI getBroadcastUri() {
-        return broadcastUri;
     }
 
     @Override
@@ -134,23 +120,8 @@ public class NetworkProfile implements Network {
     }
 
     @Override
-    public long getDataCenterId() {
-        return dataCenterId;
-    }
-
-    @Override
     public long getAccountId() {
         return ownerId;
-    }
-
-    @Override
-    public State getState() {
-        return state;
-    }
-
-    @Override
-    public boolean isRedundant() {
-        return this.isRedundant;
     }
 
     @Override
@@ -174,6 +145,11 @@ public class NetworkProfile implements Network {
     }
 
     @Override
+    public void setTrafficType(final TrafficType type) {
+        trafficType = type;
+    }
+
+    @Override
     public String getGateway() {
         return gateway;
     }
@@ -189,13 +165,47 @@ public class NetworkProfile implements Network {
     }
 
     @Override
+    public String getIp6Gateway() {
+        return ip6Gateway;
+    }
+
+    @Override
+    public String getIp6Cidr() {
+        return ip6Cidr;
+    }
+
+    @Override
+    public long getDataCenterId() {
+        return dataCenterId;
+    }
+
+    @Override
     public long getNetworkOfferingId() {
         return networkOfferingId;
     }
 
     @Override
+    public State getState() {
+        return state;
+    }
+
+    @Override
+    public boolean isRedundant() {
+        return this.isRedundant;
+    }
+
+    @Override
     public long getRelated() {
         return related;
+    }
+
+    @Override
+    public URI getBroadcastUri() {
+        return broadcastUri;
+    }
+
+    public void setBroadcastUri(final URI broadcastUri) {
+        this.broadcastUri = broadcastUri;
     }
 
     @Override
@@ -214,11 +224,6 @@ public class NetworkProfile implements Network {
     }
 
     @Override
-    public long getDomainId() {
-        return domainId;
-    }
-
-    @Override
     public Network.GuestType getGuestType() {
         return guestType;
     }
@@ -229,7 +234,7 @@ public class NetworkProfile implements Network {
     }
 
     @Override
-    public void setPhysicalNetworkId(Long physicalNetworkId) {
+    public void setPhysicalNetworkId(final Long physicalNetworkId) {
         this.physicalNetworkId = physicalNetworkId;
     }
 
@@ -256,8 +261,13 @@ public class NetworkProfile implements Network {
     }
 
     @Override
-    public boolean isDisplay(){
+    public boolean isDisplay() {
         return displayNetwork;
+    }
+
+    @Override
+    public String getGuruName() {
+        return guruName;
     }
 
     @Override
@@ -271,28 +281,8 @@ public class NetworkProfile implements Network {
     }
 
     @Override
-    public void setNetworkACLId(Long networkACLId) {
+    public void setNetworkACLId(final Long networkACLId) {
         networkAclId = networkACLId;
-    }
-
-    @Override
-    public void setTrafficType(TrafficType type) {
-        trafficType = type;
-    }
-
-    @Override
-    public String getIp6Gateway() {
-        return ip6Gateway;
-    }
-
-    @Override
-    public String getIp6Cidr() {
-        return ip6Cidr;
-    }
-
-    @Override
-    public Class<?> getEntityType() {
-        return Network.class;
     }
 
     @Override
@@ -300,4 +290,13 @@ public class NetworkProfile implements Network {
         return false;
     }
 
+    @Override
+    public long getDomainId() {
+        return domainId;
+    }
+
+    @Override
+    public Class<?> getEntityType() {
+        return Network.class;
+    }
 }

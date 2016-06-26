@@ -17,6 +17,7 @@
 package com.cloud.network.dao;
 
 import org.apache.cloudstack.resourcedetail.ResourceDetailsDaoBase;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -26,5 +27,4 @@ public class NetworkDetailsDaoImpl extends ResourceDetailsDaoBase<NetworkDetailV
     public void addDetail(long resourceId, String key, String value, boolean display) {
         super.addDetail(new NetworkDetailVO(resourceId, key, value, display));
     }
-
 }

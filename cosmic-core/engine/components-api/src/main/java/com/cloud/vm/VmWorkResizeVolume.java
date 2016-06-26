@@ -28,7 +28,7 @@ public class VmWorkResizeVolume extends VmWork {
     private boolean shrinkOk;
 
     public VmWorkResizeVolume(long userId, long accountId, long vmId, String handlerName,
-            long volumeId, long currentSize, long newSize, Long newMinIops, Long newMaxIops, Long newServiceOfferingId, boolean shrinkOk) {
+                              long volumeId, long currentSize, long newSize, Long newMinIops, Long newMaxIops, Long newServiceOfferingId, boolean shrinkOk) {
 
         super(userId, accountId, vmId, handlerName);
 

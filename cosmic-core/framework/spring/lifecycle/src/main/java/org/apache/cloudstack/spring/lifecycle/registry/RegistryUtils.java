@@ -24,12 +24,12 @@ public class RegistryUtils {
 
     public static String getName(Object object) {
         if (object instanceof Named) {
-            String name = ((Named)object).getName();
-            if (name != null)
+            String name = ((Named) object).getName();
+            if (name != null) {
                 return name;
+            }
         }
 
         return object == null ? null : object.getClass().getSimpleName();
     }
-
 }

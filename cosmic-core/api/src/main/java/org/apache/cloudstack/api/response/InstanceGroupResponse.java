@@ -16,15 +16,15 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.Date;
-
 import com.cloud.serializer.Param;
 import com.cloud.vm.InstanceGroup;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.Date;
+
+import com.google.gson.annotations.SerializedName;
 
 @SuppressWarnings("unused")
 @EntityReference(value = InstanceGroup.class)
@@ -80,16 +80,6 @@ public class InstanceGroupResponse extends BaseResponse implements ControlledVie
     }
 
     @Override
-    public void setDomainId(String domainId) {
-        this.domainId = domainId;
-    }
-
-    @Override
-    public void setDomainName(String domainName) {
-        this.domainName = domainName;
-    }
-
-    @Override
     public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
@@ -97,5 +87,15 @@ public class InstanceGroupResponse extends BaseResponse implements ControlledVie
     @Override
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    @Override
+    public void setDomainId(String domainId) {
+        this.domainId = domainId;
+    }
+
+    @Override
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
     }
 }

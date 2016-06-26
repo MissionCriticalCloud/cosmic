@@ -18,13 +18,6 @@
  */
 package org.apache.cloudstack.storage.helper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.api.VMSnapshotTO;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.host.Host;
@@ -40,13 +33,18 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeDataFactory;
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 import org.apache.cloudstack.storage.to.VolumeObjectTO;
 import org.apache.cloudstack.storage.vmsnapshot.VMSnapshotHelper;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class VMSnapshotHelperImpl implements VMSnapshotHelper {
     @Inject
@@ -77,14 +75,16 @@ public class VMSnapshotHelperImpl implements VMSnapshotHelper {
     public Long pickRunningHost(Long vmId) {
         UserVmVO vm = userVmDao.findById(vmId);
         // use VM's host if VM is running
-        if (vm.getState() == VirtualMachine.State.Running)
+        if (vm.getState() == VirtualMachine.State.Running) {
             return vm.getHostId();
+        }
 
         // check if lastHostId is available
         if (vm.getLastHostId() != null) {
             HostVO lastHost = hostDao.findByIdIncludingRemoved(vm.getLastHostId());
-            if (lastHost.getStatus() == com.cloud.host.Status.Up && !lastHost.isInMaintenanceStates())
+            if (lastHost.getStatus() == com.cloud.host.Status.Up && !lastHost.isInMaintenanceStates()) {
                 return lastHost.getId();
+            }
         }
 
         List<VolumeVO> listVolumes = volumeDao.findByInstance(vmId);
@@ -101,7 +101,7 @@ public class VMSnapshotHelperImpl implements VMSnapshotHelper {
             throw new InvalidParameterValueException("storage pool is not found");
         }
         List<HostVO> listHost =
-            hostDao.listAllUpAndEnabledNonHAHosts(Host.Type.Routing, storagePool.getClusterId(), storagePool.getPodId(), storagePool.getDataCenterId(), null);
+                hostDao.listAllUpAndEnabledNonHAHosts(Host.Type.Routing, storagePool.getClusterId(), storagePool.getPodId(), storagePool.getDataCenterId(), null);
         if (listHost == null || listHost.size() == 0) {
             throw new InvalidParameterValueException("no host in up state is found");
         }
@@ -116,13 +116,9 @@ public class VMSnapshotHelperImpl implements VMSnapshotHelper {
         for (VolumeVO volume : volumeVos) {
             volumeInfo = volumeDataFactory.getVolume(volume.getId());
 
-            volumeTOs.add((VolumeObjectTO)volumeInfo.getTO());
+            volumeTOs.add((VolumeObjectTO) volumeInfo.getTO());
         }
         return volumeTOs;
-    }
-
-    private VMSnapshotTO convert2VMSnapshotTO(VMSnapshotVO vo) {
-        return new VMSnapshotTO(vo.getId(), vo.getName(), vo.getType(), vo.getCreated().getTime(), vo.getDescription(), vo.getCurrent(), null, true);
     }
 
     @Override
@@ -148,4 +144,7 @@ public class VMSnapshotHelperImpl implements VMSnapshotHelper {
         return result;
     }
 
+    private VMSnapshotTO convert2VMSnapshotTO(VMSnapshotVO vo) {
+        return new VMSnapshotTO(vo.getId(), vo.getName(), vo.getType(), vo.getCreated().getTime(), vo.getDescription(), vo.getCurrent(), null, true);
+    }
 }

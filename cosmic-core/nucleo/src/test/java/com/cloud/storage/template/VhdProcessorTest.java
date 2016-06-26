@@ -19,14 +19,14 @@
 
 package com.cloud.storage.template;
 
+import com.cloud.exception.InternalErrorException;
+import com.cloud.storage.Storage;
+import com.cloud.storage.StorageLayer;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.cloud.exception.InternalErrorException;
-import com.cloud.storage.Storage;
-import com.cloud.storage.StorageLayer;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -95,17 +95,17 @@ public class VhdProcessorTest {
         Mockito.when(mockFile.length()).thenReturn(actualSize);
         Mockito.doThrow(new IOException("virtual size calculation failed")).when(processor).getTemplateVirtualSize((File) Mockito.any());
         Assert.assertEquals(actualSize, processor.getVirtualSize(mockFile));
-        Mockito.verify(mockFile,Mockito.times(1)).length();
+        Mockito.verify(mockFile, Mockito.times(1)).length();
     }
 
     @Test
-    public void testGetVirtualSize() throws Exception{
+    public void testGetVirtualSize() throws Exception {
         long virtualSize = 2000;
         long actualSize = 1000;
         File mockFile = Mockito.mock(File.class);
         Mockito.when(mockFile.length()).thenReturn(actualSize);
         Mockito.doReturn(virtualSize).when(processor).getTemplateVirtualSize((File) Mockito.any());
         Assert.assertEquals(virtualSize, processor.getVirtualSize(mockFile));
-        Mockito.verify(mockFile,Mockito.times(0)).length();
+        Mockito.verify(mockFile, Mockito.times(0)).length();
     }
 }

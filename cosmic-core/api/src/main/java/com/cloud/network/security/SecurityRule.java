@@ -21,21 +21,6 @@ import org.apache.cloudstack.api.InternalIdentity;
 
 public interface SecurityRule extends Identity, InternalIdentity {
 
-    public static class SecurityRuleType {
-        public static final SecurityRuleType IngressRule = new SecurityRuleType("ingress");
-        public static final SecurityRuleType EgressRule = new SecurityRuleType("egress");
-
-        public SecurityRuleType(String type) {
-            _type = type;
-        }
-
-        public String getType() {
-            return _type;
-        }
-
-        private final String _type;
-    }
-
     long getSecurityGroupId();
 
     int getStartPort();
@@ -51,4 +36,18 @@ public interface SecurityRule extends Identity, InternalIdentity {
     Long getAllowedNetworkId();
 
     String getAllowedSourceIpCidr();
+
+    public static class SecurityRuleType {
+        public static final SecurityRuleType IngressRule = new SecurityRuleType("ingress");
+        public static final SecurityRuleType EgressRule = new SecurityRuleType("egress");
+        private final String _type;
+
+        public SecurityRuleType(String type) {
+            _type = type;
+        }
+
+        public String getType() {
+            return _type;
+        }
+    }
 }

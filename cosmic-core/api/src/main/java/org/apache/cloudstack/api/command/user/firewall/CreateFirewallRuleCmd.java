@@ -16,9 +16,6 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.firewall;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.NetworkRuleConflictException;
@@ -27,7 +24,6 @@ import com.cloud.network.IpAddress;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.user.Account;
 import com.cloud.utils.net.NetUtils;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
@@ -40,6 +36,10 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.FirewallResponse;
 import org.apache.cloudstack.api.response.IPAddressResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,16 +55,16 @@ public class CreateFirewallRuleCmd extends BaseAsyncCreateCmd implements Firewal
     // ///////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.IP_ADDRESS_ID,
-               type = CommandType.UUID,
-               entityType = IPAddressResponse.class,
-               required = true,
-               description = "the IP address id of the port forwarding rule")
+            type = CommandType.UUID,
+            entityType = IPAddressResponse.class,
+            required = true,
+            description = "the IP address id of the port forwarding rule")
     private Long ipAddressId;
 
     @Parameter(name = ApiConstants.PROTOCOL,
-               type = CommandType.STRING,
-               required = true,
-               description = "the protocol for the firewall rule. Valid values are TCP/UDP/ICMP.")
+            type = CommandType.STRING,
+            required = true,
+            description = "the protocol for the firewall rule. Valid values are TCP/UDP/ICMP.")
     private String protocol;
 
     @Parameter(name = ApiConstants.START_PORT, type = CommandType.INTEGER, description = "the starting port of firewall rule")
@@ -85,47 +85,13 @@ public class CreateFirewallRuleCmd extends BaseAsyncCreateCmd implements Firewal
     @Parameter(name = ApiConstants.TYPE, type = CommandType.STRING, description = "type of firewallrule: system/user")
     private String type;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4" +
+            ".4", authorized = {RoleType.Admin})
     private Boolean display;
 
     // ///////////////////////////////////////////////////
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
-
-
-    public Long getIpAddressId() {
-        return ipAddressId;
-    }
-
-    @Override
-    public String getProtocol() {
-        return protocol.trim();
-    }
-
-    @Override
-    public List<String> getSourceCidrList() {
-        if (cidrlist != null) {
-            return cidrlist;
-        } else {
-            List<String> oneCidrList = new ArrayList<String>();
-            oneCidrList.add(NetUtils.ALL_CIDRS);
-            return oneCidrList;
-        }
-
-    }
-
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public void setSourceCidrList(List<String> cidrs) {
-        cidrlist = cidrs;
-    }
 
     @Override
     public void execute() throws ResourceUnavailableException {
@@ -153,6 +119,35 @@ public class CreateFirewallRuleCmd extends BaseAsyncCreateCmd implements Firewal
     }
 
     @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        Account account = CallContext.current().getCallingAccount();
+
+        if (account != null) {
+            return account.getId();
+        }
+
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
+    }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
+
+    @Override
+    public boolean isDisplay() {
+        if (display != null) {
+            return display;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
     public long getId() {
         throw new UnsupportedOperationException("database ID can only provided by VO objects");
     }
@@ -161,17 +156,6 @@ public class CreateFirewallRuleCmd extends BaseAsyncCreateCmd implements Firewal
     public String getXid() {
         // FIXME: We should allow for end user to specify Xid.
         return null;
-    }
-
-    @Override
-    public String getUuid() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Long getSourceIpAddressId() {
-        return ipAddressId;
     }
 
     @Override
@@ -193,6 +177,11 @@ public class CreateFirewallRuleCmd extends BaseAsyncCreateCmd implements Firewal
         }
 
         return null;
+    }
+
+    @Override
+    public String getProtocol() {
+        return protocol.trim();
     }
 
     @Override
@@ -221,15 +210,73 @@ public class CreateFirewallRuleCmd extends BaseAsyncCreateCmd implements Firewal
         return ntwkId;
     }
 
+    public Long getIpAddressId() {
+        return ipAddressId;
+    }
+
     @Override
-    public long getEntityOwnerId() {
-        Account account = CallContext.current().getCallingAccount();
+    public Long getSourceIpAddressId() {
+        return ipAddressId;
+    }
 
-        if (account != null) {
-            return account.getId();
+    @Override
+    public Integer getIcmpCode() {
+        if (icmpCode != null) {
+            return icmpCode;
+        } else if (protocol.equalsIgnoreCase(NetUtils.ICMP_PROTO)) {
+            return -1;
         }
+        return null;
+    }
 
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
+    @Override
+    public Integer getIcmpType() {
+        if (icmpType != null) {
+            return icmpType;
+        } else if (protocol.equalsIgnoreCase(NetUtils.ICMP_PROTO)) {
+            return -1;
+        }
+        return null;
+    }
+
+    @Override
+    public List<String> getSourceCidrList() {
+        if (cidrlist != null) {
+            return cidrlist;
+        } else {
+            List<String> oneCidrList = new ArrayList<String>();
+            oneCidrList.add(NetUtils.ALL_CIDRS);
+            return oneCidrList;
+        }
+    }
+
+    public void setSourceCidrList(List<String> cidrs) {
+        cidrlist = cidrs;
+    }
+
+    @Override
+    public Long getRelated() {
+        return null;
+    }
+
+    @Override
+    public FirewallRuleType getType() {
+        if (type != null && type.equalsIgnoreCase("system")) {
+            return FirewallRuleType.System;
+        } else {
+            return FirewallRuleType.User;
+        }
+    }
+
+    @Override
+    public TrafficType getTrafficType() {
+        return FirewallRule.TrafficType.Ingress;
+    }
+
+    @Override
+    public String getUuid() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
@@ -272,9 +319,8 @@ public class CreateFirewallRuleCmd extends BaseAsyncCreateCmd implements Firewal
     }
 
     @Override
-    public long getAccountId() {
-        IpAddress ip = _networkService.getIp(ipAddressId);
-        return ip.getAccountId();
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.FirewallRule;
     }
 
     @Override
@@ -296,62 +342,13 @@ public class CreateFirewallRuleCmd extends BaseAsyncCreateCmd implements Firewal
     }
 
     @Override
-    public Integer getIcmpCode() {
-        if (icmpCode != null) {
-            return icmpCode;
-        } else if (protocol.equalsIgnoreCase(NetUtils.ICMP_PROTO)) {
-            return -1;
-        }
-        return null;
-    }
-
-    @Override
-    public Integer getIcmpType() {
-        if (icmpType != null) {
-            return icmpType;
-        } else if (protocol.equalsIgnoreCase(NetUtils.ICMP_PROTO)) {
-                return -1;
-
-        }
-        return null;
-    }
-
-    @Override
-    public Long getRelated() {
-        return null;
-    }
-
-    @Override
-    public FirewallRuleType getType() {
-        if (type != null && type.equalsIgnoreCase("system")) {
-            return FirewallRuleType.System;
-        } else {
-            return FirewallRuleType.User;
-        }
-    }
-
-    @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.FirewallRule;
-    }
-
-    @Override
-    public TrafficType getTrafficType() {
-        return FirewallRule.TrafficType.Ingress;
-    }
-
-    @Override
-    public boolean isDisplay() {
-        if (display != null) {
-            return display;
-        } else {
-            return true;
-        }
+    public long getAccountId() {
+        IpAddress ip = _networkService.getIp(ipAddressId);
+        return ip.getAccountId();
     }
 
     @Override
     public Class<?> getEntityType() {
         return FirewallRule.class;
     }
-
 }

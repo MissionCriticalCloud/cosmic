@@ -16,13 +16,10 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.network;
 
-import java.util.List;
-
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -34,6 +31,9 @@ import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,10 +49,10 @@ public class CreatePhysicalNetworkCmd extends BaseAsyncCreateCmd {
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.ZONE_ID,
-               type = CommandType.UUID,
-               entityType = ZoneResponse.class,
-               required = true,
-               description = "the Zone ID for the physical network")
+            type = CommandType.UUID,
+            entityType = ZoneResponse.class,
+            required = true,
+            description = "the Zone ID for the physical network")
     private Long zoneId;
 
     @Parameter(name = ApiConstants.VLAN, type = CommandType.STRING, description = "the VLAN for the physical network")
@@ -62,23 +62,23 @@ public class CreatePhysicalNetworkCmd extends BaseAsyncCreateCmd {
     private String speed;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               description = "domain ID of the account owning a physical network")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            description = "domain ID of the account owning a physical network")
     private Long domainId;
 
     @Parameter(name = ApiConstants.BROADCAST_DOMAIN_RANGE,
-               type = CommandType.STRING,
-               description = "the broadcast domain range for the physical network[Pod or Zone]. In Acton release it can be Zone only in Advance zone, and Pod in Basic")
+            type = CommandType.STRING,
+            description = "the broadcast domain range for the physical network[Pod or Zone]. In Acton release it can be Zone only in Advance zone, and Pod in Basic")
     private String broadcastDomainRange;
 
     @Parameter(name = ApiConstants.TAGS, type = CommandType.LIST, collectionType = CommandType.STRING, description = "Tag the physical network")
     private List<String> tags;
 
     @Parameter(name = ApiConstants.ISOLATION_METHODS,
-               type = CommandType.LIST,
-               collectionType = CommandType.STRING,
-               description = "the isolation method for the physical network[VLAN/L3/GRE]")
+            type = CommandType.LIST,
+            collectionType = CommandType.STRING,
+            description = "the isolation method for the physical network[VLAN/L3/GRE]")
     private List<String> isolationMethods;
 
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, required = true, description = "the name of the physical network")
@@ -88,61 +88,9 @@ public class CreatePhysicalNetworkCmd extends BaseAsyncCreateCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public Long getZoneId() {
-        return zoneId;
-    }
-
-    public String getVlan() {
-        return vlan;
-    }
-
-    public Long getDomainId() {
-        return domainId;
-    }
-
-    public String getBroadcastDomainRange() {
-        return broadcastDomainRange;
-    }
-
-    public List<String> getIsolationMethods() {
-        return isolationMethods;
-    }
-
-    public String getNetworkSpeed() {
-        return speed;
-    }
-
-    public String getNetworkName() {
-        return networkName;
-    }
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
     @Override
     public String getEventType() {
         return EventTypes.EVENT_PHYSICAL_NETWORK_CREATE;
-    }
-
-    @Override
-    public String getCreateEventType() {
-        return EventTypes.EVENT_PHYSICAL_NETWORK_CREATE;
-    }
-
-    @Override
-    public String getCreateEventDescription() {
-        return "creating Physical Network";
     }
 
     @Override
@@ -150,9 +98,10 @@ public class CreatePhysicalNetworkCmd extends BaseAsyncCreateCmd {
         return "creating Physical Network. Id: " + getEntityId();
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
+    @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.PhysicalNetwork;
+    }
 
     @Override
     public void execute() {
@@ -168,10 +117,20 @@ public class CreatePhysicalNetworkCmd extends BaseAsyncCreateCmd {
     }
 
     @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
+    }
+
+    @Override
     public void create() throws ResourceAllocationException {
         PhysicalNetwork result =
-            _networkService.createPhysicalNetwork(getZoneId(), getVlan(), getNetworkSpeed(), getIsolationMethods(), getBroadcastDomainRange(), getDomainId(), getTags(),
-                getNetworkName());
+                _networkService.createPhysicalNetwork(getZoneId(), getVlan(), getNetworkSpeed(), getIsolationMethods(), getBroadcastDomainRange(), getDomainId(), getTags(),
+                        getNetworkName());
         if (result != null) {
             setEntityId(result.getId());
             setEntityUuid(result.getUuid());
@@ -180,8 +139,49 @@ public class CreatePhysicalNetworkCmd extends BaseAsyncCreateCmd {
         }
     }
 
+    public Long getZoneId() {
+        return zoneId;
+    }
+
+    public String getVlan() {
+        return vlan;
+    }
+
+    public String getNetworkSpeed() {
+        return speed;
+    }
+
+    public List<String> getIsolationMethods() {
+        return isolationMethods;
+    }
+
+    public String getBroadcastDomainRange() {
+        return broadcastDomainRange;
+    }
+
+    public Long getDomainId() {
+        return domainId;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public String getNetworkName() {
+        return networkName;
+    }
+
     @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.PhysicalNetwork;
+    public String getCreateEventType() {
+        return EventTypes.EVENT_PHYSICAL_NETWORK_CREATE;
+    }
+
+    @Override
+    public String getCreateEventDescription() {
+        return "creating Physical Network";
     }
 }

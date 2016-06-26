@@ -41,13 +41,13 @@ public class MessageDetector implements MessageSubscriber {
         synchronized (this) {
             try {
                 wait(timeoutInMiliseconds);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 s_logger.debug("[ignored] interupted while waiting on any message.");
             }
         }
     }
 
-    public void open(MessageBus messageBus, String[] subjects) {
+    public void open(final MessageBus messageBus, final String[] subjects) {
         assert (messageBus != null);
         assert (subjects != null);
 
@@ -55,7 +55,7 @@ public class MessageDetector implements MessageSubscriber {
         _subjects = subjects;
 
         if (subjects != null) {
-            for (String subject : subjects) {
+            for (final String subject : subjects) {
                 messageBus.subscribe(subject, this);
             }
         }
@@ -65,14 +65,14 @@ public class MessageDetector implements MessageSubscriber {
         if (_subjects != null) {
             assert (_messageBus != null);
 
-            for (String subject : _subjects) {
+            for (final String subject : _subjects) {
                 _messageBus.unsubscribe(subject, this);
             }
         }
     }
 
     @Override
-    public void onPublishMessage(String senderAddress, String subject, Object args) {
+    public void onPublishMessage(final String senderAddress, final String subject, final Object args) {
         if (subjectMatched(subject)) {
             synchronized (this) {
                 notifyAll();
@@ -80,11 +80,12 @@ public class MessageDetector implements MessageSubscriber {
         }
     }
 
-    private boolean subjectMatched(String subject) {
+    private boolean subjectMatched(final String subject) {
         if (_subjects != null) {
-            for (String sub : _subjects) {
-                if (sub.equals(subject))
+            for (final String sub : _subjects) {
+                if (sub.equals(subject)) {
                     return true;
+                }
             }
         }
         return false;

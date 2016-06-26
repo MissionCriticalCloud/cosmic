@@ -18,17 +18,12 @@
  */
 package org.apache.cloudstack.ldap;
 
+import javax.naming.NamingException;
+import javax.naming.ldap.LdapContext;
 import java.io.IOException;
 import java.util.List;
 
-import javax.naming.NamingException;
-import javax.naming.ldap.LdapContext;
-
 public interface LdapUserManager {
-
-    public enum Provider {
-        MICROSOFTAD, OPENLDAP;
-    }
 
     public LdapUser getUser(final String username, final LdapContext context) throws NamingException, IOException;
 
@@ -43,4 +38,8 @@ public interface LdapUserManager {
     public List<LdapUser> searchUsers(final LdapContext context) throws NamingException, IOException;
 
     public List<LdapUser> searchUsers(final String username, final LdapContext context) throws NamingException, IOException;
+
+    public enum Provider {
+        MICROSOFTAD, OPENLDAP
+    }
 }

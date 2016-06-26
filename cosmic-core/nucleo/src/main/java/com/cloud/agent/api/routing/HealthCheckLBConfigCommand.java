@@ -37,5 +37,4 @@ public class HealthCheckLBConfigCommand extends NetworkElementCommand {
     public LoadBalancerTO[] getLoadBalancers() {
         return loadBalancers;
     }
-
 }

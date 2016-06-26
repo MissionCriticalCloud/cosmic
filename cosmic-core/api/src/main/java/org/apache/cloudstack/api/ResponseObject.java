@@ -39,7 +39,6 @@ public interface ResponseObject {
     String getObjectName();
 
     /**
-     *
      * @param name
      */
     void setObjectName(String name);
@@ -71,7 +70,6 @@ public interface ResponseObject {
     Integer getJobStatus();
 
     /**
-     *
      * @param jobStatus
      */
     void setJobStatus(Integer jobStatus);

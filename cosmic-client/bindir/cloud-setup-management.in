@@ -17,12 +17,13 @@
 # under the License.
 
 import sys
-from cloudutils.syscfg import sysConfigFactory
-from cloudutils.utilities import initLoging, UnknownSystemException
 from cloudutils.cloudException import CloudRuntimeException, CloudInternalException
 from cloudutils.globalEnv import globalEnv
 from cloudutils.serviceConfigServer import cloudManagementConfig
+from cloudutils.syscfg import sysConfigFactory
+from cloudutils.utilities import initLoging, UnknownSystemException
 from optparse import OptionParser
+
 if __name__ == '__main__':
     initLoging("@MSLOGDIR@/setupManagement.log")
     glbEnv = globalEnv()
@@ -45,11 +46,11 @@ if __name__ == '__main__':
     try:
         syscfg = sysConfigFactory.getSysConfigFactory(glbEnv)
     except UnknownSystemException:
-        print >>sys.stderr, ("Error: CloudStack failed to detect your "
-                "operating system. Exiting.")
+        print >> sys.stderr, ("Error: CloudStack failed to detect your "
+                              "operating system. Exiting.")
         sys.exit(1)
     try:
-    	syscfg.registerService(cloudManagementConfig)
+        syscfg.registerService(cloudManagementConfig)
         syscfg.config()
         print "CloudStack Management Server setup is Done!"
     except (CloudRuntimeException, CloudInternalException), e:

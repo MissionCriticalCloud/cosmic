@@ -32,7 +32,8 @@ public class NetworkACL extends ConfigBase {
         super(ConfigBase.NETWORK_ACL);
     }
 
-    public NetworkACL(String device, String macAddress, boolean privateGatewayAcl, String nicIp, String nicNetmask, AclRule[] ingressRules, AclRule[] egressRules) {
+    public NetworkACL(final String device, final String macAddress, final boolean privateGatewayAcl, final String nicIp, final String nicNetmask, final AclRule[] ingressRules,
+                      final AclRule[] egressRules) {
         super(ConfigBase.NETWORK_ACL);
         this.device = device;
         this.macAddress = macAddress;
@@ -47,7 +48,7 @@ public class NetworkACL extends ConfigBase {
         return device;
     }
 
-    public void setDevice(String device) {
+    public void setDevice(final String device) {
         this.device = device;
     }
 
@@ -55,7 +56,7 @@ public class NetworkACL extends ConfigBase {
         return macAddress;
     }
 
-    public void setMacAddress(String macAddress) {
+    public void setMacAddress(final String macAddress) {
         this.macAddress = macAddress;
     }
 
@@ -63,7 +64,7 @@ public class NetworkACL extends ConfigBase {
         return privateGatewayAcl;
     }
 
-    public void setPrivateGatewayAcl(boolean privateGatewayAcl) {
+    public void setPrivateGatewayAcl(final boolean privateGatewayAcl) {
         this.privateGatewayAcl = privateGatewayAcl;
     }
 
@@ -71,7 +72,7 @@ public class NetworkACL extends ConfigBase {
         return nicIp;
     }
 
-    public void setNicIp(String nicIp) {
+    public void setNicIp(final String nicIp) {
         this.nicIp = nicIp;
     }
 
@@ -79,7 +80,7 @@ public class NetworkACL extends ConfigBase {
         return nicNetmask;
     }
 
-    public void setNicNetmask(String nicNetmask) {
+    public void setNicNetmask(final String nicNetmask) {
         this.nicNetmask = nicNetmask;
     }
 
@@ -87,7 +88,7 @@ public class NetworkACL extends ConfigBase {
         return ingressRules;
     }
 
-    public void setIngressRules(AclRule[] ingressRules) {
+    public void setIngressRules(final AclRule[] ingressRules) {
         this.ingressRules = ingressRules;
     }
 
@@ -95,8 +96,7 @@ public class NetworkACL extends ConfigBase {
         return egressRules;
     }
 
-    public void setEgressRules(AclRule[] egressRules) {
+    public void setEgressRules(final AclRule[] egressRules) {
         this.egressRules = egressRules;
     }
-
 }

@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.network.vpc.dao;
 
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
+import java.util.Map;
 
 public interface VpcDao extends GenericDao<VpcVO, Long> {
 

@@ -18,13 +18,13 @@ package org.apache.cloudstack.api.command.user.template;
 
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseUpdateTemplateOrIsoCmd;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.TemplateResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,23 +47,8 @@ public class UpdateTemplateCmd extends BaseUpdateTemplateOrIsoCmd {
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
 
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
     public TemplateResponse getResponse() {
-       return null;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        VirtualMachineTemplate template = _entityMgr.findById(VirtualMachineTemplate.class, getId());
-        if (template != null) {
-            return template.getAccountId();
-        }
-
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
+        return null;
     }
 
     @Override
@@ -78,5 +63,20 @@ public class UpdateTemplateCmd extends BaseUpdateTemplateOrIsoCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update template");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        VirtualMachineTemplate template = _entityMgr.findById(VirtualMachineTemplate.class, getId());
+        if (template != null) {
+            return template.getAccountId();
+        }
+
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 }

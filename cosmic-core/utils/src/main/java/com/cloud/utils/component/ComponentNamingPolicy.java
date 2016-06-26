@@ -24,7 +24,6 @@ import net.sf.cglib.core.Predicate;
 
 /**
  * Copied/Modified from Spring source
- *
  */
 public class ComponentNamingPolicy implements NamingPolicy {
 
@@ -40,8 +39,9 @@ public class ComponentNamingPolicy implements NamingPolicy {
         String base = prefix + "_" + source.substring(source.lastIndexOf('.') + 1) + getTag() + "_" + Integer.toHexString(key.hashCode());
         String attempt = base;
         int index = 2;
-        while (names.evaluate(attempt))
+        while (names.evaluate(attempt)) {
             attempt = base + "_" + index++;
+        }
         return attempt;
     }
 
@@ -60,6 +60,6 @@ public class ComponentNamingPolicy implements NamingPolicy {
 
     @Override
     public boolean equals(Object o) {
-        return (o instanceof ComponentNamingPolicy) && ((ComponentNamingPolicy)o).getTag().equals(getTag());
+        return (o instanceof ComponentNamingPolicy) && ((ComponentNamingPolicy) o).getTag().equals(getTag());
     }
 }

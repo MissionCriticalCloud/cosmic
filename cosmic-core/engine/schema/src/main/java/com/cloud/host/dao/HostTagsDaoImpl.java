@@ -16,9 +16,6 @@
 // under the License.
 package com.cloud.host.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.host.HostTagVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
@@ -26,6 +23,9 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -47,6 +47,25 @@ public class HostTagsDaoImpl extends GenericDaoBase<HostTagVO, Long> implements 
     }
 
     @Override
+    public void persist(long hostId, List<String> hostTags) {
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+
+        txn.start();
+        SearchCriteria<HostTagVO> sc = HostSearch.create();
+        sc.setParameters("hostId", hostId);
+        expunge(sc);
+
+        for (String tag : hostTags) {
+            tag = tag.trim();
+            if (tag.length() > 0) {
+                HostTagVO vo = new HostTagVO(hostId, tag);
+                persist(vo);
+            }
+        }
+        txn.commit();
+    }
+
+    @Override
     public List<String> gethostTags(long hostId) {
         SearchCriteria<HostTagVO> sc = HostSearch.create();
         sc.setParameters("hostId", hostId);
@@ -64,7 +83,7 @@ public class HostTagsDaoImpl extends GenericDaoBase<HostTagVO, Long> implements 
     public List<String> getDistinctImplicitHostTags(List<Long> hostIds, String[] implicitHostTags) {
         SearchCriteria<String> sc = DistinctImplictTagsSearch.create();
         sc.setParameters("hostIds", hostIds.toArray(new Object[hostIds.size()]));
-        sc.setParameters("implicitTags", (Object[])implicitHostTags);
+        sc.setParameters("implicitTags", (Object[]) implicitHostTags);
         return customSearch(sc, null);
     }
 
@@ -75,25 +94,6 @@ public class HostTagsDaoImpl extends GenericDaoBase<HostTagVO, Long> implements 
         SearchCriteria<HostTagVO> sc = HostSearch.create();
         sc.setParameters("hostId", hostId);
         expunge(sc);
-        txn.commit();
-    }
-
-    @Override
-    public void persist(long hostId, List<String> hostTags) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-
-        txn.start();
-        SearchCriteria<HostTagVO> sc = HostSearch.create();
-        sc.setParameters("hostId", hostId);
-        expunge(sc);
-
-        for (String tag : hostTags) {
-            tag = tag.trim();
-            if (tag.length() > 0) {
-                HostTagVO vo = new HostTagVO(hostId, tag);
-                persist(vo);
-            }
-        }
         txn.commit();
     }
 }

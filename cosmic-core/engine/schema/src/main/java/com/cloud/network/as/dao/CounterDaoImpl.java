@@ -17,14 +17,14 @@
 
 package com.cloud.network.as.dao;
 
-import java.util.List;
-
 import com.cloud.network.as.CounterVO;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -41,11 +41,11 @@ public class CounterDaoImpl extends GenericDaoBase<CounterVO, Long> implements C
     }
 
     @Override
-    public List<CounterVO> listCounters(Long id, String name, String source, String keyword, Filter filter) {
-        SearchCriteria<CounterVO> sc = AllFieldsSearch.create();
+    public List<CounterVO> listCounters(final Long id, final String name, final String source, final String keyword, final Filter filter) {
+        final SearchCriteria<CounterVO> sc = AllFieldsSearch.create();
 
         if (keyword != null) {
-            SearchCriteria<CounterVO> ssc = createSearchCriteria();
+            final SearchCriteria<CounterVO> ssc = createSearchCriteria();
             ssc.addOr("name", SearchCriteria.Op.LIKE, "%" + keyword + "%");
             sc.addAnd("name", SearchCriteria.Op.SC, ssc);
         }
@@ -63,5 +63,4 @@ public class CounterDaoImpl extends GenericDaoBase<CounterVO, Long> implements C
         }
         return listBy(sc, filter);
     }
-
 }

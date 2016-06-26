@@ -43,28 +43,28 @@ public class DirectNetworkUsageCommand extends Command {
         return false;
     }
 
-    public void setPublicIps(List<String> publicIps) {
-        this.publicIps = publicIps;
-    }
-
     public List<String> getPublicIps() {
         return publicIps;
     }
 
-    public void setStart(Date start) {
-        this.start = start;
+    public void setPublicIps(List<String> publicIps) {
+        this.publicIps = publicIps;
     }
 
     public Date getStart() {
         return start;
     }
 
-    public void setEnd(Date end) {
-        this.end = end;
+    public void setStart(Date start) {
+        this.start = start;
     }
 
     public Date getEnd() {
         return end;
+    }
+
+    public void setEnd(Date end) {
+        this.end = end;
     }
 
     public String getIncludeZones() {
@@ -82,5 +82,4 @@ public class DirectNetworkUsageCommand extends Command {
     public void setExcludeZones(String excludeZones) {
         this.excludeZones = excludeZones;
     }
-
 }

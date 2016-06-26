@@ -16,15 +16,15 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.Date;
-
 import com.cloud.event.Event;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.Date;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = Event.class)
 @SuppressWarnings("unused")
@@ -34,7 +34,8 @@ public class EventResponse extends BaseResponse implements ControlledViewEntityR
     private String id;
 
     @SerializedName(ApiConstants.USERNAME)
-    @Param(description = "the name of the user who performed the action (can be different from the account if an admin is performing an action for a user, e.g. starting/stopping a user's virtual machine)")
+    @Param(description = "the name of the user who performed the action (can be different from the account if an admin is performing an action for a user, e.g. starting/stopping" +
+            " a user's virtual machine)")
     private String username;
 
     @SerializedName(ApiConstants.TYPE)
@@ -107,6 +108,16 @@ public class EventResponse extends BaseResponse implements ControlledViewEntityR
     }
 
     @Override
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    @Override
     public void setDomainId(String domainId) {
         this.domainId = domainId;
     }
@@ -126,15 +137,5 @@ public class EventResponse extends BaseResponse implements ControlledViewEntityR
 
     public void setParentId(String parentId) {
         this.parentId = parentId;
-    }
-
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
     }
 }

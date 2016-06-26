@@ -23,15 +23,14 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.server.ResourceTag;
 import com.cloud.server.TaggedResourceService;
 import com.cloud.storage.dao.VolumeDetailsDao;
 import com.cloud.vm.dao.NicDetailsDao;
+
+import javax.naming.ConfigurationException;
+import java.util.Map;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.junit.Before;
@@ -56,13 +55,12 @@ public class ResourceMetaDataManagerTest {
 
         try {
             _resourceMetaDataMgr.configure(null, null);
-        } catch (ConfigurationException e) {
+        } catch (final ConfigurationException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         _resourceMetaDataMgr._volumeDetailDao = _volumeDetailDao;
         _resourceMetaDataMgr._taggedResourceMgr = _taggedResourceMgr;
         _resourceMetaDataMgr._nicDetailDao = _nicDetailDao;
-
     }
 
     // Test removing details
@@ -76,7 +74,6 @@ public class ResourceMetaDataManagerTest {
         doNothing().when(_volumeDetailDao).removeDetail(anyLong(), anyString());
         doNothing().when(_nicDetailDao).removeDetail(anyLong(), anyString());
         _resourceMetaDataMgr.deleteResourceMetaData(anyString(), eq(ResourceTag.ResourceObjectType.Volume), anyString());
-
     }
 
     // Test adding details
@@ -87,10 +84,8 @@ public class ResourceMetaDataManagerTest {
 
         doNothing().when(_volumeDetailDao).removeDetail(anyLong(), anyString());
         doNothing().when(_nicDetailDao).removeDetail(anyLong(), anyString());
-        Map<String, String> map = new HashedMap();
+        final Map<String, String> map = new HashedMap();
         map.put("key", "value");
         _resourceMetaDataMgr.addResourceMetaData("1", ResourceTag.ResourceObjectType.Volume, map, true);
-
     }
-
 }

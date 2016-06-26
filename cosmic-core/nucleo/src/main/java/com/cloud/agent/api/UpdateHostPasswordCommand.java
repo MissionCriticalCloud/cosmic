@@ -30,7 +30,6 @@ public class UpdateHostPasswordCommand extends Command {
     @LogLevel(Log4jLevel.Off)
     protected String hostIp;
 
-
     protected UpdateHostPasswordCommand() {
     }
 

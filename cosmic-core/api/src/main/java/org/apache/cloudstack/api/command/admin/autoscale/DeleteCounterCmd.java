@@ -20,7 +20,6 @@ package org.apache.cloudstack.api.command.admin.autoscale;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceInUseException;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -30,6 +29,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.CounterResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,18 +78,13 @@ public class DeleteCounterCmd extends BaseAsyncCmd {
         return s_name;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.Counter;
-    }
-
     @Override
     public long getEntityOwnerId() {
         return Account.ACCOUNT_ID_SYSTEM;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     @Override
@@ -100,5 +95,10 @@ public class DeleteCounterCmd extends BaseAsyncCmd {
     @Override
     public String getEventDescription() {
         return "Deleting a counter.";
+    }
+
+    @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.Counter;
     }
 }

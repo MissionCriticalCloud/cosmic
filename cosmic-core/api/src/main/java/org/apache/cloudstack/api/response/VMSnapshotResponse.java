@@ -17,15 +17,15 @@
 
 package org.apache.cloudstack.api.response;
 
-import java.util.Date;
-
 import com.cloud.serializer.Param;
 import com.cloud.vm.snapshot.VMSnapshot;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.Date;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = VMSnapshot.class)
 public class VMSnapshotResponse extends BaseResponse implements ControlledEntityResponse {
@@ -103,6 +103,14 @@ public class VMSnapshotResponse extends BaseResponse implements ControlledEntity
         return getId();
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public Date getCreated() {
         return created;
     }
@@ -127,14 +135,6 @@ public class VMSnapshotResponse extends BaseResponse implements ControlledEntity
         this.description = description;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getZoneId() {
         return zoneId;
     }
@@ -151,20 +151,20 @@ public class VMSnapshotResponse extends BaseResponse implements ControlledEntity
         this.virtualMachineid = virtualMachineid;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setState(VMSnapshot.State state) {
-        this.state = state;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public VMSnapshot.State getState() {
         return state;
+    }
+
+    public void setState(VMSnapshot.State state) {
+        this.state = state;
     }
 
     public Boolean getCurrent() {
@@ -175,20 +175,20 @@ public class VMSnapshotResponse extends BaseResponse implements ControlledEntity
         this.current = current;
     }
 
-    public void setParentName(String parentName) {
-        this.parentName = parentName;
-    }
-
     public String getParentName() {
         return parentName;
     }
 
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
+    }
+
     public String getParent() {
-      return parent;
+        return parent;
     }
 
     public void setParent(String parent) {
-      this.parent = parent;
+        this.parent = parent;
     }
 
     public String getType() {
@@ -202,19 +202,16 @@ public class VMSnapshotResponse extends BaseResponse implements ControlledEntity
     @Override
     public void setAccountName(String accountName) {
         this.accountName = accountName;
-
     }
 
     @Override
     public void setProjectId(String projectId) {
         this.projectId = projectId;
-
     }
 
     @Override
     public void setProjectName(String projectName) {
         this.projectName = projectName;
-
     }
 
     @Override
@@ -225,6 +222,5 @@ public class VMSnapshotResponse extends BaseResponse implements ControlledEntity
     @Override
     public void setDomainName(String domainName) {
         this.domainName = domainName;
-
     }
 }

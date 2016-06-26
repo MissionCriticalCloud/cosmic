@@ -32,5 +32,4 @@ public interface ModuleDefinitionSet {
     Map<String, ApplicationContext> getContextMap();
 
     Resource[] getConfigResources(String name);
-
 }

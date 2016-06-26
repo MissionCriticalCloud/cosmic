@@ -15,19 +15,18 @@
 # specific language governing permissions and limitations
 # under the License.
 
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import PASS
 from marvin.lib.base import (Account,
                              Domain, Template
                              )
-from marvin.lib.utils import (cleanup_resources, validateList)
 from marvin.lib.common import (get_zone, get_builtin_template_info)
+from marvin.lib.utils import (cleanup_resources, validateList)
 from nose.plugins.attrib import attr
-from marvin.codes import PASS
-import time
 
 
 class TestlistTemplatesDomainAdmin(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
 
@@ -43,7 +42,7 @@ class TestlistTemplatesDomainAdmin(cloudstackTestCase):
         cls.testdata["privatetemplate"]["format"] = builtin_info[2]
         cls.cleanup = []
 
-# Create 2 domain admin accounts
+        # Create 2 domain admin accounts
 
         cls.domain1 = Domain.create(
             cls.apiclient,
@@ -85,8 +84,8 @@ class TestlistTemplatesDomainAdmin(cloudstackTestCase):
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
-# test that the template register under root/domain1->account1 is not
-# listed under root/domain2->account2
+    # test that the template register under root/domain1->account1 is not
+    # listed under root/domain2->account2
 
     @attr(tags=["advanced", "basic"], required_hardware="true")
     def test_listtemplate(self):

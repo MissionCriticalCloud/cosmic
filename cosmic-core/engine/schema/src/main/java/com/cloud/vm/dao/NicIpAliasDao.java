@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.vm.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.NicIpAlias;
+
+import java.util.List;
 
 public interface NicIpAliasDao extends GenericDao<NicIpAliasVO, Long> {
     List<NicIpAliasVO> listByVmId(long instanceId);
@@ -57,5 +57,4 @@ public interface NicIpAliasDao extends GenericDao<NicIpAliasVO, Long> {
     NicIpAliasVO findByGatewayAndNetworkIdAndState(String gateway, long networkId, NicIpAlias.State state);
 
     List<NicIpAliasVO> listByNetworkIdAndState(long networkId, NicIpAlias.State state);
-
 }

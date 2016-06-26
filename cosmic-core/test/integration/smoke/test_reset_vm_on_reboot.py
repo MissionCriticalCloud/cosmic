@@ -16,24 +16,24 @@
 # under the License.
 """ P1 tests for reset Vm on reboot
 """
-#Import Local Modules
-import marvin
-from marvin.codes import FAILED
-from marvin.cloudstackTestCase import *
+# Import Local Modules
 from marvin.cloudstackAPI import *
-from marvin.lib.utils import *
+from marvin.cloudstackTestCase import *
+from marvin.codes import FAILED
 from marvin.lib.base import *
 from marvin.lib.common import *
+from marvin.lib.utils import *
 from nose.plugins.attrib import attr
 
 _multiprocess_shared_ = True
+
 
 class TestResetVmOnReboot(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         testClient = super(TestResetVmOnReboot, cls).getClsTestClient()
         cls.apiclient = testClient.getApiClient()
-        cls.services = testClient.getParsedTestDataConfig()        
+        cls.services = testClient.getParsedTestDataConfig()
 
         # Get Zone, Domain and templates
         domain = get_domain(cls.apiclient)
@@ -65,7 +65,7 @@ class TestResetVmOnReboot(cloudstackTestCase):
             isvolatile="true"
         )
 
-        #create a virtual machine
+        # create a virtual machine
         cls.virtual_machine = VirtualMachine.create(
             cls.apiclient,
             cls.services["small"],
@@ -91,14 +91,14 @@ class TestResetVmOnReboot(cloudstackTestCase):
         self.cleanup = []
 
     def tearDown(self):
-        #Clean up, terminate the created ISOs
+        # Clean up, terminate the created ISOs
         cleanup_resources(self.apiclient, self.cleanup)
         return
 
     @attr(hypervisor="xenserver")
     @attr(tags=["advanced", "basic"], required_hardware="false")
     def test_01_reset_vm_on_reboot(self):
-    #TODO: SIMENH: add new test to check volume contents
+        # TODO: SIMENH: add new test to check volume contents
         """Test reset virtual machine on reboot
         """
         # Validate the following
@@ -117,7 +117,6 @@ class TestResetVmOnReboot(cloudstackTestCase):
             "Check if volume is in listvolumes"
         )
         volume_before_reboot = volumelist_before_reboot[0]
-
 
         self.debug("Rebooting vm %s " % (self.virtual_machine.id))
 
@@ -163,8 +162,8 @@ class TestResetVmOnReboot(cloudstackTestCase):
 
         vm_response = list_vm_response[0]
         self.assertEqual(
-                    vm_response.state,
-                    'Running',
-                    "Check the state of VM"
-                )
+            vm_response.state,
+            'Running',
+            "Check the state of VM"
+        )
         return

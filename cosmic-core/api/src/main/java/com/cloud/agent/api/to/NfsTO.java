@@ -20,15 +20,14 @@ import com.cloud.storage.DataStoreRole;
 
 public class NfsTO implements DataStoreTO {
 
+    private static final String pathSeparator = "/";
     private String _url;
     private DataStoreRole _role;
     private String uuid;
-    private static final String pathSeparator = "/";
 
     public NfsTO() {
 
         super();
-
     }
 
     public NfsTO(String url, DataStoreRole role) {
@@ -37,16 +36,6 @@ public class NfsTO implements DataStoreTO {
 
         this._url = url;
         this._role = role;
-
-    }
-
-    @Override
-    public String getUrl() {
-        return _url;
-    }
-
-    public void setUrl(String url) {
-        this._url = url;
     }
 
     @Override
@@ -63,12 +52,21 @@ public class NfsTO implements DataStoreTO {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    @Override
+    public String getUrl() {
+        return _url;
+    }
+
+    public void setUrl(String url) {
+        this._url = url;
     }
 
     @Override
     public String getPathSeparator() {
         return pathSeparator;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }

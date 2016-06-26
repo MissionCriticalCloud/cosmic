@@ -20,9 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
@@ -30,6 +27,9 @@ import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,14 +40,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class RouterControlHelperTest {
 
-    private static final String DIDN_T_GET_THE_EXPECTED_IP4_ADDRESS = "Didn't get the expected IP4 address";
-    private static final String IP4_ADDRES1 = "IP4Addres1";
-    private static final String IP4_ADDRES2 = "IP4Addres2";
     protected static final long ROUTER_ID = 1L;
     protected static final long NW_ID_1 = 11L;
     protected static final long NW_ID_2 = 12L;
     protected static final long NW_ID_3 = 13L;
-
+    private static final String DIDN_T_GET_THE_EXPECTED_IP4_ADDRESS = "Didn't get the expected IP4 address";
+    private static final String IP4_ADDRES1 = "IP4Addres1";
+    private static final String IP4_ADDRES2 = "IP4Addres2";
     @Mock
     protected NicDao nicDao;
     @Mock
@@ -117,5 +116,4 @@ public class RouterControlHelperTest {
         // Assert
         assertEquals(DIDN_T_GET_THE_EXPECTED_IP4_ADDRESS, IP4_ADDRES1, ip4address);
     }
-
 }

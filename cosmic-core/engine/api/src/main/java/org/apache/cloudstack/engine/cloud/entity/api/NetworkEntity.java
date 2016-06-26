@@ -18,11 +18,10 @@
  */
 package org.apache.cloudstack.engine.cloud.entity.api;
 
-import java.util.List;
-
 import com.cloud.network.Network;
-
 import org.apache.cloudstack.engine.entity.api.CloudStackEntity;
+
+import java.util.List;
 
 public interface NetworkEntity extends CloudStackEntity, Network {
     void routeTo(NetworkEntity network);

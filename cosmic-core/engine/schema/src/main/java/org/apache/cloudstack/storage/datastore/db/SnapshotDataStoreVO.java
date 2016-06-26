@@ -16,7 +16,12 @@
 // under the License.
 package org.apache.cloudstack.storage.datastore.db;
 
-import java.util.Date;
+import com.cloud.storage.DataStoreRole;
+import com.cloud.utils.db.GenericDaoBase;
+import com.cloud.utils.fsm.StateObject;
+import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
+import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
+import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,78 +33,66 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.Date;
 
-import com.cloud.storage.DataStoreRole;
-import com.cloud.utils.db.GenericDaoBase;
-import com.cloud.utils.fsm.StateObject;
-
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Join table for image_data_store and snapshots
- *
  */
 @Entity
 @Table(name = "snapshot_store_ref")
 public class SnapshotDataStoreVO implements StateObject<ObjectInDataStoreStateMachine.State>, DataObjectInStore {
     private static final Logger s_logger = LoggerFactory.getLogger(SnapshotDataStoreVO.class);
-
+    @Column(name = "update_count", updatable = true, nullable = false)
+    protected long updatedCount;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
-    @Column(name = "store_id")
-    private long dataStoreId;
-
-    @Column(name = "store_role")
-    @Enumerated(EnumType.STRING)
-    private DataStoreRole role;
-
-    @Column(name = "snapshot_id")
-    private long snapshotId;
-
-    @Column(name = GenericDaoBase.CREATED_COLUMN)
-    private Date created = null;
-
-    @Column(name = "last_updated")
-    @Temporal(value = TemporalType.TIMESTAMP)
-    private Date lastUpdated = null;
-
-    @Column(name = "size")
-    private long size;
-
-    @Column(name = "physical_size")
-    private long physicalSize;
-
-    @Column(name = "parent_snapshot_id")
-    private long parentSnapshotId;
-
-    @Column(name = "job_id")
-    private String jobId;
-
-    @Column(name = "install_path")
-    private String installPath;
-
-    @Column(name = "update_count", updatable = true, nullable = false)
-    protected long updatedCount;
-
     @Column(name = "updated")
     @Temporal(value = TemporalType.TIMESTAMP)
     Date updated;
-
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     ObjectInDataStoreStateMachine.State state;
-
     @Column(name = "ref_cnt")
     Long refCnt = 0L;
-
     @Column(name = "volume_id")
     Long volumeId;
+    @Column(name = "store_id")
+    private long dataStoreId;
+    @Column(name = "store_role")
+    @Enumerated(EnumType.STRING)
+    private DataStoreRole role;
+    @Column(name = "snapshot_id")
+    private long snapshotId;
+    @Column(name = GenericDaoBase.CREATED_COLUMN)
+    private final Date created = null;
+    @Column(name = "last_updated")
+    @Temporal(value = TemporalType.TIMESTAMP)
+    private Date lastUpdated = null;
+    @Column(name = "size")
+    private long size;
+    @Column(name = "physical_size")
+    private long physicalSize;
+    @Column(name = "parent_snapshot_id")
+    private long parentSnapshotId;
+    @Column(name = "job_id")
+    private String jobId;
+    @Column(name = "install_path")
+    private String installPath;
+
+    public SnapshotDataStoreVO(final long hostId, final long snapshotId) {
+        super();
+        dataStoreId = hostId;
+        this.snapshotId = snapshotId;
+        state = ObjectInDataStoreStateMachine.State.Allocated;
+    }
+
+    public SnapshotDataStoreVO() {
+
+    }
 
     @Override
     public String getInstallPath() {
@@ -107,19 +100,34 @@ public class SnapshotDataStoreVO implements StateObject<ObjectInDataStoreStateMa
     }
 
     @Override
+    public void setInstallPath(final String installPath) {
+        this.installPath = installPath;
+    }
+
+    @Override
+    public long getObjectId() {
+        return getSnapshotId();
+    }
+
+    @Override
     public long getDataStoreId() {
         return dataStoreId;
     }
 
-    public void setDataStoreId(long storeId) {
+    public void setDataStoreId(final long storeId) {
         dataStoreId = storeId;
+    }
+
+    @Override
+    public State getObjectInStoreState() {
+        return state;
     }
 
     public long getSnapshotId() {
         return snapshotId;
     }
 
-    public void setSnapshotId(long snapshotId) {
+    public void setSnapshotId(final long snapshotId) {
         this.snapshotId = snapshotId;
     }
 
@@ -135,80 +143,64 @@ public class SnapshotDataStoreVO implements StateObject<ObjectInDataStoreStateMa
         return lastUpdated;
     }
 
-    public void setLastUpdated(Date date) {
+    public void setLastUpdated(final Date date) {
         lastUpdated = date;
-    }
-
-    @Override
-    public void setInstallPath(String installPath) {
-        this.installPath = installPath;
-    }
-
-    public SnapshotDataStoreVO(long hostId, long snapshotId) {
-        super();
-        dataStoreId = hostId;
-        this.snapshotId = snapshotId;
-        state = ObjectInDataStoreStateMachine.State.Allocated;
-    }
-
-    public SnapshotDataStoreVO() {
-
-    }
-
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
     }
 
     public String getJobId() {
         return jobId;
     }
 
+    public void setJobId(final String jobId) {
+        this.jobId = jobId;
+    }
+
     @Override
-    public boolean equals(Object obj) {
+    public int hashCode() {
+        final Long tid = new Long(snapshotId);
+        final Long hid = new Long(dataStoreId);
+        return tid.hashCode() + hid.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
         if (obj instanceof SnapshotDataStoreVO) {
-            SnapshotDataStoreVO other = (SnapshotDataStoreVO)obj;
+            final SnapshotDataStoreVO other = (SnapshotDataStoreVO) obj;
             return (snapshotId == other.getSnapshotId() && dataStoreId == other.getDataStoreId());
         }
         return false;
     }
 
     @Override
-    public int hashCode() {
-        Long tid = new Long(snapshotId);
-        Long hid = new Long(dataStoreId);
-        return tid.hashCode() + hid.hashCode();
-    }
-
-    public void setSize(long size) {
-        this.size = size;
+    public String toString() {
+        return new StringBuilder("SnapshotDataStore[").append(id)
+                                                      .append("-")
+                                                      .append(snapshotId)
+                                                      .append("-")
+                                                      .append(dataStoreId)
+                                                      .append(installPath)
+                                                      .append("]")
+                                                      .toString();
     }
 
     public long getSize() {
         return size;
     }
 
-    public void setPhysicalSize(long physicalSize) {
-        this.physicalSize = physicalSize;
+    public void setSize(final long size) {
+        this.size = size;
     }
 
     public long getPhysicalSize() {
         return physicalSize;
     }
 
-    public long getVolumeSize() {
-        return -1;
+    public void setPhysicalSize(final long physicalSize) {
+        this.physicalSize = physicalSize;
     }
 
-    @Override
-    public String toString() {
-        return new StringBuilder("SnapshotDataStore[").append(id)
-            .append("-")
-            .append(snapshotId)
-            .append("-")
-            .append(dataStoreId)
-            .append(installPath)
-            .append("]")
-            .toString();
+    public long getVolumeSize() {
+        return -1;
     }
 
     public long getUpdatedCount() {
@@ -233,33 +225,23 @@ public class SnapshotDataStoreVO implements StateObject<ObjectInDataStoreStateMa
         return state;
     }
 
-    public void setState(ObjectInDataStoreStateMachine.State state) {
+    public void setState(final ObjectInDataStoreStateMachine.State state) {
         this.state = state;
-    }
-
-    @Override
-    public long getObjectId() {
-        return getSnapshotId();
     }
 
     public DataStoreRole getRole() {
         return role;
     }
 
-    public void setRole(DataStoreRole role) {
+    public void setRole(final DataStoreRole role) {
         this.role = role;
-    }
-
-    @Override
-    public State getObjectInStoreState() {
-        return state;
     }
 
     public long getParentSnapshotId() {
         return parentSnapshotId;
     }
 
-    public void setParentSnapshotId(long parentSnapshotId) {
+    public void setParentSnapshotId(final long parentSnapshotId) {
         this.parentSnapshotId = parentSnapshotId;
     }
 
@@ -267,7 +249,7 @@ public class SnapshotDataStoreVO implements StateObject<ObjectInDataStoreStateMa
         return refCnt;
     }
 
-    public void setRefCnt(Long refCnt) {
+    public void setRefCnt(final Long refCnt) {
         this.refCnt = refCnt;
     }
 
@@ -278,8 +260,7 @@ public class SnapshotDataStoreVO implements StateObject<ObjectInDataStoreStateMa
     public void decrRefCnt() {
         if (refCnt > 0) {
             refCnt--;
-        }
-        else {
+        } else {
             s_logger.warn("We should not try to decrement a zero reference count even though our code has guarded");
         }
     }
@@ -288,7 +269,7 @@ public class SnapshotDataStoreVO implements StateObject<ObjectInDataStoreStateMa
         return volumeId;
     }
 
-    public void setVolumeId(Long volumeId) {
+    public void setVolumeId(final Long volumeId) {
         this.volumeId = volumeId;
     }
 }

@@ -16,10 +16,6 @@
 // under the License.
 package com.cloud.network.vpc;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -34,8 +30,11 @@ import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.acl.ControlledEntity.ACLType;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface VpcManager {
     /**
@@ -48,6 +47,7 @@ public interface VpcManager {
 
     /**
      * Returns all existing VPCs for a given account
+     *
      * @param accountId
      * @return
      */
@@ -57,7 +57,7 @@ public interface VpcManager {
      * Destroys the VPC
      *
      * @param vpc
-     * @param caller TODO
+     * @param caller       TODO
      * @param callerUserId TODO
      * @return
      * @throws ConcurrentOperationException
@@ -84,7 +84,6 @@ public interface VpcManager {
     /**
      * Creates guest network in the VPC
      *
-     *
      * @param ntwkOffId
      * @param name
      * @param displayText
@@ -107,9 +106,9 @@ public interface VpcManager {
      * @throws ResourceAllocationException
      */
     Network
-        createVpcGuestNetwork(long ntwkOffId, String name, String displayText, String gateway, String cidr, String vlanId, String networkDomain, Account owner,
-            Long domainId, PhysicalNetwork pNtwk, long zoneId, ACLType aclType, Boolean subdomainAccess, long vpcId, Long aclId, Account caller,
-            Boolean displayNetworkEnabled)
+    createVpcGuestNetwork(long ntwkOffId, String name, String displayText, String gateway, String cidr, String vlanId, String networkDomain, Account owner,
+                          Long domainId, PhysicalNetwork pNtwk, long zoneId, ACLType aclType, Boolean subdomainAccess, long vpcId, Long aclId, Account caller,
+                          Boolean displayNetworkEnabled)
 
             throws ConcurrentOperationException, InsufficientCapacityException, ResourceAllocationException;
 
@@ -139,6 +138,7 @@ public interface VpcManager {
 
     /**
      * Lists all the services and providers that the current VPC suppots
+     *
      * @param vpcOffId
      * @return map of Service to Provider(s) map
      */
@@ -146,6 +146,7 @@ public interface VpcManager {
 
     /**
      * Returns VPC that is ready to be used
+     *
      * @param vpcId
      * @return VPC object
      */
@@ -153,16 +154,17 @@ public interface VpcManager {
 
     /**
      * Performs network offering validation to determine if it can be used for network upgrade inside the VPC
+     *
      * @param networkId
      * @param newNtwkOffId
      * @param newCidr
      * @param newNetworkDomain
      * @param vpc
      * @param gateway
-     * @param networkOwner TODO
+     * @param networkOwner     TODO
      */
-        void
-        validateNtwkOffForNtwkInVpc(Long networkId, long newNtwkOffId, String newCidr, String newNetworkDomain, Vpc vpc, String gateway, Account networkOwner, Long aclId);
+    void
+    validateNtwkOffForNtwkInVpc(Long networkId, long newNtwkOffId, String newCidr, String newNetworkDomain, Vpc vpc, String gateway, Account networkOwner, Long aclId);
 
     List<PrivateGateway> getVpcPrivateGateways(long vpcId);
 }

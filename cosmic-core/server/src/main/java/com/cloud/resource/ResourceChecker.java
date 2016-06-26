@@ -10,6 +10,7 @@ import com.cloud.exception.PermissionDeniedException;
 import com.cloud.org.Grouping;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
+
 import org.apache.log4j.Logger;
 
 public class ResourceChecker {
@@ -20,16 +21,15 @@ public class ResourceChecker {
     private final AccountManager accountManager;
     private final HostPodDao hostPodDao;
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
     private ResourceChecker(final Builder builder) {
         dataCenterDao = builder.dataCenterDao;
         accountManager = builder.accountManager;
         hostPodDao = builder.hostPodDao;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
 
     public DataCenterVO checkIfDataCenterExists(final Long dataCenterId) {
         logger.debug("Checking if data center" + dataCenterId + " exists");
@@ -53,7 +53,6 @@ public class ResourceChecker {
         }
         logger.debug("Data center " + dataCenterId + "is usable");
     }
-
 
     public HostPodVO checkIfPodExists(final Long hostPodId) {
         logger.debug("Checking if pod " + hostPodId + " exists");
@@ -103,5 +102,4 @@ public class ResourceChecker {
             return new ResourceChecker(this);
         }
     }
-
 }

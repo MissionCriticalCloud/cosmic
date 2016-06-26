@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.util.List;
-
 import com.cloud.dc.PodVlanVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface PodVlanDao extends GenericDao<PodVlanVO, Long> {
     public List<PodVlanVO> listAllocatedVnets(long podId);

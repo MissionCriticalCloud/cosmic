@@ -16,11 +16,7 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.autoscale;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.network.as.AutoScalePolicy;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListAccountResourcesCmd;
@@ -29,6 +25,10 @@ import org.apache.cloudstack.api.response.AutoScalePolicyResponse;
 import org.apache.cloudstack.api.response.AutoScaleVmGroupResponse;
 import org.apache.cloudstack.api.response.ConditionResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +50,8 @@ public class ListAutoScalePoliciesCmd extends BaseListAccountResourcesCmd {
     private Long conditionId;
 
     @Parameter(name = ApiConstants.ACTION,
-               type = CommandType.STRING,
-               description = "the action to be executed if all the conditions evaluate to true for the specified duration.")
+            type = CommandType.STRING,
+            description = "the action to be executed if all the conditions evaluate to true for the specified duration.")
     private String action;
 
     @Parameter(name = ApiConstants.VMGROUP_ID, type = CommandType.UUID, entityType = AutoScaleVmGroupResponse.class, description = "the ID of the autoscale vm group")
@@ -82,11 +82,6 @@ public class ListAutoScalePoliciesCmd extends BaseListAccountResourcesCmd {
     // ///////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
         List<? extends AutoScalePolicy> autoScalePolicies = _autoScaleService.listAutoScalePolicies(this);
         ListResponse<AutoScalePolicyResponse> response = new ListResponse<AutoScalePolicyResponse>();
@@ -103,4 +98,8 @@ public class ListAutoScalePoliciesCmd extends BaseListAccountResourcesCmd {
         setResponseObject(response);
     }
 
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
 }

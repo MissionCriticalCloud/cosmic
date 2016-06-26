@@ -18,12 +18,12 @@ package org.apache.cloudstack.api;
 
 import static java.lang.annotation.ElementType.FIELD;
 
+import org.apache.cloudstack.acl.RoleType;
+import org.apache.cloudstack.api.BaseCmd.CommandType;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import org.apache.cloudstack.acl.RoleType;
-import org.apache.cloudstack.api.BaseCmd.CommandType;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({FIELD})

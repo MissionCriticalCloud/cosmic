@@ -16,15 +16,13 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs.impl;
 
-import java.util.Date;
-import java.util.TimeZone;
-
-import javax.management.StandardMBean;
-
 import com.cloud.utils.DateUtil;
-
 import org.apache.cloudstack.framework.jobs.AsyncJob;
 import org.apache.cloudstack.framework.jobs.AsyncJobMBean;
+
+import javax.management.StandardMBean;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class AsyncJobMBeanImpl extends StandardMBean implements AsyncJobMBean {
     private final AsyncJob _job;
@@ -91,15 +89,17 @@ public class AsyncJobMBeanImpl extends StandardMBean implements AsyncJobMBean {
 
     @Override
     public String getInstanceType() {
-        if (_job.getInstanceType() != null)
+        if (_job.getInstanceType() != null) {
             return _job.getInstanceType().toString();
+        }
         return "N/A";
     }
 
     @Override
     public String getInstanceId() {
-        if (_job.getInstanceId() != null)
+        if (_job.getInstanceId() != null) {
             return String.valueOf(_job.getInstanceId());
+        }
         return "N/A";
     }
 
@@ -114,16 +114,18 @@ public class AsyncJobMBeanImpl extends StandardMBean implements AsyncJobMBean {
     @Override
     public String getCreateTime() {
         Date time = _job.getCreated();
-        if (time != null)
+        if (time != null) {
             return DateUtil.getDateDisplayString(TimeZone.getDefault(), time);
+        }
         return "N/A";
     }
 
     @Override
     public String getLastUpdateTime() {
         Date time = _job.getLastUpdated();
-        if (time != null)
+        if (time != null) {
             return DateUtil.getDateDisplayString(TimeZone.getDefault(), time);
+        }
         return "N/A";
     }
 
@@ -131,8 +133,9 @@ public class AsyncJobMBeanImpl extends StandardMBean implements AsyncJobMBean {
     public String getLastPollTime() {
         Date time = _job.getLastPolled();
 
-        if (time != null)
+        if (time != null) {
             return DateUtil.getDateDisplayString(TimeZone.getDefault(), time);
+        }
         return "N/A";
     }
 

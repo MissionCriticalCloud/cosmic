@@ -16,11 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.domain;
 
-import javax.inject.Inject;
-
 import com.cloud.domain.Domain;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -30,6 +27,9 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.region.RegionService;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,28 +42,20 @@ public class UpdateDomainCmd extends BaseCmd {
     /////////////////////////////////////////////////////
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
-
-    @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = DomainResponse.class, required = true, description = "ID of domain to update")
-    private Long id;
-
-    @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "updates domain with this name")
-    private String domainName;
-
-    @Parameter(name = ApiConstants.NETWORK_DOMAIN,
-               type = CommandType.STRING,
-               description = "Network domain for the domain's networks; empty string will update domainName with NULL value")
-    private String networkDomain;
-
     @Inject
     RegionService _regionService;
+    @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = DomainResponse.class, required = true, description = "ID of domain to update")
+    private Long id;
+    @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "updates domain with this name")
+    private String domainName;
+    @Parameter(name = ApiConstants.NETWORK_DOMAIN,
+            type = CommandType.STRING,
+            description = "Network domain for the domain's networks; empty string will update domainName with NULL value")
+    private String networkDomain;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public Long getId() {
-        return id;
-    }
 
     public String getDomainName() {
         return domainName;
@@ -71,20 +63,6 @@ public class UpdateDomainCmd extends BaseCmd {
 
     public String getNetworkDomain() {
         return networkDomain;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
     }
 
     @Override
@@ -99,5 +77,23 @@ public class UpdateDomainCmd extends BaseCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update domain");
         }
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

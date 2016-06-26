@@ -16,7 +16,6 @@
 // under the License.
 package com.cloud.storage.dao;
 
-
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.ConfigKey.Scope;
 import org.apache.cloudstack.framework.config.ScopedConfigStorage;
@@ -35,13 +34,13 @@ public class StoragePoolDetailsDaoImpl extends ResourceDetailsDaoBase<StoragePoo
     }
 
     @Override
-    public String getConfigValue(long id, ConfigKey<?> key) {
-        StoragePoolDetailVO vo = findDetail(id, key.key());
+    public String getConfigValue(final long id, final ConfigKey<?> key) {
+        final StoragePoolDetailVO vo = findDetail(id, key.key());
         return vo == null ? null : vo.getValue();
     }
 
     @Override
-    public void addDetail(long resourceId, String key, String value, boolean display) {
+    public void addDetail(final long resourceId, final String key, final String value, final boolean display) {
         super.addDetail(new StoragePoolDetailVO(resourceId, key, value, display));
     }
 }

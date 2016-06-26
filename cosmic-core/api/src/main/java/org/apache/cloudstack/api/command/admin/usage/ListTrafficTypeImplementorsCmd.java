@@ -16,9 +16,6 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.usage;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceAllocationException;
@@ -26,7 +23,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
@@ -34,15 +30,19 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.TrafficTypeImplementorResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "listTrafficTypeImplementors",
-            description = "Lists implementors of implementor of a network traffic type or implementors of all network traffic types",
-            responseObject = TrafficTypeImplementorResponse.class,
-            since = "3.0.0",
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = false)
+        description = "Lists implementors of implementor of a network traffic type or implementors of all network traffic types",
+        responseObject = TrafficTypeImplementorResponse.class,
+        since = "3.0.0",
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = false)
 public class ListTrafficTypeImplementorsCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListTrafficTypeImplementorsCmd.class);
     private static final String s_name = "listtraffictypeimplementorsresponse";
@@ -51,8 +51,8 @@ public class ListTrafficTypeImplementorsCmd extends BaseListCmd {
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
     @Parameter(name = ApiConstants.TRAFFIC_TYPE,
-               type = CommandType.STRING,
-               description = "Optional. The network traffic type, if specified, return its implementor. Otherwise, return all traffic types with their implementor")
+            type = CommandType.STRING,
+            description = "Optional. The network traffic type, if specified, return its implementor. Otherwise, return all traffic types with their implementor")
     private String trafficType;
 
     /////////////////////////////////////////////////////
@@ -65,7 +65,7 @@ public class ListTrafficTypeImplementorsCmd extends BaseListCmd {
 
     @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException {
+            ResourceAllocationException {
         List<Pair<TrafficType, String>> results = _networkService.listTrafficTypeImplementor(this);
         ListResponse<TrafficTypeImplementorResponse> response = new ListResponse<TrafficTypeImplementorResponse>();
         List<TrafficTypeImplementorResponse> responses = new ArrayList<TrafficTypeImplementorResponse>();
@@ -83,12 +83,12 @@ public class ListTrafficTypeImplementorsCmd extends BaseListCmd {
     }
 
     @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
+    public String getCommandName() {
+        return s_name;
     }
 
     @Override
-    public String getCommandName() {
-        return s_name;
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

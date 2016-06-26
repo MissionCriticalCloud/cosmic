@@ -16,8 +16,9 @@
 # under the License.
 """ Tests for Multiple IP Ranges feature
 """
+import netaddr
+import random
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import cleanup_resources, get_process_status
 from marvin.lib.base import (Account,
                              DiskOffering,
                              VirtualMachine,
@@ -30,17 +31,16 @@ from marvin.lib.common import (get_domain,
                                list_hosts,
                                get_pod,
                                get_template)
-import netaddr
-from nose.plugins.attrib import attr
-from netaddr import IPNetwork, IPAddress
+from marvin.lib.utils import cleanup_resources, get_process_status
 from marvin.sshClient import SshClient
-import random
+from netaddr import IPNetwork, IPAddress
+from nose.plugins.attrib import attr
 
 
 class TestMultipleIpRanges(cloudstackTestCase):
-
     """Test Multiple IP Ranges for guest network
     """
+
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestMultipleIpRanges, cls).getClsTestClient()
@@ -139,7 +139,7 @@ class TestMultipleIpRanges(cloudstackTestCase):
         ip = IPNetwork(cls.startIp + "/" + cls.netmask)
         # Take random increment factor to avoid adding the same vlan ip range
         # in each test case
-        networkIncrementFactor = random.randint(1,255)
+        networkIncrementFactor = random.randint(1, 255)
         new_cidr = ip.__iadd__(networkIncrementFactor)
         ip2 = IPNetwork(new_cidr)
         test_nw = ip2.network
@@ -157,8 +157,8 @@ class TestMultipleIpRanges(cloudstackTestCase):
         cls.testdata["vlan_ip_range"]["podid"] = cls.pod.id
 
         return PublicIpRange.create(
-                cls.api_client,
-                cls.testdata["vlan_ip_range"])
+            cls.api_client,
+            cls.testdata["vlan_ip_range"])
 
     @classmethod
     def tearDownClass(cls):

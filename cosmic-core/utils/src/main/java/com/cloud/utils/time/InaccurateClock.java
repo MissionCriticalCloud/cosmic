@@ -19,14 +19,13 @@
 
 package com.cloud.utils.time;
 
+import com.cloud.utils.concurrency.NamedThreadFactory;
+import com.cloud.utils.mgmt.JmxUtil;
+
+import javax.management.StandardMBean;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javax.management.StandardMBean;
-
-import com.cloud.utils.concurrency.NamedThreadFactory;
-import com.cloud.utils.mgmt.JmxUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +34,9 @@ import org.slf4j.LoggerFactory;
  */
 
 public class InaccurateClock extends StandardMBean implements InaccurateClockMBean {
+    static final InaccurateClock s_timer = new InaccurateClock();
     private static final Logger s_logger = LoggerFactory.getLogger(InaccurateClock.class);
     static ScheduledExecutorService s_executor = null;
-    static final InaccurateClock s_timer = new InaccurateClock();
     private static long time;
 
     public InaccurateClock() {
@@ -46,18 +45,9 @@ public class InaccurateClock extends StandardMBean implements InaccurateClockMBe
         restart();
         try {
             JmxUtil.registerMBean("InaccurateClock", "InaccurateClock", this);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             s_logger.warn("Unable to initialize inaccurate clock", e);
         }
-    }
-
-    @Override
-    public long[] getCurrentTimes() {
-        long[] results = new long[2];
-        results[0] = time;
-        results[1] = System.currentTimeMillis();
-
-        return results;
     }
 
     @Override
@@ -73,13 +63,22 @@ public class InaccurateClock extends StandardMBean implements InaccurateClockMBe
         if (s_executor != null) {
             try {
                 s_executor.shutdown();
-            } catch (Throwable th) {
+            } catch (final Throwable th) {
                 s_logger.error("Unable to shutdown the Executor", th);
                 return "Unable to turn off check logs";
             }
         }
         s_executor = null;
         return "Off";
+    }
+
+    @Override
+    public long[] getCurrentTimes() {
+        final long[] results = new long[2];
+        results[0] = time;
+        results[1] = System.currentTimeMillis();
+
+        return results;
     }
 
     public static long getTime() {
@@ -95,7 +94,7 @@ public class InaccurateClock extends StandardMBean implements InaccurateClockMBe
         public void run() {
             try {
                 time = System.currentTimeMillis();
-            } catch (Throwable th) {
+            } catch (final Throwable th) {
                 s_logger.error("Unable to time", th);
             }
         }

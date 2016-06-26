@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.usage.dao;
 
-import java.util.List;
-
 import com.cloud.usage.ExternalPublicIpStatisticsVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface ExternalPublicIpStatisticsDao extends GenericDao<ExternalPublicIpStatisticsVO, Long> {
 
@@ -28,5 +28,4 @@ public interface ExternalPublicIpStatisticsDao extends GenericDao<ExternalPublic
     ExternalPublicIpStatisticsVO findBy(long accountId, long zoneId, String publicIpAddress);
 
     List<ExternalPublicIpStatisticsVO> listBy(long accountId, long zoneId);
-
 }

@@ -16,18 +16,15 @@
 // under the License.
 package groovy.org.apache.cloudstack.ldap
 
-import org.apache.cloudstack.framework.config.ConfigKey
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import com.cloud.utils.Pair
-import org.apache.cloudstack.api.ServerApiException
+import org.apache.cloudstack.framework.config.ConfigKey
+import org.apache.cloudstack.framework.config.dao.ConfigurationDao
 import org.apache.cloudstack.framework.config.impl.ConfigDepotImpl
 import org.apache.cloudstack.framework.config.impl.ConfigurationVO
 import org.apache.cloudstack.ldap.LdapConfiguration
 import org.apache.cloudstack.ldap.LdapConfigurationVO
-import org.apache.cloudstack.ldap.LdapManager
 import org.apache.cloudstack.ldap.LdapUserManager
 import org.apache.cloudstack.ldap.dao.LdapConfigurationDao
-import org.apache.cxf.common.util.StringUtils
 
 import javax.naming.directory.SearchControls
 
@@ -173,7 +170,7 @@ class LdapConfigurationSpec extends spock.lang.Specification {
         ldapConfigurationList.add(new LdapConfigurationVO("localhost", 389))
         Pair<List<LdapConfigurationVO>, Integer> result = new Pair<List<LdapConfigurationVO>, Integer>();
         result.set(ldapConfigurationList, ldapConfigurationList.size())
-        ldapConfigurationDao.searchConfigurations(_,_) >> result
+        ldapConfigurationDao.searchConfigurations(_, _) >> result
 
         LdapConfiguration ldapConfiguration = new LdapConfiguration(configDao, ldapConfigurationDao)
 

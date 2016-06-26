@@ -16,18 +16,18 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
+import com.cloud.network.rules.StickinessPolicy;
+import com.cloud.serializer.Param;
+import com.cloud.utils.Pair;
+import org.apache.cloudstack.acl.RoleType;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cloud.network.rules.StickinessPolicy;
-import com.cloud.serializer.Param;
-import com.cloud.utils.Pair;
 import com.google.gson.annotations.SerializedName;
-
-import org.apache.cloudstack.acl.RoleType;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
 
 public class LBStickinessPolicyResponse extends BaseResponse {
     @SerializedName("id")
@@ -44,7 +44,8 @@ public class LBStickinessPolicyResponse extends BaseResponse {
 
     @SerializedName("description")
     @Param(description = "the description of the Stickiness policy")
-    private String description;;
+    private String description;
+    ;
 
     @SerializedName("state")
     @Param(description = "the state of the policy")
@@ -62,12 +63,48 @@ public class LBStickinessPolicyResponse extends BaseResponse {
     @Param(description = "the params of the policy")
     private Map<String, String> params;
 
-    public Map<String, String> getParams() {
-        return params;
+    public LBStickinessPolicyResponse(StickinessPolicy stickinesspolicy) {
+        this.name = stickinesspolicy.getName();
+        List<Pair<String, String>> paramsList = stickinesspolicy.getParams();
+        this.methodName = stickinesspolicy.getMethodName();
+        this.description = stickinesspolicy.getDescription();
+        this.forDisplay = stickinesspolicy.isDisplay();
+        if (stickinesspolicy.isRevoke()) {
+            this.setState("Revoked");
+        }
+        if (stickinesspolicy.getUuid() != null) {
+            setId(stickinesspolicy.getUuid());
+        }
+
+        /* Get the param and values from the database and fill the response object
+         *  The following loop is to
+         *    1) convert from List of Pair<String,String> to Map<String, String>
+         *    2)  combine all params with name with ":" , currently we have one param called "domain" that can appear multiple times.
+         * */
+
+        Map<String, String> tempParamList = new HashMap<String, String>();
+        for (Pair<String, String> paramKV : paramsList) {
+            String key = paramKV.first();
+            String value = paramKV.second();
+            StringBuilder sb = new StringBuilder();
+            sb.append(value);
+            if (tempParamList.get(key) != null) {
+                sb.append(":").append(tempParamList.get(key));
+            }
+
+            tempParamList.put(key, sb.toString());
+        }
+
+        this.params = tempParamList;
+        setObjectName("stickinesspolicy");
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Map<String, String> getParams() {
+        return params;
     }
 
     public String getName() {
@@ -96,41 +133,6 @@ public class LBStickinessPolicyResponse extends BaseResponse {
 
     public void setState(String state) {
         this.state = state;
-    }
-
-    public LBStickinessPolicyResponse(StickinessPolicy stickinesspolicy) {
-        this.name = stickinesspolicy.getName();
-        List<Pair<String, String>> paramsList = stickinesspolicy.getParams();
-        this.methodName = stickinesspolicy.getMethodName();
-        this.description = stickinesspolicy.getDescription();
-        this.forDisplay = stickinesspolicy.isDisplay();
-        if (stickinesspolicy.isRevoke()) {
-            this.setState("Revoked");
-        }
-        if (stickinesspolicy.getUuid() != null)
-            setId(stickinesspolicy.getUuid());
-
-        /* Get the param and values from the database and fill the response object
-         *  The following loop is to
-         *    1) convert from List of Pair<String,String> to Map<String, String>
-         *    2)  combine all params with name with ":" , currently we have one param called "domain" that can appear multiple times.
-         * */
-
-        Map<String, String> tempParamList = new HashMap<String, String>();
-        for (Pair<String, String> paramKV : paramsList) {
-            String key = paramKV.first();
-            String value = paramKV.second();
-            StringBuilder sb = new StringBuilder();
-            sb.append(value);
-            if (tempParamList.get(key) != null) {
-                sb.append(":").append(tempParamList.get(key));
-            }
-
-            tempParamList.put(key, sb.toString());
-        }
-
-        this.params = tempParamList;
-        setObjectName("stickinesspolicy");
     }
 
     public void setForDisplay(Boolean forDisplay) {

@@ -19,18 +19,33 @@
 
 package com.cloud.network.resource;
 
-import com.cloud.agent.api.*;
-import com.cloud.network.nicira.*;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+
+import com.cloud.agent.api.Answer;
+import com.cloud.agent.api.ConfigurePublicIpsOnLogicalRouterCommand;
+import com.cloud.agent.api.CreateLogicalSwitchCommand;
+import com.cloud.agent.api.DeleteLogicalRouterCommand;
+import com.cloud.agent.api.DeleteLogicalSwitchCommand;
+import com.cloud.agent.api.DeleteLogicalSwitchPortCommand;
+import com.cloud.agent.api.MaintainCommand;
+import com.cloud.agent.api.ReadyCommand;
+import com.cloud.agent.api.UpdateLogicalSwitchPortCommand;
+import com.cloud.network.nicira.LogicalRouterPort;
+import com.cloud.network.nicira.LogicalSwitch;
+import com.cloud.network.nicira.NiciraNvpApi;
+import com.cloud.network.nicira.NiciraNvpApiException;
+import com.cloud.network.nicira.VifAttachment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 public class NiciraNvpRequestWrapperTest {
 

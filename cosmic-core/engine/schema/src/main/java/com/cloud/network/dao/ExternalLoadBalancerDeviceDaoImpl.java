@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.network.dao.ExternalLoadBalancerDeviceVO.LBDeviceAllocationState;
 import com.cloud.network.dao.ExternalLoadBalancerDeviceVO.LBDeviceState;
 import com.cloud.utils.db.DB;
@@ -25,6 +23,8 @@ import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -73,7 +73,6 @@ public class ExternalLoadBalancerDeviceDaoImpl extends GenericDaoBase<ExternalLo
         gslbProviderSearch.and("physicalNetworkId", gslbProviderSearch.entity().getPhysicalNetworkId(), Op.EQ);
         gslbProviderSearch.and("providerName", gslbProviderSearch.entity().getProviderName(), Op.EQ);
         gslbProviderSearch.and("gslbProvider", gslbProviderSearch.entity().getGslbProvider(), Op.EQ);
-
     }
 
     @Override

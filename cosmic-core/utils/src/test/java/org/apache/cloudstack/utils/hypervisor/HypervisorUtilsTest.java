@@ -19,12 +19,12 @@
 
 package org.apache.cloudstack.utils.hypervisor;
 
+import com.cloud.utils.exception.CloudRuntimeException;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
-
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -54,6 +54,24 @@ public class HypervisorUtilsTest {
         file.delete();
     }
 
+    private long setupcheckVolumeFileForActivityFile(File file, long minSize) throws IOException {
+        if (file.exists()) {
+            file.delete();
+        }
+        file.createNewFile();
+        char[] chars = new char[1048576];
+        Arrays.fill(chars, 'X');
+        long written = 0;
+        FileWriter writer = new FileWriter(file);
+        while (written < minSize) {
+            writer.write(chars);
+            written += chars.length;
+        }
+        long creationTime = System.currentTimeMillis();
+        writer.close();
+        return creationTime;
+    }
+
     @Test
     public void checkVolumeFileForActivityTest() throws IOException {
         System.out.print("Testing block on modified files - ");
@@ -72,7 +90,7 @@ public class HypervisorUtilsTest {
         file.delete();
     }
 
-    @Test(expected=CloudRuntimeException.class)
+    @Test(expected = CloudRuntimeException.class)
     public void checkVolumeFileForActivityTimeoutTest() throws IOException {
         System.out.print("Testing timeout of blocking on modified files - ");
         String filePath = "./testfileinactive";
@@ -90,23 +108,5 @@ public class HypervisorUtilsTest {
             file.delete();
         }
         System.out.println("Fail");
-    }
-
-    private long setupcheckVolumeFileForActivityFile(File file, long minSize) throws IOException {
-        if (file.exists()) {
-            file.delete();
-        }
-        file.createNewFile();
-        char[] chars = new char[1048576];
-        Arrays.fill(chars, 'X');
-        long written = 0;
-        FileWriter writer = new FileWriter(file);
-        while (written < minSize) {
-            writer.write(chars);
-            written += chars.length;
-        }
-        long creationTime = System.currentTimeMillis();
-        writer.close();
-        return creationTime;
     }
 }

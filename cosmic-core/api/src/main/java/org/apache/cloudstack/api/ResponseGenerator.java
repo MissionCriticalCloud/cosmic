@@ -16,11 +16,6 @@
 // under the License.
 package org.apache.cloudstack.api;
 
-import java.text.DecimalFormat;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-
 import com.cloud.capacity.Capacity;
 import com.cloud.configuration.ResourceCount;
 import com.cloud.configuration.ResourceLimit;
@@ -95,7 +90,6 @@ import com.cloud.vm.Nic;
 import com.cloud.vm.NicSecondaryIp;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.snapshot.VMSnapshot;
-
 import org.apache.cloudstack.affinity.AffinityGroup;
 import org.apache.cloudstack.affinity.AffinityGroupResponse;
 import org.apache.cloudstack.api.ApiConstants.HostDetails;
@@ -195,6 +189,11 @@ import org.apache.cloudstack.region.PortableIp;
 import org.apache.cloudstack.region.PortableIpRange;
 import org.apache.cloudstack.region.Region;
 import org.apache.cloudstack.usage.Usage;
+
+import java.text.DecimalFormat;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
 
 public interface ResponseGenerator {
     UserResponse createUserResponse(UserAccount user);

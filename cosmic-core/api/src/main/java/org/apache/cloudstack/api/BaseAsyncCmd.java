@@ -16,7 +16,6 @@
 // under the License.
 package org.apache.cloudstack.api;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,7 @@ public abstract class BaseAsyncCmd extends BaseCmd {
     @Parameter(name = "starteventid", type = CommandType.LONG)
     private Long startEventId;
 
-    @Parameter(name = ApiConstants.CUSTOM_JOB_ID , type = CommandType.STRING)
+    @Parameter(name = ApiConstants.CUSTOM_JOB_ID, type = CommandType.STRING)
     private String injectedJobId;
 
     public String getInjectedJobId() {
@@ -62,10 +61,6 @@ public abstract class BaseAsyncCmd extends BaseCmd {
      */
     public abstract String getEventDescription();
 
-    public void setJob(Object job) {
-        this.job = job;
-    }
-
     public Long getStartEventId() {
         return startEventId;
     }
@@ -77,7 +72,7 @@ public abstract class BaseAsyncCmd extends BaseCmd {
     /**
      * Async commands that want to be tracked as part of the listXXX commands need to
      * provide implementations of the two following methods, getInstanceId() and getInstanceType()
-     *
+     * <p>
      * getObjectId() should return the id of the object the async command is executing on
      * getObjectType() should return a type from the AsyncJob.Type enumeration
      */
@@ -101,4 +96,7 @@ public abstract class BaseAsyncCmd extends BaseCmd {
         return job;
     }
 
+    public void setJob(Object job) {
+        this.job = job;
+    }
 }

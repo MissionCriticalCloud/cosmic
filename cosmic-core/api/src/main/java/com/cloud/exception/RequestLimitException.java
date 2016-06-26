@@ -20,7 +20,6 @@ import com.cloud.utils.SerialVersionUID;
 
 /**
  * Exception thrown if number of requests is over api rate limit set.
- *
  */
 public class RequestLimitException extends PermissionDeniedException {
 
@@ -30,12 +29,11 @@ public class RequestLimitException extends PermissionDeniedException {
         super();
     }
 
-    public RequestLimitException(String msg) {
+    public RequestLimitException(final String msg) {
         super(msg);
     }
 
-    public RequestLimitException(String msg, Throwable cause) {
+    public RequestLimitException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
-
 }

@@ -30,10 +30,6 @@ public interface DataStoreProvider {
     String SMB = "NFS";
     String DEFAULT_PRIMARY = "DefaultPrimary";
 
-    enum DataStoreProviderType {
-        PRIMARY, IMAGE, ImageCache
-    }
-
     DataStoreLifeCycle getDataStoreLifeCycle();
 
     DataStoreDriver getDataStoreDriver();
@@ -45,4 +41,8 @@ public interface DataStoreProvider {
     boolean configure(Map<String, Object> params);
 
     Set<DataStoreProviderType> getTypes();
+
+    enum DataStoreProviderType {
+        PRIMARY, IMAGE, ImageCache
+    }
 }

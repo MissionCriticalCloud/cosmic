@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.projects.dao;
 
-import java.util.List;
-
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface ProjectDao extends GenericDao<ProjectVO, Long> {
 
@@ -33,5 +33,4 @@ public interface ProjectDao extends GenericDao<ProjectVO, Long> {
     List<ProjectVO> listByState(Project.State state);
 
     ProjectVO findByProjectAccountIdIncludingRemoved(long projectAccountId);
-
 }

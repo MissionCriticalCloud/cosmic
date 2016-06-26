@@ -26,12 +26,11 @@ public class ManagementServerException extends CloudException {
 
     }
 
-    public ManagementServerException(String message) {
+    public ManagementServerException(final String message) {
         super(message);
     }
 
-    public ManagementServerException(String message, Throwable cause) {
+    public ManagementServerException(final String message, final Throwable cause) {
         super(message, cause);
     }
-
 }

@@ -18,9 +18,9 @@
 """
 # Import Local Modules
 # import marvin
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (get_process_status,
-                              cleanup_resources)
+from marvin.codes import FAILED
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              VirtualMachine,
@@ -30,16 +30,14 @@ from marvin.lib.common import (list_hosts,
                                get_zone,
                                get_domain,
                                get_template)
+from marvin.lib.utils import (get_process_status,
+                              cleanup_resources)
 from nose.plugins.attrib import attr
-from marvin.codes import FAILED
-import time
-
 
 _multiprocess_shared_ = True
 
 
 class TestVRServiceFailureAlerting(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(
@@ -205,7 +203,7 @@ class TestVRServiceFailureAlerting(cloudstackTestCase):
         qresultset = self.dbclient.execute(
             "select id from alert where subject like\
                     '%{0}%' ORDER BY id DESC LIMIT 1;".format(
-            str(alertSubject)))
+                str(alertSubject)))
         self.assertNotEqual(
             len(qresultset),
             0,

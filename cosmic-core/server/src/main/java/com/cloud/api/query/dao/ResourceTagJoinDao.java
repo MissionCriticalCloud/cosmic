@@ -16,14 +16,13 @@
 // under the License.
 package com.cloud.api.query.dao;
 
-import java.util.List;
-
 import com.cloud.api.query.vo.ResourceTagJoinVO;
 import com.cloud.server.ResourceTag;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.utils.db.GenericDao;
-
 import org.apache.cloudstack.api.response.ResourceTagResponse;
+
+import java.util.List;
 
 public interface ResourceTagJoinDao extends GenericDao<ResourceTagJoinVO, Long> {
 

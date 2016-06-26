@@ -19,9 +19,9 @@
 
 package com.cloud.agent.api;
 
-import java.util.List;
-
 import com.cloud.agent.api.LogLevel.Log4jLevel;
+
+import java.util.List;
 
 @LogLevel(Log4jLevel.Trace)
 public class GetVmStatsCommand extends Command {

@@ -14,17 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from Queue import Empty, Queue
 from errno import EEXIST, ENOENT
 from hashlib import md5
 from optparse import OptionParser
 from os import environ, listdir, makedirs, utime
 from os.path import basename, dirname, getmtime, getsize, isdir, join
-from Queue import Empty, Queue
 from sys import argv, exc_info, exit, stderr, stdout
 from threading import enumerate as threading_enumerate, Thread
-from time import sleep
 from traceback import format_exception
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Inclusion of swift.common.client for convenience of single file distribution
@@ -33,7 +31,7 @@ import socket
 from cStringIO import StringIO
 from re import compile, DOTALL
 from tokenize import generate_tokens, STRING, NAME, OP
-from urllib import quote as _quote, unquote
+from urllib import quote as _quote
 from urlparse import urlparse, urlunparse
 
 try:
@@ -77,6 +75,7 @@ except ImportError:
         # fall back on local parser otherwise
         comments = compile(r'/\*.*\*/|//[^\r\n]*', DOTALL)
 
+
         def json_loads(string):
             '''
             Fairly competent json parser exploiting the python tokenizer and
@@ -86,7 +85,7 @@ except ImportError:
             '''
             try:
                 res = []
-                consts = {'true': True, 'false': False, 'null': None}
+                consts = { 'true': True, 'false': False, 'null': None }
                 string = '(' + comments.sub('', string) + ')'
                 for type, val, _junk, _junk, _junk in \
                         generate_tokens(StringIO(string).readline):
@@ -98,13 +97,12 @@ except ImportError:
                         res.append(val.replace('\\/', '/'))
                     else:
                         res.append(val)
-                return eval(''.join(res), {}, consts)
+                return eval(''.join(res), { }, consts)
             except Exception:
                 raise AttributeError()
 
 
 class ClientException(Exception):
-
     def __init__(self, msg, http_scheme='', http_host='', http_port='',
                  http_path='', http_query='', http_status=0, http_reason='',
                  http_device=''):
@@ -193,14 +191,14 @@ def get_auth(url, user, key, snet=False):
     """
     parsed, conn = http_connection(url)
     conn.request('GET', parsed.path, '',
-                 {'X-Auth-User': user, 'X-Auth-Key': key})
+                 { 'X-Auth-User': user, 'X-Auth-Key': key })
     resp = conn.getresponse()
     resp.read()
     if resp.status < 200 or resp.status >= 300:
         raise ClientException('Auth GET failed', http_scheme=parsed.scheme,
-                http_host=conn.host, http_port=conn.port,
-                http_path=parsed.path, http_status=resp.status,
-                http_reason=resp.reason)
+                              http_host=conn.host, http_port=conn.port,
+                              http_path=parsed.path, http_status=resp.status,
+                              http_reason=resp.reason)
     url = resp.getheader('x-storage-url')
     if snet:
         parsed = list(urlparse(url))
@@ -208,7 +206,7 @@ def get_auth(url, user, key, snet=False):
         parsed[1] = 'snet-' + parsed[1]
         url = urlunparse(parsed)
     return url, resp.getheader('x-storage-token',
-                                                resp.getheader('x-auth-token'))
+                               resp.getheader('x-auth-token'))
 
 
 def get_account(url, token, marker=None, limit=None, prefix=None,
@@ -250,17 +248,17 @@ def get_account(url, token, marker=None, limit=None, prefix=None,
     if prefix:
         qs += '&prefix=%s' % quote(prefix)
     conn.request('GET', '%s?%s' % (parsed.path, qs), '',
-                 {'X-Auth-Token': token})
+                 { 'X-Auth-Token': token })
     resp = conn.getresponse()
-    resp_headers = {}
+    resp_headers = { }
     for header, value in resp.getheaders():
         resp_headers[header.lower()] = value
     if resp.status < 200 or resp.status >= 300:
         resp.read()
         raise ClientException('Account GET failed', http_scheme=parsed.scheme,
-                http_host=conn.host, http_port=conn.port,
-                http_path=parsed.path, http_query=qs, http_status=resp.status,
-                http_reason=resp.reason)
+                              http_host=conn.host, http_port=conn.port,
+                              http_path=parsed.path, http_query=qs, http_status=resp.status,
+                              http_reason=resp.reason)
     if resp.status == 204:
         resp.read()
         return resp_headers, []
@@ -283,15 +281,15 @@ def head_account(url, token, http_conn=None):
         parsed, conn = http_conn
     else:
         parsed, conn = http_connection(url)
-    conn.request('HEAD', parsed.path, '', {'X-Auth-Token': token})
+    conn.request('HEAD', parsed.path, '', { 'X-Auth-Token': token })
     resp = conn.getresponse()
     resp.read()
     if resp.status < 200 or resp.status >= 300:
         raise ClientException('Account HEAD failed', http_scheme=parsed.scheme,
-                http_host=conn.host, http_port=conn.port,
-                http_path=parsed.path, http_status=resp.status,
-                http_reason=resp.reason)
-    resp_headers = {}
+                              http_host=conn.host, http_port=conn.port,
+                              http_path=parsed.path, http_status=resp.status,
+                              http_reason=resp.reason)
+    resp_headers = { }
     for header, value in resp.getheaders():
         resp_headers[header.lower()] = value
     return resp_headers
@@ -318,9 +316,9 @@ def post_account(url, token, headers, http_conn=None):
     resp.read()
     if resp.status < 200 or resp.status >= 300:
         raise ClientException('Account POST failed',
-                http_scheme=parsed.scheme, http_host=conn.host,
-                http_port=conn.port, http_path=path, http_status=resp.status,
-                http_reason=resp.reason)
+                              http_scheme=parsed.scheme, http_host=conn.host,
+                              http_port=conn.port, http_path=path, http_status=resp.status,
+                              http_reason=resp.reason)
 
 
 def get_container(url, token, container, marker=None, limit=None,
@@ -371,15 +369,15 @@ def get_container(url, token, container, marker=None, limit=None,
         qs += '&prefix=%s' % quote(prefix)
     if delimiter:
         qs += '&delimiter=%s' % quote(delimiter)
-    conn.request('GET', '%s?%s' % (path, qs), '', {'X-Auth-Token': token})
+    conn.request('GET', '%s?%s' % (path, qs), '', { 'X-Auth-Token': token })
     resp = conn.getresponse()
     if resp.status < 200 or resp.status >= 300:
         resp.read()
         raise ClientException('Container GET failed',
-                http_scheme=parsed.scheme, http_host=conn.host,
-                http_port=conn.port, http_path=path, http_query=qs,
-                http_status=resp.status, http_reason=resp.reason)
-    resp_headers = {}
+                              http_scheme=parsed.scheme, http_host=conn.host,
+                              http_port=conn.port, http_path=path, http_query=qs,
+                              http_status=resp.status, http_reason=resp.reason)
+    resp_headers = { }
     for header, value in resp.getheaders():
         resp_headers[header.lower()] = value
     if resp.status == 204:
@@ -406,15 +404,15 @@ def head_container(url, token, container, http_conn=None):
     else:
         parsed, conn = http_connection(url)
     path = '%s/%s' % (parsed.path, quote(container))
-    conn.request('HEAD', path, '', {'X-Auth-Token': token})
+    conn.request('HEAD', path, '', { 'X-Auth-Token': token })
     resp = conn.getresponse()
     resp.read()
     if resp.status < 200 or resp.status >= 300:
         raise ClientException('Container HEAD failed',
-                http_scheme=parsed.scheme, http_host=conn.host,
-                http_port=conn.port, http_path=path, http_status=resp.status,
-                http_reason=resp.reason)
-    resp_headers = {}
+                              http_scheme=parsed.scheme, http_host=conn.host,
+                              http_port=conn.port, http_path=path, http_status=resp.status,
+                              http_reason=resp.reason)
+    resp_headers = { }
     for header, value in resp.getheaders():
         resp_headers[header.lower()] = value
     return resp_headers
@@ -438,16 +436,16 @@ def put_container(url, token, container, headers=None, http_conn=None):
         parsed, conn = http_connection(url)
     path = '%s/%s' % (parsed.path, quote(container))
     if not headers:
-        headers = {}
+        headers = { }
     headers['X-Auth-Token'] = token
     conn.request('PUT', path, '', headers)
     resp = conn.getresponse()
     resp.read()
     if resp.status < 200 or resp.status >= 300:
         raise ClientException('Container PUT failed',
-                http_scheme=parsed.scheme, http_host=conn.host,
-                http_port=conn.port, http_path=path, http_status=resp.status,
-                http_reason=resp.reason)
+                              http_scheme=parsed.scheme, http_host=conn.host,
+                              http_port=conn.port, http_path=path, http_status=resp.status,
+                              http_reason=resp.reason)
 
 
 def post_container(url, token, container, headers, http_conn=None):
@@ -473,9 +471,9 @@ def post_container(url, token, container, headers, http_conn=None):
     resp.read()
     if resp.status < 200 or resp.status >= 300:
         raise ClientException('Container POST failed',
-                http_scheme=parsed.scheme, http_host=conn.host,
-                http_port=conn.port, http_path=path, http_status=resp.status,
-                http_reason=resp.reason)
+                              http_scheme=parsed.scheme, http_host=conn.host,
+                              http_port=conn.port, http_path=path, http_status=resp.status,
+                              http_reason=resp.reason)
 
 
 def delete_container(url, token, container, http_conn=None):
@@ -494,14 +492,14 @@ def delete_container(url, token, container, http_conn=None):
     else:
         parsed, conn = http_connection(url)
     path = '%s/%s' % (parsed.path, quote(container))
-    conn.request('DELETE', path, '', {'X-Auth-Token': token})
+    conn.request('DELETE', path, '', { 'X-Auth-Token': token })
     resp = conn.getresponse()
     resp.read()
     if resp.status < 200 or resp.status >= 300:
         raise ClientException('Container DELETE failed',
-                http_scheme=parsed.scheme, http_host=conn.host,
-                http_port=conn.port, http_path=path, http_status=resp.status,
-                http_reason=resp.reason)
+                              http_scheme=parsed.scheme, http_host=conn.host,
+                              http_port=conn.port, http_path=path, http_status=resp.status,
+                              http_reason=resp.reason)
 
 
 def get_object(url, token, container, name, http_conn=None,
@@ -528,13 +526,13 @@ def get_object(url, token, container, name, http_conn=None,
     else:
         parsed, conn = http_connection(url)
     path = '%s/%s/%s' % (parsed.path, quote(container), quote(name))
-    conn.request('GET', path, '', {'X-Auth-Token': token})
+    conn.request('GET', path, '', { 'X-Auth-Token': token })
     resp = conn.getresponse()
     if resp.status < 200 or resp.status >= 300:
         resp.read()
         raise ClientException('Object GET failed', http_scheme=parsed.scheme,
-                http_host=conn.host, http_port=conn.port, http_path=path,
-                http_status=resp.status, http_reason=resp.reason)
+                              http_host=conn.host, http_port=conn.port, http_path=path,
+                              http_status=resp.status, http_reason=resp.reason)
     if resp_chunk_size:
 
         def _object_body():
@@ -542,10 +540,11 @@ def get_object(url, token, container, name, http_conn=None,
             while buf:
                 yield buf
                 buf = resp.read(resp_chunk_size)
+
         object_body = _object_body()
     else:
         object_body = resp.read()
-    resp_headers = {}
+    resp_headers = { }
     for header, value in resp.getheaders():
         resp_headers[header.lower()] = value
     return resp_headers, object_body
@@ -570,14 +569,14 @@ def head_object(url, token, container, name, http_conn=None):
     else:
         parsed, conn = http_connection(url)
     path = '%s/%s/%s' % (parsed.path, quote(container), quote(name))
-    conn.request('HEAD', path, '', {'X-Auth-Token': token})
+    conn.request('HEAD', path, '', { 'X-Auth-Token': token })
     resp = conn.getresponse()
     resp.read()
     if resp.status < 200 or resp.status >= 300:
         raise ClientException('Object HEAD failed', http_scheme=parsed.scheme,
-                http_host=conn.host, http_port=conn.port, http_path=path,
-                http_status=resp.status, http_reason=resp.reason)
-    resp_headers = {}
+                              http_host=conn.host, http_port=conn.port, http_path=path,
+                              http_status=resp.status, http_reason=resp.reason)
+    resp_headers = { }
     for header, value in resp.getheaders():
         resp_headers[header.lower()] = value
     return resp_headers
@@ -626,7 +625,7 @@ def put_object(url, token=None, container=None, name=None, contents=None,
     if headers:
         headers = dict(headers)
     else:
-        headers = {}
+        headers = { }
     if token:
         headers['X-Auth-Token'] = token
     if etag:
@@ -669,8 +668,8 @@ def put_object(url, token=None, container=None, name=None, contents=None,
     resp.read()
     if resp.status < 200 or resp.status >= 300:
         raise ClientException('Object PUT failed', http_scheme=parsed.scheme,
-                http_host=conn.host, http_port=conn.port, http_path=path,
-                http_status=resp.status, http_reason=resp.reason)
+                              http_host=conn.host, http_port=conn.port, http_path=path,
+                              http_status=resp.status, http_reason=resp.reason)
     return resp.getheader('etag', '').strip('"')
 
 
@@ -698,8 +697,8 @@ def post_object(url, token, container, name, headers, http_conn=None):
     resp.read()
     if resp.status < 200 or resp.status >= 300:
         raise ClientException('Object POST failed', http_scheme=parsed.scheme,
-                http_host=conn.host, http_port=conn.port, http_path=path,
-                http_status=resp.status, http_reason=resp.reason)
+                              http_host=conn.host, http_port=conn.port, http_path=path,
+                              http_status=resp.status, http_reason=resp.reason)
 
 
 def delete_object(url, token=None, container=None, name=None, http_conn=None,
@@ -732,7 +731,7 @@ def delete_object(url, token=None, container=None, name=None, http_conn=None,
     if headers:
         headers = dict(headers)
     else:
-        headers = {}
+        headers = { }
     if token:
         headers['X-Auth-Token'] = token
     conn.request('DELETE', path, '', headers)
@@ -740,9 +739,9 @@ def delete_object(url, token=None, container=None, name=None, http_conn=None,
     resp.read()
     if resp.status < 200 or resp.status >= 300:
         raise ClientException('Object DELETE failed',
-                http_scheme=parsed.scheme, http_host=conn.host,
-                http_port=conn.port, http_path=path, http_status=resp.status,
-                http_reason=resp.reason)
+                              http_scheme=parsed.scheme, http_host=conn.host,
+                              http_port=conn.port, http_path=path, http_status=resp.status,
+                              http_reason=resp.reason)
 
 
 class Connection(object):
@@ -872,7 +871,7 @@ class Connection(object):
 
         def _default_reset(*args, **kwargs):
             raise ClientException('put_object(%r, %r, ...) failure and no '
-                'ability to reset contents for reupload.' % (container, obj))
+                                  'ability to reset contents for reupload.' % (container, obj))
 
         reset_func = _default_reset
         tell = getattr(contents, 'tell', None)
@@ -884,8 +883,8 @@ class Connection(object):
             reset_func = lambda *a, **k: None
 
         return self._retry(reset_func, put_object, container, obj, contents,
-            content_length=content_length, etag=etag, chunk_size=chunk_size,
-            content_type=content_type, headers=headers)
+                           content_length=content_length, etag=etag, chunk_size=chunk_size,
+                           content_type=content_type, headers=headers)
 
     def post_object(self, container, obj, headers):
         """Wrapper for :func:`post_object`"""
@@ -894,6 +893,7 @@ class Connection(object):
     def delete_object(self, container, obj):
         """Wrapper for :func:`delete_object`"""
         return self._retry(None, delete_object, container, obj)
+
 
 # End inclusion of swift.common.client
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -926,7 +926,6 @@ def put_errors_from_threads(threads, error_queue):
 
 
 class QueueFunctionThread(Thread):
-
     def __init__(self, queue, func, *args, **kwargs):
         """ Calls func for each item in queue; func is called with a queued
             item as the first arg followed by *args and **kwargs. Use the abort
@@ -966,11 +965,11 @@ delete --all OR delete container [--leave-segments] [object] [object] ...
 
 def st_delete(parser, args, print_queue, error_queue):
     parser.add_option('-a', '--all', action='store_true', dest='yes_all',
-        default=False, help='Indicates that you really want to delete '
-        'everything in the account')
+                      default=False, help='Indicates that you really want to delete '
+                                          'everything in the account')
     parser.add_option('', '--leave-segments', action='store_true',
-        dest='leave_segments', default=False, help='Indicates that you want '
-        'the segments of manifest objects left alone')
+                      dest='leave_segments', default=False, help='Indicates that you want '
+                                                                 'the segments of manifest objects left alone')
     (options, args) = parse_args(parser, args)
     args = args[1:]
     if (not args and not options.yes_all) or (args and options.yes_all):
@@ -1008,8 +1007,8 @@ def st_delete(parser, args, print_queue, error_queue):
                     segment_queue.put((scontainer, delobj['name']))
                 if not segment_queue.empty():
                     segment_threads = [QueueFunctionThread(segment_queue,
-                        _delete_segment, create_connection()) for _junk in
-                        xrange(10)]
+                                                           _delete_segment, create_connection()) for _junk in
+                                       xrange(10)]
                     for thread in segment_threads:
                         thread.start()
                     while not segment_queue.empty():
@@ -1067,15 +1066,15 @@ def st_delete(parser, args, print_queue, error_queue):
             error_queue.put('Container %s not found' % repr(container))
 
     url, token = get_auth(options.auth, options.user, options.key,
-        snet=options.snet)
+                          snet=options.snet)
     create_connection = lambda: Connection(options.auth, options.user,
-        options.key, preauthurl=url, preauthtoken=token, snet=options.snet)
+                                           options.key, preauthurl=url, preauthtoken=token, snet=options.snet)
     object_threads = [QueueFunctionThread(object_queue, _delete_object,
-        create_connection()) for _junk in xrange(10)]
+                                          create_connection()) for _junk in xrange(10)]
     for thread in object_threads:
         thread.start()
     container_threads = [QueueFunctionThread(container_queue,
-        _delete_container, create_connection()) for _junk in xrange(10)]
+                                             _delete_container, create_connection()) for _junk in xrange(10)]
     for thread in container_threads:
         thread.start()
     if not args:
@@ -1135,10 +1134,10 @@ download --all OR download container [options] [object] [object] ...
 
 def st_download(options, args, print_queue, error_queue):
     parser.add_option('-a', '--all', action='store_true', dest='yes_all',
-        default=False, help='Indicates that you really want to download '
-        'everything in the account')
+                      default=False, help='Indicates that you really want to download '
+                                          'everything in the account')
     parser.add_option('-o', '--output', dest='out_file', help='For a single '
-        'file download, stream the output to an alternate location ')
+                                                              'file download, stream the output to an alternate location ')
     (options, args) = parse_args(parser, args)
     args = args[1:]
     if options.out_file == '-':
@@ -1243,15 +1242,15 @@ def st_download(options, args, print_queue, error_queue):
             error_queue.put('Container %s not found' % repr(container))
 
     url, token = get_auth(options.auth, options.user, options.key,
-        snet=options.snet)
+                          snet=options.snet)
     create_connection = lambda: Connection(options.auth, options.user,
-        options.key, preauthurl=url, preauthtoken=token, snet=options.snet)
+                                           options.key, preauthurl=url, preauthtoken=token, snet=options.snet)
     object_threads = [QueueFunctionThread(object_queue, _download_object,
-        create_connection()) for _junk in xrange(10)]
+                                          create_connection()) for _junk in xrange(10)]
     for thread in object_threads:
         thread.start()
     container_threads = [QueueFunctionThread(container_queue,
-        _download_container, create_connection()) for _junk in xrange(10)]
+                                             _download_container, create_connection()) for _junk in xrange(10)]
     for thread in container_threads:
         thread.start()
     if not args:
@@ -1311,10 +1310,10 @@ list [options] [container]
 
 def st_list(options, args, print_queue, error_queue):
     parser.add_option('-p', '--prefix', dest='prefix', help='Will only list '
-        'items beginning with the prefix')
+                                                            'items beginning with the prefix')
     parser.add_option('-d', '--delimiter', dest='delimiter', help='Will roll '
-        'up items with the given delimiter (see Cloud Files general '
-        'documentation for what this means)')
+                                                                  'up items with the given delimiter (see Cloud Files general '
+                                                                  'documentation for what this means)')
     (options, args) = parse_args(parser, args)
     args = args[1:]
     if options.delimiter and not args:
@@ -1324,7 +1323,7 @@ def st_list(options, args, print_queue, error_queue):
                         (basename(argv[0]), st_list_help))
         return
     conn = Connection(options.auth, options.user, options.key,
-        snet=options.snet)
+                      snet=options.snet)
     try:
         marker = ''
         while True:
@@ -1333,7 +1332,7 @@ def st_list(options, args, print_queue, error_queue):
                     conn.get_account(marker=marker, prefix=options.prefix)[1]
             else:
                 items = conn.get_container(args[0], marker=marker,
-                    prefix=options.prefix, delimiter=options.delimiter)[1]
+                                           prefix=options.prefix, delimiter=options.delimiter)[1]
             if not items:
                 break
             for item in items:
@@ -1378,7 +1377,7 @@ Containers: %d
             for key, value in headers.items():
                 if key.startswith('x-account-meta-'):
                     print_queue.put('%10s: %s' % ('Meta %s' %
-                        key[len('x-account-meta-'):].title(), value))
+                                                  key[len('x-account-meta-'):].title(), value))
             for key, value in headers.items():
                 if not key.startswith('x-account-meta-') and key not in (
                         'content-length', 'date', 'x-account-container-count',
@@ -1415,7 +1414,7 @@ Write ACL: %s
             for key, value in headers.items():
                 if key.startswith('x-container-meta-'):
                     print_queue.put('%9s: %s' % ('Meta %s' %
-                        key[len('x-container-meta-'):].title(), value))
+                                                 key[len('x-container-meta-'):].title(), value))
             for key, value in headers.items():
                 if not key.startswith('x-container-meta-') and key not in (
                         'content-length', 'date', 'x-container-object-count',
@@ -1451,7 +1450,7 @@ Write ACL: %s
             for key, value in headers.items():
                 if key.startswith('x-object-meta-'):
                     print_queue.put('%14s: %s' % ('Meta %s' %
-                        key[len('x-object-meta-'):].title(), value))
+                                                  key[len('x-object-meta-'):].title(), value))
             for key, value in headers.items():
                 if not key.startswith('x-object-meta-') and key not in (
                         'content-type', 'content-length', 'last-modified',
@@ -1481,26 +1480,26 @@ post [options] [container] [object]
 
 def st_post(options, args, print_queue, error_queue):
     parser.add_option('-r', '--read-acl', dest='read_acl', help='Sets the '
-        'Read ACL for containers. Quick summary of ACL syntax: .r:*, '
-        '.r:-.example.com, .r:www.example.com, account1, account2:user2')
+                                                                'Read ACL for containers. Quick summary of ACL syntax: .r:*, '
+                                                                '.r:-.example.com, .r:www.example.com, account1, account2:user2')
     parser.add_option('-w', '--write-acl', dest='write_acl', help='Sets the '
-        'Write ACL for containers. Quick summary of ACL syntax: account1, '
-        'account2:user2')
+                                                                  'Write ACL for containers. Quick summary of ACL syntax: account1, '
+                                                                  'account2:user2')
     parser.add_option('-t', '--sync-to', dest='sync_to', help='Sets the '
-        'Sync To for containers, for multi-cluster replication.')
+                                                              'Sync To for containers, for multi-cluster replication.')
     parser.add_option('-k', '--sync-key', dest='sync_key', help='Sets the '
-        'Sync Key for containers, for multi-cluster replication.')
+                                                                'Sync Key for containers, for multi-cluster replication.')
     parser.add_option('-m', '--meta', action='append', dest='meta', default=[],
-        help='Sets a meta data item with the syntax name:value. This option '
-        'may be repeated. Example: -m Color:Blue -m Size:Large')
+                      help='Sets a meta data item with the syntax name:value. This option '
+                           'may be repeated. Example: -m Color:Blue -m Size:Large')
     (options, args) = parse_args(parser, args)
     args = args[1:]
     if (options.read_acl or options.write_acl or options.sync_to or
-        options.sync_key) and not args:
+            options.sync_key) and not args:
         exit('-r, -w, -t, and -k options only allowed for containers')
     conn = Connection(options.auth, options.user, options.key)
     if not args:
-        headers = {}
+        headers = { }
         for item in options.meta:
             split_item = item.split(':')
             headers['X-Account-Meta-' + split_item[0]] = \
@@ -1516,7 +1515,7 @@ def st_post(options, args, print_queue, error_queue):
             print >> stderr, 'WARNING: / in container name; you might have ' \
                              'meant %r instead of %r.' % \
                              (args[0].replace('/', ' ', 1), args[0])
-        headers = {}
+        headers = { }
         for item in options.meta:
             split_item = item.split(':')
             headers['X-Container-Meta-' + split_item[0]] = \
@@ -1536,7 +1535,7 @@ def st_post(options, args, print_queue, error_queue):
                 raise
             conn.put_container(args[0], headers=headers)
     elif len(args) == 2:
-        headers = {}
+        headers = { }
         for item in options.meta:
             split_item = item.split(':')
             headers['X-Object-Meta-' + split_item[0]] = \
@@ -1564,18 +1563,18 @@ upload [options] container file_or_directory [file_or_directory] [...]
 
 def st_upload(options, args, print_queue, error_queue):
     parser.add_option('-c', '--changed', action='store_true', dest='changed',
-        default=False, help='Will only upload files that have changed since '
-        'the last upload')
+                      default=False, help='Will only upload files that have changed since '
+                                          'the last upload')
     parser.add_option('-S', '--segment-size', dest='segment_size', help='Will '
-        'upload files in segments no larger than <size> and then create a '
-        '"manifest" file that will download all the segments as if it were '
-        'the original file. The segments will be uploaded to a '
-        '<container>_segments container so as to not pollute the main '
-        '<container> listings.')
+                                                                        'upload files in segments no larger than <size> and then create a '
+                                                                        '"manifest" file that will download all the segments as if it were '
+                                                                        'the original file. The segments will be uploaded to a '
+                                                                        '<container>_segments container so as to not pollute the main '
+                                                                        '<container> listings.')
     parser.add_option('', '--leave-segments', action='store_true',
-        dest='leave_segments', default=False, help='Indicates that you want '
-        'the older segments of manifest objects left alone (in the case of '
-        'overwrites)')
+                      dest='leave_segments', default=False, help='Indicates that you want '
+                                                                 'the older segments of manifest objects left alone (in the case of '
+                                                                 'overwrites)')
     (options, args) = parse_args(parser, args)
     args = args[1:]
     if len(args) < 2:
@@ -1591,7 +1590,7 @@ def st_upload(options, args, print_queue, error_queue):
             fp = open(job['path'], 'rb')
             fp.seek(job['segment_start'])
             conn.put_object(job.get('container', args[0] + '_segments'),
-                job['obj'], fp, content_length=job['segment_size'])
+                            job['obj'], fp, content_length=job['segment_size'])
         if options.verbose and 'log_line' in job:
             if conn.attempts > 1:
                 print_queue.put('%s [after %d attempts]' %
@@ -1609,7 +1608,7 @@ def st_upload(options, args, print_queue, error_queue):
                 obj = obj[2:]
             if obj.startswith('/'):
                 obj = obj[1:]
-            put_headers = {'x-object-meta-mtime': str(getmtime(path))}
+            put_headers = { 'x-object-meta-mtime': str(getmtime(path)) }
             if dir_marker:
                 if options.changed:
                     try:
@@ -1619,9 +1618,9 @@ def st_upload(options, args, print_queue, error_queue):
                         et = headers.get('etag')
                         mt = headers.get('x-object-meta-mtime')
                         if ct.split(';', 1)[0] == 'text/directory' and \
-                                cl == 0 and \
-                                et == 'd41d8cd98f00b204e9800998ecf8427e' and \
-                                mt == put_headers['x-object-meta-mtime']:
+                                        cl == 0 and \
+                                        et == 'd41d8cd98f00b204e9800998ecf8427e' and \
+                                        mt == put_headers['x-object-meta-mtime']:
                             return
                     except ClientException, err:
                         if err.http_status != 404:
@@ -1640,7 +1639,7 @@ def st_upload(options, args, print_queue, error_queue):
                         cl = int(headers.get('content-length'))
                         mt = headers.get('x-object-meta-mtime')
                         if options.changed and cl == getsize(path) and \
-                                mt == put_headers['x-object-meta-mtime']:
+                                        mt == put_headers['x-object-meta-mtime']:
                             return
                         if not options.leave_segments:
                             old_manifest = headers.get('x-object-manifest')
@@ -1648,12 +1647,12 @@ def st_upload(options, args, print_queue, error_queue):
                         if err.http_status != 404:
                             raise
                 if options.segment_size and \
-                        getsize(path) < options.segment_size:
+                                getsize(path) < options.segment_size:
                     full_size = getsize(path)
                     segment_queue = Queue(10000)
                     segment_threads = [QueueFunctionThread(segment_queue,
-                        _segment_job, create_connection()) for _junk in
-                        xrange(10)]
+                                                           _segment_job, create_connection()) for _junk in
+                                       xrange(10)]
                     for thread in segment_threads:
                         thread.start()
                     segment = 0
@@ -1662,13 +1661,13 @@ def st_upload(options, args, print_queue, error_queue):
                         segment_size = int(options.segment_size)
                         if segment_start + segment_size > full_size:
                             segment_size = full_size - segment_start
-                        segment_queue.put({'path': path,
-                            'obj': '%s/%s/%s/%08d' % (obj,
-                                put_headers['x-object-meta-mtime'], full_size,
-                                segment),
-                            'segment_start': segment_start,
-                            'segment_size': segment_size,
-                            'log_line': '%s segment %s' % (obj, segment)})
+                        segment_queue.put({ 'path': path,
+                                            'obj': '%s/%s/%s/%08d' % (obj,
+                                                                      put_headers['x-object-meta-mtime'], full_size,
+                                                                      segment),
+                                            'segment_start': segment_start,
+                                            'segment_size': segment_size,
+                                            'log_line': '%s segment %s' % (obj, segment) })
                         segment += 1
                         segment_start += segment_size
                     while not segment_queue.empty():
@@ -1679,8 +1678,8 @@ def st_upload(options, args, print_queue, error_queue):
                             thread.join(0.01)
                     if put_errors_from_threads(segment_threads, error_queue):
                         raise ClientException('Aborting manifest creation '
-                            'because not all segments could be uploaded. %s/%s'
-                            % (container, obj))
+                                              'because not all segments could be uploaded. %s/%s'
+                                              % (container, obj))
                     new_object_manifest = '%s_segments/%s/%s/%s/' % (
                         container, obj, put_headers['x-object-meta-mtime'],
                         full_size)
@@ -1691,18 +1690,18 @@ def st_upload(options, args, print_queue, error_queue):
                                     headers=put_headers)
                 else:
                     conn.put_object(container, obj, open(path, 'rb'),
-                        content_length=getsize(path), headers=put_headers)
+                                    content_length=getsize(path), headers=put_headers)
                 if old_manifest:
                     segment_queue = Queue(10000)
                     scontainer, sprefix = old_manifest.split('/', 1)
                     for delobj in conn.get_container(scontainer,
                                                      prefix=sprefix)[1]:
-                        segment_queue.put({'delete': True,
-                            'container': scontainer, 'obj': delobj['name']})
+                        segment_queue.put({ 'delete': True,
+                                            'container': scontainer, 'obj': delobj['name'] })
                     if not segment_queue.empty():
                         segment_threads = [QueueFunctionThread(segment_queue,
-                            _segment_job, create_connection()) for _junk in
-                            xrange(10)]
+                                                               _segment_job, create_connection()) for _junk in
+                                           xrange(10)]
                         for thread in segment_threads:
                             thread.start()
                         while not segment_queue.empty():
@@ -1726,21 +1725,21 @@ def st_upload(options, args, print_queue, error_queue):
     def _upload_dir(path):
         names = listdir(path)
         if not names:
-            object_queue.put({'path': path, 'dir_marker': True})
+            object_queue.put({ 'path': path, 'dir_marker': True })
         else:
             for name in listdir(path):
                 subpath = join(path, name)
                 if isdir(subpath):
                     _upload_dir(subpath)
                 else:
-                    object_queue.put({'path': subpath})
+                    object_queue.put({ 'path': subpath })
 
     url, token = get_auth(options.auth, options.user, options.key,
-        snet=options.snet)
+                          snet=options.snet)
     create_connection = lambda: Connection(options.auth, options.user,
-        options.key, preauthurl=url, preauthtoken=token, snet=options.snet)
+                                           options.key, preauthurl=url, preauthtoken=token, snet=options.snet)
     object_threads = [QueueFunctionThread(object_queue, _object_job,
-        create_connection()) for _junk in xrange(10)]
+                                          create_connection()) for _junk in xrange(10)]
     for thread in object_threads:
         thread.start()
     conn = create_connection()
@@ -1759,7 +1758,7 @@ def st_upload(options, args, print_queue, error_queue):
             if isdir(arg):
                 _upload_dir(arg)
             else:
-                object_queue.put({'path': arg})
+                object_queue.put({ 'path': arg })
         while not object_queue.empty():
             sleep(0.01)
         for thread in object_threads:
@@ -1828,20 +1827,24 @@ Example:
 
     print_queue = Queue(10000)
 
+
     def _print(item):
         if isinstance(item, unicode):
             item = item.encode('utf8')
         print item
+
 
     print_thread = QueueFunctionThread(print_queue, _print)
     print_thread.start()
 
     error_queue = Queue(10000)
 
+
     def _error(item):
         if isinstance(item, unicode):
             item = item.encode('utf8')
         print >> stderr, item
+
 
     error_thread = QueueFunctionThread(error_queue, _error)
     error_thread.start()

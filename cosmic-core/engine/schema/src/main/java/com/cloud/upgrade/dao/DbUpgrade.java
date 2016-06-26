@@ -38,7 +38,6 @@ public interface DbUpgrade {
     void performDataMigration(Connection conn);
 
     /**
-     *
      * @return
      */
     File[] getCleanupScripts();

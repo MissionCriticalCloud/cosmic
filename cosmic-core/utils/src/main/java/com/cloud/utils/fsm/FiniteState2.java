@@ -30,5 +30,4 @@ public interface FiniteState2<T, E> {
     T getFromStates(ChangeEvent e);
 
     Set<ChangeEvent> getPossibleEvents();
-
 }

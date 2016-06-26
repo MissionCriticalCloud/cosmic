@@ -16,11 +16,6 @@
 // under the License.
 package com.cloud.ha;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.PingTestCommand;
@@ -35,6 +30,10 @@ import com.cloud.vm.Nic;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.UserVmDao;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,7 +123,7 @@ public class UserVmDomRInvestigator extends AbstractInvestigatorImpl {
             if (hostState == Status.Up) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("ping from (" + hostId + ") to agent's host ip address (" + agent.getPrivateIpAddress() +
-                        ") successful, returning that agent is disconnected");
+                            ") successful, returning that agent is disconnected");
                 }
                 return Status.Disconnected; // the computing host ip is ping-able, but the computing agent is down, report that the agent is disconnected
             } else if (hostState == Status.Down) {
@@ -140,16 +139,6 @@ public class UserVmDomRInvestigator extends AbstractInvestigatorImpl {
             s_logger.debug("could not reach agent, could not reach agent's host, returning that we don't have enough information");
         }
         return null;
-    }
-
-    @Override
-    public boolean start() {
-        return true;
-    }
-
-    @Override
-    public boolean stop() {
-        return true;
     }
 
     private Boolean testUserVM(VirtualMachine vm, Nic nic, VirtualRouter router) {
@@ -168,7 +157,7 @@ public class UserVmDomRInvestigator extends AbstractInvestigatorImpl {
                 if (pingTestAnswer != null && pingTestAnswer.getResult()) {
                     if (s_logger.isDebugEnabled()) {
                         s_logger.debug("user vm's " + vm.getHostName() + " ip address " + privateIp + "  has been successfully pinged from the Virtual Router " +
-                            router.getHostName() + ", returning that vm is alive");
+                                router.getHostName() + ", returning that vm is alive");
                     }
                     return Boolean.TRUE;
                 }
@@ -183,6 +172,15 @@ public class UserVmDomRInvestigator extends AbstractInvestigatorImpl {
             s_logger.debug(vm + " could not be pinged, returning that it is unknown");
         }
         return null;
+    }
 
+    @Override
+    public boolean start() {
+        return true;
+    }
+
+    @Override
+    public boolean stop() {
+        return true;
     }
 }

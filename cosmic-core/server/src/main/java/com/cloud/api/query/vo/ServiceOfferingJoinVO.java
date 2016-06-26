@@ -16,108 +16,78 @@
 // under the License.
 package com.cloud.api.query.vo;
 
-import java.util.Date;
+import com.cloud.storage.Storage;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.Identity;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.storage.Storage;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "service_offering_view")
 public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentity, Identity {
 
+    @Column(name = "provisioning_type")
+    Storage.ProvisioningType provisioningType;
+    @Column(name = "tags", length = 4096)
+    String tags;
+    @Column(name = "sort_key")
+    int sortKey;
+    @Column(name = "bytes_read_rate")
+    Long bytesReadRate;
+    @Column(name = "bytes_write_rate")
+    Long bytesWriteRate;
+    @Column(name = "iops_read_rate")
+    Long iopsReadRate;
+    @Column(name = "iops_write_rate")
+    Long iopsWriteRate;
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "name")
     private String name;
-
     @Column(name = "display_text")
     private String displayText;
-
-    @Column(name = "provisioning_type")
-    Storage.ProvisioningType provisioningType;
-
-    @Column(name = "tags", length = 4096)
-    String tags;
-
     @Column(name = "use_local_storage")
     private boolean useLocalStorage;
-
     @Column(name = "system_use")
     private boolean systemUse;
-
     @Column(name = "cpu")
     private Integer cpu;
-
     @Column(name = "speed")
     private Integer speed;
-
     @Column(name = "ram_size")
     private Integer ramSize;
-
     @Column(name = "nw_rate")
     private Integer rateMbps;
-
     @Column(name = "mc_rate")
     private Integer multicastRateMbps;
-
     @Column(name = "ha_enabled")
     private boolean offerHA;
-
     @Column(name = "limit_cpu_use")
     private boolean limitCpuUse;
-
     @Column(name = "is_volatile")
     private boolean volatileVm;
-
     @Column(name = "host_tag")
     private String hostTag;
-
     @Column(name = "default_use")
     private boolean defaultUse;
-
     @Column(name = "vm_type")
     private String vmType;
-
     @Column(name = "customized_iops")
     private Boolean customizedIops;
-
     @Column(name = "min_iops")
     private Long minIops;
-
     @Column(name = "max_iops")
     private Long maxIops;
-
     @Column(name = "hv_ss_reserve")
     private Integer hypervisorSnapshotReserve;
-
-    @Column(name = "sort_key")
-    int sortKey;
-
-    @Column(name = "bytes_read_rate")
-    Long bytesReadRate;
-
-    @Column(name = "bytes_write_rate")
-    Long bytesWriteRate;
-
-    @Column(name = "iops_read_rate")
-    Long iopsReadRate;
-
-    @Column(name = "iops_write_rate")
-    Long iopsWriteRate;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
 
@@ -160,7 +130,7 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
         return displayText;
     }
 
-    public Storage.ProvisioningType getProvisioningType(){
+    public Storage.ProvisioningType getProvisioningType() {
         return provisioningType;
     }
 

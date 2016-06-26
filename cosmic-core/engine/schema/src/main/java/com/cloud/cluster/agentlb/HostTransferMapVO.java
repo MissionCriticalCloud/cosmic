@@ -16,7 +16,8 @@
 // under the License.
 package com.cloud.cluster.agentlb;
 
-import java.util.Date;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,33 +25,22 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "op_host_transfer")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class HostTransferMapVO implements InternalIdentity {
 
-    public enum HostTransferState {
-        TransferRequested, TransferStarted;
-    }
-
     @Id
     @Column(name = "id")
     private long id;
-
     @Column(name = "initial_mgmt_server_id")
     private long initialOwner;
-
     @Column(name = "future_mgmt_server_id")
     private long futureOwner;
-
     @Column(name = "state")
     private HostTransferState state;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
 
@@ -68,20 +58,20 @@ public class HostTransferMapVO implements InternalIdentity {
         return initialOwner;
     }
 
-    public long getFutureOwner() {
-        return futureOwner;
-    }
-
-    public HostTransferState getState() {
-        return state;
-    }
-
     public void setInitialOwner(long initialOwner) {
         this.initialOwner = initialOwner;
     }
 
+    public long getFutureOwner() {
+        return futureOwner;
+    }
+
     public void setFutureOwner(long futureOwner) {
         this.futureOwner = futureOwner;
+    }
+
+    public HostTransferState getState() {
+        return state;
     }
 
     public void setState(HostTransferState state) {
@@ -97,4 +87,7 @@ public class HostTransferMapVO implements InternalIdentity {
         return created;
     }
 
+    public enum HostTransferState {
+        TransferRequested, TransferStarted;
+    }
 }

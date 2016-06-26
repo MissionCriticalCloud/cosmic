@@ -16,14 +16,14 @@
 // under the License.
 package org.apache.cloudstack.engine.datacenter.entity.api.db.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.host.HostTagVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -35,20 +35,6 @@ public class HostTagsDaoImpl extends GenericDaoBase<HostTagVO, Long> implements 
         HostSearch = createSearchBuilder();
         HostSearch.and("hostId", HostSearch.entity().getHostId(), SearchCriteria.Op.EQ);
         HostSearch.done();
-    }
-
-    @Override
-    public List<String> gethostTags(long hostId) {
-        SearchCriteria<HostTagVO> sc = HostSearch.create();
-        sc.setParameters("hostId", hostId);
-
-        List<HostTagVO> results = search(sc, null);
-        List<String> hostTags = new ArrayList<String>(results.size());
-        for (HostTagVO result : results) {
-            hostTags.add(result.getTag());
-        }
-
-        return hostTags;
     }
 
     @Override
@@ -68,5 +54,19 @@ public class HostTagsDaoImpl extends GenericDaoBase<HostTagVO, Long> implements 
             }
         }
         txn.commit();
+    }
+
+    @Override
+    public List<String> gethostTags(long hostId) {
+        SearchCriteria<HostTagVO> sc = HostSearch.create();
+        sc.setParameters("hostId", hostId);
+
+        List<HostTagVO> results = search(sc, null);
+        List<String> hostTags = new ArrayList<String>(results.size());
+        for (HostTagVO result : results) {
+            hostTags.add(result.getTag());
+        }
+
+        return hostTags;
     }
 }

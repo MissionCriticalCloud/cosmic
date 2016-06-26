@@ -16,14 +16,6 @@
 // under the License.
 package com.cloud.vm;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.configuration.Config;
 import com.cloud.event.EventCategory;
 import com.cloud.event.EventTypes;
@@ -40,28 +32,41 @@ import com.cloud.vm.VirtualMachine.Event;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.UserVmDao;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.events.EventBus;
+
+import javax.inject.Inject;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 public class UserVmStateListener implements StateListener<State, VirtualMachine.Event, VirtualMachine> {
 
-    @Inject protected UsageEventDao _usageEventDao;
-    @Inject protected NetworkDao _networkDao;
-    @Inject protected NicDao _nicDao;
-    @Inject protected ServiceOfferingDao _offeringDao;
-    @Inject protected UserVmDao _userVmDao;
-    @Inject protected UserVmManager _userVmMgr;
-    @Inject protected ConfigurationDao _configDao;
     private static final Logger s_logger = LoggerFactory.getLogger(UserVmStateListener.class);
-
     protected static EventBus s_eventBus = null;
+    @Inject
+    protected UsageEventDao _usageEventDao;
+    @Inject
+    protected NetworkDao _networkDao;
+    @Inject
+    protected NicDao _nicDao;
+    @Inject
+    protected ServiceOfferingDao _offeringDao;
+    @Inject
+    protected UserVmDao _userVmDao;
+    @Inject
+    protected UserVmManager _userVmMgr;
+    @Inject
+    protected ConfigurationDao _configDao;
 
     public UserVmStateListener(UsageEventDao usageEventDao, NetworkDao networkDao, NicDao nicDao, ServiceOfferingDao offeringDao, UserVmDao userVmDao, UserVmManager userVmMgr,
-            ConfigurationDao configDao) {
+                               ConfigurationDao configDao) {
         this._usageEventDao = usageEventDao;
         this._networkDao = networkDao;
         this._nicDao = nicDao;
@@ -79,41 +84,41 @@ public class UserVmStateListener implements StateListener<State, VirtualMachine.
 
     @Override
     public boolean postStateTransitionEvent(StateMachine2.Transition<State, Event> transition, VirtualMachine vo, boolean status, Object opaque) {
-      if (!status) {
-        return false;
-      }
-      Event event = transition.getEvent();
-      State oldState = transition.getCurrentState();
-      State newState = transition.getToState();
-      pubishOnEventBus(event.name(), "postStateTransitionEvent", vo, oldState, newState);
-
-      if (vo.getType() != VirtualMachine.Type.User) {
-        return true;
-      }
-
-      if(transition.isImpacted(StateMachine2.Transition.Impact.USAGE)) {
-        if (oldState == State.Destroyed && newState == State.Stopped) {
-          generateUsageEvent(vo.getServiceOfferingId(), vo, EventTypes.EVENT_VM_CREATE);
-        } else if (newState == State.Running) {
-          generateUsageEvent(vo.getServiceOfferingId(), vo, EventTypes.EVENT_VM_START);
-        } else if (newState == State.Stopped) {
-          generateUsageEvent(vo.getServiceOfferingId(), vo, EventTypes.EVENT_VM_STOP);
-          List<NicVO> nics = _nicDao.listByVmId(vo.getId());
-          for (NicVO nic : nics) {
-            NetworkVO network = _networkDao.findById(nic.getNetworkId());
-            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NETWORK_OFFERING_REMOVE, vo.getAccountId(), vo.getDataCenterId(), vo.getId(),
-                    Long.toString(nic.getId()), network.getNetworkOfferingId(), null, 0L, vo.getClass().getName(), vo.getUuid(), vo.isDisplay());
-          }
-        } else if (newState == State.Destroyed || newState == State.Error || newState == State.Expunging) {
-          generateUsageEvent(vo.getServiceOfferingId(), vo, EventTypes.EVENT_VM_DESTROY);
+        if (!status) {
+            return false;
         }
-      }
-      return true;
+        Event event = transition.getEvent();
+        State oldState = transition.getCurrentState();
+        State newState = transition.getToState();
+        pubishOnEventBus(event.name(), "postStateTransitionEvent", vo, oldState, newState);
+
+        if (vo.getType() != VirtualMachine.Type.User) {
+            return true;
+        }
+
+        if (transition.isImpacted(StateMachine2.Transition.Impact.USAGE)) {
+            if (oldState == State.Destroyed && newState == State.Stopped) {
+                generateUsageEvent(vo.getServiceOfferingId(), vo, EventTypes.EVENT_VM_CREATE);
+            } else if (newState == State.Running) {
+                generateUsageEvent(vo.getServiceOfferingId(), vo, EventTypes.EVENT_VM_START);
+            } else if (newState == State.Stopped) {
+                generateUsageEvent(vo.getServiceOfferingId(), vo, EventTypes.EVENT_VM_STOP);
+                List<NicVO> nics = _nicDao.listByVmId(vo.getId());
+                for (NicVO nic : nics) {
+                    NetworkVO network = _networkDao.findById(nic.getNetworkId());
+                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NETWORK_OFFERING_REMOVE, vo.getAccountId(), vo.getDataCenterId(), vo.getId(),
+                            Long.toString(nic.getId()), network.getNetworkOfferingId(), null, 0L, vo.getClass().getName(), vo.getUuid(), vo.isDisplay());
+                }
+            } else if (newState == State.Destroyed || newState == State.Error || newState == State.Expunging) {
+                generateUsageEvent(vo.getServiceOfferingId(), vo, EventTypes.EVENT_VM_DESTROY);
+            }
+        }
+        return true;
     }
 
-  private void generateUsageEvent(Long serviceOfferingId, VirtualMachine vm,  String eventType){
+    private void generateUsageEvent(Long serviceOfferingId, VirtualMachine vm, String eventType) {
         boolean displayVm = true;
-        if(vm.getType() == VirtualMachine.Type.User){
+        if (vm.getType() == VirtualMachine.Type.User) {
             UserVmVO uservm = _userVmDao.findById(vm.getId());
             displayVm = uservm.isDisplayVm();
         }
@@ -126,8 +131,9 @@ public class UserVmStateListener implements StateListener<State, VirtualMachine.
         String configKey = Config.PublishResourceStateEvent.key();
         String value = _configDao.getValue(configKey);
         boolean configValue = Boolean.parseBoolean(value);
-        if(!configValue)
+        if (!configValue) {
             return;
+        }
         try {
             s_eventBus = ComponentContext.getComponent(EventBus.class);
         } catch (NoSuchBeanDefinitionException nbe) {
@@ -136,8 +142,8 @@ public class UserVmStateListener implements StateListener<State, VirtualMachine.
 
         String resourceName = getEntityFromClassName(VirtualMachine.class.getName());
         org.apache.cloudstack.framework.events.Event eventMsg =
-            new org.apache.cloudstack.framework.events.Event(ManagementService.Name, EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName,
-                vo.getUuid());
+                new org.apache.cloudstack.framework.events.Event(ManagementService.Name, EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName,
+                        vo.getUuid());
         Map<String, String> eventDescription = new HashMap<String, String>();
         eventDescription.put("resource", resourceName);
         eventDescription.put("id", vo.getUuid());
@@ -154,7 +160,6 @@ public class UserVmStateListener implements StateListener<State, VirtualMachine.
         } catch (org.apache.cloudstack.framework.events.EventBusException e) {
             s_logger.warn("Failed to publish state change event on the the event bus.");
         }
-
     }
 
     private String getEntityFromClassName(String entityClassName) {

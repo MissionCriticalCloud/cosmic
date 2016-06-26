@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.deploy.dao;
 
-import java.util.List;
-
 import com.cloud.deploy.PlannerHostReservationVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface PlannerHostReservationDao extends GenericDao<PlannerHostReservationVO, Long> {
 
@@ -28,5 +28,4 @@ public interface PlannerHostReservationDao extends GenericDao<PlannerHostReserva
     List<PlannerHostReservationVO> listAllReservedHosts();
 
     List<PlannerHostReservationVO> listAllDedicatedHosts();
-
 }

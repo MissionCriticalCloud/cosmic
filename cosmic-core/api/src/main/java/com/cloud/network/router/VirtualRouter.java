@@ -19,20 +19,12 @@ package com.cloud.network.router;
 import com.cloud.vm.VirtualMachine;
 
 /**
- *  bridge internal and external traffic.
+ * bridge internal and external traffic.
  */
 public interface VirtualRouter extends VirtualMachine {
-    public enum Role {
-        VIRTUAL_ROUTER, LB, INTERNAL_LB_VM
-    }
-
     Role getRole();
 
     boolean getIsRedundantRouter();
-
-    public enum RedundantState {
-        UNKNOWN, MASTER, BACKUP, FAULT
-    }
 
     RedundantState getRedundantState();
 
@@ -48,4 +40,12 @@ public interface VirtualRouter extends VirtualMachine {
     Long getVpcId();
 
     String getTemplateVersion();
+
+    public enum Role {
+        VIRTUAL_ROUTER, LB, INTERNAL_LB_VM
+    }
+
+    public enum RedundantState {
+        UNKNOWN, MASTER, BACKUP, FAULT
+    }
 }

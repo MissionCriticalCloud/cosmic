@@ -52,5 +52,4 @@ public class CreateLogicalSwitchPortCommand extends Command {
     public boolean executeInSequence() {
         return false;
     }
-
 }

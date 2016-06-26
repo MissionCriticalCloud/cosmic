@@ -19,10 +19,8 @@
     for 'SNAPSHOT.CREATE' type.
 """
 
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources,
-                              validateList)
+from marvin.codes import PASS
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              Snapshot,
@@ -34,12 +32,12 @@ from marvin.lib.common import (get_domain,
                                get_template,
                                list_volumes,
                                )
-
-from marvin.codes import PASS
+from marvin.lib.utils import (cleanup_resources,
+                              validateList)
+from nose.plugins.attrib import attr
 
 
 class TestVerifyEventsTable(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestVerifyEventsTable, cls).getClsTestClient()
@@ -168,7 +166,7 @@ class TestVerifyEventsTable(cloudstackTestCase):
             root_volume.id)
 
         snapshots_list = Snapshot.list(self.userapiclient,
-                                        id=snapshot.id)
+                                       id=snapshot.id)
 
         status = validateList(snapshots_list)
         self.assertEqual(status[0], PASS, "Snapshots List Validation Failed")

@@ -16,9 +16,6 @@
 // under the License.
 package com.cloud.network.security.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.network.security.SecurityGroupWork;
 import com.cloud.network.security.SecurityGroupWork.Step;
 import com.cloud.network.security.SecurityGroupWorkVO;
@@ -30,6 +27,9 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,13 +83,20 @@ public class SecurityGroupWorkDaoImpl extends GenericDaoBase<SecurityGroupWorkVO
         CleanupSearch.and("step", CleanupSearch.entity().getStep(), SearchCriteria.Op.IN);
 
         CleanupSearch.done();
-
     }
 
     @Override
     public SecurityGroupWork findByVmId(long vmId, boolean taken) {
         SearchCriteria<SecurityGroupWorkVO> sc = taken ? VmIdTakenSearch.create() : VmIdUnTakenSearch.create();
         sc.setParameters("vmId", vmId);
+        return findOneIncludingRemovedBy(sc);
+    }
+
+    @Override
+    public SecurityGroupWorkVO findByVmIdStep(long vmId, Step step) {
+        SearchCriteria<SecurityGroupWorkVO> sc = VmIdStepSearch.create();
+        sc.setParameters("vmId", vmId);
+        sc.setParameters("step", step);
         return findOneIncludingRemovedBy(sc);
     }
 
@@ -136,7 +143,6 @@ public class SecurityGroupWorkDaoImpl extends GenericDaoBase<SecurityGroupWorkVO
             txn.commit();
 
             return work;
-
         } catch (final Throwable e) {
             throw new CloudRuntimeException("Unable to execute take", e);
         }
@@ -166,14 +172,6 @@ public class SecurityGroupWorkDaoImpl extends GenericDaoBase<SecurityGroupWorkVO
     }
 
     @Override
-    public SecurityGroupWorkVO findByVmIdStep(long vmId, Step step) {
-        SearchCriteria<SecurityGroupWorkVO> sc = VmIdStepSearch.create();
-        sc.setParameters("vmId", vmId);
-        sc.setParameters("step", step);
-        return findOneIncludingRemovedBy(sc);
-    }
-
-    @Override
     @DB
     public void updateStep(Long workId, Step step) {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
@@ -188,7 +186,6 @@ public class SecurityGroupWorkDaoImpl extends GenericDaoBase<SecurityGroupWorkVO
         update(work.getId(), work);
 
         txn.commit();
-
     }
 
     @Override
@@ -232,5 +229,4 @@ public class SecurityGroupWorkDaoImpl extends GenericDaoBase<SecurityGroupWorkVO
         sc.setParameters("step", Step.Scheduled);
         return listIncludingRemovedBy(sc);
     }
-
 }

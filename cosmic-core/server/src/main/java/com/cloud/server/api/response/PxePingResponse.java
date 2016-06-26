@@ -17,9 +17,9 @@
 package com.cloud.server.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
+
+import com.google.gson.annotations.SerializedName;
 
 public class PxePingResponse extends NwDevicePxeServerResponse {
     @SerializedName(ApiConstants.PING_STORAGE_SERVER_IP)
@@ -34,27 +34,27 @@ public class PxePingResponse extends NwDevicePxeServerResponse {
     @Param(description = "Tftp root directory of PXE server")
     private String tftpDir;
 
-    public void setStorageServerIp(String ip) {
-        this.storageServerIp = ip;
-    }
-
     public String getStorageServerIp() {
         return this.storageServerIp;
     }
 
-    public void setPingDir(String dir) {
-        this.pingDir = dir;
+    public void setStorageServerIp(String ip) {
+        this.storageServerIp = ip;
     }
 
     public String getPingDir() {
         return this.pingDir;
     }
 
-    public void setTftpDir(String dir) {
-        this.tftpDir = dir;
+    public void setPingDir(String dir) {
+        this.pingDir = dir;
     }
 
     public String getTftpDir() {
         return this.tftpDir;
+    }
+
+    public void setTftpDir(String dir) {
+        this.tftpDir = dir;
     }
 }

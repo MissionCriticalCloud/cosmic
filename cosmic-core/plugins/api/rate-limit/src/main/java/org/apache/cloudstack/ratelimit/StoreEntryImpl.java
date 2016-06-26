@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implementation of limit store entry.
- *
  */
 public class StoreEntryImpl implements StoreEntry {
 
@@ -34,17 +33,8 @@ public class StoreEntryImpl implements StoreEntry {
     }
 
     @Override
-    public boolean isExpired() {
-        return System.currentTimeMillis() > expiry;
-    }
-
-    @Override
-    public long getExpireDuration() {
-        if (isExpired())
-            return 0; // already expired
-        else {
-            return expiry - System.currentTimeMillis();
-        }
+    public int getCounter() {
+        return this.counter.get();
     }
 
     @Override
@@ -53,7 +43,16 @@ public class StoreEntryImpl implements StoreEntry {
     }
 
     @Override
-    public int getCounter() {
-        return this.counter.get();
+    public boolean isExpired() {
+        return System.currentTimeMillis() > expiry;
+    }
+
+    @Override
+    public long getExpireDuration() {
+        if (isExpired()) {
+            return 0; // already expired
+        } else {
+            return expiry - System.currentTimeMillis();
+        }
     }
 }

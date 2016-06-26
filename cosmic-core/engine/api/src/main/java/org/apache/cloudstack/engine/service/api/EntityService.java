@@ -18,13 +18,12 @@
  */
 package org.apache.cloudstack.engine.service.api;
 
-import java.util.List;
-
-import javax.ws.rs.Path;
-
 import com.cloud.network.Network;
 import com.cloud.storage.Volume;
 import com.cloud.vm.VirtualMachine;
+
+import javax.ws.rs.Path;
+import java.util.List;
 
 /**
  * Service to retrieve CloudStack entities
@@ -53,5 +52,4 @@ public interface EntityService {
     Volume getVolume(String volume);
 
     Network getNetwork(String network);
-
 }

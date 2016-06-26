@@ -17,9 +17,9 @@
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 public class LdapConfigurationResponse extends BaseResponse {
     @SerializedName("hostname")
@@ -48,12 +48,12 @@ public class LdapConfigurationResponse extends BaseResponse {
         return hostname;
     }
 
-    public int getPort() {
-        return port;
-    }
-
     public void setHostname(final String hostname) {
         this.hostname = hostname;
+    }
+
+    public int getPort() {
+        return port;
     }
 
     public void setPort(final int port) {

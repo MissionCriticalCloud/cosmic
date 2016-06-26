@@ -16,25 +16,27 @@
 // under the License.
 package com.cloud.network.vpc;
 
-import java.util.List;
-
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.dao.NetworkVO;
+
+import java.util.List;
 
 public interface NetworkACLManager {
 
     /**
      * Creates Network ACL for the specified VPC
+     *
      * @param name
      * @param description
      * @param vpcId
-     * @param forDisplay TODO
+     * @param forDisplay  TODO
      * @return
      */
     NetworkACL createNetworkACL(String name, String description, long vpcId, Boolean forDisplay);
 
     /**
      * Fetches Network ACL with specified Id
+     *
      * @param id
      * @return
      */
@@ -42,6 +44,7 @@ public interface NetworkACLManager {
 
     /**
      * Applies the items in the ACL to all associated networks
+     *
      * @param aclId
      * @return
      * @throws ResourceUnavailableException
@@ -50,6 +53,7 @@ public interface NetworkACLManager {
 
     /**
      * Deletes the specified Network ACL
+     *
      * @param id
      * @return
      */
@@ -57,6 +61,7 @@ public interface NetworkACLManager {
 
     /**
      * Associates acl with a network and applies the ACLItems
+     *
      * @param acl
      * @param network
      * @return
@@ -65,6 +70,7 @@ public interface NetworkACLManager {
 
     /**
      * Creates a Network ACL Item within an ACL and applies it to associated networks
+     *
      * @param sourcePortStart
      * @param sourcePortEnd
      * @param protocol
@@ -75,14 +81,15 @@ public interface NetworkACLManager {
      * @param aclId
      * @param action
      * @param number
-     * @param forDisplay TODO
+     * @param forDisplay      TODO
      * @return
      */
     NetworkACLItem createNetworkACLItem(Integer sourcePortStart, Integer sourcePortEnd, String protocol, List<String> sourceCidrList, Integer icmpCode, Integer icmpType,
-        NetworkACLItem.TrafficType trafficType, Long aclId, String action, Integer number, Boolean forDisplay);
+                                        NetworkACLItem.TrafficType trafficType, Long aclId, String action, Integer number, Boolean forDisplay);
 
     /**
      * Returns Network ACL Item with specified Id
+     *
      * @param ruleId
      * @return
      */
@@ -90,6 +97,7 @@ public interface NetworkACLManager {
 
     /**
      * Revoke ACL Item and apply changes
+     *
      * @param ruleId
      * @return
      */
@@ -97,6 +105,7 @@ public interface NetworkACLManager {
 
     /**
      * Revoke ACL Items for network and remove them in back-end. Db is not updated
+     *
      * @param networkId
      * @param userId
      * @param caller
@@ -107,6 +116,7 @@ public interface NetworkACLManager {
 
     /**
      * List network ACL items by network
+     *
      * @param guestNtwkId
      * @return
      */
@@ -114,6 +124,7 @@ public interface NetworkACLManager {
 
     /**
      * Applies asscociated ACL to specified network
+     *
      * @param networkId
      * @return
      * @throws ResourceUnavailableException
@@ -122,6 +133,7 @@ public interface NetworkACLManager {
 
     /**
      * Updates and existing network ACL Item
+     *
      * @param id
      * @param protocol
      * @param sourceCidrList
@@ -132,16 +144,18 @@ public interface NetworkACLManager {
      * @param sourcePortEnd
      * @param icmpCode
      * @param icmpType
-     * @param customId TODO
-     * @param forDisplay TODO
+     * @param customId        TODO
+     * @param forDisplay      TODO
      * @return
      * @throws ResourceUnavailableException
      */
     NetworkACLItem updateNetworkACLItem(Long id, String protocol, List<String> sourceCidrList, NetworkACLItem.TrafficType trafficType, String action, Integer number,
-        Integer sourcePortStart, Integer sourcePortEnd, Integer icmpCode, Integer icmpType, String customId, Boolean forDisplay) throws ResourceUnavailableException;
+                                        Integer sourcePortStart, Integer sourcePortEnd, Integer icmpCode, Integer icmpType, String customId, Boolean forDisplay) throws
+            ResourceUnavailableException;
 
     /**
      * Associates acl with a network and applies the ACLItems
+     *
      * @param acl
      * @param gateway
      * @return

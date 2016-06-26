@@ -13,24 +13,24 @@ import org.libvirt.LibvirtException;
 
 @ResourceWrapper(handles = CheckVirtualMachineCommand.class)
 public final class LibvirtCheckVirtualMachineCommandWrapper
-    extends CommandWrapper<CheckVirtualMachineCommand, Answer, LibvirtComputingResource> {
+        extends CommandWrapper<CheckVirtualMachineCommand, Answer, LibvirtComputingResource> {
 
-  @Override
-  public Answer execute(final CheckVirtualMachineCommand command,
-      final LibvirtComputingResource libvirtComputingResource) {
-    try {
-      final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();
+    @Override
+    public Answer execute(final CheckVirtualMachineCommand command,
+                          final LibvirtComputingResource libvirtComputingResource) {
+        try {
+            final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();
 
-      final Connect conn = libvirtUtilitiesHelper.getConnectionByVmName(command.getVmName());
-      final PowerState state = libvirtComputingResource.getVmState(conn, command.getVmName());
-      Integer vncPort = null;
-      if (state == PowerState.PowerOn) {
-        vncPort = libvirtComputingResource.getVncPort(conn, command.getVmName());
-      }
+            final Connect conn = libvirtUtilitiesHelper.getConnectionByVmName(command.getVmName());
+            final PowerState state = libvirtComputingResource.getVmState(conn, command.getVmName());
+            Integer vncPort = null;
+            if (state == PowerState.PowerOn) {
+                vncPort = libvirtComputingResource.getVncPort(conn, command.getVmName());
+            }
 
-      return new CheckVirtualMachineAnswer(command, state, vncPort);
-    } catch (final LibvirtException e) {
-      return new CheckVirtualMachineAnswer(command, e.getMessage());
+            return new CheckVirtualMachineAnswer(command, state, vncPort);
+        } catch (final LibvirtException e) {
+            return new CheckVirtualMachineAnswer(command, e.getMessage());
+        }
     }
-  }
 }

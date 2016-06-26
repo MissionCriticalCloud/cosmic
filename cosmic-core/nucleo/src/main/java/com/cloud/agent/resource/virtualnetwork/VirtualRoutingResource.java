@@ -19,21 +19,6 @@
 
 package com.cloud.agent.resource.virtualnetwork;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CheckRouterAnswer;
 import com.cloud.agent.api.CheckRouterCommand;
@@ -52,24 +37,36 @@ import com.cloud.utils.ExecutionResult;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.exception.CloudRuntimeException;
 
+import javax.naming.ConfigurationException;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.UUID;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * VirtualNetworkResource controls and configures virtual networking
  *
- * @config
- * {@table
- *    || Param Name | Description | Values | Default ||
- *  }
+ * @config {@table
+ * || Param Name | Description | Values | Default ||
+ * }
  **/
 public class VirtualRoutingResource {
 
     private static final Logger s_logger = LoggerFactory.getLogger(VirtualRoutingResource.class);
+    protected Map<String, Lock> _vrLockMap = new HashMap<String, Lock>();
     private VirtualRouterDeployer _vrDeployer;
     private Map<String, Queue<NetworkElementCommand>> _vrAggregateCommandsSet;
-    protected Map<String, Lock> _vrLockMap = new HashMap<String, Lock>();
-
     private String _name;
     private int _sleep;
     private int _retry;
@@ -108,7 +105,7 @@ public class VirtualRoutingResource {
             }
 
             if (cmd instanceof AggregationControlCommand) {
-                return execute((AggregationControlCommand)cmd);
+                return execute((AggregationControlCommand) cmd);
             }
 
             if (_vrAggregateCommandsSet.containsKey(routerName)) {
@@ -140,13 +137,13 @@ public class VirtualRoutingResource {
 
     private Answer executeQueryCommand(NetworkElementCommand cmd) {
         if (cmd instanceof CheckRouterCommand) {
-            return execute((CheckRouterCommand)cmd);
+            return execute((CheckRouterCommand) cmd);
         } else if (cmd instanceof GetDomRVersionCmd) {
-            return execute((GetDomRVersionCmd)cmd);
+            return execute((GetDomRVersionCmd) cmd);
         } else if (cmd instanceof CheckS2SVpnConnectionsCommand) {
             return execute((CheckS2SVpnConnectionsCommand) cmd);
         } else if (cmd instanceof GetRouterAlertsCommand) {
-            return execute((GetRouterAlertsCommand)cmd);
+            return execute((GetRouterAlertsCommand) cmd);
         } else {
             s_logger.error("Unknown query command in VirtualRoutingResource!");
             return Answer.createUnsupportedCommandAnswer(cmd);
@@ -159,19 +156,17 @@ public class VirtualRoutingResource {
 
     private ExecutionResult applyConfigToVR(String routerAccessIp, ConfigItem c, int timeout) {
         if (c instanceof FileConfigItem) {
-            FileConfigItem configItem = (FileConfigItem)c;
+            FileConfigItem configItem = (FileConfigItem) c;
 
             return _vrDeployer.createFileInVR(routerAccessIp, configItem.getFilePath(), configItem.getFileName(), configItem.getFileContents());
         } else if (c instanceof ScriptConfigItem) {
-            ScriptConfigItem configItem = (ScriptConfigItem)c;
+            ScriptConfigItem configItem = (ScriptConfigItem) c;
             return _vrDeployer.executeInVR(routerAccessIp, configItem.getScript(), configItem.getArgs(), timeout);
         }
         throw new CloudRuntimeException("Unable to apply unknown configitem of type " + c.getClass().getSimpleName());
     }
 
-
     private Answer applyConfig(NetworkElementCommand cmd, List<ConfigItem> cfg) {
-
 
         if (cfg.isEmpty()) {
             return new Answer(cmd, true, "Nothing to do");
@@ -199,7 +194,6 @@ public class VirtualRoutingResource {
         if (cmd.getAnswersCount() != results.size()) {
             s_logger.warn("Expected " + cmd.getAnswersCount() + " answers while executing " + cmd.getClass().getSimpleName() + " but received " + results.size());
         }
-
 
         if (results.size() == 1) {
             return new Answer(cmd, finalResult, results.get(0).getDetails());
@@ -263,16 +257,16 @@ public class VirtualRoutingResource {
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         _name = name;
 
-        String value = (String)params.get("ssh.sleep");
+        String value = (String) params.get("ssh.sleep");
         _sleep = NumbersUtil.parseInt(value, 10) * 1000;
 
-        value = (String)params.get("ssh.retry");
+        value = (String) params.get("ssh.retry");
         _retry = NumbersUtil.parseInt(value, 36);
 
-        value = (String)params.get("ssh.port");
+        value = (String) params.get("ssh.port");
         _port = NumbersUtil.parseInt(value, 3922);
 
-        value = (String)params.get("router.aggregation.command.each.timeout");
+        value = (String) params.get("router.aggregation.command.each.timeout");
         _eachTimeout = NumbersUtil.parseInt(value, 3);
 
         if (_vrDeployer == null) {
@@ -368,7 +362,7 @@ public class VirtualRoutingResource {
                 }
 
                 // TODO replace with applyConfig with a stop on fail
-                String cfgFileName = "VR-"+ UUID.randomUUID().toString() + ".cfg";
+                String cfgFileName = "VR-" + UUID.randomUUID().toString() + ".cfg";
                 FileConfigItem fileConfigItem = new FileConfigItem(VRScripts.CONFIG_CACHE_LOCATION, cfgFileName, sb.toString());
                 ScriptConfigItem scriptConfigItem = new ScriptConfigItem(VRScripts.VR_CFG, "-c " + VRScripts.CONFIG_CACHE_LOCATION + cfgFileName);
                 // 120s is the minimal timeout

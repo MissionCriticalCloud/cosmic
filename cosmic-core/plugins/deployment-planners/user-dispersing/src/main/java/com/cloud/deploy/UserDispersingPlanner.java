@@ -16,6 +16,12 @@
 // under the License.
 package com.cloud.deploy;
 
+import com.cloud.configuration.Config;
+import com.cloud.utils.NumbersUtil;
+import com.cloud.utils.Pair;
+import com.cloud.vm.VirtualMachineProfile;
+
+import javax.naming.ConfigurationException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,29 +29,24 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import javax.naming.ConfigurationException;
-
-import com.cloud.configuration.Config;
-import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
-import com.cloud.vm.VirtualMachineProfile;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class UserDispersingPlanner extends FirstFitPlanner implements DeploymentClusterPlanner {
 
     private static final Logger s_logger = LoggerFactory.getLogger(UserDispersingPlanner.class);
+    float _userDispersionWeight;
 
     /**
      * This method should reorder the given list of Cluster Ids by applying any necessary heuristic
      * for this planner
      * For UserDispersingPlanner we need to order the clusters by considering the number of VMs for this account
+     *
      * @return List<Long> ordered list of Cluster Ids
      */
     @Override
     protected List<Long> reorderClusters(long id, boolean isZone, Pair<List<Long>, Map<Long, Double>> clusterCapacityInfo, VirtualMachineProfile vmProfile,
-        DeploymentPlan plan) {
+                                         DeploymentPlan plan) {
         List<Long> clusterIdsByCapacity = clusterCapacityInfo.first();
         if (vmProfile.getOwner() == null) {
             return clusterIdsByCapacity;
@@ -64,13 +65,13 @@ public class UserDispersingPlanner extends FirstFitPlanner implements Deployment
             //apply weights to the two lists
             return orderByApplyingWeights(clusterCapacityInfo, clusterIdsVmCountInfo, accountId);
         }
-
     }
 
     /**
      * This method should reorder the given list of Pod Ids by applying any necessary heuristic
      * for this planner
      * For UserDispersingPlanner we need to order the pods by considering the number of VMs for this account
+     *
      * @return List<Long> ordered list of Pod Ids
      */
     @Override
@@ -94,7 +95,28 @@ public class UserDispersingPlanner extends FirstFitPlanner implements Deployment
             //apply weights to the two lists
             return orderByApplyingWeights(podCapacityInfo, podIdsVmCountInfo, accountId);
         }
+    }
 
+    protected Pair<List<Long>, Map<Long, Double>> listPodsByUserDispersion(long dataCenterId, long accountId) {
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("Applying Userdispersion heuristic to pods for account: " + accountId);
+        }
+        Pair<List<Long>, Map<Long, Double>> podIdsVmCountInfo = vmInstanceDao.listPodIdsInZoneByVmCount(dataCenterId, accountId);
+        if (s_logger.isTraceEnabled()) {
+            s_logger.trace("List of pods in ascending order of number of VMs: " + podIdsVmCountInfo.first());
+        }
+
+        return podIdsVmCountInfo;
+    }
+
+    @Override
+    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+        super.configure(name, params);
+
+        String weight = configDao.getValue(Config.VmUserDispersionWeight.key());
+        _userDispersionWeight = NumbersUtil.parseFloat(weight, 1.0f);
+
+        return true;
     }
 
     protected Pair<List<Long>, Map<Long, Double>> listClustersByUserDispersion(long id, boolean isZone, long accountId) {
@@ -111,18 +133,6 @@ public class UserDispersingPlanner extends FirstFitPlanner implements Deployment
             s_logger.trace("List of clusters in ascending order of number of VMs: " + clusterIdsVmCountInfo.first());
         }
         return clusterIdsVmCountInfo;
-    }
-
-    protected Pair<List<Long>, Map<Long, Double>> listPodsByUserDispersion(long dataCenterId, long accountId) {
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Applying Userdispersion heuristic to pods for account: " + accountId);
-        }
-        Pair<List<Long>, Map<Long, Double>> podIdsVmCountInfo = vmInstanceDao.listPodIdsInZoneByVmCount(dataCenterId, accountId);
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("List of pods in ascending order of number of VMs: " + podIdsVmCountInfo.first());
-        }
-
-        return podIdsVmCountInfo;
     }
 
     private List<Long> orderByApplyingWeights(Pair<List<Long>, Map<Long, Double>> capacityInfo, Pair<List<Long>, Map<Long, Double>> vmCountInfo, long accountId) {
@@ -184,17 +194,4 @@ public class UserDispersingPlanner extends FirstFitPlanner implements Deployment
 
         return idsReorderedByWeights;
     }
-
-    float _userDispersionWeight;
-
-    @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
-        super.configure(name, params);
-
-        String weight = configDao.getValue(Config.VmUserDispersionWeight.key());
-        _userDispersionWeight = NumbersUtil.parseFloat(weight, 1.0f);
-
-        return true;
-    }
-
 }

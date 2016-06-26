@@ -67,5 +67,4 @@ public class MonitorServiceTO implements InternalIdentity {
     public String getProcessname() {
         return processname;
     }
-
 }

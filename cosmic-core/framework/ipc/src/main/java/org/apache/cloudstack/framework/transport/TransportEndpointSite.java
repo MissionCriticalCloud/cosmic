@@ -55,10 +55,6 @@ public class TransportEndpointSite {
         _outstandingSignalRequests = 0;
     }
 
-    public TransportEndpoint getEndpoint() {
-        return _endpoint;
-    }
-
     public TransportAddress getAddress() {
         return _address;
     }
@@ -88,39 +84,6 @@ public class TransportEndpointSite {
         signalOutputProcessRequest();
     }
 
-    public TransportPdu getNextOutputPdu() {
-        synchronized (this) {
-            if (_outputQueue.size() > 0)
-                return _outputQueue.remove(0);
-        }
-
-        return null;
-    }
-
-    public void processOutput() {
-        TransportPdu pdu;
-        TransportEndpoint endpoint = getEndpoint();
-
-        if (endpoint != null) {
-            while ((pdu = getNextOutputPdu()) != null) {
-                if (pdu instanceof TransportDataPdu) {
-                    String multiplexierName = ((TransportDataPdu)pdu).getMultiplexier();
-                    TransportMultiplexier multiplexier = getRoutedMultiplexier(multiplexierName);
-                    assert (multiplexier != null);
-                    multiplexier.onTransportMessage(pdu.getSourceAddress(), pdu.getDestAddress(), multiplexierName, ((TransportDataPdu)pdu).getContent());
-                }
-            }
-        }
-    }
-
-    private TransportMultiplexier getRoutedMultiplexier(String multiplexierName) {
-        TransportMultiplexier multiplexier = _multiplexierMap.get(multiplexierName);
-        if (multiplexier == null)
-            multiplexier = _endpoint;
-
-        return multiplexier;
-    }
-
     private void signalOutputProcessRequest() {
         boolean proceed = false;
         synchronized (this) {
@@ -130,8 +93,48 @@ public class TransportEndpointSite {
             }
         }
 
-        if (proceed)
+        if (proceed) {
             _provider.requestSiteOutput(this);
+        }
+    }
+
+    public void processOutput() {
+        TransportPdu pdu;
+        TransportEndpoint endpoint = getEndpoint();
+
+        if (endpoint != null) {
+            while ((pdu = getNextOutputPdu()) != null) {
+                if (pdu instanceof TransportDataPdu) {
+                    String multiplexierName = ((TransportDataPdu) pdu).getMultiplexier();
+                    TransportMultiplexier multiplexier = getRoutedMultiplexier(multiplexierName);
+                    assert (multiplexier != null);
+                    multiplexier.onTransportMessage(pdu.getSourceAddress(), pdu.getDestAddress(), multiplexierName, ((TransportDataPdu) pdu).getContent());
+                }
+            }
+        }
+    }
+
+    public TransportEndpoint getEndpoint() {
+        return _endpoint;
+    }
+
+    public TransportPdu getNextOutputPdu() {
+        synchronized (this) {
+            if (_outputQueue.size() > 0) {
+                return _outputQueue.remove(0);
+            }
+        }
+
+        return null;
+    }
+
+    private TransportMultiplexier getRoutedMultiplexier(String multiplexierName) {
+        TransportMultiplexier multiplexier = _multiplexierMap.get(multiplexierName);
+        if (multiplexier == null) {
+            multiplexier = _endpoint;
+        }
+
+        return multiplexier;
     }
 
     public void ackOutputProcessSignal() {

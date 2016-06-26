@@ -16,7 +16,8 @@
 // under the License.
 package com.cloud.vm;
 
-import java.util.HashMap;
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.uservm.UserVm;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -25,9 +26,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
-
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.uservm.UserVm;
+import java.util.HashMap;
 
 @Entity
 @Table(name = "user_vm")
@@ -35,39 +34,16 @@ import com.cloud.uservm.UserVm;
 @PrimaryKeyJoinColumn(name = "id")
 public class UserVmVO extends VMInstanceVO implements UserVm {
 
+    @Column(name = "update_parameters", updatable = true)
+    protected boolean updateParameters = true;
+    transient String password;
     @Column(name = "iso_id", nullable = true, length = 17)
     private Long isoId = null;
-
     @Column(name = "user_data", updatable = true, nullable = true, length = 32768)
     @Basic(fetch = FetchType.LAZY)
     private String userData;
-
     @Column(name = "display_name", updatable = true, nullable = true)
     private String displayName;
-
-    @Column(name = "update_parameters", updatable = true)
-    protected boolean updateParameters = true;
-
-    transient String password;
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @Override
-    public Long getIsoId() {
-        return isoId;
-    }
-
-    @Override
-    public long getServiceOfferingId() {
-        return serviceOfferingId;
-    }
 
     public UserVmVO(long id, String instanceName, String displayName, long templateId, HypervisorType hypervisorType, long guestOsId, boolean haEnabled,
                     boolean limitCpuUse, long domainId, long accountId, long userId, long serviceOfferingId, String userData, String name, Long diskOfferingId) {
@@ -81,13 +57,18 @@ public class UserVmVO extends VMInstanceVO implements UserVm {
         super();
     }
 
+    @Override
+    public Long getIsoId() {
+        return isoId;
+    }
+
     public void setIsoId(Long id) {
         this.isoId = id;
     }
 
     @Override
-    public void setUserData(String userData) {
-        this.userData = userData;
+    public String getDisplayName() {
+        return displayName;
     }
 
     @Override
@@ -96,17 +77,22 @@ public class UserVmVO extends VMInstanceVO implements UserVm {
     }
 
     @Override
-    public String getDisplayName() {
-        return displayName;
+    public void setUserData(String userData) {
+        this.userData = userData;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
     public String getDetail(String name) {
-        return details != null ? details.get(name) : null ;
+        return details != null ? details.get(name) : null;
     }
 
     @Override
@@ -114,15 +100,24 @@ public class UserVmVO extends VMInstanceVO implements UserVm {
         this.accountId = accountId;
     }
 
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    @Override
+    public long getServiceOfferingId() {
+        return serviceOfferingId;
+    }
+
     public void setDomainId(long domainId) {
         this.domainId = domainId;
     }
 
-    public void setUpdateParameters(boolean updateParameters) {
-        this.updateParameters = updateParameters;
-    }
-
     public boolean isUpdateParameters() {
         return updateParameters;
+    }
+
+    public void setUpdateParameters(boolean updateParameters) {
+        this.updateParameters = updateParameters;
     }
 }

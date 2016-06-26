@@ -19,7 +19,6 @@
 
 package com.cloud.agent.api;
 
-
 import com.cloud.agent.api.routing.GetRouterAlertsCommand;
 
 public class GetRouterAlertsAnswer extends Answer {
@@ -36,25 +35,23 @@ public class GetRouterAlertsAnswer extends Answer {
         this.timeStamp = timeStamp;
     }
 
-
     public GetRouterAlertsAnswer(GetRouterAlertsCommand cmd, String details) {
         super(cmd, false, details);
-    }
-
-    public void setAlerts(String[] alerts) {
-        this.alerts = alerts;
     }
 
     public String[] getAlerts() {
         return alerts;
     }
 
-    public void setTimeStamp(String timeStamp) {
-        this.timeStamp = timeStamp;
+    public void setAlerts(String[] alerts) {
+        this.alerts = alerts;
     }
 
     public String getTimeStamp() {
         return timeStamp;
     }
 
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
+    }
 }

@@ -16,10 +16,10 @@
 // under the License.
 package com.cloud.consoleproxy;
 
+import com.cloud.consoleproxy.util.Logger;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import com.cloud.consoleproxy.util.Logger;
 
 public class ConsoleProxyHttpHandlerHelper {
     private static final Logger s_logger = Logger.getLogger(ConsoleProxyHttpHandlerHelper.class);
@@ -39,8 +39,9 @@ public class ConsoleProxyHttpHandlerHelper {
                 String value = paramTokens[1] + "=" + paramTokens[2];
                 map.put(name, value);
             } else {
-                if (s_logger.isDebugEnabled())
+                if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Invalid paramemter in URL found. param: " + param);
+                }
             }
         }
 
@@ -77,18 +78,24 @@ public class ConsoleProxyHttpHandlerHelper {
                 } else {
                     s_logger.error("decode token. sid info is not found!");
                 }
-                if (param.getClientTunnelUrl() != null)
+                if (param.getClientTunnelUrl() != null) {
                     map.put("consoleurl", param.getClientTunnelUrl());
-                if (param.getClientTunnelSession() != null)
+                }
+                if (param.getClientTunnelSession() != null) {
                     map.put("sessionref", param.getClientTunnelSession());
-                if (param.getTicket() != null)
+                }
+                if (param.getTicket() != null) {
                     map.put("ticket", param.getTicket());
-                if (param.getLocale() != null)
+                }
+                if (param.getLocale() != null) {
                     map.put("locale", param.getLocale());
-                if (param.getUsername() != null)
+                }
+                if (param.getUsername() != null) {
                     map.put("username", param.getUsername());
-                if (param.getPassword() != null)
+                }
+                if (param.getPassword() != null) {
                     map.put("password", param.getPassword());
+                }
             } else {
                 s_logger.error("Unable to decode token");
             }

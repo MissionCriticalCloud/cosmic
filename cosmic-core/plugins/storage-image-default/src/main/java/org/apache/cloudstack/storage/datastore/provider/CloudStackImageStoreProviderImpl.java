@@ -18,15 +18,8 @@
  */
 package org.apache.cloudstack.storage.datastore.provider;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import com.cloud.storage.ScopeType;
 import com.cloud.utils.component.ComponentContext;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreDriver;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreLifeCycle;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProvider;
@@ -38,6 +31,12 @@ import org.apache.cloudstack.storage.image.ImageStoreDriver;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreHelper;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreProviderManager;
 import org.apache.cloudstack.storage.image.store.lifecycle.ImageStoreLifeCycle;
+
+import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -57,6 +56,16 @@ public class CloudStackImageStoreProviderImpl implements ImageStoreProvider {
     }
 
     @Override
+    public DataStoreDriver getDataStoreDriver() {
+        return this.driver;
+    }
+
+    @Override
+    public HypervisorHostListener getHostListener() {
+        return null;
+    }
+
+    @Override
     public String getName() {
         return this.providerName;
     }
@@ -72,16 +81,6 @@ public class CloudStackImageStoreProviderImpl implements ImageStoreProvider {
     }
 
     @Override
-    public DataStoreDriver getDataStoreDriver() {
-        return this.driver;
-    }
-
-    @Override
-    public HypervisorHostListener getHostListener() {
-        return null;
-    }
-
-    @Override
     public Set<DataStoreProviderType> getTypes() {
         Set<DataStoreProviderType> types = new HashSet<DataStoreProviderType>();
         types.add(DataStoreProviderType.IMAGE);
@@ -91,8 +90,9 @@ public class CloudStackImageStoreProviderImpl implements ImageStoreProvider {
 
     @Override
     public boolean isScopeSupported(ScopeType scope) {
-        if (scope == ScopeType.ZONE)
+        if (scope == ScopeType.ZONE) {
             return true;
+        }
         return false;
     }
 
@@ -100,5 +100,4 @@ public class CloudStackImageStoreProviderImpl implements ImageStoreProvider {
     public boolean needDownloadSysTemplate() {
         return false;
     }
-
 }

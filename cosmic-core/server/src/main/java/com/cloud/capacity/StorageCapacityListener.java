@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.capacity;
 
-import java.math.BigDecimal;
-
 import com.cloud.agent.Listener;
 import com.cloud.agent.api.AgentControlAnswer;
 import com.cloud.agent.api.AgentControlCommand;
@@ -31,6 +29,8 @@ import com.cloud.host.Host;
 import com.cloud.host.Status;
 import com.cloud.storage.Storage;
 import com.cloud.storage.StorageManager;
+
+import java.math.BigDecimal;
 
 public class StorageCapacityListener implements Listener {
 
@@ -65,15 +65,14 @@ public class StorageCapacityListener implements Listener {
             return;
         }
 
-        StartupStorageCommand ssCmd = (StartupStorageCommand)startup;
+        StartupStorageCommand ssCmd = (StartupStorageCommand) startup;
         if (ssCmd.getResourceType() == Storage.StorageResourceType.STORAGE_HOST) {
             BigDecimal overProvFactor = BigDecimal.valueOf(CapacityManager.StorageOverprovisioningFactor.value());
             CapacityVO capacity =
-                new CapacityVO(server.getId(), server.getDataCenterId(), server.getPodId(), server.getClusterId(), 0L, (overProvFactor.multiply(new BigDecimal(
-                    server.getTotalSize()))).longValue(), Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED);
+                    new CapacityVO(server.getId(), server.getDataCenterId(), server.getPodId(), server.getClusterId(), 0L, (overProvFactor.multiply(new BigDecimal(
+                            server.getTotalSize()))).longValue(), Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED);
             _capacityDao.persist(capacity);
         }
-
     }
 
     @Override
@@ -95,5 +94,4 @@ public class StorageCapacityListener implements Listener {
     public boolean processTimeout(long agentId, long seq) {
         return false;
     }
-
 }

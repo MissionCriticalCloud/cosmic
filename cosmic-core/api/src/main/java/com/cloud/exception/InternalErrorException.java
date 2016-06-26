@@ -20,12 +20,11 @@ public class InternalErrorException extends ManagementServerException {
 
     private static final long serialVersionUID = -3070582946175427902L;
 
-    public InternalErrorException(String message) {
+    public InternalErrorException(final String message) {
         super(message);
     }
 
-    public InternalErrorException(String message, Throwable cause) {
+    public InternalErrorException(final String message, final Throwable cause) {
         super(message, cause);
     }
-
 }

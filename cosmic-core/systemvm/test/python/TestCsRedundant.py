@@ -15,18 +15,17 @@
 # specific language governing permissions and limitations
 # under the License.
 
+import merge
 import unittest
-from cs.CsRedundant import CsRedundant
 from cs.CsConfig import CsConfig
 from cs.CsDatabag import CsCmdLine
-import merge
+from cs.CsRedundant import CsRedundant
 
 
 class TestCsRedundant(unittest.TestCase):
-
     def setUp(self):
         merge.DataBag.DPATH = "."
-        self.cmdline = CsCmdLine("cmdline", {})
+        self.cmdline = CsCmdLine("cmdline", { })
 
     def test_init(self):
         csconfig = CsConfig()
@@ -35,6 +34,7 @@ class TestCsRedundant(unittest.TestCase):
 
         csredundant = CsRedundant(csconfig)
         self.assertTrue(csredundant is not None)
+
 
 if __name__ == '__main__':
     unittest.main()

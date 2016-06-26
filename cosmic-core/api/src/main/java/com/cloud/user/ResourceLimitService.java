@@ -16,28 +16,23 @@
 // under the License.
 package com.cloud.user;
 
-import java.util.List;
-
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.configuration.ResourceCount;
 import com.cloud.configuration.ResourceLimit;
 import com.cloud.domain.Domain;
 import com.cloud.exception.ResourceAllocationException;
 
+import java.util.List;
+
 public interface ResourceLimitService {
 
     /**
      * Updates an existing resource limit with the specified details. If a limit doesn't exist, will create one.
      *
-     * @param accountId
-     *            TODO
-     * @param domainId
-     *            TODO
-     * @param resourceType
-     *            TODO
-     * @param max
-     *            TODO
-     *
+     * @param accountId    TODO
+     * @param domainId     TODO
+     * @param resourceType TODO
+     * @param max          TODO
      * @return the updated/created resource limit
      */
     ResourceLimit updateResourceLimit(Long accountId, Long domainId, Integer resourceType, Long max);
@@ -45,12 +40,9 @@ public interface ResourceLimitService {
     /**
      * Updates an existing resource count details for the account/domain
      *
-     * @param accountId
-     *            TODO
-     * @param domainId
-     *            TODO
-     * @param typeId
-     *            TODO
+     * @param accountId TODO
+     * @param domainId  TODO
+     * @param typeId    TODO
      * @return the updated/created resource counts
      */
     List<? extends ResourceCount> recalculateResourceCount(Long accountId, Long domainId, Integer typeId);
@@ -58,14 +50,10 @@ public interface ResourceLimitService {
     /**
      * Search for resource limits for the given id and/or account and/or type and/or domain.
      *
-     * @param id
-     *            TODO
-     * @param accountId
-     *            TODO
-     * @param domainId
-     *            TODO
-     * @param type
-     *            TODO
+     * @param id        TODO
+     * @param accountId TODO
+     * @param domainId  TODO
+     * @param type      TODO
      * @return a list of limits that match the criteria
      */
     public List<? extends ResourceLimit> searchForLimits(Long id, Long accountId, Long domainId, Integer type, Long startIndex, Long pageSizeVal);
@@ -83,6 +71,7 @@ public interface ResourceLimitService {
     /**
      * This call should be used when we have already queried resource limit for an account. This is to handle
      * some corner cases where queried limit may be null.
+     *
      * @param accountType
      * @param limit
      * @param type
@@ -123,9 +112,8 @@ public interface ResourceLimitService {
      *
      * @param account
      * @param type
-     * @param count
-     *            the number of resources being allocated, count will be added to current allocation and compared
-     *            against maximum allowed allocation
+     * @param count   the number of resources being allocated, count will be added to current allocation and compared
+     *                against maximum allowed allocation
      * @throws ResourceAllocationException
      */
     public void checkResourceLimit(Account account, ResourceCount.ResourceType type, long... count) throws ResourceAllocationException;
@@ -145,9 +133,8 @@ public interface ResourceLimitService {
      * @param account
      * @param type
      * @param displayResource
-     * @param count
-     *            the number of resources being allocated, count will be added to current allocation and compared
-     *            against maximum allowed allocation
+     * @param count           the number of resources being allocated, count will be added to current allocation and compared
+     *                        against maximum allowed allocation
      * @throws ResourceAllocationException
      */
     void checkResourceLimit(Account account, ResourceType type, Boolean displayResource, long... count) throws ResourceAllocationException;

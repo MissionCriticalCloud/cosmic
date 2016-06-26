@@ -16,8 +16,7 @@
 // under the License.
 package com.cloud.dc;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,8 +26,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "vlan")
@@ -75,16 +74,14 @@ public class VlanVO implements Vlan {
 
     @Column(name = "uuid")
     String uuid;
-
-    @Column(name= GenericDao.REMOVED_COLUMN)
+    transient String toString;
+    @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
 
-
     public VlanVO(VlanType vlanType, String vlanTag, String vlanGateway, String vlanNetmask, long dataCenterId, String ipRange, Long networkId, Long physicalNetworkId,
-            String ip6Gateway, String ip6Cidr, String ip6Range) {
+                  String ip6Gateway, String ip6Cidr, String ip6Range) {
         this.vlanType = vlanType;
         this.vlanTag = vlanTag;
         this.vlanGateway = vlanGateway;
@@ -152,15 +149,6 @@ public class VlanVO implements Vlan {
     }
 
     @Override
-    public String getUuid() {
-        return this.uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    @Override
     public Date getRemoved() {
         return removed;
     }
@@ -177,33 +165,6 @@ public class VlanVO implements Vlan {
 
     public void setPhysicalNetworkId(Long physicalNetworkId) {
         this.physicalNetworkId = physicalNetworkId;
-    }
-
-    transient String toString;
-
-    @Override
-    public String toString() {
-        if (toString == null) {
-            toString =
-                new StringBuilder("Vlan[").append(vlanTag)
-                    .append("|")
-                    .append(vlanGateway)
-                    .append("|")
-                    .append(vlanNetmask)
-                    .append("|")
-                    .append(ip6Gateway)
-                    .append("|")
-                    .append(ip6Cidr)
-                    .append("|")
-                    .append(ipRange)
-                    .append("|")
-                    .append("|")
-                    .append(ip6Range)
-                    .append(networkId)
-                    .append("]")
-                    .toString();
-        }
-        return toString;
     }
 
     @Override
@@ -235,5 +196,39 @@ public class VlanVO implements Vlan {
 
     public void setIpRange(String ipRange) {
         this.ip6Range = ipRange;
+    }
+
+    @Override
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    @Override
+    public String toString() {
+        if (toString == null) {
+            toString =
+                    new StringBuilder("Vlan[").append(vlanTag)
+                                              .append("|")
+                                              .append(vlanGateway)
+                                              .append("|")
+                                              .append(vlanNetmask)
+                                              .append("|")
+                                              .append(ip6Gateway)
+                                              .append("|")
+                                              .append(ip6Cidr)
+                                              .append("|")
+                                              .append(ipRange)
+                                              .append("|")
+                                              .append("|")
+                                              .append(ip6Range)
+                                              .append(networkId)
+                                              .append("]")
+                                              .toString();
+        }
+        return toString;
     }
 }

@@ -16,14 +16,10 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.vm;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-
 import com.cloud.event.EventTypes;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -37,10 +33,15 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.NicResponse;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "removeNicFromVirtualMachine", description = "Removes VM from specified network by deleting a NIC", responseObject = UserVmResponse.class, responseView = ResponseView.Restricted, entityType = {VirtualMachine.class},
+@APICommand(name = "removeNicFromVirtualMachine", description = "Removes VM from specified network by deleting a NIC", responseObject = UserVmResponse.class, responseView =
+        ResponseView.Restricted, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class RemoveNicFromVMCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RemoveNicFromVMCmd.class);
@@ -50,8 +51,8 @@ public class RemoveNicFromVMCmd extends BaseAsyncCmd {
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
     @ACL(accessType = AccessType.OperateEntry)
-    @Parameter(name=ApiConstants.VIRTUAL_MACHINE_ID, type=CommandType.UUID, entityType=UserVmResponse.class,
-            required=true, description="Virtual Machine ID")
+    @Parameter(name = ApiConstants.VIRTUAL_MACHINE_ID, type = CommandType.UUID, entityType = UserVmResponse.class,
+            required = true, description = "Virtual Machine ID")
     private Long vmId;
 
     @Parameter(name = ApiConstants.NIC_ID, type = CommandType.UUID, entityType = NicResponse.class, required = true, description = "NIC ID")
@@ -60,23 +61,6 @@ public class RemoveNicFromVMCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public Long getVmId() {
-        return vmId;
-    }
-
-    public Long getNicId() {
-        return nicId;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
 
     public static String getResultObjectName() {
         return "virtualmachine";
@@ -87,18 +71,21 @@ public class RemoveNicFromVMCmd extends BaseAsyncCmd {
         return EventTypes.EVENT_NIC_DELETE;
     }
 
-    @Override
-    public String getEventDescription() {
-        return  "Removing NIC " + getNicId() + " from user vm: " + getVmId();
-    }
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
 
     @Override
-    public long getEntityOwnerId() {
-        UserVm vm = _responseGenerator.findUserVmById(getVmId());
-        if (vm == null) {
-             return Account.ACCOUNT_ID_SYSTEM; // bad id given, parent this command to SYSTEM so ERROR events are tracked
-        }
-        return vm.getAccountId();
+    public String getEventDescription() {
+        return "Removing NIC " + getNicId() + " from user vm: " + getVmId();
+    }
+
+    public Long getNicId() {
+        return nicId;
+    }
+
+    public Long getVmId() {
+        return vmId;
     }
 
     @Override
@@ -108,12 +95,26 @@ public class RemoveNicFromVMCmd extends BaseAsyncCmd {
         ArrayList<VMDetails> dc = new ArrayList<VMDetails>();
         dc.add(VMDetails.valueOf("nics"));
         EnumSet<VMDetails> details = EnumSet.copyOf(dc);
-        if (result != null){
+        if (result != null) {
             UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Restricted, "virtualmachine", details, result).get(0);
             response.setResponseName(getCommandName());
             setResponseObject(response);
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to remove NIC from vm, see error log for details");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        UserVm vm = _responseGenerator.findUserVmById(getVmId());
+        if (vm == null) {
+            return Account.ACCOUNT_ID_SYSTEM; // bad id given, parent this command to SYSTEM so ERROR events are tracked
+        }
+        return vm.getAccountId();
     }
 }

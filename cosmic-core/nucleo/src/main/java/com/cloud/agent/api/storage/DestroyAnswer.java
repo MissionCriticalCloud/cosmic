@@ -30,5 +30,4 @@ public class DestroyAnswer extends Answer {
     protected DestroyAnswer() {
         super();
     }
-
 }

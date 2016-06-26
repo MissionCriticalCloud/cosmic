@@ -16,6 +16,5 @@
 // under the License.
 package com.cloud.deploy;
 
-
 public interface HAPlanner extends DeploymentPlanner {
 }

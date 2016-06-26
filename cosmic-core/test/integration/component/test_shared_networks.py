@@ -17,9 +17,13 @@
 
 """ P1 tests for shared networks
 """
-from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+import netaddr
+import random
+import time
+from ddt import ddt, data
 from marvin.cloudstackAPI import rebootRouter, stopRouter, startRouter
+from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+from marvin.codes import PASS
 from marvin.lib.base import (
     Account,
     Network,
@@ -35,10 +39,6 @@ from marvin.lib.base import (
     Router,
     NATRule
 )
-from marvin.lib.utils import (
-    cleanup_resources,
-    validateList
-)
 from marvin.lib.common import (
     get_domain,
     get_zone,
@@ -48,17 +48,16 @@ from marvin.lib.common import (
     verifyRouterState,
     verifyGuestTrafficPortGroups
 )
+from marvin.lib.utils import (
+    cleanup_resources,
+    validateList
+)
 from marvin.sshClient import SshClient
-from marvin.codes import PASS
-from ddt import ddt, data
-import time
-import random
-import netaddr
+from nose.plugins.attrib import attr
 
 
 @ddt
 class TestSharedNetworks(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestSharedNetworks, cls).getClsTestClient()
@@ -139,11 +138,11 @@ class TestSharedNetworks(cloudstackTestCase):
 
         self.testdata["shared_network"]["netmask"] = "255.255.255.0"
         self.testdata["shared_network"]["gateway"] = "172.16." + \
-            str(shared_network_subnet_number) + ".1"
+                                                     str(shared_network_subnet_number) + ".1"
         self.testdata["shared_network"]["startip"] = "172.16." + \
-            str(shared_network_subnet_number) + ".2"
+                                                     str(shared_network_subnet_number) + ".2"
         self.testdata["shared_network"]["endip"] = "172.16." + \
-            str(shared_network_subnet_number) + ".20"
+                                                   str(shared_network_subnet_number) + ".20"
 
         self.cleanup = []
         self.cleanup_networks = []
@@ -209,8 +208,8 @@ class TestSharedNetworks(cloudstackTestCase):
 
     def verifyRouterResponse(self, router_response, ip):
         if (router_response) and (isinstance(router_response, list)) and \
-           (router_response[0].state == "Running") and \
-           (router_response[0].publicip == ip):
+                (router_response[0].state == "Running") and \
+                (router_response[0].publicip == ip):
             return True
         return False
 
@@ -1749,7 +1748,7 @@ class TestSharedNetworks(cloudstackTestCase):
         self.debug("Shared Network created: %s" % self.network.id)
 
         with self.assertRaises(Exception):
-            self.project2_admin_account_virtual_machine =\
+            self.project2_admin_account_virtual_machine = \
                 VirtualMachine.create(
                     self.api_client,
                     self.testdata["virtual_machine"],
@@ -2131,11 +2130,11 @@ class TestSharedNetworks(cloudstackTestCase):
         shared_network_subnet_number = random.randrange(1, 254)
 
         self.testdata["shared_network"]["gateway"] = "172.16." + \
-            str(shared_network_subnet_number) + ".1"
+                                                     str(shared_network_subnet_number) + ".1"
         self.testdata["shared_network"]["startip"] = "172.16." + \
-            str(shared_network_subnet_number) + ".2"
+                                                     str(shared_network_subnet_number) + ".2"
         self.testdata["shared_network"]["endip"] = "172.16." + \
-            str(shared_network_subnet_number) + ".20"
+                                                   str(shared_network_subnet_number) + ".20"
 
         self.testdata["shared_network"]["acltype"] = "domain"
         self.testdata["shared_network"][
@@ -2321,11 +2320,11 @@ class TestSharedNetworks(cloudstackTestCase):
         shared_network_subnet_number = random.randrange(1, 254)
 
         self.testdata["shared_network"]["gateway"] = "172.16." + \
-            str(shared_network_subnet_number) + ".1"
+                                                     str(shared_network_subnet_number) + ".1"
         self.testdata["shared_network"]["startip"] = "172.16." + \
-            str(shared_network_subnet_number) + ".2"
+                                                     str(shared_network_subnet_number) + ".2"
         self.testdata["shared_network"]["endip"] = "172.16." + \
-            str(shared_network_subnet_number) + ".20"
+                                                   str(shared_network_subnet_number) + ".20"
 
         self.testdata["shared_network"]["acltype"] = "domain"
         self.testdata["shared_network"][
@@ -2802,7 +2801,7 @@ class TestSharedNetworks(cloudstackTestCase):
             self.fail(
                 "SSH Access failed for %s: %s" %
                 (self.isolated_network_admin_account_virtual_machine.ipaddress,
-                    e))
+                 e))
 
     @attr(tags=["advanced", "advancedns"], required_hardware="false")
     def test_networkWithsubdomainaccessTrue(self):
@@ -3645,27 +3644,27 @@ class TestSharedNetworks(cloudstackTestCase):
         )
 
         FireWallRule.create(
-                self.api_client,
-                ipaddressid=public_ip.ipaddress.id,
-                protocol='TCP',
-                cidrlist=[
-                    self.testdata["fwrule"]["cidr"]],
-                startport=self.testdata["fwrule"]["startport"],
-                endport=self.testdata["fwrule"]["endport"])
+            self.api_client,
+            ipaddressid=public_ip.ipaddress.id,
+            protocol='TCP',
+            cidrlist=[
+                self.testdata["fwrule"]["cidr"]],
+            startport=self.testdata["fwrule"]["startport"],
+            endport=self.testdata["fwrule"]["endport"])
 
         NATRule.create(
-                    self.api_client,
-                    vm,
-                    self.testdata["natrule"],
-                    ipaddressid=public_ip.ipaddress.id,
-                    networkid=shared_network.id)
+            self.api_client,
+            vm,
+            self.testdata["natrule"],
+            ipaddressid=public_ip.ipaddress.id,
+            networkid=shared_network.id)
 
         SshClient(
-                  public_ip.ipaddress.ipaddress,
-                  vm.ssh_port,
-                  vm.username,
-                  vm.password
-                  )
+            public_ip.ipaddress.ipaddress,
+            vm.ssh_port,
+            vm.username,
+            vm.password
+        )
 
         public_ip.delete(self.api_client)
 
@@ -3744,11 +3743,11 @@ class TestSharedNetworks(cloudstackTestCase):
         self.cleanup_vms.append(vm)
 
         routers = Router.list(self.api_client,
-                    networkid=self.network.id,
-                    listall=True)
+                              networkid=self.network.id,
+                              listall=True)
 
         self.assertEqual(validateList(routers)[0], PASS,
-                "No Router associated with the network found")
+                         "No Router associated with the network found")
 
         response = verifyGuestTrafficPortGroups(self.api_client,
                                                 self.config,

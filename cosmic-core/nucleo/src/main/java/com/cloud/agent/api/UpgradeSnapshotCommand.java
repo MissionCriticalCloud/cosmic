@@ -31,13 +31,13 @@ public class UpgradeSnapshotCommand extends SnapshotCommand {
     }
 
     /**
-     * @param primaryStoragePoolNameLabel   The UUID of the primary storage Pool
-     * @param secondaryStoragePoolURL  This is what shows up in the UI when you click on Secondary storage.
-     * @param snapshotUuid             The UUID of the snapshot which is going to be upgraded
-     * @param _version          version for this snapshot
+     * @param primaryStoragePoolNameLabel The UUID of the primary storage Pool
+     * @param secondaryStoragePoolURL     This is what shows up in the UI when you click on Secondary storage.
+     * @param snapshotUuid                The UUID of the snapshot which is going to be upgraded
+     * @param _version                    version for this snapshot
      */
     public UpgradeSnapshotCommand(StoragePool pool, String secondaryStoragePoolURL, Long dcId, Long accountId, Long volumeId, Long templateId, Long tmpltAccountId,
-            String volumePath, String snapshotUuid, String snapshotName, String version) {
+                                  String volumePath, String snapshotUuid, String snapshotName, String version) {
         super(pool, secondaryStoragePoolURL, snapshotUuid, snapshotName, dcId, accountId, volumeId);
         this.version = version;
         this.templateId = templateId;

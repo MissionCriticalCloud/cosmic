@@ -19,7 +19,6 @@
 
 package com.cloud.agent.resource.virtualnetwork.model;
 
-
 public class IpAddress {
     private String publicIp;
     private boolean sourceNat;
@@ -37,7 +36,7 @@ public class IpAddress {
     }
 
     public IpAddress(String publicIp, boolean sourceNat, boolean add, boolean oneToOneNat, boolean firstIP, String gateway, String netmask, String vifMacAddress,
-            Integer nicDevId, boolean newNic) {
+                     Integer nicDevId, boolean newNic) {
         super();
         this.publicIp = publicIp;
         this.sourceNat = sourceNat;
@@ -130,5 +129,4 @@ public class IpAddress {
     public void setNewNic(boolean newNic) {
         this.newNic = newNic;
     }
-
 }

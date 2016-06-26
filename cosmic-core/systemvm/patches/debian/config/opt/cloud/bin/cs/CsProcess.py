@@ -15,10 +15,11 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+import logging
 import os
 import re
+
 import CsHelper
-import logging
 
 
 class CsProcess(object):
@@ -42,7 +43,7 @@ class CsProcess(object):
         self.pid = []
         for i in CsHelper.execute("ps aux"):
             items = len(self.search)
-            proc = re.split("\s+", i)[items*-1:]
+            proc = re.split("\s+", i)[items * -1:]
             matches = len([m for m in proc if m in self.search])
             if matches == items:
                 self.pid.append(re.split("\s+", i)[1])

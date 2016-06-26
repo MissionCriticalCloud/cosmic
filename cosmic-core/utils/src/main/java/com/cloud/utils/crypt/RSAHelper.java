@@ -19,6 +19,7 @@
 
 package com.cloud.utils.crypt;
 
+import javax.crypto.Cipher;
 import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
@@ -31,8 +32,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.KeySpec;
 import java.security.spec.RSAPublicKeySpec;
 
-import javax.crypto.Cipher;
-
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
@@ -43,34 +42,9 @@ public class RSAHelper {
 
     static {
         BouncyCastleProvider provider = new BouncyCastleProvider();
-        if (Security.getProvider(provider.getName()) == null)
+        if (Security.getProvider(provider.getName()) == null) {
             Security.addProvider(provider);
-    }
-
-    private static RSAPublicKey readKey(String key) throws Exception {
-        byte[] encKey = Base64.decodeBase64(key.split(" ")[1]);
-        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(encKey));
-
-        byte[] header = readElement(dis);
-        String pubKeyFormat = new String(header);
-        if (!pubKeyFormat.equals("ssh-rsa"))
-            throw new RuntimeException("Unsupported format");
-
-        byte[] publicExponent = readElement(dis);
-        byte[] modulus = readElement(dis);
-
-        KeySpec spec = new RSAPublicKeySpec(new BigInteger(modulus), new BigInteger(publicExponent));
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA", BouncyCastleProvider.PROVIDER_NAME);
-        RSAPublicKey pubKey = (RSAPublicKey)keyFactory.generatePublic(spec);
-
-        return pubKey;
-    }
-
-    private static byte[] readElement(DataInput dis) throws IOException {
-        int len = dis.readInt();
-        byte[] buf = new byte[len];
-        dis.readFully(buf);
-        return buf;
+        }
     }
 
     public static String encryptWithSSHPublicKey(String sshPublicKey, String content) {
@@ -87,5 +61,32 @@ public class RSAHelper {
         }
 
         return returnString;
+    }
+
+    private static RSAPublicKey readKey(String key) throws Exception {
+        byte[] encKey = Base64.decodeBase64(key.split(" ")[1]);
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(encKey));
+
+        byte[] header = readElement(dis);
+        String pubKeyFormat = new String(header);
+        if (!pubKeyFormat.equals("ssh-rsa")) {
+            throw new RuntimeException("Unsupported format");
+        }
+
+        byte[] publicExponent = readElement(dis);
+        byte[] modulus = readElement(dis);
+
+        KeySpec spec = new RSAPublicKeySpec(new BigInteger(modulus), new BigInteger(publicExponent));
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA", BouncyCastleProvider.PROVIDER_NAME);
+        RSAPublicKey pubKey = (RSAPublicKey) keyFactory.generatePublic(spec);
+
+        return pubKey;
+    }
+
+    private static byte[] readElement(DataInput dis) throws IOException {
+        int len = dis.readInt();
+        byte[] buf = new byte[len];
+        dis.readFully(buf);
+        return buf;
     }
 }

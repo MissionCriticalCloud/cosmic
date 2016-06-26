@@ -30,7 +30,6 @@ public class DeleteIpAliasCommand extends NetworkElementCommand {
         this.routerip = routerip;
         this.deleteIpAliasTOs = deleteIpAliasTOs;
         this.createIpAliasTos = createIpAliasTos;
-
     }
 
     public String getRouterip() {
@@ -44,5 +43,4 @@ public class DeleteIpAliasCommand extends NetworkElementCommand {
     public List<IpAliasTO> getCreateIpAliasTos() {
         return createIpAliasTos;
     }
-
 }

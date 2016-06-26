@@ -65,7 +65,6 @@ public class CheckS2SVpnConnectionsAnswer extends Answer {
             if (status != null) {
                 return status;
             }
-
         }
         return false;
     }

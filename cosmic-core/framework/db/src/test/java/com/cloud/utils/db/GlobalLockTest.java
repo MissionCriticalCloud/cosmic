@@ -31,6 +31,24 @@ public class GlobalLockTest {
     public static final Logger s_logger = LoggerFactory.getLogger(GlobalLockTest.class);
     private final static GlobalLock WorkLock = GlobalLock.getInternLock("SecurityGroupWork");
 
+    @Test
+    public void testTimeout() {
+        Thread[] pool = new Thread[50];
+        for (int i = 0; i < pool.length; i++) {
+            pool[i] = new Thread(new Worker(i, 5, 3));
+        }
+        for (int i = 0; i < pool.length; i++) {
+            pool[i].start();
+        }
+        for (int i = 0; i < pool.length; i++) {
+            try {
+                pool[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public static class Worker implements Runnable {
         int id = 0;
         int timeoutSeconds = 10;
@@ -61,24 +79,6 @@ public class GlobalLockTest {
                     boolean unlocked = WorkLock.unlock();
                     System.out.println("Thread " + id + "  unlocked=" + unlocked);
                 }
-            }
-        }
-    }
-
-    @Test
-    public void testTimeout() {
-        Thread[] pool = new Thread[50];
-        for (int i = 0; i < pool.length; i++) {
-            pool[i] = new Thread(new Worker(i, 5, 3));
-        }
-        for (int i = 0; i < pool.length; i++) {
-            pool[i].start();
-        }
-        for (int i = 0; i < pool.length; i++) {
-            try {
-                pool[i].join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
     }

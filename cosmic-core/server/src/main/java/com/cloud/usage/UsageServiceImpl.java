@@ -16,16 +16,6 @@
 // under the License.
 package com.cloud.usage;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.configuration.Config;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
@@ -65,7 +55,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.api.command.admin.usage.GenerateUsageRecordsCmd;
 import org.apache.cloudstack.api.command.admin.usage.GetUsageRecordsCmd;
 import org.apache.cloudstack.api.command.admin.usage.RemoveRawUsageRecordsCmd;
@@ -75,6 +64,16 @@ import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.usage.Usage;
 import org.apache.cloudstack.usage.UsageService;
 import org.apache.cloudstack.usage.UsageTypes;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -129,7 +128,7 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
         super.configure(name, params);
         String timeZoneStr = _configDao.getValue(Config.UsageAggregationTimezone.toString());
         if (timeZoneStr == null) {
-           timeZoneStr = "GMT";
+            timeZoneStr = "GMT";
         }
         _usageTimezone = TimeZone.getTimeZone(timeZoneStr);
         return true;
@@ -228,7 +227,7 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("getting usage records for account: " + accountId + ", domainId: " + domainId + ", between " + adjustedStartDate + " and " + adjustedEndDate +
-                ", using pageSize: " + cmd.getPageSizeVal() + " and startIndex: " + cmd.getStartIndex());
+                    ", using pageSize: " + cmd.getPageSizeVal() + " and startIndex: " + cmd.getStartIndex());
         }
 
         Filter usageFilter = new Filter(UsageVO.class, "id", true, cmd.getStartIndex(), cmd.getPageSizeVal());
@@ -244,8 +243,9 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
             sdc.addOr("path", SearchCriteria.Op.LIKE, _domainDao.findById(caller.getDomainId()).getPath() + "%");
             List<DomainVO> domains = _domainDao.search(sdc, null);
             List<Long> domainIds = new ArrayList<Long>();
-            for (DomainVO domain : domains)
+            for (DomainVO domain : domains) {
                 domainIds.add(domain.getId());
+            }
             sc.addAnd("domainId", SearchCriteria.Op.IN, domainIds.toArray());
         }
 
@@ -377,9 +377,9 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
     @Override
     public boolean removeRawUsageRecords(RemoveRawUsageRecordsCmd cmd) throws InvalidParameterValueException {
         Integer interval = cmd.getInterval();
-        if (interval != null && interval > 0 ) {
+        if (interval != null && interval > 0) {
             String jobExecTime = _configDao.getValue(Config.UsageStatsJobExecTime.toString());
-            if (jobExecTime != null ) {
+            if (jobExecTime != null) {
                 String[] segments = jobExecTime.split(":");
                 if (segments.length == 2) {
                     String timeZoneStr = _configDao.getValue(Config.UsageExecutionTimezone.toString());
@@ -409,6 +409,11 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
         return true;
     }
 
+    @Override
+    public List<UsageTypeResponse> listUsageTypes() {
+        return UsageTypes.listUsageTypes();
+    }
+
     private Date computeAdjustedTime(Date initialDate, TimeZone targetTZ) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(initialDate);
@@ -432,10 +437,4 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
 
         return calTS.getTime();
     }
-
-    @Override
-    public List<UsageTypeResponse> listUsageTypes() {
-        return UsageTypes.listUsageTypes();
-    }
-
 }

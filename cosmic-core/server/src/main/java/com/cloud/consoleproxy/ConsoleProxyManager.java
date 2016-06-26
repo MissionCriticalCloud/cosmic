@@ -34,9 +34,9 @@ public interface ConsoleProxyManager extends Manager, ConsoleProxyService {
     public static final String ALERT_SUBJECT = "proxy-alert";
     public static final String CERTIFICATE_NAME = "CPVMCertificate";
 
-    public void setManagementState(ConsoleProxyManagementState state);
-
     public ConsoleProxyManagementState getManagementState();
+
+    public void setManagementState(ConsoleProxyManagementState state);
 
     public void resumeLastManagementState();
 
@@ -47,5 +47,4 @@ public interface ConsoleProxyManager extends Manager, ConsoleProxyService {
     public boolean rebootProxy(long proxyVmId);
 
     public boolean destroyProxy(long proxyVmId);
-
 }

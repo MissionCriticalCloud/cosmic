@@ -16,11 +16,13 @@
 // under the License.
 package org.apache.cloudstack.engine.cloud.entity.api.db;
 
-import java.security.SecureRandom;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.utils.db.Encrypt;
+import com.cloud.utils.db.GenericDao;
+import com.cloud.utils.db.StateMachine;
+import com.cloud.utils.fsm.FiniteStateObject;
+import com.cloud.vm.VirtualMachine;
+import com.cloud.vm.VirtualMachine.State;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -36,14 +38,11 @@ import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.utils.db.Encrypt;
-import com.cloud.utils.db.GenericDao;
-import com.cloud.utils.db.StateMachine;
-import com.cloud.utils.fsm.FiniteStateObject;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
+import java.security.SecureRandom;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Entity
 @Table(name = "vm_instance")
@@ -112,75 +111,62 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
 
     @Column(name = "ha_enabled", updatable = true, nullable = true)
     protected boolean haEnabled;
-
-    @Column(name = "limit_cpu_use", updatable = true, nullable = true)
-    private boolean limitCpuUse;
-
     @Column(name = "update_count", updatable = true, nullable = false)
     protected long updated;    // This field should be updated everytime the state is updated.  There's no set method in the vo object because it is done with in the dao code.
-
     @Column(name = GenericDao.CREATED_COLUMN)
     protected Date created;
-
     @Column(name = GenericDao.REMOVED_COLUMN)
     protected Date removed;
-
     @Column(name = "update_time", updatable = true)
     @Temporal(value = TemporalType.TIMESTAMP)
     protected Date updateTime;
-
     @Column(name = "domain_id")
     protected long domainId;
-
     @Column(name = "account_id")
     protected long accountId;
-
     @Column(name = "service_offering_id")
     protected long serviceOfferingId;
-
     @Column(name = "reservation_id")
     protected String reservationId;
-
     @Column(name = "hypervisor_type")
     @Enumerated(value = EnumType.STRING)
     protected HypervisorType hypervisorType;
-
-    @Transient
-    Map<String, String> details;
-
     @Column(name = "uuid")
     protected String uuid = UUID.randomUUID().toString();
-
-    //orchestration columns
-    @Column(name = "owner")
-    private String owner = null;
-
+    @Column(name = "disk_offering_id")
+    protected Long diskOfferingId;
+    @Column(name = "display_vm", updatable = true, nullable = false)
+    protected boolean display = true;
+    @Transient
+    Map<String, String> details;
     @Transient
     List<String> computeTags;
 
     @Transient
     List<String> rootDiskTags;
-
-    @Column(name = "host_name")
-    private String hostname = null;
-
-    @Column(name = "display_name")
-    private String displayname = null;
-
     @Transient
     List<String> networkIds;
-
-    @Column(name = "disk_offering_id")
-    protected Long diskOfferingId;
-
-    @Column(name = "display_vm", updatable = true, nullable = false)
-    protected boolean display = true;
-
+    transient String toString;
+    @Column(name = "limit_cpu_use", updatable = true, nullable = true)
+    private boolean limitCpuUse;
+    //orchestration columns
+    @Column(name = "owner")
+    private String owner = null;
+    @Column(name = "host_name")
+    private String hostname = null;
+    @Column(name = "display_name")
+    private String displayname = null;
     @Transient
     private VMReservationVO vmReservation;
 
     public VMEntityVO(long id, long serviceOfferingId, String name, String instanceName, Type type, Long vmTemplateId, HypervisorType hypervisorType, long guestOSId,
-            long domainId, long accountId, boolean haEnabled, Long diskOfferingId) {
+                      long domainId, long accountId, boolean haEnabled, boolean limitResourceUse) {
+        this(id, serviceOfferingId, name, instanceName, type, vmTemplateId, hypervisorType, guestOSId, domainId, accountId, haEnabled, null);
+        limitCpuUse = limitResourceUse;
+    }
+
+    public VMEntityVO(long id, long serviceOfferingId, String name, String instanceName, Type type, Long vmTemplateId, HypervisorType hypervisorType, long guestOSId,
+                      long domainId, long accountId, boolean haEnabled, Long diskOfferingId) {
         this.id = id;
         hostName = name != null ? name : uuid;
         if (vmTemplateId != null) {
@@ -198,12 +184,6 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
         this.hypervisorType = hypervisorType;
         limitCpuUse = false;
         this.diskOfferingId = diskOfferingId;
-    }
-
-    public VMEntityVO(long id, long serviceOfferingId, String name, String instanceName, Type type, Long vmTemplateId, HypervisorType hypervisorType, long guestOSId,
-            long domainId, long accountId, boolean haEnabled, boolean limitResourceUse) {
-        this(id, serviceOfferingId, name, instanceName, type, vmTemplateId, hypervisorType, guestOSId, domainId, accountId, haEnabled, null);
-        limitCpuUse = limitResourceUse;
     }
 
     protected VMEntityVO() {
@@ -224,16 +204,6 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
     }
 
     @Override
-    public Type getType() {
-        return type;
-    }
-
-    @Override
-    public long getUpdated() {
-        return updated;
-    }
-
-    @Override
     public long getId() {
         return id;
     }
@@ -247,28 +217,8 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
         this.uuid = uuid;
     }
 
-    @Override
-    public HypervisorType getHypervisorType() {
-        return hypervisorType;
-    }
-
-    @Override
-    public Date getCreated() {
-        return created;
-    }
-
     public Date getUpdateTime() {
         return updateTime;
-    }
-
-    @Override
-    public long getDataCenterId() {
-        return dataCenterIdToDeployIn;
-    }
-
-    @Override
-    public String getHostName() {
-        return hostName;
     }
 
     @Override
@@ -277,14 +227,8 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
     }
 
     @Override
-    public State getState() {
-        return state;
-    }
-
-    // don't use this directly, use VM state machine instead, this method is added for migration tool only
-    @Override
-    public void setState(State state) {
-        this.state = state;
+    public String getHostName() {
+        return hostName;
     }
 
     @Override
@@ -296,8 +240,9 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
         privateIpAddress = address;
     }
 
-    public void setVncPassword(String vncPassword) {
-        this.vncPassword = vncPassword;
+    @Override
+    public String getPrivateMacAddress() {
+        return privateMacAddress;
     }
 
     @Override
@@ -305,25 +250,8 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
         return vncPassword;
     }
 
-    @Override
-    public long getServiceOfferingId() {
-        return serviceOfferingId;
-    }
-
-    public Long getProxyId() {
-        return proxyId;
-    }
-
-    public void setProxyId(Long proxyId) {
-        this.proxyId = proxyId;
-    }
-
-    public Date getProxyAssignTime() {
-        return proxyAssignTime;
-    }
-
-    public void setProxyAssignTime(Date time) {
-        proxyAssignTime = time;
+    public void setVncPassword(String vncPassword) {
+        this.vncPassword = vncPassword;
     }
 
     @Override
@@ -348,17 +276,14 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
         this.guestOSId = guestOSId;
     }
 
-    public void incrUpdated() {
-        updated++;
-    }
-
-    public void decrUpdated() {
-        updated--;
+    @Override
+    public Long getPodIdToDeployIn() {
+        return podIdToDeployIn;
     }
 
     @Override
-    public Long getHostId() {
-        return hostId;
+    public long getDataCenterId() {
+        return dataCenterIdToDeployIn;
     }
 
     @Override
@@ -366,8 +291,9 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
         return lastHostId;
     }
 
-    public void setLastHostId(Long lastHostId) {
-        this.lastHostId = lastHostId;
+    @Override
+    public Long getHostId() {
+        return hostId;
     }
 
     public void setHostId(Long hostId) {
@@ -384,51 +310,127 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
         return limitCpuUse;
     }
 
-    public void setLimitCpuUse(boolean value) {
-        limitCpuUse = value;
+    @Override
+    public Date getCreated() {
+        return created;
     }
 
     @Override
-    public String getPrivateMacAddress() {
-        return privateMacAddress;
+    public long getServiceOfferingId() {
+        return serviceOfferingId;
+    }
+
+    public void setServiceOfferingId(long serviceOfferingId) {
+        this.serviceOfferingId = serviceOfferingId;
     }
 
     @Override
-    public Long getPodIdToDeployIn() {
-        return podIdToDeployIn;
+    public Long getDiskOfferingId() {
+        return diskOfferingId;
     }
 
-    public void setPodId(long podId) {
-        podIdToDeployIn = podId;
+    @Override
+    public Type getType() {
+        return type;
     }
 
-    public void setPrivateMacAddress(String privateMacAddress) {
-        this.privateMacAddress = privateMacAddress;
+    @Override
+    public HypervisorType getHypervisorType() {
+        return hypervisorType;
     }
 
-    public void setDataCenterId(long dataCenterId) {
-        dataCenterIdToDeployIn = dataCenterId;
+    @Override
+    public Map<String, String> getDetails() {
+        return details;
     }
 
-    public boolean isRemoved() {
-        return removed != null;
+    @Override
+    public long getUpdated() {
+        return updated;
+    }
+
+    @Override
+    public boolean isDisplay() {
+        return display;
+    }
+
+    public void setDisplay(boolean display) {
+        this.display = display;
+    }
+
+    public void setDetails(Map<String, String> details) {
+        this.details = details;
     }
 
     public void setHaEnabled(boolean value) {
         haEnabled = value;
     }
 
-    public void setReservationId(String reservationId) {
-        this.reservationId = reservationId;
+    public void setLastHostId(Long lastHostId) {
+        this.lastHostId = lastHostId;
+    }
+
+    public void setDataCenterId(long dataCenterId) {
+        dataCenterIdToDeployIn = dataCenterId;
+    }
+
+    public void setPrivateMacAddress(String privateMacAddress) {
+        this.privateMacAddress = privateMacAddress;
+    }
+
+    @Override
+    public State getState() {
+        return state;
+    }
+
+    // don't use this directly, use VM state machine instead, this method is added for migration tool only
+    @Override
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    public Long getProxyId() {
+        return proxyId;
+    }
+
+    public void setProxyId(Long proxyId) {
+        this.proxyId = proxyId;
+    }
+
+    public Date getProxyAssignTime() {
+        return proxyAssignTime;
+    }
+
+    public void setProxyAssignTime(Date time) {
+        proxyAssignTime = time;
+    }
+
+    public void incrUpdated() {
+        updated++;
+    }
+
+    public void decrUpdated() {
+        updated--;
+    }
+
+    public void setLimitCpuUse(boolean value) {
+        limitCpuUse = value;
+    }
+
+    public void setPodId(long podId) {
+        podIdToDeployIn = podId;
+    }
+
+    public boolean isRemoved() {
+        return removed != null;
     }
 
     public String getReservationId() {
         return reservationId;
     }
 
-    @Override
-    public Map<String, String> getDetails() {
-        return details;
+    public void setReservationId(String reservationId) {
+        this.reservationId = reservationId;
     }
 
     public void setDetail(String name, String value) {
@@ -437,11 +439,31 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
         details.put(name, value);
     }
 
-    public void setDetails(Map<String, String> details) {
-        this.details = details;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (id ^ (id >>> 32));
+        return result;
     }
 
-    transient String toString;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        VMEntityVO other = (VMEntityVO) obj;
+        if (id != other.id) {
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public String toString() {
@@ -449,32 +471,6 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
             toString = new StringBuilder("VM[").append(type.toString()).append("|").append(hostName).append("]").toString();
         }
         return toString;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int)(id ^ (id >>> 32));
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        VMEntityVO other = (VMEntityVO)obj;
-        if (id != other.id)
-            return false;
-        return true;
-    }
-
-    public void setServiceOfferingId(long serviceOfferingId) {
-        this.serviceOfferingId = serviceOfferingId;
     }
 
     public String getOwner() {
@@ -525,11 +521,6 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
         this.networkIds = networkIds;
     }
 
-    @Override
-    public Long getDiskOfferingId() {
-        return diskOfferingId;
-    }
-
     public VMReservationVO getVmReservation() {
         return vmReservation;
     }
@@ -541,14 +532,5 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
     @Override
     public Class<?> getEntityType() {
         return VirtualMachine.class;
-    }
-
-    @Override
-    public boolean isDisplay() {
-        return display;
-    }
-
-    public void setDisplay(boolean display) {
-        this.display = display;
     }
 }

@@ -30,31 +30,31 @@ public class NetworkUsageAnswer extends Answer {
     protected NetworkUsageAnswer() {
     }
 
-    public NetworkUsageAnswer(NetworkUsageCommand cmd, String details, Long bytesSent, Long bytesReceived) {
+    public NetworkUsageAnswer(final NetworkUsageCommand cmd, final String details, final Long bytesSent, final Long bytesReceived) {
         super(cmd, true, details);
         this.bytesReceived = bytesReceived;
         this.bytesSent = bytesSent;
         routerName = cmd.getDomRName();
     }
 
-    public NetworkUsageAnswer(Command command, Exception e) {
+    public NetworkUsageAnswer(final Command command, final Exception e) {
         super(command, e);
-    }
-
-    public void setBytesReceived(Long bytesReceived) {
-        this.bytesReceived = bytesReceived;
     }
 
     public Long getBytesReceived() {
         return bytesReceived;
     }
 
-    public void setBytesSent(Long bytesSent) {
-        this.bytesSent = bytesSent;
+    public void setBytesReceived(final Long bytesReceived) {
+        this.bytesReceived = bytesReceived;
     }
 
     public Long getBytesSent() {
         return bytesSent;
+    }
+
+    public void setBytesSent(final Long bytesSent) {
+        this.bytesSent = bytesSent;
     }
 
     public String getRouterName() {

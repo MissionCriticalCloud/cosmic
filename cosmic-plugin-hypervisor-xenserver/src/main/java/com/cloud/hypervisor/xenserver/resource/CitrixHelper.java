@@ -22,28 +22,9 @@ import com.xensource.xenapi.Host;
 
 /**
  * Reduce bloat inside CitrixResourceBase
- *
  */
 public class CitrixHelper {
-    private static final HashMap<String, MemoryValues> XenServerGuestOsMemoryMap = new HashMap<String, MemoryValues>(70);
-
-    public static class MemoryValues {
-        long max;
-        long min;
-
-        public MemoryValues(final long min, final long max) {
-            this.min = min * 1024 * 1024;
-            this.max = max * 1024 * 1024;
-        }
-
-        public long getMax() {
-            return max;
-        }
-
-        public long getMin() {
-            return min;
-        }
-    }
+    private static final HashMap<String, MemoryValues> XenServerGuestOsMemoryMap = new HashMap<>(70);
 
     static {
         XenServerGuestOsMemoryMap.put("CentOS 4.5 (32-bit)", new MemoryValues(256l, 16 * 1024l));
@@ -237,7 +218,7 @@ public class CitrixHelper {
         return prodVersion;
     }
 
-    public static String getPVbootloaderArgs(String guestOS) {
+    public static String getPVbootloaderArgs(final String guestOS) {
         if (guestOS.startsWith("SUSE Linux Enterprise Server")) {
             if (guestOS.contains("64-bit")) {
                 return "--kernel /boot/vmlinuz-xen --ramdisk /boot/initrd-xen";
@@ -246,5 +227,23 @@ public class CitrixHelper {
             }
         }
         return "";
+    }
+
+    public static class MemoryValues {
+        long max;
+        long min;
+
+        public MemoryValues(final long min, final long max) {
+            this.min = min * 1024 * 1024;
+            this.max = max * 1024 * 1024;
+        }
+
+        public long getMax() {
+            return max;
+        }
+
+        public long getMin() {
+            return min;
+        }
     }
 }

@@ -16,17 +16,17 @@
 // under the License.
 package com.cloud.dc.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.dc.PodVlanVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -38,6 +38,26 @@ public class PodVlanDaoImpl extends GenericDaoBase<PodVlanVO, Long> implements P
     private final SearchBuilder<PodVlanVO> FreeVlanSearch;
     private final SearchBuilder<PodVlanVO> VlanPodSearch;
     private final SearchBuilder<PodVlanVO> PodSearchAllocated;
+
+    public PodVlanDaoImpl() {
+        super();
+        PodSearchAllocated = createSearchBuilder();
+        PodSearchAllocated.and("podId", PodSearchAllocated.entity().getPodId(), SearchCriteria.Op.EQ);
+        PodSearchAllocated.and("allocated", PodSearchAllocated.entity().getTakenAt(), SearchCriteria.Op.NNULL);
+        PodSearchAllocated.done();
+
+        FreeVlanSearch = createSearchBuilder();
+        FreeVlanSearch.and("podId", FreeVlanSearch.entity().getPodId(), SearchCriteria.Op.EQ);
+        FreeVlanSearch.and("taken", FreeVlanSearch.entity().getTakenAt(), SearchCriteria.Op.NULL);
+        FreeVlanSearch.done();
+
+        VlanPodSearch = createSearchBuilder();
+        VlanPodSearch.and("vlan", VlanPodSearch.entity().getVlan(), SearchCriteria.Op.EQ);
+        VlanPodSearch.and("podId", VlanPodSearch.entity().getPodId(), SearchCriteria.Op.EQ);
+        VlanPodSearch.and("taken", VlanPodSearch.entity().getTakenAt(), SearchCriteria.Op.NNULL);
+        VlanPodSearch.and("account", VlanPodSearch.entity().getAccountId(), SearchCriteria.Op.EQ);
+        VlanPodSearch.done();
+    }
 
     @Override
     public List<PodVlanVO> listAllocatedVnets(long podId) {
@@ -98,7 +118,6 @@ public class PodVlanDaoImpl extends GenericDaoBase<PodVlanVO, Long> implements P
             update(vo.getId(), vo);
             txn.commit();
             return vo;
-
         } catch (Exception e) {
             throw new CloudRuntimeException("Caught Exception ", e);
         }
@@ -119,25 +138,5 @@ public class PodVlanDaoImpl extends GenericDaoBase<PodVlanVO, Long> implements P
         vo.setTakenAt(null);
         vo.setAccountId(null);
         update(vo.getId(), vo);
-    }
-
-    public PodVlanDaoImpl() {
-        super();
-        PodSearchAllocated = createSearchBuilder();
-        PodSearchAllocated.and("podId", PodSearchAllocated.entity().getPodId(), SearchCriteria.Op.EQ);
-        PodSearchAllocated.and("allocated", PodSearchAllocated.entity().getTakenAt(), SearchCriteria.Op.NNULL);
-        PodSearchAllocated.done();
-
-        FreeVlanSearch = createSearchBuilder();
-        FreeVlanSearch.and("podId", FreeVlanSearch.entity().getPodId(), SearchCriteria.Op.EQ);
-        FreeVlanSearch.and("taken", FreeVlanSearch.entity().getTakenAt(), SearchCriteria.Op.NULL);
-        FreeVlanSearch.done();
-
-        VlanPodSearch = createSearchBuilder();
-        VlanPodSearch.and("vlan", VlanPodSearch.entity().getVlan(), SearchCriteria.Op.EQ);
-        VlanPodSearch.and("podId", VlanPodSearch.entity().getPodId(), SearchCriteria.Op.EQ);
-        VlanPodSearch.and("taken", VlanPodSearch.entity().getTakenAt(), SearchCriteria.Op.NNULL);
-        VlanPodSearch.and("account", VlanPodSearch.entity().getAccountId(), SearchCriteria.Op.EQ);
-        VlanPodSearch.done();
     }
 }

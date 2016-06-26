@@ -24,21 +24,10 @@ import com.cloud.storage.StorageStats;
 
 @LogLevel(Log4jLevel.Trace)
 public class GetStorageStatsAnswer extends Answer implements StorageStats {
-    protected GetStorageStatsAnswer() {
-    }
-
     protected long used;
-
     protected long capacity;
 
-    @Override
-    public long getByteUsed() {
-        return used;
-    }
-
-    @Override
-    public long getCapacityBytes() {
-        return capacity;
+    protected GetStorageStatsAnswer() {
     }
 
     public GetStorageStatsAnswer(GetStorageStatsCommand cmd, long capacity, long used) {
@@ -49,5 +38,15 @@ public class GetStorageStatsAnswer extends Answer implements StorageStats {
 
     public GetStorageStatsAnswer(GetStorageStatsCommand cmd, String details) {
         super(cmd, false, details);
+    }
+
+    @Override
+    public long getByteUsed() {
+        return used;
+    }
+
+    @Override
+    public long getCapacityBytes() {
+        return capacity;
     }
 }

@@ -24,12 +24,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.util.Collection;
-
 import org.apache.cloudstack.spring.module.locator.impl.ClasspathModuleDefinitionLocator;
 import org.apache.cloudstack.spring.module.model.ModuleDefinition;
 import org.apache.cloudstack.spring.module.model.ModuleDefinitionSet;
+
+import java.io.IOException;
+import java.util.Collection;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -85,10 +86,10 @@ public class ModuleBasedContextFactoryTest {
         ModuleBasedContextFactory factory = new ModuleBasedContextFactory();
         ModuleDefinitionSet set = factory.loadModules(defs, "base");
 
-        testBeansInContext(set, "base", 1, new String[] {"base"}, new String[] {"child1", "child2", "child1-1"});
-        testBeansInContext(set, "child1", 2, new String[] {"base", "child1"}, new String[] {"child2", "child1-1"});
-        testBeansInContext(set, "child2", 4, new String[] {"base", "child2"}, new String[] {"child1", "child1-1"});
-        testBeansInContext(set, "child1-1", 3, new String[] {"base", "child1", "child1-1"}, new String[] {"child2"});
+        testBeansInContext(set, "base", 1, new String[]{"base"}, new String[]{"child1", "child2", "child1-1"});
+        testBeansInContext(set, "child1", 2, new String[]{"base", "child1"}, new String[]{"child2", "child1-1"});
+        testBeansInContext(set, "child2", 4, new String[]{"base", "child2"}, new String[]{"child1", "child1-1"});
+        testBeansInContext(set, "child1-1", 3, new String[]{"base", "child1", "child1-1"}, new String[]{"child2"});
     }
 
     protected void testBeansInContext(ModuleDefinitionSet set, String name, int order, String[] parents, String[] notTheres) {
@@ -133,6 +134,5 @@ public class ModuleBasedContextFactoryTest {
         public int getCount() {
             return myCount;
         }
-
     }
 }

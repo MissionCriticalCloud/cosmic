@@ -23,7 +23,6 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.Network;
 import com.cloud.user.Account;
 import com.cloud.vm.NicSecondaryIp;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -34,9 +33,9 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.NicSecondaryIpResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 @APICommand(name = "removeIpFromNic", description = "Removes secondary IP from the NIC.", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
@@ -62,12 +61,12 @@ public class RemoveIpFromVmNicCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public String getEntityTable() {
-        return "nic_secondary_ips";
+    public static String getResultObjectName() {
+        return "addressinfo";
     }
 
-    public Long getIpAddressId() {
-        return id;
+    public String getEntityTable() {
+        return "nic_secondary_ips";
     }
 
     public String getAccountName() {
@@ -79,37 +78,36 @@ public class RemoveIpFromVmNicCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public long getEntityOwnerId() {
-        Account caller = CallContext.current().getCallingAccount();
-        return caller.getAccountId();
-    }
-
-    @Override
     public String getEventType() {
         return EventTypes.EVENT_NIC_SECONDARY_IP_UNASSIGN;
     }
 
-    public NicSecondaryIp getIpEntry() {
-        NicSecondaryIp nicSecIp = _entityMgr.findById(NicSecondaryIp.class, getIpAddressId());
-        return nicSecIp;
+    @Override
+    public String getEventDescription() {
+        return ("Disassociating ip address with id=" + id);
     }
 
     @Override
-    public String getEventDescription() {
-        return  ("Disassociating ip address with id=" + id);
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.IpAddress;
+    }
+
+    @Override
+    public String getSyncObjType() {
+        return BaseAsyncCmd.networkSyncObject;
     }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
 
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public static String getResultObjectName() {
-        return "addressinfo";
+    public NetworkType getNetworkType() {
+        Network ntwk = _entityMgr.findById(Network.class, getNetworkId());
+        if (ntwk != null) {
+            DataCenter dc = _entityMgr.findById(DataCenter.class, ntwk.getDataCenterId());
+            return dc.getNetworkType();
+        }
+        return null;
     }
 
     public Long getNetworkId() {
@@ -122,20 +120,8 @@ public class RemoveIpFromVmNicCmd extends BaseAsyncCmd {
         }
     }
 
-    public NetworkType getNetworkType() {
-        Network ntwk = _entityMgr.findById(Network.class, getNetworkId());
-        if (ntwk != null) {
-            DataCenter dc = _entityMgr.findById(DataCenter.class, ntwk.getDataCenterId());
-            return dc.getNetworkType();
-        }
-        return null;
-    }
-
-
-    private boolean isZoneSGEnabled() {
-        Network ntwk = _entityMgr.findById(Network.class, getNetworkId());
-        DataCenter dc = _entityMgr.findById(DataCenter.class, ntwk.getDataCenterId());
-        return dc.isSecurityGroupEnabled();
+    public Long getIpAddressId() {
+        return id;
     }
 
     @Override
@@ -169,14 +155,25 @@ public class RemoveIpFromVmNicCmd extends BaseAsyncCmd {
         }
     }
 
-    @Override
-    public String getSyncObjType() {
-        return BaseAsyncCmd.networkSyncObject;
+    public NicSecondaryIp getIpEntry() {
+        NicSecondaryIp nicSecIp = _entityMgr.findById(NicSecondaryIp.class, getIpAddressId());
+        return nicSecIp;
+    }
+
+    private boolean isZoneSGEnabled() {
+        Network ntwk = _entityMgr.findById(Network.class, getNetworkId());
+        DataCenter dc = _entityMgr.findById(DataCenter.class, ntwk.getDataCenterId());
+        return dc.isSecurityGroupEnabled();
     }
 
     @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.IpAddress;
+    public String getCommandName() {
+        return s_name;
     }
 
+    @Override
+    public long getEntityOwnerId() {
+        Account caller = CallContext.current().getCallingAccount();
+        return caller.getAccountId();
+    }
 }

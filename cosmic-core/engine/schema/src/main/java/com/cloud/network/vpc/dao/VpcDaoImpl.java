@@ -16,11 +16,6 @@
 // under the License.
 package com.cloud.network.vpc.dao;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.cloud.network.Network;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcServiceMapVO;
@@ -35,6 +30,10 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -103,20 +102,6 @@ public class VpcDaoImpl extends GenericDaoBase<VpcVO, Long> implements VpcDao {
     }
 
     @Override
-    @DB
-    public boolean remove(Long id) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        VpcVO entry = findById(id);
-        if (entry != null) {
-            _tagsDao.removeByIdAndType(id, ResourceObjectType.Vpc);
-        }
-        boolean result = super.remove(id);
-        txn.commit();
-        return result;
-    }
-
-    @Override
     public long countByAccountId(long accountId) {
         SearchCriteria<Long> sc = CountByAccountId.create();
         sc.setParameters("accountId", accountId);
@@ -147,5 +132,19 @@ public class VpcDaoImpl extends GenericDaoBase<VpcVO, Long> implements VpcDao {
             }
         }
         txn.commit();
+    }
+
+    @Override
+    @DB
+    public boolean remove(Long id) {
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        txn.start();
+        VpcVO entry = findById(id);
+        if (entry != null) {
+            _tagsDao.removeByIdAndType(id, ResourceObjectType.Vpc);
+        }
+        boolean result = super.remove(id);
+        txn.commit();
+        return result;
     }
 }

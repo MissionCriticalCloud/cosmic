@@ -16,15 +16,6 @@
 // under the License.
 package com.cloud.resource;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.configuration.Config;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.dao.ClusterDao;
@@ -34,14 +25,22 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.network.NetworkModel;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.net.UrlUtil;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class DiscovererBase extends AdapterBase implements Discoverer {
-    protected Map<String, String> _params;
     private static final Logger s_logger = LoggerFactory.getLogger(DiscovererBase.class);
+    protected Map<String, String> _params;
     @Inject
     protected ClusterDao _clusterDao;
     @Inject
@@ -62,6 +61,16 @@ public abstract class DiscovererBase extends AdapterBase implements Discoverer {
         return true;
     }
 
+    @Override
+    public boolean start() {
+        return true;
+    }
+
+    @Override
+    public boolean stop() {
+        return true;
+    }
+
     protected Map<String, String> resolveInputParameters(URL url) {
         Map<String, String> params = UrlUtil.parseQueryParameters(url);
 
@@ -77,13 +86,27 @@ public abstract class DiscovererBase extends AdapterBase implements Discoverer {
     }
 
     @Override
-    public boolean start() {
-        return true;
-    }
+    public ServerResource reloadResource(HostVO host) {
+        String resourceName = host.getResource();
+        ServerResource resource = getResource(resourceName);
 
-    @Override
-    public boolean stop() {
-        return true;
+        if (resource != null) {
+            _hostDao.loadDetails(host);
+            updateNetworkLabels(host);
+
+            HashMap<String, Object> params = buildConfigParams(host);
+            try {
+                resource.configure(host.getName(), params);
+            } catch (ConfigurationException e) {
+                s_logger.warn("Unable to configure resource due to " + e.getMessage());
+                return null;
+            }
+            if (!resource.start()) {
+                s_logger.warn("Unable to start the resource");
+                return null;
+            }
+        }
+        return resource;
     }
 
     protected ServerResource getResource(String resourceName) {
@@ -91,7 +114,7 @@ public abstract class DiscovererBase extends AdapterBase implements Discoverer {
         try {
             Class<?> clazz = Class.forName(resourceName);
             Constructor constructor = clazz.getConstructor();
-            resource = (ServerResource)constructor.newInstance();
+            resource = (ServerResource) constructor.newInstance();
         } catch (ClassNotFoundException e) {
             s_logger.warn("Unable to find class " + resourceName, e);
         } catch (InstantiationException e) {
@@ -109,6 +132,30 @@ public abstract class DiscovererBase extends AdapterBase implements Discoverer {
         }
 
         return resource;
+    }
+
+    private void updateNetworkLabels(HostVO host) {
+        //check if networkLabels need to be updated in details
+        //we send only private and storage network label to the resource.
+        String privateNetworkLabel = _networkMgr.getDefaultManagementTrafficLabel(host.getDataCenterId(), host.getHypervisorType());
+        String storageNetworkLabel = _networkMgr.getDefaultStorageTrafficLabel(host.getDataCenterId(), host.getHypervisorType());
+
+        String privateDevice = host.getDetail("private.network.device");
+        String storageDevice = host.getDetail("storage.network.device1");
+
+        boolean update = false;
+
+        if (privateNetworkLabel != null && !privateNetworkLabel.equalsIgnoreCase(privateDevice)) {
+            host.setDetail("private.network.device", privateNetworkLabel);
+            update = true;
+        }
+        if (storageNetworkLabel != null && !storageNetworkLabel.equalsIgnoreCase(storageDevice)) {
+            host.setDetail("storage.network.device1", storageNetworkLabel);
+            update = true;
+        }
+        if (update) {
+            _hostDao.saveDetails(host);
+        }
     }
 
     protected HashMap<String, Object> buildConfigParams(HostVO host) {
@@ -144,55 +191,5 @@ public abstract class DiscovererBase extends AdapterBase implements Discoverer {
         params.put("router.aggregation.command.each.timeout", _configDao.getValue(Config.RouterAggregationCommandEachTimeout.toString()));
 
         return params;
-
     }
-
-    @Override
-    public ServerResource reloadResource(HostVO host) {
-        String resourceName = host.getResource();
-        ServerResource resource = getResource(resourceName);
-
-        if (resource != null) {
-            _hostDao.loadDetails(host);
-            updateNetworkLabels(host);
-
-            HashMap<String, Object> params = buildConfigParams(host);
-            try {
-                resource.configure(host.getName(), params);
-            } catch (ConfigurationException e) {
-                s_logger.warn("Unable to configure resource due to " + e.getMessage());
-                return null;
-            }
-            if (!resource.start()) {
-                s_logger.warn("Unable to start the resource");
-                return null;
-            }
-        }
-        return resource;
-    }
-
-    private void updateNetworkLabels(HostVO host) {
-        //check if networkLabels need to be updated in details
-        //we send only private and storage network label to the resource.
-        String privateNetworkLabel = _networkMgr.getDefaultManagementTrafficLabel(host.getDataCenterId(), host.getHypervisorType());
-        String storageNetworkLabel = _networkMgr.getDefaultStorageTrafficLabel(host.getDataCenterId(), host.getHypervisorType());
-
-        String privateDevice = host.getDetail("private.network.device");
-        String storageDevice = host.getDetail("storage.network.device1");
-
-        boolean update = false;
-
-        if (privateNetworkLabel != null && !privateNetworkLabel.equalsIgnoreCase(privateDevice)) {
-            host.setDetail("private.network.device", privateNetworkLabel);
-            update = true;
-        }
-        if (storageNetworkLabel != null && !storageNetworkLabel.equalsIgnoreCase(storageDevice)) {
-            host.setDetail("storage.network.device1", storageNetworkLabel);
-            update = true;
-        }
-        if (update) {
-            _hostDao.saveDetails(host);
-        }
-    }
-
 }

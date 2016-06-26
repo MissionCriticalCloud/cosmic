@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.network.lb;
 
-import java.util.List;
-
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.lb.LoadBalancingRule.LbDestination;
@@ -28,13 +26,14 @@ import com.cloud.network.rules.LbStickinessMethod;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.List;
 
 public interface LoadBalancingRulesManager {
 
     LoadBalancer createPublicLoadBalancer(String xId, String name, String description, int srcPort, int destPort, long sourceIpId, String protocol, String algorithm,
-        boolean openFirewall, CallContext caller, String lbProtocol, Boolean forDisplay) throws NetworkRuleConflictException;
+                                          boolean openFirewall, CallContext caller, String lbProtocol, Boolean forDisplay) throws NetworkRuleConflictException;
 
     boolean removeAllLoadBalanacersForIp(long ipId, Account caller, long callerUserId);
 
@@ -52,6 +51,7 @@ public interface LoadBalancingRulesManager {
 
     /**
      * Remove vm from all load balancers
+     *
      * @param vmId
      * @return true if removal is successful
      */

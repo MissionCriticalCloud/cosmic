@@ -16,13 +16,13 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.Date;
-
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
+
+import java.util.Date;
+
+import com.google.gson.annotations.SerializedName;
 
 public class TemplateZoneResponse extends BaseResponse {
     @SerializedName(ApiConstants.ZONE_ID)
@@ -53,22 +53,6 @@ public class TemplateZoneResponse extends BaseResponse {
     public TemplateZoneResponse(String zoneId, String zoneName) {
         super();
         this.zoneId = zoneId;
-        this.zoneName = zoneName;
-    }
-
-    public String getZoneId() {
-        return zoneId;
-    }
-
-    public void setZoneId(String zoneId) {
-        this.zoneId = zoneId;
-    }
-
-    public String getZoneName() {
-        return zoneName;
-    }
-
-    public void setZoneName(String zoneName) {
         this.zoneName = zoneName;
     }
 
@@ -105,6 +89,14 @@ public class TemplateZoneResponse extends BaseResponse {
         return result;
     }
 
+    public String getZoneId() {
+        return zoneId;
+    }
+
+    public void setZoneId(String zoneId) {
+        this.zoneId = zoneId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -116,7 +108,7 @@ public class TemplateZoneResponse extends BaseResponse {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        TemplateZoneResponse other = (TemplateZoneResponse)obj;
+        TemplateZoneResponse other = (TemplateZoneResponse) obj;
         String oid = this.getZoneId();
         if (oid == null) {
             if (other.getZoneId() != null) {
@@ -130,4 +122,11 @@ public class TemplateZoneResponse extends BaseResponse {
         return true;
     }
 
+    public String getZoneName() {
+        return zoneName;
+    }
+
+    public void setZoneName(String zoneName) {
+        this.zoneName = zoneName;
+    }
 }

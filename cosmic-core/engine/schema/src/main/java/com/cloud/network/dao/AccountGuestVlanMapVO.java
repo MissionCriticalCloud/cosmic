@@ -16,7 +16,7 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.UUID;
+import com.cloud.network.GuestVlan;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,8 +24,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.network.GuestVlan;
+import java.util.UUID;
 
 @Entity
 @Table(name = "account_vnet_map")
@@ -79,15 +78,6 @@ public class AccountGuestVlanMapVO implements GuestVlan {
     }
 
     @Override
-    public String getUuid() {
-        return this.uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    @Override
     public long getPhysicalNetworkId() {
         return this.physicalNetworkId;
     }
@@ -96,4 +86,12 @@ public class AccountGuestVlanMapVO implements GuestVlan {
         this.physicalNetworkId = physicalNetworkId;
     }
 
+    @Override
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 }

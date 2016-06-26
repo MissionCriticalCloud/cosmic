@@ -18,35 +18,33 @@
     under the License.
 
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-  xmlns:context="http://www.springframework.org/schema/context"
-  xmlns:tx="http://www.springframework.org/schema/tx" 
-  xmlns:aop="http://www.springframework.org/schema/aop"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                      http://www.springframework.org/schema/tx 
-                      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
-                      http://www.springframework.org/schema/aop
-                      http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+
+
+
+
                       http://www.springframework.org/schema/context
-                      http://www.springframework.org/schema/context/spring-context-3.0.xsd">                     
+                      http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-  <context:annotation-config />
+    <context:annotation-config />
 
-  <context:component-scan base-package="org.apache.cloudstack, com.cloud" />
+    <context:component-scan base-package="org.apache.cloudstack, com.cloud" />
 
-  <!--
-    @DB support
-  -->
-  <bean id="transactionContextBuilder" class="com.cloud.utils.db.TransactionContextBuilder" />
+    <!--
+      @DB support
+    -->
+    <bean id="transactionContextBuilder" class="com.cloud.utils.db.TransactionContextBuilder" />
 
-  <bean id="instantiatePostProcessor" class="com.cloud.utils.component.ComponentInstantiationPostProcessor">
-    <property name="Interceptors">
-        <list>
-            <ref bean="transactionContextBuilder" />
-        </list>
-    </property>
-  </bean>
+    <bean id="instantiatePostProcessor" class="com.cloud.utils.component.ComponentInstantiationPostProcessor">
+        <property name="Interceptors">
+            <list>
+                <ref bean="transactionContextBuilder" />
+            </list>
+        </property>
+    </bean>
 
 </beans>

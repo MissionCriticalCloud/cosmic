@@ -16,19 +16,19 @@
 // under the License.
 package com.cloud.hypervisor.xenserver.resource;
 
-import javax.ejb.Local;
-
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.resource.ServerResource;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.ssh.SSHCmdHelper;
+
+import javax.ejb.Local;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Host;
 import com.xensource.xenapi.Network;
 import com.xensource.xenapi.PIF;
 import com.xensource.xenapi.Types.XenAPIException;
 import com.xensource.xenapi.VLAN;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +37,30 @@ public class XenServer56Resource extends CitrixResourceBase {
     private final static Logger s_logger = LoggerFactory.getLogger(XenServer56Resource.class);
 
     @Override
-    protected String getPatchFilePath() {
-        return "scripts/vm/hypervisor/xenserver/xenserver56/patch";
+    public String networkUsage(final Connection conn, final String privateIpAddress, final String option, final String vif) {
+        String args = "";
+        if (option.equals("get")) {
+            args += "-g";
+        } else if (option.equals("create")) {
+            args += "-c";
+        } else if (option.equals("reset")) {
+            args += "-r";
+        } else if (option.equals("addVif")) {
+            args += "-a ";
+            args += vif;
+        } else if (option.equals("deleteVif")) {
+            args += "-d ";
+            args += vif;
+        }
+
+        return executeInVR(privateIpAddress, "netusage.sh", args).getDetails();
+    }
+
+    @Override
+    public StartupCommand[] initialize() {
+        pingXAPI();
+        final StartupCommand[] cmds = super.initialize();
+        return cmds;
     }
 
     @Override
@@ -85,23 +107,8 @@ public class XenServer56Resource extends CitrixResourceBase {
     }
 
     @Override
-    public String networkUsage(final Connection conn, final String privateIpAddress, final String option, final String vif) {
-        String args = "";
-        if (option.equals("get")) {
-            args += "-g";
-        } else if (option.equals("create")) {
-            args += "-c";
-        } else if (option.equals("reset")) {
-            args += "-r";
-        } else if (option.equals("addVif")) {
-            args += "-a ";
-            args += vif;
-        } else if (option.equals("deleteVif")) {
-            args += "-d ";
-            args += vif;
-        }
-
-        return executeInVR(privateIpAddress, "netusage.sh", args).getDetails();
+    protected String getPatchFilePath() {
+        return "scripts/vm/hypervisor/xenserver/xenserver56/patch";
     }
 
     public Boolean checkHeartbeat(final String hostuuid) {
@@ -125,12 +132,5 @@ public class XenServer56Resource extends CitrixResourceBase {
         } finally {
             sshConnection.close();
         }
-    }
-
-    @Override
-    public StartupCommand[] initialize() {
-        pingXAPI();
-        final StartupCommand[] cmds = super.initialize();
-        return cmds;
     }
 }

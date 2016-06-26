@@ -22,12 +22,54 @@ import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
 public class LbStickinessMethod {
-    public static class StickinessMethodType {
-        private String _name;
+    @SerializedName("methodname")
+    private String _methodName;
+    @SerializedName("paramlist")
+    private List<LbStickinessMethodParam> _paramList;
+    @SerializedName("description")
+    private String _description;
 
+    public LbStickinessMethod(StickinessMethodType methodType, String description) {
+        this._methodName = methodType.getName();
+        this._description = description;
+        this._paramList = new ArrayList<LbStickinessMethodParam>(1);
+    }
+
+    public void addParam(String name, Boolean required, String description, Boolean isFlag) {
+        /* FIXME : UI is breaking if the capability string length is larger , temporarily description is commented out */
+        // LbStickinessMethodParam param = new LbStickinessMethodParam(name, required, description);
+        LbStickinessMethodParam param = new LbStickinessMethodParam(name, required, " ", isFlag);
+        _paramList.add(param);
+        return;
+    }
+
+    public String getMethodName() {
+        return _methodName;
+    }
+
+    public List<LbStickinessMethodParam> getParamList() {
+        return _paramList;
+    }
+
+    public void setParamList(List<LbStickinessMethodParam> paramList) {
+        this._paramList = paramList;
+    }
+
+    public String getDescription() {
+        return _description;
+    }
+
+    public void setDescription(String description) {
+        /* FIXME : UI is breaking if the capability string length is larger , temporarily description is commented out */
+        //this.description = description;
+        this._description = " ";
+    }
+
+    public static class StickinessMethodType {
         public static final StickinessMethodType LBCookieBased = new StickinessMethodType("LbCookie");
         public static final StickinessMethodType AppCookieBased = new StickinessMethodType("AppCookie");
         public static final StickinessMethodType SourceBased = new StickinessMethodType("SourceBased");
+        private String _name;
 
         public StickinessMethodType(String name) {
             _name = name;
@@ -89,51 +131,5 @@ public class LbStickinessMethod {
         public void setDescription(String description) {
             this._description = description;
         }
-
-    }
-
-    @SerializedName("methodname")
-    private String _methodName;
-
-    @SerializedName("paramlist")
-    private List<LbStickinessMethodParam> _paramList;
-
-    @SerializedName("description")
-    private String _description;
-
-    public LbStickinessMethod(StickinessMethodType methodType, String description) {
-        this._methodName = methodType.getName();
-        this._description = description;
-        this._paramList = new ArrayList<LbStickinessMethodParam>(1);
-    }
-
-    public void addParam(String name, Boolean required, String description, Boolean isFlag) {
-        /* FIXME : UI is breaking if the capability string length is larger , temporarily description is commented out */
-        // LbStickinessMethodParam param = new LbStickinessMethodParam(name, required, description);
-        LbStickinessMethodParam param = new LbStickinessMethodParam(name, required, " ", isFlag);
-        _paramList.add(param);
-        return;
-    }
-
-    public String getMethodName() {
-        return _methodName;
-    }
-
-    public List<LbStickinessMethodParam> getParamList() {
-        return _paramList;
-    }
-
-    public void setParamList(List<LbStickinessMethodParam> paramList) {
-        this._paramList = paramList;
-    }
-
-    public String getDescription() {
-        return _description;
-    }
-
-    public void setDescription(String description) {
-        /* FIXME : UI is breaking if the capability string length is larger , temporarily description is commented out */
-        //this.description = description;
-        this._description = " ";
     }
 }

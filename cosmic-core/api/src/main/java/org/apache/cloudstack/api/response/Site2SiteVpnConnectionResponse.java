@@ -16,16 +16,16 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.Date;
-
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.Date;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = Site2SiteVpnConnection.class)
 @SuppressWarnings("unused")
@@ -228,5 +228,4 @@ public class Site2SiteVpnConnectionResponse extends BaseResponse implements Cont
     public void setForDisplay(Boolean forDisplay) {
         this.forDisplay = forDisplay;
     }
-
 }

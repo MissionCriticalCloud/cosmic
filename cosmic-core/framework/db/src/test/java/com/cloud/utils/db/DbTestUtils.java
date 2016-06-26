@@ -16,14 +16,14 @@
 // under the License.
 package com.cloud.utils.db;
 
+import com.cloud.utils.PropertiesUtil;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import com.cloud.utils.PropertiesUtil;
 
 public class DbTestUtils {
 
@@ -34,13 +34,12 @@ public class DbTestUtils {
         }
         Connection conn = TransactionLegacy.getStandaloneConnection();
         ScriptRunner runner = new ScriptRunner(conn, autoCommit, stopOnError);
-        try(FileReader reader = new FileReader(cleanScript);)
-        {
-           runner.runScript(reader);
-           conn.close();
+        try (FileReader reader = new FileReader(cleanScript);) {
+            runner.runScript(reader);
+            conn.close();
         } catch (FileNotFoundException e) {
             throw new RuntimeException("Unable to read " + file, e);
-        }catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException("Unable to read " + file, e);
         } catch (SQLException e) {
             throw new RuntimeException("Unable to close DB connection", e);
@@ -54,12 +53,12 @@ public class DbTestUtils {
         }
         Connection conn = TransactionLegacy.getStandaloneUsageConnection();
         ScriptRunner runner = new ScriptRunner(conn, autoCommit, stopOnError);
-        try(FileReader reader = new FileReader(cleanScript);) {
+        try (FileReader reader = new FileReader(cleanScript);) {
             runner.runScript(reader);
-        } catch (IOException e){
-            throw new RuntimeException("executeUsageScript:Exception:"+e.getMessage(),e);
-        }catch (SQLException e){
-            throw new RuntimeException("executeUsageScript:Exception:"+e.getMessage(),e);
+        } catch (IOException e) {
+            throw new RuntimeException("executeUsageScript:Exception:" + e.getMessage(), e);
+        } catch (SQLException e) {
+            throw new RuntimeException("executeUsageScript:Exception:" + e.getMessage(), e);
         }
         try {
             conn.close();
@@ -67,5 +66,4 @@ public class DbTestUtils {
             throw new RuntimeException("Unable to close DB connection", e);
         }
     }
-
 }

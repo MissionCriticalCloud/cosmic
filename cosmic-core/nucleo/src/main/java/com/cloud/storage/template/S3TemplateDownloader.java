@@ -19,9 +19,16 @@
 
 package com.cloud.storage.template;
 
+import static com.cloud.utils.StringUtils.join;
+
 import static java.util.Arrays.asList;
 
-import static com.cloud.utils.StringUtils.join;
+import com.cloud.agent.api.to.S3TO;
+import com.cloud.utils.net.HTTPUtils;
+import com.cloud.utils.net.Proxy;
+import com.cloud.utils.storage.S3.S3Utils;
+import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import org.apache.cloudstack.storage.command.DownloadCommand.ResourceType;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -35,13 +42,6 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.StorageClass;
 import com.amazonaws.services.s3.transfer.Upload;
-import com.cloud.agent.api.to.S3TO;
-import com.cloud.utils.net.HTTPUtils;
-import com.cloud.utils.net.Proxy;
-import com.cloud.utils.storage.S3.S3Utils;
-
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.storage.command.DownloadCommand.ResourceType;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.URIException;
@@ -53,9 +53,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Download a template file using HTTP(S)
- *
+ * <p>
  * This class, once instantiated, has the purpose to download a single Template to an S3 Image Store.
- *
+ * <p>
  * Execution of the instance is started when runInContext() is called.
  */
 public class S3TemplateDownloader extends ManagedContextRunnable implements TemplateDownloader {
@@ -79,7 +79,7 @@ public class S3TemplateDownloader extends ManagedContextRunnable implements Temp
     private boolean resume = false;
 
     public S3TemplateDownloader(S3TO s3TO, String downloadUrl, String installPath, DownloadCompleteCallback downloadCompleteCallback,
-            long maxTemplateSizeInBytes, String username, String password, Proxy proxy, ResourceType resourceType) {
+                                long maxTemplateSizeInBytes, String username, String password, Proxy proxy, ResourceType resourceType) {
         this.downloadUrl = downloadUrl;
         this.s3TO = s3TO;
         this.resourceType = resourceType;
@@ -107,6 +107,42 @@ public class S3TemplateDownloader extends ManagedContextRunnable implements Temp
 
         // Set credentials if available.
         HTTPUtils.setCredentials(username, password, this.httpClient);
+    }
+
+    public String getDownloadUrl() {
+        try {
+            return getMethod.getURI().toString();
+        } catch (URIException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Returns an InputStream only when the status is DOWNLOAD_FINISHED.
+     * <p>
+     * The caller of this method must close the InputStream to prevent resource leaks!
+     *
+     * @return S3ObjectInputStream of the object.
+     */
+    public InputStream getS3ObjectInputStream() {
+        // Check if the download is finished
+        if (status != Status.DOWNLOAD_FINISHED) {
+            return null;
+        }
+
+        return S3Utils.getObjectStream(s3TO, s3TO.getBucketName(), s3Key);
+    }
+
+    public void cleanupAfterError() {
+        LOGGER.warn("Cleanup after error, trying to remove object: " + s3Key);
+
+        S3Utils.deleteObject(s3TO, s3TO.getBucketName(), s3Key);
+    }
+
+    @Override
+    protected void runInContext() {
+        // Start the download!
+        download(resume, downloadCompleteCallback);
     }
 
     @Override
@@ -200,7 +236,8 @@ public class S3TemplateDownloader extends ManagedContextRunnable implements Temp
                 // Record the amount of bytes transferred.
                 totalBytes += progressEvent.getBytesTransferred();
 
-                LOGGER.trace("Template download from " + downloadUrl + " to S3 bucket " + s3TO.getBucketName() + " transferred  " + totalBytes + " in " + ((new Date().getTime() - start.getTime()) / 1000) + " seconds");
+                LOGGER.trace("Template download from " + downloadUrl + " to S3 bucket " + s3TO.getBucketName() + " transferred  " + totalBytes + " in " + ((new Date().getTime()
+                        - start.getTime()) / 1000) + " seconds");
 
                 if (progressEvent.getEventType() == ProgressEventType.TRANSFER_STARTED_EVENT) {
                     status = Status.IN_PROGRESS;
@@ -225,9 +262,11 @@ public class S3TemplateDownloader extends ManagedContextRunnable implements Temp
         downloadTime = new Date().getTime() - start.getTime();
 
         if (status == Status.DOWNLOAD_FINISHED) {
-            LOGGER.info("Template download from " + downloadUrl + " to S3 bucket " + s3TO.getBucketName() + " transferred  " + totalBytes + " in " + (downloadTime / 1000) + " seconds, completed successfully!");
+            LOGGER.info("Template download from " + downloadUrl + " to S3 bucket " + s3TO.getBucketName() + " transferred  " + totalBytes + " in " + (downloadTime / 1000) + " " +
+                    "seconds, completed successfully!");
         } else {
-            LOGGER.warn("Template download from " + downloadUrl + " to S3 bucket " + s3TO.getBucketName() + " transferred  " + totalBytes + " in " + (downloadTime / 1000) + " seconds, completed with status " + status.toString());
+            LOGGER.warn("Template download from " + downloadUrl + " to S3 bucket " + s3TO.getBucketName() + " transferred  " + totalBytes + " in " + (downloadTime / 1000) + " " +
+                    "seconds, completed with status " + status.toString());
         }
 
         // Close input stream
@@ -239,51 +278,6 @@ public class S3TemplateDownloader extends ManagedContextRunnable implements Temp
         }
 
         return totalBytes;
-    }
-
-    public String getDownloadUrl() {
-        try {
-            return getMethod.getURI().toString();
-        } catch (URIException e) {
-            return null;
-        }
-    }
-
-    @Override
-    public Status getStatus() {
-        return status;
-    }
-
-    @Override
-    public long getDownloadTime() {
-        return downloadTime;
-    }
-
-    @Override
-    public long getDownloadedBytes() {
-        return totalBytes;
-    }
-
-    /**
-     * Returns an InputStream only when the status is DOWNLOAD_FINISHED.
-     *
-     * The caller of this method must close the InputStream to prevent resource leaks!
-     *
-     * @return S3ObjectInputStream of the object.
-     */
-    public InputStream getS3ObjectInputStream() {
-        // Check if the download is finished
-        if (status != Status.DOWNLOAD_FINISHED) {
-            return null;
-        }
-
-        return S3Utils.getObjectStream(s3TO, s3TO.getBucketName(), s3Key);
-    }
-
-    public void cleanupAfterError() {
-        LOGGER.warn("Cleanup after error, trying to remove object: " + s3Key);
-
-        S3Utils.deleteObject(s3TO, s3TO.getBucketName(), s3Key);
     }
 
     @Override
@@ -321,9 +315,8 @@ public class S3TemplateDownloader extends ManagedContextRunnable implements Temp
     }
 
     @Override
-    protected void runInContext() {
-        // Start the download!
-        download(resume, downloadCompleteCallback);
+    public Status getStatus() {
+        return status;
     }
 
     @Override
@@ -331,8 +324,14 @@ public class S3TemplateDownloader extends ManagedContextRunnable implements Temp
         this.status = status;
     }
 
-    public boolean isResume() {
-        return resume;
+    @Override
+    public long getDownloadTime() {
+        return downloadTime;
+    }
+
+    @Override
+    public long getDownloadedBytes() {
+        return totalBytes;
     }
 
     @Override
@@ -341,8 +340,17 @@ public class S3TemplateDownloader extends ManagedContextRunnable implements Temp
     }
 
     @Override
+    public void setDownloadError(String error) {
+        errorString = error;
+    }
+
+    @Override
     public String getDownloadLocalPath() {
         return s3Key;
+    }
+
+    public boolean isResume() {
+        return resume;
     }
 
     @Override
@@ -351,18 +359,13 @@ public class S3TemplateDownloader extends ManagedContextRunnable implements Temp
     }
 
     @Override
-    public long getMaxTemplateSizeInBytes() {
-        return maxTemplateSizeInByte;
-    }
-
-    @Override
-    public void setDownloadError(String error) {
-        errorString = error;
-    }
-
-    @Override
     public boolean isInited() {
         return true;
+    }
+
+    @Override
+    public long getMaxTemplateSizeInBytes() {
+        return maxTemplateSizeInByte;
     }
 
     public ResourceType getResourceType() {

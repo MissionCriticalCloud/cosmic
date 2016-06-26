@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.vm.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.SecondaryStorageVm;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.VirtualMachine.State;
+
+import java.util.List;
 
 public interface SecondaryStorageVmDao extends GenericDao<SecondaryStorageVmVO, Long> {
 

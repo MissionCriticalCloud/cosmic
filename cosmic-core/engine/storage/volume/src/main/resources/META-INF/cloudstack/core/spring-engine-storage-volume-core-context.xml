@@ -16,34 +16,28 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:aop="http://www.springframework.org/schema/aop"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-                      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
-                      http://www.springframework.org/schema/context
-                      http://www.springframework.org/schema/context/spring-context-3.0.xsd"
-                      >
+                      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+>
 
     <!--Filesystem types -->
     <bean id="iSCSI" class="org.apache.cloudstack.storage.datastore.type.ISCSI" />
     <bean id="networkFileSystem"
-        class="org.apache.cloudstack.storage.datastore.type.NetworkFileSystem" />
+          class="org.apache.cloudstack.storage.datastore.type.NetworkFileSystem" />
 
     <bean id="volumeServiceImpl"
-        class="org.apache.cloudstack.storage.volume.VolumeServiceImpl"
-        depends-on="snapshotManagerImpl, dataMotionServiceImpl" />
+          class="org.apache.cloudstack.storage.volume.VolumeServiceImpl"
+          depends-on="snapshotManagerImpl, dataMotionServiceImpl" />
 
     <bean id="volumeDataFactoryImpl"
-        class="org.apache.cloudstack.storage.volume.VolumeDataFactoryImpl" />
-
+          class="org.apache.cloudstack.storage.volume.VolumeDataFactoryImpl" />
 
     <bean id="primaryDataStoreHelper"
-        class="org.apache.cloudstack.storage.volume.datastore.PrimaryDataStoreHelper" />
+          class="org.apache.cloudstack.storage.volume.datastore.PrimaryDataStoreHelper" />
 
     <bean id="primaryDataStoreProviderMgr"
-        class="org.apache.cloudstack.storage.datastore.manager.PrimaryDataStoreProviderManagerImpl" />
- 
+          class="org.apache.cloudstack.storage.datastore.manager.PrimaryDataStoreProviderManagerImpl" />
+
 </beans>

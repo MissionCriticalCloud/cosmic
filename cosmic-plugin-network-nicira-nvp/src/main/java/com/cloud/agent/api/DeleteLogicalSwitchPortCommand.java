@@ -40,5 +40,4 @@ public class DeleteLogicalSwitchPortCommand extends Command {
     public boolean executeInSequence() {
         return false;
     }
-
 }

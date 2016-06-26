@@ -23,8 +23,7 @@ public interface VpcOfferingDao extends GenericDao<VpcOfferingVO, Long> {
     /**
      * Returns the VPC offering that matches the unique name.
      *
-     * @param uniqueName
-     *            name
+     * @param uniqueName name
      * @return VpcOfferingVO
      */
     VpcOfferingVO findByUniqueName(String uniqueName);

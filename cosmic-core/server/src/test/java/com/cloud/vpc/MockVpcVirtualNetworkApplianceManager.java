@@ -17,11 +17,6 @@
 
 package com.cloud.vpc;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -38,9 +33,13 @@ import com.cloud.user.User;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.VirtualMachineProfile;
-
 import org.apache.cloudstack.api.command.admin.router.UpgradeRouterCmd;
 import org.apache.cloudstack.api.command.admin.router.UpgradeRouterTemplateCmd;
+
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -94,6 +93,16 @@ public class MockVpcVirtualNetworkApplianceManager extends ManagerBase implement
     @Override
     public boolean removeDhcpSupportForSubnet(final Network network, final List<DomainRouterVO> routers) throws ResourceUnavailableException {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean prepareAggregatedExecution(final Network network, final List<DomainRouterVO> routers) throws AgentUnavailableException {
+        return true;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean completeAggregatedExecution(final Network network, final List<DomainRouterVO> routers) throws AgentUnavailableException {
+        return true;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     /* (non-Javadoc)
@@ -150,13 +159,32 @@ public class MockVpcVirtualNetworkApplianceManager extends ManagerBase implement
         return null;
     }
 
+    @Override
+    public VirtualRouter findRouter(final long routerId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Long> upgradeRouterTemplate(final UpgradeRouterTemplateCmd cmd) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    /* (non-Javadoc)
+     * @see com.cloud.utils.component.Manager#getName()
+     */
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     /* (non-Javadoc)
      * @see com.cloud.utils.component.Manager#configure(java.lang.String, java.util.Map)
      */
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         return true;
-
     }
 
     /* (non-Javadoc)
@@ -173,16 +201,6 @@ public class MockVpcVirtualNetworkApplianceManager extends ManagerBase implement
     @Override
     public boolean stop() {
         return true;
-
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.utils.component.Manager#getName()
-     */
-    @Override
-    public String getName() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     /* (non-Javadoc)
@@ -235,27 +253,6 @@ public class MockVpcVirtualNetworkApplianceManager extends ManagerBase implement
     public List<DomainRouterVO> getVpcRouters(final long vpcId) {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public VirtualRouter findRouter(final long routerId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Long> upgradeRouterTemplate(final UpgradeRouterTemplateCmd cmd) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean prepareAggregatedExecution(final Network network, final List<DomainRouterVO> routers) throws AgentUnavailableException {
-        return true;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean completeAggregatedExecution(final Network network, final List<DomainRouterVO> routers) throws AgentUnavailableException {
-        return true;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

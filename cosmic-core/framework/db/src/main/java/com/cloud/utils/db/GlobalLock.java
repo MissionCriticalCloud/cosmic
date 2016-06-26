@@ -18,11 +18,11 @@ package com.cloud.utils.db;
 
 import static java.lang.String.format;
 
+import com.cloud.utils.Profiler;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-
-import com.cloud.utils.Profiler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,46 +45,15 @@ import org.slf4j.LoggerFactory;
 //
 public class GlobalLock {
     protected final static Logger s_logger = LoggerFactory.getLogger(GlobalLock.class);
-
+    private static Map<String, GlobalLock> s_lockMap = new HashMap<String, GlobalLock>();
     private String name;
     private int lockCount = 0;
     private Thread ownerThread = null;
-
     private int referenceCount = 0;
     private long holdingStartTick = 0;
 
-    private static Map<String, GlobalLock> s_lockMap = new HashMap<String, GlobalLock>();
-
     private GlobalLock(String name) {
         this.name = name;
-    }
-
-    public int addRef() {
-        synchronized (this) {
-            referenceCount++;
-            return referenceCount;
-        }
-    }
-
-    public int releaseRef() {
-        int refCount;
-
-        boolean needToRemove = false;
-        synchronized (this) {
-            referenceCount--;
-            refCount = referenceCount;
-
-            if (referenceCount < 0)
-                s_logger.warn("Unmatched Global lock " + name + " reference usage detected, check your code!");
-
-            if (referenceCount == 0)
-                needToRemove = true;
-        }
-
-        if (needToRemove)
-            releaseInternLock(name);
-
-        return refCount;
     }
 
     public static GlobalLock getInternLock(String name) {
@@ -106,12 +75,71 @@ public class GlobalLock {
         synchronized (s_lockMap) {
             GlobalLock lock = s_lockMap.get(name);
             if (lock != null) {
-                if (lock.referenceCount == 0)
+                if (lock.referenceCount == 0) {
                     s_lockMap.remove(name);
+                }
             } else {
                 s_logger.warn("Releasing " + name + ", but it is already released.");
             }
         }
+    }
+
+    public static <T> T executeWithLock(final String operationId, final int lockAcquisitionTimeout, final Callable<T> operation) throws Exception {
+
+        final GlobalLock lock = GlobalLock.getInternLock(operationId);
+
+        try {
+
+            if (!lock.lock(lockAcquisitionTimeout)) {
+                if (s_logger.isDebugEnabled()) {
+                    s_logger.debug(format("Failed to acquire lock for operation id %1$s", operationId));
+                }
+                return null;
+            }
+
+            return operation.call();
+        } finally {
+
+            if (lock != null) {
+                lock.unlock();
+            }
+        }
+    }
+
+    public static <T> T executeWithNoWaitLock(final String operationId, final Callable<T> operation) throws Exception {
+
+        return executeWithLock(operationId, 0, operation);
+    }
+
+    public int addRef() {
+        synchronized (this) {
+            referenceCount++;
+            return referenceCount;
+        }
+    }
+
+    public int releaseRef() {
+        int refCount;
+
+        boolean needToRemove = false;
+        synchronized (this) {
+            referenceCount--;
+            refCount = referenceCount;
+
+            if (referenceCount < 0) {
+                s_logger.warn("Unmatched Global lock " + name + " reference usage detected, check your code!");
+            }
+
+            if (referenceCount == 0) {
+                needToRemove = true;
+            }
+        }
+
+        if (needToRemove) {
+            releaseInternLock(name);
+        }
+
+        return refCount;
     }
 
     public boolean lock(int timeoutSeconds) {
@@ -126,8 +154,9 @@ public class GlobalLock {
 
                         lockCount++;
 
-                        if (s_logger.isTraceEnabled())
+                        if (s_logger.isTraceEnabled()) {
                             s_logger.trace("lock " + name + " is acquired, lock count :" + lockCount);
+                        }
                         return true;
                     }
 
@@ -141,8 +170,9 @@ public class GlobalLock {
                         profiler.stop();
 
                         remainingMilliSeconds -= profiler.getDurationInMillis();
-                        if (remainingMilliSeconds < 0)
+                        if (remainingMilliSeconds < 0) {
                             return false;
+                        }
 
                         continue;
                     } else {
@@ -157,8 +187,9 @@ public class GlobalLock {
                         lockCount++;
                         holdingStartTick = System.currentTimeMillis();
 
-                        if (s_logger.isTraceEnabled())
+                        if (s_logger.isTraceEnabled()) {
                             s_logger.trace("lock " + name + " is acquired, lock count :" + lockCount);
+                        }
                         return true;
                     }
                 } else {
@@ -184,8 +215,9 @@ public class GlobalLock {
                     ownerThread = null;
                     DbUtil.releaseGlobalLock(name);
 
-                    if (s_logger.isTraceEnabled())
+                    if (s_logger.isTraceEnabled()) {
                         s_logger.trace("lock " + name + " is returned to free state, total holding time :" + (System.currentTimeMillis() - holdingStartTick));
+                    }
                     holdingStartTick = 0;
 
                     // release holding position in intern map when we released the DB connection
@@ -193,8 +225,9 @@ public class GlobalLock {
                     notifyAll();
                 }
 
-                if (s_logger.isTraceEnabled())
+                if (s_logger.isTraceEnabled()) {
                     s_logger.trace("lock " + name + " is released, lock count :" + lockCount);
+                }
                 return true;
             }
             return false;
@@ -204,36 +237,4 @@ public class GlobalLock {
     public String getName() {
         return name;
     }
-
-    public static <T> T executeWithLock(final String operationId, final int lockAcquisitionTimeout, final Callable<T> operation) throws Exception {
-
-        final GlobalLock lock = GlobalLock.getInternLock(operationId);
-
-        try {
-
-            if (!lock.lock(lockAcquisitionTimeout)) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug(format("Failed to acquire lock for operation id %1$s", operationId));
-                }
-                return null;
-            }
-
-            return operation.call();
-
-        } finally {
-
-            if (lock != null) {
-                lock.unlock();
-            }
-
-        }
-
-    }
-
-    public static <T> T executeWithNoWaitLock(final String operationId, final Callable<T> operation) throws Exception {
-
-        return executeWithLock(operationId, 0, operation);
-
-    }
-
 }

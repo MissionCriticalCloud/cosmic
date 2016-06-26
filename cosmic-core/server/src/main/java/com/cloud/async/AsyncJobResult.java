@@ -17,7 +17,6 @@
 package com.cloud.async;
 
 import com.cloud.api.ApiSerializerHelper;
-
 import org.apache.cloudstack.jobs.JobInfo;
 
 public class AsyncJobResult {
@@ -37,44 +36,12 @@ public class AsyncJobResult {
         result = "";
     }
 
-    public long getJobId() {
-        return jobId;
-    }
-
-    public void setJobId(long jobId) {
-        this.jobId = jobId;
-    }
-
     public String getUuid() {
         return uuid;
     }
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    public JobInfo.Status getJobStatus() {
-        return jobStatus;
-    }
-
-    public void setJobStatus(JobInfo.Status jobStatus) {
-        this.jobStatus = jobStatus;
-    }
-
-    public int getProcessStatus() {
-        return processStatus;
-    }
-
-    public void setProcessStatus(int processStatus) {
-        this.processStatus = processStatus;
-    }
-
-    public int getResultCode() {
-        return resultCode;
-    }
-
-    public void setResultCode(int resultCode) {
-        this.resultCode = resultCode;
     }
 
     public String getResult() {
@@ -103,5 +70,37 @@ public class AsyncJobResult {
         sb.append(", result: ").append(result);
         sb.append("}");
         return sb.toString();
+    }
+
+    public long getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(long jobId) {
+        this.jobId = jobId;
+    }
+
+    public JobInfo.Status getJobStatus() {
+        return jobStatus;
+    }
+
+    public void setJobStatus(JobInfo.Status jobStatus) {
+        this.jobStatus = jobStatus;
+    }
+
+    public int getProcessStatus() {
+        return processStatus;
+    }
+
+    public void setProcessStatus(int processStatus) {
+        this.processStatus = processStatus;
+    }
+
+    public int getResultCode() {
+        return resultCode;
+    }
+
+    public void setResultCode(int resultCode) {
+        this.resultCode = resultCode;
     }
 }

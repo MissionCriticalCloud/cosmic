@@ -33,16 +33,16 @@ import org.hamcrest.Matcher;
 
 public class HttpUriRequestPayloadMatcher extends FeatureMatcher<HttpUriRequest, String> {
 
+    public HttpUriRequestPayloadMatcher(final Matcher<? super String> subMatcher, final String featureDescription, final String featureName) {
+        super(subMatcher, featureDescription, featureName);
+    }
+
     public static HttpUriRequest aPayload(final String payload) {
         return argThat(hasPayload(payload));
     }
 
     public static HttpUriRequestPayloadMatcher hasPayload(final String payload) {
         return new HttpUriRequestPayloadMatcher(equalTo(payload), "payload", "payload");
-    }
-
-    public HttpUriRequestPayloadMatcher(final Matcher<? super String> subMatcher, final String featureDescription, final String featureName) {
-        super(subMatcher, featureDescription, featureName);
     }
 
     @Override

@@ -58,5 +58,4 @@ public class StaticRoute {
     public void setCidr(String cidr) {
         this.cidr = cidr;
     }
-
 }

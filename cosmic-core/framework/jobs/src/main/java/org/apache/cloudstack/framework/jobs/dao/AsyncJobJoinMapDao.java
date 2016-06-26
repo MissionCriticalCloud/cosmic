@@ -16,13 +16,12 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
-
 import org.apache.cloudstack.framework.jobs.impl.AsyncJobJoinMapVO;
 import org.apache.cloudstack.jobs.JobInfo;
+
+import java.util.Date;
+import java.util.List;
 
 public interface AsyncJobJoinMapDao extends GenericDao<AsyncJobJoinMapVO, Long> {
 
@@ -38,10 +37,10 @@ public interface AsyncJobJoinMapDao extends GenericDao<AsyncJobJoinMapVO, Long> 
 
     void completeJoin(long joinJobId, JobInfo.Status joinStatus, String joinResult, long completeMsid);
 
-//    List<Long> wakeupScan();
+    //    List<Long> wakeupScan();
 
     List<Long> findJobsToWake(long joinedJobId);
 
     List<Long> findJobsToWakeBetween(Date cutDate);
-//    List<Long> wakeupByJoinedJobCompletion(long joinedJobId);
+    //    List<Long> wakeupByJoinedJobCompletion(long joinedJobId);
 }

@@ -17,8 +17,6 @@
 
 package com.cloud.usage;
 
-import java.io.IOException;
-
 import com.cloud.alert.AlertManager;
 import com.cloud.event.dao.UsageEventDao;
 import com.cloud.usage.UsageManagerTestConfiguration.Library;
@@ -48,9 +46,11 @@ import com.cloud.usage.parser.VmDiskUsageParser;
 import com.cloud.usage.parser.VolumeUsageParser;
 import com.cloud.user.dao.AccountDaoImpl;
 import com.cloud.user.dao.UserStatisticsDaoImpl;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDaoImpl;
 import org.apache.cloudstack.test.utils.SpringUtils;
+
+import java.io.IOException;
+
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -63,14 +63,14 @@ import org.springframework.core.type.filter.TypeFilter;
 
 @Configuration
 @ComponentScan(basePackageClasses = {AccountDaoImpl.class, UsageDaoImpl.class, UsageJobDaoImpl.class, UsageVMInstanceDaoImpl.class, UsageIPAddressDaoImpl.class,
-    UsageNetworkDaoImpl.class, UsageVolumeDaoImpl.class, UsageStorageDaoImpl.class, UsageLoadBalancerPolicyDaoImpl.class,
-    UsagePortForwardingRuleDaoImpl.class, UsageNetworkOfferingDaoImpl.class, UsageVPNUserDaoImpl.class, UsageVmDiskDaoImpl.class,
-    UsageSecurityGroupDaoImpl.class, ConfigurationDaoImpl.class, UsageManagerImpl.class, VMInstanceUsageParser.class, IPAddressUsageParser.class,
-    LoadBalancerUsageParser.class, NetworkOfferingUsageParser.class, NetworkUsageParser.class, PortForwardingUsageParser.class,
-    SecurityGroupUsageParser.class, StorageUsageParser.class, VmDiskUsageParser.class, VolumeUsageParser.class, VPNUserUsageParser.class,
-    UserStatisticsDaoImpl.class},
-               includeFilters = {@Filter(value = Library.class, type = FilterType.CUSTOM)},
-               useDefaultFilters = false)
+        UsageNetworkDaoImpl.class, UsageVolumeDaoImpl.class, UsageStorageDaoImpl.class, UsageLoadBalancerPolicyDaoImpl.class,
+        UsagePortForwardingRuleDaoImpl.class, UsageNetworkOfferingDaoImpl.class, UsageVPNUserDaoImpl.class, UsageVmDiskDaoImpl.class,
+        UsageSecurityGroupDaoImpl.class, ConfigurationDaoImpl.class, UsageManagerImpl.class, VMInstanceUsageParser.class, IPAddressUsageParser.class,
+        LoadBalancerUsageParser.class, NetworkOfferingUsageParser.class, NetworkUsageParser.class, PortForwardingUsageParser.class,
+        SecurityGroupUsageParser.class, StorageUsageParser.class, VmDiskUsageParser.class, VolumeUsageParser.class, VPNUserUsageParser.class,
+        UserStatisticsDaoImpl.class},
+        includeFilters = {@Filter(value = Library.class, type = FilterType.CUSTOM)},
+        useDefaultFilters = false)
 public class UsageManagerTestConfiguration {
 
     @Bean
@@ -86,11 +86,10 @@ public class UsageManagerTestConfiguration {
     public static class Library implements TypeFilter {
 
         @Override
-        public boolean match(MetadataReader mdr, MetadataReaderFactory arg1) throws IOException {
+        public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) throws IOException {
             mdr.getClassMetadata().getClassName();
-            ComponentScan cs = UsageManagerTestConfiguration.class.getAnnotation(ComponentScan.class);
+            final ComponentScan cs = UsageManagerTestConfiguration.class.getAnnotation(ComponentScan.class);
             return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);
         }
-
     }
 }

@@ -17,28 +17,18 @@
 
 package com.cloud.vpc;
 
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.element.Site2SiteVpnServiceProvider;
 import com.cloud.utils.component.ManagerBase;
 
+import javax.naming.ConfigurationException;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class MockSite2SiteVpnServiceProvider extends ManagerBase implements Site2SiteVpnServiceProvider {
-
-    /* (non-Javadoc)
-     * @see com.cloud.utils.component.Adapter#configure(java.lang.String, java.util.Map)
-     */
-    @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
-        // TODO Auto-generated method stub
-        return true;
-    }
 
     /* (non-Javadoc)
      * @see com.cloud.utils.component.Adapter#getName()
@@ -47,6 +37,15 @@ public class MockSite2SiteVpnServiceProvider extends ManagerBase implements Site
     public String getName() {
         // TODO Auto-generated method stub
         return "Site2SiteVpnServiceProvider";
+    }
+
+    /* (non-Javadoc)
+     * @see com.cloud.utils.component.Adapter#configure(java.lang.String, java.util.Map)
+     */
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+        // TODO Auto-generated method stub
+        return true;
     }
 
     /* (non-Javadoc)
@@ -71,7 +70,7 @@ public class MockSite2SiteVpnServiceProvider extends ManagerBase implements Site
      * @see com.cloud.network.element.Site2SiteVpnServiceProvider#startSite2SiteVpn(com.cloud.network.Site2SiteVpnConnection)
      */
     @Override
-    public boolean startSite2SiteVpn(Site2SiteVpnConnection conn) throws ResourceUnavailableException {
+    public boolean startSite2SiteVpn(final Site2SiteVpnConnection conn) throws ResourceUnavailableException {
         // TODO Auto-generated method stub
         return true;
     }
@@ -80,9 +79,8 @@ public class MockSite2SiteVpnServiceProvider extends ManagerBase implements Site
      * @see com.cloud.network.element.Site2SiteVpnServiceProvider#stopSite2SiteVpn(com.cloud.network.Site2SiteVpnConnection)
      */
     @Override
-    public boolean stopSite2SiteVpn(Site2SiteVpnConnection conn) throws ResourceUnavailableException {
+    public boolean stopSite2SiteVpn(final Site2SiteVpnConnection conn) throws ResourceUnavailableException {
         // TODO Auto-generated method stub
         return true;
     }
-
 }

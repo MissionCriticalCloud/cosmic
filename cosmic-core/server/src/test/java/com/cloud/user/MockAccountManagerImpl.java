@@ -16,12 +16,6 @@
 // under the License.
 package com.cloud.user;
 
-import java.net.InetAddress;
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.api.query.vo.ControlledViewEntity;
 import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
@@ -36,7 +30,6 @@ import com.cloud.utils.component.Manager;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
@@ -44,10 +37,93 @@ import org.apache.cloudstack.api.command.admin.account.UpdateAccountCmd;
 import org.apache.cloudstack.api.command.admin.user.DeleteUserCmd;
 import org.apache.cloudstack.api.command.admin.user.RegisterCmd;
 import org.apache.cloudstack.api.command.admin.user.UpdateUserCmd;
+
+import javax.naming.ConfigurationException;
+import java.net.InetAddress;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class MockAccountManagerImpl extends ManagerBase implements Manager, AccountManager {
+
+    @Override
+    public boolean disableAccount(long accountId) throws ConcurrentOperationException, ResourceUnavailableException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean deleteAccount(AccountVO account, long callerUserId, Account caller) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public Long checkAccessAndSpecifyAuthority(Account caller, Long zoneId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Account createAccount(String accountName, short accountType, Long domainId, String networkDomain, Map<String, String> details, String uuid) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void logoutUser(long userId) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public UserAccount authenticateUser(String username, String password, Long domainId, InetAddress loginIpAddress, Map<String, Object[]> requestParameters) {
+        return null;
+    }
+
+    @Override
+    public Pair<User, Account> findUserByApiKey(String apiKey) {
+        return null;
+    }
+
+    @Override
+    public boolean enableAccount(long accountId) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void buildACLSearchBuilder(SearchBuilder<? extends ControlledEntity> sb, Long domainId, boolean isRecursive, List<Long> permittedAccounts,
+                                      ListProjectResourcesCriteria listProjectResourcesCriteria) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void buildACLViewSearchBuilder(SearchBuilder<? extends ControlledViewEntity> sb, Long domainId,
+                                          boolean isRecursive, List<Long> permittedAccounts, ListProjectResourcesCriteria listProjectResourcesCriteria) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void buildACLSearchCriteria(SearchCriteria<? extends ControlledEntity> sc, Long domainId, boolean isRecursive, List<Long> permittedAccounts,
+                                       ListProjectResourcesCriteria listProjectResourcesCriteria) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void buildACLSearchParameters(Account caller, Long id, String accountName, Long projectId, List<Long> permittedAccounts, Ternary<Long, Boolean,
+            ListProjectResourcesCriteria> domainIdRecursiveListProject, boolean listAll, boolean forProjectInvitation) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void buildACLViewSearchCriteria(SearchCriteria<? extends ControlledViewEntity> sc, Long domainId,
+                                           boolean isRecursive, List<Long> permittedAccounts, ListProjectResourcesCriteria listProjectResourcesCriteria) {
+        // TODO Auto-generated method stub
+    }
 
     @Override
     public boolean deleteUserAccount(long accountId) {
@@ -56,25 +132,7 @@ public class MockAccountManagerImpl extends ManagerBase implements Manager, Acco
     }
 
     @Override
-    public UserAccount disableUser(long userId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public UserAccount enableUser(long userId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public UserAccount lockUser(long userId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public UserAccount updateUser(UpdateUserCmd cmd) {
+    public Account updateAccount(UpdateAccountCmd cmd) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -92,13 +150,79 @@ public class MockAccountManagerImpl extends ManagerBase implements Manager, Acco
     }
 
     @Override
+    public boolean deleteUser(DeleteUserCmd deleteUserCmd) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public UserAccount updateUser(UpdateUserCmd cmd) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public UserAccount disableUser(long userId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public UserAccount enableUser(long userId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public Account lockAccount(String accountName, Long domainId, Long accountId) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Account updateAccount(UpdateAccountCmd cmd) {
+    public List<String> listAclGroupsByAccount(Long accountId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+        return true;
+    }
+
+    @Override
+    public boolean start() {
+        return true;
+    }
+
+    @Override
+    public boolean stop() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public UserAccount createUserAccount(String userName, String password, String firstName, String lastName, String email, String timezone, String accountName,
+                                         short accountType, Long domainId, String networkDomain, Map<String, String> details, String accountUUID, String userUUID) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public UserAccount createUserAccount(String userName, String password, String firstName, String lastName, String email, String timezone, String accountName, short accountType,
+                                         Long domainId, String networkDomain, Map<String, String> details, String accountUUID, String userUUID, User.Source source) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public UserAccount lockUser(long userId) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -114,9 +238,18 @@ public class MockAccountManagerImpl extends ManagerBase implements Manager, Acco
     }
 
     @Override
-    public boolean deleteUser(DeleteUserCmd deleteUserCmd) {
+    public User createUser(String userName, String password, String firstName,
+                           String lastName, String email, String timeZone, String accountName,
+                           Long domainId, String userUUID) {
         // TODO Auto-generated method stub
-        return false;
+        return null;
+    }
+
+    @Override
+    public User createUser(String userName, String password, String firstName, String lastName, String email, String timeZone, String accountName, Long domainId,
+                           String userUUID, User.Source source) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
@@ -181,6 +314,18 @@ public class MockAccountManagerImpl extends ManagerBase implements Manager, Acco
     }
 
     @Override
+    public boolean isDomainAdmin(Long accountId) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean isNormalUser(long accountId) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
     public User getActiveUserByRegistrationToken(String registrationToken) {
         // TODO Auto-generated method stub
         return null;
@@ -193,15 +338,38 @@ public class MockAccountManagerImpl extends ManagerBase implements Manager, Acco
     }
 
     @Override
-    public boolean disableAccount(long accountId) throws ConcurrentOperationException, ResourceUnavailableException {
+    public String[] createApiKeyAndSecretKey(RegisterCmd cmd) {
+        return null;
+    }
+
+    @Override
+    public String[] createApiKeyAndSecretKey(final long userId) {
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see com.cloud.user.AccountService#getUserByApiKey(java.lang.String)
+     */
+    @Override
+    public UserAccount getUserByApiKey(String apiKey) {
         // TODO Auto-generated method stub
-        return false;
+        return null;
+    }
+
+    @Override
+    public RoleType getRoleType(Account account) {
+        return null;
     }
 
     @Override
     public void checkAccess(Account account, Domain domain) throws PermissionDeniedException {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public void checkAccess(Account account, AccessType accessType, boolean sameOwner, ControlledEntity... entities) throws PermissionDeniedException {
+        // TODO Auto-generated method stub
     }
 
     @Override
@@ -215,182 +383,8 @@ public class MockAccountManagerImpl extends ManagerBase implements Manager, Acco
     }
 
     @Override
-    public Long checkAccessAndSpecifyAuthority(Account caller, Long zoneId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
-        return true;
-    }
-
-    @Override
-    public boolean start() {
-        return true;
-    }
-
-    @Override
-    public boolean stop() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public String getName() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void checkAccess(Account account, AccessType accessType, boolean sameOwner, ControlledEntity... entities) throws PermissionDeniedException {
-        // TODO Auto-generated method stub
-    }
-
-
-    @Override
-    public UserAccount getUserAccountById(Long userId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void logoutUser(long userId) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public UserAccount authenticateUser(String username, String password, Long domainId, InetAddress loginIpAddress, Map<String, Object[]> requestParameters) {
-        return null;
-    }
-
-    @Override
-    public Pair<User, Account> findUserByApiKey(String apiKey) {
-        return null;
-    }
-
-    @Override
-    public String[] createApiKeyAndSecretKey(RegisterCmd cmd) {
-        return null;
-    }
-
-    @Override
-    public String[] createApiKeyAndSecretKey(final long userId) {
-        return null;
-    }
-
-    @Override
-    public boolean enableAccount(long accountId) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void buildACLSearchBuilder(SearchBuilder<? extends ControlledEntity> sb, Long domainId, boolean isRecursive, List<Long> permittedAccounts,
-            ListProjectResourcesCriteria listProjectResourcesCriteria) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void buildACLSearchCriteria(SearchCriteria<? extends ControlledEntity> sc, Long domainId, boolean isRecursive, List<Long> permittedAccounts,
-            ListProjectResourcesCriteria listProjectResourcesCriteria) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void buildACLSearchParameters(Account caller, Long id, String accountName, Long projectId, List<Long> permittedAccounts, Ternary<Long, Boolean, ListProjectResourcesCriteria> domainIdRecursiveListProject, boolean listAll, boolean forProjectInvitation) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void buildACLViewSearchBuilder(SearchBuilder<? extends ControlledViewEntity> sb, Long domainId,
-            boolean isRecursive, List<Long> permittedAccounts, ListProjectResourcesCriteria listProjectResourcesCriteria) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void buildACLViewSearchCriteria(SearchCriteria<? extends ControlledViewEntity> sc, Long domainId,
-            boolean isRecursive, List<Long> permittedAccounts, ListProjectResourcesCriteria listProjectResourcesCriteria) {
-        // TODO Auto-generated method stub
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.user.AccountService#getUserByApiKey(java.lang.String)
-     */
-    @Override
-    public UserAccount getUserByApiKey(String apiKey) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public UserAccount createUserAccount(String userName, String password, String firstName, String lastName, String email, String timezone, String accountName,
-        short accountType, Long domainId, String networkDomain, Map<String, String> details, String accountUUID, String userUUID) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public UserAccount createUserAccount(String userName, String password, String firstName, String lastName, String email, String timezone, String accountName, short accountType,
-                                         Long domainId, String networkDomain, Map<String, String> details, String accountUUID, String userUUID, User.Source source) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public User createUser(String userName, String password, String firstName,
-            String lastName, String email, String timeZone, String accountName,
-            Long domainId, String userUUID) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override public User createUser(String userName, String password, String firstName, String lastName, String email, String timeZone, String accountName, Long domainId,
-                                     String userUUID, User.Source source) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public RoleType getRoleType(Account account) {
-        return null;
-    }
-
-    @Override
-    public boolean deleteAccount(AccountVO account, long callerUserId, Account caller) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Account createAccount(String accountName, short accountType, Long domainId, String networkDomain, Map<String, String> details, String uuid) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean isDomainAdmin(Long accountId) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean isNormalUser(long accountId) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public List<String> listAclGroupsByAccount(Long accountId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public void checkAccess(Account account, AccessType accessType, boolean sameOwner, String apiName,
-            ControlledEntity... entities) throws PermissionDeniedException {
+                            ControlledEntity... entities) throws PermissionDeniedException {
         // TODO Auto-generated method stub
     }
 
@@ -400,5 +394,9 @@ public class MockAccountManagerImpl extends ManagerBase implements Manager, Acco
         return null;
     }
 
-
+    @Override
+    public UserAccount getUserAccountById(Long userId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

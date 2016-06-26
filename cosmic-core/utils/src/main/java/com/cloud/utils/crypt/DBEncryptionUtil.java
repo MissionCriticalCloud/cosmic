@@ -19,10 +19,10 @@
 
 package com.cloud.utils.crypt;
 
-import java.util.Properties;
-
 import com.cloud.utils.db.DbProperties;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.util.Properties;
 
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
@@ -51,6 +51,23 @@ public class DBEncryptionUtil {
         return encryptedString;
     }
 
+    private static void initialize() {
+        final Properties dbProps = DbProperties.getDbProperties();
+
+        if (EncryptionSecretKeyChecker.useEncryption()) {
+            String dbSecretKey = dbProps.getProperty("db.cloud.encrypt.secret");
+            if (dbSecretKey == null || dbSecretKey.isEmpty()) {
+                throw new CloudRuntimeException("Empty DB secret key in db.properties");
+            }
+
+            s_encryptor = new StandardPBEStringEncryptor();
+            s_encryptor.setAlgorithm("PBEWithMD5AndDES");
+            s_encryptor.setPassword(dbSecretKey);
+        } else {
+            throw new CloudRuntimeException("Trying to encrypt db values when encrytion is not enabled");
+        }
+    }
+
     public static String decrypt(String encrypted) {
         if (!EncryptionSecretKeyChecker.useEncryption() || (encrypted == null) || encrypted.isEmpty()) {
             return encrypted;
@@ -67,22 +84,5 @@ public class DBEncryptionUtil {
             throw e;
         }
         return plain;
-    }
-
-    private static void initialize() {
-        final Properties dbProps = DbProperties.getDbProperties();
-
-        if (EncryptionSecretKeyChecker.useEncryption()) {
-            String dbSecretKey = dbProps.getProperty("db.cloud.encrypt.secret");
-            if (dbSecretKey == null || dbSecretKey.isEmpty()) {
-                throw new CloudRuntimeException("Empty DB secret key in db.properties");
-            }
-
-            s_encryptor = new StandardPBEStringEncryptor();
-            s_encryptor.setAlgorithm("PBEWithMD5AndDES");
-            s_encryptor.setPassword(dbSecretKey);
-        } else {
-            throw new CloudRuntimeException("Trying to encrypt db values when encrytion is not enabled");
-        }
     }
 }

@@ -65,7 +65,7 @@ public class DbUpgradeUtilsTest {
         Connection conn = connectionMock;
         String tableName = "tableName";
         String key = "key";
-        List<String> keys = Arrays.asList(new String[] {key});
+        List<String> keys = Arrays.asList(new String[]{key});
         boolean isForeignKey = false;
 
         DbUpgradeUtils.dropKeysIfExist(conn, tableName, keys, isForeignKey);
@@ -79,7 +79,7 @@ public class DbUpgradeUtilsTest {
         String tableName = "tableName";
         String key1 = "key1";
         String key2 = "key2";
-        List<String> keys = Arrays.asList(new String[] {key1, key2});
+        List<String> keys = Arrays.asList(new String[]{key1, key2});
         boolean isForeignKey = false;
 
         DbUpgradeUtils.dropKeysIfExist(conn, tableName, keys, isForeignKey);
@@ -116,7 +116,7 @@ public class DbUpgradeUtilsTest {
         String tableName = "tableName";
         String column = "column";
         when(daoMock.columnExists(conn, tableName, column)).thenReturn(true);
-        List<String> columns = Arrays.asList(new String[] {column});
+        List<String> columns = Arrays.asList(new String[]{column});
 
         DbUpgradeUtils.dropTableColumnsIfExist(conn, tableName, columns);
 
@@ -130,7 +130,7 @@ public class DbUpgradeUtilsTest {
         String tableName = "tableName";
         String column = "column";
         when(daoMock.columnExists(conn, tableName, column)).thenReturn(false);
-        List<String> columns = Arrays.asList(new String[] {column});
+        List<String> columns = Arrays.asList(new String[]{column});
 
         DbUpgradeUtils.dropTableColumnsIfExist(conn, tableName, columns);
 
@@ -148,7 +148,7 @@ public class DbUpgradeUtilsTest {
         when(daoMock.columnExists(conn, tableName, column1)).thenReturn(true);
         when(daoMock.columnExists(conn, tableName, column2)).thenReturn(false);
         when(daoMock.columnExists(conn, tableName, column3)).thenReturn(true);
-        List<String> keys = Arrays.asList(new String[] {column1, column2, column3});
+        List<String> keys = Arrays.asList(new String[]{column1, column2, column3});
 
         DbUpgradeUtils.dropTableColumnsIfExist(conn, tableName, keys);
 

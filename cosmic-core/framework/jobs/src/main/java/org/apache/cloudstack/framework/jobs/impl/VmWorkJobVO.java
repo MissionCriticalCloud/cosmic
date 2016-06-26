@@ -16,6 +16,8 @@
 // under the License.
 package org.apache.cloudstack.framework.jobs.impl;
 
+import com.cloud.vm.VirtualMachine;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -24,37 +26,17 @@ import javax.persistence.Enumerated;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
-import com.cloud.vm.VirtualMachine;
-
 @Entity
 @Table(name = "vm_work_job")
 @DiscriminatorValue(value = "VmWork")
 @PrimaryKeyJoinColumn(name = "id")
 public class VmWorkJobVO extends AsyncJobVO {
 
-    // These steps are rather arbitrary.  What's recorded depends on the
-    // the operation being performed.
-    public enum Step {
-        Filed(false), Prepare(false), Starting(true), Started(false), Release(false), Done(false), Migrating(true), Reconfiguring(false), Error(false);
-
-        boolean updateState; // Should the VM State be updated after this step?
-
-        private Step(boolean updateState) {
-            this.updateState = updateState;
-        }
-
-        boolean updateState() {
-            return updateState;
-        }
-    }
-
     @Column(name = "step")
     Step step;
-
     @Column(name = "vm_type")
     @Enumerated(value = EnumType.STRING)
     VirtualMachine.Type vmType;
-
     @Column(name = "vm_instance_id")
     long vmInstanceId;
 
@@ -88,5 +70,21 @@ public class VmWorkJobVO extends AsyncJobVO {
 
     public void setVmInstanceId(long vmInstanceId) {
         this.vmInstanceId = vmInstanceId;
+    }
+
+    // These steps are rather arbitrary.  What's recorded depends on the
+    // the operation being performed.
+    public enum Step {
+        Filed(false), Prepare(false), Starting(true), Started(false), Release(false), Done(false), Migrating(true), Reconfiguring(false), Error(false);
+
+        boolean updateState; // Should the VM State be updated after this step?
+
+        private Step(boolean updateState) {
+            this.updateState = updateState;
+        }
+
+        boolean updateState() {
+            return updateState;
+        }
     }
 }

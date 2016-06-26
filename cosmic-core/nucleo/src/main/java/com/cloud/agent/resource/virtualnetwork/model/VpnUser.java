@@ -58,5 +58,4 @@ public class VpnUser {
     public void setAdd(boolean add) {
         this.add = add;
     }
-
 }

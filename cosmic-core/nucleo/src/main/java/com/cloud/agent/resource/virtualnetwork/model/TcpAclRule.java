@@ -49,5 +49,4 @@ public class TcpAclRule extends AclRule {
     public void setLastPort(int lastPort) {
         this.lastPort = lastPort;
     }
-
 }

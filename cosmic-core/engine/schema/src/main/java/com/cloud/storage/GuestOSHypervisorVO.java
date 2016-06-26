@@ -16,8 +16,7 @@
 // under the License.
 package com.cloud.storage;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,8 +24,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "guest_os_hypervisor")
@@ -66,11 +65,6 @@ public class GuestOSHypervisorVO implements GuestOSHypervisor {
     }
 
     @Override
-    public String getHypervisorVersion() {
-        return hypervisorVersion;
-    }
-
-    @Override
     public String getHypervisorType() {
         return hypervisorType;
     }
@@ -83,6 +77,11 @@ public class GuestOSHypervisorVO implements GuestOSHypervisor {
     @Override
     public long getGuestOsId() {
         return guestOsId;
+    }
+
+    @Override
+    public String getHypervisorVersion() {
+        return hypervisorVersion;
     }
 
     @Override
@@ -100,6 +99,27 @@ public class GuestOSHypervisorVO implements GuestOSHypervisor {
         return created;
     }
 
+    @Override
+    public boolean getIsUserDefined() {
+        return isUserDefined;
+    }
+
+    public void setIsUserDefined(boolean isUserDefined) {
+        this.isUserDefined = isUserDefined;
+    }
+
+    public void setRemoved(Date removed) {
+        this.removed = removed;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public void setHypervisorVersion(String hypervisorVersion) {
+        this.hypervisorVersion = hypervisorVersion;
+    }
+
     public void setGuestOsId(long guestOsId) {
         this.guestOsId = guestOsId;
     }
@@ -110,26 +130,5 @@ public class GuestOSHypervisorVO implements GuestOSHypervisor {
 
     public void setHypervisorType(String hypervisorType) {
         this.hypervisorType = hypervisorType;
-    }
-
-    public void setHypervisorVersion(String hypervisorVersion) {
-        this.hypervisorVersion = hypervisorVersion;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public void setRemoved(Date removed) {
-        this.removed = removed;
-    }
-
-    @Override
-    public boolean getIsUserDefined() {
-        return isUserDefined;
-    }
-
-    public void setIsUserDefined(boolean isUserDefined) {
-        this.isUserDefined = isUserDefined;
     }
 }

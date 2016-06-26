@@ -16,7 +16,7 @@
 // under the License.
 package com.cloud.vm;
 
-import java.util.Date;
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -27,8 +27,7 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import java.util.Date;
 
 /**
  * SecondaryStorageVmVO domain object
@@ -74,25 +73,13 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
         super();
     }
 
-    public void setPublicIpAddress(String publicIpAddress) {
-        this.publicIpAddress = publicIpAddress;
-    }
-
-    public void setPublicNetmask(String publicNetmask) {
-        this.publicNetmask = publicNetmask;
-    }
-
-    public void setPublicMacAddress(String publicMacAddress) {
-        this.publicMacAddress = publicMacAddress;
-    }
-
-    public void setLastUpdateTime(Date time) {
-        this.lastUpdateTime = time;
-    }
-
     @Override
     public String getPublicIpAddress() {
         return this.publicIpAddress;
+    }
+
+    public void setPublicIpAddress(String publicIpAddress) {
+        this.publicIpAddress = publicIpAddress;
     }
 
     @Override
@@ -100,9 +87,17 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
         return this.publicNetmask;
     }
 
+    public void setPublicNetmask(String publicNetmask) {
+        this.publicNetmask = publicNetmask;
+    }
+
     @Override
     public String getPublicMacAddress() {
         return this.publicMacAddress;
+    }
+
+    public void setPublicMacAddress(String publicMacAddress) {
+        this.publicMacAddress = publicMacAddress;
     }
 
     @Override
@@ -110,20 +105,24 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
         return this.lastUpdateTime;
     }
 
-    public void setGuid(String guid) {
-        this.guid = guid;
+    public void setLastUpdateTime(Date time) {
+        this.lastUpdateTime = time;
     }
 
     public String getGuid() {
         return guid;
     }
 
-    public void setNfsShare(String nfsShare) {
-        this.nfsShare = nfsShare;
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 
     public String getNfsShare() {
         return nfsShare;
+    }
+
+    public void setNfsShare(String nfsShare) {
+        this.nfsShare = nfsShare;
     }
 
     public Role getRole() {

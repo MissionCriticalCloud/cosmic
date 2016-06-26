@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface NetworkRuleConfigDao extends GenericDao<NetworkRuleConfigVO, Long> {
     List<NetworkRuleConfigVO> listBySecurityGroupId(long securityGroupId);

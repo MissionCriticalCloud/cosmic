@@ -56,5 +56,4 @@ public class SecStorageVMSetupCommand extends Command {
     public void setCopyPassword(String copyPassword) {
         this.copyPassword = copyPassword;
     }
-
 }

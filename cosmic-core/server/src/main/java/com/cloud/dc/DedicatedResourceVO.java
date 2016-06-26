@@ -16,7 +16,7 @@
 // under the License.
 package com.cloud.dc;
 
-import java.util.UUID;
+import com.cloud.utils.NumbersUtil;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,8 +24,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.NumbersUtil;
+import java.util.UUID;
 
 @Entity
 @Table(name = "dedicated_resources")
@@ -80,6 +79,24 @@ public class DedicatedResourceVO implements DedicatedResources {
         this.affinityGroupId = affinityGroupId;
     }
 
+    public DedicatedResourceVO(long dedicatedResourceId) {
+        this.id = dedicatedResourceId;
+    }
+
+    @Override
+    public int hashCode() {
+        return NumbersUtil.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof DedicatedResourceVO) {
+            return ((DedicatedResourceVO) obj).getId() == this.getId();
+        } else {
+            return false;
+        }
+    }
+
     @Override
     public long getId() {
         return id;
@@ -121,10 +138,6 @@ public class DedicatedResourceVO implements DedicatedResources {
         this.hostId = hostId;
     }
 
-    public DedicatedResourceVO(long dedicatedResourceId) {
-        this.id = dedicatedResourceId;
-    }
-
     @Override
     public Long getDomainId() {
         return domainId;
@@ -155,19 +168,5 @@ public class DedicatedResourceVO implements DedicatedResources {
     @Override
     public long getAffinityGroupId() {
         return affinityGroupId;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof DedicatedResourceVO) {
-            return ((DedicatedResourceVO)obj).getId() == this.getId();
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return NumbersUtil.hash(id);
     }
 }

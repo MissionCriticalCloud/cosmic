@@ -25,12 +25,11 @@ public class InsufficientAddressCapacityException extends InsufficientNetworkCap
 
     private static final long serialVersionUID = SerialVersionUID.InsufficientAddressCapacityException;
 
-    public InsufficientAddressCapacityException(String msg, Class<?> scope, Long id) {
+    public InsufficientAddressCapacityException(final String msg, final Class<?> scope, final Long id) {
         super(msg, scope, id);
     }
 
     protected InsufficientAddressCapacityException() {
         super();
     }
-
 }

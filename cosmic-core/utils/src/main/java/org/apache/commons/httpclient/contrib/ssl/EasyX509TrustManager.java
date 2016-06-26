@@ -19,15 +19,14 @@
 
 package org.apache.commons.httpclient.contrib.ssl;
 
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,19 +45,20 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author <a href="mailto:adrian.sutton@ephox.com">Adrian Sutton</a>
  * @author <a href="mailto:oleg@ural.ru">Oleg Kalnichevski</a>
- *
- * <p>
- * DISCLAIMER: HttpClient developers DO NOT actively support this component.
- * The component is provided as a reference material, which may be inappropriate
- * for use without additional customization.
- * </p>
+ *         <p>
+ *         <p>
+ *         DISCLAIMER: HttpClient developers DO NOT actively support this component.
+ *         The component is provided as a reference material, which may be inappropriate
+ *         for use without additional customization.
+ *         </p>
  */
 
 public class EasyX509TrustManager implements X509TrustManager {
-    private X509TrustManager standardTrustManager = null;
-
-    /** Log object for this class. */
+    /**
+     * Log object for this class.
+     */
     private static final Log LOG = LogFactory.getLog(EasyX509TrustManager.class);
+    private X509TrustManager standardTrustManager = null;
 
     /**
      * Constructor for EasyX509TrustManager.
@@ -71,11 +71,11 @@ public class EasyX509TrustManager implements X509TrustManager {
         if (trustmanagers.length == 0) {
             throw new NoSuchAlgorithmException("no trust manager found");
         }
-        standardTrustManager = (X509TrustManager)trustmanagers[0];
+        standardTrustManager = (X509TrustManager) trustmanagers[0];
     }
 
     /**
-     * @see javax.net.ssl.X509TrustManager#checkClientTrusted(X509Certificate[],String authType)
+     * @see javax.net.ssl.X509TrustManager#checkClientTrusted(X509Certificate[], String authType)
      */
     @Override
     public void checkClientTrusted(X509Certificate[] certificates, String authType) throws CertificateException {
@@ -83,7 +83,7 @@ public class EasyX509TrustManager implements X509TrustManager {
     }
 
     /**
-     * @see javax.net.ssl.X509TrustManager#checkServerTrusted(X509Certificate[],String authType)
+     * @see javax.net.ssl.X509TrustManager#checkServerTrusted(X509Certificate[], String authType)
      */
     @Override
     public void checkServerTrusted(X509Certificate[] certificates, String authType) throws CertificateException {

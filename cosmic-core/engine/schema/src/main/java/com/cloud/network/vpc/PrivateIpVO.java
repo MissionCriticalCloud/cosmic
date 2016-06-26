@@ -16,7 +16,7 @@
 // under the License.
 package com.cloud.network.vpc;
 
-import java.util.Date;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,8 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "private_ip_address")
@@ -68,10 +67,6 @@ public class PrivateIpVO implements InternalIdentity {
         this.sourceNat = sourceNat;
     }
 
-    public void setTakenAt(Date takenDate) {
-        this.takenAt = takenDate;
-    }
-
     public String getIpAddress() {
         return ipAddress;
     }
@@ -82,6 +77,10 @@ public class PrivateIpVO implements InternalIdentity {
 
     public Date getTakenAt() {
         return takenAt;
+    }
+
+    public void setTakenAt(Date takenDate) {
+        this.takenAt = takenDate;
     }
 
     @Override
@@ -100,5 +99,4 @@ public class PrivateIpVO implements InternalIdentity {
     public boolean getSourceNat() {
         return sourceNat;
     }
-
 }

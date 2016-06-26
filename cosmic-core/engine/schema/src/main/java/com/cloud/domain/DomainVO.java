@@ -16,8 +16,7 @@
 // under the License.
 package com.cloud.domain;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,8 +24,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,10 +113,11 @@ public class DomainVO implements Domain {
         if (parent == null) {
             this.parent = Domain.ROOT_DOMAIN;
         } else {
-            if (parent.longValue() <= Domain.ROOT_DOMAIN)
+            if (parent.longValue() <= Domain.ROOT_DOMAIN) {
                 this.parent = Domain.ROOT_DOMAIN;
-            else
+            } else {
                 this.parent = parent;
+            }
         }
     }
 
@@ -129,11 +129,6 @@ public class DomainVO implements Domain {
     @Override
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    public long getAccountId() {
-        return accountId;
     }
 
     @Override
@@ -189,17 +184,22 @@ public class DomainVO implements Domain {
     }
 
     @Override
-    public String toString() {
-        return new StringBuilder("Domain:").append(id).append(path).toString();
-    }
-
-    @Override
     public String getNetworkDomain() {
         return networkDomain;
     }
 
     public void setNetworkDomain(String domainSuffix) {
         this.networkDomain = domainSuffix;
+    }
+
+    @Override
+    public long getAccountId() {
+        return accountId;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("Domain:").append(id).append(path).toString();
     }
 
     @Override
@@ -210,5 +210,4 @@ public class DomainVO implements Domain {
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
-
 }

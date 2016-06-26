@@ -22,5 +22,4 @@ public class CreateVolumeOVAAnswer extends Answer {
     public CreateVolumeOVAAnswer(CreateVolumeOVACommand cmd, boolean result, String details) {
         super(cmd, result, details);
     }
-
 }

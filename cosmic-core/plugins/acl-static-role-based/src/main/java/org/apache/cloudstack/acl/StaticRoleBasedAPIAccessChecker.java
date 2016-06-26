@@ -16,15 +16,6 @@
 // under the License.
 package org.apache.cloudstack.acl;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.user.Account;
 import com.cloud.user.AccountService;
@@ -32,8 +23,16 @@ import com.cloud.user.User;
 import com.cloud.utils.PropertiesUtil;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.component.PluggableService;
-
 import org.apache.cloudstack.api.APICommand;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,12 +68,12 @@ public class StaticRoleBasedAPIAccessChecker extends AdapterBase implements APIC
 
         RoleType roleType = _accountService.getRoleType(account);
         boolean isAllowed =
-            commandsPropertiesOverrides.contains(commandName) ? commandsPropertiesRoleBasedApisMap.get(roleType).contains(commandName) : annotationRoleBasedApisMap.get(
-                roleType).contains(commandName);
+                commandsPropertiesOverrides.contains(commandName) ? commandsPropertiesRoleBasedApisMap.get(roleType).contains(commandName) : annotationRoleBasedApisMap.get(
+                        roleType).contains(commandName);
 
         if (!isAllowed) {
             throw new PermissionDeniedException("The API does not exist or is blacklisted. Role type=" + roleType.toString() + " is not allowed to request the api: " +
-                commandName);
+                    commandName);
         }
         return isAllowed;
     }
@@ -84,7 +83,7 @@ public class StaticRoleBasedAPIAccessChecker extends AdapterBase implements APIC
         super.configure(name, params);
 
         for (String commandPropertyFile : commandPropertyFiles) {
-            processMapping(PropertiesUtil.processConfigFile(new String[] { commandPropertyFile }));
+            processMapping(PropertiesUtil.processConfigFile(new String[]{commandPropertyFile}));
         }
         return true;
     }
@@ -96,8 +95,9 @@ public class StaticRoleBasedAPIAccessChecker extends AdapterBase implements APIC
                 APICommand command = clz.getAnnotation(APICommand.class);
                 for (RoleType role : command.authorized()) {
                     Set<String> commands = annotationRoleBasedApisMap.get(role);
-                    if (!commands.contains(command.name()))
+                    if (!commands.contains(command.name())) {
                         commands.add(command.name());
+                    }
                 }
             }
         }
@@ -112,8 +112,9 @@ public class StaticRoleBasedAPIAccessChecker extends AdapterBase implements APIC
             try {
                 short cmdPermissions = Short.parseShort(roleMask);
                 for (RoleType roleType : RoleType.values()) {
-                    if ((cmdPermissions & roleType.getValue()) != 0)
+                    if ((cmdPermissions & roleType.getValue()) != 0) {
                         commandsPropertiesRoleBasedApisMap.get(roleType).add(apiName);
+                    }
                 }
             } catch (NumberFormatException nfe) {
                 s_logger.info("Malformed key=value pair for entry: " + entry.toString());
@@ -137,5 +138,4 @@ public class StaticRoleBasedAPIAccessChecker extends AdapterBase implements APIC
     public void setCommandPropertyFiles(Set<String> commandPropertyFiles) {
         this.commandPropertyFiles = commandPropertyFiles;
     }
-
 }

@@ -19,7 +19,6 @@ package org.apache.cloudstack.api.command.user.account;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.projects.Project;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -30,6 +29,7 @@ import org.apache.cloudstack.api.command.user.project.DeleteProjectCmd;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,10 +44,10 @@ public class DeleteAccountFromProjectCmd extends BaseAsyncCmd {
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
     @Parameter(name = ApiConstants.PROJECT_ID,
-               type = CommandType.UUID,
-               entityType = ProjectResponse.class,
-               required = true,
-               description = "ID of the project to remove the account from")
+            type = CommandType.UUID,
+            entityType = ProjectResponse.class,
+            required = true,
+            description = "ID of the project to remove the account from")
     private Long projectId;
 
     @Parameter(name = ApiConstants.ACCOUNT, type = CommandType.STRING, required = true, description = "name of the account to be removed from the project")
@@ -57,18 +57,13 @@ public class DeleteAccountFromProjectCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    @Override
-    public String getCommandName() {
-        return s_name;
+    public Long getProjectId() {
+        return projectId;
     }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
-
-    public Long getProjectId() {
-        return projectId;
-    }
 
     public String getAccountName() {
         return accountName;
@@ -84,6 +79,11 @@ public class DeleteAccountFromProjectCmd extends BaseAsyncCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete account from the project");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 
     @Override

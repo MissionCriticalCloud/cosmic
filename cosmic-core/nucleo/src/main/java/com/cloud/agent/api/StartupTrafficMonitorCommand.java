@@ -25,5 +25,4 @@ public class StartupTrafficMonitorCommand extends StartupCommand {
     public StartupTrafficMonitorCommand() {
         super(Host.Type.TrafficMonitor);
     }
-
 }

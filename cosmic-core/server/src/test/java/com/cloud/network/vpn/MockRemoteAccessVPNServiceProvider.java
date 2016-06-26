@@ -16,27 +16,26 @@
 // under the License.
 package com.cloud.network.vpn;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VpnUser;
 import com.cloud.network.element.RemoteAccessVPNServiceProvider;
 import com.cloud.utils.component.ManagerBase;
 
-public class MockRemoteAccessVPNServiceProvider extends ManagerBase implements RemoteAccessVPNServiceProvider {
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
 
-    @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
-        return true;
-    }
+public class MockRemoteAccessVPNServiceProvider extends ManagerBase implements RemoteAccessVPNServiceProvider {
 
     @Override
     public String getName() {
         return "MockRemoteAccessVPNServiceProvider";
+    }
+
+    @Override
+    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+        return true;
     }
 
     @Override
@@ -67,5 +66,4 @@ public class MockRemoteAccessVPNServiceProvider extends ManagerBase implements R
         // TODO Auto-generated method stub
         return false;
     }
-
 }

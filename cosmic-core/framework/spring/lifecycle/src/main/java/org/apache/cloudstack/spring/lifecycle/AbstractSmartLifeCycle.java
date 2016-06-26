@@ -49,5 +49,4 @@ public abstract class AbstractSmartLifeCycle implements SmartLifecycle {
         stop();
         callback.run();
     }
-
 }

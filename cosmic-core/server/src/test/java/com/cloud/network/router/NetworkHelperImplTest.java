@@ -40,7 +40,6 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class NetworkHelperImplTest {
 
@@ -52,7 +51,7 @@ public class NetworkHelperImplTest {
     @InjectMocks
     protected NetworkHelperImpl nwHelper = new NetworkHelperImpl();
 
-    @Test(expected=ResourceUnavailableException.class)
+    @Test(expected = ResourceUnavailableException.class)
     public void testSendCommandsToRouterWrongRouterVersion()
             throws AgentUnavailableException, OperationTimedoutException, ResourceUnavailableException {
         // Prepare
@@ -168,5 +167,4 @@ public class NetworkHelperImplTest {
         verify(answer1, times(0)).getResult();
         assertFalse(result);
     }
-
 }

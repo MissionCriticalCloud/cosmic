@@ -16,12 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.network;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.offering.NetworkOffering;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
@@ -30,6 +26,10 @@ import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.NetworkOfferingResponse;
 import org.apache.cloudstack.api.response.NetworkResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,37 +64,37 @@ public class ListNetworkOfferingsCmd extends BaseListCmd {
     private String availability;
 
     @Parameter(name = ApiConstants.ZONE_ID,
-               type = CommandType.UUID,
-               entityType = ZoneResponse.class,
-               description = "list network offerings available for network creation in specific zone")
+            type = CommandType.UUID,
+            entityType = ZoneResponse.class,
+            description = "list network offerings available for network creation in specific zone")
     private Long zoneId;
 
     @Parameter(name = ApiConstants.STATE, type = CommandType.STRING, description = "list network offerings by state")
     private String state;
 
     @Parameter(name = ApiConstants.NETWORK_ID,
-               type = CommandType.UUID,
-               entityType = NetworkResponse.class,
-               description = "the ID of the network. Pass this in if you want to see the available network offering that a network can be changed to.")
+            type = CommandType.UUID,
+            entityType = NetworkResponse.class,
+            description = "the ID of the network. Pass this in if you want to see the available network offering that a network can be changed to.")
     private Long networkId;
 
     @Parameter(name = ApiConstants.GUEST_IP_TYPE, type = CommandType.STRING, description = "list network offerings by guest type: shared or isolated")
     private String guestIpType;
 
     @Parameter(name = ApiConstants.SUPPORTED_SERVICES,
-               type = CommandType.LIST,
-               collectionType = CommandType.STRING,
-               description = "list network offerings supporting certain services")
+            type = CommandType.LIST,
+            collectionType = CommandType.STRING,
+            description = "list network offerings supporting certain services")
     private List<String> supportedServices;
 
     @Parameter(name = ApiConstants.SOURCE_NAT_SUPPORTED,
-               type = CommandType.BOOLEAN,
-               description = "true if need to list only netwok offerings where source NAT is supported, false otherwise")
+            type = CommandType.BOOLEAN,
+            description = "true if need to list only netwok offerings where source NAT is supported, false otherwise")
     private Boolean sourceNatSupported;
 
     @Parameter(name = ApiConstants.SPECIFY_IP_RANGES,
-               type = CommandType.BOOLEAN,
-               description = "true if need to list only network offerings which support specifying ip ranges")
+            type = CommandType.BOOLEAN,
+            description = "true if need to list only network offerings which support specifying ip ranges")
     private Boolean specifyIpRanges;
 
     @Parameter(name = ApiConstants.TAGS, type = CommandType.STRING, description = "list network offerings by tags", length = 4096)
@@ -178,14 +178,6 @@ public class ListNetworkOfferingsCmd extends BaseListCmd {
         return forVpc;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
     @Override
     public void execute() {
         Pair<List<? extends NetworkOffering>, Integer> offerings = _configService.searchForNetworkOfferings(this);
@@ -199,5 +191,13 @@ public class ListNetworkOfferingsCmd extends BaseListCmd {
         response.setResponses(offeringResponses, offerings.second());
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

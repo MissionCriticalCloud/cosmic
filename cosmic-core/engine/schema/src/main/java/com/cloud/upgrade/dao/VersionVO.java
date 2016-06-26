@@ -16,7 +16,7 @@
 // under the License.
 package com.cloud.upgrade.dao;
 
-import java.util.Date;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,16 +28,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "version")
 public class VersionVO implements InternalIdentity {
-    public enum Step {
-        Upgrade, Complete
-    };
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -45,16 +40,14 @@ public class VersionVO implements InternalIdentity {
 
     @Column(name = "version")
     String version;
-
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated")
     Date updated;
-
     @Enumerated(value = EnumType.STRING)
     @Column(name = "step")
     Step step;
 
-    public VersionVO(String version) {
+    public VersionVO(final String version) {
         this.version = version;
         this.updated = new Date();
         this.step = Step.Upgrade;
@@ -76,7 +69,7 @@ public class VersionVO implements InternalIdentity {
         return updated;
     }
 
-    public void setUpdated(Date updated) {
+    public void setUpdated(final Date updated) {
         this.updated = updated;
     }
 
@@ -84,8 +77,11 @@ public class VersionVO implements InternalIdentity {
         return step;
     }
 
-    public void setStep(Step step) {
+    public void setStep(final Step step) {
         this.step = step;
     }
 
+    public enum Step {
+        Upgrade, Complete
+    }
 }

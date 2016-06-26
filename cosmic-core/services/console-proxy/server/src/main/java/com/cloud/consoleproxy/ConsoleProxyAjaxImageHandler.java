@@ -16,6 +16,8 @@
 // under the License.
 package com.cloud.consoleproxy;
 
+import com.cloud.consoleproxy.util.Logger;
+
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -24,7 +26,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
-import com.cloud.consoleproxy.util.Logger;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -35,15 +36,17 @@ public class ConsoleProxyAjaxImageHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange t) throws IOException {
         try {
-            if (s_logger.isDebugEnabled())
+            if (s_logger.isDebugEnabled()) {
                 s_logger.debug("AjaxImageHandler " + t.getRequestURI());
+            }
 
             long startTick = System.currentTimeMillis();
 
             doHandle(t);
 
-            if (s_logger.isDebugEnabled())
+            if (s_logger.isDebugEnabled()) {
                 s_logger.debug(t.getRequestURI() + "Process time " + (System.currentTimeMillis() - startTick) + " ms");
+            }
         } catch (IOException e) {
             throw e;
         } catch (IllegalArgumentException e) {
@@ -79,12 +82,14 @@ public class ConsoleProxyAjaxImageHandler implements HttpHandler {
         int width = 144;
         int height = 110;
 
-        if (tag == null)
+        if (tag == null) {
             tag = "";
+        }
 
         int port;
-        if (host == null || portStr == null || sid == null)
+        if (host == null || portStr == null || sid == null) {
             throw new IllegalArgumentException();
+        }
 
         try {
             port = Integer.parseInt(portStr);
@@ -94,14 +99,16 @@ public class ConsoleProxyAjaxImageHandler implements HttpHandler {
         }
 
         try {
-            if (keyStr != null)
+            if (keyStr != null) {
                 key = Integer.parseInt(keyStr);
-            if (null != w)
+            }
+            if (null != w) {
                 width = Integer.parseInt(w);
+            }
 
-            if (null != h)
+            if (null != h) {
                 height = Integer.parseInt(h);
-
+            }
         } catch (NumberFormatException e) {
             s_logger.warn("Invalid numeric parameter in query string: " + keyStr);
             throw new IllegalArgumentException(e);
@@ -150,8 +157,9 @@ public class ConsoleProxyAjaxImageHandler implements HttpHandler {
                     os.close();
                 }
             } else {
-                if (s_logger.isInfoEnabled())
+                if (s_logger.isInfoEnabled()) {
                     s_logger.info("Image has already been swept out, key: " + key);
+                }
                 t.sendResponseHeaders(404, -1);
             }
         }

@@ -54,15 +54,6 @@ public class GraphiteClient {
     }
 
     /**
-     * Get the current system timestamp to pass to Graphite
-     *
-     * @return Seconds passed since epoch (01-01-1970)
-     */
-    protected long getCurrentSystemTime() {
-        return System.currentTimeMillis() / 1000;
-    }
-
-    /**
      * Send a array of metrics to graphite.
      *
      * @param metrics the metrics as key-value-pairs
@@ -74,15 +65,15 @@ public class GraphiteClient {
     /**
      * Send a array of metrics with a given timestamp to graphite.
      *
-     * @param metrics the metrics as key-value-pairs
+     * @param metrics   the metrics as key-value-pairs
      * @param timeStamp the timestamp
      */
     public void sendMetrics(Map<String, Integer> metrics, long timeStamp) {
-        try (DatagramSocket sock = new DatagramSocket()){
+        try (DatagramSocket sock = new DatagramSocket()) {
             java.security.Security.setProperty("networkaddress.cache.ttl", "0");
             InetAddress addr = InetAddress.getByName(this.graphiteHost);
 
-            for (Map.Entry<String, Integer> metric: metrics.entrySet()) {
+            for (Map.Entry<String, Integer> metric : metrics.entrySet()) {
                 byte[] message = new String(metric.getKey() + " " + metric.getValue() + " " + timeStamp + "\n").getBytes();
                 DatagramPacket packet = new DatagramPacket(message, message.length, addr, graphitePort);
                 sock.send(packet);
@@ -95,11 +86,19 @@ public class GraphiteClient {
     }
 
     /**
+     * Get the current system timestamp to pass to Graphite
+     *
+     * @return Seconds passed since epoch (01-01-1970)
+     */
+    protected long getCurrentSystemTime() {
+        return System.currentTimeMillis() / 1000;
+    }
+
+    /**
      * Send a single metric with the current time as timestamp to graphite.
      *
-     * @param key The metric key
+     * @param key   The metric key
      * @param value the metric value
-     *
      * @throws GraphiteException if sending data to graphite failed
      */
     public void sendMetric(String key, int value) {
@@ -109,10 +108,9 @@ public class GraphiteClient {
     /**
      * Send a single metric with a given timestamp to graphite.
      *
-     * @param key The metric key
-     * @param value The metric value
+     * @param key       The metric key
+     * @param value     The metric value
      * @param timeStamp the timestamp to use
-     *
      * @throws GraphiteException if sending data to graphite failed
      */
     public void sendMetric(final String key, final int value, long timeStamp) {

@@ -52,5 +52,4 @@ public class CloudStackLog4jSetup implements SmartLifecycle {
     public void stop(Runnable callback) {
         callback.run();
     }
-
 }

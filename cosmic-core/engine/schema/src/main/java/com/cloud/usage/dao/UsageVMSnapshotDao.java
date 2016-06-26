@@ -16,11 +16,11 @@
 // under the License.
 package com.cloud.usage.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.usage.UsageVMSnapshotVO;
 import com.cloud.utils.db.GenericDao;
+
+import java.util.Date;
+import java.util.List;
 
 public interface UsageVMSnapshotDao extends GenericDao<UsageVMSnapshotVO, Long> {
     public void update(UsageVMSnapshotVO usage);

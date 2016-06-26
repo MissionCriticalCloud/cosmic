@@ -17,9 +17,9 @@
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
+
+import com.google.gson.annotations.SerializedName;
 
 public class LoginCmdResponse extends AuthenticationCmdResponse {
 

@@ -16,14 +16,6 @@
 // under the License.
 package org.apache.cloudstack.engine.datacenter.entity.api.db.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
 import com.cloud.org.Grouping;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
@@ -32,11 +24,19 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
-
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity;
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State;
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineHostPodVO;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -68,7 +68,6 @@ public class EngineHostPodDaoImpl extends GenericDaoBase<EngineHostPodVO, Long> 
         StateChangeSearch.and("id", StateChangeSearch.entity().getId(), SearchCriteria.Op.EQ);
         StateChangeSearch.and("state", StateChangeSearch.entity().getState(), SearchCriteria.Op.EQ);
         StateChangeSearch.done();
-
     }
 
     @Override
@@ -118,20 +117,6 @@ public class EngineHostPodDaoImpl extends GenericDaoBase<EngineHostPodVO, Long> 
     }
 
     @Override
-    public boolean remove(Long id) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        EngineHostPodVO pod = createForUpdate();
-        pod.setName(null);
-
-        update(id, pod);
-
-        boolean result = super.remove(id);
-        txn.commit();
-        return result;
-    }
-
-    @Override
     public List<Long> listDisabledPods(long zoneId) {
         GenericSearchBuilder<EngineHostPodVO, Long> podIdSearch = createSearchBuilder(Long.class);
         podIdSearch.selectFields(podIdSearch.entity().getId());
@@ -143,6 +128,20 @@ public class EngineHostPodDaoImpl extends GenericDaoBase<EngineHostPodVO, Long> 
         sc.addAnd("dataCenterId", SearchCriteria.Op.EQ, zoneId);
         sc.addAnd("allocationState", SearchCriteria.Op.EQ, Grouping.AllocationState.Disabled);
         return customSearch(sc, null);
+    }
+
+    @Override
+    public boolean remove(Long id) {
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        txn.start();
+        EngineHostPodVO pod = createForUpdate();
+        pod.setName(null);
+
+        update(id, pod);
+
+        boolean result = super.remove(id);
+        txn.commit();
+        return result;
     }
 
     @Override
@@ -168,27 +167,25 @@ public class EngineHostPodDaoImpl extends GenericDaoBase<EngineHostPodVO, Long> 
                 StringBuilder str = new StringBuilder("Unable to update ").append(vo.toString());
                 str.append(": DB Data={id=").append(dbDC.getId()).append("; state=").append(dbDC.getState()).append(";updatedTime=").append(dbDC.getLastUpdated());
                 str.append(": New Data={id=")
-                    .append(vo.getId())
-                    .append("; state=")
-                    .append(nextState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatedTime=")
-                    .append(vo.getLastUpdated());
+                   .append(vo.getId())
+                   .append("; state=")
+                   .append(nextState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatedTime=")
+                   .append(vo.getLastUpdated());
                 str.append(": stale Data={id=")
-                    .append(vo.getId())
-                    .append("; state=")
-                    .append(currentState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatedTime=")
-                    .append(oldUpdatedTime);
+                   .append(vo.getId())
+                   .append("; state=")
+                   .append(currentState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatedTime=")
+                   .append(oldUpdatedTime);
             } else {
                 s_logger.debug("Unable to update dataCenter: id=" + vo.getId() + ", as there is no such dataCenter exists in the database anymore");
             }
         }
         return rows > 0;
-
     }
-
 }

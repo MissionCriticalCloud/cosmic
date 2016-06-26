@@ -18,15 +18,13 @@
  */
 package org.apache.cloudstack.framework.ws.jackson;
 
-import java.io.IOException;
-
 import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalUriInfo;
 
 public class UriSerializer extends JsonSerializer<String> {

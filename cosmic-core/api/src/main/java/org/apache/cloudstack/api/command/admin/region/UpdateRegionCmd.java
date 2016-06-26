@@ -16,10 +16,7 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.region;
 
-import javax.inject.Inject;
-
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -29,6 +26,9 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.RegionResponse;
 import org.apache.cloudstack.region.Region;
 import org.apache.cloudstack.region.RegionService;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,48 +41,18 @@ public class UpdateRegionCmd extends BaseCmd {
     /////////////////////////////////////////////////////
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
-
-    @Parameter(name = ApiConstants.ID, type = CommandType.INTEGER, required = true, description = "Id of region to update")
-    private Integer id;
-
-    @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "updates region with this name")
-    private String regionName;
-
-    @Parameter(name = ApiConstants.END_POINT, type = CommandType.STRING, description = "updates region with this end point")
-    private String endPoint;
-
     @Inject
     RegionService _regionService;
+    @Parameter(name = ApiConstants.ID, type = CommandType.INTEGER, required = true, description = "Id of region to update")
+    private Integer id;
+    @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "updates region with this name")
+    private String regionName;
+    @Parameter(name = ApiConstants.END_POINT, type = CommandType.STRING, description = "updates region with this end point")
+    private String endPoint;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getRegionName() {
-        return regionName;
-    }
-
-    public String getEndPoint() {
-        return endPoint;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
 
     @Override
     public void execute() {
@@ -94,5 +64,31 @@ public class UpdateRegionCmd extends BaseCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update Region");
         }
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getRegionName() {
+        return regionName;
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public String getEndPoint() {
+        return endPoint;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

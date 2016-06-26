@@ -23,13 +23,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
@@ -38,6 +31,13 @@ import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.element.NetworkElement;
 import com.cloud.network.vpc.dao.VpcOfferingServiceMapDao;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,8 +52,7 @@ public class VpcManagerImplTest {
     VpcManagerImpl manager;
 
     @Before
-    public void setup()
-    {
+    public void setup() {
         MockitoAnnotations.initMocks(this);
         manager = new VpcManagerImpl();
         manager._vpcOffSvcMapDao = vpcOffSvcMapDao;
@@ -69,15 +68,7 @@ public class VpcManagerImplTest {
         Map<Service, Set<Provider>> map = manager.getVpcOffSvcProvidersMap(vpcOffId);
 
         assertNotNull(map);
-        assertEquals(map.size(),1);
-    }
-
-    protected Map<String, String> createFakeCapabilityInputMap() {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put(VpcManagerImpl.CAPABILITYVALUE, VpcManagerImpl.TRUE_VALUE);
-        map.put(VpcManagerImpl.CAPABILITYTYPE, Network.Capability.SupportedProtocols.getName());
-        map.put(VpcManagerImpl.SERVICE, "");
-        return map;
+        assertEquals(map.size(), 1);
     }
 
     @Test
@@ -93,13 +84,20 @@ public class VpcManagerImplTest {
         servicePair.put(VpcManagerImpl.CAPABILITYVALUE, VpcManagerImpl.TRUE_VALUE);
         serviceCapabilitystList.put("", servicePair);
 
-
         // Execute
         boolean result = Whitebox.invokeMethod(this.manager, "isVpcOfferingForRegionLevelVpc",
                 serviceCapabilitystList); //, Network.Capability.RedundantRouter.getName(), Service.SourceNat);
 
         // Assert
         assertEquals("VpcOffering should be created for Region Level Vpc", true, result);
+    }
+
+    protected Map<String, String> createFakeCapabilityInputMap() {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(VpcManagerImpl.CAPABILITYVALUE, VpcManagerImpl.TRUE_VALUE);
+        map.put(VpcManagerImpl.CAPABILITYTYPE, Network.Capability.SupportedProtocols.getName());
+        map.put(VpcManagerImpl.SERVICE, "");
+        return map;
     }
 
     @Test
@@ -130,19 +128,6 @@ public class VpcManagerImplTest {
         this.manager.checkCapabilityPerServiceProvider(providers, Capability.RedundantRouter, Service.SourceNat);
     }
 
-    @Test
-    public void testCheckCapabilityPerServiceProvider() {
-        // Prepare
-        final Map<Capability, String> capabilities = new HashMap<>();
-        capabilities.put(Capability.RegionLevelVpc, "");
-        capabilities.put(Capability.DistributedRouter, "");
-        Set<Network.Provider> providers = this.prepareVpcManagerForCheckingCapabilityPerService(Service.Connectivity, capabilities);
-
-        // Execute
-        this.manager.checkCapabilityPerServiceProvider(providers, Capability.DistributedRouter, Service.Connectivity);
-        this.manager.checkCapabilityPerServiceProvider(providers, Capability.RegionLevelVpc, Service.Connectivity);
-    }
-
     protected Set<Network.Provider> prepareVpcManagerForCheckingCapabilityPerService(Service service, Map<Capability, String> capabilities) {
         final Set<Network.Provider> providers = new HashSet<>();
         providers.add(Provider.VPCVirtualRouter);
@@ -160,5 +145,18 @@ public class VpcManagerImplTest {
         capabilitiesService1.put(service, capabilities);
 
         return providers;
+    }
+
+    @Test
+    public void testCheckCapabilityPerServiceProvider() {
+        // Prepare
+        final Map<Capability, String> capabilities = new HashMap<>();
+        capabilities.put(Capability.RegionLevelVpc, "");
+        capabilities.put(Capability.DistributedRouter, "");
+        Set<Network.Provider> providers = this.prepareVpcManagerForCheckingCapabilityPerService(Service.Connectivity, capabilities);
+
+        // Execute
+        this.manager.checkCapabilityPerServiceProvider(providers, Capability.DistributedRouter, Service.Connectivity);
+        this.manager.checkCapabilityPerServiceProvider(providers, Capability.RegionLevelVpc, Service.Connectivity);
     }
 }

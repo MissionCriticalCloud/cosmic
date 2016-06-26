@@ -37,6 +37,5 @@ public interface Investigator extends Adapter {
          *
          */
         private static final long serialVersionUID = 1L;
-
-    };
+    }
 }

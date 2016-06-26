@@ -17,9 +17,9 @@
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
+
+import com.google.gson.annotations.SerializedName;
 
 public class ExternalFirewallResponse extends NetworkDeviceResponse {
 
@@ -73,7 +73,7 @@ public class ExternalFirewallResponse extends NetworkDeviceResponse {
     }
 
     @Override
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -81,7 +81,7 @@ public class ExternalFirewallResponse extends NetworkDeviceResponse {
         return zoneId;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
@@ -89,7 +89,7 @@ public class ExternalFirewallResponse extends NetworkDeviceResponse {
         return ipAddress;
     }
 
-    public void setIpAddress(String ipAddress) {
+    public void setIpAddress(final String ipAddress) {
         this.ipAddress = ipAddress;
     }
 
@@ -97,7 +97,7 @@ public class ExternalFirewallResponse extends NetworkDeviceResponse {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(final String username) {
         this.username = username;
     }
 
@@ -105,7 +105,7 @@ public class ExternalFirewallResponse extends NetworkDeviceResponse {
         return publicInterface;
     }
 
-    public void setPublicInterface(String publicInterface) {
+    public void setPublicInterface(final String publicInterface) {
         this.publicInterface = publicInterface;
     }
 
@@ -113,7 +113,7 @@ public class ExternalFirewallResponse extends NetworkDeviceResponse {
         return usageInterface;
     }
 
-    public void setUsageInterface(String usageInterface) {
+    public void setUsageInterface(final String usageInterface) {
         this.usageInterface = usageInterface;
     }
 
@@ -121,7 +121,7 @@ public class ExternalFirewallResponse extends NetworkDeviceResponse {
         return privateInterface;
     }
 
-    public void setPrivateInterface(String privateInterface) {
+    public void setPrivateInterface(final String privateInterface) {
         this.privateInterface = privateInterface;
     }
 
@@ -129,7 +129,7 @@ public class ExternalFirewallResponse extends NetworkDeviceResponse {
         return publicZone;
     }
 
-    public void setPublicZone(String publicZone) {
+    public void setPublicZone(final String publicZone) {
         this.publicZone = publicZone;
     }
 
@@ -137,7 +137,7 @@ public class ExternalFirewallResponse extends NetworkDeviceResponse {
         return privateZone;
     }
 
-    public void setPrivateZone(String privateZone) {
+    public void setPrivateZone(final String privateZone) {
         this.privateZone = privateZone;
     }
 
@@ -145,7 +145,7 @@ public class ExternalFirewallResponse extends NetworkDeviceResponse {
         return numRetries;
     }
 
-    public void setNumRetries(String numRetries) {
+    public void setNumRetries(final String numRetries) {
         this.numRetries = numRetries;
     }
 
@@ -153,7 +153,7 @@ public class ExternalFirewallResponse extends NetworkDeviceResponse {
         return timeout;
     }
 
-    public void setTimeout(String timeout) {
+    public void setTimeout(final String timeout) {
         this.timeout = timeout;
     }
 }

@@ -26,5 +26,4 @@ public interface VmDiskStats {
     public long getBytesRead();
 
     public long getBytesWrite();
-
 }

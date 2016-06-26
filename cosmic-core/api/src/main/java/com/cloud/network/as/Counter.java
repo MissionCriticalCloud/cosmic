@@ -22,16 +22,15 @@ import org.apache.cloudstack.api.InternalIdentity;
 
 public interface Counter extends InternalIdentity, Identity {
 
-    public static enum Source {
-        snmp,
-        cpu,
-        memory
-    }
-
     String getName();
 
     String getValue();
 
     Source getSource();
 
+    public static enum Source {
+        snmp,
+        cpu,
+        memory
+    }
 }

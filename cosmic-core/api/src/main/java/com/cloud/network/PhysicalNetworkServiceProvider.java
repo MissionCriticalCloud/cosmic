@@ -16,33 +16,28 @@
 // under the License.
 package com.cloud.network;
 
-import java.util.List;
-
 import com.cloud.network.Network.Service;
-
 import org.apache.cloudstack.api.InternalIdentity;
+
+import java.util.List;
 
 /**
  *
  */
 public interface PhysicalNetworkServiceProvider extends InternalIdentity {
 
-    public enum State {
-        Disabled, Enabled, Shutdown;
-    }
-
     @Override
     long getId();
 
     State getState();
+
+    void setState(State state);
 
     long getPhysicalNetworkId();
 
     String getProviderName();
 
     long getDestinationPhysicalNetworkId();
-
-    void setState(State state);
 
     boolean isLbServiceProvided();
 
@@ -67,4 +62,8 @@ public interface PhysicalNetworkServiceProvider extends InternalIdentity {
     String getUuid();
 
     boolean isNetworkAclServiceProvided();
+
+    public enum State {
+        Disabled, Enabled, Shutdown
+    }
 }

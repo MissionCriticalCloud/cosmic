@@ -43,7 +43,7 @@ public class ClusteredDirectAgentAttache extends DirectAgentAttache implements R
         }
 
         if (req instanceof Response) {
-            super.process(((Response)req).getAnswers());
+            super.process(((Response) req).getAnswers());
         } else {
             super.send(req);
         }
@@ -53,7 +53,7 @@ public class ClusteredDirectAgentAttache extends DirectAgentAttache implements R
     public boolean processAnswers(long seq, Response response) {
         long mgmtId = response.getManagementServerId();
         if (mgmtId != -1 && mgmtId != _nodeId) {
-            ((ClusteredAgentManagerImpl)_agentMgr).routeToPeer(Long.toString(mgmtId), response.getBytes());
+            ((ClusteredAgentManagerImpl) _agentMgr).routeToPeer(Long.toString(mgmtId), response.getBytes());
             if (response.executeInSequence()) {
                 sendNext(response.getSequence());
             }
@@ -62,5 +62,4 @@ public class ClusteredDirectAgentAttache extends DirectAgentAttache implements R
             return super.processAnswers(seq, response);
         }
     }
-
 }

@@ -19,10 +19,10 @@
 
 package com.cloud.agent.api;
 
-import java.util.Map;
-
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.vm.VirtualMachine;
+
+import java.util.Map;
 
 public class PlugNicCommand extends Command {
 
@@ -30,15 +30,6 @@ public class PlugNicCommand extends Command {
     String instanceName;
     VirtualMachine.Type vmType;
     Map<String, String> details;
-
-    public NicTO getNic() {
-        return nic;
-    }
-
-    @Override
-    public boolean executeInSequence() {
-        return true;
-    }
 
     protected PlugNicCommand() {
     }
@@ -54,6 +45,15 @@ public class PlugNicCommand extends Command {
         this.instanceName = instanceName;
         this.vmType = vmtype;
         this.details = details;
+    }
+
+    public NicTO getNic() {
+        return nic;
+    }
+
+    @Override
+    public boolean executeInSequence() {
+        return true;
     }
 
     public String getVmName() {

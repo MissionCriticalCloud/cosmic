@@ -16,8 +16,6 @@
 // under the License.
 package com.cloud.network.router;
 
-import java.util.List;
-
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.RemoteAccessVpn;
@@ -25,6 +23,8 @@ import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.VpcVirtualNetworkApplianceService;
 import com.cloud.network.vpc.PrivateGateway;
 import com.cloud.vm.DomainRouterVO;
+
+import java.util.List;
 
 public interface VpcVirtualNetworkApplianceManager extends VirtualNetworkApplianceManager, VpcVirtualNetworkApplianceService {
 

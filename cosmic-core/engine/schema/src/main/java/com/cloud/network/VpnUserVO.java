@@ -16,7 +16,7 @@
 // under the License.
 package com.cloud.network;
 
-import java.util.UUID;
+import com.cloud.utils.db.Encrypt;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,8 +26,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.Encrypt;
+import java.util.UUID;
 
 @Entity
 @Table(name = ("vpn_users"))

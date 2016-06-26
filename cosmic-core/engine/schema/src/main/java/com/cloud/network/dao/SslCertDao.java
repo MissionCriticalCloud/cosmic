@@ -16,9 +16,9 @@
 // under the License.
 package com.cloud.network.dao;
 
-import java.util.List;
-
 import com.cloud.utils.db.GenericDao;
+
+import java.util.List;
 
 public interface SslCertDao extends GenericDao<SslCertVO, Long> {
     List<SslCertVO> listByAccountId(Long id);

@@ -23,12 +23,11 @@ public class AffinityConflictException extends CloudRuntimeException {
 
     private static final long serialVersionUID = SerialVersionUID.AffinityConflictException;
 
-    public AffinityConflictException(String message) {
+    public AffinityConflictException(final String message) {
         super(message);
     }
 
-    public AffinityConflictException(String message, Throwable th) {
+    public AffinityConflictException(final String message, final Throwable th) {
         super(message, th);
     }
-
 }

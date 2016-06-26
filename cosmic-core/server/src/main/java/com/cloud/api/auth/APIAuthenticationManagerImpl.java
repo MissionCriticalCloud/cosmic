@@ -16,28 +16,26 @@
 // under the License.
 package com.cloud.api.auth;
 
+import com.cloud.utils.component.ComponentContext;
+import com.cloud.utils.component.ManagerBase;
+import org.apache.cloudstack.api.APICommand;
+import org.apache.cloudstack.api.auth.APIAuthenticationManager;
+import org.apache.cloudstack.api.auth.APIAuthenticator;
+import org.apache.cloudstack.api.auth.PluggableAPIAuthenticator;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.component.ManagerBase;
-
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.auth.APIAuthenticationManager;
-import org.apache.cloudstack.api.auth.APIAuthenticator;
-import org.apache.cloudstack.api.auth.PluggableAPIAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("unchecked")
 public class APIAuthenticationManagerImpl extends ManagerBase implements APIAuthenticationManager {
     public static final Logger s_logger = LoggerFactory.getLogger(APIAuthenticationManagerImpl.class.getName());
-
-    private List<PluggableAPIAuthenticator> _apiAuthenticators;
-
     private static Map<String, Class<?>> s_authenticators = null;
+    private List<PluggableAPIAuthenticator> _apiAuthenticators;
 
     public APIAuthenticationManagerImpl() {
     }
@@ -53,7 +51,7 @@ public class APIAuthenticationManagerImpl extends ManagerBase implements APIAuth
     @Override
     public boolean start() {
         initAuthenticator();
-        for (Class<?> authenticator: getCommands()) {
+        for (Class<?> authenticator : getCommands()) {
             APICommand command = authenticator.getAnnotation(APICommand.class);
             if (command != null && !command.name().isEmpty()
                     && APIAuthenticator.class.isAssignableFrom(authenticator)) {
@@ -61,10 +59,6 @@ public class APIAuthenticationManagerImpl extends ManagerBase implements APIAuth
             }
         }
         return true;
-    }
-
-    private static synchronized void addAuthenticator(Class<?> authenticator, APICommand command) {
-        s_authenticators.put(command.name().toLowerCase(), authenticator);
     }
 
     private static synchronized void initAuthenticator() {
@@ -76,7 +70,7 @@ public class APIAuthenticationManagerImpl extends ManagerBase implements APIAuth
         List<Class<?>> cmdList = new ArrayList<Class<?>>();
         cmdList.add(DefaultLoginAPIAuthenticatorCmd.class);
         cmdList.add(DefaultLogoutAPIAuthenticatorCmd.class);
-        for (PluggableAPIAuthenticator apiAuthenticator: _apiAuthenticators) {
+        for (PluggableAPIAuthenticator apiAuthenticator : _apiAuthenticators) {
             List<Class<?>> commands = apiAuthenticator.getAuthCommands();
             if (commands != null) {
                 cmdList.addAll(commands);
@@ -85,6 +79,10 @@ public class APIAuthenticationManagerImpl extends ManagerBase implements APIAuth
             }
         }
         return cmdList;
+    }
+
+    private static synchronized void addAuthenticator(Class<?> authenticator, APICommand command) {
+        s_authenticators.put(command.name().toLowerCase(), authenticator);
     }
 
     @Override

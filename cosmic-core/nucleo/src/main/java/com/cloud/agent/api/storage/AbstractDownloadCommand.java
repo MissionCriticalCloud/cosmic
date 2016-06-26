@@ -55,6 +55,12 @@ public abstract class AbstractDownloadCommand extends SsCommand {
         return url;
     }
 
+    public void setUrl(String url) {
+        assert url != null;
+        url = url.replace('\\', '/');
+        this.url = url;
+    }
+
     public String getName() {
         return name;
     }
@@ -71,11 +77,4 @@ public abstract class AbstractDownloadCommand extends SsCommand {
     public boolean executeInSequence() {
         return true;
     }
-
-    public void setUrl(String url) {
-        assert url != null;
-        url = url.replace('\\', '/');
-        this.url = url;
-    }
-
 }

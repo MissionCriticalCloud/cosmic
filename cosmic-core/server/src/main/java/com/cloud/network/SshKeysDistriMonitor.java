@@ -32,15 +32,15 @@ import com.cloud.host.Host;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SshKeysDistriMonitor implements Listener {
     private static final Logger s_logger = LoggerFactory.getLogger(SshKeysDistriMonitor.class);
-    AgentManager _agentMgr;
     private final HostDao _hostDao;
+    AgentManager _agentMgr;
     private ConfigurationDao _configDao;
 
     public SshKeysDistriMonitor(AgentManager mgr, HostDao host, ConfigurationDao config) {
@@ -50,27 +50,26 @@ public class SshKeysDistriMonitor implements Listener {
     }
 
     @Override
-    public boolean isRecurring() {
-        return false;
-    }
-
-    @Override
     public synchronized boolean processAnswers(long agentId, long seq, Answer[] resp) {
         return true;
     }
 
     @Override
-    public synchronized boolean processDisconnect(long agentId, Status state) {
-        if (s_logger.isTraceEnabled())
-            s_logger.trace("Agent disconnected, agent id: " + agentId + ", state: " + state + ". Will notify waiters");
+    public boolean processCommands(long agentId, long seq, Command[] commands) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-        return true;
+    @Override
+    public AgentControlAnswer processControlCommand(long agentId, AgentControlCommand cmd) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
     public void processConnect(Host host, StartupCommand cmd, boolean forRebalance) throws ConnectionException {
         if (cmd instanceof StartupRoutingCommand) {
-            if (((StartupRoutingCommand)cmd).getHypervisorType() == HypervisorType.KVM || ((StartupRoutingCommand)cmd).getHypervisorType() == HypervisorType.XenServer) {
+            if (((StartupRoutingCommand) cmd).getHypervisorType() == HypervisorType.KVM || ((StartupRoutingCommand) cmd).getHypervisorType() == HypervisorType.XenServer) {
                 /*TODO: Get the private/public keys here*/
 
                 String pubKey = _configDao.getValue("ssh.publickey");
@@ -88,21 +87,23 @@ public class SshKeysDistriMonitor implements Listener {
     }
 
     @Override
-    public int getTimeout() {
-        // TODO Auto-generated method stub
-        return -1;
+    public synchronized boolean processDisconnect(long agentId, Status state) {
+        if (s_logger.isTraceEnabled()) {
+            s_logger.trace("Agent disconnected, agent id: " + agentId + ", state: " + state + ". Will notify waiters");
+        }
+
+        return true;
     }
 
     @Override
-    public boolean processCommands(long agentId, long seq, Command[] commands) {
-        // TODO Auto-generated method stub
+    public boolean isRecurring() {
         return false;
     }
 
     @Override
-    public AgentControlAnswer processControlCommand(long agentId, AgentControlCommand cmd) {
+    public int getTimeout() {
         // TODO Auto-generated method stub
-        return null;
+        return -1;
     }
 
     @Override

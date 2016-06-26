@@ -16,6 +16,10 @@
 // under the License.
 package com.cloud.api;
 
+import org.apache.cloudstack.api.ResponseObject;
+import org.apache.cloudstack.api.response.ExceptionResponse;
+import org.apache.cloudstack.api.response.SuccessResponse;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
@@ -23,32 +27,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-
-import org.apache.cloudstack.api.ResponseObject;
-import org.apache.cloudstack.api.response.ExceptionResponse;
-import org.apache.cloudstack.api.response.SuccessResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ResponseObjectTypeAdapter implements JsonSerializer<ResponseObject> {
     public static final Logger s_logger = LoggerFactory.getLogger(ResponseObjectTypeAdapter.class.getName());
-
-    @Override
-    public JsonElement serialize(ResponseObject responseObj, Type typeOfResponseObj, JsonSerializationContext ctx) {
-        JsonObject obj = new JsonObject();
-
-        if (responseObj instanceof SuccessResponse) {
-            obj.addProperty("success", ((SuccessResponse)responseObj).getSuccess());
-            return obj;
-        } else if (responseObj instanceof ExceptionResponse) {
-            obj.addProperty("errorcode", ((ExceptionResponse)responseObj).getErrorCode());
-            obj.addProperty("errortext", ((ExceptionResponse)responseObj).getErrorText());
-            return obj;
-        } else {
-            obj.add(responseObj.getObjectName(), ApiResponseGsonHelper.getBuilder().create().toJsonTree(responseObj));
-            return obj;
-        }
-    }
 
     private static Method getGetMethod(Object o, String propName) {
         Method method = null;
@@ -60,12 +43,13 @@ public class ResponseObjectTypeAdapter implements JsonSerializer<ResponseObject>
         } catch (NoSuchMethodException e1) {
             if (s_logger.isTraceEnabled()) {
                 s_logger.trace("ResponseObject " + o.getClass().getName() + " does not have " + methodName + "() method for property: " + propName +
-                    ", will check is-prefixed method to see if it is boolean property");
+                        ", will check is-prefixed method to see if it is boolean property");
             }
         }
 
-        if (method != null)
+        if (method != null) {
             return method;
+        }
 
         methodName = getGetMethodName("is", propName);
         try {
@@ -89,5 +73,22 @@ public class ResponseObjectTypeAdapter implements JsonSerializer<ResponseObject>
         }
 
         return sb.toString();
+    }
+
+    @Override
+    public JsonElement serialize(ResponseObject responseObj, Type typeOfResponseObj, JsonSerializationContext ctx) {
+        JsonObject obj = new JsonObject();
+
+        if (responseObj instanceof SuccessResponse) {
+            obj.addProperty("success", ((SuccessResponse) responseObj).getSuccess());
+            return obj;
+        } else if (responseObj instanceof ExceptionResponse) {
+            obj.addProperty("errorcode", ((ExceptionResponse) responseObj).getErrorCode());
+            obj.addProperty("errortext", ((ExceptionResponse) responseObj).getErrorText());
+            return obj;
+        } else {
+            obj.add(responseObj.getObjectName(), ApiResponseGsonHelper.getBuilder().create().toJsonTree(responseObj));
+            return obj;
+        }
     }
 }
