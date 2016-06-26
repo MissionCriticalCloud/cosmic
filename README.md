@@ -1,5 +1,7 @@
-# Cosmic
 [![Build Status](https://beta-jenkins.mcc.schubergphilis.com/buildStatus/icon?job=cosmic/0001-cosmic-master-build)](https://beta-jenkins.mcc.schubergphilis.com/job/cosmic/job/0001-cosmic-master-build/)
+
+# Cosmic
+
 Cosmic is open source software designed to deploy and manage large
 networks of virtual machines, as a highly available, highly scalable
 Infrastructure as a Service (IaaS) cloud computing platform. Cosmic
