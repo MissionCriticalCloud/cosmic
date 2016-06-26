@@ -1,27 +1,13 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-from utilities import writeProgressBar, bash
-from cloudException import CloudRuntimeException, CloudInternalException, formatExceptionInfo
 import logging
-from networkConfig import networkConfig
-import re
-from configFileOps import configFileOps
 import os
+import re
 import shutil
+
+from cloudException import CloudRuntimeException, CloudInternalException, formatExceptionInfo
+from configFileOps import configFileOps
+from networkConfig import networkConfig
+from utilities import writeProgressBar, bash
+
 
 class serviceCfgBase(object):
     def __init__(self, syscfg):
@@ -54,9 +40,9 @@ class serviceCfgBase(object):
         except:
             logging.debug(formatExceptionInfo())
             if self.syscfg.env.mode == "Server":
-                raise CloudRuntimeException("Configure %s failed, Please check the /var/log/cosmic/management/setupManagement.log for detail"%self.serviceName)
+                raise CloudRuntimeException("Configure %s failed, Please check the /var/log/cosmic/management/setupManagement.log for detail" % self.serviceName)
             else:
-                raise CloudRuntimeException("Configure %s failed, Please check the /var/log/cosmic/agent/setup.log for detail"%self.serviceName)
+                raise CloudRuntimeException("Configure %s failed, Please check the /var/log/cosmic/agent/setup.log for detail" % self.serviceName)
 
     def backup(self):
         if self.status is None:
@@ -80,6 +66,7 @@ class serviceCfgBase(object):
     def restore(self):
         return True
 
+
 class networkConfigBase:
     def __init__(self, syscfg):
         self.netcfg = networkConfig()
@@ -92,7 +79,7 @@ class networkConfigBase:
         preCfged = False
         for br in self.syscfg.env.nics:
             if not self.netcfg.isNetworkDev(br):
-                logging.debug("%s is not a network device, is it down?"%br)
+                logging.debug("%s is not a network device, is it down?" % br)
                 return False
             if self.syscfg.env.bridgeType == "openvswitch" and not self.netcfg.isOvsBridge(br):
                 raise CloudInternalException("%s is not an openvswitch bridge" % br)
@@ -119,10 +106,10 @@ class networkConfigBase:
             brDevice = self.netcfg.getDevInfo(brName)
             self.writeToCfgFile(brDevice.name, device)
         elif device.type == "bridge":
-            #Fixme, assuming the outgoing physcial device is on port 1
+            # Fixme, assuming the outgoing physcial device is on port 1
             enslavedDev = self.netcfg.getEnslavedDev(device.name, 1)
             if enslavedDev is None:
-                raise CloudInternalException("Failed to get enslaved devices on bridge:%s"%device.name)
+                raise CloudInternalException("Failed to get enslaved devices on bridge:%s" % device.name)
 
             brDevice = device
             device = self.netcfg.getDevInfo(enslavedDev)
@@ -134,6 +121,7 @@ class networkConfigBase:
 
     def writeToCfgFile(self):
         pass
+
 
 class networkConfigUbuntu(serviceCfgBase, networkConfigBase):
     def __init__(self, syscfg):
@@ -147,38 +135,38 @@ class networkConfigUbuntu(serviceCfgBase, networkConfigBase):
         elif line.find("dhcp") != -1:
             return "dhcp"
         else:
-            logging.debug("Failed to find the network method from:%s"%line)
+            logging.debug("Failed to find the network method from:%s" % line)
             raise CloudInternalException("Failed to find the network method from /etc/network/interfaces")
 
     def addBridge(self, br, dev):
-        bash("ifdown %s"%dev.name)
+        bash("ifdown %s" % dev.name)
         for line in file(self.netCfgFile).readlines():
-            match = re.match("^ *iface %s.*"%dev.name, line)
+            match = re.match("^ *iface %s.*" % dev.name, line)
             if match is not None:
                 dev.method = self.getNetworkMethod(match.group(0))
                 cfo = configFileOps(self.netCfgFile, self)
                 if self.syscfg.env.bridgeType == "openvswitch":
                     bridgeCfg = "\n".join(("",
-                        "iface {device} inet manual",
-                        "  ovs_type OVSPort",
-                        "  ovs_bridge {bridge}",
-                        "",
-                        "auto {bridge}",
-                        "allow-ovs {bridge}",
-                        "iface {bridge} inet {device_method}",
-                        "  ovs_type OVSBridge",
-                        "  ovs_ports {device}",
-                        "")).format(bridge=br, device=dev.name, device_method=dev.method)
+                                           "iface {device} inet manual",
+                                           "  ovs_type OVSPort",
+                                           "  ovs_bridge {bridge}",
+                                           "",
+                                           "auto {bridge}",
+                                           "allow-ovs {bridge}",
+                                           "iface {bridge} inet {device_method}",
+                                           "  ovs_type OVSBridge",
+                                           "  ovs_ports {device}",
+                                           "")).format(bridge=br, device=dev.name, device_method=dev.method)
                     cfo.replace_line("^ *auto %s.*" % dev.name,
-                        "allow-{bridge} {device}".format(bridge=br, device=dev.name))
+                                     "allow-{bridge} {device}".format(bridge=br, device=dev.name))
                 elif self.syscfg.env.bridgeType == "native":
                     bridgeCfg = "\niface %s inet manual\n \
                                  auto %s\n \
                                  iface %s inet %s\n \
-                                 bridge_ports %s\n"%(dev.name, br, br, dev.method, dev.name)
+                                 bridge_ports %s\n" % (dev.name, br, br, dev.method, dev.name)
                 else:
                     raise CloudInternalException("Unknown network.bridge.type %s" % self.syscfg.env.bridgeType)
-                cfo.replace_line("^ *iface %s.*"%dev.name, bridgeCfg)
+                cfo.replace_line("^ *iface %s.*" % dev.name, bridgeCfg)
 
     def addDev(self, br, dev):
         logging.debug("Haven't implement yet")
@@ -188,16 +176,16 @@ class networkConfigUbuntu(serviceCfgBase, networkConfigBase):
 
     def writeToCfgFile(self, br, dev):
         cfg = file(self.netCfgFile).read()
-        ifaceDev = re.search("^ *iface %s.*"%dev.name, cfg, re.MULTILINE)
-        ifaceBr = re.search("^ *iface %s.*"%br, cfg, re.MULTILINE)
+        ifaceDev = re.search("^ *iface %s.*" % dev.name, cfg, re.MULTILINE)
+        ifaceBr = re.search("^ *iface %s.*" % br, cfg, re.MULTILINE)
         if ifaceDev is not None and ifaceBr is not None:
-            logging.debug("%s:%s already configured"%(br, dev.name))
+            logging.debug("%s:%s already configured" % (br, dev.name))
             return True
         elif ifaceDev is not None and ifaceBr is None:
-            #reconfig bridge
+            # reconfig bridge
             self.addBridge(br, dev)
         elif ifaceDev is None and ifaceBr is not None:
-            #reconfig dev
+            # reconfig dev
             raise CloudInternalException("Missing device configuration, Need to add your network configuration into /etc/network/interfaces at first")
         else:
             raise CloudInternalException("Missing bridge/device network configuration, need to add your network configuration into /etc/network/interfaces at first")
@@ -213,7 +201,7 @@ class networkConfigUbuntu(serviceCfgBase, networkConfigBase):
                 self.syscfg.svo.stopService("network-manager")
                 self.syscfg.svo.disableService("network-manager")
 
-            ifup_op = bash("ifup %s"%self.brName)
+            ifup_op = bash("ifup %s" % self.brName)
             if not ifup_op.isSuccess():
                 raise CloudInternalException("Can't start network:%s %s" % (self.brName, ifup_op.getErrMsg()))
 
@@ -237,6 +225,7 @@ class networkConfigUbuntu(serviceCfgBase, networkConfigBase):
             logging.debug(formatExceptionInfo())
             return False
 
+
 class networkConfigRedhat(serviceCfgBase, networkConfigBase):
     def __init__(self, syscfg):
         super(networkConfigRedhat, self).__init__(syscfg)
@@ -249,17 +238,16 @@ class networkConfigRedhat(serviceCfgBase, networkConfigBase):
         isDevExist = os.path.exists(self.devCfgFile)
         isBrExist = os.path.exists(self.brCfgFile)
         if isDevExist and isBrExist:
-            logging.debug("%s:%s already configured"%(brName, dev.name))
+            logging.debug("%s:%s already configured" % (brName, dev.name))
             return True
         elif isDevExist and not isBrExist:
-            #reconfig bridge
+            # reconfig bridge
             self.addBridge(brName, dev)
         elif not isDevExist and isBrExist:
-            #reconfig dev
+            # reconfig dev
             raise CloudInternalException("Missing device configuration, Need to add your network configuration into /etc/sysconfig/network-scripts at first")
         else:
             raise CloudInternalException("Missing bridge/device network configuration, need to add your network configuration into /etc/sysconfig/network-scripts at first")
-
 
     def addBridge(self, brName, dev):
         bash("ifdown %s" % dev.name)
@@ -267,7 +255,7 @@ class networkConfigRedhat(serviceCfgBase, networkConfigBase):
         if not os.path.exists(self.brCfgFile):
             shutil.copy(self.devCfgFile, self.brCfgFile)
 
-        #config device file at first: disable nm, set onboot=yes if not
+        # config device file at first: disable nm, set onboot=yes if not
         cfo = configFileOps(self.devCfgFile, self)
         cfo.addEntry("NM_CONTROLLED", "no")
         cfo.addEntry("ONBOOT", "yes")
@@ -338,6 +326,7 @@ class networkConfigRedhat(serviceCfgBase, networkConfigBase):
             logging.debug(formatExceptionInfo())
             return False
 
+
 class cgroupConfig(serviceCfgBase):
     def __init__(self, syscfg):
         super(cgroupConfig, self).__init__(syscfg)
@@ -354,7 +343,7 @@ class cgroupConfig(serviceCfgBase):
             cfo.add_lines(addConfig)
 
             self.syscfg.svo.stopService("cgconfig", True)
-            self.syscfg.svo.enableService("cgconfig",forcestart=True)
+            self.syscfg.svo.enableService("cgconfig", forcestart=True)
 
             cfo = configFileOps("/etc/cgrules.conf", self)
             cfgline = "root:/usr/sbin/libvirtd  cpu virt/\n"
@@ -370,13 +359,14 @@ class cgroupConfig(serviceCfgBase):
     def restore(self):
         try:
             self.syscfg.svo.stopService("cgconfig")
-            self.syscfg.svo.enableService("cgconfig",forcestart=True)
+            self.syscfg.svo.enableService("cgconfig", forcestart=True)
             self.syscfg.svo.stopService("cgred")
             self.syscfg.svo.enableService("cgred")
             return True
         except:
             logging.debug(formatExceptionInfo())
             return False
+
 
 class nfsConfig(serviceCfgBase):
     def __init__(self, syscfg):
@@ -405,6 +395,7 @@ class nfsConfig(serviceCfgBase):
         except:
             logging.debug(formatExceptionInfo())
             return False
+
 
 class securityPolicyConfigUbuntu(serviceCfgBase):
     def __init__(self, syscfg):
@@ -440,6 +431,7 @@ class securityPolicyConfigUbuntu(serviceCfgBase):
             logging.debug(formatExceptionInfo())
             return False
 
+
 class securityPolicyConfigRedhat(serviceCfgBase):
     def __init__(self, syscfg):
         super(securityPolicyConfigRedhat, self).__init__(syscfg)
@@ -470,6 +462,7 @@ class securityPolicyConfigRedhat(serviceCfgBase):
         except:
             logging.debug(formatExceptionInfo())
             return False
+
 
 class libvirtConfigRedhat(serviceCfgBase):
     def __init__(self, syscfg):
@@ -510,6 +503,7 @@ class libvirtConfigRedhat(serviceCfgBase):
     def restore(self):
         pass
 
+
 class libvirtConfigUbuntu(serviceCfgBase):
     def __init__(self, syscfg):
         super(libvirtConfigUbuntu, self).__init__(syscfg)
@@ -525,10 +519,10 @@ class libvirtConfigUbuntu(serviceCfgBase):
 
         if os.path.exists("/etc/init/libvirt-bin.conf"):
             cfo = configFileOps("/etc/init/libvirt-bin.conf", self)
-            cfo.replace_line("exec /usr/sbin/libvirtd","exec /usr/sbin/libvirtd -d -l")
+            cfo.replace_line("exec /usr/sbin/libvirtd", "exec /usr/sbin/libvirtd -d -l")
         else:
             cfo = configFileOps("/etc/default/libvirt-bin", self)
-            cfo.replace_or_add_line("libvirtd_opts=","libvirtd_opts='-l -d'")
+            cfo.replace_or_add_line("libvirtd_opts=", "libvirtd_opts='-l -d'")
 
     def config(self):
         try:
@@ -557,6 +551,7 @@ class libvirtConfigUbuntu(serviceCfgBase):
             logging.debug(formatExceptionInfo())
             return False
 
+
 class firewallConfigUbuntu(serviceCfgBase):
     def __init__(self, syscfg):
         super(firewallConfigUbuntu, self).__init__(syscfg)
@@ -566,7 +561,7 @@ class firewallConfigUbuntu(serviceCfgBase):
         try:
             ports = "22 1798 16509".split()
             for p in ports:
-                bash("ufw allow %s"%p)
+                bash("ufw allow %s" % p)
             bash("ufw allow proto tcp from any to any port 5900:6100")
             bash("ufw allow proto tcp from any to any port 49152:49216")
             self.syscfg.svo.stopService("ufw")
@@ -578,6 +573,7 @@ class firewallConfigUbuntu(serviceCfgBase):
     def restore(self):
         return True
 
+
 class firewallConfigBase(serviceCfgBase):
     def __init__(self, syscfg):
         super(firewallConfigBase, self).__init__(syscfg)
@@ -587,7 +583,7 @@ class firewallConfigBase(serviceCfgBase):
     def allowPort(self, port):
         status = False
         try:
-            status = bash("iptables-save|grep INPUT|grep -w %s"%port).isSuccess()
+            status = bash("iptables-save|grep INPUT|grep -w %s" % port).isSuccess()
         except:
             pass
 
@@ -595,13 +591,13 @@ class firewallConfigBase(serviceCfgBase):
             redo = False
             result = True
             try:
-                result = bash("iptables -I INPUT -p tcp -m tcp --dport %s -j ACCEPT"%port).isSuccess()
+                result = bash("iptables -I INPUT -p tcp -m tcp --dport %s -j ACCEPT" % port).isSuccess()
             except:
                 redo = True
 
             if not result or redo:
                 bash("sleep 30")
-                bash("iptables -I INPUT -p tcp -m tcp --dport %s -j ACCEPT"%port)
+                bash("iptables -I INPUT -p tcp -m tcp --dport %s -j ACCEPT" % port)
 
     def config(self):
         try:
@@ -620,6 +616,7 @@ class firewallConfigBase(serviceCfgBase):
 
     def restore(self):
         return True
+
 
 class firewallConfigAgent(firewallConfigBase):
     def __init__(self, syscfg):
@@ -654,8 +651,8 @@ class cloudAgentConfig(serviceCfgBase):
             cfo.addEntry("resource", "com.cloud.storage.resource.LocalSecondaryStorageResource|com.cloud.agent.resource.computing.CloudZonesComputingResource")
             cfo.save()
 
-            #self.syscfg.svo.stopService("cloud-agent")
-            #self.syscfg.svo.enableService("cloud-agent")
+            # self.syscfg.svo.stopService("cloud-agent")
+            # self.syscfg.svo.enableService("cloud-agent")
             return True
         except:
             raise
@@ -712,25 +709,27 @@ class cloudAgentConfig(serviceCfgBase):
     def restore(self):
         return True
 
+
 class firewallConfigServer(firewallConfigBase):
     def __init__(self, syscfg):
         super(firewallConfigServer, self).__init__(syscfg)
-        #9090 is used for cluster management server
+        # 9090 is used for cluster management server
         if self.syscfg.env.svrMode == "myCloud":
             self.ports = "443 8080 8250 8443 9090".split()
         else:
             self.ports = "8080 8250 9090".split()
 
+
 class ubuntuFirewallConfigServer(firewallConfigServer):
     def allowPort(self, port):
         status = False
         try:
-            status = bash("iptables-save|grep INPUT|grep -w %s"%port).isSuccess()
+            status = bash("iptables-save|grep INPUT|grep -w %s" % port).isSuccess()
         except:
             pass
 
         if not status:
-            bash("ufw allow %s/tcp"%port)
+            bash("ufw allow %s/tcp" % port)
 
     def config(self):
         try:

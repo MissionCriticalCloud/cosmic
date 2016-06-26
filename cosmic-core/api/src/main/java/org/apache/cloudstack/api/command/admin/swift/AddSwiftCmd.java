@@ -1,28 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.swift;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import com.cloud.exception.DiscoveryException;
 import com.cloud.storage.ImageStore;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -30,6 +10,10 @@ import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ImageStoreResponse;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +43,28 @@ public class AddSwiftCmd extends BaseCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public String getUrl() {
-        return url;
+    @Override
+    public void execute() {
+        final Map<String, String> dm = new HashMap<>();
+        dm.put(ApiConstants.ACCOUNT, getAccount());
+        dm.put(ApiConstants.USERNAME, getUsername());
+        dm.put(ApiConstants.KEY, getKey());
+
+        try {
+            final ImageStore result = _storageService.discoverImageStore(null, getUrl(), "Swift", null, dm);
+            ImageStoreResponse storeResponse = null;
+            if (result != null) {
+                storeResponse = _responseGenerator.createImageStoreResponse(result);
+                storeResponse.setResponseName(getCommandName());
+                storeResponse.setObjectName("secondarystorage");
+                setResponseObject(storeResponse);
+            } else {
+                throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to add Swift secondary storage");
+            }
+        } catch (final DiscoveryException ex) {
+            s_logger.warn("Exception: ", ex);
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, ex.getMessage());
+        }
     }
 
     /////////////////////////////////////////////////////
@@ -79,6 +83,10 @@ public class AddSwiftCmd extends BaseCmd {
         return key;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
     @Override
     public String getCommandName() {
         return s_name;
@@ -87,29 +95,5 @@ public class AddSwiftCmd extends BaseCmd {
     @Override
     public long getEntityOwnerId() {
         return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
-    public void execute() {
-        Map<String, String> dm = new HashMap<String, String>();
-        dm.put(ApiConstants.ACCOUNT, getAccount());
-        dm.put(ApiConstants.USERNAME, getUsername());
-        dm.put(ApiConstants.KEY, getKey());
-
-        try{
-            ImageStore result = _storageService.discoverImageStore(null, getUrl(), "Swift", null, dm);
-            ImageStoreResponse storeResponse = null;
-            if (result != null) {
-                storeResponse = _responseGenerator.createImageStoreResponse(result);
-                storeResponse.setResponseName(getCommandName());
-                storeResponse.setObjectName("secondarystorage");
-                setResponseObject(storeResponse);
-            } else {
-                throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to add Swift secondary storage");
-            }
-        } catch (DiscoveryException ex) {
-            s_logger.warn("Exception: ", ex);
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, ex.getMessage());
-        }
     }
 }

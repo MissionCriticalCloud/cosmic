@@ -1,22 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.dc;
 
-import java.util.UUID;
+import com.cloud.utils.NumbersUtil;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,8 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.NumbersUtil;
+import java.util.UUID;
 
 @Entity
 @Table(name = "dedicated_resources")
@@ -69,7 +52,8 @@ public class DedicatedResourceVO implements DedicatedResources {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public DedicatedResourceVO(Long dataCenterId, Long podId, Long clusterId, Long hostId, Long domainId, Long accountId, long affinityGroupId) {
+    public DedicatedResourceVO(final Long dataCenterId, final Long podId, final Long clusterId, final Long hostId, final Long domainId, final Long accountId, final long
+            affinityGroupId) {
         this.dataCenterId = dataCenterId;
         this.podId = podId;
         this.clusterId = clusterId;
@@ -78,6 +62,24 @@ public class DedicatedResourceVO implements DedicatedResources {
         this.accountId = accountId;
         this.uuid = UUID.randomUUID().toString();
         this.affinityGroupId = affinityGroupId;
+    }
+
+    public DedicatedResourceVO(final long dedicatedResourceId) {
+        this.id = dedicatedResourceId;
+    }
+
+    @Override
+    public int hashCode() {
+        return NumbersUtil.hash(id);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof DedicatedResourceVO) {
+            return ((DedicatedResourceVO) obj).getId() == this.getId();
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -90,7 +92,7 @@ public class DedicatedResourceVO implements DedicatedResources {
         return dataCenterId;
     }
 
-    public void setDataCenterId(long dataCenterId) {
+    public void setDataCenterId(final long dataCenterId) {
         this.dataCenterId = dataCenterId;
     }
 
@@ -99,7 +101,7 @@ public class DedicatedResourceVO implements DedicatedResources {
         return podId;
     }
 
-    public void setPodId(long podId) {
+    public void setPodId(final long podId) {
         this.podId = podId;
     }
 
@@ -108,7 +110,7 @@ public class DedicatedResourceVO implements DedicatedResources {
         return clusterId;
     }
 
-    public void setClusterId(long clusterId) {
+    public void setClusterId(final long clusterId) {
         this.clusterId = clusterId;
     }
 
@@ -117,12 +119,8 @@ public class DedicatedResourceVO implements DedicatedResources {
         return hostId;
     }
 
-    public void setHostId(long hostId) {
+    public void setHostId(final long hostId) {
         this.hostId = hostId;
-    }
-
-    public DedicatedResourceVO(long dedicatedResourceId) {
-        this.id = dedicatedResourceId;
     }
 
     @Override
@@ -130,7 +128,7 @@ public class DedicatedResourceVO implements DedicatedResources {
         return domainId;
     }
 
-    public void setDomainId(Long domainId) {
+    public void setDomainId(final Long domainId) {
         this.domainId = domainId;
     }
 
@@ -139,7 +137,7 @@ public class DedicatedResourceVO implements DedicatedResources {
         return accountId;
     }
 
-    public void setAccountId(Long accountId) {
+    public void setAccountId(final Long accountId) {
         this.accountId = accountId;
     }
 
@@ -148,26 +146,12 @@ public class DedicatedResourceVO implements DedicatedResources {
         return this.uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(final String uuid) {
         this.uuid = uuid;
     }
 
     @Override
     public long getAffinityGroupId() {
         return affinityGroupId;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof DedicatedResourceVO) {
-            return ((DedicatedResourceVO)obj).getId() == this.getId();
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return NumbersUtil.hash(id);
     }
 }

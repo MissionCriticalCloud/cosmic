@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.vm;
 
 import com.cloud.agent.api.to.DiskTO;
@@ -35,6 +19,7 @@ import java.util.Map;
  */
 public class VirtualMachineProfileImpl implements VirtualMachineProfile {
 
+    static EntityManager s_entityMgr;
     VirtualMachine _vm;
     ServiceOffering _offering;
     VirtualMachineTemplate _template;
@@ -47,17 +32,19 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
     BootloaderType _bootloader;
     Float cpuOvercommitRatio = 1.0f;
     Float memoryOvercommitRatio = 1.0f;
-
     VirtualMachine.Type _type;
-
     List<String[]> vmData = null;
-
     String configDriveLabel = null;
     String configDriveIsoBaseLocation = "/tmp/";
     String configDriveIsoRootFolder = null;
     String configDriveIsoFile = null;
 
-    public VirtualMachineProfileImpl(final VirtualMachine vm, final VirtualMachineTemplate template, final ServiceOffering offering, final Account owner, final Map<Param, Object> params) {
+    public VirtualMachineProfileImpl(final VirtualMachine vm) {
+        this(vm, null, null, null, null);
+    }
+
+    public VirtualMachineProfileImpl(final VirtualMachine vm, final VirtualMachineTemplate template, final ServiceOffering offering, final Account owner, final Map<Param,
+            Object> params) {
         _vm = vm;
         _template = template;
         _offering = offering;
@@ -66,200 +53,22 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
         if (_params == null) {
             _params = new HashMap<>();
         }
-        if (vm != null)
+        if (vm != null) {
             _type = vm.getType();
-    }
-
-    public VirtualMachineProfileImpl(final VirtualMachine vm) {
-        this(vm, null, null, null, null);
+        }
     }
 
     public VirtualMachineProfileImpl(final VirtualMachine.Type type) {
         _type = type;
     }
 
-    @Override
-    public String toString() {
-        return _vm.toString();
-    }
-
-    @Override
-    public VirtualMachine getVirtualMachine() {
-        return _vm;
-    }
-
-    @Override
-    public ServiceOffering getServiceOffering() {
-        if (_offering == null) {
-            _offering = s_entityMgr.findById(ServiceOffering.class, _vm.getServiceOfferingId());
-        }
-        return _offering;
-    }
-
-    @Override
-    public void setParameter(final Param name, final Object value) {
-        _params.put(name, value);
-    }
-
-    @Override
-    public void setBootLoaderType(final BootloaderType bootLoader) {
-        _bootloader = bootLoader;
-    }
-
-    @Override
-    public VirtualMachineTemplate getTemplate() {
-        if (_template == null && _vm != null) {
-            _template = s_entityMgr.findByIdIncludingRemoved(VirtualMachineTemplate.class, _vm.getTemplateId());
-        }
-        return _template;
-    }
-
-    @Override
-    public HypervisorType getHypervisorType() {
-        return _vm.getHypervisorType();
-    }
-
-    @Override
-    public long getTemplateId() {
-        return _vm.getTemplateId();
-    }
-
-    @Override
-    public long getServiceOfferingId() {
-        return _vm.getServiceOfferingId();
-    }
-
-    @Override
-    public long getId() {
-        return _vm.getId();
-    }
-
-    @Override
-    public String getUuid() {
-        return _vm.getUuid();
-    }
-
-    public void setNics(final List<NicProfile> nics) {
-        _nics = nics;
-    }
-
-    public void setDisks(final List<DiskTO> disks) {
-        _disks = disks;
-    }
-
-    @Override
-    public List<NicProfile> getNics() {
-        return _nics;
-    }
-
-    @Override
-    public List<DiskTO> getDisks() {
-        return _disks;
-    }
-
-    @Override
-    public void addNic(final int index, final NicProfile nic) {
-        _nics.add(index, nic);
-    }
-
-    @Override
-    public void addDisk(final int index, final DiskTO disk) {
-        _disks.add(index, disk);
-    }
-
-    @Override
-    public StringBuilder getBootArgsBuilder() {
-        return _bootArgs;
-    }
-
-    @Override
-    public void addBootArgs(final String... args) {
-        for (final String arg : args) {
-            _bootArgs.append(arg).append(" ");
-        }
-    }
-
-    @Override
-    public VirtualMachine.Type getType() {
-        return _type;
-    }
-
-    @Override
-    public Account getOwner() {
-        if (_owner == null) {
-            _owner = s_entityMgr.findById(Account.class, _vm.getAccountId());
-        }
-        return _owner;
-    }
-
-    @Override
-    public String getBootArgs() {
-        return _bootArgs.toString();
-    }
-
-    static EntityManager s_entityMgr;
-
     static void init(final EntityManager entityMgr) {
         s_entityMgr = entityMgr;
     }
 
     @Override
-    public void addNic(final NicProfile nic) {
-        _nics.add(nic);
-    }
-
-    @Override
-    public void addDisk(final DiskTO disk) {
-        _disks.add(disk);
-    }
-
-    @Override
-    public Object getParameter(final Param name) {
-        return _params.get(name);
-    }
-
-    @Override
-    public String getHostName() {
-        return _vm.getHostName();
-    }
-
-    @Override
-    public String getInstanceName() {
-        return _vm.getInstanceName();
-    }
-
-    @Override
-    public BootloaderType getBootLoaderType() {
-        return _bootloader;
-    }
-
-    @Override
-    public Map<Param, Object> getParameters() {
-        return _params;
-    }
-
-    public void setServiceOffering(final ServiceOfferingVO offering) {
-        _offering = offering;
-    }
-
-    public void setCpuOvercommitRatio(final Float cpuOvercommitRatio) {
-        this.cpuOvercommitRatio = cpuOvercommitRatio;
-
-    }
-
-    public void setMemoryOvercommitRatio(final Float memoryOvercommitRatio) {
-        this.memoryOvercommitRatio = memoryOvercommitRatio;
-
-    }
-
-    @Override
-    public Float getCpuOvercommitRatio() {
-        return cpuOvercommitRatio;
-    }
-
-    @Override
-    public Float getMemoryOvercommitRatio() {
-        return memoryOvercommitRatio;
+    public String toString() {
+        return _vm.toString();
     }
 
     @Override
@@ -292,10 +101,6 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
         this.configDriveIsoRootFolder = configDriveIsoRootFolder;
     }
 
-    public String getConfigDriveIsoBaseLocation() {
-        return configDriveIsoBaseLocation;
-    }
-
     @Override
     public String getConfigDriveIsoFile() {
         return configDriveIsoFile;
@@ -304,5 +109,180 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
     @Override
     public void setConfigDriveIsoFile(final String isoFile) {
         this.configDriveIsoFile = isoFile;
+    }
+
+    @Override
+    public String getHostName() {
+        return _vm.getHostName();
+    }
+
+    @Override
+    public String getInstanceName() {
+        return _vm.getInstanceName();
+    }
+
+    @Override
+    public Account getOwner() {
+        if (_owner == null) {
+            _owner = s_entityMgr.findById(Account.class, _vm.getAccountId());
+        }
+        return _owner;
+    }
+
+    @Override
+    public VirtualMachine getVirtualMachine() {
+        return _vm;
+    }
+
+    @Override
+    public ServiceOffering getServiceOffering() {
+        if (_offering == null) {
+            _offering = s_entityMgr.findById(ServiceOffering.class, _vm.getServiceOfferingId());
+        }
+        return _offering;
+    }
+
+    @Override
+    public Object getParameter(final Param name) {
+        return _params.get(name);
+    }
+
+    @Override
+    public HypervisorType getHypervisorType() {
+        return _vm.getHypervisorType();
+    }
+
+    @Override
+    public VirtualMachineTemplate getTemplate() {
+        if (_template == null && _vm != null) {
+            _template = s_entityMgr.findByIdIncludingRemoved(VirtualMachineTemplate.class, _vm.getTemplateId());
+        }
+        return _template;
+    }
+
+    @Override
+    public long getTemplateId() {
+        return _vm.getTemplateId();
+    }
+
+    @Override
+    public long getServiceOfferingId() {
+        return _vm.getServiceOfferingId();
+    }
+
+    @Override
+    public long getId() {
+        return _vm.getId();
+    }
+
+    @Override
+    public String getUuid() {
+        return _vm.getUuid();
+    }
+
+    @Override
+    public List<NicProfile> getNics() {
+        return _nics;
+    }
+
+    public void setNics(final List<NicProfile> nics) {
+        _nics = nics;
+    }
+
+    @Override
+    public List<DiskTO> getDisks() {
+        return _disks;
+    }
+
+    public void setDisks(final List<DiskTO> disks) {
+        _disks = disks;
+    }
+
+    @Override
+    public void addNic(final int index, final NicProfile nic) {
+        _nics.add(index, nic);
+    }
+
+    @Override
+    public void addDisk(final int index, final DiskTO disk) {
+        _disks.add(index, disk);
+    }
+
+    @Override
+    public StringBuilder getBootArgsBuilder() {
+        return _bootArgs;
+    }
+
+    @Override
+    public void addBootArgs(final String... args) {
+        for (final String arg : args) {
+            _bootArgs.append(arg).append(" ");
+        }
+    }
+
+    @Override
+    public String getBootArgs() {
+        return _bootArgs.toString();
+    }
+
+    @Override
+    public void addNic(final NicProfile nic) {
+        _nics.add(nic);
+    }
+
+    @Override
+    public void addDisk(final DiskTO disk) {
+        _disks.add(disk);
+    }
+
+    @Override
+    public VirtualMachine.Type getType() {
+        return _type;
+    }
+
+    @Override
+    public void setParameter(final Param name, final Object value) {
+        _params.put(name, value);
+    }
+
+    @Override
+    public BootloaderType getBootLoaderType() {
+        return _bootloader;
+    }
+
+    @Override
+    public void setBootLoaderType(final BootloaderType bootLoader) {
+        _bootloader = bootLoader;
+    }
+
+    @Override
+    public Map<Param, Object> getParameters() {
+        return _params;
+    }
+
+    @Override
+    public Float getCpuOvercommitRatio() {
+        return cpuOvercommitRatio;
+    }
+
+    public void setCpuOvercommitRatio(final Float cpuOvercommitRatio) {
+        this.cpuOvercommitRatio = cpuOvercommitRatio;
+    }
+
+    @Override
+    public Float getMemoryOvercommitRatio() {
+        return memoryOvercommitRatio;
+    }
+
+    public void setMemoryOvercommitRatio(final Float memoryOvercommitRatio) {
+        this.memoryOvercommitRatio = memoryOvercommitRatio;
+    }
+
+    public void setServiceOffering(final ServiceOfferingVO offering) {
+        _offering = offering;
+    }
+
+    public String getConfigDriveIsoBaseLocation() {
+        return configDriveIsoBaseLocation;
     }
 }

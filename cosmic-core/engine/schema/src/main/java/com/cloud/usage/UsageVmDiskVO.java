@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.usage;
 
 import javax.persistence.Column;
@@ -67,8 +51,9 @@ public class UsageVmDiskVO {
     protected UsageVmDiskVO() {
     }
 
-    public UsageVmDiskVO(Long accountId, long zoneId, Long vmId, Long volumeId, long ioRead, long ioWrite, long aggIORead, long aggIOWrite, long bytesRead,
-            long bytesWrite, long aggBytesRead, long aggBytesWrite, long eventTimeMillis) {
+    public UsageVmDiskVO(final Long accountId, final long zoneId, final Long vmId, final Long volumeId, final long ioRead, final long ioWrite, final long aggIORead, final long
+            aggIOWrite, final long bytesRead,
+                         final long bytesWrite, final long aggBytesRead, final long aggBytesWrite, final long eventTimeMillis) {
         this.accountId = accountId;
         this.zoneId = zoneId;
         this.vmId = vmId;
@@ -88,7 +73,7 @@ public class UsageVmDiskVO {
         return accountId;
     }
 
-    public void setAccountId(long accountId) {
+    public void setAccountId(final long accountId) {
         this.accountId = accountId;
     }
 
@@ -96,7 +81,7 @@ public class UsageVmDiskVO {
         return zoneId;
     }
 
-    public void setZoneId(long zoneId) {
+    public void setZoneId(final long zoneId) {
         this.zoneId = zoneId;
     }
 
@@ -104,7 +89,7 @@ public class UsageVmDiskVO {
         return ioRead;
     }
 
-    public void setIORead(Long ioRead) {
+    public void setIORead(final Long ioRead) {
         this.ioRead = ioRead;
     }
 
@@ -112,7 +97,7 @@ public class UsageVmDiskVO {
         return ioWrite;
     }
 
-    public void setIOWrite(Long ioWrite) {
+    public void setIOWrite(final Long ioWrite) {
         this.ioWrite = ioWrite;
     }
 
@@ -120,7 +105,7 @@ public class UsageVmDiskVO {
         return bytesRead;
     }
 
-    public void setBytesRead(Long bytesRead) {
+    public void setBytesRead(final Long bytesRead) {
         this.bytesRead = bytesRead;
     }
 
@@ -128,7 +113,7 @@ public class UsageVmDiskVO {
         return bytesWrite;
     }
 
-    public void setBytesWrite(Long bytesWrite) {
+    public void setBytesWrite(final Long bytesWrite) {
         this.bytesWrite = bytesWrite;
     }
 
@@ -136,7 +121,7 @@ public class UsageVmDiskVO {
         return eventTimeMillis;
     }
 
-    public void setEventTimeMillis(long eventTimeMillis) {
+    public void setEventTimeMillis(final long eventTimeMillis) {
         this.eventTimeMillis = eventTimeMillis;
     }
 
@@ -152,7 +137,7 @@ public class UsageVmDiskVO {
         return aggIOWrite;
     }
 
-    public void setAggIOWrite(long aggIOWrite) {
+    public void setAggIOWrite(final long aggIOWrite) {
         this.aggIOWrite = aggIOWrite;
     }
 
@@ -160,7 +145,7 @@ public class UsageVmDiskVO {
         return aggIORead;
     }
 
-    public void setAggIORead(long aggIORead) {
+    public void setAggIORead(final long aggIORead) {
         this.aggIORead = aggIORead;
     }
 
@@ -168,7 +153,7 @@ public class UsageVmDiskVO {
         return aggBytesWrite;
     }
 
-    public void setAggBytesWrite(long aggBytesWrite) {
+    public void setAggBytesWrite(final long aggBytesWrite) {
         this.aggBytesWrite = aggBytesWrite;
     }
 
@@ -176,7 +161,7 @@ public class UsageVmDiskVO {
         return aggBytesRead;
     }
 
-    public void setAggBytesRead(long aggBytesRead) {
+    public void setAggBytesRead(final long aggBytesRead) {
         this.aggBytesRead = aggBytesRead;
     }
 }

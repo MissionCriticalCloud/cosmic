@@ -1,36 +1,15 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.cloud.network.router.deployment;
-
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ConcurrentOperationException;
@@ -50,8 +29,12 @@ import com.cloud.network.vpc.VpcVO;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.network.vpc.dao.VpcOfferingDao;
 import com.cloud.vm.DomainRouterVO;
-import com.google.common.collect.Maps;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -59,11 +42,9 @@ import org.mockito.Mock;
 
 public class VpcRouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTestBase {
 
-    private static final String FOR_VPC_ONLY_THE_GIVEN_DESTINATION_SHOULD_BE_USED = "For Vpc only the given destination should be used";
-
-    private static final long VPC_ID = 201L;
     public static final long VPC_OFFERING_ID = 210L;
-
+    private static final String FOR_VPC_ONLY_THE_GIVEN_DESTINATION_SHOULD_BE_USED = "For Vpc only the given destination should be used";
+    private static final long VPC_ID = 201L;
     @Mock
     protected VpcDao mockVpcDao;
     @Mock
@@ -82,19 +63,19 @@ public class VpcRouterDeploymentDefinitionTest extends RouterDeploymentDefinitio
 
     protected RouterDeploymentDefinition deployment;
 
+    @Before
+    public void initTest() {
+        initMocks();
+
+        deployment = builder.create().setVpc(mockVpc).setDeployDestination(mockDestination).setAccountOwner(mockOwner).setParams(params).build();
+    }
+
     @Override
     protected void initMocks() {
         super.initMocks();
         when(mockVpc.getId()).thenReturn(VPC_ID);
         when(mockVpc.getZoneId()).thenReturn(VPC_ID);
         when(mockVpc.getVpcOfferingId()).thenReturn(VPC_OFFERING_ID);
-    }
-
-    @Before
-    public void initTest() {
-        initMocks();
-
-        deployment = builder.create().setVpc(mockVpc).setDeployDestination(mockDestination).setAccountOwner(mockOwner).setParams(params).build();
     }
 
     @Test
@@ -173,6 +154,11 @@ public class VpcRouterDeploymentDefinitionTest extends RouterDeploymentDefinitio
         assertEquals("If there is already a router found, there is no need to deploy more", 0, deployment.getNumberOfRoutersToDeploy());
     }
 
+    @Test
+    public void testPrepareDeploymentPublicNw() {
+        driveTestPrepareDeployment(true, true);
+    }
+
     protected void driveTestPrepareDeployment(final boolean isRedundant, final boolean isPublicNw) {
         // Prepare
         when(mockVpc.isRedundant()).thenReturn(isRedundant);
@@ -196,11 +182,6 @@ public class VpcRouterDeploymentDefinitionTest extends RouterDeploymentDefinitio
             assertEquals("Since deployment cannot proceed we should empty the list of routers",
                     0, deployment.routers.size());
         }
-    }
-
-    @Test
-    public void testPrepareDeploymentPublicNw() {
-        driveTestPrepareDeployment(true, true);
     }
 
     @Test
@@ -257,17 +238,16 @@ public class VpcRouterDeploymentDefinitionTest extends RouterDeploymentDefinitio
 
     @Test
     public void testDeployAllVirtualRoutersWithNoDeployedRouter() throws InsufficientAddressCapacityException, InsufficientServerCapacityException, StorageUnavailableException,
-    InsufficientCapacityException, ResourceUnavailableException {
+            InsufficientCapacityException, ResourceUnavailableException {
 
         driveTestDeployAllVirtualRouters(null);
 
         // Assert
         assertTrue("No router should have been set as deployed", deployment.routers.isEmpty());
-
     }
 
     public void driveTestDeployAllVirtualRouters(final DomainRouterVO router) throws InsufficientAddressCapacityException, InsufficientServerCapacityException,
-    StorageUnavailableException, InsufficientCapacityException, ResourceUnavailableException {
+            StorageUnavailableException, InsufficientCapacityException, ResourceUnavailableException {
         // Prepare
         final VpcRouterDeploymentDefinition vpcDeployment = (VpcRouterDeploymentDefinition) deployment;
         when(vpcDeployment.nwHelper.deployRouter(vpcDeployment, true)).thenReturn(router);
@@ -305,9 +285,9 @@ public class VpcRouterDeploymentDefinitionTest extends RouterDeploymentDefinitio
         // Set and confirm is redundant
         when(mockVpc.isRedundant()).thenReturn(true);
         final RouterDeploymentDefinition deployment = builder.create()
-                .setVpc(mockVpc)
-                .setDeployDestination(mockDestination)
-                .build();
+                                                             .setVpc(mockVpc)
+                                                             .setDeployDestination(mockDestination)
+                                                             .build();
         assertTrue("The builder ignored redundancy from its inner network", deployment.isRedundant());
         when(mockVpc.isRedundant()).thenReturn(false);
         assertFalse("The builder ignored redundancy from its inner network", deployment.isRedundant());

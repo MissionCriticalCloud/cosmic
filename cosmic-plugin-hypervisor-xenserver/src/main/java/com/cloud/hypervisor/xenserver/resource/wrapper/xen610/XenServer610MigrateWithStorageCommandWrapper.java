@@ -1,28 +1,8 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xen610;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.MigrateWithStorageAnswer;
@@ -38,6 +18,13 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.exception.CloudRuntimeException;
+import org.apache.cloudstack.storage.to.VolumeObjectTO;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Host;
 import com.xensource.xenapi.Network;
@@ -47,12 +34,10 @@ import com.xensource.xenapi.Types;
 import com.xensource.xenapi.VDI;
 import com.xensource.xenapi.VIF;
 import com.xensource.xenapi.VM;
-
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  MigrateWithStorageCommand.class)
+@ResourceWrapper(handles = MigrateWithStorageCommand.class)
 public final class XenServer610MigrateWithStorageCommandWrapper extends CommandWrapper<MigrateWithStorageCommand, Answer, XenServer610Resource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(XenServer610MigrateWithStorageCommandWrapper.class);
@@ -75,15 +60,15 @@ public final class XenServer610MigrateWithStorageCommandWrapper extends CommandW
                 xenServer610Resource.getNetwork(connection, nicTo);
             }
 
-            final Map<String, String> other = new HashMap<String, String>();
+            final Map<String, String> other = new HashMap<>();
             other.put("live", "true");
 
             final XsLocalNetwork nativeNetworkForTraffic = xenServer610Resource.getNativeNetworkForTraffic(connection, TrafficType.Storage, null);
             final Network networkForSm = nativeNetworkForTraffic.getNetwork();
 
             // Create the vif map. The vm stays in the same cluster so we have to pass an empty vif map.
-            final Map<VIF, Network> vifMap = new HashMap<VIF, Network>();
-            final Map<VDI, SR> vdiMap = new HashMap<VDI, SR>();
+            final Map<VIF, Network> vifMap = new HashMap<>();
+            final Map<VDI, SR> vdiMap = new HashMap<>();
             for (final Map.Entry<VolumeTO, StorageFilerTO> entry : volumeToFiler.entrySet()) {
                 final VolumeTO volume = entry.getKey();
                 final StorageFilerTO sotrageFiler = entry.getValue();

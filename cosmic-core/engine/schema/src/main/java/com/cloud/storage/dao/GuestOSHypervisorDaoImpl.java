@@ -1,28 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.storage.dao;
-
-import java.util.Date;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.GuestOSHypervisorVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
@@ -53,16 +37,16 @@ public class GuestOSHypervisorDaoImpl extends GenericDaoBase<GuestOSHypervisorVO
     }
 
     @Override
-    public HypervisorType findHypervisorTypeByGuestOsId(long guestOsId) {
-        SearchCriteria<GuestOSHypervisorVO> sc = guestOsSearch.create();
+    public HypervisorType findHypervisorTypeByGuestOsId(final long guestOsId) {
+        final SearchCriteria<GuestOSHypervisorVO> sc = guestOsSearch.create();
         sc.setParameters("guest_os_id", guestOsId);
-        GuestOSHypervisorVO goh = findOneBy(sc);
+        final GuestOSHypervisorVO goh = findOneBy(sc);
         return HypervisorType.getType(goh.getHypervisorType());
     }
 
     @Override
-    public GuestOSHypervisorVO findByOsIdAndHypervisor(long guestOsId, String hypervisorType, String hypervisorVersion) {
-        SearchCriteria<GuestOSHypervisorVO> sc = mappingSearch.create();
+    public GuestOSHypervisorVO findByOsIdAndHypervisor(final long guestOsId, final String hypervisorType, final String hypervisorVersion) {
+        final SearchCriteria<GuestOSHypervisorVO> sc = mappingSearch.create();
         String version = "default";
         if (!(hypervisorVersion == null || hypervisorVersion.isEmpty())) {
             version = hypervisorVersion;
@@ -74,8 +58,18 @@ public class GuestOSHypervisorDaoImpl extends GenericDaoBase<GuestOSHypervisorVO
     }
 
     @Override
-    public GuestOSHypervisorVO findByOsIdAndHypervisorAndUserDefined(long guestOsId, String hypervisorType, String hypervisorVersion, boolean isUserDefined) {
-        SearchCriteria<GuestOSHypervisorVO> sc = userDefinedMappingSearch.create();
+    public boolean removeGuestOsMapping(final Long id) {
+        final GuestOSHypervisorVO guestOsHypervisor = findById(id);
+        createForUpdate(id);
+        guestOsHypervisor.setRemoved(new Date());
+        update(id, guestOsHypervisor);
+        return super.remove(id);
+    }
+
+    @Override
+    public GuestOSHypervisorVO findByOsIdAndHypervisorAndUserDefined(final long guestOsId, final String hypervisorType, final String hypervisorVersion, final boolean
+            isUserDefined) {
+        final SearchCriteria<GuestOSHypervisorVO> sc = userDefinedMappingSearch.create();
         String version = "default";
         if (!(hypervisorVersion == null || hypervisorVersion.isEmpty())) {
             version = hypervisorVersion;
@@ -86,14 +80,4 @@ public class GuestOSHypervisorDaoImpl extends GenericDaoBase<GuestOSHypervisorVO
         sc.setParameters("is_user_defined", isUserDefined);
         return findOneBy(sc);
     }
-
-    @Override
-    public boolean removeGuestOsMapping(Long id) {
-        GuestOSHypervisorVO guestOsHypervisor = findById(id);
-        createForUpdate(id);
-        guestOsHypervisor.setRemoved(new Date());
-        update(id, guestOsHypervisor);
-        return super.remove(id);
-    }
-
 }

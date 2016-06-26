@@ -1,35 +1,17 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
-from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.base import (Account,
-                             Domain, Template, Configurations,VirtualMachine,Snapshot,ServiceOffering
-                             )
-from marvin.lib.utils import (cleanup_resources, validateList)
-from marvin.lib.common import (get_zone, get_template, get_builtin_template_info,update_resource_limit,list_volumes )
-from nose.plugins.attrib import attr
-from marvin.codes import PASS
-from marvin.sshClient import SshClient
-from marvin.cloudstackException import CloudstackAPIException
 import time
+from marvin.cloudstackException import CloudstackAPIException
+from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+from marvin.codes import PASS
+from marvin.lib.base import (Account,
+                             Domain, Template, Configurations, VirtualMachine, Snapshot, ServiceOffering
+                             )
+from marvin.lib.common import (get_zone, get_template, get_builtin_template_info, update_resource_limit, list_volumes)
+from marvin.lib.utils import (cleanup_resources, validateList)
+from marvin.sshClient import SshClient
+from nose.plugins.attrib import attr
 
 
 class TestlistTemplates(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
 
@@ -39,10 +21,10 @@ class TestlistTemplates(cloudstackTestCase):
         cls.testdata = testClient.getParsedTestDataConfig()
         cls.zone = get_zone(cls.apiclient, cls.testClient.getZoneForTests())
         cls.template = get_template(
-                cls.apiclient,
-                cls.zone.id,
-                cls.testdata["ostype"]
-            )
+            cls.apiclient,
+            cls.zone.id,
+            cls.testdata["ostype"]
+        )
         cls.hypervisor = cls.testClient.getHypervisorInfo()
         builtin_info = get_builtin_template_info(cls.apiclient, cls.zone.id)
         cls.testdata["templates"]["url"] = builtin_info[0]
@@ -61,9 +43,9 @@ class TestlistTemplates(cloudstackTestCase):
         cls.testdata["virtual_machine"]["template"] = cls.template.id
         cls.testdata["custom_volume"]["zoneid"] = cls.zone.id
         cls.service_offering = ServiceOffering.create(
-                cls.apiclient,
-                cls.testdata["service_offerings"]["tiny"]
-            )
+            cls.apiclient,
+            cls.testdata["service_offerings"]["tiny"]
+        )
         cls.mgtSvrDetails = cls.config.__dict__["mgtSvr"][0].__dict__
         cls.cleanup = []
 
@@ -94,6 +76,7 @@ class TestlistTemplates(cloudstackTestCase):
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
+
     def RestartServers(self):
         """ Restart management server and usage server """
 
@@ -107,13 +90,12 @@ class TestlistTemplates(cloudstackTestCase):
         sshClient.execute(command)
         return
 
-    def updateConfigurAndRestart(self,name, value):
+    def updateConfigurAndRestart(self, name, value):
         Configurations.update(self.apiclient,
-                              name,value )
+                              name, value)
         self.RestartServers()
         time.sleep(self.testdata["sleep"])
-      
-      
+
     @attr(tags=["advanced", "basic"], required_hardware="true")
     def test_01_CS40139_listtemplate_with_different_pagesize(self):
         """
@@ -130,16 +112,16 @@ class TestlistTemplates(cloudstackTestCase):
             return
         self.updateConfigurAndRestart("default.page.size", "1000")
         self.debug("Updating template resource limit for account: %s" %
-                                                self.account.name)
+                   self.account.name)
         # Set usage_template=1000 for Account 1
         update_resource_limit(
-                              self.apiclient,
-                              4, # Template
-                              account=self.account.name,
-                              domainid=self.domain.id,
-                              max=1000
-                              )
-        
+            self.apiclient,
+            4,  # Template
+            account=self.account.name,
+            domainid=self.domain.id,
+            max=1000
+        )
+
         for i in range(0, 850):
             template_created = Template.register(
                 self.apiclient,
@@ -162,9 +144,9 @@ class TestlistTemplates(cloudstackTestCase):
             domainid=self.account.domainid)
         status = validateList(listfirst500template)
         self.assertEquals(
-                PASS,
-                status[0],
-                "First 500 template list is empty")
+            PASS,
+            status[0],
+            "First 500 template list is empty")
         listremainingtemplate = Template.list(
             self.apiclient,
             templatefilter="executable",
@@ -174,9 +156,9 @@ class TestlistTemplates(cloudstackTestCase):
             domainid=self.account.domainid)
         status = validateList(listremainingtemplate)
         self.assertEquals(
-                PASS,
-                status[0],
-                "Next 500 template list is empty")
+            PASS,
+            status[0],
+            "Next 500 template list is empty")
         listalltemplate = Template.list(
             self.apiclient,
             templatefilter="executable",
@@ -186,18 +168,17 @@ class TestlistTemplates(cloudstackTestCase):
             domainid=self.account.domainid)
         status = validateList(listalltemplate)
         self.assertEquals(
-                PASS,
-                status[0],
-                "entire template list is empty")
+            PASS,
+            status[0],
+            "entire template list is empty")
         listfirst500template.extend(listremainingtemplate)
-        for i, j in zip(listalltemplate,listfirst500template):
+        for i, j in zip(listalltemplate, listfirst500template):
             self.assertNotEqual(
-            i,
-            j,
-            "Check template listed are not same"
-        )
+                i,
+                j,
+                "Check template listed are not same"
+            )
         return
-
 
     @attr(tags=["advanced", "basic"], required_hardware="true")
     def test_02_template_permissions(self):
@@ -223,7 +204,7 @@ class TestlistTemplates(cloudstackTestCase):
 
         """
         self.updateConfigurAndRestart("allow.public.user.templates", "false")
-        
+
         user_account = Account.create(
             self.apiclient,
             self.testdata["account2"],
@@ -280,7 +261,7 @@ class TestlistTemplates(cloudstackTestCase):
         )
         self.assertIsNotNone(user_vm_created,
                              "VM creation failed"
-        )
+                             )
         # Get the Root disk of VM
         volume = list_volumes(
             self.user_api_client,

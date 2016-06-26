@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.managed.context.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -23,12 +5,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.apache.cloudstack.managed.context.ManagedContextListener;
+import org.apache.cloudstack.managed.threadlocal.ManagedThreadLocal;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.apache.cloudstack.managed.context.ManagedContextListener;
-import org.apache.cloudstack.managed.threadlocal.ManagedThreadLocal;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -55,7 +38,7 @@ public class DefaultManagedContextTest {
 
     @Test
     public void testRunnable() throws Exception {
-        final List<Object> touch = new ArrayList<Object>();
+        final List<Object> touch = new ArrayList<>();
 
         context.runWithContext(new Runnable() {
             @Override
@@ -69,17 +52,17 @@ public class DefaultManagedContextTest {
 
     @Test
     public void testGoodListeners() throws Exception {
-        final List<Object> touch = new ArrayList<Object>();
+        final List<Object> touch = new ArrayList<>();
 
         context.registerListener(new ManagedContextListener<Object>() {
             @Override
-            public Object onEnterContext(boolean reentry) {
+            public Object onEnterContext(final boolean reentry) {
                 touch.add("enter");
                 return "hi";
             }
 
             @Override
-            public void onLeaveContext(Object data, boolean reentry) {
+            public void onLeaveContext(final Object data, final boolean reentry) {
                 touch.add("leave");
                 assertEquals("hi", data);
             }
@@ -87,13 +70,13 @@ public class DefaultManagedContextTest {
 
         context.registerListener(new ManagedContextListener<Object>() {
             @Override
-            public Object onEnterContext(boolean reentry) {
+            public Object onEnterContext(final boolean reentry) {
                 touch.add("enter1");
                 return "hi";
             }
 
             @Override
-            public void onLeaveContext(Object data, boolean reentry) {
+            public void onLeaveContext(final Object data, final boolean reentry) {
                 touch.add("leave1");
                 assertEquals("hi", data);
             }
@@ -114,17 +97,17 @@ public class DefaultManagedContextTest {
 
     @Test
     public void testBadListeners() throws Exception {
-        final List<Object> touch = new ArrayList<Object>();
+        final List<Object> touch = new ArrayList<>();
 
         context.registerListener(new ManagedContextListener<Object>() {
             @Override
-            public Object onEnterContext(boolean reentry) {
+            public Object onEnterContext(final boolean reentry) {
                 touch.add("enter");
                 throw new RuntimeException("I'm a failure");
             }
 
             @Override
-            public void onLeaveContext(Object data, boolean reentry) {
+            public void onLeaveContext(final Object data, final boolean reentry) {
                 touch.add("leave");
                 assertNull(data);
             }
@@ -132,13 +115,13 @@ public class DefaultManagedContextTest {
 
         context.registerListener(new ManagedContextListener<Object>() {
             @Override
-            public Object onEnterContext(boolean reentry) {
+            public Object onEnterContext(final boolean reentry) {
                 touch.add("enter1");
                 return "hi";
             }
 
             @Override
-            public void onLeaveContext(Object data, boolean reentry) {
+            public void onLeaveContext(final Object data, final boolean reentry) {
                 touch.add("leave1");
                 assertEquals("hi", data);
             }
@@ -153,7 +136,7 @@ public class DefaultManagedContextTest {
             }).intValue();
 
             fail();
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             assertTrue(t instanceof RuntimeException);
             assertEquals("I'm a failure", t.getMessage());
         }
@@ -166,17 +149,17 @@ public class DefaultManagedContextTest {
 
     @Test
     public void testBadInvocation() throws Exception {
-        final List<Object> touch = new ArrayList<Object>();
+        final List<Object> touch = new ArrayList<>();
 
         context.registerListener(new ManagedContextListener<Object>() {
             @Override
-            public Object onEnterContext(boolean reentry) {
+            public Object onEnterContext(final boolean reentry) {
                 touch.add("enter");
                 return "hi";
             }
 
             @Override
-            public void onLeaveContext(Object data, boolean reentry) {
+            public void onLeaveContext(final Object data, final boolean reentry) {
                 touch.add("leave");
                 assertEquals("hi", data);
             }
@@ -184,13 +167,13 @@ public class DefaultManagedContextTest {
 
         context.registerListener(new ManagedContextListener<Object>() {
             @Override
-            public Object onEnterContext(boolean reentry) {
+            public Object onEnterContext(final boolean reentry) {
                 touch.add("enter1");
                 return "hi1";
             }
 
             @Override
-            public void onLeaveContext(Object data, boolean reentry) {
+            public void onLeaveContext(final Object data, final boolean reentry) {
                 touch.add("leave1");
                 assertEquals("hi1", data);
             }
@@ -205,7 +188,7 @@ public class DefaultManagedContextTest {
             }).intValue();
 
             fail();
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             assertTrue(t.getMessage(), t instanceof RuntimeException);
             assertEquals("I'm a failure", t.getMessage());
         }
@@ -218,17 +201,17 @@ public class DefaultManagedContextTest {
 
     @Test
     public void testBadListernInExit() throws Exception {
-        final List<Object> touch = new ArrayList<Object>();
+        final List<Object> touch = new ArrayList<>();
 
         context.registerListener(new ManagedContextListener<Object>() {
             @Override
-            public Object onEnterContext(boolean reentry) {
+            public Object onEnterContext(final boolean reentry) {
                 touch.add("enter");
                 return "hi";
             }
 
             @Override
-            public void onLeaveContext(Object data, boolean reentry) {
+            public void onLeaveContext(final Object data, final boolean reentry) {
                 touch.add("leave");
                 assertEquals("hi", data);
 
@@ -238,13 +221,13 @@ public class DefaultManagedContextTest {
 
         context.registerListener(new ManagedContextListener<Object>() {
             @Override
-            public Object onEnterContext(boolean reentry) {
+            public Object onEnterContext(final boolean reentry) {
                 touch.add("enter1");
                 return "hi1";
             }
 
             @Override
-            public void onLeaveContext(Object data, boolean reentry) {
+            public void onLeaveContext(final Object data, final boolean reentry) {
                 touch.add("leave1");
                 assertEquals("hi1", data);
             }
@@ -259,7 +242,7 @@ public class DefaultManagedContextTest {
             }).intValue();
 
             fail();
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             assertTrue(t.getMessage(), t instanceof RuntimeException);
             assertEquals("I'm a failure", t.getMessage());
         }

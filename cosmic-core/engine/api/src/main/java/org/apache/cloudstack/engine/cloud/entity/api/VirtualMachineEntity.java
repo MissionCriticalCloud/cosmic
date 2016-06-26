@@ -1,31 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.engine.cloud.entity.api;
-
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner;
@@ -36,13 +9,19 @@ import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.vm.VirtualMachineProfile;
-
 import org.apache.cloudstack.engine.entity.api.CloudStackEntity;
+
+import javax.ws.rs.BeanParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
+import java.util.Map;
 
 /**
  * VirtualMachineEntity represents a Virtual Machine in Cloud Orchestration
  * Platform.
- *
  */
 @Path("vm/{id}")
 @Produces({"application/json", "application/xml"})
@@ -86,13 +65,14 @@ public interface VirtualMachineEntity extends CloudStackEntity {
 
     /**
      * Start the virtual machine with a given deployment plan
+     *
      * @param plannerToUse the Deployment Planner that should be used
-     * @param plan plan to which to deploy the machine
-     * @param exclude list of areas to exclude
+     * @param plan         plan to which to deploy the machine
+     * @param exclude      list of areas to exclude
      * @return a reservation id
      */
     String reserve(DeploymentPlanner plannerToUse, @BeanParam DeploymentPlan plan, ExcludeList exclude, String caller) throws InsufficientCapacityException,
-        ResourceUnavailableException;
+            ResourceUnavailableException;
 
     /**
      * Migrate this VM to a certain destination.
@@ -103,14 +83,13 @@ public interface VirtualMachineEntity extends CloudStackEntity {
 
     /**
      * Deploy this virtual machine according to the reservation from before.
-     * @param reservationId reservation id from reserve call.
      *
+     * @param reservationId reservation id from reserve call.
      */
     void deploy(String reservationId, String caller, Map<VirtualMachineProfile.Param, Object> params) throws InsufficientCapacityException, ResourceUnavailableException;
 
     /**
      * Stop the virtual machine
-     *
      */
     boolean stop(String caller) throws ResourceUnavailableException, CloudException;
 
@@ -128,6 +107,7 @@ public interface VirtualMachineEntity extends CloudStackEntity {
 
     /**
      * Duplicate this VM in the database so that it will start new
+     *
      * @param externalId
      * @return a new VirtualMachineEntity
      */
@@ -140,26 +120,30 @@ public interface VirtualMachineEntity extends CloudStackEntity {
 
     /**
      * Attach volume to this VM
-     * @param volume volume to attach
+     *
+     * @param volume   volume to attach
      * @param deviceId deviceId to use
      */
     void attach(VolumeEntity volume, short deviceId);
 
     /**
      * Detach the volume from this VM
+     *
      * @param volume volume to detach
      */
     void detach(VolumeEntity volume);
 
     /**
      * Connect the VM to a network
-     * @param network network to attach
+     *
+     * @param network  network to attach
      * @param deviceId device id to use when a nic is created
      */
     void connectTo(NetworkEntity network, short nicId);
 
     /**
      * Disconnect the VM from this network
+     *
      * @param netowrk network to disconnect from
      */
     void disconnectFrom(NetworkEntity netowrk, short nicId);

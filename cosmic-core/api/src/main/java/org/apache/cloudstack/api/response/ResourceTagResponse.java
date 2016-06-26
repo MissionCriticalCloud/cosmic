@@ -1,28 +1,11 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 
-@SuppressWarnings("unused")
+import com.google.gson.annotations.SerializedName;
+
 public class ResourceTagResponse extends BaseResponse implements ControlledViewEntityResponse {
     @SerializedName(ApiConstants.KEY)
     @Param(description = "tag key name")
@@ -64,79 +47,84 @@ public class ResourceTagResponse extends BaseResponse implements ControlledViewE
     @Param(description = "customer associated with the tag")
     private String customer;
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 
-    public void setResourceType(String resourceType) {
+    public void setResourceType(final String resourceType) {
         this.resourceType = resourceType;
     }
 
-    public void setResourceId(String id) {
+    public void setResourceId(final String id) {
         this.resourceId = id;
     }
 
     @Override
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
     @Override
-    public void setDomainId(String domainId) {
-        this.domainId = domainId;
-    }
-
-    @Override
-    public void setDomainName(String domainName) {
-        this.domainName = domainName;
-    }
-
-    @Override
-    public void setProjectId(String projectId) {
+    public void setProjectId(final String projectId) {
         this.projectId = projectId;
     }
 
     @Override
-    public void setProjectName(String projectName) {
+    public void setProjectName(final String projectName) {
         this.projectName = projectName;
     }
 
-    public void setCustomer(String customer) {
-        this.customer = customer;
+    @Override
+    public void setDomainId(final String domainId) {
+        this.domainId = domainId;
     }
 
-    public String getKey() {
-        return this.key;
+    @Override
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setCustomer(final String customer) {
+        this.customer = customer;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        String key = this.getKey();
+        final String key = this.getKey();
         result = prime * result + ((key == null) ? 0 : key.hashCode());
         return result;
     }
 
+    public String getKey() {
+        return this.key;
+    }
+
+    public void setKey(final String key) {
+        this.key = key;
+    }
+
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        ResourceTagResponse other = (ResourceTagResponse) obj;
-        String key = this.getKey();
+        }
+        final ResourceTagResponse other = (ResourceTagResponse) obj;
+        final String key = this.getKey();
         if (key == null) {
-            if (other.getKey() != null)
+            if (other.getKey() != null) {
                 return false;
-        } else if (!key.equals(other.getKey()))
+            }
+        } else if (!key.equals(other.getKey())) {
             return false;
+        }
         return true;
     }
 }

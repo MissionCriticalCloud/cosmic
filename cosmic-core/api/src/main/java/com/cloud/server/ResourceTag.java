@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-//  with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.server;
 
 import org.apache.cloudstack.acl.ControlledEntity;
@@ -21,6 +5,38 @@ import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
 
 public interface ResourceTag extends ControlledEntity, Identity, InternalIdentity {
+
+    /**
+     * @return
+     */
+    String getKey();
+
+    /**
+     * @return
+     */
+    String getValue();
+
+    /**
+     * @return
+     */
+    long getResourceId();
+
+    void setResourceId(long resourceId);
+
+    /**
+     * @return
+     */
+    ResourceObjectType getResourceType();
+
+    /**
+     * @return
+     */
+    String getCustomer();
+
+    /**
+     * @return
+     */
+    String getResourceUuid();
 
     // FIXME - extract enum to another interface as its used both by resourceTags and resourceMetaData code
     public enum ResourceObjectType {
@@ -59,14 +75,13 @@ public interface ResourceTag extends ControlledEntity, Identity, InternalIdentit
         LBHealthCheckPolicy(false, true),
         SnapshotPolicy(false, true);
 
+        private final boolean resourceTagsSupport;
+        private final boolean metadataSupport;
 
-        ResourceObjectType(boolean resourceTagsSupport, boolean resourceMetadataSupport) {
+        ResourceObjectType(final boolean resourceTagsSupport, final boolean resourceMetadataSupport) {
             this.resourceTagsSupport = resourceTagsSupport;
             metadataSupport = resourceMetadataSupport;
         }
-
-        private final boolean resourceTagsSupport;
-        private final boolean metadataSupport;
 
         public boolean resourceTagsSupport() {
             return resourceTagsSupport;
@@ -76,37 +91,4 @@ public interface ResourceTag extends ControlledEntity, Identity, InternalIdentit
             return metadataSupport;
         }
     }
-
-    /**
-     * @return
-     */
-    String getKey();
-
-    /**
-     * @return
-     */
-    String getValue();
-
-    /**
-     * @return
-     */
-    long getResourceId();
-
-    void setResourceId(long resourceId);
-
-    /**
-     * @return
-     */
-    ResourceObjectType getResourceType();
-
-    /**
-     * @return
-     */
-    String getCustomer();
-
-    /**
-     * @return
-     */
-    String getResourceUuid();
-
 }

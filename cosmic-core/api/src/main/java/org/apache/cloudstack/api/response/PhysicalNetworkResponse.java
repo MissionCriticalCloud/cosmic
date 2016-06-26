@@ -1,33 +1,16 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.List;
 
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
 
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
+
 @EntityReference(value = PhysicalNetwork.class)
-@SuppressWarnings("unused")
 public class PhysicalNetworkResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.ID)
@@ -73,64 +56,63 @@ public class PhysicalNetworkResponse extends BaseResponse {
     @Override
     public String getObjectId() {
         return this.id;
-
     }
 
-    public void setId(String uuid) {
+    public void setId(final String uuid) {
         this.id = uuid;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
-    public void setDomainId(String domainId) {
+    public void setDomainId(final String domainId) {
         this.domainId = domainId;
     }
 
-    public void setVlan(String vlan) {
+    public void setVlan(final String vlan) {
         this.vlan = vlan;
     }
 
-    public void setTags(List<String> tags) {
+    public void setTags(final List<String> tags) {
         if (tags == null || tags.size() == 0) {
             return;
         }
 
-        StringBuilder buf = new StringBuilder();
-        for (String tag : tags) {
+        final StringBuilder buf = new StringBuilder();
+        for (final String tag : tags) {
             buf.append(tag).append(",");
         }
 
         this.tags = buf.delete(buf.length() - 1, buf.length()).toString();
     }
 
-    public void setBroadcastDomainRange(String broadcastDomainRange) {
+    public void setBroadcastDomainRange(final String broadcastDomainRange) {
         this.broadcastDomainRange = broadcastDomainRange;
     }
 
-    public void setNetworkSpeed(String networkSpeed) {
+    public void setNetworkSpeed(final String networkSpeed) {
         this.networkSpeed = networkSpeed;
     }
 
-    public void setIsolationMethods(List<String> isolationMethods) {
+    public void setIsolationMethods(final List<String> isolationMethods) {
         if (isolationMethods == null || isolationMethods.size() == 0) {
             return;
         }
 
-        StringBuilder buf = new StringBuilder();
-        for (String isolationMethod : isolationMethods) {
+        final StringBuilder buf = new StringBuilder();
+        for (final String isolationMethod : isolationMethods) {
             buf.append(isolationMethod).append(",");
         }
 
         this.isolationMethods = buf.delete(buf.length() - 1, buf.length()).toString();
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 }

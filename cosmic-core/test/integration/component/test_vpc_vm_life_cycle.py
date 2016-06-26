@@ -1,54 +1,36 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 """ Component tests VM life cycle in VPC network functionality
 """
-#Import Local Modules
-from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import cleanup_resources, validateList
-from marvin.lib.base import (VirtualMachine,
-                                         NATRule,
-                                         LoadBalancerRule,
-                                         StaticNATRule,
-                                         PublicIPAddress,
-                                         VPC,
-                                         VpcOffering,
-                                         Network,
-                                         NetworkOffering,
-                                         NetworkACL,
-                                         Router,
-                                         Account,
-                                         ServiceOffering,
-                                         Host,
-                                         Cluster)
-from marvin.lib.common import (get_domain,
-                                           get_zone,
-                                           get_template,
-                                           get_free_vlan,
-                                           wait_for_cleanup,
-                                           list_virtual_machines,
-                                           list_hosts,
-                                           findSuitableHostForMigration,
-                                           verifyGuestTrafficPortGroups)
-
-from marvin.codes import PASS, ERROR_NO_HOST_FOR_MIGRATION
-
+# Import Local Modules
 import time
+from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+from marvin.codes import PASS, ERROR_NO_HOST_FOR_MIGRATION
+from marvin.lib.base import (VirtualMachine,
+                             NATRule,
+                             LoadBalancerRule,
+                             StaticNATRule,
+                             PublicIPAddress,
+                             VPC,
+                             VpcOffering,
+                             Network,
+                             NetworkOffering,
+                             NetworkACL,
+                             Router,
+                             Account,
+                             ServiceOffering,
+                             Host,
+                             Cluster)
+from marvin.lib.common import (get_domain,
+                               get_zone,
+                               get_template,
+                               get_free_vlan,
+                               wait_for_cleanup,
+                               list_virtual_machines,
+                               list_hosts,
+                               findSuitableHostForMigration,
+                               verifyGuestTrafficPortGroups)
+from marvin.lib.utils import cleanup_resources, validateList
+from nose.plugins.attrib import attr
+
 
 class Services:
     """Test VM life cycle in VPC network services
@@ -107,8 +89,8 @@ class Services:
                     "NetworkACL": 'VpcVirtualRouter'
                 },
                 "serviceCapabilityList": {
-                    "SourceNat": {"SupportedSourceNatTypes": "peraccount"},
-                    "Lb": {"lbSchemes": "public", "SupportedLbIsolation": "dedicated"}
+                    "SourceNat": { "SupportedSourceNatTypes": "peraccount" },
+                    "Lb": { "lbSchemes": "public", "SupportedLbIsolation": "dedicated" }
                 },
             },
             "network_offering_no_lb": {
@@ -185,10 +167,10 @@ class Services:
                 "protocol": "TCP"
             },
             "icmp_rule": {
-                    "icmptype": -1,
-                    "icmpcode": -1,
-                    "cidrlist": '0.0.0.0/0',
-                    "protocol": "ICMP"
+                "icmptype": -1,
+                "icmpcode": -1,
+                "cidrlist": '0.0.0.0/0',
+                "protocol": "ICMP"
             },
             "virtual_machine": {
                 "displayname": "Test VM",
@@ -210,8 +192,8 @@ class Services:
             "mode": 'advanced'
         }
 
-class TestVMLifeCycleVPC(cloudstackTestCase):
 
+class TestVMLifeCycleVPC(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestVMLifeCycleVPC, cls).getClsTestClient()
@@ -222,156 +204,156 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
         cls.domain = get_domain(cls.api_client)
         cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
         cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.services["ostype"]
-                            )
+            cls.api_client,
+            cls.zone.id,
+            cls.services["ostype"]
+        )
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
 
         cls.service_offering = ServiceOffering.create(
-                                            cls.api_client,
-                                            cls.services["service_offering"]
-                                            )
+            cls.api_client,
+            cls.services["service_offering"]
+        )
 
         cls.account = Account.create(
-                                     cls.api_client,
-                                     cls.services["account"],
-                                     admin=True,
-                                     domainid=cls.domain.id
-                                     )
+            cls.api_client,
+            cls.services["account"],
+            admin=True,
+            domainid=cls.domain.id
+        )
 
         cls.vpc_off = VpcOffering.create(
-                                     cls.api_client,
-                                     cls.services["vpc_offering"]
-                                     )
+            cls.api_client,
+            cls.services["vpc_offering"]
+        )
 
         cls.vpc_off.update(cls.api_client, state='Enabled')
 
         cls.services["vpc"]["cidr"] = '10.1.1.1/16'
         cls.vpc = VPC.create(
-                         cls.api_client,
-                         cls.services["vpc"],
-                         vpcofferingid=cls.vpc_off.id,
-                         zoneid=cls.zone.id,
-                         account=cls.account.name,
-                         domainid=cls.account.domainid
-                         )
+            cls.api_client,
+            cls.services["vpc"],
+            vpcofferingid=cls.vpc_off.id,
+            zoneid=cls.zone.id,
+            account=cls.account.name,
+            domainid=cls.account.domainid
+        )
 
         cls.nw_off = NetworkOffering.create(
-                                            cls.api_client,
-                                            cls.services["network_offering"],
-                                            conservemode=False
-                                            )
+            cls.api_client,
+            cls.services["network_offering"],
+            conservemode=False
+        )
         # Enable Network offering
         cls.nw_off.update(cls.api_client, state='Enabled')
 
         # Creating network using the network offering created
         cls.network_1 = Network.create(
-                                cls.api_client,
-                                cls.services["network"],
-                                accountid=cls.account.name,
-                                domainid=cls.account.domainid,
-                                networkofferingid=cls.nw_off.id,
-                                zoneid=cls.zone.id,
-                                gateway='10.1.1.1',
-                                vpcid=cls.vpc.id
-                                )
+            cls.api_client,
+            cls.services["network"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            networkofferingid=cls.nw_off.id,
+            zoneid=cls.zone.id,
+            gateway='10.1.1.1',
+            vpcid=cls.vpc.id
+        )
         cls.nw_off_no_lb = NetworkOffering.create(
-                                    cls.api_client,
-                                    cls.services["network_offering_no_lb"],
-                                    conservemode=False
-                                    )
+            cls.api_client,
+            cls.services["network_offering_no_lb"],
+            conservemode=False
+        )
         # Enable Network offering
         cls.nw_off_no_lb.update(cls.api_client, state='Enabled')
         # Spawn an instance in that network
         cls.vm_1 = VirtualMachine.create(
-                                  cls.api_client,
-                                  cls.services["virtual_machine"],
-                                  accountid=cls.account.name,
-                                  domainid=cls.account.domainid,
-                                  serviceofferingid=cls.service_offering.id,
-                                  networkids=[str(cls.network_1.id)]
-                                  )
+            cls.api_client,
+            cls.services["virtual_machine"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            serviceofferingid=cls.service_offering.id,
+            networkids=[str(cls.network_1.id)]
+        )
         cls.vm_2 = VirtualMachine.create(
-                                  cls.api_client,
-                                  cls.services["virtual_machine"],
-                                  accountid=cls.account.name,
-                                  domainid=cls.account.domainid,
-                                  serviceofferingid=cls.service_offering.id,
-                                  networkids=[str(cls.network_1.id)]
-                                  )
+            cls.api_client,
+            cls.services["virtual_machine"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            serviceofferingid=cls.service_offering.id,
+            networkids=[str(cls.network_1.id)]
+        )
         cls.public_ip_1 = PublicIPAddress.create(
-                                cls.api_client,
-                                accountid=cls.account.name,
-                                zoneid=cls.zone.id,
-                                domainid=cls.account.domainid,
-                                networkid=cls.network_1.id,
-                                vpcid=cls.vpc.id
-                                )
+            cls.api_client,
+            accountid=cls.account.name,
+            zoneid=cls.zone.id,
+            domainid=cls.account.domainid,
+            networkid=cls.network_1.id,
+            vpcid=cls.vpc.id
+        )
         cls.lb_rule = LoadBalancerRule.create(
-                                    cls.api_client,
-                                    cls.services["lbrule"],
-                                    ipaddressid=cls.public_ip_1.ipaddress.id,
-                                    accountid=cls.account.name,
-                                    networkid=cls.network_1.id,
-                                    vpcid=cls.vpc.id,
-                                    domainid=cls.account.domainid
-                                )
+            cls.api_client,
+            cls.services["lbrule"],
+            ipaddressid=cls.public_ip_1.ipaddress.id,
+            accountid=cls.account.name,
+            networkid=cls.network_1.id,
+            vpcid=cls.vpc.id,
+            domainid=cls.account.domainid
+        )
         cls.lb_rule.assign(cls.api_client, [cls.vm_1, cls.vm_2])
 
         cls.public_ip_2 = PublicIPAddress.create(
-                                cls.api_client,
-                                accountid=cls.account.name,
-                                zoneid=cls.zone.id,
-                                domainid=cls.account.domainid,
-                                networkid=cls.network_1.id,
-                                vpcid=cls.vpc.id
-                                )
+            cls.api_client,
+            accountid=cls.account.name,
+            zoneid=cls.zone.id,
+            domainid=cls.account.domainid,
+            networkid=cls.network_1.id,
+            vpcid=cls.vpc.id
+        )
 
         cls.nat_rule = NATRule.create(
-                                  cls.api_client,
-                                  cls.vm_1,
-                                  cls.services["natrule"],
-                                  ipaddressid=cls.public_ip_2.ipaddress.id,
-                                  openfirewall=False,
-                                  networkid=cls.network_1.id,
-                                  vpcid=cls.vpc.id
-                                  )
+            cls.api_client,
+            cls.vm_1,
+            cls.services["natrule"],
+            ipaddressid=cls.public_ip_2.ipaddress.id,
+            openfirewall=False,
+            networkid=cls.network_1.id,
+            vpcid=cls.vpc.id
+        )
 
         # Opening up the ports in VPC
         cls.nwacl_nat = NetworkACL.create(
-                                         cls.api_client,
-                                         networkid=cls.network_1.id,
-                                         services=cls.services["natrule"],
-                                         traffictype='Ingress'
-                                    )
+            cls.api_client,
+            networkid=cls.network_1.id,
+            services=cls.services["natrule"],
+            traffictype='Ingress'
+        )
 
         cls.nwacl_lb = NetworkACL.create(
-                                cls.api_client,
-                                networkid=cls.network_1.id,
-                                services=cls.services["lbrule"],
-                                traffictype='Ingress'
-                                )
+            cls.api_client,
+            networkid=cls.network_1.id,
+            services=cls.services["lbrule"],
+            traffictype='Ingress'
+        )
         cls.services["icmp_rule"]["protocol"] = "all"
         cls.nwacl_internet_1 = NetworkACL.create(
-                                        cls.api_client,
-                                        networkid=cls.network_1.id,
-                                        services=cls.services["icmp_rule"],
-                                        traffictype='Egress'
-                                        )
+            cls.api_client,
+            networkid=cls.network_1.id,
+            services=cls.services["icmp_rule"],
+            traffictype='Egress'
+        )
         cls._cleanup = [
-                        cls.account,
-                        cls.service_offering,
-                        cls.nw_off,
-                        cls.nw_off_no_lb
-                        ]
+            cls.account,
+            cls.service_offering,
+            cls.nw_off,
+            cls.nw_off_no_lb
+        ]
         return
 
     @classmethod
     def tearDownClass(cls):
         try:
-            #Cleanup resources used
+            # Cleanup resources used
             cleanup_resources(cls.api_client, cls._cleanup)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
@@ -385,7 +367,7 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
 
     def tearDown(self):
         try:
-            #Clean up, terminate the created network offerings
+            # Clean up, terminate the created network offerings
             cleanup_resources(self.apiclient, self.cleanup)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
@@ -396,22 +378,22 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
 
         self.debug("Check if the VPC offering is created successfully?")
         vpc_offs = VpcOffering.list(
-                                    self.apiclient,
-                                    id=vpc_offering.id
-                                    )
+            self.apiclient,
+            id=vpc_offering.id
+        )
         self.assertEqual(
-                         isinstance(vpc_offs, list),
-                         True,
-                         "List VPC offerings should return a valid list"
-                         )
+            isinstance(vpc_offs, list),
+            True,
+            "List VPC offerings should return a valid list"
+        )
         self.assertEqual(
-                 vpc_offering.name,
-                 vpc_offs[0].name,
-                "Name of the VPC offering should match with listVPCOff data"
-                )
+            vpc_offering.name,
+            vpc_offs[0].name,
+            "Name of the VPC offering should match with listVPCOff data"
+        )
         self.debug(
-                "VPC offering is created successfully - %s" %
-                                                        vpc_offering.name)
+            "VPC offering is created successfully - %s" %
+            vpc_offering.name)
         return
 
     def validate_vpc_network(self, network, state=None):
@@ -419,25 +401,25 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
 
         self.debug("Check if the VPC network is created successfully?")
         vpc_networks = VPC.list(
-                                    self.apiclient,
-                                    id=network.id
-                          )
+            self.apiclient,
+            id=network.id
+        )
         self.assertEqual(
-                         isinstance(vpc_networks, list),
-                         True,
-                         "List VPC network should return a valid list"
-                         )
+            isinstance(vpc_networks, list),
+            True,
+            "List VPC network should return a valid list"
+        )
         self.assertEqual(
-                 network.name,
-                 vpc_networks[0].name,
-                "Name of the VPC network should match with listVPC data"
-                )
+            network.name,
+            vpc_networks[0].name,
+            "Name of the VPC network should match with listVPC data"
+        )
         if state:
             self.assertEqual(
-                 vpc_networks[0].state,
-                 state,
+                vpc_networks[0].state,
+                state,
                 "VPC state should be '%s'" % state
-                )
+            )
         self.debug("VPC network validated - %s" % network.name)
         return
 
@@ -445,10 +427,10 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
         """Validates if the network rules work properly or not?"""
         try:
             self.debug("Checking if we can SSH into VM_1 through %s?" %
-                    (self.public_ip_1.ipaddress.ipaddress))
+                       (self.public_ip_1.ipaddress.ipaddress))
             ssh_1 = self.vm_1.get_ssh_client(
-                                ipaddress=self.public_ip_1.ipaddress.ipaddress,
-                                reconnect=True)
+                ipaddress=self.public_ip_1.ipaddress.ipaddress,
+                reconnect=True)
             self.debug("SSH into VM is successfully")
 
             self.debug("Verifying if we can ping to outside world from VM?")
@@ -461,35 +443,35 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
             # rtt min/avg/max/mdev = 25.970/25.970/25.970/0.000 ms
         except Exception as e:
             self.fail("Failed to SSH into VM - %s, %s" %
-                                    (self.public_ip_1.ipaddress.ipaddress, e))
+                      (self.public_ip_1.ipaddress.ipaddress, e))
 
         result = str(res)
         self.assertEqual(
-                         result.count("1 received"),
-                         1,
-                         "Ping to outside world from VM should be successful"
-                         )
+            result.count("1 received"),
+            1,
+            "Ping to outside world from VM should be successful"
+        )
 
         self.debug("Checking if we can SSH into VM_1 through %s?" %
-                (self.public_ip_2.ipaddress.ipaddress))
+                   (self.public_ip_2.ipaddress.ipaddress))
         try:
             ssh_2 = self.vm_1.get_ssh_client(
-                            ipaddress=self.public_ip_2.ipaddress.ipaddress,
-                            reconnect=True)
+                ipaddress=self.public_ip_2.ipaddress.ipaddress,
+                reconnect=True)
             self.debug("SSH into VM is successfully")
 
             self.debug("Verifying if we can ping to outside world from VM?")
             res = ssh_2.execute("ping -c 1 www.google.com")
         except Exception as e:
             self.fail("Failed to SSH into VM - %s, %s" %
-                                    (self.public_ip_2.ipaddress.ipaddress, e))
+                      (self.public_ip_2.ipaddress.ipaddress, e))
 
         result = str(res)
         self.assertEqual(
-                         result.count("1 received"),
-                         1,
-                         "Ping to outside world from VM should be successful"
-                         )
+            result.count("1 received"),
+            1,
+            "Ping to outside world from VM should be successful"
+        )
         return
 
     @attr(tags=["advanced", "intervlan", "dvs"])
@@ -506,23 +488,23 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
 
         self.debug("Check if deployed VMs are in running state?")
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  account=self.account.name,
-                                  domainid=self.account.domainid,
-                                  listall=True
-                                  )
+            self.apiclient,
+            account=self.account.name,
+            domainid=self.account.domainid,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(vms, list),
-                         True,
-                         "List VMs should return a valid response"
-                         )
+            isinstance(vms, list),
+            True,
+            "List VMs should return a valid response"
+        )
         for vm in vms:
             self.debug("VM name: %s, VM state: %s" % (vm.name, vm.state))
             self.assertEqual(
-                             vm.state,
-                             "Running",
-                             "Vm state should be running for each VM deployed"
-                             )
+                vm.state,
+                "Running",
+                "Vm state should be running for each VM deployed"
+            )
         return
 
     @attr(tags=["advanced", "intervlan", "dvs"])
@@ -535,7 +517,7 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
         # 2. Rules should be still configured on virtual router.
 
         self.debug("Stopping the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.stop(self.apiclient)
             self.vm_2.stop(self.apiclient)
@@ -545,26 +527,26 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
         # Check if the network rules still exists after Vm stop
         self.debug("Checking if NAT rules ")
         nat_rules = NATRule.list(
-                                 self.apiclient,
-                                 id=self.nat_rule.id,
-                                 listall=True
-                                 )
+            self.apiclient,
+            id=self.nat_rule.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(nat_rules, list),
-                         True,
-                         "List NAT rules shall return a valid list"
-                         )
+            isinstance(nat_rules, list),
+            True,
+            "List NAT rules shall return a valid list"
+        )
 
         lb_rules = LoadBalancerRule.list(
-                                         self.apiclient,
-                                         id=self.lb_rule.id,
-                                         listall=True
-                                         )
+            self.apiclient,
+            id=self.lb_rule.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(lb_rules, list),
-                         True,
-                         "List LB rules shall return a valid list"
-                         )
+            isinstance(lb_rules, list),
+            True,
+            "List LB rules shall return a valid list"
+        )
         return
 
     @attr(tags=["advanced", "intervlan", "dvs"], required_hardware="true")
@@ -580,7 +562,7 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
         # 3. Make sure that we are able to access google.com from this user Vm
 
         self.debug("Starting the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.start(self.apiclient)
             self.vm_2.start(self.apiclient)
@@ -608,7 +590,7 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
         self.validate_network_rules()
 
         self.debug("Starting the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.reboot(self.apiclient)
             self.vm_2.reboot(self.apiclient)
@@ -621,7 +603,7 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
         self.validate_network_rules()
         return
 
-    @attr(tags=["advanced","multihost", "intervlan", "dvs"], required_hardware="true")
+    @attr(tags=["advanced", "multihost", "intervlan", "dvs"], required_hardware="true")
     def test_05_destroy_instance_in_network(self):
         """ Test destroy an instance in VPC networks
         """
@@ -639,86 +621,86 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
         self.validate_network_rules()
 
         self.debug("Destroying the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.delete(self.apiclient, expunge=False)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_1.id
-                                                 )
+                self.apiclient,
+                id=self.vm_1.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Destroyed',
-                    "VM state should be destroyed"
-                    )
-            
+                vm_response.state,
+                'Destroyed',
+                "VM state should be destroyed"
+            )
+
         except Exception as e:
             self.fail("Failed to stop the virtual instances, %s" % e)
-            
+
         # Check if the network rules still exists after Vm stop
         self.debug("Checking if NAT rules ")
         nat_rules = NATRule.list(
-                                 self.apiclient,
-                                 id=self.nat_rule.id,
-                                 listall=True
-                                 )
+            self.apiclient,
+            id=self.nat_rule.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(nat_rules, list),
-                         True,
-                         "List NAT rules shall return a valid list"
-                         )
+            isinstance(nat_rules, list),
+            True,
+            "List NAT rules shall return a valid list"
+        )
 
         lb_rules = LoadBalancerRule.list(
-                                         self.apiclient,
-                                         id=self.lb_rule.id,
-                                         listall=True
-                                         )
+            self.apiclient,
+            id=self.lb_rule.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(lb_rules, list),
-                         True,
-                         "List LB rules shall return a valid list"
-                         )
+            isinstance(lb_rules, list),
+            True,
+            "List LB rules shall return a valid list"
+        )
 
         self.debug("Recovering the expunged virtual machine vm1 in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.recover(self.apiclient)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_1.id
-                                                 )
+                self.apiclient,
+                id=self.vm_1.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Stopped',
-                    "VM state should be stopped"
-                    )
+                vm_response.state,
+                'Stopped',
+                "VM state should be stopped"
+            )
 
         except Exception as e:
             self.fail("Failed to recover the virtual instances, %s" % e)
-            
+
         try:
             self.vm_2.delete(self.apiclient, expunge=False)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_2.id
-                                                 )
+                self.apiclient,
+                id=self.vm_2.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Destroyed',
-                    "VM state should be destroyed"
-                    )
+                vm_response.state,
+                'Destroyed',
+                "VM state should be destroyed"
+            )
 
 
 
@@ -727,22 +709,22 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
             self.fail("Failed to stop the virtual instances, %s" % e)
 
         self.debug("Recovering the expunged virtual machine vm2 in account: %s" %
-                                                self.account.name)            
+                   self.account.name)
         try:
             self.vm_2.recover(self.apiclient)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_2.id
-                                                 )
+                self.apiclient,
+                id=self.vm_2.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Stopped',
-                    "VM state should be stopped"
-                    )
+                vm_response.state,
+                'Stopped',
+                "VM state should be stopped"
+            )
         except Exception as e:
             self.fail("Failed to recover the virtual instances, %s" % e)
 
@@ -751,32 +733,32 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
             self.vm_1.start(self.apiclient)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_1.id
-                                                 )
+                self.apiclient,
+                id=self.vm_1.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Running',
-                    "VM state should be running"
-                    )
+                vm_response.state,
+                'Running',
+                "VM state should be running"
+            )
 
             self.vm_2.start(self.apiclient)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_2.id
-                                                 )
+                self.apiclient,
+                id=self.vm_2.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Running',
-                    "VM state should be running"
-                    )
+                vm_response.state,
+                'Running',
+                "VM state should be running"
+            )
         except Exception as e:
             self.fail("Failed to start the instances, %s" % e)
 
@@ -786,7 +768,6 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
         self.validate_network_rules()
 
         return
-
 
     @attr(tags=["advanced", "intervlan", "dvs"], required_hardware="true")
     def test_07_migrate_instance_in_network(self):
@@ -809,9 +790,9 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
             self.skipTest(ERROR_NO_HOST_FOR_MIGRATION)
 
         self.debug("Migrating VM-ID: %s to Host: %s" % (
-                                                        self.vm_1.id,
-                                                        host.id
-                                                        ))
+            self.vm_1.id,
+            host.id
+        ))
 
         try:
             self.vm_1.migrate(self.apiclient, hostid=host.id)
@@ -838,8 +819,8 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
 
         try:
             ssh = self.vm_1.get_ssh_client(
-                                ipaddress=self.public_ip_1.ipaddress.ipaddress,
-                                reconnect=True)
+                ipaddress=self.public_ip_1.ipaddress.ipaddress,
+                reconnect=True)
             self.debug("SSH into VM is successfully")
             ssh.execute("yum install wget -y")
         except Exception as e:
@@ -848,9 +829,9 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
         self.debug("check the userdata with that of present in router")
         try:
             cmds = [
-               "wget http://%s/latest/user-data" % self.network_1.gateway,
-               "cat user-data",
-               ]
+                "wget http://%s/latest/user-data" % self.network_1.gateway,
+                "cat user-data",
+            ]
             for c in cmds:
                 result = ssh.execute(c)
                 self.debug("%s: %s" % (c, result))
@@ -859,11 +840,11 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
 
         res = str(result)
         self.assertEqual(
-                            res.count(
-                                self.services["virtual_machine"]["userdata"]),
-                            1,
-                            "Verify user data from router"
-                        )
+            res.count(
+                self.services["virtual_machine"]["userdata"]),
+            1,
+            "Verify user data from router"
+        )
         return
 
     @attr(tags=["advanced", "intervlan", "dvs"], required_hardware="true")
@@ -882,8 +863,8 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
 
         try:
             ssh = self.vm_1.get_ssh_client(
-                                ipaddress=self.public_ip_1.ipaddress.ipaddress,
-                                reconnect=True)
+                ipaddress=self.public_ip_1.ipaddress.ipaddress,
+                reconnect=True)
             self.debug("SSH into VM is successfully")
         except Exception as e:
             self.fail("Failed to SSH into instance")
@@ -891,9 +872,9 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
         self.debug("check the metadata with that of present in router")
         try:
             cmds = [
-               "wget http://%s/latest/vm-id" % self.network_1.gateway,
-               "cat vm-id",
-               ]
+                "wget http://%s/latest/vm-id" % self.network_1.gateway,
+                "cat vm-id",
+            ]
             for c in cmds:
                 result = ssh.execute(c)
                 self.debug("%s: %s" % (c, result))
@@ -902,10 +883,10 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
 
         res = str(result)
         self.assertNotEqual(
-                         res,
-                         None,
-                         "Meta data should be returned from router"
-                        )
+            res,
+            None,
+            "Meta data should be returned from router"
+        )
         return
 
     @attr(tags=["advanced", "intervlan", "dvs"], required_hardware="true")
@@ -924,7 +905,7 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
         self.validate_network_rules()
 
         self.debug("Delete virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.delete(self.apiclient)
             self.vm_2.delete(self.apiclient)
@@ -935,28 +916,28 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
             "Waiting for expunge interval to cleanup the network and VMs")
 
         wait_for_cleanup(
-                         self.apiclient,
-                         ["expunge.interval", "expunge.delay"]
-                        )
+            self.apiclient,
+            ["expunge.interval", "expunge.delay"]
+        )
 
         # Check if the network rules still exists after Vm stop
         self.debug("Checking if NAT rules existed")
         with self.assertRaises(Exception):
             NATRule.list(
-                         self.apiclient,
-                         id=self.nat_rule.id,
-                         listall=True
-                         )
+                self.apiclient,
+                id=self.nat_rule.id,
+                listall=True
+            )
 
             LoadBalancerRule.list(
-                                  self.apiclient,
-                                  id=self.lb_rule.id,
-                                  listall=True
-                                  )
+                self.apiclient,
+                id=self.lb_rule.id,
+                listall=True
+            )
         return
 
-class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
 
+class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestVMLifeCycleSharedNwVPC, cls).getClsTestClient()
@@ -967,79 +948,78 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
         cls.domain = get_domain(cls.api_client)
         cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
         cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.services["ostype"]
-                            )
+            cls.api_client,
+            cls.zone.id,
+            cls.services["ostype"]
+        )
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
 
         cls.service_offering = ServiceOffering.create(
-                                            cls.api_client,
-                                            cls.services["service_offering"]
-                                            )
+            cls.api_client,
+            cls.services["service_offering"]
+        )
         cls.vpc_off = VpcOffering.create(
-                                     cls.api_client,
-                                     cls.services["vpc_offering"]
-                                     )
+            cls.api_client,
+            cls.services["vpc_offering"]
+        )
         cls.vpc_off.update(cls.api_client, state='Enabled')
 
         cls.account = Account.create(
-                                     cls.api_client,
-                                     cls.services["account"],
-                                     admin=True,
-                                     domainid=cls.domain.id
-                                     )
+            cls.api_client,
+            cls.services["account"],
+            admin=True,
+            domainid=cls.domain.id
+        )
 
         cls.services["vpc"]["cidr"] = '10.1.1.1/16'
         cls.vpc = VPC.create(
-                         cls.api_client,
-                         cls.services["vpc"],
-                         vpcofferingid=cls.vpc_off.id,
-                         zoneid=cls.zone.id,
-                         account=cls.account.name,
-                         domainid=cls.account.domainid
-                         )
+            cls.api_client,
+            cls.services["vpc"],
+            vpcofferingid=cls.vpc_off.id,
+            zoneid=cls.zone.id,
+            account=cls.account.name,
+            domainid=cls.account.domainid
+        )
 
         cls.nw_off = NetworkOffering.create(
-                                            cls.api_client,
-                                            cls.services["network_offering"],
-                                            conservemode=False
-                                            )
+            cls.api_client,
+            cls.services["network_offering"],
+            conservemode=False
+        )
         # Enable Network offering
         cls.nw_off.update(cls.api_client, state='Enabled')
 
         # Creating network using the network offering created
         cls.network_1 = Network.create(
-                                cls.api_client,
-                                cls.services["network"],
-                                accountid=cls.account.name,
-                                domainid=cls.account.domainid,
-                                networkofferingid=cls.nw_off.id,
-                                zoneid=cls.zone.id,
-                                gateway='10.1.1.1',
-                                vpcid=cls.vpc.id
-                                )
+            cls.api_client,
+            cls.services["network"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            networkofferingid=cls.nw_off.id,
+            zoneid=cls.zone.id,
+            gateway='10.1.1.1',
+            vpcid=cls.vpc.id
+        )
         cls.nw_off_no_lb = NetworkOffering.create(
-                                    cls.api_client,
-                                    cls.services["network_offering_no_lb"],
-                                    conservemode=False
-                                    )
+            cls.api_client,
+            cls.services["network_offering_no_lb"],
+            conservemode=False
+        )
 
         cls.shared_nw_off = NetworkOffering.create(
-                                        cls.api_client,
-                                        cls.services["network_off_shared"],
-                                        conservemode=False
-                                        )
+            cls.api_client,
+            cls.services["network_off_shared"],
+            conservemode=False
+        )
         # Enable Network offering
         cls.shared_nw_off.update(cls.api_client, state='Enabled')
-
 
         physical_network, shared_vlan = get_free_vlan(cls.api_client, cls.zone.id)
         if shared_vlan is None:
             assert False, "Failed to get free vlan id for shared network creation in the zone"
 
-        #create network using the shared network offering created
+        # create network using the shared network offering created
         cls.services["network"]["acltype"] = "Domain"
         cls.services["network"]["physicalnetworkid"] = physical_network.id
         cls.services["network"]["vlan"] = shared_vlan
@@ -1050,116 +1030,115 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
 
         # Creating network using the network offering created
         cls.network_2 = Network.create(
-                                cls.api_client,
-                                cls.services["network"],
-                                accountid=cls.account.name,
-                                domainid=cls.account.domainid,
-                                networkofferingid=cls.shared_nw_off.id,
-                                zoneid=cls.zone.id,
-                                gateway='10.1.2.1',
-                                )
+            cls.api_client,
+            cls.services["network"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            networkofferingid=cls.shared_nw_off.id,
+            zoneid=cls.zone.id,
+            gateway='10.1.2.1',
+        )
 
         cls.vm_1 = VirtualMachine.create(
-                                  cls.api_client,
-                                  cls.services["virtual_machine"],
-                                  accountid=cls.account.name,
-                                  domainid=cls.account.domainid,
-                                  serviceofferingid=cls.service_offering.id,
-                                  networkids=[str(cls.network_1.id),
-                                              str(cls.network_2.id)]
-                                  )
+            cls.api_client,
+            cls.services["virtual_machine"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            serviceofferingid=cls.service_offering.id,
+            networkids=[str(cls.network_1.id),
+                        str(cls.network_2.id)]
+        )
 
         cls.vm_2 = VirtualMachine.create(
-                                  cls.api_client,
-                                  cls.services["virtual_machine"],
-                                  accountid=cls.account.name,
-                                  domainid=cls.account.domainid,
-                                  serviceofferingid=cls.service_offering.id,
-                                  networkids=[str(cls.network_1.id),
-                                              str(cls.network_2.id)]
-                                  )
-
+            cls.api_client,
+            cls.services["virtual_machine"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            serviceofferingid=cls.service_offering.id,
+            networkids=[str(cls.network_1.id),
+                        str(cls.network_2.id)]
+        )
 
         cls.vm_3 = VirtualMachine.create(
-                                  cls.api_client,
-                                  cls.services["virtual_machine"],
-                                  accountid=cls.account.name,
-                                  domainid=cls.account.domainid,
-                                  serviceofferingid=cls.service_offering.id,
-                                  networkids=[str(cls.network_1.id),
-                                              str(cls.network_2.id)]
-                                  )
+            cls.api_client,
+            cls.services["virtual_machine"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            serviceofferingid=cls.service_offering.id,
+            networkids=[str(cls.network_1.id),
+                        str(cls.network_2.id)]
+        )
 
         cls.public_ip_1 = PublicIPAddress.create(
-                                cls.api_client,
-                                accountid=cls.account.name,
-                                zoneid=cls.zone.id,
-                                domainid=cls.account.domainid,
-                                networkid=cls.network_1.id,
-                                vpcid=cls.vpc.id
-                                )
+            cls.api_client,
+            accountid=cls.account.name,
+            zoneid=cls.zone.id,
+            domainid=cls.account.domainid,
+            networkid=cls.network_1.id,
+            vpcid=cls.vpc.id
+        )
         cls.lb_rule = LoadBalancerRule.create(
-                                    cls.api_client,
-                                    cls.services["lbrule"],
-                                    ipaddressid=cls.public_ip_1.ipaddress.id,
-                                    accountid=cls.account.name,
-                                    networkid=cls.network_1.id,
-                                    vpcid=cls.vpc.id,
-                                    domainid=cls.account.domainid
-                                )
+            cls.api_client,
+            cls.services["lbrule"],
+            ipaddressid=cls.public_ip_1.ipaddress.id,
+            accountid=cls.account.name,
+            networkid=cls.network_1.id,
+            vpcid=cls.vpc.id,
+            domainid=cls.account.domainid
+        )
 
         # Only the vms in the same network can be added to load balancing rule
         # hence we can't add vm_2 with vm_1
         cls.lb_rule.assign(cls.api_client, [cls.vm_1])
 
         cls.public_ip_2 = PublicIPAddress.create(
-                                cls.api_client,
-                                accountid=cls.account.name,
-                                zoneid=cls.zone.id,
-                                domainid=cls.account.domainid,
-                                networkid=cls.network_1.id,
-                                vpcid=cls.vpc.id
-                                )
+            cls.api_client,
+            accountid=cls.account.name,
+            zoneid=cls.zone.id,
+            domainid=cls.account.domainid,
+            networkid=cls.network_1.id,
+            vpcid=cls.vpc.id
+        )
 
         cls.nat_rule = NATRule.create(
-                                  cls.api_client,
-                                  cls.vm_1,
-                                  cls.services["natrule"],
-                                  ipaddressid=cls.public_ip_2.ipaddress.id,
-                                  openfirewall=False,
-                                  networkid=cls.network_1.id,
-                                  vpcid=cls.vpc.id
-                                  )
+            cls.api_client,
+            cls.vm_1,
+            cls.services["natrule"],
+            ipaddressid=cls.public_ip_2.ipaddress.id,
+            openfirewall=False,
+            networkid=cls.network_1.id,
+            vpcid=cls.vpc.id
+        )
 
         # Opening up the ports in VPC
         cls.nwacl_nat = NetworkACL.create(
-                                         cls.api_client,
-                                         networkid=cls.network_1.id,
-                                         services=cls.services["natrule"],
-                                         traffictype='Ingress'
-                                    )
+            cls.api_client,
+            networkid=cls.network_1.id,
+            services=cls.services["natrule"],
+            traffictype='Ingress'
+        )
 
         cls.nwacl_lb = NetworkACL.create(
-                                cls.api_client,
-                                networkid=cls.network_1.id,
-                                services=cls.services["lbrule"],
-                                traffictype='Ingress'
-                                )
+            cls.api_client,
+            networkid=cls.network_1.id,
+            services=cls.services["lbrule"],
+            traffictype='Ingress'
+        )
         cls.services["icmp_rule"]["protocol"] = "all"
         cls.nwacl_internet_1 = NetworkACL.create(
-                                        cls.api_client,
-                                        networkid=cls.network_1.id,
-                                        services=cls.services["icmp_rule"],
-                                        traffictype='Egress'
-                                        )
+            cls.api_client,
+            networkid=cls.network_1.id,
+            services=cls.services["icmp_rule"],
+            traffictype='Egress'
+        )
         cls._cleanup = [
-                        cls.account,
-                        cls.network_2,
-                        cls.nw_off,
-                        cls.shared_nw_off,
-                        cls.vpc_off,
-                        cls.service_offering,
-                        ]
+            cls.account,
+            cls.network_2,
+            cls.nw_off,
+            cls.shared_nw_off,
+            cls.vpc_off,
+            cls.service_offering,
+        ]
         return
 
     @classmethod
@@ -1191,22 +1170,22 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
 
         self.debug("Check if the VPC offering is created successfully?")
         vpc_offs = VpcOffering.list(
-                                    self.apiclient,
-                                    id=vpc_offering.id
-                                    )
+            self.apiclient,
+            id=vpc_offering.id
+        )
         self.assertEqual(
-                         isinstance(vpc_offs, list),
-                         True,
-                         "List VPC offerings should return a valid list"
-                         )
+            isinstance(vpc_offs, list),
+            True,
+            "List VPC offerings should return a valid list"
+        )
         self.assertEqual(
-                 vpc_offering.name,
-                 vpc_offs[0].name,
-                "Name of the VPC offering should match with listVPCOff data"
-                )
+            vpc_offering.name,
+            vpc_offs[0].name,
+            "Name of the VPC offering should match with listVPCOff data"
+        )
         self.debug(
-                "VPC offering is created successfully - %s" %
-                                                        vpc_offering.name)
+            "VPC offering is created successfully - %s" %
+            vpc_offering.name)
         return
 
     def validate_vpc_network(self, network, state=None):
@@ -1214,25 +1193,25 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
 
         self.debug("Check if the VPC network is created successfully?")
         vpc_networks = VPC.list(
-                                    self.apiclient,
-                                    id=network.id
-                          )
+            self.apiclient,
+            id=network.id
+        )
         self.assertEqual(
-                         isinstance(vpc_networks, list),
-                         True,
-                         "List VPC network should return a valid list"
-                         )
+            isinstance(vpc_networks, list),
+            True,
+            "List VPC network should return a valid list"
+        )
         self.assertEqual(
-                 network.name,
-                 vpc_networks[0].name,
-                "Name of the VPC network should match with listVPC data"
-                )
+            network.name,
+            vpc_networks[0].name,
+            "Name of the VPC network should match with listVPC data"
+        )
         if state:
             self.assertEqual(
-                 vpc_networks[0].state,
-                 state,
+                vpc_networks[0].state,
+                state,
                 "VPC state should be '%s'" % state
-                )
+            )
         self.debug("VPC network validated - %s" % network.name)
         return
 
@@ -1241,10 +1220,10 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
 
         try:
             self.debug("Checking if we can SSH into VM_1 through %s?" %
-                    (self.public_ip_1.ipaddress.ipaddress))
+                       (self.public_ip_1.ipaddress.ipaddress))
             ssh_1 = self.vm_1.get_ssh_client(
-                                ipaddress=self.public_ip_1.ipaddress.ipaddress,
-                                reconnect=True)
+                ipaddress=self.public_ip_1.ipaddress.ipaddress,
+                reconnect=True)
             self.debug("SSH into VM is successfully")
 
             self.debug("Verifying if we can ping to outside world from VM?")
@@ -1257,10 +1236,10 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
             # rtt min/avg/max/mdev = 25.970/25.970/25.970/0.000 ms
             result = str(res)
             self.assertEqual(
-                         result.count("1 received"),
-                         1,
-                         "Ping to outside world from VM should be successful"
-                         )
+                result.count("1 received"),
+                1,
+                "Ping to outside world from VM should be successful"
+            )
 
             self.debug("We should be allowed to ping virtual gateway")
             self.debug("Finding the gateway corresponding to isolated network")
@@ -1280,13 +1259,13 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
 
             result = str(res)
             self.assertEqual(
-                         result.count("1 received"),
-                         1,
-                         "Ping to VM gateway should be successful"
-                         )
+                result.count("1 received"),
+                1,
+                "Ping to VM gateway should be successful"
+            )
         except Exception as e:
             self.fail("Failed to SSH into VM - %s, %s" %
-                                    (self.public_ip_1.ipaddress.ipaddress, e))
+                      (self.public_ip_1.ipaddress.ipaddress, e))
         return
 
     @attr(tags=["advanced", "intervlan"], required_hardware="true")
@@ -1302,23 +1281,23 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
 
         self.debug("Check if deployed VMs are in running state?")
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  account=self.account.name,
-                                  domainid=self.account.domainid,
-                                  listall=True
-                                  )
+            self.apiclient,
+            account=self.account.name,
+            domainid=self.account.domainid,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(vms, list),
-                         True,
-                         "List VMs should return a valid response"
-                         )
+            isinstance(vms, list),
+            True,
+            "List VMs should return a valid response"
+        )
         for vm in vms:
             self.debug("VM name: %s, VM state: %s" % (vm.name, vm.state))
             self.assertEqual(
-                             vm.state,
-                             "Running",
-                             "Vm state should be running for each VM deployed"
-                             )
+                vm.state,
+                "Running",
+                "Vm state should be running for each VM deployed"
+            )
 
         self.debug("Validating if network rules are coonfigured properly?")
         self.validate_network_rules()
@@ -1337,7 +1316,7 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
         self.validate_network_rules()
 
         self.debug("Stopping one of the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_2.stop(self.apiclient)
         except Exception as e:
@@ -1360,7 +1339,7 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
         self.validate_network_rules()
 
         self.debug("Starting one of the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_2.start(self.apiclient)
         except Exception as e:
@@ -1368,21 +1347,21 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
 
         self.debug("Check if the instance is in stopped state?")
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  id=self.vm_2.id,
-                                  listall=True
-                                  )
+            self.apiclient,
+            id=self.vm_2.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(vms, list),
-                         True,
-                         "List virtual machines should return a valid list"
-                         )
+            isinstance(vms, list),
+            True,
+            "List virtual machines should return a valid list"
+        )
         vm = vms[0]
         self.assertEqual(
-                         vm.state,
-                         "Running",
-                         "Virtual machine should be in running state"
-                         )
+            vm.state,
+            "Running",
+            "Virtual machine should be in running state"
+        )
 
         self.debug("Validating if network rules are coonfigured properly?")
         self.validate_network_rules()
@@ -1401,7 +1380,7 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
         self.validate_network_rules()
 
         self.debug("Restarting the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.reboot(self.apiclient)
             self.vm_2.reboot(self.apiclient)
@@ -1410,22 +1389,22 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
 
         self.debug("Check if the instance is in stopped state?")
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  account=self.account.name,
-                                  domainid=self.account.domainid,
-                                  listall=True
-                                  )
+            self.apiclient,
+            account=self.account.name,
+            domainid=self.account.domainid,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(vms, list),
-                         True,
-                         "List virtual machines should return a valid list"
-                         )
+            isinstance(vms, list),
+            True,
+            "List virtual machines should return a valid list"
+        )
         for vm in vms:
             self.assertEqual(
-                         vm.state,
-                         "Running",
-                         "Virtual machine should be in running state"
-                         )
+                vm.state,
+                "Running",
+                "Virtual machine should be in running state"
+            )
 
         self.debug("Validating if network rules are coonfigured properly?")
         self.validate_network_rules()
@@ -1441,26 +1420,26 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
         # 2. Rules should be still configured on virtual router.
 
         self.debug("Destroying one of the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_2.delete(self.apiclient)
         except Exception as e:
             self.fail("Failed to destroy the virtual instances, %s" % e)
 
-        #Wait for expunge interval to cleanup VM
+        # Wait for expunge interval to cleanup VM
         wait_for_cleanup(self.apiclient, ["expunge.delay", "expunge.interval"])
 
         self.debug("Check if the instance is in stopped state?")
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  id=self.vm_2.id,
-                                  listall=True
-                                  )
+            self.apiclient,
+            id=self.vm_2.id,
+            listall=True
+        )
         self.assertEqual(
-                         vms,
-                         None,
-                         "List virtual machines should not return anything"
-                         )
+            vms,
+            None,
+            "List virtual machines should not return anything"
+        )
 
         self.debug("Validating if network rules are coonfigured properly?")
         self.validate_network_rules()
@@ -1474,14 +1453,14 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
         self.debug("Deploying vm")
 
         self.vm_2 = VirtualMachine.create(
-                                  self.api_client,
-                                  self.services["virtual_machine"],
-                                  accountid=self.account.name,
-                                  domainid=self.account.domainid,
-                                  serviceofferingid=self.service_offering.id,
-                                  networkids=[str(self.network_1.id),
-                                              str(self.network_2.id)]
-                                  )
+            self.api_client,
+            self.services["virtual_machine"],
+            accountid=self.account.name,
+            domainid=self.account.domainid,
+            serviceofferingid=self.service_offering.id,
+            networkids=[str(self.network_1.id),
+                        str(self.network_2.id)]
+        )
 
         self.cleanup.append(self.vm_2)
 
@@ -1497,21 +1476,21 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
 
         self.debug("Check if the instance is in stopped state?")
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  id=self.vm_2.id,
-                                  listall=True
-                                  )
+            self.apiclient,
+            id=self.vm_2.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(vms, list),
-                         True,
-                         "List virtual machines should return a valid list"
-                         )
+            isinstance(vms, list),
+            True,
+            "List virtual machines should return a valid list"
+        )
         vm = vms[0]
         self.assertEqual(
-                         vm.state,
-                         "Stopped",
-                         "Virtual machine should be in stopped state"
-                         )
+            vm.state,
+            "Stopped",
+            "Virtual machine should be in stopped state"
+        )
 
         self.debug("Starting the instance: %s" % self.vm_2.name)
         try:
@@ -1520,21 +1499,21 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
             self.fail("Failed to start the instances, %s" % e)
 
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  id=self.vm_2.id,
-                                  listall=True
-                                  )
+            self.apiclient,
+            id=self.vm_2.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(vms, list),
-                         True,
-                         "List virtual machines should return a valid list"
-                         )
+            isinstance(vms, list),
+            True,
+            "List virtual machines should return a valid list"
+        )
         vm = vms[0]
         self.assertEqual(
-                         vm.state,
-                         "Running",
-                         "Virtual machine should be in running state"
-                         )
+            vm.state,
+            "Running",
+            "Virtual machine should be in running state"
+        )
 
         self.debug("Validating if network rules are coonfigured properly?")
         self.validate_network_rules()
@@ -1561,9 +1540,9 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
             self.skipTest(ERROR_NO_HOST_FOR_MIGRATION)
 
         self.debug("Migrating VM-ID: %s to Host: %s" % (
-                                                        self.vm_1.id,
-                                                        host.id
-                                                        ))
+            self.vm_1.id,
+            host.id
+        ))
 
         try:
             self.vm_1.migrate(self.apiclient, hostid=host.id)
@@ -1590,8 +1569,8 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
 
         try:
             ssh = self.vm_1.get_ssh_client(
-                                ipaddress=self.public_ip_1.ipaddress.ipaddress,
-                                reconnect=True)
+                ipaddress=self.public_ip_1.ipaddress.ipaddress,
+                reconnect=True)
             self.debug("SSH into VM is successfully")
             ssh.execute("yum install wget -y")
         except Exception as e:
@@ -1600,9 +1579,9 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
         self.debug("check the userdata with that of present in router")
         try:
             cmds = [
-               "wget http://%s/latest/user-data" % self.network_1.gateway,
-               "cat user-data",
-               ]
+                "wget http://%s/latest/user-data" % self.network_1.gateway,
+                "cat user-data",
+            ]
             for c in cmds:
                 result = ssh.execute(c)
                 self.debug("%s: %s" % (c, result))
@@ -1611,11 +1590,11 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
 
         res = str(result)
         self.assertEqual(
-                            res.count(
-                                self.services["virtual_machine"]["userdata"]),
-                            1,
-                            "Verify user data from router"
-                        )
+            res.count(
+                self.services["virtual_machine"]["userdata"]),
+            1,
+            "Verify user data from router"
+        )
         return
 
     @attr(tags=["advanced", "intervlan"], required_hardware="true")
@@ -1634,8 +1613,8 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
 
         try:
             ssh = self.vm_1.get_ssh_client(
-                                ipaddress=self.public_ip_1.ipaddress.ipaddress,
-                                reconnect=True)
+                ipaddress=self.public_ip_1.ipaddress.ipaddress,
+                reconnect=True)
             self.debug("SSH into VM is successfully")
         except Exception as e:
             self.fail("Failed to SSH into instance")
@@ -1643,9 +1622,9 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
         self.debug("check the metadata with that of present in router")
         try:
             cmds = [
-               "wget http://%s/latest/vm-id" % self.network_1.gateway,
-               "cat vm-id",
-               ]
+                "wget http://%s/latest/vm-id" % self.network_1.gateway,
+                "cat vm-id",
+            ]
             for c in cmds:
                 result = ssh.execute(c)
                 self.debug("%s: %s" % (c, result))
@@ -1654,10 +1633,10 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
 
         res = str(result)
         self.assertNotEqual(
-                         res,
-                         None,
-                         "Meta data should be returned from router"
-                        )
+            res,
+            None,
+            "Meta data should be returned from router"
+        )
         return
 
     @attr(tags=["advanced", "intervlan"], required_hardware="true")
@@ -1676,7 +1655,7 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
         self.validate_network_rules()
 
         self.debug("Delete virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_3.delete(self.apiclient)
         except Exception as e:
@@ -1686,16 +1665,16 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
             "Waiting for expunge interval to cleanup the network and VMs")
 
         wait_for_cleanup(
-                         self.apiclient,
-                         ["expunge.interval", "expunge.delay"]
-                        )
+            self.apiclient,
+            ["expunge.interval", "expunge.delay"]
+        )
 
         self.debug("Validating if network rules are coonfigured properly?")
         self.validate_network_rules()
 
         self.debug(
             "Deleting the rest of the virtual machines in account: %s" %
-                                                    self.account.name)
+            self.account.name)
         try:
             self.vm_1.delete(self.apiclient)
         except Exception as e:
@@ -1705,28 +1684,28 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
             "Waiting for expunge interval to cleanup the network and VMs")
 
         wait_for_cleanup(
-                         self.apiclient,
-                         ["expunge.interval", "expunge.delay"]
-                        )
+            self.apiclient,
+            ["expunge.interval", "expunge.delay"]
+        )
 
         # Check if the network rules still exists after Vm expunged
         self.debug("Checking if NAT rules existed ")
         with self.assertRaises(Exception):
             NATRule.list(
-                         self.apiclient,
-                         id=self.nat_rule.id,
-                         listall=True
-                         )
+                self.apiclient,
+                id=self.nat_rule.id,
+                listall=True
+            )
 
             LoadBalancerRule.list(
-                                  self.apiclient,
-                                  id=self.lb_rule.id,
-                                  listall=True
-                                  )
+                self.apiclient,
+                id=self.lb_rule.id,
+                listall=True
+            )
         return
 
-class TestVMLifeCycleBothIsolated(cloudstackTestCase):
 
+class TestVMLifeCycleBothIsolated(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestVMLifeCycleBothIsolated, cls).getClsTestClient()
@@ -1738,93 +1717,93 @@ class TestVMLifeCycleBothIsolated(cloudstackTestCase):
         cls.domain = get_domain(cls.api_client)
         cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
         cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.services["ostype"]
-                            )
+            cls.api_client,
+            cls.zone.id,
+            cls.services["ostype"]
+        )
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
 
         cls.service_offering = ServiceOffering.create(
-                                            cls.api_client,
-                                            cls.services["service_offering"]
-                                            )
+            cls.api_client,
+            cls.services["service_offering"]
+        )
         cls.vpc_off = VpcOffering.create(
-                                     cls.api_client,
-                                     cls.services["vpc_offering"]
-                                     )
+            cls.api_client,
+            cls.services["vpc_offering"]
+        )
         cls.vpc_off.update(cls.api_client, state='Enabled')
 
         cls.account = Account.create(
-                                     cls.api_client,
-                                     cls.services["account"],
-                                     admin=True,
-                                     domainid=cls.domain.id
-                                     )
+            cls.api_client,
+            cls.services["account"],
+            admin=True,
+            domainid=cls.domain.id
+        )
 
         cls.vpc_off = VpcOffering.create(
-                                     cls.api_client,
-                                     cls.services["vpc_offering"]
-                                     )
+            cls.api_client,
+            cls.services["vpc_offering"]
+        )
 
         cls.vpc_off.update(cls.api_client, state='Enabled')
 
         cls.services["vpc"]["cidr"] = '10.1.1.1/16'
         cls.vpc = VPC.create(
-                         cls.api_client,
-                         cls.services["vpc"],
-                         vpcofferingid=cls.vpc_off.id,
-                         zoneid=cls.zone.id,
-                         account=cls.account.name,
-                         domainid=cls.account.domainid
-                         )
+            cls.api_client,
+            cls.services["vpc"],
+            vpcofferingid=cls.vpc_off.id,
+            zoneid=cls.zone.id,
+            account=cls.account.name,
+            domainid=cls.account.domainid
+        )
 
         cls.nw_off = NetworkOffering.create(
-                                            cls.api_client,
-                                            cls.services["network_offering"],
-                                            conservemode=False
-                                            )
+            cls.api_client,
+            cls.services["network_offering"],
+            conservemode=False
+        )
         # Enable Network offering
         cls.nw_off.update(cls.api_client, state='Enabled')
 
         # Creating network using the network offering created
         cls.network_1 = Network.create(
-                                cls.api_client,
-                                cls.services["network"],
-                                accountid=cls.account.name,
-                                domainid=cls.account.domainid,
-                                networkofferingid=cls.nw_off.id,
-                                zoneid=cls.zone.id,
-                                gateway='10.1.1.1',
-                                vpcid=cls.vpc.id
-                                )
+            cls.api_client,
+            cls.services["network"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            networkofferingid=cls.nw_off.id,
+            zoneid=cls.zone.id,
+            gateway='10.1.1.1',
+            vpcid=cls.vpc.id
+        )
         cls.nw_off_no_lb = NetworkOffering.create(
-                                    cls.api_client,
-                                    cls.services["network_offering_no_lb"],
-                                    conservemode=False
-                                    )
+            cls.api_client,
+            cls.services["network_offering_no_lb"],
+            conservemode=False
+        )
 
         # Enable Network offering
         cls.nw_off_no_lb.update(cls.api_client, state='Enabled')
 
         # Creating network using the network offering created
         cls.network_2 = Network.create(
-                                cls.api_client,
-                                cls.services["network"],
-                                accountid=cls.account.name,
-                                domainid=cls.account.domainid,
-                                networkofferingid=cls.nw_off_no_lb.id,
-                                zoneid=cls.zone.id,
-                                gateway='10.1.2.1',
-                                vpcid=cls.vpc.id
-                                )
+            cls.api_client,
+            cls.services["network"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            networkofferingid=cls.nw_off_no_lb.id,
+            zoneid=cls.zone.id,
+            gateway='10.1.2.1',
+            vpcid=cls.vpc.id
+        )
         cls._cleanup = [
-                        cls.account,
-                        cls.service_offering,
-                        cls.nw_off,
-                        cls.nw_off_no_lb,
-                        cls.vpc_off
-                        ]
+            cls.account,
+            cls.service_offering,
+            cls.nw_off,
+            cls.nw_off_no_lb,
+            cls.vpc_off
+        ]
         return
 
     @classmethod
@@ -1843,7 +1822,7 @@ class TestVMLifeCycleBothIsolated(cloudstackTestCase):
 
     def tearDown(self):
         try:
-            #Clean up, terminate the created network offerings
+            # Clean up, terminate the created network offerings
             cleanup_resources(self.apiclient, self.cleanup)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
@@ -1854,22 +1833,22 @@ class TestVMLifeCycleBothIsolated(cloudstackTestCase):
 
         self.debug("Check if the VPC offering is created successfully?")
         vpc_offs = VpcOffering.list(
-                                    self.apiclient,
-                                    id=vpc_offering.id
-                                    )
+            self.apiclient,
+            id=vpc_offering.id
+        )
         self.assertEqual(
-                         isinstance(vpc_offs, list),
-                         True,
-                         "List VPC offerings should return a valid list"
-                         )
+            isinstance(vpc_offs, list),
+            True,
+            "List VPC offerings should return a valid list"
+        )
         self.assertEqual(
-                 vpc_offering.name,
-                 vpc_offs[0].name,
-                "Name of the VPC offering should match with listVPCOff data"
-                )
+            vpc_offering.name,
+            vpc_offs[0].name,
+            "Name of the VPC offering should match with listVPCOff data"
+        )
         self.debug(
-                "VPC offering is created successfully - %s" %
-                                                        vpc_offering.name)
+            "VPC offering is created successfully - %s" %
+            vpc_offering.name)
         return
 
     def validate_vpc_network(self, network, state=None):
@@ -1877,25 +1856,25 @@ class TestVMLifeCycleBothIsolated(cloudstackTestCase):
 
         self.debug("Check if the VPC network is created successfully?")
         vpc_networks = VPC.list(
-                                    self.apiclient,
-                                    id=network.id
-                          )
+            self.apiclient,
+            id=network.id
+        )
         self.assertEqual(
-                         isinstance(vpc_networks, list),
-                         True,
-                         "List VPC network should return a valid list"
-                         )
+            isinstance(vpc_networks, list),
+            True,
+            "List VPC network should return a valid list"
+        )
         self.assertEqual(
-                 network.name,
-                 vpc_networks[0].name,
-                "Name of the VPC network should match with listVPC data"
-                )
+            network.name,
+            vpc_networks[0].name,
+            "Name of the VPC network should match with listVPC data"
+        )
         if state:
             self.assertEqual(
-                 vpc_networks[0].state,
-                 state,
+                vpc_networks[0].state,
+                state,
                 "VPC state should be '%s'" % state
-                )
+            )
         self.debug("VPC network validated - %s" % network.name)
         return
 
@@ -1904,10 +1883,10 @@ class TestVMLifeCycleBothIsolated(cloudstackTestCase):
 
         try:
             self.debug("Checking if we can SSH into VM_1 through %s?" %
-                    (self.public_ip_1.ipaddress.ipaddress))
+                       (self.public_ip_1.ipaddress.ipaddress))
             ssh_1 = self.vm_1.get_ssh_client(
-                                ipaddress=self.public_ip_1.ipaddress.ipaddress,
-                                reconnect=True)
+                ipaddress=self.public_ip_1.ipaddress.ipaddress,
+                reconnect=True)
             self.debug("SSH into VM is successfully")
 
             self.debug("Verifying if we can ping to outside world from VM?")
@@ -1920,10 +1899,10 @@ class TestVMLifeCycleBothIsolated(cloudstackTestCase):
             # rtt min/avg/max/mdev = 25.970/25.970/25.970/0.000 ms
             result = str(res)
             self.assertEqual(
-                         result.count("1 received"),
-                         1,
-                         "Ping to outside world from VM should be successful"
-                         )
+                result.count("1 received"),
+                1,
+                "Ping to outside world from VM should be successful"
+            )
 
             self.debug("We should be allowed to ping virtual gateway")
             self.debug("VM gateway: %s" % self.vm_1.nic[0].gateway)
@@ -1933,13 +1912,13 @@ class TestVMLifeCycleBothIsolated(cloudstackTestCase):
 
             result = str(res)
             self.assertEqual(
-                         result.count("1 received"),
-                         1,
-                         "Ping to VM gateway should be successful"
-                         )
+                result.count("1 received"),
+                1,
+                "Ping to VM gateway should be successful"
+            )
         except Exception as e:
             self.fail("Failed to SSH into VM - %s, %s" %
-                                    (self.public_ip_1.ipaddress.ipaddress, e))
+                      (self.public_ip_1.ipaddress.ipaddress, e))
         return
 
     @attr(tags=["advanced", "intervlan"])
@@ -1962,14 +1941,14 @@ class TestVMLifeCycleBothIsolated(cloudstackTestCase):
         self.debug("Deploying virtual machine in two isolated networks")
         with self.assertRaises(Exception):
             VirtualMachine.create(
-                                  self.apiclient,
-                                  self.services["virtual_machine"],
-                                  accountid=self.account.name,
-                                  domainid=self.account.domainid,
-                                  serviceofferingid=self.service_offering.id,
-                                  networkids=[str(self.network_1.id),
-                                              str(self.network_2.id)]
-                                  )
+                self.apiclient,
+                self.services["virtual_machine"],
+                accountid=self.account.name,
+                domainid=self.account.domainid,
+                serviceofferingid=self.service_offering.id,
+                networkids=[str(self.network_1.id),
+                            str(self.network_2.id)]
+            )
         self.debug("Deploy VM in 2 isolated networks failed")
         return
 
@@ -1988,76 +1967,76 @@ class TestVMLifeCycleBothIsolated(cloudstackTestCase):
         self.debug("Finding the virtual router for vpc: %s" % self.vpc.id)
 
         routers = Router.list(
-                              self.apiclient,
-                              zoneid=self.zone.id,
-                              listall=True
-                              )
+            self.apiclient,
+            zoneid=self.zone.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(routers, list),
-                         True,
-                         "List routers should return router for vpc: %s" %
-                                                        self.vpc.id
-                         )
+            isinstance(routers, list),
+            True,
+            "List routers should return router for vpc: %s" %
+            self.vpc.id
+        )
         router = routers[0]
 
         self.debug("Check state of VPC virtual router, state: %s" %
-                                                                router.state)
+                   router.state)
         if router.state == "Running":
             self.debug("Router state is running, stop it!")
             Router.stop(self.apiclient, id=router.id)
 
             self.debug("Check the router state again")
             routers = Router.list(
-                              self.apiclient,
-                              id=router.id,
-                              listall=True
-                              )
+                self.apiclient,
+                id=router.id,
+                listall=True
+            )
             self.assertEqual(
-                         isinstance(routers, list),
-                         True,
-                         "List routers should return router for vpc: %s" %
-                                                        self.vpc.id
-                         )
+                isinstance(routers, list),
+                True,
+                "List routers should return router for vpc: %s" %
+                self.vpc.id
+            )
             router = routers[0]
             self.debug("router.state %s" %
-                    router.state)
+                       router.state)
 
             self.assertEqual(
-                             router.state,
-                             "Stopped",
-                             "Router state should be stopped"
-                             )
+                router.state,
+                "Stopped",
+                "Router state should be stopped"
+            )
         self.debug("Deploy an instance in network: %s with stopped VPCVR" %
-                                                        self.network_1.name)
+                   self.network_1.name)
         try:
             vm = VirtualMachine.create(
-                                  self.apiclient,
-                                  self.services["virtual_machine"],
-                                  accountid=self.account.name,
-                                  domainid=self.account.domainid,
-                                  serviceofferingid=self.service_offering.id,
-                                  networkids=[str(self.network_1.id)]
-                                  )
+                self.apiclient,
+                self.services["virtual_machine"],
+                accountid=self.account.name,
+                domainid=self.account.domainid,
+                serviceofferingid=self.service_offering.id,
+                networkids=[str(self.network_1.id)]
+            )
         except Exception as e:
             self.fail("Failed to deploy the virtual instance: %s" % e)
 
         self.debug("Verify the deployment of virtual instace")
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  id=vm.id,
-                                  listall=True
-                                  )
+            self.apiclient,
+            id=vm.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(vms, list),
-                         True,
-                         "List vms shall return a valid resposnse"
-                         )
+            isinstance(vms, list),
+            True,
+            "List vms shall return a valid resposnse"
+        )
         vm_response = vms[0]
         self.assertEqual(
-                         vm_response.state,
-                         "Running",
-                         "VM state should be running after deployment"
-                         )
+            vm_response.state,
+            "Running",
+            "VM state should be running after deployment"
+        )
         return
 
     @attr(tags=["dvs"], required_hardware="true")
@@ -2071,8 +2050,8 @@ class TestVMLifeCycleBothIsolated(cloudstackTestCase):
                                                     self.zone)
             assert response[0] == PASS, response[1]
 
-class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
 
+class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestVMLifeCycleStoppedVPCVR, cls).getClsTestClient()
@@ -2083,172 +2062,172 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
         cls.domain = get_domain(cls.api_client)
         cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
         cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.services["ostype"]
-                            )
+            cls.api_client,
+            cls.zone.id,
+            cls.services["ostype"]
+        )
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
 
         cls.service_offering = ServiceOffering.create(
-                                            cls.api_client,
-                                            cls.services["service_offering"]
-                                            )
+            cls.api_client,
+            cls.services["service_offering"]
+        )
 
         cls.account = Account.create(
-                                     cls.api_client,
-                                     cls.services["account"],
-                                     admin=True,
-                                     domainid=cls.domain.id
-                                     )
+            cls.api_client,
+            cls.services["account"],
+            admin=True,
+            domainid=cls.domain.id
+        )
 
         cls.vpc_off = VpcOffering.create(
-                                     cls.api_client,
-                                     cls.services["vpc_offering"]
-                                     )
+            cls.api_client,
+            cls.services["vpc_offering"]
+        )
 
         cls.vpc_off.update(cls.api_client, state='Enabled')
 
         cls.services["vpc"]["cidr"] = '10.1.1.1/16'
         cls.vpc = VPC.create(
-                         cls.api_client,
-                         cls.services["vpc"],
-                         vpcofferingid=cls.vpc_off.id,
-                         zoneid=cls.zone.id,
-                         account=cls.account.name,
-                         domainid=cls.account.domainid
-                         )
+            cls.api_client,
+            cls.services["vpc"],
+            vpcofferingid=cls.vpc_off.id,
+            zoneid=cls.zone.id,
+            account=cls.account.name,
+            domainid=cls.account.domainid
+        )
 
         cls.nw_off = NetworkOffering.create(
-                                            cls.api_client,
-                                            cls.services["network_offering"],
-                                            conservemode=False
-                                            )
+            cls.api_client,
+            cls.services["network_offering"],
+            conservemode=False
+        )
         # Enable Network offering
         cls.nw_off.update(cls.api_client, state='Enabled')
 
         # Creating network using the network offering created
         cls.network_1 = Network.create(
-                                cls.api_client,
-                                cls.services["network"],
-                                accountid=cls.account.name,
-                                domainid=cls.account.domainid,
-                                networkofferingid=cls.nw_off.id,
-                                zoneid=cls.zone.id,
-                                gateway='10.1.1.1',
-                                vpcid=cls.vpc.id
-                                )
+            cls.api_client,
+            cls.services["network"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            networkofferingid=cls.nw_off.id,
+            zoneid=cls.zone.id,
+            gateway='10.1.1.1',
+            vpcid=cls.vpc.id
+        )
         cls.nw_off_no_lb = NetworkOffering.create(
-                                    cls.api_client,
-                                    cls.services["network_offering_no_lb"],
-                                    conservemode=False
-                                    )
+            cls.api_client,
+            cls.services["network_offering_no_lb"],
+            conservemode=False
+        )
         # Enable Network offering
         cls.nw_off_no_lb.update(cls.api_client, state='Enabled')
 
         # Creating network using the network offering created
         cls.network_2 = Network.create(
-                                cls.api_client,
-                                cls.services["network"],
-                                accountid=cls.account.name,
-                                domainid=cls.account.domainid,
-                                networkofferingid=cls.nw_off_no_lb.id,
-                                zoneid=cls.zone.id,
-                                gateway='10.1.2.1',
-                                vpcid=cls.vpc.id
-                                )
+            cls.api_client,
+            cls.services["network"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            networkofferingid=cls.nw_off_no_lb.id,
+            zoneid=cls.zone.id,
+            gateway='10.1.2.1',
+            vpcid=cls.vpc.id
+        )
         # Spawn an instance in that network
         cls.vm_1 = VirtualMachine.create(
-                                  cls.api_client,
-                                  cls.services["virtual_machine"],
-                                  accountid=cls.account.name,
-                                  domainid=cls.account.domainid,
-                                  serviceofferingid=cls.service_offering.id,
-                                  networkids=[str(cls.network_1.id)]
-                                  )
+            cls.api_client,
+            cls.services["virtual_machine"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            serviceofferingid=cls.service_offering.id,
+            networkids=[str(cls.network_1.id)]
+        )
         # Spawn an instance in that network
         cls.vm_2 = VirtualMachine.create(
-                                  cls.api_client,
-                                  cls.services["virtual_machine"],
-                                  accountid=cls.account.name,
-                                  domainid=cls.account.domainid,
-                                  serviceofferingid=cls.service_offering.id,
-                                  networkids=[str(cls.network_1.id)]
-                                  )
+            cls.api_client,
+            cls.services["virtual_machine"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            serviceofferingid=cls.service_offering.id,
+            networkids=[str(cls.network_1.id)]
+        )
         cls.vm_3 = VirtualMachine.create(
-                                  cls.api_client,
-                                  cls.services["virtual_machine"],
-                                  accountid=cls.account.name,
-                                  domainid=cls.account.domainid,
-                                  serviceofferingid=cls.service_offering.id,
-                                  networkids=[str(cls.network_2.id)]
-                                  )
+            cls.api_client,
+            cls.services["virtual_machine"],
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            serviceofferingid=cls.service_offering.id,
+            networkids=[str(cls.network_2.id)]
+        )
 
         cls.public_ip_1 = PublicIPAddress.create(
-                                cls.api_client,
-                                accountid=cls.account.name,
-                                zoneid=cls.zone.id,
-                                domainid=cls.account.domainid,
-                                networkid=cls.network_1.id,
-                                vpcid=cls.vpc.id
-                                )
+            cls.api_client,
+            accountid=cls.account.name,
+            zoneid=cls.zone.id,
+            domainid=cls.account.domainid,
+            networkid=cls.network_1.id,
+            vpcid=cls.vpc.id
+        )
         cls.lb_rule = LoadBalancerRule.create(
-                                    cls.api_client,
-                                    cls.services["lbrule"],
-                                    ipaddressid=cls.public_ip_1.ipaddress.id,
-                                    accountid=cls.account.name,
-                                    networkid=cls.network_1.id,
-                                    vpcid=cls.vpc.id,
-                                    domainid=cls.account.domainid
-                                )
+            cls.api_client,
+            cls.services["lbrule"],
+            ipaddressid=cls.public_ip_1.ipaddress.id,
+            accountid=cls.account.name,
+            networkid=cls.network_1.id,
+            vpcid=cls.vpc.id,
+            domainid=cls.account.domainid
+        )
         cls.lb_rule.assign(cls.api_client, [cls.vm_1, cls.vm_2])
 
         cls.public_ip_2 = PublicIPAddress.create(
-                                cls.api_client,
-                                accountid=cls.account.name,
-                                zoneid=cls.zone.id,
-                                domainid=cls.account.domainid,
-                                networkid=cls.network_1.id,
-                                vpcid=cls.vpc.id
-                                )
+            cls.api_client,
+            accountid=cls.account.name,
+            zoneid=cls.zone.id,
+            domainid=cls.account.domainid,
+            networkid=cls.network_1.id,
+            vpcid=cls.vpc.id
+        )
 
         cls.nat_rule = NATRule.create(
-                                  cls.api_client,
-                                  cls.vm_1,
-                                  cls.services["natrule"],
-                                  ipaddressid=cls.public_ip_2.ipaddress.id,
-                                  openfirewall=False,
-                                  networkid=cls.network_1.id,
-                                  vpcid=cls.vpc.id
-                                  )
+            cls.api_client,
+            cls.vm_1,
+            cls.services["natrule"],
+            ipaddressid=cls.public_ip_2.ipaddress.id,
+            openfirewall=False,
+            networkid=cls.network_1.id,
+            vpcid=cls.vpc.id
+        )
 
         # Opening up the ports in VPC
         cls.nwacl_nat = NetworkACL.create(
-                                         cls.api_client,
-                                         networkid=cls.network_1.id,
-                                         services=cls.services["natrule"],
-                                         traffictype='Ingress'
-                                    )
+            cls.api_client,
+            networkid=cls.network_1.id,
+            services=cls.services["natrule"],
+            traffictype='Ingress'
+        )
 
         cls.nwacl_lb = NetworkACL.create(
-                                cls.api_client,
-                                networkid=cls.network_1.id,
-                                services=cls.services["lbrule"],
-                                traffictype='Ingress'
-                                )
+            cls.api_client,
+            networkid=cls.network_1.id,
+            services=cls.services["lbrule"],
+            traffictype='Ingress'
+        )
 
         cls.nwacl_internet = NetworkACL.create(
-                                        cls.api_client,
-                                        networkid=cls.network_1.id,
-                                        services=cls.services["icmp_rule"],
-                                        traffictype='Egress'
-                                        )
+            cls.api_client,
+            networkid=cls.network_1.id,
+            services=cls.services["icmp_rule"],
+            traffictype='Egress'
+        )
         cls._cleanup = [
-                        cls.account,
-                        cls.service_offering,
-                        cls.nw_off,
-                        cls.nw_off_no_lb
-                        ]
+            cls.account,
+            cls.service_offering,
+            cls.nw_off,
+            cls.nw_off_no_lb
+        ]
         return
 
     @classmethod
@@ -2265,10 +2244,10 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
         self.dbclient = self.testClient.getDbConnection()
         self.debug("Check the status of VPC virtual router")
         routers = Router.list(
-                              self.apiclient,
-                              zoneid=self.zone.id,
-                              listall=True
-                              )
+            self.apiclient,
+            zoneid=self.zone.id,
+            listall=True
+        )
         if not isinstance(routers, list):
             raise Exception("No response from list routers API")
 
@@ -2281,7 +2260,7 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
 
     def tearDown(self):
         try:
-            #Clean up, terminate the created network offerings
+            # Clean up, terminate the created network offerings
             cleanup_resources(self.apiclient, self.cleanup)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
@@ -2292,22 +2271,22 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
 
         self.debug("Check if the VPC offering is created successfully?")
         vpc_offs = VpcOffering.list(
-                                    self.apiclient,
-                                    id=vpc_offering.id
-                                    )
+            self.apiclient,
+            id=vpc_offering.id
+        )
         self.assertEqual(
-                         isinstance(vpc_offs, list),
-                         True,
-                         "List VPC offerings should return a valid list"
-                         )
+            isinstance(vpc_offs, list),
+            True,
+            "List VPC offerings should return a valid list"
+        )
         self.assertEqual(
-                 vpc_offering.name,
-                 vpc_offs[0].name,
-                "Name of the VPC offering should match with listVPCOff data"
-                )
+            vpc_offering.name,
+            vpc_offs[0].name,
+            "Name of the VPC offering should match with listVPCOff data"
+        )
         self.debug(
-                "VPC offering is created successfully - %s" %
-                                                        vpc_offering.name)
+            "VPC offering is created successfully - %s" %
+            vpc_offering.name)
         return
 
     def validate_vpc_network(self, network, state=None):
@@ -2315,25 +2294,25 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
 
         self.debug("Check if the VPC network is created successfully?")
         vpc_networks = VPC.list(
-                                    self.apiclient,
-                                    id=network.id
-                          )
+            self.apiclient,
+            id=network.id
+        )
         self.assertEqual(
-                         isinstance(vpc_networks, list),
-                         True,
-                         "List VPC network should return a valid list"
-                         )
+            isinstance(vpc_networks, list),
+            True,
+            "List VPC network should return a valid list"
+        )
         self.assertEqual(
-                 network.name,
-                 vpc_networks[0].name,
-                "Name of the VPC network should match with listVPC data"
-                )
+            network.name,
+            vpc_networks[0].name,
+            "Name of the VPC network should match with listVPC data"
+        )
         if state:
             self.assertEqual(
-                 vpc_networks[0].state,
-                 state,
+                vpc_networks[0].state,
+                state,
                 "VPC state should be '%s'" % state
-                )
+            )
         self.debug("VPC network validated - %s" % network.name)
         return
 
@@ -2341,10 +2320,10 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
         """Validates if the network rules work properly or not?"""
         try:
             self.debug("Checking if we can SSH into VM_1 through %s?" %
-                    (self.public_ip_1.ipaddress.ipaddress))
+                       (self.public_ip_1.ipaddress.ipaddress))
             ssh_1 = self.vm_1.get_ssh_client(
-                                ipaddress=self.public_ip_1.ipaddress.ipaddress,
-                                reconnect=True)
+                ipaddress=self.public_ip_1.ipaddress.ipaddress,
+                reconnect=True)
             self.debug("SSH into VM is successfully")
 
             self.debug("Verifying if we can ping to outside world from VM?")
@@ -2357,34 +2336,34 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
             # rtt min/avg/max/mdev = 25.970/25.970/25.970/0.000 ms
         except Exception as e:
             self.fail("Failed to SSH into VM - %s, %s" %
-                                    (self.public_ip_1.ipaddress.ipaddress, e))
+                      (self.public_ip_1.ipaddress.ipaddress, e))
 
         result = str(res)
         self.assertEqual(
-                         result.count("1 received"),
-                         1,
-                         "Ping to outside world from VM should be successful"
-                         )
+            result.count("1 received"),
+            1,
+            "Ping to outside world from VM should be successful"
+        )
 
         self.debug("Checking if we can SSH into VM_1?")
         try:
             ssh_2 = self.vm_1.get_ssh_client(
-                            ipaddress=self.public_ip_2.ipaddress.ipaddress,
-                            reconnect=True)
+                ipaddress=self.public_ip_2.ipaddress.ipaddress,
+                reconnect=True)
             self.debug("SSH into VM is successfully")
 
             self.debug("Verifying if we can ping to outside world from VM?")
             res = ssh_2.execute("ping -c 1 www.google.com")
         except Exception as e:
             self.fail("Failed to SSH into VM - %s, %s" %
-                                    (self.public_ip_2.ipaddress.ipaddress, e))
+                      (self.public_ip_2.ipaddress.ipaddress, e))
 
         result = str(res)
         self.assertEqual(
-                         result.count("1 received"),
-                         1,
-                         "Ping to outside world from VM should be successful"
-                         )
+            result.count("1 received"),
+            1,
+            "Ping to outside world from VM should be successful"
+        )
         return
 
     @attr(tags=["advanced", "intervlan"])
@@ -2401,23 +2380,23 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
 
         self.debug("Check if deployed VMs are in running state?")
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  account=self.account.name,
-                                  domainid=self.account.domainid,
-                                  listall=True
-                                  )
+            self.apiclient,
+            account=self.account.name,
+            domainid=self.account.domainid,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(vms, list),
-                         True,
-                         "List VMs should return a valid response"
-                         )
+            isinstance(vms, list),
+            True,
+            "List VMs should return a valid response"
+        )
         for vm in vms:
             self.debug("VM name: %s, VM state: %s" % (vm.name, vm.state))
             self.assertEqual(
-                             vm.state,
-                             "Running",
-                             "Vm state should be running for each VM deployed"
-                             )
+                vm.state,
+                "Running",
+                "Vm state should be running for each VM deployed"
+            )
         return
 
     @attr(tags=["advanced", "intervlan"])
@@ -2430,7 +2409,7 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
         # 2. Rules should be still configured on virtual router.
 
         self.debug("Stopping the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.stop(self.apiclient)
             self.vm_2.stop(self.apiclient)
@@ -2440,26 +2419,26 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
         # Check if the network rules still exists after Vm stop
         self.debug("Checking if NAT rules ")
         nat_rules = NATRule.list(
-                                 self.apiclient,
-                                 id=self.nat_rule.id,
-                                 listall=True
-                                 )
+            self.apiclient,
+            id=self.nat_rule.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(nat_rules, list),
-                         True,
-                         "List NAT rules shall return a valid list"
-                         )
+            isinstance(nat_rules, list),
+            True,
+            "List NAT rules shall return a valid list"
+        )
 
         lb_rules = LoadBalancerRule.list(
-                                         self.apiclient,
-                                         id=self.lb_rule.id,
-                                         listall=True
-                                         )
+            self.apiclient,
+            id=self.lb_rule.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(lb_rules, list),
-                         True,
-                         "List LB rules shall return a valid list"
-                         )
+            isinstance(lb_rules, list),
+            True,
+            "List LB rules shall return a valid list"
+        )
         return
 
     @attr(tags=["advanced", "intervlan"], required_hardware="true")
@@ -2475,7 +2454,7 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
         # 3. Make sure that we are able to access google.com from this user Vm
 
         self.debug("Starting the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.start(self.apiclient)
             self.vm_2.start(self.apiclient)
@@ -2501,7 +2480,7 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
         self.validate_network_rules()
 
         self.debug("Starting the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.reboot(self.apiclient)
             self.vm_2.reboot(self.apiclient)
@@ -2512,7 +2491,7 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
         self.validate_network_rules()
         return
 
-    @attr(tags=["advanced","multihost", "intervlan"], required_hardware="true")
+    @attr(tags=["advanced", "multihost", "intervlan"], required_hardware="true")
     def test_05_destroy_instance_in_network(self):
         """ Test destroy an instance in VPC networks
         """
@@ -2530,107 +2509,107 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
         self.validate_network_rules()
 
         self.debug("Destroying the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.delete(self.apiclient, expunge=False)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_1.id
-                                                 )
+                self.apiclient,
+                id=self.vm_1.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Destroyed',
-                    "VM state should be destroyed"
-                    )
-            
+                vm_response.state,
+                'Destroyed',
+                "VM state should be destroyed"
+            )
+
         except Exception as e:
             self.fail("Failed to stop the virtual instances, %s" % e)
-            
+
         # Check if the network rules still exists after Vm stop
         self.debug("Checking if NAT rules ")
         nat_rules = NATRule.list(
-                                 self.apiclient,
-                                 id=self.nat_rule.id,
-                                 listall=True
-                                 )
+            self.apiclient,
+            id=self.nat_rule.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(nat_rules, list),
-                         True,
-                         "List NAT rules shall return a valid list"
-                         )
+            isinstance(nat_rules, list),
+            True,
+            "List NAT rules shall return a valid list"
+        )
 
         lb_rules = LoadBalancerRule.list(
-                                         self.apiclient,
-                                         id=self.lb_rule.id,
-                                         listall=True
-                                         )
+            self.apiclient,
+            id=self.lb_rule.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(lb_rules, list),
-                         True,
-                         "List LB rules shall return a valid list"
-                         )
+            isinstance(lb_rules, list),
+            True,
+            "List LB rules shall return a valid list"
+        )
 
         self.debug("Recovering the expunged virtual machine vm1 in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.recover(self.apiclient)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_1.id
-                                                 )
+                self.apiclient,
+                id=self.vm_1.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Stopped',
-                    "VM state should be stopped"
-                    )
+                vm_response.state,
+                'Stopped',
+                "VM state should be stopped"
+            )
 
         except Exception as e:
             self.fail("Failed to recover the virtual instances, %s" % e)
-            
+
         try:
             self.vm_2.delete(self.apiclient, expunge=False)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_2.id
-                                                 )
+                self.apiclient,
+                id=self.vm_2.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Destroyed',
-                    "VM state should be destroyed"
-                    )
+                vm_response.state,
+                'Destroyed',
+                "VM state should be destroyed"
+            )
 
         except Exception as e:
             self.fail("Failed to stop the virtual instances, %s" % e)
 
         self.debug("Recovering the expunged virtual machine vm2 in account: %s" %
-                                                self.account.name)            
+                   self.account.name)
         try:
             self.vm_2.recover(self.apiclient)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_2.id
-                                                 )
+                self.apiclient,
+                id=self.vm_2.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Stopped',
-                    "VM state should be stopped"
-                    )
+                vm_response.state,
+                'Stopped',
+                "VM state should be stopped"
+            )
         except Exception as e:
             self.fail("Failed to recover the virtual instances, %s" % e)
 
@@ -2639,32 +2618,32 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
             self.vm_1.start(self.apiclient)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_1.id
-                                                 )
+                self.apiclient,
+                id=self.vm_1.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Running',
-                    "VM state should be running"
-                    )
+                vm_response.state,
+                'Running',
+                "VM state should be running"
+            )
 
             self.vm_2.start(self.apiclient)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_2.id
-                                                 )
+                self.apiclient,
+                id=self.vm_2.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Running',
-                    "VM state should be running"
-                    )
+                vm_response.state,
+                'Running',
+                "VM state should be running"
+            )
         except Exception as e:
             self.fail("Failed to start the instances, %s" % e)
 
@@ -2675,8 +2654,8 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
 
         return
 
-class TestVMLifeCycleDiffHosts(cloudstackTestCase):
 
+class TestVMLifeCycleDiffHosts(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         try:
@@ -2689,10 +2668,10 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
             cls.domain = get_domain(cls.api_client)
             cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
             cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.services["ostype"]
-                            )
+                cls.api_client,
+                cls.zone.id,
+                cls.services["ostype"]
+            )
             cls.services["virtual_machine"]["zoneid"] = cls.zone.id
             cls.services["virtual_machine"]["template"] = cls.template.id
 
@@ -2700,7 +2679,7 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
             # 3rd host is needed to run the migrate test case
             # Even if only 2 hosts are present, remaining test cases will be run and
             # migrate test will be skipped automatically
-            cluster = cls.FindClusterWithSufficientHosts(numberofhosts = 3)
+            cluster = cls.FindClusterWithSufficientHosts(numberofhosts=3)
             if cluster is None:
                 raise unittest.SkipTest("Skipping as unable to find a cluster with\
                         sufficient number of hosts")
@@ -2717,185 +2696,185 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
                 Host.update(cls.api_client, id=hosts[2].id, hosttags="host1")
 
             cls.service_offering_1 = ServiceOffering.create(
-                                            cls.api_client,
-                                            cls.services["service_offering_1"]
-                                            )
+                cls.api_client,
+                cls.services["service_offering_1"]
+            )
             cls.service_offering_2 = ServiceOffering.create(
-                                            cls.api_client,
-                                            cls.services["service_offering_2"]
-                                            )
+                cls.api_client,
+                cls.services["service_offering_2"]
+            )
 
             cls.account = Account.create(
-                                     cls.api_client,
-                                     cls.services["account"],
-                                     admin=True,
-                                     domainid=cls.domain.id
-                                     )
+                cls.api_client,
+                cls.services["account"],
+                admin=True,
+                domainid=cls.domain.id
+            )
 
             cls.vpc_off = VpcOffering.create(
-                                     cls.api_client,
-                                     cls.services["vpc_offering"]
-                                     )
+                cls.api_client,
+                cls.services["vpc_offering"]
+            )
 
             cls.vpc_off.update(cls.api_client, state='Enabled')
 
             cls.services["vpc"]["cidr"] = '10.1.1.1/16'
             cls.vpc = VPC.create(
-                         cls.api_client,
-                         cls.services["vpc"],
-                         vpcofferingid=cls.vpc_off.id,
-                         zoneid=cls.zone.id,
-                         account=cls.account.name,
-                         domainid=cls.account.domainid
-                         )
+                cls.api_client,
+                cls.services["vpc"],
+                vpcofferingid=cls.vpc_off.id,
+                zoneid=cls.zone.id,
+                account=cls.account.name,
+                domainid=cls.account.domainid
+            )
 
             cls.nw_off = NetworkOffering.create(
-                                            cls.api_client,
-                                            cls.services["network_offering"],
-                                            conservemode=False
-                                            )
+                cls.api_client,
+                cls.services["network_offering"],
+                conservemode=False
+            )
             # Enable Network offering
             cls.nw_off.update(cls.api_client, state='Enabled')
 
             # Creating network using the network offering created
             cls.network_1 = Network.create(
-                                cls.api_client,
-                                cls.services["network"],
-                                accountid=cls.account.name,
-                                domainid=cls.account.domainid,
-                                networkofferingid=cls.nw_off.id,
-                                zoneid=cls.zone.id,
-                                gateway='10.1.1.1',
-                                vpcid=cls.vpc.id
-                                )
+                cls.api_client,
+                cls.services["network"],
+                accountid=cls.account.name,
+                domainid=cls.account.domainid,
+                networkofferingid=cls.nw_off.id,
+                zoneid=cls.zone.id,
+                gateway='10.1.1.1',
+                vpcid=cls.vpc.id
+            )
             cls.nw_off_no_lb = NetworkOffering.create(
-                                    cls.api_client,
-                                    cls.services["network_offering_no_lb"],
-                                    conservemode=False
-                                    )
+                cls.api_client,
+                cls.services["network_offering_no_lb"],
+                conservemode=False
+            )
             # Enable Network offering
             cls.nw_off_no_lb.update(cls.api_client, state='Enabled')
 
             # Creating network using the network offering created
             cls.network_2 = Network.create(
-                                cls.api_client,
-                                cls.services["network"],
-                                accountid=cls.account.name,
-                                domainid=cls.account.domainid,
-                                networkofferingid=cls.nw_off_no_lb.id,
-                                zoneid=cls.zone.id,
-                                gateway='10.1.2.1',
-                                vpcid=cls.vpc.id
-                                )
+                cls.api_client,
+                cls.services["network"],
+                accountid=cls.account.name,
+                domainid=cls.account.domainid,
+                networkofferingid=cls.nw_off_no_lb.id,
+                zoneid=cls.zone.id,
+                gateway='10.1.2.1',
+                vpcid=cls.vpc.id
+            )
             # Spawn an instance in that network
             cls.vm_1 = VirtualMachine.create(
-                                  cls.api_client,
-                                  cls.services["virtual_machine"],
-                                  accountid=cls.account.name,
-                                  domainid=cls.account.domainid,
-                                  serviceofferingid=cls.service_offering_1.id,
-                                  networkids=[str(cls.network_1.id)]
-                                  )
+                cls.api_client,
+                cls.services["virtual_machine"],
+                accountid=cls.account.name,
+                domainid=cls.account.domainid,
+                serviceofferingid=cls.service_offering_1.id,
+                networkids=[str(cls.network_1.id)]
+            )
             # Spawn an instance in that network
             cls.vm_2 = VirtualMachine.create(
-                                  cls.api_client,
-                                  cls.services["virtual_machine"],
-                                  accountid=cls.account.name,
-                                  domainid=cls.account.domainid,
-                                  serviceofferingid=cls.service_offering_1.id,
-                                  networkids=[str(cls.network_1.id)]
-                                  )
+                cls.api_client,
+                cls.services["virtual_machine"],
+                accountid=cls.account.name,
+                domainid=cls.account.domainid,
+                serviceofferingid=cls.service_offering_1.id,
+                networkids=[str(cls.network_1.id)]
+            )
 
             cls.vm_3 = VirtualMachine.create(
-                                  cls.api_client,
-                                  cls.services["virtual_machine"],
-                                  accountid=cls.account.name,
-                                  domainid=cls.account.domainid,
-                                  serviceofferingid=cls.service_offering_2.id,
-                                  networkids=[str(cls.network_2.id)]
-                                  )
+                cls.api_client,
+                cls.services["virtual_machine"],
+                accountid=cls.account.name,
+                domainid=cls.account.domainid,
+                serviceofferingid=cls.service_offering_2.id,
+                networkids=[str(cls.network_2.id)]
+            )
 
             cls.public_ip_static = PublicIPAddress.create(
-                                cls.api_client,
-                                accountid=cls.account.name,
-                                zoneid=cls.zone.id,
-                                domainid=cls.account.domainid,
-                                networkid=cls.network_1.id,
-                                vpcid=cls.vpc.id
-                                )
+                cls.api_client,
+                accountid=cls.account.name,
+                zoneid=cls.zone.id,
+                domainid=cls.account.domainid,
+                networkid=cls.network_1.id,
+                vpcid=cls.vpc.id
+            )
             StaticNATRule.enable(
-                              cls.api_client,
-                              ipaddressid=cls.public_ip_static.ipaddress.id,
-                              virtualmachineid=cls.vm_1.id,
-                              networkid=cls.network_1.id
-                              )
+                cls.api_client,
+                ipaddressid=cls.public_ip_static.ipaddress.id,
+                virtualmachineid=cls.vm_1.id,
+                networkid=cls.network_1.id
+            )
 
             cls.public_ip_1 = PublicIPAddress.create(
-                                cls.api_client,
-                                accountid=cls.account.name,
-                                zoneid=cls.zone.id,
-                                domainid=cls.account.domainid,
-                                networkid=cls.network_1.id,
-                                vpcid=cls.vpc.id
-                                )
+                cls.api_client,
+                accountid=cls.account.name,
+                zoneid=cls.zone.id,
+                domainid=cls.account.domainid,
+                networkid=cls.network_1.id,
+                vpcid=cls.vpc.id
+            )
 
             cls.nat_rule = NATRule.create(
-                                  cls.api_client,
-                                  cls.vm_1,
-                                  cls.services["natrule"],
-                                  ipaddressid=cls.public_ip_1.ipaddress.id,
-                                  openfirewall=False,
-                                  networkid=cls.network_1.id,
-                                  vpcid=cls.vpc.id
-                                  )
+                cls.api_client,
+                cls.vm_1,
+                cls.services["natrule"],
+                ipaddressid=cls.public_ip_1.ipaddress.id,
+                openfirewall=False,
+                networkid=cls.network_1.id,
+                vpcid=cls.vpc.id
+            )
 
             cls.public_ip_2 = PublicIPAddress.create(
-                                cls.api_client,
-                                accountid=cls.account.name,
-                                zoneid=cls.zone.id,
-                                domainid=cls.account.domainid,
-                                networkid=cls.network_1.id,
-                                vpcid=cls.vpc.id
-                                )
+                cls.api_client,
+                accountid=cls.account.name,
+                zoneid=cls.zone.id,
+                domainid=cls.account.domainid,
+                networkid=cls.network_1.id,
+                vpcid=cls.vpc.id
+            )
 
             cls.lb_rule = LoadBalancerRule.create(
-                                    cls.api_client,
-                                    cls.services["lbrule"],
-                                    ipaddressid=cls.public_ip_2.ipaddress.id,
-                                    accountid=cls.account.name,
-                                    networkid=cls.network_1.id,
-                                    vpcid=cls.vpc.id,
-                                    domainid=cls.account.domainid
-                                )
+                cls.api_client,
+                cls.services["lbrule"],
+                ipaddressid=cls.public_ip_2.ipaddress.id,
+                accountid=cls.account.name,
+                networkid=cls.network_1.id,
+                vpcid=cls.vpc.id,
+                domainid=cls.account.domainid
+            )
             cls.lb_rule.assign(cls.api_client, [cls.vm_1, cls.vm_2])
 
             # Opening up the ports in VPC
             cls.nwacl_nat = NetworkACL.create(
-                                         cls.api_client,
-                                         networkid=cls.network_1.id,
-                                         services=cls.services["natrule"],
-                                         traffictype='Ingress'
-                                    )
+                cls.api_client,
+                networkid=cls.network_1.id,
+                services=cls.services["natrule"],
+                traffictype='Ingress'
+            )
 
             cls.nwacl_lb = NetworkACL.create(
-                                cls.api_client,
-                                networkid=cls.network_1.id,
-                                services=cls.services["lbrule"],
-                                traffictype='Ingress'
-                                )
+                cls.api_client,
+                networkid=cls.network_1.id,
+                services=cls.services["lbrule"],
+                traffictype='Ingress'
+            )
             cls.services["icmp_rule"]["protocol"] = "all"
             cls.nwacl_internet = NetworkACL.create(
-                                        cls.api_client,
-                                        networkid=cls.network_1.id,
-                                        services=cls.services["icmp_rule"],
-                                        traffictype='Egress'
-                                        )
+                cls.api_client,
+                networkid=cls.network_1.id,
+                services=cls.services["icmp_rule"],
+                traffictype='Egress'
+            )
             cls._cleanup = [
-                        cls.service_offering_1,
-                        cls.service_offering_2,
-                        cls.nw_off,
-                        cls.nw_off_no_lb,
-                        ]
+                cls.service_offering_1,
+                cls.service_offering_2,
+                cls.nw_off,
+                cls.nw_off_no_lb,
+            ]
 
         except Exception as e:
             raise Exception("Warning: Exception during setup : %s" % e)
@@ -2907,7 +2886,7 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         try:
             cls.account.delete(cls.api_client)
             wait_for_cleanup(cls.api_client, ["account.cleanup.interval"])
-            #Cleanup resources used
+            # Cleanup resources used
             cleanup_resources(cls.api_client, cls._cleanup)
 
             # Waiting for network cleanup to delete vpc offering
@@ -2927,18 +2906,18 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
 
     def tearDown(self):
         try:
-            #Clean up, terminate the created network offerings
+            # Clean up, terminate the created network offerings
             cleanup_resources(self.apiclient, self.cleanup)
             wait_for_cleanup(self.apiclient, [
-                                              "network.gc.interval",
-                                              "network.gc.wait"])
+                "network.gc.interval",
+                "network.gc.wait"])
 
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
     @classmethod
-    def FindClusterWithSufficientHosts(cls, numberofhosts = 3):
+    def FindClusterWithSufficientHosts(cls, numberofhosts=3):
         """ Find a cluster in the zone with given number of hosts
             or at most 1 less than the given number as the extra host
             is needed only for migrate"""
@@ -2948,48 +2927,47 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
             hosts = Host.list(cls.api_client, clusterid=cluster.id)
             if len(hosts) >= (numberofhosts - 1):
                 return cluster
-        #end for
+        # end for
         return None
-
 
     def validate_vm_deployment(self):
         """Validates VM deployment on different hosts"""
 
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  account=self.account.name,
-                                  domainid=self.account.domainid,
-                                  networkid=self.network_1.id,
-                                  listall=True
-                                  )
+            self.apiclient,
+            account=self.account.name,
+            domainid=self.account.domainid,
+            networkid=self.network_1.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(vms, list),
-                         True,
-                         "List VMs shall return a valid response"
-                         )
+            isinstance(vms, list),
+            True,
+            "List VMs shall return a valid response"
+        )
         host_1 = vms[0].hostid
         self.debug("Host for network 1: %s" % vms[0].hostid)
 
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  account=self.account.name,
-                                  domainid=self.account.domainid,
-                                  networkid=self.network_2.id,
-                                  listall=True
-                                  )
+            self.apiclient,
+            account=self.account.name,
+            domainid=self.account.domainid,
+            networkid=self.network_2.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(vms, list),
-                         True,
-                         "List VMs shall return a valid response"
-                         )
+            isinstance(vms, list),
+            True,
+            "List VMs shall return a valid response"
+        )
         host_2 = vms[0].hostid
         self.debug("Host for network 2: %s" % vms[0].hostid)
 
         self.assertNotEqual(
-                host_1,
-                host_2,
-                "Both the virtual machines should be deployed on diff hosts "
-                )
+            host_1,
+            host_2,
+            "Both the virtual machines should be deployed on diff hosts "
+        )
         return
 
     def validate_vpc_offering(self, vpc_offering):
@@ -2997,22 +2975,22 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
 
         self.debug("Check if the VPC offering is created successfully?")
         vpc_offs = VpcOffering.list(
-                                    self.apiclient,
-                                    id=vpc_offering.id
-                                    )
+            self.apiclient,
+            id=vpc_offering.id
+        )
         self.assertEqual(
-                         isinstance(vpc_offs, list),
-                         True,
-                         "List VPC offerings should return a valid list"
-                         )
+            isinstance(vpc_offs, list),
+            True,
+            "List VPC offerings should return a valid list"
+        )
         self.assertEqual(
-                 vpc_offering.name,
-                 vpc_offs[0].name,
-                "Name of the VPC offering should match with listVPCOff data"
-                )
+            vpc_offering.name,
+            vpc_offs[0].name,
+            "Name of the VPC offering should match with listVPCOff data"
+        )
         self.debug(
-                "VPC offering is created successfully - %s" %
-                                                        vpc_offering.name)
+            "VPC offering is created successfully - %s" %
+            vpc_offering.name)
         return
 
     def validate_vpc_network(self, network, state=None):
@@ -3020,25 +2998,25 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
 
         self.debug("Check if the VPC network is created successfully?")
         vpc_networks = VPC.list(
-                                    self.apiclient,
-                                    id=network.id
-                          )
+            self.apiclient,
+            id=network.id
+        )
         self.assertEqual(
-                         isinstance(vpc_networks, list),
-                         True,
-                         "List VPC network should return a valid list"
-                         )
+            isinstance(vpc_networks, list),
+            True,
+            "List VPC network should return a valid list"
+        )
         self.assertEqual(
-                 network.name,
-                 vpc_networks[0].name,
-                "Name of the VPC network should match with listVPC data"
-                )
+            network.name,
+            vpc_networks[0].name,
+            "Name of the VPC network should match with listVPC data"
+        )
         if state:
             self.assertEqual(
-                 vpc_networks[0].state,
-                 state,
+                vpc_networks[0].state,
+                state,
                 "VPC state should be '%s'" % state
-                )
+            )
         self.debug("VPC network validated - %s" % network.name)
         return
 
@@ -3047,10 +3025,10 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         for ip in [self.public_ip_1.ipaddress.ipaddress, self.public_ip_2.ipaddress.ipaddress, self.public_ip_static.ipaddress.ipaddress]:
             try:
                 self.debug("Checking if we can SSH into VM_1 through %s?" %
-                        (ip))
+                           (ip))
                 ssh = self.vm_1.get_ssh_client(
-                                    ipaddress=ip,
-                                    reconnect=True)
+                    ipaddress=ip,
+                    reconnect=True)
 
                 self.assertNotEqual(ssh, None,
                                     "SSH client should be returned successfully")
@@ -3067,17 +3045,17 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
                 # rtt min/avg/max/mdev = 25.970/25.970/25.970/0.000 ms
                 result = str(res)
                 self.assertEqual(
-                             result.count("1 received"),
-                             1,
-                             "Ping to outside world from VM should be successful"
-                             )
+                    result.count("1 received"),
+                    1,
+                    "Ping to outside world from VM should be successful"
+                )
             except Exception as e:
                 self.fail("Failed to SSH into VM - %s, %s" %
-                                        (ip, e))
+                          (ip, e))
 
         return
 
-    @attr(tags=["advanced","multihost", "intervlan", "dvs"], required_hardware="true")
+    @attr(tags=["advanced", "multihost", "intervlan", "dvs"], required_hardware="true")
     def test_01_deploy_instance_in_network(self):
         """ Test deploy an instance in VPC networks
         """
@@ -3092,26 +3070,26 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         self.validate_vm_deployment()
         self.debug("Check if deployed VMs are in running state?")
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  account=self.account.name,
-                                  domainid=self.account.domainid,
-                                  listall=True
-                                  )
+            self.apiclient,
+            account=self.account.name,
+            domainid=self.account.domainid,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(vms, list),
-                         True,
-                         "List VMs should return a valid response"
-                         )
+            isinstance(vms, list),
+            True,
+            "List VMs should return a valid response"
+        )
         for vm in vms:
             self.debug("VM name: %s, VM state: %s" % (vm.name, vm.state))
             self.assertEqual(
-                             vm.state,
-                             "Running",
-                             "Vm state should be running for each VM deployed"
-                             )
+                vm.state,
+                "Running",
+                "Vm state should be running for each VM deployed"
+            )
         return
 
-    @attr(tags=["advanced","multihost", "intervlan", "dvs"], required_hardware="true")
+    @attr(tags=["advanced", "multihost", "intervlan", "dvs"], required_hardware="true")
     def test_02_stop_instance_in_network(self):
         """ Test stop an instance in VPC networks
         """
@@ -3121,7 +3099,7 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         # 2. Rules should be still configured on virtual router.
 
         self.debug("Stopping the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.stop(self.apiclient)
             self.vm_2.stop(self.apiclient)
@@ -3131,29 +3109,29 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         # Check if the network rules still exists after Vm stop
         self.debug("Checking if NAT rules ")
         nat_rules = NATRule.list(
-                                 self.apiclient,
-                                 id=self.nat_rule.id,
-                                 listall=True
-                                 )
+            self.apiclient,
+            id=self.nat_rule.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(nat_rules, list),
-                         True,
-                         "List NAT rules shall return a valid list"
-                         )
+            isinstance(nat_rules, list),
+            True,
+            "List NAT rules shall return a valid list"
+        )
 
         lb_rules = LoadBalancerRule.list(
-                                         self.apiclient,
-                                         id=self.lb_rule.id,
-                                         listall=True
-                                         )
+            self.apiclient,
+            id=self.lb_rule.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(lb_rules, list),
-                         True,
-                         "List LB rules shall return a valid list"
-                         )
+            isinstance(lb_rules, list),
+            True,
+            "List LB rules shall return a valid list"
+        )
         return
 
-    @attr(tags=["advanced","multihost", "intervlan", "dvs"], required_hardware="true")
+    @attr(tags=["advanced", "multihost", "intervlan", "dvs"], required_hardware="true")
     def test_03_start_instance_in_network(self):
         """ Test start an instance in VPC networks
         """
@@ -3166,37 +3144,37 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         # 3. Make sure that we are able to access google.com from this user Vm
 
         self.debug("Starting the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.start(self.apiclient)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_1.id
-                                                 )
+                self.apiclient,
+                id=self.vm_1.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Running',
-                    "VM state should be running"
-                    )
+                vm_response.state,
+                'Running',
+                "VM state should be running"
+            )
 
             self.vm_2.start(self.apiclient)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_2.id
-                                                 )
+                self.apiclient,
+                id=self.vm_2.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Running',
-                    "VM state should be running"
-                    )
+                vm_response.state,
+                'Running',
+                "VM state should be running"
+            )
 
         except Exception as e:
             self.fail("Failed to start the virtual instances, %s" % e)
@@ -3204,7 +3182,7 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         self.validate_network_rules()
         return
 
-    @attr(tags=["advanced","multihost", "intervlan", "dvs"], required_hardware="true")
+    @attr(tags=["advanced", "multihost", "intervlan", "dvs"], required_hardware="true")
     def test_04_reboot_instance_in_network(self):
         """ Test reboot an instance in VPC networks
         """
@@ -3220,7 +3198,7 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         self.validate_network_rules()
 
         self.debug("Starting the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.reboot(self.apiclient)
             self.vm_2.reboot(self.apiclient)
@@ -3231,7 +3209,7 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         self.validate_network_rules()
         return
 
-    @attr(tags=["advanced","multihost", "intervlan", "dvs"], required_hardware="true")
+    @attr(tags=["advanced", "multihost", "intervlan", "dvs"], required_hardware="true")
     def test_05_destroy_instance_in_network(self):
         """ Test destroy an instance in VPC networks
         """
@@ -3249,107 +3227,107 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         self.validate_network_rules()
 
         self.debug("Destroying the virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.delete(self.apiclient, expunge=False)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_1.id
-                                                 )
+                self.apiclient,
+                id=self.vm_1.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Destroyed',
-                    "VM state should be destroyed"
-                    )
-            
+                vm_response.state,
+                'Destroyed',
+                "VM state should be destroyed"
+            )
+
         except Exception as e:
             self.fail("Failed to stop the virtual instances, %s" % e)
-            
+
         # Check if the network rules still exists after Vm stop
         self.debug("Checking if NAT rules ")
         nat_rules = NATRule.list(
-                                 self.apiclient,
-                                 id=self.nat_rule.id,
-                                 listall=True
-                                 )
+            self.apiclient,
+            id=self.nat_rule.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(nat_rules, list),
-                         True,
-                         "List NAT rules shall return a valid list"
-                         )
+            isinstance(nat_rules, list),
+            True,
+            "List NAT rules shall return a valid list"
+        )
 
         lb_rules = LoadBalancerRule.list(
-                                         self.apiclient,
-                                         id=self.lb_rule.id,
-                                         listall=True
-                                         )
+            self.apiclient,
+            id=self.lb_rule.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(lb_rules, list),
-                         True,
-                         "List LB rules shall return a valid list"
-                         )
+            isinstance(lb_rules, list),
+            True,
+            "List LB rules shall return a valid list"
+        )
 
         self.debug("Recovering the expunged virtual machine vm1 in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.recover(self.apiclient)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_1.id
-                                                 )
+                self.apiclient,
+                id=self.vm_1.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Stopped',
-                    "VM state should be stopped"
-                    )
+                vm_response.state,
+                'Stopped',
+                "VM state should be stopped"
+            )
 
         except Exception as e:
             self.fail("Failed to recover the virtual instances, %s" % e)
-            
+
         try:
             self.vm_2.delete(self.apiclient, expunge=False)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_2.id
-                                                 )
+                self.apiclient,
+                id=self.vm_2.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Destroyed',
-                    "VM state should be destroyed"
-                    )
+                vm_response.state,
+                'Destroyed',
+                "VM state should be destroyed"
+            )
 
         except Exception as e:
             self.fail("Failed to stop the virtual instances, %s" % e)
 
         self.debug("Recovering the expunged virtual machine vm2 in account: %s" %
-                                                self.account.name)            
+                   self.account.name)
         try:
             self.vm_2.recover(self.apiclient)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_2.id
-                                                 )
+                self.apiclient,
+                id=self.vm_2.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Stopped',
-                    "VM state should be stopped"
-                    )
+                vm_response.state,
+                'Stopped',
+                "VM state should be stopped"
+            )
         except Exception as e:
             self.fail("Failed to recover the virtual instances, %s" % e)
 
@@ -3358,32 +3336,32 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
             self.vm_1.start(self.apiclient)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_1.id
-                                                 )
+                self.apiclient,
+                id=self.vm_1.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Running',
-                    "VM state should be running"
-                    )
+                vm_response.state,
+                'Running',
+                "VM state should be running"
+            )
 
             self.vm_2.start(self.apiclient)
 
             list_vm_response = list_virtual_machines(
-                                                 self.apiclient,
-                                                 id=self.vm_2.id
-                                                 )
+                self.apiclient,
+                id=self.vm_2.id
+            )
 
             vm_response = list_vm_response[0]
 
             self.assertEqual(
-                    vm_response.state,
-                    'Running',
-                    "VM state should be running"
-                    )
+                vm_response.state,
+                'Running',
+                "VM state should be running"
+            )
         except Exception as e:
             self.fail("Failed to start the instances, %s" % e)
 
@@ -3394,7 +3372,7 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
 
         return
 
-    @attr(tags=["advanced","multihost", "intervlan", "dvs"], required_hardware="true")
+    @attr(tags=["advanced", "multihost", "intervlan", "dvs"], required_hardware="true")
     def test_06_migrate_instance_in_network(self):
         """ Test migrate an instance in VPC networks
         """
@@ -3415,9 +3393,9 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
             self.skipTest(ERROR_NO_HOST_FOR_MIGRATION)
 
         self.debug("Migrating VM-ID: %s to Host: %s" % (
-                                                        self.vm_1.id,
-                                                        host.id
-                                                        ))
+            self.vm_1.id,
+            host.id
+        ))
 
         try:
             self.vm_1.migrate(self.apiclient, hostid=host.id)
@@ -3428,7 +3406,7 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         self.validate_network_rules()
         return
 
-    @attr(tags=["advanced","multihost", "intervlan", "dvs"], required_hardware="true")
+    @attr(tags=["advanced", "multihost", "intervlan", "dvs"], required_hardware="true")
     def test_07_user_data(self):
         """ Test user data in virtual machines
         """
@@ -3442,11 +3420,11 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         #   User should be able to query the user data for the vms belonging to
         #   both the networks from the VR
         self.debug("Checking if we can SSH into VM_1 through %s" %
-                    (self.public_ip_2.ipaddress.ipaddress))
+                   (self.public_ip_2.ipaddress.ipaddress))
         try:
             ssh = self.vm_1.get_ssh_client(
-                                ipaddress=self.public_ip_2.ipaddress.ipaddress,
-                                reconnect=True)
+                ipaddress=self.public_ip_2.ipaddress.ipaddress,
+                reconnect=True)
 
             self.assertNotEqual(ssh, None,
                                 "get_ssh_client should return ssh handle")
@@ -3459,9 +3437,9 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         self.debug("check the userdata with that of present in router")
         try:
             cmds = [
-               "wget http://%s/latest/user-data" % self.network_1.gateway,
-               "cat user-data",
-               ]
+                "wget http://%s/latest/user-data" % self.network_1.gateway,
+                "cat user-data",
+            ]
             for c in cmds:
                 result = ssh.execute(c)
                 self.debug("%s: %s" % (c, result))
@@ -3470,14 +3448,14 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
 
         res = str(result)
         self.assertEqual(
-                            res.count(
-                                self.services["virtual_machine"]["userdata"]),
-                            1,
-                            "Verify user data from router"
-                        )
+            res.count(
+                self.services["virtual_machine"]["userdata"]),
+            1,
+            "Verify user data from router"
+        )
         return
 
-    @attr(tags=["advanced","multihost", "intervlan", "dvs"], required_hardware="true")
+    @attr(tags=["advanced", "multihost", "intervlan", "dvs"], required_hardware="true")
     def test_08_meta_data(self):
         """ Test meta data in virtual machines
         """
@@ -3491,11 +3469,11 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         #   User should be able to query the user data for the vms belonging to
         #   both the networks from the VR
         self.debug("Checking if we can SSH into VM_1 through %s" %
-                    (self.public_ip_2.ipaddress.ipaddress))
+                   (self.public_ip_2.ipaddress.ipaddress))
         try:
             ssh = self.vm_1.get_ssh_client(
-                                ipaddress=self.public_ip_2.ipaddress.ipaddress,
-                                reconnect=True)
+                ipaddress=self.public_ip_2.ipaddress.ipaddress,
+                reconnect=True)
 
             self.assertNotEqual(ssh, None,
                                 "get_ssh_client should return ssh handle")
@@ -3507,9 +3485,9 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         self.debug("check the metadata with that of present in router")
         try:
             cmds = [
-               "wget http://%s/latest/vm-id" % self.network_1.gateway,
-               "cat vm-id",
-               ]
+                "wget http://%s/latest/vm-id" % self.network_1.gateway,
+                "cat vm-id",
+            ]
             for c in cmds:
                 result = ssh.execute(c)
                 self.debug("%s: %s" % (c, result))
@@ -3518,13 +3496,13 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
 
         res = str(result)
         self.assertNotEqual(
-                         res,
-                         None,
-                         "Meta data should be returned from router"
-                        )
+            res,
+            None,
+            "Meta data should be returned from router"
+        )
         return
 
-    @attr(tags=["advanced","multihost", "intervlan", "dvs"], required_hardware="true")
+    @attr(tags=["advanced", "multihost", "intervlan", "dvs"], required_hardware="true")
     def test_09_expunge_instance_in_network(self):
         """ Test expunge an instance in VPC networks
         """
@@ -3540,7 +3518,7 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         self.validate_network_rules()
 
         self.debug("Delete virtual machines in account: %s" %
-                                                self.account.name)
+                   self.account.name)
         try:
             self.vm_1.delete(self.apiclient)
             self.vm_2.delete(self.apiclient)
@@ -3552,14 +3530,14 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
         self.debug("Checking if NAT rules existed")
         with self.assertRaises(Exception):
             NATRule.list(
-                         self.apiclient,
-                         id=self.nat_rule.id,
-                         listall=True
-                        )
+                self.apiclient,
+                id=self.nat_rule.id,
+                listall=True
+            )
 
             LoadBalancerRule.list(
-                                  self.apiclient,
-                                  id=self.lb_rule.id,
-                                  listall=True
-                                 )
+                self.apiclient,
+                id=self.lb_rule.id,
+                listall=True
+            )
         return

@@ -1,26 +1,10 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  * @deprecated as of 4.3 along with the api {@link org.apache.cloudstack.api.command.LDAPConfigCmd}
@@ -60,7 +44,7 @@ public class LDAPConfigResponse extends BaseResponse {
         return hostname;
     }
 
-    public void setHostname(String hostname) {
+    public void setHostname(final String hostname) {
         this.hostname = hostname;
     }
 
@@ -68,7 +52,7 @@ public class LDAPConfigResponse extends BaseResponse {
         return port;
     }
 
-    public void setPort(String port) {
+    public void setPort(final String port) {
         this.port = port;
     }
 
@@ -76,7 +60,7 @@ public class LDAPConfigResponse extends BaseResponse {
         return useSSL;
     }
 
-    public void setUseSSL(String useSSL) {
+    public void setUseSSL(final String useSSL) {
         this.useSSL = useSSL;
     }
 
@@ -84,7 +68,7 @@ public class LDAPConfigResponse extends BaseResponse {
         return searchBase;
     }
 
-    public void setSearchBase(String searchBase) {
+    public void setSearchBase(final String searchBase) {
         this.searchBase = searchBase;
     }
 
@@ -92,7 +76,7 @@ public class LDAPConfigResponse extends BaseResponse {
         return queryFilter;
     }
 
-    public void setQueryFilter(String queryFilter) {
+    public void setQueryFilter(final String queryFilter) {
         this.queryFilter = queryFilter;
     }
 
@@ -100,7 +84,7 @@ public class LDAPConfigResponse extends BaseResponse {
         return bindDN;
     }
 
-    public void setBindDN(String bindDN) {
+    public void setBindDN(final String bindDN) {
         this.bindDN = bindDN;
     }
 
@@ -108,8 +92,7 @@ public class LDAPConfigResponse extends BaseResponse {
         return bindPassword;
     }
 
-    public void setBindPassword(String bindPassword) {
+    public void setBindPassword(final String bindPassword) {
         this.bindPassword = bindPassword;
     }
-
 }

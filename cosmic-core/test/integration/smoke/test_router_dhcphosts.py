@@ -1,27 +1,5 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 # Import Local Modules
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (
-    cleanup_resources,
-    get_process_status
-)
 from marvin.lib.base import (
     VirtualMachine,
     Account,
@@ -42,12 +20,17 @@ from marvin.lib.common import (
     list_hosts,
     list_vlan_ipranges
 )
+from marvin.lib.utils import (
+    cleanup_resources,
+    get_process_status
+)
+from nose.plugins.attrib import attr
+
 # Import System modules
 import logging
 
 
 class TestRouterDHCPHosts(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
 
@@ -91,18 +74,18 @@ class TestRouterDHCPHosts(cloudstackTestCase):
 
         cls.logger.debug("Creating Network Offering on zone %s" % (cls.zone.id))
         cls.network_offering = NetworkOffering.create(cls.api_client,
-                                                       cls.services["isolated_network_offering"],
-                                                       conservemode=True)
+                                                      cls.services["isolated_network_offering"],
+                                                      conservemode=True)
 
         cls.network_offering.update(cls.api_client, state='Enabled')
 
         cls.logger.debug("Creating Network for Account %s using offering %s" % (cls.account.name, cls.network_offering.id))
         cls.network = Network.create(cls.api_client,
-                                      cls.services["network"],
-                                      accountid=cls.account.name,
-                                      domainid=cls.account.domainid,
-                                      networkofferingid=cls.network_offering.id,
-                                      zoneid=cls.zone.id)
+                                     cls.services["network"],
+                                     accountid=cls.account.name,
+                                     domainid=cls.account.domainid,
+                                     networkofferingid=cls.network_offering.id,
+                                     zoneid=cls.zone.id)
 
         cls.logger.debug("Creating VM1 for Account %s using offering %s with IP 10.1.1.50" % (cls.account.name, cls.service_offering.id))
         cls.vm_1 = VirtualMachine.create(cls.api_client,
@@ -178,17 +161,17 @@ class TestRouterDHCPHosts(cloudstackTestCase):
 
     def find_public_gateway(self):
         networks = list_networks(self.apiclient,
-                                  zoneid = self.zone.id,
-                                  listall = True,
-                                  issystem = True,
-                                  traffictype = "Public")
+                                 zoneid=self.zone.id,
+                                 listall=True,
+                                 issystem=True,
+                                 traffictype="Public")
         self.logger.debug('::: Public Networks ::: ==> %s' % networks)
 
         self.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
 
         ip_ranges = list_vlan_ipranges(self.apiclient,
-                                       zoneid = self.zone.id,
-                                       networkid = networks[0].id)
+                                       zoneid=self.zone.id,
+                                       networkid=networks[0].id)
         self.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)
 
         self.assertTrue(len(ip_ranges) == 1, "Test expects only 1 VLAN IP Range network but found -> '%s'" % len(ip_ranges))
@@ -211,10 +194,10 @@ class TestRouterDHCPHosts(cloudstackTestCase):
             self.fail("Failed to SSH into VM - %s" % (nat_rule.ipaddress))
 
         self.assertEqual(
-                         result.count("3 packets received"),
-                         1,
-                         "Ping to outside world from VM should be successful"
-                         )
+            result.count("3 packets received"),
+            1,
+            "Ping to outside world from VM should be successful"
+        )
 
     def test_dhcphosts(self, vm, router):
         hosts = list_hosts(
@@ -230,7 +213,7 @@ class TestRouterDHCPHosts(cloudstackTestCase):
         host.user = self.services["configurableData"]["host"]["username"]
         host.passwd = self.services["configurableData"]["host"]["password"]
         host.port = self.services["configurableData"]["host"]["port"]
-        #mac1,10.7.32.101,infinite
+        # mac1,10.7.32.101,infinite
         try:
             result = get_process_status(
                 host.ipaddress,
@@ -380,13 +363,13 @@ class TestRouterDHCPHosts(cloudstackTestCase):
 
         self.logger.debug("Creating new VM using the same IP as the one which was deleted => IP 10.1.1.50")
         self.vm_1 = VirtualMachine.create(self.apiclient,
-                                         self.services["virtual_machine"],
-                                         templateid=self.template.id,
-                                         accountid=self.account.name,
-                                         domainid=self.domain.id,
-                                         serviceofferingid=self.service_offering.id,
-                                         networkids=[str(self.network.id)],
-                                         ipaddress="10.1.1.50")
+                                          self.services["virtual_machine"],
+                                          templateid=self.template.id,
+                                          accountid=self.account.name,
+                                          domainid=self.domain.id,
+                                          serviceofferingid=self.service_offering.id,
+                                          networkids=[str(self.network.id)],
+                                          ipaddress="10.1.1.50")
 
         self.cleanup.append(self.vm_1)
 

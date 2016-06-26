@@ -1,103 +1,44 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.user;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.naming.ConfigurationException;
 
 import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
-
 import org.apache.cloudstack.api.command.admin.domain.ListDomainChildrenCmd;
 import org.apache.cloudstack.api.command.admin.domain.ListDomainsCmd;
 import org.apache.cloudstack.api.command.admin.domain.UpdateDomainCmd;
+
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class MockDomainManagerImpl extends ManagerBase implements DomainManager, DomainService {
 
     @Override
-    public Domain getDomain(long id) {
+    public Set<Long> getDomainChildrenIds(final String parentDomainPath) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Domain getDomain(String uuid) {
+    public Domain createDomain(final String name, final Long parentId, final Long ownerId, final String networkDomain, final String domainUUID) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Domain getDomainByName(String name, long parentId) {
+    public Set<Long> getDomainParentIds(final long domainId) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public boolean isChildDomain(Long parentId, Long childId) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean deleteDomain(long domainId, Boolean cleanup) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Pair<List<? extends Domain>, Integer> searchForDomains(ListDomainsCmd cmd) throws PermissionDeniedException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Pair<List<? extends Domain>, Integer> searchForDomainChildren(ListDomainChildrenCmd cmd) throws PermissionDeniedException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Set<Long> getDomainChildrenIds(String parentDomainPath) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DomainVO findDomainByPath(String domainPath) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Set<Long> getDomainParentIds(long domainId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean removeDomain(long domainId) {
+    public boolean removeDomain(final long domainId) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -109,13 +50,31 @@ public class MockDomainManagerImpl extends ManagerBase implements DomainManager,
     }
 
     @Override
-    public boolean deleteDomain(DomainVO domain, Boolean cleanup) {
+    public boolean deleteDomain(final DomainVO domain, final Boolean cleanup) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean deleteDomain(final long domainId, final Boolean cleanup) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public Domain updateDomain(final UpdateDomainCmd cmd) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         return true;
     }
 
@@ -132,27 +91,50 @@ public class MockDomainManagerImpl extends ManagerBase implements DomainManager,
     }
 
     @Override
-    public String getName() {
+    public Domain createDomain(final String name, final Long parentId, final String networkDomain, final String domainUUID) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Domain createDomain(String name, Long parentId, String networkDomain, String domainUUID) {
+    public Domain getDomain(final long id) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Domain updateDomain(UpdateDomainCmd cmd) {
+    public Domain getDomain(final String uuid) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Domain createDomain(String name, Long parentId, Long ownerId, String networkDomain, String domainUUID) {
+    public Domain getDomainByName(final String name, final long parentId) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    @Override
+    public boolean isChildDomain(final Long parentId, final Long childId) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public Pair<List<? extends Domain>, Integer> searchForDomains(final ListDomainsCmd cmd) throws PermissionDeniedException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Pair<List<? extends Domain>, Integer> searchForDomainChildren(final ListDomainChildrenCmd cmd) throws PermissionDeniedException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public DomainVO findDomainByPath(final String domainPath) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

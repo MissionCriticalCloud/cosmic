@@ -1,30 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command;
-
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.inject.Inject;
 
 import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
@@ -38,7 +12,6 @@ import com.cloud.user.AccountService;
 import com.cloud.user.DomainService;
 import com.cloud.user.User;
 import com.cloud.user.UserAccount;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -51,6 +24,16 @@ import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.ldap.LdapManager;
 import org.apache.cloudstack.ldap.LdapUser;
 import org.apache.cloudstack.ldap.NoLdapUserMatchingQueryException;
+
+import javax.inject.Inject;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -65,34 +48,36 @@ public class LdapImportUsersCmd extends BaseListCmd {
     private static final String s_name = "ldapuserresponse";
 
     @Parameter(name = ApiConstants.TIMEZONE,
-               type = CommandType.STRING,
-               description = "Specifies a timezone for this command. For more information on the timezone parameter, see Time Zone Format.")
+            type = CommandType.STRING,
+            description = "Specifies a timezone for this command. For more information on the timezone parameter, see Time Zone Format.")
     private String timezone;
 
     @Parameter(name = ApiConstants.ACCOUNT_TYPE,
-               type = CommandType.SHORT,
-               required = true,
-               description = "Type of the account.  Specify 0 for user, 1 for root admin, and 2 for domain admin")
+            type = CommandType.SHORT,
+            required = true,
+            description = "Type of the account.  Specify 0 for user, 1 for root admin, and 2 for domain admin")
     private Short accountType;
 
     @Parameter(name = ApiConstants.ACCOUNT_DETAILS, type = CommandType.MAP, description = "details for account used to store specific parameters")
     private Map<String, String> details;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               description = "Specifies the domain to which the ldap users are to be "
-                   + "imported. If no domain is specified, a domain will created using group parameter. If the group is also not specified, a domain name based on the OU information will be "
-                   + "created. If no OU hierarchy exists, will be defaulted to ROOT domain")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            description = "Specifies the domain to which the ldap users are to be "
+                    + "imported. If no domain is specified, a domain will created using group parameter. If the group is also not specified, a domain name based on the OU " +
+                    "information will be "
+                    + "created. If no OU hierarchy exists, will be defaulted to ROOT domain")
     private Long domainId;
 
     @Parameter(name = ApiConstants.GROUP, type = CommandType.STRING, description = "Specifies the group name from which the ldap users are to be imported. "
-        + "If no group is specified, all the users will be imported.")
+            + "If no group is specified, all the users will be imported.")
     private String groupName;
 
     private Domain _domain;
 
-    @Parameter(name = ApiConstants.ACCOUNT, type = CommandType.STRING, description = "Creates the user under the specified account. If no account is specified, the username will be used as the account name.")
+    @Parameter(name = ApiConstants.ACCOUNT, type = CommandType.STRING, description = "Creates the user under the specified account. If no account is specified, the username will" +
+            " be used as the account name.")
     private String accountName;
 
     @Inject
@@ -109,29 +94,9 @@ public class LdapImportUsersCmd extends BaseListCmd {
         _accountService = accountService;
     }
 
-    private void createCloudstackUserAccount(LdapUser user, String accountName, Domain domain) {
-        Account account = _accountService.getActiveAccountByName(accountName, domain.getId());
-        if (account == null) {
-            s_logger.debug("No account exists with name: " + accountName + " creating the account and an user with name: " + user.getUsername() + " in the account");
-            _accountService.createUserAccount(user.getUsername(), generatePassword(), user.getFirstname(), user.getLastname(), user.getEmail(), timezone, accountName, accountType,
-                    domain.getId(), domain.getNetworkDomain(), details, UUID.randomUUID().toString(), UUID.randomUUID().toString(), User.Source.LDAP);
-        } else {
-//            check if the user exists. if yes, call update
-            UserAccount csuser = _accountService.getActiveUserAccount(user.getUsername(), domain.getId());
-            if(csuser == null) {
-                s_logger.debug("No user exists with name: " + user.getUsername() + " creating a user in the account: " + accountName);
-                _accountService.createUser(user.getUsername(), generatePassword(), user.getFirstname(), user.getLastname(), user.getEmail(), timezone, accountName, domain.getId(),
-                                           UUID.randomUUID().toString(), User.Source.LDAP);
-            } else {
-                s_logger.debug("account with name: " + accountName + " exist and user with name: " + user.getUsername() + " exists in the account. Updating the account.");
-                _accountService.updateUser(csuser.getId(), user.getFirstname(), user.getLastname(), user.getEmail(), null, null, null, null, null);
-            }
-        }
-    }
-
     @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException, NetworkRuleConflictException {
+            ResourceAllocationException, NetworkRuleConflictException {
 
         List<LdapUser> users;
         try {
@@ -141,51 +106,28 @@ public class LdapImportUsersCmd extends BaseListCmd {
             } else {
                 users = _ldapManager.getUsers();
             }
-        } catch (NoLdapUserMatchingQueryException ex) {
-            users = new ArrayList<LdapUser>();
+        } catch (final NoLdapUserMatchingQueryException ex) {
+            users = new ArrayList<>();
             s_logger.info("No Ldap user matching query. " + " ::: " + ex.getMessage());
         }
 
-        List<LdapUser> addedUsers = new ArrayList<LdapUser>();
-        for (LdapUser user : users) {
-            Domain domain = getDomain(user);
+        final List<LdapUser> addedUsers = new ArrayList<>();
+        for (final LdapUser user : users) {
+            final Domain domain = getDomain(user);
             try {
                 createCloudstackUserAccount(user, getAccountName(user), domain);
                 addedUsers.add(user);
-            } catch (InvalidParameterValueException ex) {
+            } catch (final InvalidParameterValueException ex) {
                 s_logger.error("Failed to create user with username: " + user.getUsername() + " ::: " + ex.getMessage());
             }
         }
-        ListResponse<LdapUserResponse> response = new ListResponse<LdapUserResponse>();
+        final ListResponse<LdapUserResponse> response = new ListResponse<>();
         response.setResponses(createLdapUserResponse(addedUsers));
         response.setResponseName(getCommandName());
         setResponseObject(response);
     }
 
-    private String getAccountName(LdapUser user) {
-        String finalAccountName = accountName;
-        if(finalAccountName == null ) {
-            finalAccountName = user.getUsername();
-        }
-        return finalAccountName;
-    }
-
-    private Domain getDomainForName(String name) {
-        Domain domain = null;
-        if (StringUtils.isNotBlank(name)) {
-            //removing all the special characters and trimming its length to 190 to make the domain valid.
-            String domainName = StringUtils.substring(name.replaceAll("\\W", ""), 0, 190);
-            if (StringUtils.isNotBlank(domainName)) {
-                domain = _domainService.getDomainByName(domainName, Domain.ROOT_DOMAIN);
-                if (domain == null) {
-                    domain = _domainService.createDomain(domainName, Domain.ROOT_DOMAIN, domainName, UUID.randomUUID().toString());
-                }
-            }
-        }
-        return domain;
-    }
-
-    private Domain getDomain(LdapUser user) {
+    private Domain getDomain(final LdapUser user) {
         Domain domain;
         if (_domain != null) {
             //this means either domain id or groupname is passed and this will be same for all the users in this call. hence returning it.
@@ -210,8 +152,36 @@ public class LdapImportUsersCmd extends BaseListCmd {
         return domain;
     }
 
-    private List<LdapUserResponse> createLdapUserResponse(List<LdapUser> users) {
-        final List<LdapUserResponse> ldapResponses = new ArrayList<LdapUserResponse>();
+    private void createCloudstackUserAccount(final LdapUser user, final String accountName, final Domain domain) {
+        final Account account = _accountService.getActiveAccountByName(accountName, domain.getId());
+        if (account == null) {
+            s_logger.debug("No account exists with name: " + accountName + " creating the account and an user with name: " + user.getUsername() + " in the account");
+            _accountService.createUserAccount(user.getUsername(), generatePassword(), user.getFirstname(), user.getLastname(), user.getEmail(), timezone, accountName, accountType,
+                    domain.getId(), domain.getNetworkDomain(), details, UUID.randomUUID().toString(), UUID.randomUUID().toString(), User.Source.LDAP);
+        } else {
+            //            check if the user exists. if yes, call update
+            final UserAccount csuser = _accountService.getActiveUserAccount(user.getUsername(), domain.getId());
+            if (csuser == null) {
+                s_logger.debug("No user exists with name: " + user.getUsername() + " creating a user in the account: " + accountName);
+                _accountService.createUser(user.getUsername(), generatePassword(), user.getFirstname(), user.getLastname(), user.getEmail(), timezone, accountName, domain.getId(),
+                        UUID.randomUUID().toString(), User.Source.LDAP);
+            } else {
+                s_logger.debug("account with name: " + accountName + " exist and user with name: " + user.getUsername() + " exists in the account. Updating the account.");
+                _accountService.updateUser(csuser.getId(), user.getFirstname(), user.getLastname(), user.getEmail(), null, null, null, null, null);
+            }
+        }
+    }
+
+    private String getAccountName(final LdapUser user) {
+        String finalAccountName = accountName;
+        if (finalAccountName == null) {
+            finalAccountName = user.getUsername();
+        }
+        return finalAccountName;
+    }
+
+    private List<LdapUserResponse> createLdapUserResponse(final List<LdapUser> users) {
+        final List<LdapUserResponse> ldapResponses = new ArrayList<>();
         for (final LdapUser user : users) {
             final LdapUserResponse ldapResponse = _ldapManager.createLdapUserResponse(user);
             ldapResponse.setObjectName("LdapUser");
@@ -220,9 +190,19 @@ public class LdapImportUsersCmd extends BaseListCmd {
         return ldapResponses;
     }
 
-    @Override
-    public String getCommandName() {
-        return s_name;
+    private Domain getDomainForName(final String name) {
+        Domain domain = null;
+        if (StringUtils.isNotBlank(name)) {
+            //removing all the special characters and trimming its length to 190 to make the domain valid.
+            final String domainName = StringUtils.substring(name.replaceAll("\\W", ""), 0, 190);
+            if (StringUtils.isNotBlank(domainName)) {
+                domain = _domainService.getDomainByName(domainName, Domain.ROOT_DOMAIN);
+                if (domain == null) {
+                    domain = _domainService.createDomain(domainName, Domain.ROOT_DOMAIN, domainName, UUID.randomUUID().toString());
+                }
+            }
+        }
+        return domain;
     }
 
     private String generatePassword() throws ServerApiException {
@@ -231,8 +211,13 @@ public class LdapImportUsersCmd extends BaseListCmd {
             final byte bytes[] = new byte[20];
             randomGen.nextBytes(bytes);
             return new String(Base64.encode(bytes), "UTF-8");
-        } catch ( NoSuchAlgorithmException | UnsupportedEncodingException e) {
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to generate random password");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

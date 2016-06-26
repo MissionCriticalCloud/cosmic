@@ -14,8 +14,8 @@ import com.cloud.resource.ResourceWrapper;
 @ResourceWrapper(handles = ReadyCommand.class)
 public final class LibvirtReadyCommandWrapper extends CommandWrapper<ReadyCommand, Answer, LibvirtComputingResource> {
 
-  @Override
-  public Answer execute(final ReadyCommand command, final LibvirtComputingResource libvirtComputingResource) {
-    return new ReadyAnswer(command);
-  }
+    @Override
+    public Answer execute(final ReadyCommand command, final LibvirtComputingResource libvirtComputingResource) {
+        return new ReadyAnswer(command);
+    }
 }

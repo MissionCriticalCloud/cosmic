@@ -1,36 +1,26 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.hypervisor.ovm3.resources;
 
 import com.cloud.agent.api.routing.IpAssocCommand;
 import com.cloud.agent.api.routing.IpAssocVpcCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.to.IpAddressTO;
-import com.cloud.hypervisor.ovm3.objects.*;
+import com.cloud.hypervisor.ovm3.objects.CloudStackPluginTest;
+import com.cloud.hypervisor.ovm3.objects.ConnectionTest;
+import com.cloud.hypervisor.ovm3.objects.LinuxTest;
+import com.cloud.hypervisor.ovm3.objects.NetworkTest;
+import com.cloud.hypervisor.ovm3.objects.OvmObject;
+import com.cloud.hypervisor.ovm3.objects.XenTest;
+import com.cloud.hypervisor.ovm3.objects.XmlTestResultTest;
 import com.cloud.hypervisor.ovm3.resources.helpers.Ovm3Configuration;
 import com.cloud.hypervisor.ovm3.resources.helpers.Ovm3ConfigurationTest;
 import com.cloud.hypervisor.ovm3.support.Ovm3SupportTest;
 import com.cloud.utils.ExecutionResult;
-import org.junit.Test;
 
 import javax.naming.ConfigurationException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.Test;
 
 public class Ovm3VirtualRoutingResourceTest {
     ConnectionTest con;
@@ -86,6 +76,14 @@ public class Ovm3VirtualRoutingResourceTest {
         results.basicBooleanTest(result.isSuccess(), false);
     }
 
+    @Test
+    public void prepareVpcCommandFailTest() throws ConfigurationException {
+        prepare();
+        final IpAssocVpcCommand vpc = generateIpAssocVpcCommand(xen.getVmNicMac().replace("0", "A"));
+        results.basicBooleanTest(hypervisor.executeRequest(vpc).getResult(),
+                false);
+    }
+
     private ConnectionTest prepare() throws ConfigurationException {
         final Ovm3Configuration config = new Ovm3Configuration(configTest.getParams());
         con = support.prepConnectionResults();
@@ -96,12 +94,23 @@ public class Ovm3VirtualRoutingResourceTest {
         return con;
     }
 
-    @Test
-    public void prepareVpcCommandFailTest() throws ConfigurationException {
-        prepare();
-        final IpAssocVpcCommand vpc = generateIpAssocVpcCommand(xen.getVmNicMac().replace("0", "A"));
-        results.basicBooleanTest(hypervisor.executeRequest(vpc).getResult(),
-                false);
+    private IpAssocVpcCommand generateIpAssocVpcCommand(final String mac) {
+        final IpAssocVpcCommand cmd = new IpAssocVpcCommand(getIp(mac));
+        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, xen.getVmName());
+        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, routerip);
+        // assertEquals(6, cmd.getAnswersCount()); // AnswersCount is clearly
+        // wrong as it doesn't know enough to tell
+        return cmd;
+    }
+
+    private IpAddressTO[] getIp(final String mac) {
+        final String br[] = xen.getVmNicBridge().split("[.]");
+        final List<IpAddressTO> ips = new ArrayList<>();
+        final IpAddressTO ip = new IpAddressTO(1, routerip, true, true, true, "vlan://"
+                + br[1], "64.1.1.1", "255.255.255.0", mac, 1000, false);
+        ips.add(ip);
+        final IpAddressTO[] ipArray = ips.toArray(new IpAddressTO[ips.size()]);
+        return ipArray;
     }
 
     @Test
@@ -119,6 +128,15 @@ public class Ovm3VirtualRoutingResourceTest {
         prepare();
         final IpAssocCommand rvm = generateIpAssocCommand(xen.getVmNicMac());
         results.basicBooleanTest(hypervisor.executeRequest(rvm).getResult());
+    }
+
+    private IpAssocCommand generateIpAssocCommand(final String mac) {
+        final IpAssocCommand cmd = new IpAssocCommand(getIp(mac));
+        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, xen.getVmName());
+        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, routerip);
+        // assertEquals(6, cmd.getAnswersCount()); // AnswersCount is clearly
+        // wrong as it doesn't know enough to tell
+        return cmd;
     }
 
     /**
@@ -160,33 +178,5 @@ public class Ovm3VirtualRoutingResourceTest {
         prepare();
         final IpAssocVpcCommand vpc = generateIpAssocVpcCommand(xen.getVmNicMac());
         results.basicBooleanTest(hypervisor.executeRequest(vpc).getResult());
-    }
-
-    private IpAddressTO[] getIp(final String mac) {
-        final String br[] = xen.getVmNicBridge().split("[.]");
-        final List<IpAddressTO> ips = new ArrayList<>();
-        final IpAddressTO ip = new IpAddressTO(1, routerip, true, true, true, "vlan://"
-                + br[1], "64.1.1.1", "255.255.255.0", mac, 1000, false);
-        ips.add(ip);
-        final IpAddressTO[] ipArray = ips.toArray(new IpAddressTO[ips.size()]);
-        return ipArray;
-    }
-
-    private IpAssocVpcCommand generateIpAssocVpcCommand(final String mac) {
-        final IpAssocVpcCommand cmd = new IpAssocVpcCommand(getIp(mac));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, xen.getVmName());
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, routerip);
-        // assertEquals(6, cmd.getAnswersCount()); // AnswersCount is clearly
-        // wrong as it doesn't know enough to tell
-        return cmd;
-    }
-
-    private IpAssocCommand generateIpAssocCommand(final String mac) {
-        final IpAssocCommand cmd = new IpAssocCommand(getIp(mac));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, xen.getVmName());
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, routerip);
-        // assertEquals(6, cmd.getAnswersCount()); // AnswersCount is clearly
-        // wrong as it doesn't know enough to tell
-        return cmd;
     }
 }

@@ -1,26 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.network.rules;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.IpAddress;
@@ -31,8 +9,13 @@ import com.cloud.network.router.VirtualRouter;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.Nic;
 import com.cloud.vm.dao.NicDao;
-
 import org.apache.cloudstack.network.topology.NetworkTopologyVisitor;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,13 +38,13 @@ public class VpcIpAssociationRules extends RuleApplier {
     public boolean accept(final NetworkTopologyVisitor visitor, final VirtualRouter router) throws ResourceUnavailableException {
         _router = router;
 
-        _vlanMacAddress = new HashMap<String, String>();
-        _ipsToSend = new ArrayList<PublicIpAddress>();
+        _vlanMacAddress = new HashMap<>();
+        _ipsToSend = new ArrayList<>();
 
-        NicDao nicDao = visitor.getVirtualNetworkApplianceFactory().getNicDao();
-        for (PublicIpAddress ipAddr : _ipAddresses) {
-            String broadcastURI = BroadcastDomainType.Vlan.toUri(ipAddr.getVlanTag()).toString();
-            Nic nic = nicDao.findByNetworkIdInstanceIdAndBroadcastUri(ipAddr.getNetworkId(), _router.getId(), broadcastURI);
+        final NicDao nicDao = visitor.getVirtualNetworkApplianceFactory().getNicDao();
+        for (final PublicIpAddress ipAddr : _ipAddresses) {
+            final String broadcastURI = BroadcastDomainType.Vlan.toUri(ipAddr.getVlanTag()).toString();
+            final Nic nic = nicDao.findByNetworkIdInstanceIdAndBroadcastUri(ipAddr.getNetworkId(), _router.getId(), broadcastURI);
 
             String macAddress = null;
             if (nic == null) {

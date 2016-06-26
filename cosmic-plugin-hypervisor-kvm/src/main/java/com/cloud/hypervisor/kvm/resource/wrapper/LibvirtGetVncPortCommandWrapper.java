@@ -16,18 +16,18 @@ import org.libvirt.LibvirtException;
 
 @ResourceWrapper(handles = GetVncPortCommand.class)
 public final class LibvirtGetVncPortCommandWrapper
-    extends CommandWrapper<GetVncPortCommand, Answer, LibvirtComputingResource> {
+        extends CommandWrapper<GetVncPortCommand, Answer, LibvirtComputingResource> {
 
-  @Override
-  public Answer execute(final GetVncPortCommand command, final LibvirtComputingResource libvirtComputingResource) {
-    try {
-      final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();
+    @Override
+    public Answer execute(final GetVncPortCommand command, final LibvirtComputingResource libvirtComputingResource) {
+        try {
+            final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();
 
-      final Connect conn = libvirtUtilitiesHelper.getConnectionByVmName(command.getName());
-      final Integer vncPort = libvirtComputingResource.getVncPort(conn, command.getName());
-      return new GetVncPortAnswer(command, libvirtComputingResource.getPrivateIp(), 5900 + vncPort);
-    } catch (final LibvirtException e) {
-      return new GetVncPortAnswer(command, e.toString());
+            final Connect conn = libvirtUtilitiesHelper.getConnectionByVmName(command.getName());
+            final Integer vncPort = libvirtComputingResource.getVncPort(conn, command.getName());
+            return new GetVncPortAnswer(command, libvirtComputingResource.getPrivateIp(), 5900 + vncPort);
+        } catch (final LibvirtException e) {
+            return new GetVncPortAnswer(command, e.toString());
+        }
     }
-  }
 }

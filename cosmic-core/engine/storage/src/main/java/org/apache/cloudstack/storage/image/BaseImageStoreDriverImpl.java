@@ -1,29 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.storage.image;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Date;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.storage.DownloadAnswer;
@@ -39,7 +14,6 @@ import com.cloud.storage.dao.VMTemplateZoneDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.download.DownloadMonitor;
 import com.cloud.utils.net.Proxy;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.CopyCommandResult;
 import org.apache.cloudstack.engine.subsystem.api.storage.CreateCmdResult;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
@@ -56,6 +30,13 @@ import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
 import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreVO;
+
+import javax.inject.Inject;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Date;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +44,7 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
     private static final Logger s_logger = LoggerFactory.getLogger(BaseImageStoreDriverImpl.class);
     @Inject
     protected VMTemplateDao _templateDao;
+    protected String _proxy = null;
     @Inject
     DownloadMonitor _downloadMonitor;
     @Inject
@@ -79,17 +61,16 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
     VMTemplateZoneDao _vmTemplateZoneDao;
     @Inject
     AlertManager _alertMgr;
-    protected String _proxy = null;
 
     protected Proxy getHttpProxy() {
         if (_proxy == null) {
             return null;
         }
         try {
-            URI uri = new URI(_proxy);
-            Proxy prx = new Proxy(uri);
+            final URI uri = new URI(_proxy);
+            final Proxy prx = new Proxy(uri);
             return prx;
-        } catch (URISyntaxException e) {
+        } catch (final URISyntaxException e) {
             return null;
         }
     }
@@ -100,31 +81,14 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
     }
 
     @Override
-    public DataTO getTO(DataObject data) {
+    public DataTO getTO(final DataObject data) {
         return null;
     }
 
-    protected class CreateContext<T> extends AsyncRpcContext<T> {
-        final DataObject data;
-
-        public CreateContext(AsyncCompletionCallback<T> callback, DataObject data) {
-            super(callback);
-            this.data = data;
-        }
-    }
-
-    protected Long getMaxTemplateSizeInBytes() {
-        try {
-            return Long.parseLong(configDao.getValue("max.template.iso.size")) * 1024L * 1024L * 1024L;
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
     @Override
-    public void createAsync(DataStore dataStore, DataObject data, AsyncCompletionCallback<CreateCmdResult> callback) {
-        CreateContext<CreateCmdResult> context = new CreateContext<CreateCmdResult>(callback, data);
-        AsyncCallbackDispatcher<BaseImageStoreDriverImpl, DownloadAnswer> caller = AsyncCallbackDispatcher.create(this);
+    public void createAsync(final DataStore dataStore, final DataObject data, final AsyncCompletionCallback<CreateCmdResult> callback) {
+        final CreateContext<CreateCmdResult> context = new CreateContext<>(callback, data);
+        final AsyncCallbackDispatcher<BaseImageStoreDriverImpl, DownloadAnswer> caller = AsyncCallbackDispatcher.create(this);
         caller.setContext(context);
         if (data.getType() == DataObjectType.TEMPLATE) {
             caller.setCallback(caller.getTarget().createTemplateAsyncCallback(null, null));
@@ -141,16 +105,16 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
         }
     }
 
-    protected Void createTemplateAsyncCallback(AsyncCallbackDispatcher<? extends BaseImageStoreDriverImpl, DownloadAnswer> callback,
-        CreateContext<CreateCmdResult> context) {
+    protected Void createTemplateAsyncCallback(final AsyncCallbackDispatcher<? extends BaseImageStoreDriverImpl, DownloadAnswer> callback,
+                                               final CreateContext<CreateCmdResult> context) {
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Performing image store createTemplate async callback");
         }
-        DownloadAnswer answer = callback.getResult();
-        DataObject obj = context.data;
-        DataStore store = obj.getDataStore();
+        final DownloadAnswer answer = callback.getResult();
+        final DataObject obj = context.data;
+        final DataStore store = obj.getDataStore();
 
-        TemplateDataStoreVO tmpltStoreVO = _templateStoreDao.findByStoreTemplate(store.getId(), obj.getId());
+        final TemplateDataStoreVO tmpltStoreVO = _templateStoreDao.findByStoreTemplate(store.getId(), obj.getId());
         if (tmpltStoreVO != null) {
             if (tmpltStoreVO.getDownloadState() == VMTemplateStorageResourceAssoc.Status.DOWNLOADED) {
                 if (s_logger.isDebugEnabled()) {
@@ -158,7 +122,7 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
                 }
                 return null;
             }
-            TemplateDataStoreVO updateBuilder = _templateStoreDao.createForUpdate();
+            final TemplateDataStoreVO updateBuilder = _templateStoreDao.createForUpdate();
             updateBuilder.setDownloadPercent(answer.getDownloadPct());
             updateBuilder.setDownloadState(answer.getDownloadStatus());
             updateBuilder.setLastUpdated(new Date());
@@ -170,42 +134,42 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
             updateBuilder.setPhysicalSize(answer.getTemplatePhySicalSize());
             _templateStoreDao.update(tmpltStoreVO.getId(), updateBuilder);
             // update size in vm_template table
-            VMTemplateVO tmlptUpdater = _templateDao.createForUpdate();
+            final VMTemplateVO tmlptUpdater = _templateDao.createForUpdate();
             tmlptUpdater.setSize(answer.getTemplateSize());
             _templateDao.update(obj.getId(), tmlptUpdater);
         }
 
-        AsyncCompletionCallback<CreateCmdResult> caller = context.getParentCallback();
+        final AsyncCompletionCallback<CreateCmdResult> caller = context.getParentCallback();
 
         if (answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.DOWNLOAD_ERROR ||
-            answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.ABANDONED || answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.UNKNOWN) {
-            CreateCmdResult result = new CreateCmdResult(null, null);
+                answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.ABANDONED || answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.UNKNOWN) {
+            final CreateCmdResult result = new CreateCmdResult(null, null);
             result.setSuccess(false);
             result.setResult(answer.getErrorString());
             caller.complete(result);
-            String msg = "Failed to register template: " + obj.getUuid() + " with error: " + answer.getErrorString();
+            final String msg = "Failed to register template: " + obj.getUuid() + " with error: " + answer.getErrorString();
             _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_UPLOAD_FAILED, _vmTemplateZoneDao.listByTemplateId(obj.getId()).get(0).getZoneId(), null, msg, msg);
             s_logger.error(msg);
         } else if (answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.DOWNLOADED) {
             if (answer.getCheckSum() != null) {
-                VMTemplateVO templateDaoBuilder = _templateDao.createForUpdate();
+                final VMTemplateVO templateDaoBuilder = _templateDao.createForUpdate();
                 templateDaoBuilder.setChecksum(answer.getCheckSum());
                 _templateDao.update(obj.getId(), templateDaoBuilder);
             }
 
-            CreateCmdResult result = new CreateCmdResult(null, null);
+            final CreateCmdResult result = new CreateCmdResult(null, null);
             caller.complete(result);
         }
         return null;
     }
 
     protected Void
-        createVolumeAsyncCallback(AsyncCallbackDispatcher<? extends BaseImageStoreDriverImpl, DownloadAnswer> callback, CreateContext<CreateCmdResult> context) {
-        DownloadAnswer answer = callback.getResult();
-        DataObject obj = context.data;
-        DataStore store = obj.getDataStore();
+    createVolumeAsyncCallback(final AsyncCallbackDispatcher<? extends BaseImageStoreDriverImpl, DownloadAnswer> callback, final CreateContext<CreateCmdResult> context) {
+        final DownloadAnswer answer = callback.getResult();
+        final DataObject obj = context.data;
+        final DataStore store = obj.getDataStore();
 
-        VolumeDataStoreVO volStoreVO = _volumeStoreDao.findByStoreVolume(store.getId(), obj.getId());
+        final VolumeDataStoreVO volStoreVO = _volumeStoreDao.findByStoreVolume(store.getId(), obj.getId());
         if (volStoreVO != null) {
             if (volStoreVO.getDownloadState() == VMTemplateStorageResourceAssoc.Status.DOWNLOADED) {
                 if (s_logger.isDebugEnabled()) {
@@ -213,7 +177,7 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
                 }
                 return null;
             }
-            VolumeDataStoreVO updateBuilder = _volumeStoreDao.createForUpdate();
+            final VolumeDataStoreVO updateBuilder = _volumeStoreDao.createForUpdate();
             updateBuilder.setDownloadPercent(answer.getDownloadPct());
             updateBuilder.setDownloadState(answer.getDownloadStatus());
             updateBuilder.setLastUpdated(new Date());
@@ -225,39 +189,39 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
             updateBuilder.setPhysicalSize(answer.getTemplatePhySicalSize());
             _volumeStoreDao.update(volStoreVO.getId(), updateBuilder);
             // update size in volume table
-            VolumeVO volUpdater = volumeDao.createForUpdate();
+            final VolumeVO volUpdater = volumeDao.createForUpdate();
             volUpdater.setSize(answer.getTemplateSize());
             volumeDao.update(obj.getId(), volUpdater);
         }
 
-        AsyncCompletionCallback<CreateCmdResult> caller = context.getParentCallback();
+        final AsyncCompletionCallback<CreateCmdResult> caller = context.getParentCallback();
 
         if (answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.DOWNLOAD_ERROR ||
-            answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.ABANDONED || answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.UNKNOWN) {
-            CreateCmdResult result = new CreateCmdResult(null, null);
+                answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.ABANDONED || answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.UNKNOWN) {
+            final CreateCmdResult result = new CreateCmdResult(null, null);
             result.setSuccess(false);
             result.setResult(answer.getErrorString());
             caller.complete(result);
-            String msg = "Failed to upload volume: " + obj.getUuid() + " with error: " + answer.getErrorString();
+            final String msg = "Failed to upload volume: " + obj.getUuid() + " with error: " + answer.getErrorString();
             _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_UPLOAD_FAILED,
                     (volStoreVO == null ? -1L : volStoreVO.getZoneId()), null, msg, msg);
             s_logger.error(msg);
         } else if (answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.DOWNLOADED) {
-            CreateCmdResult result = new CreateCmdResult(null, null);
+            final CreateCmdResult result = new CreateCmdResult(null, null);
             caller.complete(result);
         }
         return null;
     }
 
     @Override
-    public void deleteAsync(DataStore dataStore, DataObject data, AsyncCompletionCallback<CommandResult> callback) {
-        CommandResult result = new CommandResult();
+    public void deleteAsync(final DataStore dataStore, final DataObject data, final AsyncCompletionCallback<CommandResult> callback) {
+        final CommandResult result = new CommandResult();
         try {
-            DeleteCommand cmd = new DeleteCommand(data.getTO());
-            EndPoint ep = _epSelector.select(data);
+            final DeleteCommand cmd = new DeleteCommand(data.getTO());
+            final EndPoint ep = _epSelector.select(data);
             Answer answer = null;
             if (ep == null) {
-                String errMsg = "No remote endpoint to send command, check if host or ssvm is down?";
+                final String errMsg = "No remote endpoint to send command, check if host or ssvm is down?";
                 s_logger.error(errMsg);
                 answer = new Answer(cmd, false, errMsg);
             } else {
@@ -266,7 +230,7 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
             if (answer != null && !answer.getResult()) {
                 result.setResult(answer.getDetails());
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             s_logger.debug("Unable to destoy " + data.getType().toString() + ": " + data.getId(), ex);
             result.setResult(ex.toString());
         }
@@ -274,19 +238,36 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
     }
 
     @Override
-    public void copyAsync(DataObject srcdata, DataObject destData, AsyncCompletionCallback<CopyCommandResult> callback) {
+    public void copyAsync(final DataObject srcdata, final DataObject destData, final AsyncCompletionCallback<CopyCommandResult> callback) {
     }
 
     @Override
-    public boolean canCopy(DataObject srcData, DataObject destData) {
+    public boolean canCopy(final DataObject srcData, final DataObject destData) {
         return false;
     }
 
     @Override
-    public void resize(DataObject data, AsyncCompletionCallback<CreateCmdResult> callback) {
+    public void resize(final DataObject data, final AsyncCompletionCallback<CreateCmdResult> callback) {
+    }
+
+    protected Long getMaxTemplateSizeInBytes() {
+        try {
+            return Long.parseLong(configDao.getValue("max.template.iso.size")) * 1024L * 1024L * 1024L;
+        } catch (final NumberFormatException e) {
+            return null;
+        }
     }
 
     @Override
-    public void deleteEntityExtractUrl(DataStore store, String installPath, String url, Upload.Type entityType){
+    public void deleteEntityExtractUrl(final DataStore store, final String installPath, final String url, final Upload.Type entityType) {
+    }
+
+    protected class CreateContext<T> extends AsyncRpcContext<T> {
+        final DataObject data;
+
+        public CreateContext(final AsyncCompletionCallback<T> callback, final DataObject data) {
+            super(callback);
+            this.data = data;
+        }
     }
 }

@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.dc.dao;
-
-import java.util.List;
 
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.utils.Pair;
@@ -28,6 +10,8 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -199,41 +183,41 @@ public class DedicatedResourceDaoImpl extends GenericDaoBase<DedicatedResourceVO
     }
 
     @Override
-    public DedicatedResourceVO findByZoneId(Long zoneId) {
-        SearchCriteria<DedicatedResourceVO> sc = ZoneSearch.create();
+    public DedicatedResourceVO findByZoneId(final Long zoneId) {
+        final SearchCriteria<DedicatedResourceVO> sc = ZoneSearch.create();
         sc.setParameters("zoneId", zoneId);
         return findOneBy(sc);
     }
 
     @Override
-    public DedicatedResourceVO findByPodId(Long podId) {
-        SearchCriteria<DedicatedResourceVO> sc = PodSearch.create();
+    public DedicatedResourceVO findByPodId(final Long podId) {
+        final SearchCriteria<DedicatedResourceVO> sc = PodSearch.create();
         sc.setParameters("podId", podId);
 
         return findOneBy(sc);
     }
 
     @Override
-    public DedicatedResourceVO findByClusterId(Long clusterId) {
-        SearchCriteria<DedicatedResourceVO> sc = ClusterSearch.create();
+    public DedicatedResourceVO findByClusterId(final Long clusterId) {
+        final SearchCriteria<DedicatedResourceVO> sc = ClusterSearch.create();
         sc.setParameters("clusterId", clusterId);
 
         return findOneBy(sc);
     }
 
     @Override
-    public DedicatedResourceVO findByHostId(Long hostId) {
-        SearchCriteria<DedicatedResourceVO> sc = HostSearch.create();
+    public DedicatedResourceVO findByHostId(final Long hostId) {
+        final SearchCriteria<DedicatedResourceVO> sc = HostSearch.create();
         sc.setParameters("hostId", hostId);
 
         return findOneBy(sc);
     }
 
     @Override
-    public Pair<List<DedicatedResourceVO>, Integer> searchDedicatedZones(Long dataCenterId, Long domainId, Long accountId, Long affinityGroupId) {
-        SearchCriteria<DedicatedResourceVO> sc = ListAllZonesSearch.create();
-        if (dataCenterId != null) {
-            sc.setParameters("zoneId", dataCenterId);
+    public Pair<List<DedicatedResourceVO>, Integer> searchDedicatedHosts(final Long hostId, final Long domainId, final Long accountId, final Long affinityGroupId) {
+        final SearchCriteria<DedicatedResourceVO> sc = ListAllHostsSearch.create();
+        if (hostId != null) {
+            sc.setParameters("hostId", hostId);
         }
         if (affinityGroupId != null) {
             sc.setParameters("affinityGroupId", affinityGroupId);
@@ -243,35 +227,15 @@ public class DedicatedResourceDaoImpl extends GenericDaoBase<DedicatedResourceVO
             if (accountId != null) {
                 sc.setParameters("accountId", accountId);
             } else {
-                sc.setParameters("accountId", (Object)null);
+                sc.setParameters("accountId", (Object) null);
             }
         }
         return searchAndCount(sc, null);
     }
 
     @Override
-    public Pair<List<DedicatedResourceVO>, Integer> searchDedicatedPods(Long podId, Long domainId, Long accountId, Long affinityGroupId) {
-        SearchCriteria<DedicatedResourceVO> sc = ListAllPodsSearch.create();
-        if (podId != null) {
-            sc.setParameters("podId", podId);
-        }
-        if (affinityGroupId != null) {
-            sc.setParameters("affinityGroupId", affinityGroupId);
-        }
-        if (domainId != null) {
-            sc.setParameters("domainId", domainId);
-            if (accountId != null) {
-                sc.setParameters("accountId", accountId);
-            } else {
-                sc.setParameters("accountId", (Object)null);
-            }
-        }
-        return searchAndCount(sc, null);
-    }
-
-    @Override
-    public Pair<List<DedicatedResourceVO>, Integer> searchDedicatedClusters(Long clusterId, Long domainId, Long accountId, Long affinityGroupId) {
-        SearchCriteria<DedicatedResourceVO> sc = ListAllClustersSearch.create();
+    public Pair<List<DedicatedResourceVO>, Integer> searchDedicatedClusters(final Long clusterId, final Long domainId, final Long accountId, final Long affinityGroupId) {
+        final SearchCriteria<DedicatedResourceVO> sc = ListAllClustersSearch.create();
         if (clusterId != null) {
             sc.setParameters("clusterId", clusterId);
         }
@@ -284,17 +248,17 @@ public class DedicatedResourceDaoImpl extends GenericDaoBase<DedicatedResourceVO
             if (accountId != null) {
                 sc.setParameters("accountId", accountId);
             } else {
-                sc.setParameters("accountId", (Object)null);
+                sc.setParameters("accountId", (Object) null);
             }
         }
         return searchAndCount(sc, null);
     }
 
     @Override
-    public Pair<List<DedicatedResourceVO>, Integer> searchDedicatedHosts(Long hostId, Long domainId, Long accountId, Long affinityGroupId) {
-        SearchCriteria<DedicatedResourceVO> sc = ListAllHostsSearch.create();
-        if (hostId != null) {
-            sc.setParameters("hostId", hostId);
+    public Pair<List<DedicatedResourceVO>, Integer> searchDedicatedPods(final Long podId, final Long domainId, final Long accountId, final Long affinityGroupId) {
+        final SearchCriteria<DedicatedResourceVO> sc = ListAllPodsSearch.create();
+        if (podId != null) {
+            sc.setParameters("podId", podId);
         }
         if (affinityGroupId != null) {
             sc.setParameters("affinityGroupId", affinityGroupId);
@@ -304,67 +268,87 @@ public class DedicatedResourceDaoImpl extends GenericDaoBase<DedicatedResourceVO
             if (accountId != null) {
                 sc.setParameters("accountId", accountId);
             } else {
-                sc.setParameters("accountId", (Object)null);
+                sc.setParameters("accountId", (Object) null);
             }
         }
         return searchAndCount(sc, null);
     }
 
     @Override
-    public List<DedicatedResourceVO> listByAccountId(Long accountId) {
-        SearchCriteria<DedicatedResourceVO> sc = ListByAccountId.create();
+    public Pair<List<DedicatedResourceVO>, Integer> searchDedicatedZones(final Long dataCenterId, final Long domainId, final Long accountId, final Long affinityGroupId) {
+        final SearchCriteria<DedicatedResourceVO> sc = ListAllZonesSearch.create();
+        if (dataCenterId != null) {
+            sc.setParameters("zoneId", dataCenterId);
+        }
+        if (affinityGroupId != null) {
+            sc.setParameters("affinityGroupId", affinityGroupId);
+        }
+        if (domainId != null) {
+            sc.setParameters("domainId", domainId);
+            if (accountId != null) {
+                sc.setParameters("accountId", accountId);
+            } else {
+                sc.setParameters("accountId", (Object) null);
+            }
+        }
+        return searchAndCount(sc, null);
+    }
+
+    @Override
+    public List<DedicatedResourceVO> listByAccountId(final Long accountId) {
+        final SearchCriteria<DedicatedResourceVO> sc = ListByAccountId.create();
         sc.setParameters("accountId", accountId);
         return listBy(sc);
     }
 
     @Override
-    public List<DedicatedResourceVO> listByDomainId(Long domainId) {
-        SearchCriteria<DedicatedResourceVO> sc = ListByDomainId.create();
+    public List<DedicatedResourceVO> listByDomainId(final Long domainId) {
+        final SearchCriteria<DedicatedResourceVO> sc = ListByDomainId.create();
         sc.setParameters("domainId", domainId);
         return listBy(sc);
     }
 
     @Override
-    public List<DedicatedResourceVO> listZonesNotInDomainIds(List<Long> domainIds) {
-        SearchCriteria<DedicatedResourceVO> sc = ZoneByDomainIdsSearch.create();
+    public List<DedicatedResourceVO> listZonesNotInDomainIds(final List<Long> domainIds) {
+        final SearchCriteria<DedicatedResourceVO> sc = ZoneByDomainIdsSearch.create();
         sc.setParameters("domainId", domainIds.toArray(new Object[domainIds.size()]));
         return listBy(sc);
     }
 
     @Override
-    public boolean remove(Long id) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        DedicatedResourceVO resource = createForUpdate();
-        update(id, resource);
-
-        boolean result = super.remove(id);
-        txn.commit();
-        return result;
-    }
-
-    @Override
     public List<Long> listAllPods() {
-        SearchCriteria<Long> sc = ListPodsSearch.create();
+        final SearchCriteria<Long> sc = ListPodsSearch.create();
         return customSearch(sc, null);
     }
 
     @Override
     public List<Long> listAllClusters() {
-        SearchCriteria<Long> sc = ListClustersSearch.create();
+        final SearchCriteria<Long> sc = ListClustersSearch.create();
         return customSearch(sc, null);
     }
 
     @Override
     public List<Long> listAllHosts() {
-        SearchCriteria<Long> sc = ListHostsSearch.create();
+        final SearchCriteria<Long> sc = ListHostsSearch.create();
         return customSearch(sc, null);
     }
 
     @Override
-    public List<DedicatedResourceVO> listByAffinityGroupId(Long affinityGroupId) {
-        SearchCriteria<DedicatedResourceVO> sc = ListByAffinityGroupId.create();
+    public List<DedicatedResourceVO> listByAffinityGroupId(final Long affinityGroupId) {
+        final SearchCriteria<DedicatedResourceVO> sc = ListByAffinityGroupId.create();
         sc.setParameters("affinityGroupId", affinityGroupId);
         return listBy(sc);
+    }
+
+    @Override
+    public boolean remove(final Long id) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        txn.start();
+        final DedicatedResourceVO resource = createForUpdate();
+        update(id, resource);
+
+        final boolean result = super.remove(id);
+        txn.commit();
+        return result;
     }
 }

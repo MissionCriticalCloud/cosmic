@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.capacity;
 
 import com.cloud.agent.Listener;
@@ -33,30 +17,30 @@ public class ComputeCapacityListener implements Listener {
     CapacityManager _capacityMgr;
     float _cpuOverProvisioningFactor = 1.0f;
 
-    public ComputeCapacityListener(CapacityDao capacityDao, CapacityManager capacityMgr) {
+    public ComputeCapacityListener(final CapacityDao capacityDao, final CapacityManager capacityMgr) {
         super();
         this._capacityDao = capacityDao;
         this._capacityMgr = capacityMgr;
     }
 
     @Override
-    public boolean processAnswers(long agentId, long seq, Answer[] answers) {
+    public boolean processAnswers(final long agentId, final long seq, final Answer[] answers) {
         return false;
     }
 
     @Override
-    public boolean processCommands(long agentId, long seq, Command[] commands) {
+    public boolean processCommands(final long agentId, final long seq, final Command[] commands) {
         return false;
     }
 
     @Override
-    public AgentControlAnswer processControlCommand(long agentId, AgentControlCommand cmd) {
+    public AgentControlAnswer processControlCommand(final long agentId, final AgentControlCommand cmd) {
 
         return null;
     }
 
     @Override
-    public void processConnect(Host server, StartupCommand startup, boolean forRebalance) throws ConnectionException {
+    public void processConnect(final Host server, final StartupCommand startup, final boolean forRebalance) throws ConnectionException {
         if (!(startup instanceof StartupRoutingCommand)) {
             return;
         }
@@ -64,7 +48,7 @@ public class ComputeCapacityListener implements Listener {
     }
 
     @Override
-    public boolean processDisconnect(long agentId, Status state) {
+    public boolean processDisconnect(final long agentId, final Status state) {
         return false;
     }
 
@@ -79,8 +63,7 @@ public class ComputeCapacityListener implements Listener {
     }
 
     @Override
-    public boolean processTimeout(long agentId, long seq) {
+    public boolean processTimeout(final long agentId, final long seq) {
         return false;
     }
-
 }

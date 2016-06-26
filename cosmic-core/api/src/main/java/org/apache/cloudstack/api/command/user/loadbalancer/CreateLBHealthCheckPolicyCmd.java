@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.loadbalancer;
 
 import com.cloud.event.EventTypes;
@@ -23,7 +7,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.rules.HealthCheckPolicy;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -34,16 +17,16 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.api.response.LBHealthCheckResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "createLBHealthCheckPolicy",
-            description = "Creates a load balancer health check policy",
-            responseObject = LBHealthCheckResponse.class,
-            since = "4.2.0",
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = false)
-@SuppressWarnings("rawtypes")
+        description = "Creates a load balancer health check policy",
+        responseObject = LBHealthCheckResponse.class,
+        since = "4.2.0",
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = false)
 public class CreateLBHealthCheckPolicyCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateLBHealthCheckPolicyCmd.class.getName());
 
@@ -54,10 +37,10 @@ public class CreateLBHealthCheckPolicyCmd extends BaseAsyncCreateCmd {
     // ///////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.LBID,
-               type = CommandType.UUID,
-               entityType = FirewallRuleResponse.class,
-               required = true,
-               description = "the ID of the load balancer rule")
+            type = CommandType.UUID,
+            entityType = FirewallRuleResponse.class,
+            required = true,
+            description = "the ID of the load balancer rule")
     private Long lbRuleId;
 
     @Parameter(name = ApiConstants.DESCRIPTION, type = CommandType.STRING, description = "the description of the load balancer health check policy")
@@ -67,32 +50,32 @@ public class CreateLBHealthCheckPolicyCmd extends BaseAsyncCreateCmd {
     private String pingPath;
 
     @Parameter(name = ApiConstants.HEALTHCHECK_RESPONSE_TIMEOUT,
-               type = CommandType.INTEGER,
-               required = false,
-               description = "Time to wait when receiving a response from the health check (2sec - 60 sec)")
+            type = CommandType.INTEGER,
+            required = false,
+            description = "Time to wait when receiving a response from the health check (2sec - 60 sec)")
     private int responsTimeOut;
 
     @Parameter(name = ApiConstants.HEALTHCHECK_INTERVAL_TIME,
-               type = CommandType.INTEGER,
-               required = false,
-               description = "Amount of time between health checks (1 sec - 20940 sec)")
+            type = CommandType.INTEGER,
+            required = false,
+            description = "Amount of time between health checks (1 sec - 20940 sec)")
     private int healthCheckInterval;
 
     @Parameter(name = ApiConstants.HEALTHCHECK_HEALTHY_THRESHOLD,
-               type = CommandType.INTEGER,
-               required = false,
-               description = "Number of consecutive health check success before declaring an instance healthy")
+            type = CommandType.INTEGER,
+            required = false,
+            description = "Number of consecutive health check success before declaring an instance healthy")
     private int healthyThreshold;
 
     @Parameter(name = ApiConstants.HEALTHCHECK_UNHEALTHY_THRESHOLD,
-               type = CommandType.INTEGER,
-               required = false,
-               description = "Number of consecutive health check failures before declaring an instance unhealthy")
+            type = CommandType.INTEGER,
+            required = false,
+            description = "Number of consecutive health check failures before declaring an instance unhealthy")
     private int unhealthyThreshold;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4" +
+            ".4", authorized = {RoleType.Admin})
     private Boolean display;
-
 
     // ///////////////////////////////////////////////////
     // ///////////////// Accessors ///////////////////////
@@ -101,14 +84,6 @@ public class CreateLBHealthCheckPolicyCmd extends BaseAsyncCreateCmd {
     @Deprecated
     public Boolean getDisplay() {
         return display;
-    }
-
-    @Override
-    public boolean isDisplay() {
-        if(display == null)
-            return true;
-        else
-            return display;
     }
 
     public Long getLbRuleId() {
@@ -123,28 +98,13 @@ public class CreateLBHealthCheckPolicyCmd extends BaseAsyncCreateCmd {
         return pingPath;
     }
 
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Account account = CallContext.current().getCallingAccount();
-        if (account != null) {
-            return account.getId();
-        }
-
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
-
     public int getResponsTimeOut() {
         return responsTimeOut;
     }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
 
     public int getHealthCheckInterval() {
         return healthCheckInterval;
@@ -169,8 +129,8 @@ public class CreateLBHealthCheckPolicyCmd extends BaseAsyncCreateCmd {
             if (success) {
                 // State might be different after the rule is applied, so get new object here
                 policy = _entityMgr.findById(HealthCheckPolicy.class, getEntityId());
-                LoadBalancer lb = _lbService.findById(policy.getLoadBalancerId());
-                LBHealthCheckResponse hcResponse = _responseGenerator.createLBHealthCheckPolicyResponse(policy, lb);
+                final LoadBalancer lb = _lbService.findById(policy.getLoadBalancerId());
+                final LBHealthCheckResponse hcResponse = _responseGenerator.createLBHealthCheckPolicyResponse(policy, lb);
                 setResponseObject(hcResponse);
                 hcResponse.setResponseName(getCommandName());
             }
@@ -182,12 +142,36 @@ public class CreateLBHealthCheckPolicyCmd extends BaseAsyncCreateCmd {
     }
 
     @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final Account account = CallContext.current().getCallingAccount();
+        if (account != null) {
+            return account.getId();
+        }
+
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
+    }
+
+    @Override
+    public boolean isDisplay() {
+        if (display == null) {
+            return true;
+        } else {
+            return display;
+        }
+    }
+
+    @Override
     public void create() {
         try {
-            HealthCheckPolicy result = _lbService.createLBHealthCheckPolicy(this);
+            final HealthCheckPolicy result = _lbService.createLBHealthCheckPolicy(this);
             this.setEntityId(result.getId());
             this.setEntityUuid(result.getUuid());
-        } catch (InvalidParameterValueException e) {
+        } catch (final InvalidParameterValueException e) {
             s_logger.warn("Exception: ", e);
             throw new ServerApiException(ApiErrorCode.MALFORMED_PARAMETER_ERROR, e.getMessage());
         }

@@ -1,28 +1,8 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xen610;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.MigrateWithStorageReceiveAnswer;
@@ -39,16 +19,21 @@ import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.Pair;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.google.gson.Gson;
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Host;
 import com.xensource.xenapi.Network;
 import com.xensource.xenapi.SR;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  MigrateWithStorageReceiveCommand.class)
+@ResourceWrapper(handles = MigrateWithStorageReceiveCommand.class)
 public final class XenServer610MigrateWithStorageReceiveCommandWrapper extends CommandWrapper<MigrateWithStorageReceiveCommand, Answer, XenServer610Resource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(XenServer610MigrateWithStorageReceiveCommandWrapper.class);
@@ -68,20 +53,20 @@ public final class XenServer610MigrateWithStorageReceiveCommandWrapper extends C
             // agent attache. Seriliaze the SR and Network objects here to a string and pass in
             // the answer object. It'll be deserialzed and object created in migrate with
             // storage send command execution.
-            Gson gson = new Gson();
+            final Gson gson = new Gson();
             // Get a map of all the SRs to which the vdis will be migrated.
-            final List<Pair<VolumeTO, Object>> volumeToSr = new ArrayList<Pair<VolumeTO, Object>>();
+            final List<Pair<VolumeTO, Object>> volumeToSr = new ArrayList<>();
             for (final Pair<VolumeTO, StorageFilerTO> entry : volumeToFiler) {
                 final StorageFilerTO storageFiler = entry.second();
                 final SR sr = xenServer610Resource.getStorageRepository(connection, storageFiler.getUuid());
-                volumeToSr.add(new Pair<VolumeTO, Object>(entry.first(), sr));
+                volumeToSr.add(new Pair<>(entry.first(), sr));
             }
 
             // Get the list of networks to which the vifs will attach.
-            final List<Pair<NicTO, Object>> nicToNetwork = new ArrayList<Pair<NicTO, Object>>();
+            final List<Pair<NicTO, Object>> nicToNetwork = new ArrayList<>();
             for (final NicTO nicTo : vmSpec.getNics()) {
                 final Network network = xenServer610Resource.getNetwork(connection, nicTo);
-                nicToNetwork.add(new Pair<NicTO, Object>(nicTo, network));
+                nicToNetwork.add(new Pair<>(nicTo, network));
             }
 
             final XsLocalNetwork nativeNetworkForTraffic = xenServer610Resource.getNativeNetworkForTraffic(connection, TrafficType.Storage, null);
@@ -89,7 +74,7 @@ public final class XenServer610MigrateWithStorageReceiveCommandWrapper extends C
             final XsHost xsHost = xenServer610Resource.getHost();
             final String uuid = xsHost.getUuid();
 
-            final Map<String, String> other = new HashMap<String, String>();
+            final Map<String, String> other = new HashMap<>();
             other.put("live", "true");
 
             final Host host = Host.getByUuid(connection, uuid);

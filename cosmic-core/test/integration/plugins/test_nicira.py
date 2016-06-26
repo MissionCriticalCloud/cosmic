@@ -1,25 +1,11 @@
 #!/usr/bin/env python
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# 'License'); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# 'AS IS' BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 
+
+import logging
 import requests
-from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.cloudstackException import CloudstackAPIException
-from marvin.lib.utils import cleanup_resources
+from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import (FAILED)
 from marvin.lib.base import (
     PhysicalNetwork,
     VpcOffering,
@@ -41,94 +27,92 @@ from marvin.lib.common import (
     list_hosts,
     findSuitableHostForMigration
 )
+from marvin.lib.utils import cleanup_resources
 from nose.plugins.attrib import attr
-from marvin.codes import (FAILED, PASS)
-import time
-import logging
+
 
 class TestNicira(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         test_case = super(TestNicira, cls)
 
-        test_client    = test_case.getClsTestClient()
-        cls.config     = test_case.getClsConfig()
+        test_client = test_case.getClsTestClient()
+        cls.config = test_case.getClsConfig()
         cls.api_client = test_client.getApiClient()
 
         cls.physical_networks = cls.config.zones[0].physical_networks
-        cls.nicira_hosts      = cls.config.niciraNvp.hosts
+        cls.nicira_hosts = cls.config.niciraNvp.hosts
 
         cls.physical_network_id = cls.get_nicira_enabled_physical_network_id(cls.physical_networks)
 
         cls.network_offerring_services = {
-            'name':              'NiciraEnabledNetwork',
-            'displaytext':       'NiciraEnabledNetwork',
-            'guestiptype':       'Isolated',
+            'name': 'NiciraEnabledNetwork',
+            'displaytext': 'NiciraEnabledNetwork',
+            'guestiptype': 'Isolated',
             'supportedservices': 'SourceNat,Dhcp,Dns,Firewall,PortForwarding,Connectivity',
-            'traffictype':       'GUEST',
-            'availability':      'Optional',
+            'traffictype': 'GUEST',
+            'availability': 'Optional',
             'serviceProviderList': {
-                    'SourceNat':      'VirtualRouter',
-                    'Dhcp':           'VirtualRouter',
-                    'Dns':            'VirtualRouter',
-                    'Firewall':       'VirtualRouter',
-                    'PortForwarding': 'VirtualRouter',
-                    'Connectivity':   'NiciraNvp'
+                'SourceNat': 'VirtualRouter',
+                'Dhcp': 'VirtualRouter',
+                'Dns': 'VirtualRouter',
+                'Firewall': 'VirtualRouter',
+                'PortForwarding': 'VirtualRouter',
+                'Connectivity': 'NiciraNvp'
             }
         }
 
         cls.vpc_tier_offering_services = {
-            'name':              'NiciraEnabledVpcTier',
-            'displaytext':       'NiciraEnabledVpcTier',
-            'guestiptype':       'Isolated',
+            'name': 'NiciraEnabledVpcTier',
+            'displaytext': 'NiciraEnabledVpcTier',
+            'guestiptype': 'Isolated',
             'supportedservices': 'Vpn,Dhcp,Dns,SourceNat,PortForwarding,Lb,UserData,StaticNat,NetworkACL,Connectivity',
-            'traffictype':       'GUEST',
-            'availability':      'Optional',
-            'useVpc':            'on',
+            'traffictype': 'GUEST',
+            'availability': 'Optional',
+            'useVpc': 'on',
             'serviceProviderList': {
-                    'Vpn':            'VpcVirtualRouter',
-                    'Dhcp':           'VpcVirtualRouter',
-                    'Dns':            'VpcVirtualRouter',
-                    'SourceNat':      'VpcVirtualRouter',
-                    'PortForwarding': 'VpcVirtualRouter',
-                    'Lb':             'VpcVirtualRouter',
-                    'UserData':       'VpcVirtualRouter',
-                    'StaticNat':      'VpcVirtualRouter',
-                    'NetworkACL':     'VpcVirtualRouter',
-                    'Connectivity':   'NiciraNvp'
+                'Vpn': 'VpcVirtualRouter',
+                'Dhcp': 'VpcVirtualRouter',
+                'Dns': 'VpcVirtualRouter',
+                'SourceNat': 'VpcVirtualRouter',
+                'PortForwarding': 'VpcVirtualRouter',
+                'Lb': 'VpcVirtualRouter',
+                'UserData': 'VpcVirtualRouter',
+                'StaticNat': 'VpcVirtualRouter',
+                'NetworkACL': 'VpcVirtualRouter',
+                'Connectivity': 'NiciraNvp'
             }
         }
 
         cls.vpc_offering_services = {
-            'name' :             'VPC off',
-            'displaytext':       'VPC off',
+            'name': 'VPC off',
+            'displaytext': 'VPC off',
             'supportedservices': 'Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat,NetworkACL,Connectivity',
             'serviceProviderList': {
-                'Vpn':            'VpcVirtualRouter',
-                'Dhcp':           'VpcVirtualRouter',
-                'Dns':            'VpcVirtualRouter',
-                'SourceNat':      'VpcVirtualRouter',
+                'Vpn': 'VpcVirtualRouter',
+                'Dhcp': 'VpcVirtualRouter',
+                'Dns': 'VpcVirtualRouter',
+                'SourceNat': 'VpcVirtualRouter',
                 'PortForwarding': 'VpcVirtualRouter',
-                'Lb':             'VpcVirtualRouter',
-                'UserData':       'VpcVirtualRouter',
-                'StaticNat':      'VpcVirtualRouter',
-                'NetworkACL':     'VpcVirtualRouter',
-                'Connectivity':   'NiciraNvp'
+                'Lb': 'VpcVirtualRouter',
+                'UserData': 'VpcVirtualRouter',
+                'StaticNat': 'VpcVirtualRouter',
+                'NetworkACL': 'VpcVirtualRouter',
+                'Connectivity': 'NiciraNvp'
             }
         }
 
         cls.private_network_offering_services = {
-            'name':                'NSXPrivateGatewayOffering',
-            'displaytext':         'NSXPrivateGatewayOffering',
-            'availability':        'Optional',
-            'guestiptype':         'Isolated',
-            'traffictype':         'GUEST',
-            'forvpc':              False,
-            'specifyVlan':         True,
-            'conservemode':        True,
+            'name': 'NSXPrivateGatewayOffering',
+            'displaytext': 'NSXPrivateGatewayOffering',
+            'availability': 'Optional',
+            'guestiptype': 'Isolated',
+            'traffictype': 'GUEST',
+            'forvpc': False,
+            'specifyVlan': True,
+            'conservemode': True,
             'egressdefaultpolicy': False,
-            'supportedservices':   'Connectivity',
+            'supportedservices': 'Connectivity',
             'serviceProviderList': {
                 'Connectivity': 'NiciraNvp'
             }
@@ -153,7 +137,7 @@ class TestNicira(cloudstackTestCase):
         )
 
         cls.domain = get_domain(cls.api_client)
-        cls.zone   = get_zone(cls.api_client, test_client.getZoneForTests())
+        cls.zone = get_zone(cls.api_client, test_client.getZoneForTests())
 
         template = get_template(
             cls.api_client,
@@ -165,24 +149,24 @@ class TestNicira(cloudstackTestCase):
         cls.vm_services = {
             'mode': cls.zone.networktype,
             'small': {
-                'zoneid':      cls.zone.id,
-                'template':    template.id,
+                'zoneid': cls.zone.id,
+                'template': template.id,
                 'displayname': 'testserver',
-                'username':    cls.config.zones[0].pods[0].clusters[0].hosts[0].username,
-                'password':    cls.config.zones[0].pods[0].clusters[0].hosts[0].password,
-                'ssh_port':    22,
-                'hypervisor':  cls.config.zones[0].pods[0].clusters[0].hypervisor,
+                'username': cls.config.zones[0].pods[0].clusters[0].hosts[0].username,
+                'password': cls.config.zones[0].pods[0].clusters[0].hosts[0].password,
+                'ssh_port': 22,
+                'hypervisor': cls.config.zones[0].pods[0].clusters[0].hypervisor,
                 'privateport': 22,
-                'publicport':  22,
-                'protocol':    'TCP',
+                'publicport': 22,
+                'protocol': 'TCP',
             },
             'service_offerings': {
                 'tiny': {
-                    'name':        'Tiny Instance',
+                    'name': 'Tiny Instance',
                     'displaytext': 'Tiny Instance',
-                    'cpunumber':   1,
-                    'cpuspeed':    100,
-                    'memory':      64,
+                    'cpunumber': 1,
+                    'cpuspeed': 100,
+                    'memory': 64,
                 }
             }
         }
@@ -205,7 +189,6 @@ class TestNicira(cloudstackTestCase):
         cls.logger.setLevel(logging.DEBUG)
         cls.logger.addHandler(cls.stream_handler)
 
-
     @classmethod
     def tearDownClass(cls):
         try:
@@ -222,7 +205,6 @@ class TestNicira(cloudstackTestCase):
         except Exception as e:
             raise Exception('Warning: Exception during test cleanup : %s' % e)
 
-
     @classmethod
     def determine_master_controller(cls, hosts, credentials):
         for host in hosts:
@@ -234,7 +216,6 @@ class TestNicira(cloudstackTestCase):
             elif status_code == 200:
                 return host
         raise Exception('None of the supplied hosts (%s) is a Nicira controller' % hosts)
-
 
     @classmethod
     def get_transport_zone_from_controller(cls, controller_host, credentials):
@@ -258,7 +239,6 @@ class TestNicira(cloudstackTestCase):
         else:
             raise Exception('Unexpected response from Nicira controller. Status code = %s, content = %s' % status_code)
 
-
     @classmethod
     def get_nicira_enabled_physical_network_id(cls, physical_networks):
         nicira_physical_network_name = None
@@ -270,14 +250,12 @@ class TestNicira(cloudstackTestCase):
             raise Exception('Did not find a Nicira enabled physical network in configuration')
         return PhysicalNetwork.list(cls.api_client, name=nicira_physical_network_name)[0].id
 
-
     def determine_slave_conroller(self, hosts, master_controller):
-        slaves = [ s for s in hosts if s != master_controller ]
+        slaves = [s for s in hosts if s != master_controller]
         if len(slaves) > 0:
             return slaves[0]
         else:
             raise Exception('None of the supplied hosts (%s) is a Nicira slave' % hosts)
-
 
     def add_nicira_device(self, hostname):
         nicira_device = NiciraNvp.add(
@@ -292,13 +270,12 @@ class TestNicira(cloudstackTestCase):
         self.logger.debug("Added NSX device %s" % hostname)
         self.test_cleanup.append(nicira_device)
 
-
     def create_guest_network(self):
         network_services = {
-            'name'            : 'nicira_enabled_network',
-            'displaytext'     : 'nicira_enabled_network',
-            'zoneid'          : self.zone.id,
-            'networkoffering' : self.network_offering.id
+            'name': 'nicira_enabled_network',
+            'displaytext': 'nicira_enabled_network',
+            'zoneid': self.zone.id,
+            'networkoffering': self.network_offering.id
         }
         network = Network.create(
             self.api_client,
@@ -310,14 +287,13 @@ class TestNicira(cloudstackTestCase):
         self.test_cleanup.append(network)
         return network
 
-
     def create_vpc(self, cidr='10.1.1.1/16', account='admin'):
         vpc_services = {
-            'name'            : 'nicira_enabled_vpc',
-            'displaytext'     : 'nicira_enabled_vpc',
-            'zoneid'          : self.zone.id,
-            'networkoffering' : self.vpc_offering,
-            'cidr'            : cidr
+            'name': 'nicira_enabled_vpc',
+            'displaytext': 'nicira_enabled_vpc',
+            'zoneid': self.zone.id,
+            'networkoffering': self.vpc_offering,
+            'cidr': cidr
         }
         try:
             self.logger.debug("Creating a VPC network in the account: %s" % account)
@@ -337,12 +313,11 @@ class TestNicira(cloudstackTestCase):
 
         return vpc
 
-
     def create_vpc_tier(self, vpc):
         network_services = {
-            'name'            : 'nicira_enabled_vpc_tier',
-            'displaytext'     : 'nicira_enabled_vpc_tier',
-            'netmask'         : '255.255.255.0'
+            'name': 'nicira_enabled_vpc_tier',
+            'displaytext': 'nicira_enabled_vpc_tier',
+            'netmask': '255.255.255.0'
         }
 
         self.logger.debug('Creating VPC tier')
@@ -360,7 +335,6 @@ class TestNicira(cloudstackTestCase):
         self.test_cleanup.append(network)
         return network
 
-
     def create_virtual_machine(self, network, mode='default'):
         self.logger.debug('Creating VM')
         virtual_machine = VirtualMachine.create(
@@ -375,7 +349,6 @@ class TestNicira(cloudstackTestCase):
         self.logger.debug("Created VM with ID: %s" % virtual_machine.id)
         self.test_cleanup.append(virtual_machine)
         return virtual_machine
-
 
     def create_private_gateway(self, vpc, ip_address, gateway, aclId, vlan):
         self.logger.debug('::: Creating private gateway in vpc %s with ip %s :::' % (vpc.id, ip_address))
@@ -398,20 +371,16 @@ class TestNicira(cloudstackTestCase):
 
         return private_gateway
 
-
     def get_routers_for_network(self, network):
         return list_routers(self.api_client, account='admin', domainid=self.domain.id, networkid=network.id)
 
-
     def get_hosts(self):
         return list_hosts(self.api_client, account='admin', domainid=self.domain.id)
-
 
     def get_master_router(self, routers):
         master = filter(lambda r: r.redundantstate == 'MASTER', routers)
         self.logger.debug('Found %s master router(s): %s' % (master.size(), master))
         return master[0]
-
 
     def distribute_vm_and_routers_by_hosts(self, virtual_machine, routers):
         if len(routers) > 1:
@@ -431,7 +400,6 @@ class TestNicira(cloudstackTestCase):
         else:
             self.logger.debug('Master Router VM is not on the same host as VM: %s, %s' % (router.hostid, virtual_machine.hostid))
 
-
     def acquire_publicip(self, network):
         self.logger.debug('Associating public IP for network: %s' % network.name)
         public_ip = PublicIPAddress.create(
@@ -444,7 +412,6 @@ class TestNicira(cloudstackTestCase):
         self.logger.debug('Associated %s with network %s' % (public_ip.ipaddress.ipaddress, network.id))
         self.test_cleanup.append(public_ip)
         return public_ip
-
 
     def create_natrule(self, vm, public_ip, network):
         self.logger.debug('Creating NAT rule in network for vm with public IP')
@@ -459,12 +426,11 @@ class TestNicira(cloudstackTestCase):
         self.test_cleanup.append(nat_rule)
         return nat_rule
 
-
-    @attr(tags = ['advanced', 'smoke', 'nicira'], required_hardware='true')
+    @attr(tags=['advanced', 'smoke', 'nicira'], required_hardware='true')
     def test_01_nicira_controller(self):
         self.add_nicira_device(self.nicira_master_controller)
 
-        network         = self.create_guest_network()
+        network = self.create_guest_network()
         virtual_machine = self.create_virtual_machine(network, self.vm_services['mode'])
 
         list_vm_response = VirtualMachine.list(self.api_client, id=virtual_machine.id)
@@ -477,8 +443,7 @@ class TestNicira(cloudstackTestCase):
         self.assertEqual(vm_response.id, virtual_machine.id, 'Virtual machine in response does not match request')
         self.assertEqual(vm_response.state, 'Running', 'VM is not in Running state')
 
-
-    @attr(tags = ['advanced', 'smoke', 'nicira'], required_hardware='true')
+    @attr(tags=['advanced', 'smoke', 'nicira'], required_hardware='true')
     def test_02_nicira_controller_redirect(self):
         '''
             Nicira clusters will redirect clients (in this case ACS) to the master node.
@@ -495,7 +460,7 @@ class TestNicira(cloudstackTestCase):
 
         self.add_nicira_device(nicira_slave)
 
-        network         = self.create_guest_network()
+        network = self.create_guest_network()
         virtual_machine = self.create_virtual_machine(network, self.vm_services['mode'])
 
         list_vm_response = VirtualMachine.list(self.api_client, id=virtual_machine.id)
@@ -508,14 +473,13 @@ class TestNicira(cloudstackTestCase):
         self.assertEqual(vm_response.id, virtual_machine.id, 'Virtual machine in response does not match request')
         self.assertEqual(vm_response.state, 'Running', 'VM is not in Running state')
 
-
-    @attr(tags = ['advanced', 'smoke', 'nicira'], required_hardware='true')
+    @attr(tags=['advanced', 'smoke', 'nicira'], required_hardware='true')
     def test_03_nicira_tunnel_guest_network(self):
         self.add_nicira_device(self.nicira_master_controller)
-        network         = self.create_guest_network()
+        network = self.create_guest_network()
         virtual_machine = self.create_virtual_machine(network, self.vm_services['mode'])
-        public_ip       = self.acquire_publicip(network)
-        nat_rule        = self.create_natrule(virtual_machine, public_ip, network)
+        public_ip = self.acquire_publicip(network)
+        nat_rule = self.create_natrule(virtual_machine, public_ip, network)
 
         list_vm_response = VirtualMachine.list(self.api_client, id=virtual_machine.id)
         self.logger.debug('Verify listVirtualMachines response for virtual machine: %s' % virtual_machine.id)
@@ -544,14 +508,13 @@ class TestNicira(cloudstackTestCase):
 
         self.assertEqual(result.count('3 packets received'), 1, 'Ping to outside world from VM should be successful')
 
-
-    @attr(tags = ['advanced', 'smoke', 'nicira'], required_hardware='true')
+    @attr(tags=['advanced', 'smoke', 'nicira'], required_hardware='true')
     def test_04_vpc_private_gateway_with_invalid_lswitch(self):
         self.logger.debug('Adding NSX device')
         self.add_nicira_device(self.nicira_master_controller)
 
         self.logger.debug('Creating VPC offering')
-        self.vpc_offering  = VpcOffering.create(self.api_client, self.vpc_offering_services)
+        self.vpc_offering = VpcOffering.create(self.api_client, self.vpc_offering_services)
         self.vpc_offering.update(self.api_client, state='Enabled')
         self.test_cleanup.append(self.vpc_offering)
 
@@ -566,10 +529,10 @@ class TestNicira(cloudstackTestCase):
         self.test_cleanup.append(self.private_network_offering)
 
         allow_all_acl_id = 'bd6d44f8-fc11-11e5-8fe8-5254001daa61'
-        bad_lswitch      = 'lswitch:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+        bad_lswitch = 'lswitch:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
 
-        vpc             = self.create_vpc()
-        network         = self.create_vpc_tier(vpc)
+        vpc = self.create_vpc()
+        network = self.create_vpc_tier(vpc)
         virtual_machine = self.create_virtual_machine(network)
 
         self.logger.debug('Creating private gateway')

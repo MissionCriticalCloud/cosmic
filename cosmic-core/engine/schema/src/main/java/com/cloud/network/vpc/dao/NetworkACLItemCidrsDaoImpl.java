@@ -1,25 +1,4 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package com.cloud.network.vpc.dao;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.network.vpc.NetworkACLItemCidrsDao;
 import com.cloud.network.vpc.NetworkACLItemCidrsVO;
@@ -28,13 +7,15 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
  * @author daan
- *
  */
 @Component
 public class NetworkACLItemCidrsDaoImpl extends GenericDaoBase<NetworkACLItemCidrsVO, Long> implements NetworkACLItemCidrsDao {
@@ -51,22 +32,22 @@ public class NetworkACLItemCidrsDaoImpl extends GenericDaoBase<NetworkACLItemCid
      * @see com.cloud.network.dao.NetworkAclItemCidrsDao#persist(long, java.util.List)
      */
     @Override
-    public void persist(long networkACLItemId, List<String> cidrs) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public void persist(final long networkACLItemId, final List<String> cidrs) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
 
         txn.start();
-        for (String cidr : cidrs) {
-            NetworkACLItemCidrsVO vo = new NetworkACLItemCidrsVO(networkACLItemId, cidr);
+        for (final String cidr : cidrs) {
+            final NetworkACLItemCidrsVO vo = new NetworkACLItemCidrsVO(networkACLItemId, cidr);
             persist(vo);
         }
         txn.commit();
     }
 
     @Override
-    public void updateCidrs(long networkACLItemId, List<String> cidrs) {
-        List<String> oldCidrs = getCidrs(networkACLItemId);
+    public void updateCidrs(final long networkACLItemId, final List<String> cidrs) {
+        final List<String> oldCidrs = getCidrs(networkACLItemId);
         if (!(oldCidrs.size() == cidrs.size() && oldCidrs.equals(cidrs))) {
-            SearchCriteria<NetworkACLItemCidrsVO> sc = cidrsSearch.create();
+            final SearchCriteria<NetworkACLItemCidrsVO> sc = cidrsSearch.create();
             sc.setParameters("networkAclItemId", networkACLItemId);
             remove(sc);
             persist(networkACLItemId, cidrs);
@@ -77,13 +58,13 @@ public class NetworkACLItemCidrsDaoImpl extends GenericDaoBase<NetworkACLItemCid
      * @see com.cloud.network.dao.NetworkAclItemCidrsDao#getCidrs(long)
      */
     @Override
-    public List<String> getCidrs(long networkACLItemId) {
-        SearchCriteria<NetworkACLItemCidrsVO> sc = cidrsSearch.create();
+    public List<String> getCidrs(final long networkACLItemId) {
+        final SearchCriteria<NetworkACLItemCidrsVO> sc = cidrsSearch.create();
         sc.setParameters("networkAclItemId", networkACLItemId);
 
-        List<NetworkACLItemCidrsVO> results = search(sc, null);
-        List<String> cidrs = new ArrayList<String>(results.size());
-        for (NetworkACLItemCidrsVO result : results) {
+        final List<NetworkACLItemCidrsVO> results = search(sc, null);
+        final List<String> cidrs = new ArrayList<>(results.size());
+        for (final NetworkACLItemCidrsVO result : results) {
             cidrs.add(result.getCidr());
         }
 
@@ -91,13 +72,12 @@ public class NetworkACLItemCidrsDaoImpl extends GenericDaoBase<NetworkACLItemCid
     }
 
     @Override
-    public List<NetworkACLItemCidrsVO> listByNetworkACLItemId(long networkACLItemId) {
-        SearchCriteria<NetworkACLItemCidrsVO> sc = cidrsSearch.create();
+    public List<NetworkACLItemCidrsVO> listByNetworkACLItemId(final long networkACLItemId) {
+        final SearchCriteria<NetworkACLItemCidrsVO> sc = cidrsSearch.create();
         sc.setParameters("networkAclItemId", networkACLItemId);
 
-        List<NetworkACLItemCidrsVO> results = search(sc, null);
+        final List<NetworkACLItemCidrsVO> results = search(sc, null);
 
         return results;
     }
-
 }

@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.storage.datastore.db;
 
 import com.cloud.storage.DataStoreRole;
@@ -23,11 +7,21 @@ import com.cloud.utils.fsm.StateObject;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.persistence.*;
-import java.util.Date;
 
 /**
  * Join table for image_data_store and templates
@@ -36,82 +30,59 @@ import java.util.Date;
 @Table(name = "template_store_ref")
 public class TemplateDataStoreVO implements StateObject<ObjectInDataStoreStateMachine.State>, DataObjectInStore {
     private static final Logger s_logger = LoggerFactory.getLogger(TemplateDataStoreVO.class);
-
+    @Column(name = "update_count", updatable = true, nullable = false)
+    protected long updatedCount;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
-    @Column(name = "store_id")
-    private Long dataStoreId;
-
-    @Column(name = "template_id")
-    private long templateId;
-
-    @Column(name = "store_role")
-    @Enumerated(EnumType.STRING)
-    private DataStoreRole dataStoreRole;
-
-    @Column(name = GenericDaoBase.CREATED_COLUMN)
-    private Date created = null;
-
-    @Column(name = "last_updated")
-    @Temporal(value = TemporalType.TIMESTAMP)
-    private Date lastUpdated = null;
-
-    @Column(name = "download_pct")
-    private int downloadPercent;
-
-    @Column(name = "size")
-    private Long size;
-
-    @Column(name = "physical_size")
-    private long physicalSize;
-
-    @Column(name = "download_state")
-    @Enumerated(EnumType.STRING)
-    private Status downloadState;
-
-    @Column(name = "local_path")
-    private String localDownloadPath;
-
-    @Column(name = "error_str")
-    private String errorString;
-
-    @Column(name = "job_id")
-    private String jobId;
-
-    @Column(name = "install_path")
-    private String installPath;
-
-    @Column(name = "url", length = 2048)
-    private String downloadUrl;
-
-    @Column(name = "download_url", length = 2048)
-    private String extractUrl;
-
-    @Column(name = "download_url_created")
-    @Temporal(value = TemporalType.TIMESTAMP)
-    private Date extractUrlCreated = null;
-
-    @Column(name = "is_copy")
-    private boolean isCopy = false;
-
     @Column(name = "destroyed")
     boolean destroyed = false;
-
-    @Column(name = "update_count", updatable = true, nullable = false)
-    protected long updatedCount;
-
     @Column(name = "updated")
     @Temporal(value = TemporalType.TIMESTAMP)
     Date updated;
-
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     ObjectInDataStoreStateMachine.State state;
-
     @Column(name = "ref_cnt")
     Long refCnt = 0L;
+    @Column(name = "store_id")
+    private Long dataStoreId;
+    @Column(name = "template_id")
+    private long templateId;
+    @Column(name = "store_role")
+    @Enumerated(EnumType.STRING)
+    private DataStoreRole dataStoreRole;
+    @Column(name = GenericDaoBase.CREATED_COLUMN)
+    private Date created = null;
+    @Column(name = "last_updated")
+    @Temporal(value = TemporalType.TIMESTAMP)
+    private Date lastUpdated = null;
+    @Column(name = "download_pct")
+    private int downloadPercent;
+    @Column(name = "size")
+    private Long size;
+    @Column(name = "physical_size")
+    private long physicalSize;
+    @Column(name = "download_state")
+    @Enumerated(EnumType.STRING)
+    private Status downloadState;
+    @Column(name = "local_path")
+    private String localDownloadPath;
+    @Column(name = "error_str")
+    private String errorString;
+    @Column(name = "job_id")
+    private String jobId;
+    @Column(name = "install_path")
+    private String installPath;
+    @Column(name = "url", length = 2048)
+    private String downloadUrl;
+    @Column(name = "download_url", length = 2048)
+    private String extractUrl;
+    @Column(name = "download_url_created")
+    @Temporal(value = TemporalType.TIMESTAMP)
+    private Date extractUrlCreated = null;
+    @Column(name = "is_copy")
+    private boolean isCopy = false;
 
     public TemplateDataStoreVO(final Long hostId, final long templateId) {
         super();
@@ -121,7 +92,8 @@ public class TemplateDataStoreVO implements StateObject<ObjectInDataStoreStateMa
         refCnt = 0L;
     }
 
-    public TemplateDataStoreVO(final Long hostId, final long templateId, final Date lastUpdated, final int downloadPercent, final Status downloadState, final String localDownloadPath, final String errorString,
+    public TemplateDataStoreVO(final Long hostId, final long templateId, final Date lastUpdated, final int downloadPercent, final Status downloadState, final String
+            localDownloadPath, final String errorString,
                                final String jobId, final String installPath, final String downloadUrl) {
         super();
         dataStoreId = hostId;
@@ -167,12 +139,27 @@ public class TemplateDataStoreVO implements StateObject<ObjectInDataStoreStateMa
     }
 
     @Override
+    public void setInstallPath(final String installPath) {
+        this.installPath = installPath;
+    }
+
+    @Override
+    public long getObjectId() {
+        return getTemplateId();
+    }
+
+    @Override
     public long getDataStoreId() {
         return dataStoreId;
     }
 
     public void setDataStoreId(final long storeId) {
         dataStoreId = storeId;
+    }
+
+    @Override
+    public State getObjectInStoreState() {
+        return state;
     }
 
     public long getTemplateId() {
@@ -189,10 +176,6 @@ public class TemplateDataStoreVO implements StateObject<ObjectInDataStoreStateMa
 
     public void setDownloadPercent(final int downloadPercent) {
         this.downloadPercent = downloadPercent;
-    }
-
-    public void setDownloadState(final Status downloadState) {
-        this.downloadState = downloadState;
     }
 
     public long getId() {
@@ -215,37 +198,43 @@ public class TemplateDataStoreVO implements StateObject<ObjectInDataStoreStateMa
         lastUpdated = date;
     }
 
-    @Override
-    public void setInstallPath(final String installPath) {
-        this.installPath = installPath;
-    }
-
     public Status getDownloadState() {
         return downloadState;
     }
 
-    public void setLocalDownloadPath(final String localPath) {
-        localDownloadPath = localPath;
+    public void setDownloadState(final Status downloadState) {
+        this.downloadState = downloadState;
     }
 
     public String getLocalDownloadPath() {
         return localDownloadPath;
     }
 
-    public void setErrorString(final String errorString) {
-        this.errorString = errorString;
+    public void setLocalDownloadPath(final String localPath) {
+        localDownloadPath = localPath;
     }
 
     public String getErrorString() {
         return errorString;
     }
 
-    public void setJobId(final String jobId) {
-        this.jobId = jobId;
+    public void setErrorString(final String errorString) {
+        this.errorString = errorString;
     }
 
     public String getJobId() {
         return jobId;
+    }
+
+    public void setJobId(final String jobId) {
+        this.jobId = jobId;
+    }
+
+    @Override
+    public int hashCode() {
+        final Long tid = new Long(templateId);
+        final Long hid = new Long(dataStoreId);
+        return tid.hashCode() + hid.hashCode();
     }
 
     @Override
@@ -258,59 +247,52 @@ public class TemplateDataStoreVO implements StateObject<ObjectInDataStoreStateMa
     }
 
     @Override
-    public int hashCode() {
-        final Long tid = new Long(templateId);
-        final Long hid = new Long(dataStoreId);
-        return tid.hashCode() + hid.hashCode();
-    }
-
-    public void setSize(final Long size) {
-        this.size = size;
+    public String toString() {
+        return new StringBuilder("TmplDataStore[").append(id).append("-").append(templateId).append("-").append(dataStoreId).append(installPath).append("]").toString();
     }
 
     public long getSize() {
         return size;
     }
 
-    public void setPhysicalSize(final long physicalSize) {
-        this.physicalSize = physicalSize;
+    public void setSize(final Long size) {
+        this.size = size;
     }
 
     public long getPhysicalSize() {
         return physicalSize;
     }
 
-    public void setDestroyed(final boolean destroyed) {
-        this.destroyed = destroyed;
+    public void setPhysicalSize(final long physicalSize) {
+        this.physicalSize = physicalSize;
     }
 
     public boolean getDestroyed() {
         return destroyed;
     }
 
-    public void setDownloadUrl(final String downloadUrl) {
-        this.downloadUrl = downloadUrl;
+    public void setDestroyed(final boolean destroyed) {
+        this.destroyed = destroyed;
     }
 
     public String getDownloadUrl() {
         return downloadUrl;
     }
 
-    public void setCopy(final boolean isCopy) {
-        this.isCopy = isCopy;
+    public void setDownloadUrl(final String downloadUrl) {
+        this.downloadUrl = downloadUrl;
     }
 
     public boolean isCopy() {
         return isCopy;
     }
 
-    public long getTemplateSize() {
-        return -1;
+    public void setCopy(final boolean isCopy) {
+        this.isCopy = isCopy;
     }
 
-    @Override
-    public String toString() {
-        return new StringBuilder("TmplDataStore[").append(id).append("-").append(templateId).append("-").append(dataStoreId).append(installPath).append("]").toString();
+    public long getTemplateSize() {
+        return -1;
     }
 
     @Override
@@ -337,16 +319,6 @@ public class TemplateDataStoreVO implements StateObject<ObjectInDataStoreStateMa
 
     public Date getUpdated() {
         return updated;
-    }
-
-    @Override
-    public long getObjectId() {
-        return getTemplateId();
-    }
-
-    @Override
-    public State getObjectInStoreState() {
-        return state;
     }
 
     public DataStoreRole getDataStoreRole() {
@@ -392,5 +364,4 @@ public class TemplateDataStoreVO implements StateObject<ObjectInDataStoreStateMa
     public void setExtractUrlCreated(final Date extractUrlCreated) {
         this.extractUrlCreated = extractUrlCreated;
     }
-
 }

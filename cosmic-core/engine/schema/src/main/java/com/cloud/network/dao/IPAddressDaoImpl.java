@@ -1,28 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.dao;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.VlanVO;
@@ -40,8 +16,15 @@ import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.net.Ip;
-
 import org.apache.cloudstack.resourcedetail.dao.UserIpAddressDetailsDao;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Date;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -124,11 +107,11 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
         AllIpCountForDashboard.and("dc", AllIpCountForDashboard.entity().getDataCenterId(), Op.EQ);
         AllIpCountForDashboard.and("state", AllIpCountForDashboard.entity().getState(), SearchCriteria.Op.NEQ);
 
-        SearchBuilder<VlanVO> virtaulNetworkVlan = _vlanDao.createSearchBuilder();
+        final SearchBuilder<VlanVO> virtaulNetworkVlan = _vlanDao.createSearchBuilder();
         virtaulNetworkVlan.and("vlanType", virtaulNetworkVlan.entity().getVlanType(), SearchCriteria.Op.EQ);
 
         AllIpCountForDashboard.join("vlan", virtaulNetworkVlan, virtaulNetworkVlan.entity().getId(), AllIpCountForDashboard.entity().getVlanId(),
-            JoinBuilder.JoinType.INNER);
+                JoinBuilder.JoinType.INNER);
         virtaulNetworkVlan.done();
         AllIpCountForDashboard.done();
 
@@ -143,7 +126,7 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
         CountFreePublicIps.select(null, Func.COUNT, null);
         CountFreePublicIps.and("state", CountFreePublicIps.entity().getState(), SearchCriteria.Op.EQ);
         CountFreePublicIps.and("networkId", CountFreePublicIps.entity().getSourceNetworkId(), SearchCriteria.Op.EQ);
-        SearchBuilder<VlanVO> join = _vlanDao.createSearchBuilder();
+        final SearchBuilder<VlanVO> join = _vlanDao.createSearchBuilder();
         join.and("vlanType", join.entity().getVlanType(), Op.EQ);
         CountFreePublicIps.join("vlans", join, CountFreePublicIps.entity().getVlanId(), join.entity().getId(), JoinBuilder.JoinType.INNER);
         CountFreePublicIps.done();
@@ -154,21 +137,23 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     }
 
     @Override
-    public boolean mark(long dcId, Ip ip) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("dataCenterId", dcId);
-        sc.setParameters("ipAddress", ip);
+    @DB
+    public IPAddressVO markAsUnavailable(final long ipAddressId) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+        sc.setParameters("id", ipAddressId);
 
-        IPAddressVO vo = createForUpdate();
-        vo.setAllocatedTime(new Date());
-        vo.setState(State.Allocated);
+        final IPAddressVO ip = createForUpdate();
+        ip.setState(State.Releasing);
+        if (update(ip, sc) != 1) {
+            return null;
+        }
 
-        return update(vo, sc) >= 1;
+        return findOneBy(sc);
     }
 
     @Override
-    public void unassignIpAddress(long ipAddressId) {
-        IPAddressVO address = createForUpdate();
+    public void unassignIpAddress(final long ipAddressId) {
+        final IPAddressVO address = createForUpdate();
         address.setAllocatedToAccountId(null);
         address.setAllocatedInDomainId(null);
         address.setAllocatedTime(null);
@@ -187,69 +172,37 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     }
 
     @Override
-    public List<IPAddressVO> listByAccount(long accountId) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+    public List<IPAddressVO> listByAccount(final long accountId) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("accountId", accountId);
         return listBy(sc);
     }
 
     @Override
-    public List<IPAddressVO> listByVlanId(long vlanId) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+    public List<IPAddressVO> listByVlanId(final long vlanId) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("vlan", vlanId);
         return listBy(sc);
     }
 
     @Override
-    public IPAddressVO findByIpAndSourceNetworkId(long networkId, String ipAddress) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("sourcenetwork", networkId);
-        sc.setParameters("ipAddress", ipAddress);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public IPAddressVO findByIpAndNetworkId(long networkId, String ipAddress) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("network", networkId);
-        sc.setParameters("ipAddress", ipAddress);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public IPAddressVO findByIpAndVlanId(String ipAddress, long vlanid) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("ipAddress", ipAddress);
-        sc.setParameters("vlan", vlanid);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public IPAddressVO findByIpAndDcId(long dcId, String ipAddress) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("dataCenterId", dcId);
-        sc.setParameters("ipAddress", ipAddress);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public List<IPAddressVO> listByDcId(long dcId) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("dataCenterId", dcId);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<IPAddressVO> listByDcIdIpAddress(long dcId, String ipAddress) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+    public List<IPAddressVO> listByDcIdIpAddress(final long dcId, final String ipAddress) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("dataCenterId", dcId);
         sc.setParameters("ipAddress", ipAddress);
         return listBy(sc);
     }
 
     @Override
-    public List<IPAddressVO> listByAssociatedNetwork(long networkId, Boolean isSourceNat) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+    public List<IPAddressVO> listByDcId(final long dcId) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+        sc.setParameters("dataCenterId", dcId);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<IPAddressVO> listByAssociatedNetwork(final long networkId, final Boolean isSourceNat) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("network", networkId);
 
         if (isSourceNat != null) {
@@ -260,50 +213,24 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     }
 
     @Override
-    public List<IPAddressVO> listStaticNatPublicIps(long networkId) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+    public List<IPAddressVO> listStaticNatPublicIps(final long networkId) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("network", networkId);
         sc.setParameters("oneToOneNat", true);
         return listBy(sc);
     }
 
     @Override
-    public IPAddressVO findByAssociatedVmId(long vmId) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("associatedWithVmId", vmId);
-
-        return findOneBy(sc);
-    }
-
-
-    // for vm secondary ips case mapping is  IP1--> vmIp1, IP2-->vmIp2, etc
-    // Used when vm is mapped to muliple to public ips
-    @Override
-    public List<IPAddressVO> findAllByAssociatedVmId(long vmId) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("associatedWithVmId", vmId);
-
-        return listBy(sc);
-    }
-
-    @Override
-    public IPAddressVO findByVmIp(String vmIp) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("associatedVmIp", vmIp);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public int countIPs(long dcId, boolean onlyCountAllocated) {
-        SearchCriteria<Integer> sc = onlyCountAllocated ? AllocatedIpCountForDc.create() : AllIpCountForDc.create();
+    public int countIPs(final long dcId, final boolean onlyCountAllocated) {
+        final SearchCriteria<Integer> sc = onlyCountAllocated ? AllocatedIpCountForDc.create() : AllIpCountForDc.create();
         sc.setParameters("dc", dcId);
 
         return customSearch(sc, null).get(0);
     }
 
     @Override
-    public int countIPs(long dcId, long vlanId, boolean onlyCountAllocated) {
-        SearchCriteria<Integer> sc = onlyCountAllocated ? AllocatedIpCount.create() : AllIpCount.create();
+    public int countIPs(final long dcId, final long vlanId, final boolean onlyCountAllocated) {
+        final SearchCriteria<Integer> sc = onlyCountAllocated ? AllocatedIpCount.create() : AllIpCount.create();
         sc.setParameters("dc", dcId);
         sc.setParameters("vlan", vlanId);
 
@@ -311,8 +238,56 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     }
 
     @Override
-    public int countIPsForNetwork(long dcId, boolean onlyCountAllocated, VlanType vlanType) {
-        SearchCriteria<Integer> sc = AllIpCountForDashboard.create();
+    @DB
+    public int countIPs(final long dcId, final Long accountId, final String vlanId, final String vlanGateway, final String vlanNetmask) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        int ipCount = 0;
+        try {
+            final String sql =
+                    "SELECT count(*) FROM user_ip_address u INNER JOIN vlan v on (u.vlan_db_id = v.id AND v.data_center_id = ? AND v.vlan_id = ? AND v.vlan_gateway = ? AND v" +
+                            ".vlan_netmask = ? AND u.account_id = ?)";
+
+            final PreparedStatement pstmt = txn.prepareAutoCloseStatement(sql);
+            pstmt.setLong(1, dcId);
+            pstmt.setString(2, vlanId);
+            pstmt.setString(3, vlanGateway);
+            pstmt.setString(4, vlanNetmask);
+            pstmt.setLong(5, accountId);
+            final ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                ipCount = rs.getInt(1);
+            }
+        } catch (final Exception e) {
+            s_logger.warn("Exception counting IP addresses", e);
+        }
+
+        return ipCount;
+    }
+
+    @Override
+    public long countAllocatedIPsForAccount(final long accountId) {
+        final SearchCriteria<Long> sc = AllocatedIpCountForAccount.create();
+        sc.setParameters("account", accountId);
+        return customSearch(sc, null).get(0);
+    }
+
+    @Override
+    public boolean mark(final long dcId, final Ip ip) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+        sc.setParameters("dataCenterId", dcId);
+        sc.setParameters("ipAddress", ip);
+
+        final IPAddressVO vo = createForUpdate();
+        vo.setAllocatedTime(new Date());
+        vo.setState(State.Allocated);
+
+        return update(vo, sc) >= 1;
+    }
+
+    @Override
+    public int countIPsForNetwork(final long dcId, final boolean onlyCountAllocated, final VlanType vlanType) {
+        final SearchCriteria<Integer> sc = AllIpCountForDashboard.create();
         sc.setParameters("dc", dcId);
         if (onlyCountAllocated) {
             sc.setParameters("state", State.Free);
@@ -322,79 +297,49 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     }
 
     @Override
-    @DB
-    public int countIPs(long dcId, Long accountId, String vlanId, String vlanGateway, String vlanNetmask) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        int ipCount = 0;
-        try {
-            String sql =
-                "SELECT count(*) FROM user_ip_address u INNER JOIN vlan v on (u.vlan_db_id = v.id AND v.data_center_id = ? AND v.vlan_id = ? AND v.vlan_gateway = ? AND v.vlan_netmask = ? AND u.account_id = ?)";
-
-            PreparedStatement pstmt = txn.prepareAutoCloseStatement(sql);
-            pstmt.setLong(1, dcId);
-            pstmt.setString(2, vlanId);
-            pstmt.setString(3, vlanGateway);
-            pstmt.setString(4, vlanNetmask);
-            pstmt.setLong(5, accountId);
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                ipCount = rs.getInt(1);
-            }
-        } catch (Exception e) {
-            s_logger.warn("Exception counting IP addresses", e);
-        }
-
-        return ipCount;
-    }
-
-    @Override
-    @DB
-    public IPAddressVO markAsUnavailable(long ipAddressId) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("id", ipAddressId);
-
-        IPAddressVO ip = createForUpdate();
-        ip.setState(State.Releasing);
-        if (update(ip, sc) != 1) {
-            return null;
-        }
+    public IPAddressVO findByAssociatedVmId(final long vmId) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+        sc.setParameters("associatedWithVmId", vmId);
 
         return findOneBy(sc);
     }
 
+    // for vm secondary ips case mapping is  IP1--> vmIp1, IP2-->vmIp2, etc
+    // Used when vm is mapped to muliple to public ips
     @Override
-    public long countAllocatedIPsForAccount(long accountId) {
-        SearchCriteria<Long> sc = AllocatedIpCountForAccount.create();
-        sc.setParameters("account", accountId);
-        return customSearch(sc, null).get(0);
+    public List<IPAddressVO> findAllByAssociatedVmId(final long vmId) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+        sc.setParameters("associatedWithVmId", vmId);
+
+        return listBy(sc);
     }
 
     @Override
-    public List<IPAddressVO> listByPhysicalNetworkId(long physicalNetworkId) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+    public IPAddressVO findByIpAndSourceNetworkId(final long networkId, final String ipAddress) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+        sc.setParameters("sourcenetwork", networkId);
+        sc.setParameters("ipAddress", ipAddress);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public IPAddressVO findByIpAndDcId(final long dcId, final String ipAddress) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+        sc.setParameters("dataCenterId", dcId);
+        sc.setParameters("ipAddress", ipAddress);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public List<IPAddressVO> listByPhysicalNetworkId(final long physicalNetworkId) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("physicalNetworkId", physicalNetworkId);
         return listBy(sc);
     }
 
     @Override
-    public long countFreePublicIPs() {
-        SearchCriteria<Long> sc = CountFreePublicIps.create();
-        sc.setParameters("state", State.Free);
-        sc.setJoinParameters("vlans", "vlanType", VlanType.VirtualNetwork);
-        return customSearch(sc, null).get(0);
-    }
-
-    @Override
-    public long countFreeIpsInVlan(long vlanDbId) {
-        SearchCriteria<IPAddressVO> sc = VlanDbIdSearchUnallocated.create();
-        sc.setParameters("vlanDbId", vlanDbId);
-        return listBy(sc).size();
-    }
-
-    @Override
-    public List<IPAddressVO> listByAssociatedVpc(long vpcId, Boolean isSourceNat) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+    public List<IPAddressVO> listByAssociatedVpc(final long vpcId, final Boolean isSourceNat) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("vpcId", vpcId);
 
         if (isSourceNat != null) {
@@ -405,70 +350,108 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     }
 
     @Override
-    public long countFreeIPsInNetwork(long networkId) {
-        SearchCriteria<Long> sc = CountFreePublicIps.create();
+    public long countFreePublicIPs() {
+        final SearchCriteria<Long> sc = CountFreePublicIps.create();
+        sc.setParameters("state", State.Free);
+        sc.setJoinParameters("vlans", "vlanType", VlanType.VirtualNetwork);
+        return customSearch(sc, null).get(0);
+    }
+
+    @Override
+    public long countFreeIPsInNetwork(final long networkId) {
+        final SearchCriteria<Long> sc = CountFreePublicIps.create();
         sc.setParameters("state", State.Free);
         sc.setParameters("networkId", networkId);
         return customSearch(sc, null).get(0);
     }
 
     @Override
-    public void deletePublicIPRangeExceptAliasIP(long vlanDbId, String aliasIp) {
-        SearchCriteria<IPAddressVO> sc = DeleteAllExceptGivenIp.create();
-        sc.setParameters("vlan", vlanDbId);
-        sc.setParameters("ip", aliasIp);
-        remove(sc);
+    public IPAddressVO findByVmIp(final String vmIp) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+        sc.setParameters("associatedVmIp", vmIp);
+        return findOneBy(sc);
     }
 
     @Override
-    public boolean deletePublicIPRange(long vlanDbId) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("vlan", vlanDbId);
-        remove(sc);
-        return true;
-    }
-
-    @Override
-    @DB
-    public boolean remove(Long id) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        IPAddressVO entry = findById(id);
-        if (entry != null) {
-            _tagsDao.removeByIdAndType(id, ResourceObjectType.SecurityGroup);
-        }
-        boolean result = super.remove(id);
-        txn.commit();
-        return result;
-    }
-
-    @Override
-    public IPAddressVO findByAssociatedVmIdAndVmIp(long vmId, String vmIp) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+    public IPAddressVO findByAssociatedVmIdAndVmIp(final long vmId, final String vmIp) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("associatedWithVmId", vmId);
         sc.setParameters("associatedVmIp", vmIp);
         return findOneBy(sc);
     }
 
     @Override
-    public List<IPAddressVO> listByAssociatedVmId(long vmId) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+    public IPAddressVO findByIpAndNetworkId(final long networkId, final String ipAddress) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+        sc.setParameters("network", networkId);
+        sc.setParameters("ipAddress", ipAddress);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public IPAddressVO findByIpAndVlanId(final String ipAddress, final long vlanid) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+        sc.setParameters("ipAddress", ipAddress);
+        sc.setParameters("vlan", vlanid);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public long countFreeIpsInVlan(final long vlanDbId) {
+        final SearchCriteria<IPAddressVO> sc = VlanDbIdSearchUnallocated.create();
+        sc.setParameters("vlanDbId", vlanDbId);
+        return listBy(sc).size();
+    }
+
+    @Override
+    public void deletePublicIPRangeExceptAliasIP(final long vlanDbId, final String aliasIp) {
+        final SearchCriteria<IPAddressVO> sc = DeleteAllExceptGivenIp.create();
+        sc.setParameters("vlan", vlanDbId);
+        sc.setParameters("ip", aliasIp);
+        remove(sc);
+    }
+
+    @Override
+    public boolean deletePublicIPRange(final long vlanDbId) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+        sc.setParameters("vlan", vlanDbId);
+        remove(sc);
+        return true;
+    }
+
+    @Override
+    public void lockRange(final long vlandbId) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+        sc.setParameters("vlan", vlandbId);
+        lockRows(sc, null, true);
+    }
+
+    @Override
+    public List<IPAddressVO> listByAssociatedVmId(final long vmId) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("associatedWithVmId", vmId);
         return listBy(sc);
     }
 
     @Override
-    public IPAddressVO findByVmIdAndNetworkId(long networkId, long vmId) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+    public IPAddressVO findByVmIdAndNetworkId(final long networkId, final long vmId) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("network", networkId);
         sc.setParameters("associatedWithVmId", vmId);
         return findOneBy(sc);
     }
 
     @Override
-    public void lockRange(long vlandbId) {
-        SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("vlan", vlandbId);
-        lockRows(sc, null, true);
+    @DB
+    public boolean remove(final Long id) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        txn.start();
+        final IPAddressVO entry = findById(id);
+        if (entry != null) {
+            _tagsDao.removeByIdAndType(id, ResourceObjectType.SecurityGroup);
+        }
+        final boolean result = super.remove(id);
+        txn.commit();
+        return result;
     }
 }

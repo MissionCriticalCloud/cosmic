@@ -1,27 +1,7 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.guest;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.storage.GuestOSHypervisor;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
@@ -29,6 +9,10 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.GuestOSResponse;
 import org.apache.cloudstack.api.response.GuestOsMappingResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +36,8 @@ public class ListGuestOsMappingCmd extends BaseListCmd {
     @Parameter(name = ApiConstants.HYPERVISOR, type = CommandType.STRING, required = false, description = "list Guest OS mapping by hypervisor")
     private String hypervisor;
 
-    @Parameter(name = ApiConstants.HYPERVISOR_VERSION, type = CommandType.STRING, required = false, description = "list Guest OS mapping by hypervisor version. Must be used with hypervisor parameter")
+    @Parameter(name = ApiConstants.HYPERVISOR_VERSION, type = CommandType.STRING, required = false, description = "list Guest OS mapping by hypervisor version. Must be used with" +
+            " hypervisor parameter")
     private String hypervisorVersion;
 
     /////////////////////////////////////////////////////
@@ -80,22 +65,22 @@ public class ListGuestOsMappingCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
-        Pair<List<? extends GuestOSHypervisor>, Integer> result = _mgr.listGuestOSMappingByCriteria(this);
-        ListResponse<GuestOsMappingResponse> response = new ListResponse<GuestOsMappingResponse>();
-        List<GuestOsMappingResponse> osMappingResponses = new ArrayList<GuestOsMappingResponse>();
-        for (GuestOSHypervisor guestOSHypervisor : result.first()) {
-            GuestOsMappingResponse guestOsMappingResponse = _responseGenerator.createGuestOSMappingResponse(guestOSHypervisor);
+        final Pair<List<? extends GuestOSHypervisor>, Integer> result = _mgr.listGuestOSMappingByCriteria(this);
+        final ListResponse<GuestOsMappingResponse> response = new ListResponse<>();
+        final List<GuestOsMappingResponse> osMappingResponses = new ArrayList<>();
+        for (final GuestOSHypervisor guestOSHypervisor : result.first()) {
+            final GuestOsMappingResponse guestOsMappingResponse = _responseGenerator.createGuestOSMappingResponse(guestOSHypervisor);
             osMappingResponses.add(guestOsMappingResponse);
         }
 
         response.setResponses(osMappingResponses, result.second());
         response.setResponseName(getCommandName());
         setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

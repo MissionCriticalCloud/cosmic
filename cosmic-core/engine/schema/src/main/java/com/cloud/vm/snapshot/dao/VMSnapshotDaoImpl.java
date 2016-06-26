@@ -1,24 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.vm.snapshot.dao;
-
-import java.util.Date;
-import java.util.List;
 
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
@@ -29,6 +9,9 @@ import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshot.Event;
 import com.cloud.vm.snapshot.VMSnapshot.State;
 import com.cloud.vm.snapshot.VMSnapshotVO;
+
+import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,112 +57,111 @@ public class VMSnapshotDaoImpl extends GenericDaoBase<VMSnapshotVO, Long> implem
     }
 
     @Override
-    public List<VMSnapshotVO> findByVm(Long vmId) {
-        SearchCriteria<VMSnapshotVO> sc = SnapshotSearch.create();
+    public List<VMSnapshotVO> findByVm(final Long vmId) {
+        final SearchCriteria<VMSnapshotVO> sc = SnapshotSearch.create();
         sc.setParameters("vm_id", vmId);
         return listBy(sc, null);
     }
 
     @Override
     public List<VMSnapshotVO> listExpungingSnapshot() {
-        SearchCriteria<VMSnapshotVO> sc = ExpungingSnapshotSearch.create();
+        final SearchCriteria<VMSnapshotVO> sc = ExpungingSnapshotSearch.create();
         sc.setParameters("state", State.Expunging);
         return listBy(sc, null);
     }
 
     @Override
-    public List<VMSnapshotVO> listByInstanceId(Long vmId, State... status) {
-        SearchCriteria<VMSnapshotVO> sc = SnapshotStatusSearch.create();
+    public List<VMSnapshotVO> listByInstanceId(final Long vmId, final State... status) {
+        final SearchCriteria<VMSnapshotVO> sc = SnapshotStatusSearch.create();
         sc.setParameters("vm_id", vmId);
-        sc.setParameters("state", (Object[])status);
+        sc.setParameters("state", (Object[]) status);
         return listBy(sc, null);
     }
 
     @Override
-    public VMSnapshotVO findCurrentSnapshotByVmId(Long vmId) {
-        SearchCriteria<VMSnapshotVO> sc = AllFieldsSearch.create();
+    public VMSnapshotVO findCurrentSnapshotByVmId(final Long vmId) {
+        final SearchCriteria<VMSnapshotVO> sc = AllFieldsSearch.create();
         sc.setParameters("vm_id", vmId);
         sc.setParameters("current", 1);
         return findOneBy(sc);
     }
 
     @Override
-    public List<VMSnapshotVO> listByParent(Long vmSnapshotId) {
-        SearchCriteria<VMSnapshotVO> sc = AllFieldsSearch.create();
+    public List<VMSnapshotVO> listByParent(final Long vmSnapshotId) {
+        final SearchCriteria<VMSnapshotVO> sc = AllFieldsSearch.create();
         sc.setParameters("parent", vmSnapshotId);
         sc.setParameters("state", State.Ready);
         return listBy(sc, null);
     }
 
     @Override
-    public VMSnapshotVO findByName(Long vmId, String name) {
-        SearchCriteria<VMSnapshotVO> sc = AllFieldsSearch.create();
+    public VMSnapshotVO findByName(final Long vmId, final String name) {
+        final SearchCriteria<VMSnapshotVO> sc = AllFieldsSearch.create();
         sc.setParameters("vm_id", vmId);
         sc.setParameters("display_name", name);
         return null;
     }
 
-    public List<VMSnapshotVO> listByAccountId(Long accountId) {
-        SearchCriteria sc = this.AllFieldsSearch.create();
-        sc.setParameters("accountId", new Object[] { accountId });
+    public List<VMSnapshotVO> listByAccountId(final Long accountId) {
+        final SearchCriteria sc = this.AllFieldsSearch.create();
+        sc.setParameters("accountId", new Object[]{accountId});
         return listBy(sc, null);
     }
 
     @Override
-    public boolean updateState(State currentState, Event event, State nextState, VMSnapshot vo, Object data) {
+    public boolean updateState(final State currentState, final Event event, final State nextState, final VMSnapshot vo, final Object data) {
 
-        Long oldUpdated = vo.getUpdatedCount();
-        Date oldUpdatedTime = vo.getUpdated();
+        final Long oldUpdated = vo.getUpdatedCount();
+        final Date oldUpdatedTime = vo.getUpdated();
 
-        SearchCriteria<VMSnapshotVO> sc = AllFieldsSearch.create();
+        final SearchCriteria<VMSnapshotVO> sc = AllFieldsSearch.create();
         sc.setParameters("id", vo.getId());
         sc.setParameters("state", currentState);
         sc.setParameters("updatedCount", vo.getUpdatedCount());
 
         vo.incrUpdatedCount();
 
-        UpdateBuilder builder = getUpdateBuilder(vo);
+        final UpdateBuilder builder = getUpdateBuilder(vo);
         builder.set(vo, "state", nextState);
         builder.set(vo, "updated", new Date());
 
-        int rows = update((VMSnapshotVO)vo, sc);
+        final int rows = update((VMSnapshotVO) vo, sc);
         if (rows == 0 && s_logger.isDebugEnabled()) {
-            VMSnapshotVO dbVol = findByIdIncludingRemoved(vo.getId());
+            final VMSnapshotVO dbVol = findByIdIncludingRemoved(vo.getId());
             if (dbVol != null) {
-                StringBuilder str = new StringBuilder("Unable to update ").append(vo.toString());
+                final StringBuilder str = new StringBuilder("Unable to update ").append(vo.toString());
                 str.append(": DB Data={id=")
-                    .append(dbVol.getId())
-                    .append("; state=")
-                    .append(dbVol.getState())
-                    .append("; updatecount=")
-                    .append(dbVol.getUpdatedCount())
-                    .append(";updatedTime=")
-                    .append(dbVol.getUpdated());
+                   .append(dbVol.getId())
+                   .append("; state=")
+                   .append(dbVol.getState())
+                   .append("; updatecount=")
+                   .append(dbVol.getUpdatedCount())
+                   .append(";updatedTime=")
+                   .append(dbVol.getUpdated());
                 str.append(": New Data={id=")
-                    .append(vo.getId())
-                    .append("; state=")
-                    .append(nextState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatecount=")
-                    .append(vo.getUpdatedCount())
-                    .append("; updatedTime=")
-                    .append(vo.getUpdated());
+                   .append(vo.getId())
+                   .append("; state=")
+                   .append(nextState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatecount=")
+                   .append(vo.getUpdatedCount())
+                   .append("; updatedTime=")
+                   .append(vo.getUpdated());
                 str.append(": stale Data={id=")
-                    .append(vo.getId())
-                    .append("; state=")
-                    .append(currentState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatecount=")
-                    .append(oldUpdated)
-                    .append("; updatedTime=")
-                    .append(oldUpdatedTime);
+                   .append(vo.getId())
+                   .append("; state=")
+                   .append(currentState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatecount=")
+                   .append(oldUpdated)
+                   .append("; updatedTime=")
+                   .append(oldUpdatedTime);
             } else {
                 s_logger.debug("Unable to update VM snapshot: id=" + vo.getId() + ", as there is no such snapshot exists in the database anymore");
             }
         }
         return rows > 0;
     }
-
 }

@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package org.apache.cloudstack.storage.to;
@@ -25,7 +10,6 @@ import com.cloud.agent.api.to.DataTO;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.template.VirtualMachineTemplate;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.TemplateInfo;
 
 public class TemplateObjectTO implements DataTO {
@@ -49,7 +33,7 @@ public class TemplateObjectTO implements DataTO {
 
     }
 
-    public TemplateObjectTO(VirtualMachineTemplate template) {
+    public TemplateObjectTO(final VirtualMachineTemplate template) {
         this.uuid = template.getUuid();
         this.id = template.getId();
         this.origUrl = template.getUrl();
@@ -62,7 +46,7 @@ public class TemplateObjectTO implements DataTO {
         this.hypervisorType = template.getHypervisorType();
     }
 
-    public TemplateObjectTO(TemplateInfo template) {
+    public TemplateObjectTO(final TemplateInfo template) {
         this.path = template.getInstallPath();
         this.uuid = template.getUuid();
         this.id = template.getId();
@@ -79,41 +63,43 @@ public class TemplateObjectTO implements DataTO {
         this.hypervisorType = template.getHypervisorType();
     }
 
-    @Override
-    public String getPath() {
-        return this.path;
-    }
-
     public String getUuid() {
         return this.uuid;
     }
 
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 
     public ImageFormat getFormat() {
         return format;
     }
 
+    public void setFormat(final ImageFormat format) {
+        this.format = format;
+    }
+
     public long getAccountId() {
         return accountId;
+    }
+
+    public void setAccountId(final long accountId) {
+        this.accountId = accountId;
     }
 
     public String getChecksum() {
         return checksum;
     }
 
+    public void setChecksum(final String checksum) {
+        this.checksum = checksum;
+    }
+
     public boolean isRequiresHvm() {
         return hvm;
     }
 
-    public void setRequiresHvm(boolean hvm) {
+    public void setRequiresHvm(final boolean hvm) {
         this.hvm = hvm;
     }
 
@@ -121,7 +107,7 @@ public class TemplateObjectTO implements DataTO {
         return displayText;
     }
 
-    public void setDescription(String desc) {
+    public void setDescription(final String desc) {
         this.displayText = desc;
     }
 
@@ -135,16 +121,34 @@ public class TemplateObjectTO implements DataTO {
         return this.imageDataStore;
     }
 
-    public void setHypervisorType(Hypervisor.HypervisorType hypervisorType) {
-        this.hypervisorType = hypervisorType;
-    }
-
     @Override
     public Hypervisor.HypervisorType getHypervisorType() {
         return this.hypervisorType;
     }
 
-    public void setDataStore(DataStoreTO store) {
+    @Override
+    public String getPath() {
+        return this.path;
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    public void setId(final long id) {
+        this.id = id;
+    }
+
+    public void setPath(final String path) {
+        this.path = path;
+    }
+
+    public void setHypervisorType(final Hypervisor.HypervisorType hypervisorType) {
+        this.hypervisorType = hypervisorType;
+    }
+
+    public void setDataStore(final DataStoreTO store) {
         this.imageDataStore = store;
     }
 
@@ -155,15 +159,7 @@ public class TemplateObjectTO implements DataTO {
         return name;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -171,23 +167,11 @@ public class TemplateObjectTO implements DataTO {
         return origUrl;
     }
 
-    public void setOrigUrl(String origUrl) {
+    public void setOrigUrl(final String origUrl) {
         this.origUrl = origUrl;
     }
 
-    public void setFormat(ImageFormat format) {
-        this.format = format;
-    }
-
-    public void setAccountId(long accountId) {
-        this.accountId = accountId;
-    }
-
-    public void setChecksum(String checksum) {
-        this.checksum = checksum;
-    }
-
-    public void setImageDataStore(DataStoreTO imageDataStore) {
+    public void setImageDataStore(final DataStoreTO imageDataStore) {
         this.imageDataStore = imageDataStore;
     }
 
@@ -195,7 +179,7 @@ public class TemplateObjectTO implements DataTO {
         return guestOsType;
     }
 
-    public void setGuestOsType(String guestOsType) {
+    public void setGuestOsType(final String guestOsType) {
         this.guestOsType = guestOsType;
     }
 
@@ -203,7 +187,7 @@ public class TemplateObjectTO implements DataTO {
         return size;
     }
 
-    public void setSize(Long size) {
+    public void setSize(final Long size) {
         this.size = size;
     }
 
@@ -211,7 +195,7 @@ public class TemplateObjectTO implements DataTO {
         return physicalSize;
     }
 
-    public void setPhysicalSize(Long physicalSize) {
+    public void setPhysicalSize(final Long physicalSize) {
         this.physicalSize = physicalSize;
     }
 

@@ -1,29 +1,13 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function($, cloudStack) {
-    cloudStack.ipRules = function(args) {
-        return function(detailArgs) {
+(function ($, cloudStack) {
+    cloudStack.ipRules = function (args) {
+        return function (detailArgs) {
             var context = detailArgs.context;
 
-            var portMultiEdit = function(args) {
+            var portMultiEdit = function (args) {
                 return $('<div>').multiEdit(args);
             };
 
-            var makeMultiEditPanel = function($item) {
+            var makeMultiEditPanel = function ($item) {
                 if ($item.closest('li').hasClass('disabled'))
                     return false;
 
@@ -36,7 +20,7 @@
                 $browser.cloudBrowser('addPanel', {
                     title: targetName,
                     maximizeIfSelected: true,
-                    complete: function($newPanel) {
+                    complete: function ($newPanel) {
                         $newPanel.detailView({
                             $browser: $browser,
                             name: targetId,
@@ -44,7 +28,7 @@
                             tabs: {
                                 network: {
                                     title: targetName,
-                                    custom: function(args) {
+                                    custom: function (args) {
                                         return portMultiEdit($.extend(target, {
                                             context: context
                                         }));
@@ -58,7 +42,7 @@
                 return true;
             };
 
-            var staticNATChart = function(args, includingFirewall) {
+            var staticNATChart = function (args, includingFirewall) {
                 var $chart = $('#template').find('.network-chart.static-nat').clone();
                 var $vmName = $chart.find('li.static-nat-enabled .vmname');
                 var $browser = $('#browser .container');
@@ -68,7 +52,7 @@
                 args.staticNATDataProvider({
                     context: context,
                     response: {
-                        success: function(args) {
+                        success: function (args) {
                             var vmID = args.data.virtualmachineid;
                             var vmIP = args.data.vmipaddress;
                             var vmName = args.data.virtualmachinename;
@@ -78,14 +62,14 @@
                                 $('<span>').html('<br/>VM IP: ' + vmIP)
                             );
 
-                            $vmName.click(function() {
+                            $vmName.click(function () {
                                 $browser.cloudBrowser('addPanel', {
                                     title: _l('label.static.nat.vm.details'),
-                                    complete: function($newPanel) {
+                                    complete: function ($newPanel) {
                                         vmDataProvider({
                                             context: context,
                                             response: {
-                                                success: function(args) {
+                                                success: function (args) {
                                                     var instance = args.data;
                                                     var detailViewArgs = $.extend(true, {}, vmDetails, {
                                                         $browser: $browser,
@@ -111,7 +95,7 @@
                 });
 
                 if (includingFirewall == true) {
-                    $chart.find('li.firewall .view-details').click(function() {
+                    $chart.find('li.firewall .view-details').click(function () {
                         //makeMultiEditPanel($(this), { title: _l('label.nat.port.range')});
                         makeMultiEditPanel($(this));
                     });
@@ -122,7 +106,7 @@
                 return $chart;
             };
 
-            var netChart = function(args) {
+            var netChart = function (args) {
 
                 var $chart = $('#template').find('.network-chart.normal').clone();
                 var preFilter = args.preFilter ? args.preFilter({
@@ -139,17 +123,17 @@
                             return staticNATChart(args, false); //static NAT excluding Firewall
                         }
                     } else { //choose non-static NAT chart
-                        $(preFilter).each(function() {
+                        $(preFilter).each(function () {
                             var id = this;
 
-                            var $li = $chart.find('li').filter(function() {
+                            var $li = $chart.find('li').filter(function () {
                                 return $(this).hasClass(id);
                             }).addClass('disabled');
                         });
                     }
                 }
 
-                $chart.find('.view-details').click(function() {
+                $chart.find('.view-details').click(function () {
                     makeMultiEditPanel($(this));
                     return false;
                 });

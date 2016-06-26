@@ -1,36 +1,19 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
+
+import com.cloud.serializer.Param;
+import com.cloud.vm.VirtualMachine;
+import com.cloud.vm.VirtualMachine.State;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
+import org.apache.cloudstack.api.EntityReference;
 
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.cloud.serializer.Param;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.google.gson.annotations.SerializedName;
 
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.EntityReference;
-
 @EntityReference(value = VirtualMachine.class)
-@SuppressWarnings("unused")
 public class DomainRouterResponse extends BaseResponse implements ControlledViewEntityResponse {
     @SerializedName(ApiConstants.ID)
     @Param(description = "the id of the router")
@@ -217,7 +200,7 @@ public class DomainRouterResponse extends BaseResponse implements ControlledView
     private boolean requiresUpgrade;
 
     public DomainRouterResponse() {
-        nics = new LinkedHashSet<NicResponse>();
+        nics = new LinkedHashSet<>();
     }
 
     @Override
@@ -229,47 +212,47 @@ public class DomainRouterResponse extends BaseResponse implements ControlledView
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
-    public void setZoneName(String zoneName) {
+    public void setZoneName(final String zoneName) {
         this.zoneName = zoneName;
     }
 
-    public void setDns1(String dns1) {
+    public void setDns1(final String dns1) {
         this.dns1 = dns1;
     }
 
-    public void setDns2(String dns2) {
+    public void setDns2(final String dns2) {
         this.dns2 = dns2;
     }
 
-    public void setNetworkDomain(String networkDomain) {
+    public void setNetworkDomain(final String networkDomain) {
         this.networkDomain = networkDomain;
     }
 
-    public void setGateway(String gateway) {
+    public void setGateway(final String gateway) {
         this.gateway = gateway;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setPodId(String podId) {
+    public void setPodId(final String podId) {
         this.podId = podId;
     }
 
-    public void setHostId(String hostId) {
+    public void setHostId(final String hostId) {
         this.hostId = hostId;
     }
 
-    public void setHostName(String hostName) {
+    public void setHostName(final String hostName) {
         this.hostName = hostName;
     }
 
@@ -277,102 +260,112 @@ public class DomainRouterResponse extends BaseResponse implements ControlledView
         return hypervisor;
     }
 
-    public void setHypervisor(String hypervisor) {
+    public void setHypervisor(final String hypervisor) {
         this.hypervisor = hypervisor;
     }
 
-    public void setPublicIp(String publicIp) {
+    public void setPublicIp(final String publicIp) {
         this.publicIp = publicIp;
     }
 
-    public void setPublicMacAddress(String publicMacAddress) {
+    public void setPublicMacAddress(final String publicMacAddress) {
         this.publicMacAddress = publicMacAddress;
     }
 
-    public void setPublicNetmask(String publicNetmask) {
+    public void setPublicNetmask(final String publicNetmask) {
         this.publicNetmask = publicNetmask;
     }
 
-    public void setGuestIpAddress(String guestIpAddress) {
+    public void setGuestIpAddress(final String guestIpAddress) {
         this.guestIpAddress = guestIpAddress;
     }
 
-    public void setGuestMacAddress(String guestMacAddress) {
+    public void setGuestMacAddress(final String guestMacAddress) {
         this.guestMacAddress = guestMacAddress;
     }
 
-    public void setGuestNetmask(String guestNetmask) {
+    public void setGuestNetmask(final String guestNetmask) {
         this.guestNetmask = guestNetmask;
     }
 
-    public void setTemplateId(String templateId) {
+    public void setTemplateId(final String templateId) {
         this.templateId = templateId;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 
-    public void setState(State state) {
+    public void setState(final State state) {
         this.state = state;
     }
 
     @Override
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
     @Override
-    public void setDomainId(String domainId) {
+    public void setProjectId(final String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public void setProjectName(final String projectName) {
+        this.projectName = projectName;
+    }
+
+    @Override
+    public void setDomainId(final String domainId) {
         this.domainId = domainId;
     }
 
     @Override
-    public void setDomainName(String domainName) {
+    public void setDomainName(final String domainName) {
         this.domainName = domainName;
     }
 
-    public void setPublicNetworkId(String publicNetworkId) {
+    public void setPublicNetworkId(final String publicNetworkId) {
         this.publicNetworkId = publicNetworkId;
     }
 
-    public void setGuestNetworkId(String guestNetworkId) {
+    public void setGuestNetworkId(final String guestNetworkId) {
         this.guestNetworkId = guestNetworkId;
     }
 
-    public void setGuestNetworkName(String guestNetworkName) {
+    public void setGuestNetworkName(final String guestNetworkName) {
         this.guestNetworkName = guestNetworkName;
     }
 
-    public void setLinkLocalIp(String linkLocalIp) {
+    public void setLinkLocalIp(final String linkLocalIp) {
         this.linkLocalIp = linkLocalIp;
     }
 
-    public void setLinkLocalMacAddress(String linkLocalMacAddress) {
+    public void setLinkLocalMacAddress(final String linkLocalMacAddress) {
         this.linkLocalMacAddress = linkLocalMacAddress;
     }
 
-    public void setLinkLocalNetmask(String linkLocalNetmask) {
+    public void setLinkLocalNetmask(final String linkLocalNetmask) {
         this.linkLocalNetmask = linkLocalNetmask;
     }
 
-    public void setLinkLocalNetworkId(String linkLocalNetworkId) {
+    public void setLinkLocalNetworkId(final String linkLocalNetworkId) {
         this.linkLocalNetworkId = linkLocalNetworkId;
     }
 
-    public void setServiceOfferingId(String serviceOfferingId) {
+    public void setServiceOfferingId(final String serviceOfferingId) {
         this.serviceOfferingId = serviceOfferingId;
     }
 
-    public void setServiceOfferingName(String serviceOfferingName) {
+    public void setServiceOfferingName(final String serviceOfferingName) {
         this.serviceOfferingName = serviceOfferingName;
     }
 
-    public void setRedundantState(String redundantState) {
+    public void setRedundantState(final String redundantState) {
         this.redundantState = redundantState;
     }
 
-    public void setIsRedundantRouter(boolean isRedundantRouter) {
+    public void setIsRedundantRouter(final boolean isRedundantRouter) {
         this.isRedundantRouter = isRedundantRouter;
     }
 
@@ -380,7 +373,7 @@ public class DomainRouterResponse extends BaseResponse implements ControlledView
         return this.version;
     }
 
-    public void setVersion(String version) {
+    public void setVersion(final String version) {
         this.version = version;
     }
 
@@ -388,33 +381,23 @@ public class DomainRouterResponse extends BaseResponse implements ControlledView
         return this.scriptsVersion;
     }
 
-    public void setScriptsVersion(String scriptsVersion) {
+    public void setScriptsVersion(final String scriptsVersion) {
         this.scriptsVersion = scriptsVersion;
     }
 
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public void setVpcId(String vpcId) {
+    public void setVpcId(final String vpcId) {
         this.vpcId = vpcId;
     }
 
-    public void setVpcName(String vpcName) {
+    public void setVpcName(final String vpcName) {
         this.vpcName = vpcName;
     }
 
-    public void setNics(Set<NicResponse> nics) {
+    public void setNics(final Set<NicResponse> nics) {
         this.nics = nics;
     }
 
-    public void addNic(NicResponse nic) {
+    public void addNic(final NicResponse nic) {
         this.nics.add(nic);
     }
 
@@ -422,7 +405,7 @@ public class DomainRouterResponse extends BaseResponse implements ControlledView
         return ip6Dns1;
     }
 
-    public void setIp6Dns1(String ip6Dns1) {
+    public void setIp6Dns1(final String ip6Dns1) {
         this.ip6Dns1 = ip6Dns1;
     }
 
@@ -430,11 +413,11 @@ public class DomainRouterResponse extends BaseResponse implements ControlledView
         return ip6Dns2;
     }
 
-    public void setIp6Dns2(String ip6Dns2) {
+    public void setIp6Dns2(final String ip6Dns2) {
         this.ip6Dns2 = ip6Dns2;
     }
 
-    public void setRole(String role) {
+    public void setRole(final String role) {
         this.role = role;
     }
 
@@ -442,7 +425,7 @@ public class DomainRouterResponse extends BaseResponse implements ControlledView
         return requiresUpgrade;
     }
 
-    public void setRequiresUpgrade(boolean requiresUpgrade) {
+    public void setRequiresUpgrade(final boolean requiresUpgrade) {
         this.requiresUpgrade = requiresUpgrade;
     }
 }

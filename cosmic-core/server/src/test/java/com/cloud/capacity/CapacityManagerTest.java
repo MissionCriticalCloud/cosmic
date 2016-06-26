@@ -1,20 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.capacity;
 
 import static org.mockito.Matchers.anyLong;
@@ -38,20 +21,12 @@ public class CapacityManagerTest {
     ServiceOfferingDao SOfferingDao = mock(ServiceOfferingDao.class);
     ClusterDetailsDao ClusterDetailsDao = mock(com.cloud.dc.ClusterDetailsDao.class);
     CapacityManagerImpl capMgr;
-    private ServiceOfferingVO svo = mock(ServiceOfferingVO.class);
-    private CapacityVO cvoCpu = mock(CapacityVO.class);
-    private CapacityVO cvoRam = mock(CapacityVO.class);
-    private VirtualMachine vm = mock(VirtualMachine.class);
-    private ClusterDetailsVO clusterDetailCpu = mock(ClusterDetailsVO.class);
-    private ClusterDetailsVO clusterDetailRam = mock(ClusterDetailsVO.class);
-
-    public CapacityManagerImpl setUp() {
-        CapacityManagerImpl capMgr = new CapacityManagerImpl();
-        capMgr._clusterDetailsDao = ClusterDetailsDao;
-        capMgr._capacityDao = CDao;
-        capMgr._offeringsDao = SOfferingDao;
-        return capMgr;
-    }
+    private final ServiceOfferingVO svo = mock(ServiceOfferingVO.class);
+    private final CapacityVO cvoCpu = mock(CapacityVO.class);
+    private final CapacityVO cvoRam = mock(CapacityVO.class);
+    private final VirtualMachine vm = mock(VirtualMachine.class);
+    private final ClusterDetailsVO clusterDetailCpu = mock(ClusterDetailsVO.class);
+    private final ClusterDetailsVO clusterDetailRam = mock(ClusterDetailsVO.class);
 
     @Test
     public void allocateCapacityTest() {
@@ -64,7 +39,7 @@ public class CapacityManagerTest {
         when(cvoCpu.getUsedCapacity()).thenReturn(500l);
         when(cvoCpu.getTotalCapacity()).thenReturn(2000l);
         when(cvoRam.getUsedCapacity()).thenReturn(3000l);
-        when(cvoRam.getTotalCapacity()).thenReturn((long)1024 * 1024 * 1024);
+        when(cvoRam.getTotalCapacity()).thenReturn((long) 1024 * 1024 * 1024);
         when(svo.getCpu()).thenReturn(500);
         when(svo.getRamSize()).thenReturn(512);
         when(cvoCpu.getReservedCapacity()).thenReturn(0l);
@@ -72,8 +47,15 @@ public class CapacityManagerTest {
         when(clusterDetailRam.getValue()).thenReturn("1.5");
         when(clusterDetailCpu.getValue()).thenReturn("2");
         when(CDao.update(anyLong(), isA(CapacityVO.class))).thenReturn(true);
-        boolean hasCapacity = capMgr.checkIfHostHasCapacity(1l, 500, 1024 * 1024 * 1024, false, 2, 2, false);
+        final boolean hasCapacity = capMgr.checkIfHostHasCapacity(1l, 500, 1024 * 1024 * 1024, false, 2, 2, false);
         Assert.assertTrue(hasCapacity);
+    }
 
+    public CapacityManagerImpl setUp() {
+        final CapacityManagerImpl capMgr = new CapacityManagerImpl();
+        capMgr._clusterDetailsDao = ClusterDetailsDao;
+        capMgr._capacityDao = CDao;
+        capMgr._offeringsDao = SOfferingDao;
+        return capMgr;
     }
 }

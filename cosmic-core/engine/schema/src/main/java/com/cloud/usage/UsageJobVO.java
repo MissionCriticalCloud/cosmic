@@ -1,22 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.usage;
 
-import java.util.Date;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,8 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "usage_job")
@@ -88,7 +71,7 @@ public class UsageJobVO implements InternalIdentity {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -96,7 +79,7 @@ public class UsageJobVO implements InternalIdentity {
         return host;
     }
 
-    public void setHost(String host) {
+    public void setHost(final String host) {
         this.host = host;
     }
 
@@ -104,7 +87,7 @@ public class UsageJobVO implements InternalIdentity {
         return pid;
     }
 
-    public void setPid(Integer pid) {
+    public void setPid(final Integer pid) {
         this.pid = pid;
     }
 
@@ -112,7 +95,7 @@ public class UsageJobVO implements InternalIdentity {
         return jobType;
     }
 
-    public void setJobType(int jobType) {
+    public void setJobType(final int jobType) {
         this.jobType = jobType;
     }
 
@@ -120,7 +103,7 @@ public class UsageJobVO implements InternalIdentity {
         return scheduled;
     }
 
-    public void setScheduled(int scheduled) {
+    public void setScheduled(final int scheduled) {
         this.scheduled = scheduled;
     }
 
@@ -128,7 +111,7 @@ public class UsageJobVO implements InternalIdentity {
         return startMillis;
     }
 
-    public void setStartMillis(long startMillis) {
+    public void setStartMillis(final long startMillis) {
         this.startMillis = startMillis;
     }
 
@@ -136,7 +119,7 @@ public class UsageJobVO implements InternalIdentity {
         return endMillis;
     }
 
-    public void setEndMillis(long endMillis) {
+    public void setEndMillis(final long endMillis) {
         this.endMillis = endMillis;
     }
 
@@ -144,7 +127,7 @@ public class UsageJobVO implements InternalIdentity {
         return execTime;
     }
 
-    public void setExecTime(long execTime) {
+    public void setExecTime(final long execTime) {
         this.execTime = execTime;
     }
 
@@ -152,7 +135,7 @@ public class UsageJobVO implements InternalIdentity {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(final Date startDate) {
         this.startDate = startDate;
     }
 
@@ -160,7 +143,7 @@ public class UsageJobVO implements InternalIdentity {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(final Date endDate) {
         this.endDate = endDate;
     }
 
@@ -168,7 +151,7 @@ public class UsageJobVO implements InternalIdentity {
         return success;
     }
 
-    public void setSuccess(Boolean success) {
+    public void setSuccess(final Boolean success) {
         this.success = success;
     }
 
@@ -176,7 +159,7 @@ public class UsageJobVO implements InternalIdentity {
         return heartbeat;
     }
 
-    public void setHeartbeat(Date heartbeat) {
+    public void setHeartbeat(final Date heartbeat) {
         this.heartbeat = heartbeat;
     }
 }

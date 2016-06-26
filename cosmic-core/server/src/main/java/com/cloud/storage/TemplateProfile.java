@@ -1,26 +1,10 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.storage;
-
-import java.util.Map;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
+
+import java.util.Map;
 
 public class TemplateProfile {
     Long userId;
@@ -50,9 +34,52 @@ public class TemplateProfile {
     Boolean isDynamicallyScalable;
     TemplateType templateType;
 
-    public TemplateProfile(Long templateId, Long userId, String name, String displayText, Integer bits, Boolean passwordEnabled, Boolean requiresHvm, String url,
-            Boolean isPublic, Boolean featured, Boolean isExtractable, ImageFormat format, Long guestOsId, Long zoneId, HypervisorType hypervisorType,
-            String accountName, Long domainId, Long accountId, String chksum, Boolean bootable, Map details, Boolean sshKeyEnabled) {
+    public TemplateProfile(final Long userId, final VMTemplateVO template, final Long zoneId) {
+        this.userId = userId;
+        this.template = template;
+        this.zoneId = zoneId;
+    }
+
+    public TemplateProfile(final Long templateId, final Long userId, final String name, final String displayText, final Integer bits, final Boolean passwordEnabled, final
+    Boolean requiresHvm, final String url,
+                           final Boolean isPublic, final Boolean featured, final Boolean isExtractable, final ImageFormat format, final Long guestOsId, final Long zoneId,
+
+                           final HypervisorType hypervisorType, final String accountName, final Long domainId, final Long accountId, final String chksum, final Boolean bootable,
+                           final String templateTag, final Map details,
+                           final Boolean sshKeyEnabled, final Long imageStoreId, final Boolean isDynamicallyScalable, final TemplateType templateType) {
+        this(templateId,
+                userId,
+                name,
+                displayText,
+                bits,
+                passwordEnabled,
+                requiresHvm,
+                url,
+                isPublic,
+                featured,
+                isExtractable,
+                format,
+                guestOsId,
+                zoneId,
+                hypervisorType,
+                accountName,
+                domainId,
+                accountId,
+                chksum,
+                bootable,
+                details,
+                sshKeyEnabled);
+        this.templateTag = templateTag;
+        this.isDynamicallyScalable = isDynamicallyScalable;
+        this.templateType = templateType;
+    }
+
+    public TemplateProfile(final Long templateId, final Long userId, final String name, final String displayText, final Integer bits, final Boolean passwordEnabled, final
+    Boolean requiresHvm, final String url,
+                           final Boolean isPublic, final Boolean featured, final Boolean isExtractable, final ImageFormat format, final Long guestOsId, final Long zoneId, final
+                           HypervisorType hypervisorType,
+                           final String accountName, final Long domainId, final Long accountId, final String chksum, final Boolean bootable, final Map details, final Boolean
+                                   sshKeyEnabled) {
         this.templateId = templateId;
         this.userId = userId;
         this.name = name;
@@ -77,49 +104,11 @@ public class TemplateProfile {
         this.sshKeyEnbaled = sshKeyEnabled;
     }
 
-    public TemplateProfile(Long userId, VMTemplateVO template, Long zoneId) {
-        this.userId = userId;
-        this.template = template;
-        this.zoneId = zoneId;
-    }
-
-    public TemplateProfile(Long templateId, Long userId, String name, String displayText, Integer bits, Boolean passwordEnabled, Boolean requiresHvm, String url,
-            Boolean isPublic, Boolean featured, Boolean isExtractable, ImageFormat format, Long guestOsId, Long zoneId,
-
-            HypervisorType hypervisorType, String accountName, Long domainId, Long accountId, String chksum, Boolean bootable, String templateTag, Map details,
-            Boolean sshKeyEnabled, Long imageStoreId, Boolean isDynamicallyScalable, TemplateType templateType) {
-        this(templateId,
-            userId,
-            name,
-            displayText,
-            bits,
-            passwordEnabled,
-            requiresHvm,
-            url,
-            isPublic,
-            featured,
-            isExtractable,
-            format,
-            guestOsId,
-            zoneId,
-            hypervisorType,
-            accountName,
-            domainId,
-            accountId,
-            chksum,
-            bootable,
-            details,
-            sshKeyEnabled);
-        this.templateTag = templateTag;
-        this.isDynamicallyScalable = isDynamicallyScalable;
-        this.templateType = templateType;
-    }
-
     public Long getTemplateId() {
         return templateId;
     }
 
-    public void setTemplateId(Long id) {
+    public void setTemplateId(final Long id) {
         this.templateId = id;
     }
 
@@ -127,7 +116,7 @@ public class TemplateProfile {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(final Long userId) {
         this.userId = userId;
     }
 
@@ -135,7 +124,7 @@ public class TemplateProfile {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -143,7 +132,7 @@ public class TemplateProfile {
         return displayText;
     }
 
-    public void setDisplayText(String text) {
+    public void setDisplayText(final String text) {
         this.displayText = text;
     }
 
@@ -151,7 +140,7 @@ public class TemplateProfile {
         return bits;
     }
 
-    public void setBits(Integer bits) {
+    public void setBits(final Integer bits) {
         this.bits = bits;
     }
 
@@ -159,7 +148,7 @@ public class TemplateProfile {
         return passwordEnabled;
     }
 
-    public void setPasswordEnabled(Boolean enabled) {
+    public void setPasswordEnabled(final Boolean enabled) {
         this.passwordEnabled = enabled;
     }
 
@@ -167,7 +156,7 @@ public class TemplateProfile {
         return requiresHvm;
     }
 
-    public void setRequiresHVM(Boolean hvm) {
+    public void setRequiresHVM(final Boolean hvm) {
         this.requiresHvm = hvm;
     }
 
@@ -175,7 +164,7 @@ public class TemplateProfile {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(final String url) {
         this.url = url;
     }
 
@@ -183,7 +172,7 @@ public class TemplateProfile {
         return isPublic;
     }
 
-    public void setIsPublic(Boolean is) {
+    public void setIsPublic(final Boolean is) {
         this.isPublic = is;
     }
 
@@ -191,7 +180,7 @@ public class TemplateProfile {
         return featured;
     }
 
-    public void setFeatured(Boolean featured) {
+    public void setFeatured(final Boolean featured) {
         this.featured = featured;
     }
 
@@ -199,7 +188,7 @@ public class TemplateProfile {
         return isExtractable;
     }
 
-    public void setIsExtractable(Boolean is) {
+    public void setIsExtractable(final Boolean is) {
         this.isExtractable = is;
     }
 
@@ -207,7 +196,7 @@ public class TemplateProfile {
         return format;
     }
 
-    public void setFormat(ImageFormat format) {
+    public void setFormat(final ImageFormat format) {
         this.format = format;
     }
 
@@ -215,7 +204,7 @@ public class TemplateProfile {
         return guestOsId;
     }
 
-    public void setGuestOsId(Long id) {
+    public void setGuestOsId(final Long id) {
         this.guestOsId = id;
     }
 
@@ -223,7 +212,7 @@ public class TemplateProfile {
         return zoneId;
     }
 
-    public void setZoneId(Long id) {
+    public void setZoneId(final Long id) {
         this.zoneId = id;
     }
 
@@ -231,7 +220,7 @@ public class TemplateProfile {
         return hypervisorType;
     }
 
-    public void setHypervisorType(HypervisorType type) {
+    public void setHypervisorType(final HypervisorType type) {
         this.hypervisorType = type;
     }
 
@@ -239,7 +228,7 @@ public class TemplateProfile {
         return domainId;
     }
 
-    public void setDomainId(Long id) {
+    public void setDomainId(final Long id) {
         this.domainId = id;
     }
 
@@ -247,7 +236,7 @@ public class TemplateProfile {
         return accountId;
     }
 
-    public void setAccountId(Long id) {
+    public void setAccountId(final Long id) {
         this.accountId = id;
     }
 
@@ -255,7 +244,7 @@ public class TemplateProfile {
         return chksum;
     }
 
-    public void setCheckSum(String chksum) {
+    public void setCheckSum(final String chksum) {
         this.chksum = chksum;
     }
 
@@ -263,7 +252,7 @@ public class TemplateProfile {
         return this.bootable;
     }
 
-    public void setBootable(Boolean bootable) {
+    public void setBootable(final Boolean bootable) {
         this.bootable = bootable;
     }
 
@@ -271,7 +260,7 @@ public class TemplateProfile {
         return template;
     }
 
-    public void setTemplate(VMTemplateVO template) {
+    public void setTemplate(final VMTemplateVO template) {
         this.template = template;
     }
 
@@ -279,7 +268,7 @@ public class TemplateProfile {
         return templateTag;
     }
 
-    public void setTemplateTag(String templateTag) {
+    public void setTemplateTag(final String templateTag) {
         this.templateTag = templateTag;
     }
 
@@ -287,23 +276,23 @@ public class TemplateProfile {
         return this.details;
     }
 
-    public void setDetails(Map details) {
+    public void setDetails(final Map details) {
         this.details = details;
-    }
-
-    public void setSshKeyEnabled(Boolean enabled) {
-        this.sshKeyEnbaled = enabled;
     }
 
     public Boolean getSshKeyEnabled() {
         return this.sshKeyEnbaled;
     }
 
+    public void setSshKeyEnabled(final Boolean enabled) {
+        this.sshKeyEnbaled = enabled;
+    }
+
     public Boolean IsDynamicallyScalable() {
         return this.isDynamicallyScalable;
     }
 
-    public void setScalabe(Boolean isDynamicallyScalabe) {
+    public void setScalabe(final Boolean isDynamicallyScalabe) {
         this.isDynamicallyScalable = isDynamicallyScalabe;
     }
 
@@ -311,7 +300,7 @@ public class TemplateProfile {
         return templateType;
     }
 
-    public void setTemplateType(TemplateType templateType) {
+    public void setTemplateType(final TemplateType templateType) {
         this.templateType = templateType;
     }
 }

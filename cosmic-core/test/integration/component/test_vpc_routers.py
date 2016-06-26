@@ -1,30 +1,12 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 """ Component tests for VPC - Router Operations
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
+import time
 from marvin.cloudstackAPI import (startRouter,
                                   stopRouter,
                                   rebootRouter,
                                   migrateSystemVm)
-from marvin.lib.utils import cleanup_resources
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (Account,
                              Router,
                              ServiceOffering,
@@ -45,11 +27,11 @@ from marvin.lib.common import (get_domain,
                                get_zone,
                                list_routers,
                                get_template)
-import time
+from marvin.lib.utils import cleanup_resources
+from nose.plugins.attrib import attr
 
 
 class Services:
-
     """Test VPC Router services
     """
 
@@ -188,7 +170,6 @@ class Services:
 
 
 class TestVPCRoutersBasic(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestVPCRoutersBasic, cls).getClsTestClient()
@@ -225,7 +206,7 @@ class TestVPCRoutersBasic(cloudstackTestCase):
         )
         cls._cleanup = [cls.account]
         cls._cleanup.append(cls.vpc_off)
-        #cls.debug("Enabling the VPC offering created")
+        # cls.debug("Enabling the VPC offering created")
         cls.vpc_off.update(cls.api_client, state='Enabled')
 
         # cls.debug("creating a VPC network in the account: %s" %
@@ -365,8 +346,8 @@ class TestVPCRoutersBasic(cloudstackTestCase):
         router.hostid = router_response[0].hostid
         self.assertEqual(
             router.hostid, host.id, "Migration to host %s failed. The router host is"
-            " still %s" %
-            (host.id, router.hostid))
+                                    " still %s" %
+                                    (host.id, router.hostid))
         return
 
     @attr(tags=["advanced", "intervlan"], required_hardware="false")
@@ -620,7 +601,6 @@ class TestVPCRoutersBasic(cloudstackTestCase):
 
 
 class TestVPCRouterOneNetwork(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls._cleanup = []
@@ -1010,8 +990,8 @@ class TestVPCRouterOneNetwork(cloudstackTestCase):
         router.hostid = router_response[0].hostid
         self.assertEqual(
             router.hostid, host.id, "Migration to host %s failed. The router host is"
-            "still %s" %
-            (host.id, router.hostid))
+                                    "still %s" %
+                                    (host.id, router.hostid))
         return
 
     @attr(tags=["advanced", "intervlan", "provisioining"])

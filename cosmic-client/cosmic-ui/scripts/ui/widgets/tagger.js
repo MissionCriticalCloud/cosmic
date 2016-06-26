@@ -1,22 +1,5 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
-(function($, cloudStack) {
-    var isFormValid = function($form) {
+(function ($, cloudStack) {
+    var isFormValid = function ($form) {
         var key = $form.find('input[name=key]').val();
         var value = $form.find('input[name=value]').val();
 
@@ -34,7 +17,7 @@
     };
 
     var elems = {
-        inputArea: function(args) {
+        inputArea: function (args) {
             var $form = $('<form>').addClass('tag-input');
             var $keyField = $('<div>').addClass('field key');
             var $keyLabel = $('<label>').attr('for', 'key').html(_l('label.key') + ':');
@@ -55,45 +38,45 @@
 
             $form.submit(
                 args.onSubmit ?
-                function() {
-                    if (!isFormValid($form)) return false;
+                    function () {
+                        if (!isFormValid($form)) return false;
 
-                    args.onSubmit({
-                        data: cloudStack.serializeForm($form),
-                        response: {
-                            success: function() {
-                                // Restore editing of input
-                                $key.attr('disabled', false);
-                                $value.attr('disabled', false);
+                        args.onSubmit({
+                            data: cloudStack.serializeForm($form),
+                            response: {
+                                success: function () {
+                                    // Restore editing of input
+                                    $key.attr('disabled', false);
+                                    $value.attr('disabled', false);
 
-                                // Clear out old data
-                                $key.val('');
-                                $value.val('');
-                                $key.focus();
-                            },
-                            error: function() {
-                                // Restore editing of input
-                                $key.attr('disabled', false);
-                                $value.attr('disabled', false);
-                                $key.focus();
+                                    // Clear out old data
+                                    $key.val('');
+                                    $value.val('');
+                                    $key.focus();
+                                },
+                                error: function () {
+                                    // Restore editing of input
+                                    $key.attr('disabled', false);
+                                    $value.attr('disabled', false);
+                                    $key.focus();
+                                }
                             }
-                        }
-                    });
+                        });
 
-                    // Prevent input during submission
-                    $key.attr('disabled', 'disabled');
-                    $value.attr('disabled', 'disabled');
+                        // Prevent input during submission
+                        $key.attr('disabled', 'disabled');
+                        $value.attr('disabled', 'disabled');
 
-                    return false;
-                } :
-                function() {
-                    return false;
-                }
+                        return false;
+                    } :
+                    function () {
+                        return false;
+                    }
             );
 
             return $form;
         },
-        tagItem: function(title, onRemove, data) {
+        tagItem: function (title, onRemove, data) {
             var $li = $('<li>');
             var $label = $('<span>').addClass('label');
             var $remove = $('<span>').addClass('remove').html('X');
@@ -102,7 +85,7 @@
 
             $label.append($key, '<span>=</span>', $value);
             $label.attr('title', title);
-            $remove.click(function() {
+            $remove.click(function () {
                 if (onRemove) onRemove($li, data);
             });
 
@@ -111,7 +94,7 @@
             return $li;
         },
 
-        info: function(text) {
+        info: function (text) {
             var $info = $('<div>').addClass('tag-info');
             var $text = $('<span>').html(text);
 
@@ -122,7 +105,7 @@
     };
 
     $.widget('cloudStack.tagger', {
-        _init: function(args) {
+        _init: function (args) {
             var context = this.options.context;
             var jsonObj = this.options.jsonObj;
             var dataProvider = this.options.dataProvider;
@@ -132,14 +115,14 @@
             var $title = elems.info(_l('label.tags')).addClass('title');
             var $loading = $('<div>').addClass('loading-overlay');
 
-            var onRemoveItem = function($item, data) {
+            var onRemoveItem = function ($item, data) {
                 $loading.appendTo($container);
                 actions.remove({
                     context: $.extend(true, {}, context, {
                         tagItems: [data]
                     }),
                     response: {
-                        success: function(args) {
+                        success: function (args) {
                             var notification = $.extend(true, {}, args.notification, {
                                 interval: 500,
                                 _custom: args._custom
@@ -150,19 +133,19 @@
 
                                 // Success
 
-                                function() {
+                                function () {
                                     $loading.remove();
                                     $item.remove();
                                 }, {},
 
                                 // Error
 
-                                function() {
+                                function () {
                                     $loading.remove();
                                 }, {}
                             );
                         },
-                        error: function(message) {
+                        error: function (message) {
                             $loading.remove();
                             cloudStack.dialog.notice({
                                 message: message
@@ -173,7 +156,7 @@
             };
 
             var $inputArea = elems.inputArea({
-                onSubmit: function(args) {
+                onSubmit: function (args) {
                     var data = args.data;
                     var success = args.response.success;
                     var error = args.response.error;
@@ -184,7 +167,7 @@
                         data: data,
                         context: context,
                         response: {
-                            success: function(args) {
+                            success: function (args) {
                                 var notification = $.extend(true, {}, args.notification, {
                                     interval: 500,
                                     _custom: args._custom
@@ -195,7 +178,7 @@
 
                                     // Success
 
-                                    function() {
+                                    function () {
                                         $loading.remove();
                                         elems.tagItem(title, onRemoveItem, data).appendTo($tagArea);
                                         success();
@@ -203,13 +186,13 @@
 
                                     // Error
 
-                                    function() {
+                                    function () {
                                         $loading.remove();
                                         error();
                                     }, {}
                                 );
                             },
-                            error: function(message) {
+                            error: function (message) {
                                 $loading.remove();
                                 error();
                                 cloudStack.dialog.notice({
@@ -229,11 +212,11 @@
                 context: context,
                 jsonObj: jsonObj,
                 response: {
-                    success: function(args) {
+                    success: function (args) {
                         var data = args.data;
 
                         $loading.remove();
-                        $(data).map(function(index, item) {
+                        $(data).map(function (index, item) {
                             var key = item.key;
                             var value = item.value;
                             var data = {
@@ -244,7 +227,7 @@
                             elems.tagItem(key + ' = ' + value, onRemoveItem, data).appendTo($tagArea);
                         });
                     },
-                    error: function(message) {
+                    error: function (message) {
                         $loading.remove();
                         $container.find('ul').html(message);
                     }

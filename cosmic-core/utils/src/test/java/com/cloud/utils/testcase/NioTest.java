@@ -1,26 +1,8 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils.testcase;
-
-import java.nio.channels.ClosedChannelException;
-import java.util.Random;
 
 import com.cloud.utils.exception.NioConnectionException;
 import com.cloud.utils.nio.HandlerFactory;
@@ -30,11 +12,13 @@ import com.cloud.utils.nio.NioServer;
 import com.cloud.utils.nio.Task;
 import com.cloud.utils.nio.Task.Type;
 
+import java.nio.channels.ClosedChannelException;
+import java.util.Random;
+
+import junit.framework.TestCase;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import junit.framework.TestCase;
 
 /**
  *
@@ -46,34 +30,13 @@ import junit.framework.TestCase;
 public class NioTest extends TestCase {
 
     private static final Logger s_logger = LoggerFactory.getLogger(NioTest.class);
-
+    Random randomGenerator = new Random();
+    byte[] _testBytes;
     private NioServer _server;
     private NioClient _client;
-
     private Link _clientLink;
-
     private int _testCount;
     private int _completedCount;
-
-    private boolean isTestsDone() {
-        boolean result;
-        synchronized (this) {
-            result = _testCount == _completedCount;
-        }
-        return result;
-    }
-
-    private void getOneMoreTest() {
-        synchronized (this) {
-            _testCount++;
-        }
-    }
-
-    private void oneMoreTestDone() {
-        synchronized (this) {
-            _completedCount++;
-        }
-    }
 
     @Override
     public void setUp() {
@@ -122,6 +85,14 @@ public class NioTest extends TestCase {
         stopServer();
     }
 
+    private boolean isTestsDone() {
+        final boolean result;
+        synchronized (this) {
+            result = _testCount == _completedCount;
+        }
+        return result;
+    }
+
     protected void stopClient() {
         _client.stop();
         s_logger.info("Client stopped.");
@@ -135,10 +106,6 @@ public class NioTest extends TestCase {
     protected void setClientLink(final Link link) {
         _clientLink = link;
     }
-
-    Random randomGenerator = new Random();
-
-    byte[] _testBytes;
 
     public void testConnection() {
         _testBytes = new byte[1000000];
@@ -156,10 +123,22 @@ public class NioTest extends TestCase {
         }
     }
 
+    private void getOneMoreTest() {
+        synchronized (this) {
+            _testCount++;
+        }
+    }
+
     protected void doServerProcess(final byte[] data) {
         oneMoreTestDone();
         Assert.assertArrayEquals(_testBytes, data);
         s_logger.info("Verify done.");
+    }
+
+    private void oneMoreTestDone() {
+        synchronized (this) {
+            _completedCount++;
+        }
     }
 
     public class NioTestClient implements HandlerFactory {
@@ -189,16 +168,10 @@ public class NioTest extends TestCase {
                     s_logger.info("Client: Received OTHER task");
                 }
             }
-
         }
     }
 
     public class NioTestServer implements HandlerFactory {
-
-        @Override
-        public Task create(final Type type, final Link link, final byte[] data) {
-            return new NioTestServerHandler(type, link, data);
-        }
 
         public class NioTestServerHandler extends Task {
 
@@ -220,7 +193,11 @@ public class NioTest extends TestCase {
                     s_logger.info("Server: Received OTHER task");
                 }
             }
+        }
 
+        @Override
+        public Task create(final Type type, final Link link, final byte[] data) {
+            return new NioTestServerHandler(type, link, data);
         }
     }
 }

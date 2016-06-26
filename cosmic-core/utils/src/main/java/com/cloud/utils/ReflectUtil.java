@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils;
@@ -22,6 +7,8 @@ package com.cloud.utils;
 import static java.beans.Introspector.getBeanInfo;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
+
+import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -35,9 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.google.common.collect.ImmutableSet;
-
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -51,14 +36,14 @@ public class ReflectUtil {
     private static final Logger s_logger = LoggerFactory.getLogger(ReflectUtil.class);
     private static final Logger logger = LoggerFactory.getLogger(Reflections.class);
 
-    public static Pair<Class<?>, Field> getAnyField(Class<?> clazz, String fieldName) {
+    public static Pair<Class<?>, Field> getAnyField(final Class<?> clazz, final String fieldName) {
         try {
-            return new Pair<Class<?>, Field>(clazz, clazz.getDeclaredField(fieldName));
-        } catch (SecurityException e) {
+            return new Pair<>(clazz, clazz.getDeclaredField(fieldName));
+        } catch (final SecurityException e) {
             throw new CloudRuntimeException("How the heck?", e);
-        } catch (NoSuchFieldException e) {
+        } catch (final NoSuchFieldException e) {
             // Do I really want this?  No I don't but what can I do?  It only throws the NoSuchFieldException.
-            Class<?> parent = clazz.getSuperclass();
+            final Class<?> parent = clazz.getSuperclass();
             if (parent != null) {
                 return getAnyField(parent, fieldName);
             }
@@ -67,48 +52,50 @@ public class ReflectUtil {
     }
 
     // Gets all classes with some annotation from a package
-    public static Set<Class<?>> getClassesWithAnnotation(Class<? extends Annotation> annotation, String[] packageNames) {
-        Reflections reflections;
-        Set<Class<?>> classes = new HashSet<Class<?>>();
-        ConfigurationBuilder builder=new ConfigurationBuilder();
-        for (String packageName : packageNames) {
-             builder.addUrls(ClasspathHelper.forPackage(packageName));
+    public static Set<Class<?>> getClassesWithAnnotation(final Class<? extends Annotation> annotation, final String[] packageNames) {
+        final Reflections reflections;
+        final Set<Class<?>> classes = new HashSet<>();
+        final ConfigurationBuilder builder = new ConfigurationBuilder();
+        for (final String packageName : packageNames) {
+            builder.addUrls(ClasspathHelper.forPackage(packageName));
         }
-        builder.setScanners(new SubTypesScanner(),new TypeAnnotationsScanner());
+        builder.setScanners(new SubTypesScanner(), new TypeAnnotationsScanner());
         reflections = new Reflections(builder);
         classes.addAll(reflections.getTypesAnnotatedWith(annotation));
         return classes;
     }
 
     // Checks against posted search classes if cmd is async
-    public static boolean isCmdClassAsync(Class<?> cmdClass, Class<?>[] searchClasses) {
+    public static boolean isCmdClassAsync(final Class<?> cmdClass, final Class<?>[] searchClasses) {
         boolean isAsync = false;
         Class<?> superClass = cmdClass;
 
         while (superClass != null && superClass != Object.class) {
-            String superName = superClass.getName();
-            for (Class<?> baseClass : searchClasses) {
+            final String superName = superClass.getName();
+            for (final Class<?> baseClass : searchClasses) {
                 if (superName.equals(baseClass.getName())) {
                     isAsync = true;
                     break;
                 }
             }
-            if (isAsync)
+            if (isAsync) {
                 break;
+            }
             superClass = superClass.getSuperclass();
         }
         return isAsync;
     }
 
     // Returns all fields until a base class for a cmd class
-    public static List<Field> getAllFieldsForClass(Class<?> cmdClass, Class<?> baseClass) {
-        List<Field> fields = new ArrayList<Field>();
+    public static List<Field> getAllFieldsForClass(final Class<?> cmdClass, final Class<?> baseClass) {
+        final List<Field> fields = new ArrayList<>();
         Collections.addAll(fields, cmdClass.getDeclaredFields());
         Class<?> superClass = cmdClass.getSuperclass();
         while (baseClass.isAssignableFrom(superClass) && baseClass != superClass) {
-            Field[] superClassFields = superClass.getDeclaredFields();
-            if (superClassFields != null)
+            final Field[] superClassFields = superClass.getDeclaredFields();
+            if (superClassFields != null) {
                 Collections.addAll(fields, superClassFields);
+            }
             superClass = superClass.getSuperclass();
         }
         return fields;
@@ -116,26 +103,27 @@ public class ReflectUtil {
 
     /**
      * Returns all unique fields except excludeClasses for a cmd class
-     * @param cmdClass    the class in which fields should be collected
+     *
+     * @param cmdClass       the class in which fields should be collected
      * @param excludeClasses the classes whose fields must be ignored
      * @return list of fields
      */
-    public static Set<Field> getAllFieldsForClass(Class<?> cmdClass, Class<?>[] excludeClasses) {
-        Set<Field> fields = new HashSet<Field>();
+    public static Set<Field> getAllFieldsForClass(final Class<?> cmdClass, final Class<?>[] excludeClasses) {
+        final Set<Field> fields = new HashSet<>();
         Collections.addAll(fields, cmdClass.getDeclaredFields());
         Class<?> superClass = cmdClass.getSuperclass();
 
         while (superClass != null && superClass != Object.class) {
-            String superName = superClass.getName();
+            final String superName = superClass.getName();
             boolean isNameEqualToSuperName = false;
-            for (Class<?> baseClass : excludeClasses) {
+            for (final Class<?> baseClass : excludeClasses) {
                 if (superName.equals(baseClass.getName())) {
                     isNameEqualToSuperName = true;
                 }
             }
 
             if (!isNameEqualToSuperName) {
-                Field[] superClassFields = superClass.getDeclaredFields();
+                final Field[] superClassFields = superClass.getDeclaredFields();
                 if (superClassFields != null) {
                     Collections.addAll(fields, superClassFields);
                 }
@@ -168,7 +156,7 @@ public class ReflectUtil {
             final BeanInfo beanInfo = getBeanInfo(clazz);
             final PropertyDescriptor[] descriptors = beanInfo.getPropertyDescriptors();
 
-            final List<String> serializedProperties = new ArrayList<String>();
+            final List<String> serializedProperties = new ArrayList<>();
             for (final PropertyDescriptor descriptor : descriptors) {
 
                 if (excludedProperties.contains(descriptor.getName())) {
@@ -178,36 +166,33 @@ public class ReflectUtil {
                 serializedProperties.add(descriptor.getName());
                 final Object value = descriptor.getReadMethod().invoke(target);
                 serializedProperties.add(value != null ? value.toString() : "null");
-
             }
 
             return unmodifiableList(serializedProperties);
-
-        } catch (IntrospectionException e) {
+        } catch (final IntrospectionException e) {
             s_logger.warn("Ignored IntrospectionException when serializing class " + target.getClass().getCanonicalName(), e);
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             s_logger.warn("Ignored IllegalArgumentException when serializing class " + target.getClass().getCanonicalName(), e);
-        } catch (IllegalAccessException e) {
+        } catch (final IllegalAccessException e) {
             s_logger.warn("Ignored IllegalAccessException when serializing class " + target.getClass().getCanonicalName(), e);
-        } catch (InvocationTargetException e) {
+        } catch (final InvocationTargetException e) {
             s_logger.warn("Ignored InvocationTargetException when serializing class " + target.getClass().getCanonicalName(), e);
         }
 
         return emptyList();
-
     }
 
-    public static String getEntityName(Class clz){
-        if(clz == null)
+    public static String getEntityName(final Class clz) {
+        if (clz == null) {
             return null;
+        }
 
-        String entityName = clz.getName();
-        int index = entityName.lastIndexOf(".");
+        final String entityName = clz.getName();
+        final int index = entityName.lastIndexOf(".");
         if (index != -1) {
             return entityName.substring(index + 1);
-        }else{
+        } else {
             return entityName;
         }
     }
-
 }

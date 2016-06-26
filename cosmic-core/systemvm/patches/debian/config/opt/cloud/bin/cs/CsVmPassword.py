@@ -1,15 +1,15 @@
 #!/usr/bin/python
 # -- coding: utf-8 --
 
+import logging
+from netaddr import IPNetwork, IPAddress
+
 import CsHelper
 from CsProcess import CsProcess
-from netaddr import IPNetwork, IPAddress
-import logging
 
 
 class CsPassword:
-
-    TOKEN_FILE="/tmp/passwdsrvrtoken"
+    TOKEN_FILE = "/tmp/passwdsrvrtoken"
 
     def __init__(self, dbag):
         self.dbag = dbag

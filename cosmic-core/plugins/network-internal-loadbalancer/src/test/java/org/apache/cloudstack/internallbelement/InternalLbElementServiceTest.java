@@ -1,27 +1,9 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.internallbelement;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import javax.inject.Inject;
 
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.VirtualRouterProvider;
@@ -32,8 +14,10 @@ import com.cloud.network.dao.VirtualRouterProviderDao;
 import com.cloud.network.element.VirtualRouterProviderVO;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.component.ComponentContext;
-
 import org.apache.cloudstack.network.element.InternalLoadBalancerElementService;
+
+import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,8 +53,8 @@ public class InternalLbElementServiceTest {
     public void setUp() {
 
         ComponentContext.initComponentsLifeCycle();
-        VirtualRouterProviderVO validElement = new VirtualRouterProviderVO(1, Type.InternalLbVm);
-        VirtualRouterProviderVO invalidElement = new VirtualRouterProviderVO(1, Type.VirtualRouter);
+        final VirtualRouterProviderVO validElement = new VirtualRouterProviderVO(1, Type.InternalLbVm);
+        final VirtualRouterProviderVO invalidElement = new VirtualRouterProviderVO(1, Type.VirtualRouter);
 
         Mockito.when(_vrProviderDao.findById(validElId)).thenReturn(validElement);
         Mockito.when(_vrProviderDao.findById(invalidElId)).thenReturn(invalidElement);
@@ -79,8 +63,8 @@ public class InternalLbElementServiceTest {
 
         Mockito.when(_vrProviderDao.findByNspIdAndType(validProviderId, Type.InternalLbVm)).thenReturn(validElement);
 
-        PhysicalNetworkServiceProviderVO validProvider = new PhysicalNetworkServiceProviderVO(1, "InternalLoadBalancerElement");
-        PhysicalNetworkServiceProviderVO invalidProvider = new PhysicalNetworkServiceProviderVO(1, "Invalid name!");
+        final PhysicalNetworkServiceProviderVO validProvider = new PhysicalNetworkServiceProviderVO(1, "InternalLoadBalancerElement");
+        final PhysicalNetworkServiceProviderVO invalidProvider = new PhysicalNetworkServiceProviderVO(1, "Invalid name!");
 
         Mockito.when(_pNtwkProviderDao.findById(validProviderId)).thenReturn(validProvider);
         Mockito.when(_pNtwkProviderDao.findById(invalidProviderId)).thenReturn(invalidProvider);
@@ -95,12 +79,12 @@ public class InternalLbElementServiceTest {
         String expectedExcText = null;
         try {
             _lbElSvc.getInternalLoadBalancerElement(nonExistingElId);
-        } catch (InvalidParameterValueException e) {
+        } catch (final InvalidParameterValueException e) {
             expectedExcText = e.getMessage();
             throw e;
         } finally {
             assertEquals("Test failed. The non-existing intenral lb provider was found" + expectedExcText, expectedExcText,
-                "Unable to find InternalLoadBalancerElementService by id");
+                    "Unable to find InternalLoadBalancerElementService by id");
         }
     }
 
@@ -109,12 +93,12 @@ public class InternalLbElementServiceTest {
         String expectedExcText = null;
         try {
             _lbElSvc.getInternalLoadBalancerElement(invalidElId);
-        } catch (InvalidParameterValueException e) {
+        } catch (final InvalidParameterValueException e) {
             expectedExcText = e.getMessage();
             throw e;
         } finally {
             assertEquals("Test failed. The non-existing intenral lb provider was found" + expectedExcText, expectedExcText,
-                "Unable to find InternalLoadBalancerElementService by id");
+                    "Unable to find InternalLoadBalancerElementService by id");
         }
     }
 
@@ -134,7 +118,6 @@ public class InternalLbElementServiceTest {
     public void configureNonExistingVm() {
 
         _lbElSvc.configureInternalLoadBalancerElement(nonExistingElId, true);
-
     }
 
     @Test(expected = InvalidParameterValueException.class)
@@ -170,7 +153,6 @@ public class InternalLbElementServiceTest {
     public void addToNonExistingProvider() {
 
         _lbElSvc.addInternalLoadBalancerElement(nonExistingProviderId);
-
     }
 
     public void addToInvalidProvider() {
@@ -181,5 +163,4 @@ public class InternalLbElementServiceTest {
     public void addToExistingProvider() {
         _lbElSvc.addInternalLoadBalancerElement(validProviderId);
     }
-
 }

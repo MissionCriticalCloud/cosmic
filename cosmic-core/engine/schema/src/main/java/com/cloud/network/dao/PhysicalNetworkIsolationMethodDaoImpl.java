@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.dao;
-
-import java.util.List;
 
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.db.GenericDaoBase;
@@ -24,6 +6,8 @@ import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -47,25 +31,24 @@ public class PhysicalNetworkIsolationMethodDaoImpl extends GenericDaoBase<Physic
         AllFieldsSearch.done();
     }
 
-    public List<String> getAllIsolationMethod(long physicalNetworkId) {
-        SearchCriteria<String> sc = IsolationMethodSearch.create();
+    public List<String> getAllIsolationMethod(final long physicalNetworkId) {
+        final SearchCriteria<String> sc = IsolationMethodSearch.create();
         sc.setParameters("physicalNetworkId", physicalNetworkId);
 
         return customSearch(sc, null);
     }
 
-    public String getIsolationMethod(long physicalNetworkId) {
-        SearchCriteria<String> sc = IsolationMethodSearch.create();
+    public String getIsolationMethod(final long physicalNetworkId) {
+        final SearchCriteria<String> sc = IsolationMethodSearch.create();
         sc.setParameters("physicalNetworkId", physicalNetworkId);
 
         return customSearch(sc, null).get(0);
     }
 
-    public int clearIsolationMethods(long physicalNetworkId) {
-        SearchCriteria<PhysicalNetworkIsolationMethodVO> sc = AllFieldsSearch.create();
+    public int clearIsolationMethods(final long physicalNetworkId) {
+        final SearchCriteria<PhysicalNetworkIsolationMethodVO> sc = AllFieldsSearch.create();
         sc.setParameters("physicalNetworkId", physicalNetworkId);
 
         return remove(sc);
     }
-
 }

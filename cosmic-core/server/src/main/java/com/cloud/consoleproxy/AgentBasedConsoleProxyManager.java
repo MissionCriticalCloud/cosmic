@@ -1,25 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.consoleproxy;
-
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.GetVncPortAnswer;
@@ -38,10 +17,14 @@ import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.ConsoleProxyDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.security.keys.KeysManager;
 import org.apache.cloudstack.framework.security.keystore.KeystoreManager;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,57 +36,123 @@ public class AgentBasedConsoleProxyManager extends ManagerBase implements Consol
     @Inject
     protected UserVmDao _userVmDao;
     protected String _consoleProxyUrlDomain;
-    @Inject
-    private VMInstanceDao _instanceDao;
-    private ConsoleProxyListener _listener;
     protected int _consoleProxyUrlPort = ConsoleProxyManager.DEFAULT_PROXY_URL_PORT;
     protected int _consoleProxyPort = ConsoleProxyManager.DEFAULT_PROXY_VNC_PORT;
     protected boolean _sslEnabled = false;
     @Inject
-    AgentManager _agentMgr;
-    @Inject
-    VirtualMachineManager _itMgr;
-    @Inject
     protected ConsoleProxyDao _cpDao;
     @Inject
     protected KeystoreManager _ksMgr;
-
+    @Inject
+    AgentManager _agentMgr;
+    @Inject
+    VirtualMachineManager _itMgr;
     @Inject
     ConfigurationDao _configDao;
     @Inject
     ManagementServer _ms;
     @Inject
     KeysManager _keysMgr;
+    @Inject
+    private VMInstanceDao _instanceDao;
+    private ConsoleProxyListener _listener;
 
-    public class AgentBasedAgentHook extends AgentHookBase {
-
-        public AgentBasedAgentHook(VMInstanceDao instanceDao, HostDao hostDao, ConfigurationDao cfgDao, KeystoreManager ksMgr, AgentManager agentMgr, KeysManager keysMgr) {
-            super(instanceDao, hostDao, cfgDao, ksMgr, agentMgr, keysMgr);
-        }
-
-        @Override
-        protected HostVO findConsoleProxyHost(StartupProxyCommand cmd) {
-            return _hostDao.findByGuid(cmd.getGuid());
-        }
-
-    }
-
-    public int getVncPort(VMInstanceVO vm) {
+    public int getVncPort(final VMInstanceVO vm) {
         if (vm.getHostId() == null) {
             return -1;
         }
-        GetVncPortAnswer answer = (GetVncPortAnswer)_agentMgr.easySend(vm.getHostId(), new GetVncPortCommand(vm.getId(), vm.getHostName()));
+        final GetVncPortAnswer answer = (GetVncPortAnswer) _agentMgr.easySend(vm.getHostId(), new GetVncPortCommand(vm.getId(), vm.getHostName()));
         return (answer == null || !answer.getResult()) ? -1 : answer.getPort();
     }
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public ConsoleProxyInfo assignProxy(final long dataCenterId, final long userVmId) {
+        final UserVmVO userVm = _userVmDao.findById(userVmId);
+        if (userVm == null) {
+            s_logger.warn("User VM " + userVmId + " no longer exists, return a null proxy for user vm:" + userVmId);
+            return null;
+        }
+
+        final HostVO host = findHost(userVm);
+        if (host != null) {
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("Assign embedded console proxy running at " + host.getName() + " to user vm " + userVmId + " with public IP " + host.getPublicIpAddress());
+            }
+
+            // only private IP, public IP, host id have meaningful values, rest
+            // of all are place-holder values
+            String publicIp = host.getPublicIpAddress();
+            if (publicIp == null) {
+                if (s_logger.isDebugEnabled()) {
+                    s_logger.debug("Host " + host.getName() + "/" + host.getPrivateIpAddress() +
+                            " does not have public interface, we will return its private IP for cosole proxy.");
+                }
+                publicIp = host.getPrivateIpAddress();
+            }
+
+            int urlPort = _consoleProxyUrlPort;
+
+            if (host.getProxyPort() != null && host.getProxyPort().intValue() > 0) {
+                urlPort = host.getProxyPort().intValue();
+            }
+
+            return new ConsoleProxyInfo(_sslEnabled, publicIp, _consoleProxyPort, urlPort, _consoleProxyUrlDomain);
+        } else {
+            s_logger.warn("Host that VM is running is no longer available, console access to VM " + userVmId + " will be temporarily unavailable.");
+        }
+        return null;
+    }
+
+    HostVO findHost(final VMInstanceVO vm) {
+        return _hostDao.findById(vm.getHostId());
+    }
+
+    @Override
+    public ConsoleProxyManagementState getManagementState() {
+        return null;
+    }
+
+    @Override
+    public void setManagementState(final ConsoleProxyManagementState state) {
+    }
+
+    @Override
+    public void resumeLastManagementState() {
+    }
+
+    @Override
+    public ConsoleProxyVO startProxy(final long proxyVmId, final boolean ignoreRestartSetting) {
+        return null;
+    }
+
+    @Override
+    public boolean stopProxy(final long proxyVmId) {
+        return false;
+    }
+
+    @Override
+    public boolean rebootProxy(final long proxyVmId) {
+        return false;
+    }
+
+    @Override
+    public boolean destroyProxy(final long proxyVmId) {
+        return false;
+    }
+
+    @Override
+    public String getName() {
+        return _name;
+    }
+
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
 
         if (s_logger.isInfoEnabled()) {
             s_logger.info("Start configuring AgentBasedConsoleProxyManager");
         }
 
-        Map<String, String> configs = _configDao.getConfiguration("management-server", params);
+        final Map<String, String> configs = _configDao.getConfiguration("management-server", params);
         String value = configs.get("consoleproxy.url.port");
         if (value != null) {
             _consoleProxyUrlPort = NumbersUtil.parseInt(value, ConsoleProxyManager.DEFAULT_PROXY_URL_PORT);
@@ -130,83 +179,16 @@ public class AgentBasedConsoleProxyManager extends ManagerBase implements Consol
         return true;
     }
 
-    HostVO findHost(VMInstanceVO vm) {
-        return _hostDao.findById(vm.getHostId());
-    }
+    public class AgentBasedAgentHook extends AgentHookBase {
 
-    @Override
-    public ConsoleProxyInfo assignProxy(long dataCenterId, long userVmId) {
-        UserVmVO userVm = _userVmDao.findById(userVmId);
-        if (userVm == null) {
-            s_logger.warn("User VM " + userVmId + " no longer exists, return a null proxy for user vm:" + userVmId);
-            return null;
+        public AgentBasedAgentHook(final VMInstanceDao instanceDao, final HostDao hostDao, final ConfigurationDao cfgDao, final KeystoreManager ksMgr, final AgentManager
+                agentMgr, final KeysManager keysMgr) {
+            super(instanceDao, hostDao, cfgDao, ksMgr, agentMgr, keysMgr);
         }
 
-        HostVO host = findHost(userVm);
-        if (host != null) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Assign embedded console proxy running at " + host.getName() + " to user vm " + userVmId + " with public IP " + host.getPublicIpAddress());
-            }
-
-            // only private IP, public IP, host id have meaningful values, rest
-            // of all are place-holder values
-            String publicIp = host.getPublicIpAddress();
-            if (publicIp == null) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Host " + host.getName() + "/" + host.getPrivateIpAddress() +
-                        " does not have public interface, we will return its private IP for cosole proxy.");
-                }
-                publicIp = host.getPrivateIpAddress();
-            }
-
-            int urlPort = _consoleProxyUrlPort;
-
-            if (host.getProxyPort() != null && host.getProxyPort().intValue() > 0) {
-                urlPort = host.getProxyPort().intValue();
-            }
-
-            return new ConsoleProxyInfo(_sslEnabled, publicIp, _consoleProxyPort, urlPort, _consoleProxyUrlDomain);
-        } else {
-            s_logger.warn("Host that VM is running is no longer available, console access to VM " + userVmId + " will be temporarily unavailable.");
+        @Override
+        protected HostVO findConsoleProxyHost(final StartupProxyCommand cmd) {
+            return _hostDao.findByGuid(cmd.getGuid());
         }
-        return null;
-    }
-
-    @Override
-    public ConsoleProxyVO startProxy(long proxyVmId, boolean ignoreRestartSetting) {
-        return null;
-    }
-
-    @Override
-    public boolean destroyProxy(long proxyVmId) {
-        return false;
-    }
-
-    @Override
-    public boolean rebootProxy(long proxyVmId) {
-        return false;
-    }
-
-    @Override
-    public boolean stopProxy(long proxyVmId) {
-        return false;
-    }
-
-    @Override
-    public void setManagementState(ConsoleProxyManagementState state) {
-    }
-
-    @Override
-    public ConsoleProxyManagementState getManagementState() {
-        return null;
-    }
-
-    @Override
-    public void resumeLastManagementState() {
-    }
-
-    @Override
-    public String getName() {
-        return _name;
     }
 }

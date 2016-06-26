@@ -1,22 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.framework.jobs.impl;
 
-import java.util.Date;
+import com.cloud.utils.DateUtil;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.jobs.JobInfo;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,11 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.utils.DateUtil;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.jobs.JobInfo;
+import java.util.Date;
 
 @Entity
 @Table(name = "async_job_join_map")
@@ -97,7 +79,7 @@ public class AsyncJobJoinMapVO {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -105,7 +87,7 @@ public class AsyncJobJoinMapVO {
         return jobId;
     }
 
-    public void setJobId(long jobId) {
+    public void setJobId(final long jobId) {
         this.jobId = jobId;
     }
 
@@ -113,7 +95,7 @@ public class AsyncJobJoinMapVO {
         return joinJobId;
     }
 
-    public void setJoinJobId(long joinJobId) {
+    public void setJoinJobId(final long joinJobId) {
         this.joinJobId = joinJobId;
     }
 
@@ -121,7 +103,7 @@ public class AsyncJobJoinMapVO {
         return joinStatus;
     }
 
-    public void setJoinStatus(JobInfo.Status joinStatus) {
+    public void setJoinStatus(final JobInfo.Status joinStatus) {
         this.joinStatus = joinStatus;
     }
 
@@ -129,7 +111,7 @@ public class AsyncJobJoinMapVO {
         return joinResult;
     }
 
-    public void setJoinResult(String joinResult) {
+    public void setJoinResult(final String joinResult) {
         this.joinResult = joinResult;
     }
 
@@ -137,7 +119,7 @@ public class AsyncJobJoinMapVO {
         return joinMsid;
     }
 
-    public void setJoinMsid(long joinMsid) {
+    public void setJoinMsid(final long joinMsid) {
         this.joinMsid = joinMsid;
     }
 
@@ -145,7 +127,7 @@ public class AsyncJobJoinMapVO {
         return completeMsid;
     }
 
-    public void setCompleteMsid(Long completeMsid) {
+    public void setCompleteMsid(final Long completeMsid) {
         this.completeMsid = completeMsid;
     }
 
@@ -153,7 +135,7 @@ public class AsyncJobJoinMapVO {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 
@@ -161,7 +143,7 @@ public class AsyncJobJoinMapVO {
         return lastUpdated;
     }
 
-    public void setLastUpdated(Date lastUpdated) {
+    public void setLastUpdated(final Date lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
 
@@ -169,7 +151,7 @@ public class AsyncJobJoinMapVO {
         return syncSourceId;
     }
 
-    public void setSyncSourceId(Long syncSourceId) {
+    public void setSyncSourceId(final Long syncSourceId) {
         this.syncSourceId = syncSourceId;
     }
 
@@ -177,7 +159,7 @@ public class AsyncJobJoinMapVO {
         return wakeupHandler;
     }
 
-    public void setWakeupHandler(String wakeupHandler) {
+    public void setWakeupHandler(final String wakeupHandler) {
         this.wakeupHandler = wakeupHandler;
     }
 
@@ -185,7 +167,7 @@ public class AsyncJobJoinMapVO {
         return wakeupDispatcher;
     }
 
-    public void setWakeupDispatcher(String wakeupDispatcher) {
+    public void setWakeupDispatcher(final String wakeupDispatcher) {
         this.wakeupDispatcher = wakeupDispatcher;
     }
 
@@ -193,7 +175,7 @@ public class AsyncJobJoinMapVO {
         return wakeupInterval;
     }
 
-    public void setWakeupInterval(long wakeupInterval) {
+    public void setWakeupInterval(final long wakeupInterval) {
         this.wakeupInterval = wakeupInterval;
     }
 
@@ -201,7 +183,7 @@ public class AsyncJobJoinMapVO {
         return nextWakeupTime;
     }
 
-    public void setNextWakeupTime(Date nextWakeupTime) {
+    public void setNextWakeupTime(final Date nextWakeupTime) {
         this.nextWakeupTime = nextWakeupTime;
     }
 
@@ -209,7 +191,7 @@ public class AsyncJobJoinMapVO {
         return expiration;
     }
 
-    public void setExpiration(Date expiration) {
+    public void setExpiration(final Date expiration) {
         this.expiration = expiration;
     }
 }

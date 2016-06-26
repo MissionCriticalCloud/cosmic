@@ -1,27 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.usage;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
@@ -32,6 +11,11 @@ import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.api.response.UsageRecordResponse;
 import org.apache.cloudstack.usage.Usage;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,15 +37,17 @@ public class GetUsageRecordsCmd extends BaseListCmd {
     private Long domainId;
 
     @Parameter(name = ApiConstants.END_DATE,
-               type = CommandType.DATE,
-               required = true,
-               description = "End date range for usage record query (use format \"yyyy-MM-dd\" or the new format \"yyyy-MM-dd HH:mm:ss\", e.g. startDate=2015-01-01 or startdate=2015-01-01 10:30:00).")
+            type = CommandType.DATE,
+            required = true,
+            description = "End date range for usage record query (use format \"yyyy-MM-dd\" or the new format \"yyyy-MM-dd HH:mm:ss\", e.g. startDate=2015-01-01 or " +
+                    "startdate=2015-01-01 10:30:00).")
     private Date endDate;
 
     @Parameter(name = ApiConstants.START_DATE,
-               type = CommandType.DATE,
-               required = true,
-               description = "Start date range for usage record query (use format \"yyyy-MM-dd\" or the new format \"yyyy-MM-dd HH:mm:ss\", e.g. startDate=2015-01-01 or startdate=2015-01-01 11:00:00).")
+            type = CommandType.DATE,
+            required = true,
+            description = "Start date range for usage record query (use format \"yyyy-MM-dd\" or the new format \"yyyy-MM-dd HH:mm:ss\", e.g. startDate=2015-01-01 or " +
+                    "startdate=2015-01-01 11:00:00).")
     private Date startDate;
 
     @Parameter(name = ApiConstants.ACCOUNT_ID, type = CommandType.UUID, entityType = AccountResponse.class, description = "List usage records for the specified account")
@@ -73,7 +59,8 @@ public class GetUsageRecordsCmd extends BaseListCmd {
     @Parameter(name = ApiConstants.TYPE, type = CommandType.LONG, description = "List usage records for the specified usage type")
     private Long usageType;
 
-    @Parameter(name = ApiConstants.USAGE_ID, type = CommandType.STRING, description = "List usage records for the specified usage UUID. Can be used only together with TYPE parameter.")
+    @Parameter(name = ApiConstants.USAGE_ID, type = CommandType.STRING, description = "List usage records for the specified usage UUID. Can be used only together with TYPE " +
+            "parameter.")
     private String usageId;
 
     /////////////////////////////////////////////////////
@@ -84,20 +71,40 @@ public class GetUsageRecordsCmd extends BaseListCmd {
         return accountName;
     }
 
+    public void setAccountName(final String accountName) {
+        this.accountName = accountName;
+    }
+
     public Long getDomainId() {
         return domainId;
+    }
+
+    public void setDomainId(final Long domainId) {
+        this.domainId = domainId;
     }
 
     public Date getEndDate() {
         return endDate;
     }
 
+    public void setEndDate(final Date endDate) {
+        this.endDate = endDate == null ? null : new Date(endDate.getTime());
+    }
+
     public Date getStartDate() {
         return startDate;
     }
 
+    public void setStartDate(final Date startDate) {
+        this.startDate = startDate == null ? null : new Date(startDate.getTime());
+    }
+
     public Long getAccountId() {
         return accountId;
+    }
+
+    public void setAccountId(final Long accountId) {
+        this.accountId = accountId;
     }
 
     public Long getUsageType() {
@@ -111,48 +118,23 @@ public class GetUsageRecordsCmd extends BaseListCmd {
     public String getUsageId() {
         return usageId;
     }
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-    }
 
-    public void setDomainId(Long domainId) {
-        this.domainId = domainId;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate == null ? null : new Date(endDate.getTime());
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate == null ? null : new Date(startDate.getTime());
-    }
-
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
-    }
-
-    public void setUsageId(String usageId) {
+    public void setUsageId(final String usageId) {
         this.usageId = usageId;
     }
-
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
-        Pair<List<? extends Usage>, Integer> usageRecords = _usageService.getUsageRecords(this);
-        ListResponse<UsageRecordResponse> response = new ListResponse<UsageRecordResponse>();
-        List<UsageRecordResponse> usageResponses = new ArrayList<UsageRecordResponse>();
+        final Pair<List<? extends Usage>, Integer> usageRecords = _usageService.getUsageRecords(this);
+        final ListResponse<UsageRecordResponse> response = new ListResponse<>();
+        final List<UsageRecordResponse> usageResponses = new ArrayList<>();
         if (usageRecords != null) {
-            for (Usage usageRecord : usageRecords.first()) {
-                UsageRecordResponse usageResponse = _responseGenerator.createUsageResponse(usageRecord);
+            for (final Usage usageRecord : usageRecords.first()) {
+                final UsageRecordResponse usageResponse = _responseGenerator.createUsageResponse(usageRecord);
                 usageResponse.setObjectName("usagerecord");
                 usageResponses.add(usageResponse);
             }
@@ -161,5 +143,10 @@ public class GetUsageRecordsCmd extends BaseListCmd {
 
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

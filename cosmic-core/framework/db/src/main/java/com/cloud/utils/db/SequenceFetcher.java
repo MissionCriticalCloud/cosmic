@@ -1,21 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// the License.  You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.utils.db;
 
+import com.cloud.utils.concurrency.NamedThreadFactory;
+
+import javax.persistence.TableGenerator;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,10 +14,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.persistence.TableGenerator;
-
-import com.cloud.utils.concurrency.NamedThreadFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,45 +21,43 @@ import org.slf4j.LoggerFactory;
  * Since Mysql does not have sequence support, we have
  * table retrieval was inside a transaction, the value
  * gets locked until the transaction is over.
- *
+ * <p>
  * allocation size.
- *
  */
 public class SequenceFetcher {
+    protected static final SequenceFetcher s_instance = new SequenceFetcher();
     private final static Logger s_logger = LoggerFactory.getLogger(SequenceFetcher.class);
-    ExecutorService _executors;
     private final static Random random = new Random();
+    ExecutorService _executors;
 
-    public <T> T getNextSequence(Class<T> clazz, TableGenerator tg) {
+    protected SequenceFetcher() {
+        _executors = new ThreadPoolExecutor(100, 100, 120l, TimeUnit.SECONDS, new LinkedBlockingQueue<>(250), new NamedThreadFactory("SequenceFetcher"));
+    }
+
+    public static SequenceFetcher getInstance() {
+        return s_instance;
+    }
+
+    public <T> T getNextSequence(final Class<T> clazz, final TableGenerator tg) {
         return getNextSequence(clazz, tg, null, false);
     }
 
-    public <T> T getNextSequence(Class<T> clazz, TableGenerator tg, Object key) {
-        return getNextSequence(clazz, tg, key, false);
-    }
-
-    public <T> T getRandomNextSequence(Class<T> clazz, TableGenerator tg) {
-        return getNextSequence(clazz, tg, null, true);
-    }
-
-    public <T> T getNextSequence(Class<T> clazz, TableGenerator tg, Object key, boolean isRandom) {
-        Future<T> future = _executors.submit(new Fetcher<T>(clazz, tg, key, isRandom));
+    public <T> T getNextSequence(final Class<T> clazz, final TableGenerator tg, final Object key, final boolean isRandom) {
+        final Future<T> future = _executors.submit(new Fetcher<>(clazz, tg, key, isRandom));
         try {
             return future.get();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             s_logger.warn("Unable to get sequeunce for " + tg.table() + ":" + tg.pkColumnValue(), e);
             return null;
         }
     }
 
-    protected SequenceFetcher() {
-        _executors = new ThreadPoolExecutor(100, 100, 120l, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(250), new NamedThreadFactory("SequenceFetcher"));
+    public <T> T getNextSequence(final Class<T> clazz, final TableGenerator tg, final Object key) {
+        return getNextSequence(clazz, tg, key, false);
     }
 
-    protected static final SequenceFetcher s_instance = new SequenceFetcher();
-
-    public static SequenceFetcher getInstance() {
-        return s_instance;
+    public <T> T getRandomNextSequence(final Class<T> clazz, final TableGenerator tg) {
+        return getNextSequence(clazz, tg, null, true);
     }
 
     protected class Fetcher<T> implements Callable<T> {
@@ -85,7 +66,7 @@ public class SequenceFetcher {
         Object _key;
         boolean isRandom = false;
 
-        protected Fetcher(Class<T> clazz, TableGenerator tg, Object key, boolean isRandom) {
+        protected Fetcher(final Class<T> clazz, final TableGenerator tg, final Object key, final boolean isRandom) {
             _tg = tg;
             _clazz = clazz;
             _key = key;
@@ -93,16 +74,14 @@ public class SequenceFetcher {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public T call() throws Exception {
             StringBuilder sql = new StringBuilder("SELECT ");
             sql.append(_tg.valueColumnName()).append(" FROM ").append(_tg.table());
             sql.append(" WHERE ").append(_tg.pkColumnName()).append(" = ? FOR UPDATE");
 
-
             try (TransactionLegacy txn = TransactionLegacy.open("Sequence");
-                 PreparedStatement selectStmt = txn.prepareStatement(sql.toString());
-                ) {
+                 PreparedStatement selectStmt = txn.prepareStatement(sql.toString())
+            ) {
                 if (_key == null) {
                     selectStmt.setString(1, _tg.pkColumnValue());
                 } else {
@@ -113,7 +92,7 @@ public class SequenceFetcher {
                 sql.append(_tg.table()).append(" SET ").append(_tg.valueColumnName()).append("=").append("?+?");
                 sql.append(" WHERE ").append(_tg.pkColumnName()).append("=?");
 
-                try (PreparedStatement updateStmt = txn.prepareStatement(sql.toString());) {
+                try (PreparedStatement updateStmt = txn.prepareStatement(sql.toString())) {
                     if (isRandom) {
                         updateStmt.setInt(2, random.nextInt(10) + 1);
                     } else {
@@ -127,7 +106,7 @@ public class SequenceFetcher {
 
                     txn.start();
                     Object obj = null;
-                    try (ResultSet rs = selectStmt.executeQuery();) {
+                    try (ResultSet rs = selectStmt.executeQuery()) {
 
                         while (rs.next()) {
                             if (_clazz.isAssignableFrom(Long.class)) {
@@ -138,7 +117,7 @@ public class SequenceFetcher {
                                 obj = rs.getObject(1);
                             }
                         }
-                    } catch (SQLException e) {
+                    } catch (final SQLException e) {
                         s_logger.warn("Caught this exception when running: " + (selectStmt != null ? selectStmt.toString() : ""), e);
                     }
 
@@ -149,11 +128,11 @@ public class SequenceFetcher {
 
                     updateStmt.setObject(1, obj);
                     try {
-                        int rows = updateStmt.executeUpdate();
+                        final int rows = updateStmt.executeUpdate();
                         assert rows == 1 : "Come on....how exactly did we update this many rows " + rows + " for " + updateStmt.toString();
                         txn.commit();
-                        return (T)obj;
-                    } catch (SQLException e) {
+                        return (T) obj;
+                    } catch (final SQLException e) {
                         s_logger.warn("Caught this exception when running: " + (updateStmt != null ? updateStmt.toString() : ""), e);
                     }
                 }

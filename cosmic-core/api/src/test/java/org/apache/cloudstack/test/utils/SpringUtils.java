@@ -1,30 +1,13 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// the License.  You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package org.apache.cloudstack.test.utils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.component.ComponentInstantiationPostProcessor;
 import com.cloud.utils.component.ComponentMethodInterceptor;
 import com.cloud.utils.db.TransactionContextBuilder;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -35,27 +18,27 @@ public class SpringUtils {
      * This method allows you to use @ComponentScan for your unit testing but
      * it limits the scope of the classes found to the class specified in
      * the @ComponentScan annotation.
-     *
+     * <p>
      * Without using this method, the default behavior of @ComponentScan is
      * to actually scan in the package of the class specified rather than
      * only the class. This can cause extra classes to be loaded which causes
      * the classes these extra classes depend on to be loaded. The end effect
      * is often most of the project gets loaded.
-     *
+     * <p>
      * In order to use this method properly, you must do the following: <li>
-     *   - Specify @ComponentScan with basePackageClasses, includeFilters, and
-     *     useDefaultFilters=true.  See the following example.
-     *
+     * - Specify @ComponentScan with basePackageClasses, includeFilters, and
+     * useDefaultFilters=true.  See the following example.
+     * <p>
      * <pre>
      *     @ComponentScan(basePackageClasses={AffinityGroupServiceImpl.class, EventUtils.class},
      *     includeFilters={@Filter(value=TestConfiguration.Library.class, type=FilterType.CUSTOM)},
      *     useDefaultFilters=false)
      * </pre>
-     *
-     *   - Create a Library class and use that to call this method.  See the
-     *     following example.  The Library class you define here is the Library
-     *     class being added in the filter above.
-     *
+     * <p>
+     * - Create a Library class and use that to call this method.  See the
+     * following example.  The Library class you define here is the Library
+     * class being added in the filter above.
+     * <p>
      * <pre>
      * public static class Library implements TypeFilter {
      *      @Override
@@ -67,19 +50,18 @@ public class SpringUtils {
      * </pre>
      *
      * @param clazzName name of the class that should be included in the Spring components
-     * @param cs ComponentScan annotation that was declared on the configuration
-     *
+     * @param cs        ComponentScan annotation that was declared on the configuration
      * @return
      */
-    public static boolean includedInBasePackageClasses(String clazzName, ComponentScan cs) {
-        Class<?> clazzToCheck;
+    public static boolean includedInBasePackageClasses(final String clazzName, final ComponentScan cs) {
+        final Class<?> clazzToCheck;
         try {
             clazzToCheck = Class.forName(clazzName);
-        } catch (ClassNotFoundException e) {
+        } catch (final ClassNotFoundException e) {
             throw new CloudRuntimeException("Unable to find " + clazzName);
         }
-        Class<?>[] clazzes = cs.basePackageClasses();
-        for (Class<?> clazz : clazzes) {
+        final Class<?>[] clazzes = cs.basePackageClasses();
+        for (final Class<?> clazz : clazzes) {
             if (clazzToCheck.isAssignableFrom(clazz)) {
                 return true;
             }
@@ -101,14 +83,13 @@ public class SpringUtils {
 
         @Bean
         public ComponentInstantiationPostProcessor instantiatePostProcessor() {
-            ComponentInstantiationPostProcessor processor = new ComponentInstantiationPostProcessor();
+            final ComponentInstantiationPostProcessor processor = new ComponentInstantiationPostProcessor();
 
-            List<ComponentMethodInterceptor> interceptors = new ArrayList<ComponentMethodInterceptor>();
+            final List<ComponentMethodInterceptor> interceptors = new ArrayList<>();
             interceptors.add(new TransactionContextBuilder());
             processor.setInterceptors(interceptors);
 
             return processor;
         }
-
     }
 }

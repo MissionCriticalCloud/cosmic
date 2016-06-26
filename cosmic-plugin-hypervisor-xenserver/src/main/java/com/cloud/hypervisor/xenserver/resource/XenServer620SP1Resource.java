@@ -1,35 +1,17 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package com.cloud.hypervisor.xenserver.resource;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
-import javax.ejb.Local;
 
 import com.cloud.agent.api.StartCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.agent.api.VgpuTypesInfo;
 import com.cloud.agent.api.to.GPUDeviceTO;
 import com.cloud.resource.ServerResource;
+
+import javax.ejb.Local;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.GPUGroup;
 import com.xensource.xenapi.Host;
@@ -39,12 +21,11 @@ import com.xensource.xenapi.VGPU;
 import com.xensource.xenapi.VGPUType;
 import com.xensource.xenapi.VGPUType.Record;
 import com.xensource.xenapi.VM;
-
 import org.apache.xmlrpc.XmlRpcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Local(value=ServerResource.class)
+@Local(value = ServerResource.class)
 public class XenServer620SP1Resource extends XenServer620Resource {
 
     private static final Logger s_logger = LoggerFactory.getLogger(XenServer620SP1Resource.class);
@@ -63,48 +44,6 @@ public class XenServer620SP1Resource extends XenServer620Resource {
                 s_logger.debug("Error while getting GPU device info from host " + cmd.getName(), e);
             }
         }
-    }
-
-    @Override
-    public HashMap<String, HashMap<String, VgpuTypesInfo>> getGPUGroupDetails(final Connection conn) throws XenAPIException, XmlRpcException {
-        final HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails = new HashMap<String, HashMap<String, VgpuTypesInfo>>();
-        final Host host = Host.getByUuid(conn, _host.getUuid());
-        final Set<PGPU> pgpus = host.getPGPUs(conn);
-        final Iterator<PGPU> iter = pgpus.iterator();
-        while (iter.hasNext()) {
-            final PGPU pgpu = iter.next();
-            final GPUGroup gpuGroup = pgpu.getGPUGroup(conn);
-            final Set<VGPUType> enabledVGPUTypes = gpuGroup.getEnabledVGPUTypes(conn);
-            final String groupName = gpuGroup.getNameLabel(conn);
-            HashMap<String, VgpuTypesInfo> gpuCapacity = new HashMap<String, VgpuTypesInfo>();
-            if (groupDetails.get(groupName) != null) {
-                gpuCapacity = groupDetails.get(groupName);
-            }
-            // Get remaining capacity of all the enabled VGPU in a PGPU
-            if(enabledVGPUTypes != null) {
-                final Iterator<VGPUType> it = enabledVGPUTypes.iterator();
-                while (it.hasNext()) {
-                    final VGPUType type = it.next();
-                    final Record record = type.getRecord(conn);
-                    Long remainingCapacity = pgpu.getRemainingCapacity(conn, type);
-                    Long maxCapacity = pgpu.getSupportedVGPUMaxCapacities(conn).get(type);
-                    VgpuTypesInfo entry;
-                    if ((entry = gpuCapacity.get(record.modelName)) != null) {
-                        remainingCapacity += entry.getRemainingCapacity();
-                        maxCapacity += entry.getMaxCapacity();
-                        entry.setRemainingCapacity(remainingCapacity);
-                        entry.setMaxVmCapacity(maxCapacity);
-                        gpuCapacity.put(record.modelName, entry);
-                    } else {
-                        final VgpuTypesInfo vgpuTypeRecord = new VgpuTypesInfo(null, record.modelName, record.framebufferSize, record.maxHeads,
-                                record.maxResolutionX, record.maxResolutionY, maxCapacity, remainingCapacity, maxCapacity);
-                        gpuCapacity.put(record.modelName, vgpuTypeRecord);
-                    }
-                }
-            }
-            groupDetails.put(groupName, gpuCapacity);
-        }
-        return groupDetails;
     }
 
     @Override
@@ -128,7 +67,7 @@ public class XenServer620SP1Resource extends XenServer620Resource {
             }
         }
         final String device = "0"; // Only allow device = "0" for now, as XenServer supports just a single vGPU per VM.
-        final Map<String, String> other_config = new HashMap<String, String>();
+        final Map<String, String> other_config = new HashMap<>();
         VGPU.create(conn, vm, gpuGroup, device, other_config, vgpuType);
 
         if (s_logger.isDebugEnabled()) {
@@ -136,5 +75,47 @@ public class XenServer620SP1Resource extends XenServer620Resource {
         }
         // Calculate and set remaining GPU capacity in the host.
         cmd.getVirtualMachine().getGpuDevice().setGroupDetails(getGPUGroupDetails(conn));
+    }
+
+    @Override
+    public HashMap<String, HashMap<String, VgpuTypesInfo>> getGPUGroupDetails(final Connection conn) throws XenAPIException, XmlRpcException {
+        final HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails = new HashMap<>();
+        final Host host = Host.getByUuid(conn, _host.getUuid());
+        final Set<PGPU> pgpus = host.getPGPUs(conn);
+        final Iterator<PGPU> iter = pgpus.iterator();
+        while (iter.hasNext()) {
+            final PGPU pgpu = iter.next();
+            final GPUGroup gpuGroup = pgpu.getGPUGroup(conn);
+            final Set<VGPUType> enabledVGPUTypes = gpuGroup.getEnabledVGPUTypes(conn);
+            final String groupName = gpuGroup.getNameLabel(conn);
+            HashMap<String, VgpuTypesInfo> gpuCapacity = new HashMap<>();
+            if (groupDetails.get(groupName) != null) {
+                gpuCapacity = groupDetails.get(groupName);
+            }
+            // Get remaining capacity of all the enabled VGPU in a PGPU
+            if (enabledVGPUTypes != null) {
+                final Iterator<VGPUType> it = enabledVGPUTypes.iterator();
+                while (it.hasNext()) {
+                    final VGPUType type = it.next();
+                    final Record record = type.getRecord(conn);
+                    Long remainingCapacity = pgpu.getRemainingCapacity(conn, type);
+                    Long maxCapacity = pgpu.getSupportedVGPUMaxCapacities(conn).get(type);
+                    final VgpuTypesInfo entry;
+                    if ((entry = gpuCapacity.get(record.modelName)) != null) {
+                        remainingCapacity += entry.getRemainingCapacity();
+                        maxCapacity += entry.getMaxCapacity();
+                        entry.setRemainingCapacity(remainingCapacity);
+                        entry.setMaxVmCapacity(maxCapacity);
+                        gpuCapacity.put(record.modelName, entry);
+                    } else {
+                        final VgpuTypesInfo vgpuTypeRecord = new VgpuTypesInfo(null, record.modelName, record.framebufferSize, record.maxHeads,
+                                record.maxResolutionX, record.maxResolutionY, maxCapacity, remainingCapacity, maxCapacity);
+                        gpuCapacity.put(record.modelName, vgpuTypeRecord);
+                    }
+                }
+            }
+            groupDetails.put(groupName, gpuCapacity);
+        }
+        return groupDetails;
     }
 }

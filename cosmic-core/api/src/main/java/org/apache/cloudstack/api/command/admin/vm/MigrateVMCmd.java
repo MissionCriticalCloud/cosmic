@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.vm;
 
 import com.cloud.event.EventTypes;
@@ -27,7 +11,6 @@ import com.cloud.storage.StoragePool;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -39,14 +22,15 @@ import org.apache.cloudstack.api.response.HostResponse;
 import org.apache.cloudstack.api.response.StoragePoolResponse;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "migrateVirtualMachine",
-            description = "Attempts Migration of a VM to a different host or Root volume of the vm to a different storage pool",
+        description = "Attempts Migration of a VM to a different host or Root volume of the vm to a different storage pool",
         responseObject = UserVmResponse.class, entityType = {VirtualMachine.class},
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = true)
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = true)
 public class MigrateVMCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(MigrateVMCmd.class.getName());
 
@@ -57,60 +41,29 @@ public class MigrateVMCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.HOST_ID,
-               type = CommandType.UUID,
-               entityType = HostResponse.class,
-               required = false,
-               description = "Destination Host ID to migrate VM to. Required for live migrating a VM from host to host")
+            type = CommandType.UUID,
+            entityType = HostResponse.class,
+            required = false,
+            description = "Destination Host ID to migrate VM to. Required for live migrating a VM from host to host")
     private Long hostId;
 
     @Parameter(name = ApiConstants.VIRTUAL_MACHINE_ID,
-               type = CommandType.UUID,
-               entityType = UserVmResponse.class,
-               required = true,
-               description = "the ID of the virtual machine")
+            type = CommandType.UUID,
+            entityType = UserVmResponse.class,
+            required = true,
+            description = "the ID of the virtual machine")
     private Long virtualMachineId;
 
     @Parameter(name = ApiConstants.STORAGE_ID,
-               type = CommandType.UUID,
-               entityType = StoragePoolResponse.class,
-               required = false,
-               description = "Destination storage pool ID to migrate VM volumes to. Required for migrating the root disk volume")
+            type = CommandType.UUID,
+            entityType = StoragePoolResponse.class,
+            required = false,
+            description = "Destination storage pool ID to migrate VM volumes to. Required for migrating the root disk volume")
     private Long storageId;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public Long getHostId() {
-        return hostId;
-    }
-
-    public Long getVirtualMachineId() {
-        return virtualMachineId;
-    }
-
-    public Long getStoragePoolId() {
-        return storageId;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        UserVm userVm = _entityMgr.findById(UserVm.class, getVirtualMachineId());
-        if (userVm != null) {
-            return userVm.getAccountId();
-        }
-
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
 
     @Override
     public String getEventType() {
@@ -120,6 +73,18 @@ public class MigrateVMCmd extends BaseAsyncCmd {
     @Override
     public String getEventDescription() {
         return "Attempting to migrate VM Id: " + getVirtualMachineId() + " to host Id: " + getHostId();
+    }
+
+    public Long getVirtualMachineId() {
+        return virtualMachineId;
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public Long getHostId() {
+        return hostId;
     }
 
     @Override
@@ -132,7 +97,7 @@ public class MigrateVMCmd extends BaseAsyncCmd {
             throw new InvalidParameterValueException("Only one of hostId and storageId can be specified");
         }
 
-        UserVm userVm = _userVmService.getUserVm(getVirtualMachineId());
+        final UserVm userVm = _userVmService.getUserVm(getVirtualMachineId());
         if (userVm == null) {
             throw new InvalidParameterValueException("Unable to find the VM by id=" + getVirtualMachineId());
         }
@@ -166,24 +131,43 @@ public class MigrateVMCmd extends BaseAsyncCmd {
                 migratedVm = _userVmService.vmStorageMigration(getVirtualMachineId(), destStoragePool);
             }
             if (migratedVm != null) {
-                UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Full, "virtualmachine", (UserVm)migratedVm).get(0);
+                final UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Full, "virtualmachine", (UserVm) migratedVm).get(0);
                 response.setResponseName(getCommandName());
                 setResponseObject(response);
             } else {
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to migrate vm");
             }
-        } catch (ResourceUnavailableException ex) {
+        } catch (final ResourceUnavailableException ex) {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.RESOURCE_UNAVAILABLE_ERROR, ex.getMessage());
-        } catch (ConcurrentOperationException e) {
+        } catch (final ConcurrentOperationException e) {
             s_logger.warn("Exception: ", e);
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, e.getMessage());
-        } catch (ManagementServerException e) {
+        } catch (final ManagementServerException e) {
             s_logger.warn("Exception: ", e);
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, e.getMessage());
-        } catch (VirtualMachineMigrationException e) {
+        } catch (final VirtualMachineMigrationException e) {
             s_logger.warn("Exception: ", e);
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, e.getMessage());
         }
+    }
+
+    public Long getStoragePoolId() {
+        return storageId;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final UserVm userVm = _entityMgr.findById(UserVm.class, getVirtualMachineId());
+        if (userVm != null) {
+            return userVm.getAccountId();
+        }
+
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
 }

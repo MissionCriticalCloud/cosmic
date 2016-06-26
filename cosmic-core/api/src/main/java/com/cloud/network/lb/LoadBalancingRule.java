@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.lb;
-
-import java.util.List;
 
 import com.cloud.network.as.AutoScalePolicy;
 import com.cloud.network.as.AutoScaleVmGroup;
@@ -29,18 +11,20 @@ import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.utils.Pair;
 import com.cloud.utils.net.Ip;
 
+import java.util.List;
+
 public class LoadBalancingRule {
-    private LoadBalancer lb;
-    private Ip sourceIp;
+    private final LoadBalancer lb;
+    private final Ip sourceIp;
     private List<LbDestination> destinations;
-    private List<LbStickinessPolicy> stickinessPolicies;
+    private final List<LbStickinessPolicy> stickinessPolicies;
     private LbAutoScaleVmGroup autoScaleVmGroup;
     private List<LbHealthCheckPolicy> healthCheckPolicies;
     private LbSslCert sslCert;
     private String lbProtocol;
 
-    public LoadBalancingRule(LoadBalancer lb, List<LbDestination> destinations, List<LbStickinessPolicy> stickinessPolicies,
-            List<LbHealthCheckPolicy> healthCheckPolicies, Ip sourceIp) {
+    public LoadBalancingRule(final LoadBalancer lb, final List<LbDestination> destinations, final List<LbStickinessPolicy> stickinessPolicies,
+                             final List<LbHealthCheckPolicy> healthCheckPolicies, final Ip sourceIp) {
         this.lb = lb;
         this.destinations = destinations;
         this.stickinessPolicies = stickinessPolicies;
@@ -48,8 +32,8 @@ public class LoadBalancingRule {
         this.sourceIp = sourceIp;
     }
 
-    public LoadBalancingRule(LoadBalancer lb, List<LbDestination> destinations, List<LbStickinessPolicy> stickinessPolicies,
-            List<LbHealthCheckPolicy> healthCheckPolicies, Ip sourceIp, LbSslCert sslCert, String lbProtocol) {
+    public LoadBalancingRule(final LoadBalancer lb, final List<LbDestination> destinations, final List<LbStickinessPolicy> stickinessPolicies,
+                             final List<LbHealthCheckPolicy> healthCheckPolicies, final Ip sourceIp, final LbSslCert sslCert, final String lbProtocol) {
         this.lb = lb;
         this.destinations = destinations;
         this.stickinessPolicies = stickinessPolicies;
@@ -119,28 +103,48 @@ public class LoadBalancingRule {
         return lb.getNetworkId();
     }
 
-    public void setDestinations(List<LbDestination> destinations) {
-        this.destinations = destinations;
-    }
-
     public List<LbDestination> getDestinations() {
         return destinations;
+    }
+
+    public void setDestinations(final List<LbDestination> destinations) {
+        this.destinations = destinations;
     }
 
     public List<LbStickinessPolicy> getStickinessPolicies() {
         return stickinessPolicies;
     }
 
-    public void setHealthCheckPolicies(List<LbHealthCheckPolicy> healthCheckPolicies) {
-        this.healthCheckPolicies = healthCheckPolicies;
-    }
-
     public List<LbHealthCheckPolicy> getHealthCheckPolicies() {
         return healthCheckPolicies;
     }
 
+    public void setHealthCheckPolicies(final List<LbHealthCheckPolicy> healthCheckPolicies) {
+        this.healthCheckPolicies = healthCheckPolicies;
+    }
+
     public LbSslCert getLbSslCert() {
         return sslCert;
+    }
+
+    public LbAutoScaleVmGroup getAutoScaleVmGroup() {
+        return autoScaleVmGroup;
+    }
+
+    public void setAutoScaleVmGroup(final LbAutoScaleVmGroup autoScaleVmGroup) {
+        this.autoScaleVmGroup = autoScaleVmGroup;
+    }
+
+    public boolean isAutoScaleConfig() {
+        return this.autoScaleVmGroup != null;
+    }
+
+    public Ip getSourceIp() {
+        return sourceIp;
+    }
+
+    public Scheme getScheme() {
+        return lb.getScheme();
     }
 
     public interface Destination {
@@ -154,17 +158,17 @@ public class LoadBalancingRule {
     }
 
     public static class LbStickinessPolicy {
-        private String _methodName;
-        private List<Pair<String, String>> _params;
-        private boolean _revoke;
+        private final String _methodName;
+        private final List<Pair<String, String>> _params;
+        private final boolean _revoke;
 
-        public LbStickinessPolicy(String methodName, List<Pair<String, String>> params, boolean revoke) {
+        public LbStickinessPolicy(final String methodName, final List<Pair<String, String>> params, final boolean revoke) {
             this._methodName = methodName;
             this._params = params;
             this._revoke = revoke;
         }
 
-        public LbStickinessPolicy(String methodName, List<Pair<String, String>> params) {
+        public LbStickinessPolicy(final String methodName, final List<Pair<String, String>> params) {
             this._methodName = methodName;
             this._params = params;
             this._revoke = false;
@@ -192,12 +196,14 @@ public class LoadBalancingRule {
         private int unhealthThresshold;
         private boolean _revoke;
 
-        public LbHealthCheckPolicy(String pingpath, String description, int responseTime, int healthcheckInterval, int healthcheckThresshold, int unhealthThresshold) {
+        public LbHealthCheckPolicy(final String pingpath, final String description, final int responseTime, final int healthcheckInterval, final int healthcheckThresshold, final
+        int unhealthThresshold) {
             this(pingpath, description, responseTime, healthcheckInterval, healthcheckThresshold, unhealthThresshold, false);
         }
 
-        public LbHealthCheckPolicy(String pingpath, String description, int responseTime, int healthcheckInterval, int healthcheckThresshold, int unhealthThresshold,
-                boolean revoke) {
+        public LbHealthCheckPolicy(final String pingpath, final String description, final int responseTime, final int healthcheckInterval, final int healthcheckThresshold, final
+        int unhealthThresshold,
+                                   final boolean revoke) {
             this.pingpath = pingpath;
             this.description = description;
             this.responseTime = responseTime;
@@ -237,16 +243,15 @@ public class LoadBalancingRule {
         public boolean isRevoked() {
             return _revoke;
         }
-
     }
 
     public static class LbDestination implements Destination {
-        private int portStart;
-        private int portEnd;
-        private String ip;
         boolean revoked;
+        private final int portStart;
+        private final int portEnd;
+        private final String ip;
 
-        public LbDestination(int portStart, int portEnd, String ip, boolean revoked) {
+        public LbDestination(final int portStart, final int portEnd, final String ip, final boolean revoked) {
             this.portStart = portStart;
             this.portEnd = portEnd;
             this.ip = ip;
@@ -273,28 +278,16 @@ public class LoadBalancingRule {
             return revoked;
         }
 
-        public void setRevoked(boolean revoked) {
+        public void setRevoked(final boolean revoked) {
             this.revoked = revoked;
         }
-    }
-
-    public LbAutoScaleVmGroup getAutoScaleVmGroup() {
-        return autoScaleVmGroup;
-    }
-
-    public boolean isAutoScaleConfig() {
-        return this.autoScaleVmGroup != null;
-    }
-
-    public void setAutoScaleVmGroup(LbAutoScaleVmGroup autoScaleVmGroup) {
-        this.autoScaleVmGroup = autoScaleVmGroup;
     }
 
     public static class LbCondition {
         private final Condition condition;
         private final Counter counter;
 
-        public LbCondition(Counter counter, Condition condition) {
+        public LbCondition(final Counter counter, final Condition condition) {
             this.condition = condition;
             this.counter = counter;
         }
@@ -313,7 +306,7 @@ public class LoadBalancingRule {
         private final AutoScalePolicy policy;
         private boolean revoked;
 
-        public LbAutoScalePolicy(AutoScalePolicy policy, List<LbCondition> conditions) {
+        public LbAutoScalePolicy(final AutoScalePolicy policy, final List<LbCondition> conditions) {
             this.policy = policy;
             this.conditions = conditions;
         }
@@ -330,13 +323,12 @@ public class LoadBalancingRule {
             return revoked;
         }
 
-        public void setRevoked(boolean revoked) {
+        public void setRevoked(final boolean revoked) {
             this.revoked = revoked;
         }
     }
 
     public static class LbAutoScaleVmProfile {
-        AutoScaleVmProfile profile;
         private final String autoScaleUserApiKey;
         private final String autoScaleUserSecretKey;
         private final String csUrl;
@@ -346,9 +338,11 @@ public class LoadBalancingRule {
         private final String templateId;
         private final String networkId;
         private final String vmName;
+        AutoScaleVmProfile profile;
 
-        public LbAutoScaleVmProfile(AutoScaleVmProfile profile, String autoScaleUserApiKey, String autoScaleUserSecretKey, String csUrl, String zoneId, String domainId,
-                String serviceOfferingId, String templateId, String vmName, String networkId) {
+        public LbAutoScaleVmProfile(final AutoScaleVmProfile profile, final String autoScaleUserApiKey, final String autoScaleUserSecretKey, final String csUrl, final String
+                zoneId, final String domainId,
+                                    final String serviceOfferingId, final String templateId, final String vmName, final String networkId) {
             this.profile = profile;
             this.autoScaleUserApiKey = autoScaleUserApiKey;
             this.autoScaleUserSecretKey = autoScaleUserSecretKey;
@@ -403,12 +397,12 @@ public class LoadBalancingRule {
     }
 
     public static class LbAutoScaleVmGroup {
-        AutoScaleVmGroup vmGroup;
         private final List<LbAutoScalePolicy> policies;
         private final LbAutoScaleVmProfile profile;
         private final String currentState;
+        AutoScaleVmGroup vmGroup;
 
-        public LbAutoScaleVmGroup(AutoScaleVmGroup vmGroup, List<LbAutoScalePolicy> policies, LbAutoScaleVmProfile profile, String currentState) {
+        public LbAutoScaleVmGroup(final AutoScaleVmGroup vmGroup, final List<LbAutoScalePolicy> policies, final LbAutoScaleVmProfile profile, final String currentState) {
             this.vmGroup = vmGroup;
             this.policies = policies;
             this.profile = profile;
@@ -433,14 +427,14 @@ public class LoadBalancingRule {
     }
 
     public static class LbSslCert {
-        private String cert;
-        private String key;
+        private final String cert;
+        private final String key;
         private String password = null;
         private String chain = null;
-        private String fingerprint;
-        private boolean revoked;
+        private final String fingerprint;
+        private final boolean revoked;
 
-        public LbSslCert(String cert, String key, String password, String chain, String fingerprint, boolean revoked) {
+        public LbSslCert(final String cert, final String key, final String password, final String chain, final String fingerprint, final boolean revoked) {
             this.cert = cert;
             this.key = key;
             this.password = password;
@@ -473,13 +467,5 @@ public class LoadBalancingRule {
         public boolean isRevoked() {
             return revoked;
         }
-    }
-
-    public Ip getSourceIp() {
-        return sourceIp;
-    }
-
-    public Scheme getScheme() {
-        return lb.getScheme();
     }
 }

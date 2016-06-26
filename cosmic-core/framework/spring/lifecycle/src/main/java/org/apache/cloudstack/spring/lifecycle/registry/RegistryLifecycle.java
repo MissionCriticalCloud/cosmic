@@ -1,29 +1,11 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.spring.lifecycle.registry;
+
+import com.cloud.utils.component.Registry;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
-
-import com.cloud.utils.component.Registry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,11 +18,9 @@ import org.springframework.util.StringUtils;
 
 public class RegistryLifecycle implements BeanPostProcessor, SmartLifecycle, ApplicationContextAware {
 
-    private static final Logger log = LoggerFactory.getLogger(RegistryLifecycle.class);
-
     public static final String EXTENSION_EXCLUDE = "extensions.exclude";
     public static final String EXTENSION_INCLUDE_PREFIX = "extensions.include.";
-
+    private static final Logger log = LoggerFactory.getLogger(RegistryLifecycle.class);
     Registry<Object> registry;
 
     /* The bean name works around circular dependency issues in Spring.  This shouldn't be
@@ -48,13 +28,13 @@ public class RegistryLifecycle implements BeanPostProcessor, SmartLifecycle, App
      * can use this.
      */
     String registryBeanName;
-    Set<Object> beans = new HashSet<Object>();
+    Set<Object> beans = new HashSet<>();
     Class<?> typeClass;
     ApplicationContext applicationContext;
     Set<String> excludes = null;
 
     @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessBeforeInitialization(final Object bean, final String beanName) throws BeansException {
         if (typeClass.isAssignableFrom(bean.getClass()) && !isExcluded(bean)) {
             beans.add(bean);
         }
@@ -62,14 +42,14 @@ public class RegistryLifecycle implements BeanPostProcessor, SmartLifecycle, App
         return bean;
     }
 
-    protected synchronized boolean isExcluded(Object bean) {
-        String name = RegistryUtils.getName(bean);
+    protected synchronized boolean isExcluded(final Object bean) {
+        final String name = RegistryUtils.getName(bean);
 
         if (excludes == null) {
             loadExcluded();
         }
 
-        boolean result = excludes.contains(name);
+        final boolean result = excludes.contains(name);
         if (result) {
             log.info("Excluding extension [{}] based on configuration", name);
         }
@@ -78,18 +58,18 @@ public class RegistryLifecycle implements BeanPostProcessor, SmartLifecycle, App
     }
 
     protected synchronized void loadExcluded() {
-        Properties props = applicationContext.getBean("DefaultConfigProperties", Properties.class);
-        excludes = new HashSet<String>();
-        for (String exclude : props.getProperty(EXTENSION_EXCLUDE, "").trim().split("\\s*,\\s*")) {
+        final Properties props = applicationContext.getBean("DefaultConfigProperties", Properties.class);
+        excludes = new HashSet<>();
+        for (final String exclude : props.getProperty(EXTENSION_EXCLUDE, "").trim().split("\\s*,\\s*")) {
             if (StringUtils.hasText(exclude)) {
                 excludes.add(exclude);
             }
         }
 
-        for (String key : props.stringPropertyNames()) {
+        for (final String key : props.stringPropertyNames()) {
             if (key.startsWith(EXTENSION_INCLUDE_PREFIX)) {
-                String module = key.substring(EXTENSION_INCLUDE_PREFIX.length());
-                boolean include = props.getProperty(key).equalsIgnoreCase("true");
+                final String module = key.substring(EXTENSION_INCLUDE_PREFIX.length());
+                final boolean include = props.getProperty(key).equalsIgnoreCase("true");
                 if (!include) {
                     excludes.add(module);
                 }
@@ -98,17 +78,17 @@ public class RegistryLifecycle implements BeanPostProcessor, SmartLifecycle, App
     }
 
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessAfterInitialization(final Object bean, final String beanName) throws BeansException {
         return bean;
     }
 
     @Override
     public void start() {
-        Iterator<Object> iter = beans.iterator();
-        Registry<Object> registry = lookupRegistry();
+        final Iterator<Object> iter = beans.iterator();
+        final Registry<Object> registry = lookupRegistry();
 
         while (iter.hasNext()) {
-            Object next = iter.next();
+            final Object next = iter.next();
             if (registry.register(next)) {
                 log.debug("Registered {}", next);
             } else {
@@ -119,9 +99,9 @@ public class RegistryLifecycle implements BeanPostProcessor, SmartLifecycle, App
 
     @Override
     public void stop() {
-        Registry<Object> registry = lookupRegistry();
+        final Registry<Object> registry = lookupRegistry();
 
-        for (Object bean : beans) {
+        for (final Object bean : beans) {
             registry.unregister(bean);
         }
 
@@ -131,6 +111,10 @@ public class RegistryLifecycle implements BeanPostProcessor, SmartLifecycle, App
     @Override
     public boolean isRunning() {
         return false;
+    }
+
+    protected Registry<Object> lookupRegistry() {
+        return registry == null ? applicationContext.getBean(registryBeanName, Registry.class) : registry;
     }
 
     @Override
@@ -144,26 +128,21 @@ public class RegistryLifecycle implements BeanPostProcessor, SmartLifecycle, App
     }
 
     @Override
-    public void stop(Runnable callback) {
+    public void stop(final Runnable callback) {
         stop();
         callback.run();
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected Registry<Object> lookupRegistry() {
-        return registry == null ? applicationContext.getBean(registryBeanName, Registry.class) : registry;
     }
 
     public Registry<Object> getRegistry() {
         return registry;
     }
 
-    public void setRegistry(Registry<Object> registry) {
+    public void setRegistry(final Registry<Object> registry) {
         this.registry = registry;
     }
 
@@ -171,7 +150,7 @@ public class RegistryLifecycle implements BeanPostProcessor, SmartLifecycle, App
         return typeClass;
     }
 
-    public void setTypeClass(Class<?> typeClass) {
+    public void setTypeClass(final Class<?> typeClass) {
         this.typeClass = typeClass;
     }
 
@@ -179,8 +158,7 @@ public class RegistryLifecycle implements BeanPostProcessor, SmartLifecycle, App
         return registryBeanName;
     }
 
-    public void setRegistryBeanName(String registryBeanName) {
+    public void setRegistryBeanName(final String registryBeanName) {
         this.registryBeanName = registryBeanName;
     }
-
 }

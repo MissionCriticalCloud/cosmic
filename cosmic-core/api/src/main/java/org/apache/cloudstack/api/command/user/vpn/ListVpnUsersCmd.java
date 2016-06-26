@@ -1,33 +1,17 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.vpn;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.network.VpnUser;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.VpnUsersResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,22 +48,22 @@ public class ListVpnUsersCmd extends BaseListProjectAndAccountResourcesCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
-        Pair<List<? extends VpnUser>, Integer> vpnUsers = _ravService.searchForVpnUsers(this);
+        final Pair<List<? extends VpnUser>, Integer> vpnUsers = _ravService.searchForVpnUsers(this);
 
-        ListResponse<VpnUsersResponse> response = new ListResponse<VpnUsersResponse>();
-        List<VpnUsersResponse> vpnResponses = new ArrayList<VpnUsersResponse>();
-        for (VpnUser vpnUser : vpnUsers.first()) {
+        final ListResponse<VpnUsersResponse> response = new ListResponse<>();
+        final List<VpnUsersResponse> vpnResponses = new ArrayList<>();
+        for (final VpnUser vpnUser : vpnUsers.first()) {
             vpnResponses.add(_responseGenerator.createVpnUserResponse(vpnUser));
         }
 
         response.setResponses(vpnResponses, vpnUsers.second());
         response.setResponseName(getCommandName());
         setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

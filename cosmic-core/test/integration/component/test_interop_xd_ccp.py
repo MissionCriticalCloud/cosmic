@@ -1,69 +1,43 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ BVT tests for XenDesktop CloudPlatform InterOperability
 """
-#Import Local Modules
-from marvin.cloudstackTestCase import cloudstackTestCase
+# Import Local Modules
 from marvin.cloudstackAPI import (restoreVirtualMachine,
-                                  destroyVirtualMachine,
                                   listVirtualMachines,
-                                  attachIso,
-                                  detachIso,
-                                  listHypervisorCapabilities,
                                   deleteVolume,
-                                  createVolume,
                                   attachVolume)
-from marvin.lib.utils import (cleanup_resources,
-                              validateList)
+from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import FAILED
 from marvin.lib.base import (SecurityGroup,
                              NetworkOffering,
                              Account,
                              Template,
                              ServiceOffering,
                              VirtualMachine,
-                             Host,
-                             Configurations,
                              Volume,
                              DiskOffering,
-                             Domain,
-                             StoragePool,
                              Region,
                              Zone,
                              Network)
 from marvin.lib.common import (get_domain,
-                                get_zone,
-                                get_template,
-                                get_pod,
-                                list_hosts,
-                                get_windows_template,
-                                list_virtual_machines
-                                )
-
-from marvin.codes import FAILED, PASS
+                               get_zone,
+                               get_template,
+                               list_hosts,
+                               get_windows_template,
+                               list_virtual_machines
+                               )
+from marvin.lib.utils import (cleanup_resources)
 from nose.plugins.attrib import attr
-#Import System modules
+
+# Import System modules
 import time
 import random
 import string
 import unittest
 
 _multiprocess_shared_ = True
-class TestXDCCPInterop(cloudstackTestCase):
 
+
+class TestXDCCPInterop(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         testClient = super(TestXDCCPInterop, cls).getClsTestClient()
@@ -76,29 +50,29 @@ class TestXDCCPInterop(cloudstackTestCase):
         cls.services['mode'] = cls.zone.networktype
 
         hosts = list_hosts(
-               cls.apiclient,
-               type="Routing"
-           )
-   
-        if hosts is None:
-               raise unittest.SkipTest(
-                   "There are no hypervisor's available.Check list hosts response")
-        for hypervisorhost in hosts :
-                    if hypervisorhost.hypervisor == "XenServer":
-                        cls.uploadtemplateformat="VHD"
-                        break
-                    elif hypervisorhost.hypervisor== "VMware":
-                        cls.uploadtemplateformat="OVA"
-                        break
-                    elif hypervisorhost.hypervisor== "KVM":
-                       cls.uploadtemplateformat="KVM"
-                    break
+            cls.apiclient,
+            type="Routing"
+        )
 
-        if cls.uploadtemplateformat=="KVM":
+        if hosts is None:
+            raise unittest.SkipTest(
+                "There are no hypervisor's available.Check list hosts response")
+        for hypervisorhost in hosts:
+            if hypervisorhost.hypervisor == "XenServer":
+                cls.uploadtemplateformat = "VHD"
+                break
+            elif hypervisorhost.hypervisor == "VMware":
+                cls.uploadtemplateformat = "OVA"
+                break
+            elif hypervisorhost.hypervisor == "KVM":
+                cls.uploadtemplateformat = "KVM"
+            break
+
+        if cls.uploadtemplateformat == "KVM":
             assert False, "Interop is not supported on KVM"
 
-        cls.uploadurl=cls.services["interop"][cls.uploadtemplateformat]["url"]
-  
+        cls.uploadurl = cls.services["interop"][cls.uploadtemplateformat]["url"]
+
         cls.xtemplate = get_template(
             cls.apiclient,
             cls.zone.id,
@@ -124,7 +98,7 @@ class TestXDCCPInterop(cloudstackTestCase):
             cls.apiclient,
             cls.zone.id,
             ostype_desc="Windows 8 (64-bit)")
-        #cls.template = get_windows_template(cls.apiclient, cls.zone.id ,ostype_desc="Windows Server 2012 (64-bit)")
+        # cls.template = get_windows_template(cls.apiclient, cls.zone.id ,ostype_desc="Windows Server 2012 (64-bit)")
 
         if cls.template == FAILED:
             if "http://pleaseupdateURL/" in cls.uploadurl:
@@ -140,7 +114,7 @@ class TestXDCCPInterop(cloudstackTestCase):
             timeout = cls.services["vgpu"]["timeout"]
 
             while True:
-                time.sleep(cls.services["vgpu"]["sleep"]) 
+                time.sleep(cls.services["vgpu"]["sleep"])
                 list_template_response = Template.list(
                     cls.apiclient,
                     templatefilter=cls.services["templatefilter"],
@@ -164,7 +138,7 @@ class TestXDCCPInterop(cloudstackTestCase):
                         template_response.id)
 
                 timeout = timeout - 1
-        cls.volume=[]
+        cls.volume = []
 
         # Set Zones and disk offerings
         cls.services["small"]["zoneid"] = cls.zone.id
@@ -173,16 +147,15 @@ class TestXDCCPInterop(cloudstackTestCase):
         user_data = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(2500))
         cls.services["virtual_machine"]["userdata"] = user_data
 
-
-#        cls.services["large"]["zoneid"] = cls.zone.id
-#        cls.services["large"]["template"] = cls.template.id
+        #        cls.services["large"]["zoneid"] = cls.zone.id
+        #        cls.services["large"]["template"] = cls.template.id
 
         cls.virtual_machine = VirtualMachine.create(
             cls.apiclient,
             cls.services["small"],
             accountid=cls.account.name,
             domainid=cls.account.domainid,
-            serviceofferingid=cls.service_offering.id,  
+            serviceofferingid=cls.service_offering.id,
             mode=cls.services['mode'],
             startvm="false"
         )
@@ -190,7 +163,6 @@ class TestXDCCPInterop(cloudstackTestCase):
             UserName=cls.account.name,
             DomainName=cls.account.domain
         )
-
 
         cls.cleanup = [
             cls.service_offering,
@@ -205,196 +177,192 @@ class TestXDCCPInterop(cloudstackTestCase):
             raise Exception("Warning: Exception during cleanup : %s" % e)
 
     def setUp(self):
-        #self.user_api_client = self.testClient.getApiClient()
-        #self.dbclient = self.testClient.getDbConnection()
+        # self.user_api_client = self.testClient.getApiClient()
+        # self.dbclient = self.testClient.getDbConnection()
         self.cleanup = []
 
-
-    @attr(tags = ["advanced", "advancedns", "basic", "sg"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="true")
     def test_01_create_list_delete_security_group(self):
         """
         Test Security Group Creation,List,Deletion on a Basic
         """
-        if self.zone.networktype!="Basic":
+        if self.zone.networktype != "Basic":
             self.skipTest("Security Group creation is applicable only with Basic zone setup. skipping")
 
-        sg=SecurityGroup.create(self.user_api_client,
-                                self.services("security_group")
-                                )
+        sg = SecurityGroup.create(self.user_api_client,
+                                  self.services("security_group")
+                                  )
 
-        listsg=SecurityGroup.list(self.user_api_client,id=sg.id)
+        listsg = SecurityGroup.list(self.user_api_client, id=sg.id)
 
-        if sg.name!=listsg[0].name:
+        if sg.name != listsg[0].name:
             self.fail("Security Group is not created with specified details")
 
         sg.delete(self.user_api_client)
 
         return
 
-    @attr(tags = ["advanced", "advancedns",  "basic", "sg"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="true")
     def test_01_list_all_regions_with_noparams(self):
         """
         Test List Regions With No Parameters
         """
-        regionavailable="no"
-        listregions=Region.list(self.user_api_client)
+        regionavailable = "no"
+        listregions = Region.list(self.user_api_client)
 
         self.assertEqual(
-                            isinstance(listregions, list),
-                            True,
-                            "Check listRegions response returns a valid list"
-                        )
+            isinstance(listregions, list),
+            True,
+            "Check listRegions response returns a valid list"
+        )
 
         for reg1 in listregions:
-            if reg1.name=="Local":
-                regionavailable="yes"
+            if reg1.name == "Local":
+                regionavailable = "yes"
                 exit
-        if regionavailable=="no":
+        if regionavailable == "no":
             self.fail("There is no region created")
 
-    @attr(tags = ["advanced", "advancedns",  "basic", "sg"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="true")
     def test_02_list_all_diskofferings_with_noparams(self):
         """
         Test List Disk Offerings with No Parameters
         """
 
-        diskofferingvailable=0
-        listdiskofferings=DiskOffering.list(self.user_api_client)
+        diskofferingvailable = 0
+        listdiskofferings = DiskOffering.list(self.user_api_client)
 
         self.assertEqual(
-                            isinstance(listdiskofferings, list),
-                            True,
-                            "Check list Disk Offerings response returns a valid list"
-                        )
+            isinstance(listdiskofferings, list),
+            True,
+            "Check list Disk Offerings response returns a valid list"
+        )
 
         for diskoffering1 in listdiskofferings:
-            if diskoffering1.name=="Small":
-                diskofferingvailable=diskofferingvailable+1
-            elif diskoffering1.name=="Medium":
-                diskofferingvailable=diskofferingvailable+1
-            elif diskoffering1.name=="Large":
-                diskofferingvailable=diskofferingvailable+1
-            elif diskoffering1.name=="Custom":
-                diskofferingvailable=diskofferingvailable+1
+            if diskoffering1.name == "Small":
+                diskofferingvailable = diskofferingvailable + 1
+            elif diskoffering1.name == "Medium":
+                diskofferingvailable = diskofferingvailable + 1
+            elif diskoffering1.name == "Large":
+                diskofferingvailable = diskofferingvailable + 1
+            elif diskoffering1.name == "Custom":
+                diskofferingvailable = diskofferingvailable + 1
 
-        if diskofferingvailable<4:
+        if diskofferingvailable < 4:
             self.fail("All the default disk offerings are not listed")
 
-
-    @attr(tags = ["advanced", "advancedns",  "basic", "sg"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="true")
     def test_03_list_all_Serviceofferings_with_noparams(self):
         """
         Test List Service Offerings with No Parameters
         """
 
-        serviceofferingvailable=0
-        listserviceofferings=ServiceOffering.list(self.user_api_client)
+        serviceofferingvailable = 0
+        listserviceofferings = ServiceOffering.list(self.user_api_client)
 
         self.assertEqual(
-                            isinstance(listserviceofferings, list),
-                            True,
-                            "Check list Service Offerings response returns a valid list"
-                        )
+            isinstance(listserviceofferings, list),
+            True,
+            "Check list Service Offerings response returns a valid list"
+        )
 
         for serviceoffering1 in listserviceofferings:
-            if serviceoffering1.name=="Small Instance":
-                serviceofferingvailable=serviceofferingvailable+1
-            elif serviceoffering1.name=="Medium Instance":
-                serviceofferingvailable=serviceofferingvailable+1
+            if serviceoffering1.name == "Small Instance":
+                serviceofferingvailable = serviceofferingvailable + 1
+            elif serviceoffering1.name == "Medium Instance":
+                serviceofferingvailable = serviceofferingvailable + 1
 
-        if serviceofferingvailable<2:
+        if serviceofferingvailable < 2:
             self.fail("All the default service offerings are not listed")
 
-
-    @attr(tags = ["advanced", "advancedns",  "basic", "sg"], required_hardware="false")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="false")
     def test_04_list_zones_with_no_params(self):
 
         """
         Test list zones
         """
-        zonesavailable=0
-        listallzones=Zone.list(self.user_api_client)
+        zonesavailable = 0
+        listallzones = Zone.list(self.user_api_client)
 
         self.assertEqual(
-                            isinstance(listallzones, list),
-                            True,
-                            "Check list zones response returns a valid list"
-                        )
+            isinstance(listallzones, list),
+            True,
+            "Check list zones response returns a valid list"
+        )
 
         for zone1 in listallzones:
-            if zone1.allocationstate=="Enabled":
-                zonesavailable=zonesavailable+1
- 
-        if zonesavailable<1:
+            if zone1.allocationstate == "Enabled":
+                zonesavailable = zonesavailable + 1
+
+        if zonesavailable < 1:
             self.fail("Check if zones are listed")
 
         return
 
-
-    @attr(tags = ["advanced", "advancedns",  "basic", "sg"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="true")
     def test_05_validate_stopped_vm_deployment(self):
         """
         Test Deploy Virtual Machine in Stopped State
         """
 
         list_vm_response = VirtualMachine.list(
-                                                 self.user_api_client,
-                                                 id=self.virtual_machine.id
-                                                 )
+            self.user_api_client,
+            id=self.virtual_machine.id
+        )
 
         self.debug(
-                "Verify listVirtualMachines response for virtual machine: %s" \
-                % self.virtual_machine.id
-            )
+            "Verify listVirtualMachines response for virtual machine: %s" \
+            % self.virtual_machine.id
+        )
         self.assertEqual(
-                            isinstance(list_vm_response, list),
-                            True,
-                            "Check list response returns a valid list"
-                        )
+            isinstance(list_vm_response, list),
+            True,
+            "Check list response returns a valid list"
+        )
         self.assertNotEqual(
-                            len(list_vm_response),
-                            0,
-                            "Check VM available in List Virtual Machines"
-                        )
+            len(list_vm_response),
+            0,
+            "Check VM available in List Virtual Machines"
+        )
         vm_response = list_vm_response[0]
         self.assertEqual(
 
-                            vm_response.id,
-                            self.virtual_machine.id,
-                            "Check virtual machine id in listVirtualMachines"
-                        )
+            vm_response.id,
+            self.virtual_machine.id,
+            "Check virtual machine id in listVirtualMachines"
+        )
         self.assertEqual(
-                    vm_response.name,
-                    self.virtual_machine.name,
-                    "Check virtual machine name in listVirtualMachines"
-                    )
+            vm_response.name,
+            self.virtual_machine.name,
+            "Check virtual machine name in listVirtualMachines"
+        )
         self.assertEqual(
             vm_response.state,
             'Stopped',
-             msg="VM is not in Stopped state"
+            msg="VM is not in Stopped state"
         )
         return
 
-    @attr(tags = ["advanced", "advancedns",  "basic", "sg"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="true")
     def test_06_attachvolume_to_a_stopped_vm(self):
         """
         Test Attach Volume To A Stopped VM
         """
 
         list_vm_response = VirtualMachine.list(
-                                                 self.user_api_client,
-                                                 id=self.virtual_machine.id
-                                                 )
+            self.user_api_client,
+            id=self.virtual_machine.id
+        )
 
         self.assertEqual(
             list_vm_response[0].state,
             'Stopped',
-             msg="Check if VM is in Stopped state"
+            msg="Check if VM is in Stopped state"
         )
-        custom_disk_offering=DiskOffering.list(
-                                self.user_api_client,
-                                 name="custom"
-                                 )
+        custom_disk_offering = DiskOffering.list(
+            self.user_api_client,
+            name="custom"
+        )
 
         self.__class__.volume = Volume.create(
             self.user_api_client,
@@ -406,108 +374,107 @@ class TestXDCCPInterop(cloudstackTestCase):
             size=1
         )
 
-                # Check List Volume response for newly created volume
+        # Check List Volume response for newly created volume
         list_volume_response = Volume.list(
-                    self.user_api_client,
-                    id=self.volume.id
-                )
+            self.user_api_client,
+            id=self.volume.id
+        )
         self.assertNotEqual(
-                    list_volume_response,
-                    None,
-                    "Check if volume exists in ListVolumes"
-                )
+            list_volume_response,
+            None,
+            "Check if volume exists in ListVolumes"
+        )
 
-                # Attach volume to VM
+        # Attach volume to VM
         cmd = attachVolume.attachVolumeCmd()
         cmd.id = self.volume.id
         cmd.virtualmachineid = self.virtual_machine.id
-        cmd.deviceid=1
-        vol1=self.user_api_client.attachVolume(cmd)
+        cmd.deviceid = 1
+        vol1 = self.user_api_client.attachVolume(cmd)
 
-            # Check all volumes attached to same VM
+        # Check all volumes attached to same VM
         list_volume_response = Volume.list(
-                self.user_api_client,
-                virtualmachineid=self.virtual_machine.id,
-                type='DATADISK',
-                listall=True
-            )
+            self.user_api_client,
+            virtualmachineid=self.virtual_machine.id,
+            type='DATADISK',
+            listall=True
+        )
         self.assertNotEqual(
-                list_volume_response,
-                None,
-                "Check if volume exists in ListVolumes")
+            list_volume_response,
+            None,
+            "Check if volume exists in ListVolumes")
         self.assertEqual(
-                isinstance(list_volume_response, list),
-                True,
-                "Check list volumes response for valid list")
+            isinstance(list_volume_response, list),
+            True,
+            "Check list volumes response for valid list")
 
         self.assertEqual(
-                list_volume_response[0].deviceid,
-                1,
-                "Check listed volume device id is 1")
+            list_volume_response[0].deviceid,
+            1,
+            "Check listed volume device id is 1")
 
         return
 
-    @attr(tags = ["advanced", "advancedns",  "basic", "sg"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="true")
     def test_07_start_vm(self):
         """
-        Test Start Stopped Virtual Machine with volumes attached 
+        Test Start Stopped Virtual Machine with volumes attached
         """
 
         list_vm_response = VirtualMachine.list(
-                                                 self.user_api_client,
-                                                 id=self.virtual_machine.id
-                                                 )
+            self.user_api_client,
+            id=self.virtual_machine.id
+        )
 
         self.assertEqual(
             list_vm_response[0].state,
             'Stopped',
-             msg="Check if VM is in Stopped state before starting it"
+            msg="Check if VM is in Stopped state before starting it"
         )
         self.virtual_machine.start(self.user_api_client)
 
         time.sleep(600)
 
         list_vm_response = VirtualMachine.list(
-                                            self.user_api_client,
-                                            id=self.virtual_machine.id
-                                            )
+            self.user_api_client,
+            id=self.virtual_machine.id
+        )
         self.assertEqual(
-                            isinstance(list_vm_response, list),
-                            True,
-                            "Check list response returns a valid list"
-                        )
+            isinstance(list_vm_response, list),
+            True,
+            "Check list response returns a valid list"
+        )
 
         self.assertNotEqual(
-                            len(list_vm_response),
-                            0,
-                            "Check VM available in List Virtual Machines"
-                        )
+            len(list_vm_response),
+            0,
+            "Check VM available in List Virtual Machines"
+        )
 
         self.debug(
-                "Verify listVirtualMachines response for virtual machine: %s" \
-                % self.virtual_machine.id
-                )
+            "Verify listVirtualMachines response for virtual machine: %s" \
+            % self.virtual_machine.id
+        )
         self.assertEqual(
-                            list_vm_response[0].state,
-                            "Running",
-                            "Check virtual machine is in running state"
-                        )
+            list_vm_response[0].state,
+            "Running",
+            "Check virtual machine is in running state"
+        )
         return
 
-
-    @attr(tags = ["advanced", "advancedns",  "basic", "sg"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="true")
     def test_08_list_all_vms_with_zone_id(self):
         """
         Test list all vm's available with the zone id
         """
 
-        vm_available=0
-        
+        vm_available = 0
+
         cmd = listVirtualMachines.listVirtualMachinesCmd()
         cmd.listall = True
-        cmd.zoneid=self.zone.id
+        cmd.zoneid = self.zone.id
 
-        list_vm_response=self.user_api_client.listVirtualMachines(cmd)
+        list_vm_response = self.user_api_client.listVirtualMachines(cmd)
         """
         list_vm_response = VirtualMachine.list(
                                                  self.user_api_client,
@@ -515,21 +482,20 @@ class TestXDCCPInterop(cloudstackTestCase):
                                                  )
         """
         self.assertEqual(
-                            isinstance(list_vm_response, list),
-                            True,
-                            "Check list vm's with zone id response returns a valid list"
-                        )
+            isinstance(list_vm_response, list),
+            True,
+            "Check list vm's with zone id response returns a valid list"
+        )
         for vm1 in list_vm_response:
-            if vm1.id==self.virtual_machine.id:
-                vm_available=vm_available+1
+            if vm1.id == self.virtual_machine.id:
+                vm_available = vm_available + 1
 
-        if vm_available<1:
+        if vm_available < 1:
             self.fail("List VM's with zone id is not listing the expected vm details correctly")
 
         return
 
-
-    @attr(tags = ["advanced", "advancedns",  "basic", "sg"], required_hardware="false")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="false")
     def test_09_reboot_vm(self):
         """Test Reboot Virtual Machine
         """
@@ -537,33 +503,32 @@ class TestXDCCPInterop(cloudstackTestCase):
         self.virtual_machine.reboot(self.user_api_client)
 
         list_vm_response = VirtualMachine.list(
-                                            self.user_api_client,
-                                            id=self.virtual_machine.id
-                                            )
+            self.user_api_client,
+            id=self.virtual_machine.id
+        )
         self.assertEqual(
-                            isinstance(list_vm_response, list),
-                            True,
-                            "Check list response returns a valid list"
-                        )
+            isinstance(list_vm_response, list),
+            True,
+            "Check list response returns a valid list"
+        )
 
         self.assertNotEqual(
-                            len(list_vm_response),
-                            0,
-                            "Check VM available in List Virtual Machines"
-                        )
+            len(list_vm_response),
+            0,
+            "Check VM available in List Virtual Machines"
+        )
 
         self.assertEqual(
-                            list_vm_response[0].state,
-                            "Running",
-                            "Check virtual machine is in running state"
-                        )
+            list_vm_response[0].state,
+            "Running",
+            "Check virtual machine is in running state"
+        )
         return
 
-
-    @attr(tags = ["advanced", "advancedns",  "basic", "sg"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="true")
     def test_10_detach_volume(self):
         """
-        Test Detach Volume 
+        Test Detach Volume
         """
 
         list_volume_response1 = Volume.list(
@@ -571,7 +536,7 @@ class TestXDCCPInterop(cloudstackTestCase):
             id=self.volume.id
         )
 
-        if  list_volume_response1[0].virtualmachineid is None:
+        if list_volume_response1[0].virtualmachineid is None:
             self.skipTest("Check if volume is attached to the VM before detach")
 
         self.virtual_machine.detach_volume(self.user_api_client, self.volume)
@@ -618,7 +583,7 @@ class TestXDCCPInterop(cloudstackTestCase):
             id=self.volume.id
         )
 
-        if  list_volume_response1[0].virtualmachineid is not None:
+        if list_volume_response1[0].virtualmachineid is not None:
             self.skipTest("Check if volume is detached before deleting")
 
         cmd = deleteVolume.deleteVolumeCmd()
@@ -639,31 +604,27 @@ class TestXDCCPInterop(cloudstackTestCase):
         )
         return
 
-
-    @attr(tags = ["advanced", "advancedns",  "basic", "sg"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="true")
     def test_12_stop_vm_with_force_false(self):
         """
         Test Stop Virtual Machine
         """
 
         list_vm_response = VirtualMachine.list(
-                                                 self.user_api_client,
-                                                 id=self.virtual_machine.id
-                                                 )
+            self.user_api_client,
+            id=self.virtual_machine.id
+        )
 
-        if list_vm_response[0].state!='Running':
+        if list_vm_response[0].state != 'Running':
             self.skipTest("Check if VM is in Running state before stopping it")
 
         try:
-            self.virtual_machine.stop(self.user_api_client,forced="false")
+            self.virtual_machine.stop(self.user_api_client, forced="false")
         except Exception as e:
             self.fail("Failed to stop VM: %s" % e)
         return
 
-
-
-
-    @attr(tags = ["advanced", "advancedns",  "basic", "sg"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="true")
     def test_13_destroy_vm(self):
         """
         Test destroy Virtual Machine
@@ -672,58 +633,57 @@ class TestXDCCPInterop(cloudstackTestCase):
         self.virtual_machine.delete(self.user_api_client, expunge=False)
 
         list_vm_response = VirtualMachine.list(
-                                            self.user_api_client,
-                                            id=self.virtual_machine.id
-                                            )
+            self.user_api_client,
+            id=self.virtual_machine.id
+        )
         self.assertEqual(
-                            isinstance(list_vm_response, list),
-                            True,
-                            "Check list response returns a valid list"
-                        )
+            isinstance(list_vm_response, list),
+            True,
+            "Check list response returns a valid list"
+        )
 
         self.assertNotEqual(
-                            len(list_vm_response),
-                            0,
-                            "Check VM available in List Virtual Machines"
-                        )
+            len(list_vm_response),
+            0,
+            "Check VM available in List Virtual Machines"
+        )
 
         self.assertEqual(
-                            list_vm_response[0].state,
-                            "Destroyed",
-                            "Check virtual machine is in destroyed state"
-                        )
+            list_vm_response[0].state,
+            "Destroyed",
+            "Check virtual machine is in destroyed state"
+        )
         return
 
-
-    @attr(tags = ["advanced", "advancedns",  "basic", "sg"], required_hardware="false")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="false")
     def test_14_restore_stopped_vm(self):
 
         """
         Test Restoring Stopped Virtual Machine
         """
 
-        noffering=NetworkOffering.list(
-                     self.user_api_client,
-                     name="DefaultIsolatedNetworkOfferingWithSourceNatService"
-                     )
-        vmnetwork=Network.create(
-                                 self.user_api_client,
-                                self.services["network"],
-                                accountid=self.account.name,
-                                domainid=self.account.domainid,
-                                networkofferingid=noffering[0].id,
-                                zoneid=self.zone.id
-                                 )
+        noffering = NetworkOffering.list(
+            self.user_api_client,
+            name="DefaultIsolatedNetworkOfferingWithSourceNatService"
+        )
+        vmnetwork = Network.create(
+            self.user_api_client,
+            self.services["network"],
+            accountid=self.account.name,
+            domainid=self.account.domainid,
+            networkofferingid=noffering[0].id,
+            zoneid=self.zone.id
+        )
 
         list_nw_response = Network.list(
-                                            self.user_api_client,
-                                            id=vmnetwork.id
-                                            )
+            self.user_api_client,
+            id=vmnetwork.id
+        )
         self.assertEqual(
-                            isinstance(list_nw_response, list),
-                            True,
-                            "Check list response returns a valid networks list"
-                        )
+            isinstance(list_nw_response, list),
+            True,
+            "Check list response returns a valid networks list"
+        )
         restorevm = VirtualMachine.create(
             self.user_api_client,
             self.services["small"],
@@ -735,21 +695,20 @@ class TestXDCCPInterop(cloudstackTestCase):
             startvm="false"
         )
 
-
         list_vm_response = VirtualMachine.list(
-                                            self.user_api_client,
-                                            id=restorevm.id
-                                            )
+            self.user_api_client,
+            id=restorevm.id
+        )
         self.assertEqual(
-                            list_vm_response[0].state,
-                            "Stopped",
-                            "Check virtual machine is in Stopped state"
-                        )
+            list_vm_response[0].state,
+            "Stopped",
+            "Check virtual machine is in Stopped state"
+        )
 
-        custom_disk_offering=DiskOffering.list(
-                                self.apiclient,
-                                 name="custom"
-                                 )
+        custom_disk_offering = DiskOffering.list(
+            self.apiclient,
+            name="custom"
+        )
 
         newvolume = Volume.create(
             self.user_api_client,
@@ -761,65 +720,64 @@ class TestXDCCPInterop(cloudstackTestCase):
             size=1
         )
 
-                # Attach volume to VM
+        # Attach volume to VM
         cmd = attachVolume.attachVolumeCmd()
         cmd.id = newvolume.id
         cmd.virtualmachineid = restorevm.id
-        cmd.deviceid=1
-        vol1=self.user_api_client.attachVolume(cmd)
+        cmd.deviceid = 1
+        vol1 = self.user_api_client.attachVolume(cmd)
 
         cmd = restoreVirtualMachine.restoreVirtualMachineCmd()
-        cmd.virtualmachineid=restorevm.id
+        cmd.virtualmachineid = restorevm.id
         self.user_api_client.restoreVirtualMachine(cmd)
 
         time.sleep(600)
 
         list_vm_response = VirtualMachine.list(
-                                            self.user_api_client,
-                                            id=restorevm.id
-                                            )
+            self.user_api_client,
+            id=restorevm.id
+        )
         self.assertEqual(
-                            isinstance(list_vm_response, list),
-                            True,
-                            "Check list response returns a valid list"
-                        )
+            isinstance(list_vm_response, list),
+            True,
+            "Check list response returns a valid list"
+        )
 
         self.assertNotEqual(
-                            len(list_vm_response),
-                            0,
-                            "Check VM available in List Virtual Machines"
-                        )
+            len(list_vm_response),
+            0,
+            "Check VM available in List Virtual Machines"
+        )
 
         self.assertEqual(
-                            list_vm_response[0].state,
-                            "Stopped",
-                            "Check virtual machine is in Stopped state"
-                        )
+            list_vm_response[0].state,
+            "Stopped",
+            "Check virtual machine is in Stopped state"
+        )
 
         restorevm.start(self.user_api_client)
 
         list_vm_response = VirtualMachine.list(
-                                            self.user_api_client,
-                                            id=restorevm.id
-                                            )
+            self.user_api_client,
+            id=restorevm.id
+        )
         self.assertEqual(
-                            isinstance(list_vm_response, list),
-                            True,
-                            "Check list response returns a valid list"
-                        )
+            isinstance(list_vm_response, list),
+            True,
+            "Check list response returns a valid list"
+        )
 
         self.assertNotEqual(
-                            len(list_vm_response),
-                            0,
-                            "Check VM available in List Virtual Machines"
-                        )
-
+            len(list_vm_response),
+            0,
+            "Check VM available in List Virtual Machines"
+        )
 
         self.assertEqual(
-                            list_vm_response[0].state,
-                            "Running",
-                            "Check virtual machine is in running state"
-                        )
+            list_vm_response[0].state,
+            "Running",
+            "Check virtual machine is in running state"
+        )
 
         restorevm.delete(self.apiclient)
 
@@ -827,37 +785,35 @@ class TestXDCCPInterop(cloudstackTestCase):
 
         return
 
-
-
-    @attr(tags = ["advanced", "advancedns",  "basic", "sg"], required_hardware="false")
+    @attr(tags=["advanced", "advancedns", "basic", "sg"], required_hardware="false")
     def test_15_restore_vm_with_template_id(self):
 
         """
         Test restoring Virtual Machine with template id
         """
 
-        noffering=NetworkOffering.list(
-                     self.user_api_client,
-                     name="DefaultIsolatedNetworkOfferingWithSourceNatService"
-                     )
-        vm1network=Network.create(
-                                 self.user_api_client,
-                                self.services["network"],
-                                accountid=self.account.name,
-                                domainid=self.account.domainid,
-                                networkofferingid=noffering[0].id,
-                                zoneid=self.zone.id
-                                 )
+        noffering = NetworkOffering.list(
+            self.user_api_client,
+            name="DefaultIsolatedNetworkOfferingWithSourceNatService"
+        )
+        vm1network = Network.create(
+            self.user_api_client,
+            self.services["network"],
+            accountid=self.account.name,
+            domainid=self.account.domainid,
+            networkofferingid=noffering[0].id,
+            zoneid=self.zone.id
+        )
 
         list_nw_response = Network.list(
-                                            self.user_api_client,
-                                            id=vm1network.id
-                                            )
+            self.user_api_client,
+            id=vm1network.id
+        )
         self.assertEqual(
-                            isinstance(list_nw_response, list),
-                            True,
-                            "Check list response returns a valid networks list"
-                        )
+            isinstance(list_nw_response, list),
+            True,
+            "Check list response returns a valid networks list"
+        )
 
         restorevm = VirtualMachine.create(
             self.user_api_client,
@@ -870,24 +826,22 @@ class TestXDCCPInterop(cloudstackTestCase):
             startvm="true"
         )
 
-
         time.sleep(600)
 
         list_vm_response = VirtualMachine.list(
-                                            self.user_api_client,
-                                            id=restorevm.id
-                                            )
+            self.user_api_client,
+            id=restorevm.id
+        )
         self.assertEqual(
-                            list_vm_response[0].state,
-                            "Running",
-                            "Check virtual machine is in running state"
-                        )
+            list_vm_response[0].state,
+            "Running",
+            "Check virtual machine is in running state"
+        )
 
-
-        custom_disk_offering=DiskOffering.list(
-                                self.user_api_client,
-                                 name="custom"
-                                 )
+        custom_disk_offering = DiskOffering.list(
+            self.user_api_client,
+            name="custom"
+        )
 
         newvolume = Volume.create(
             self.user_api_client,
@@ -899,12 +853,12 @@ class TestXDCCPInterop(cloudstackTestCase):
             size=1
         )
 
-                # Attach volume to VM
+        # Attach volume to VM
         cmd = attachVolume.attachVolumeCmd()
         cmd.id = newvolume.id
         cmd.virtualmachineid = restorevm.id
-        cmd.deviceid=1
-        vol1=self.user_api_client.attachVolume(cmd)
+        cmd.deviceid = 1
+        vol1 = self.user_api_client.attachVolume(cmd)
 
         cmd = restoreVirtualMachine.restoreVirtualMachineCmd()
         cmd.virtualmachineid = restorevm.id
@@ -914,26 +868,26 @@ class TestXDCCPInterop(cloudstackTestCase):
         time.sleep(600)
 
         list_vm_response = VirtualMachine.list(
-                                            self.user_api_client,
-                                            id=restorevm.id
-                                            )
+            self.user_api_client,
+            id=restorevm.id
+        )
         self.assertEqual(
-                            isinstance(list_vm_response, list),
-                            True,
-                            "Check list response returns a valid list"
-                        )
+            isinstance(list_vm_response, list),
+            True,
+            "Check list response returns a valid list"
+        )
 
         self.assertNotEqual(
-                            len(list_vm_response),
-                            0,
-                            "Check VM available in List Virtual Machines"
-                        )
+            len(list_vm_response),
+            0,
+            "Check VM available in List Virtual Machines"
+        )
 
         self.assertEqual(
-                            list_vm_response[0].state,
-                            "Running",
-                            "Check virtual machine is in Stopped state"
-                        )
+            list_vm_response[0].state,
+            "Running",
+            "Check virtual machine is in Stopped state"
+        )
 
         restorevm.delete(self.apiclient)
 
@@ -941,76 +895,74 @@ class TestXDCCPInterop(cloudstackTestCase):
 
         return
 
-
-
     @attr(tags=["advanced", "advancedns"], required_hardware="false")
     def test_16_create_template_volume(self):
         """Test Create template from volume
         """
 
-        noffering=NetworkOffering.list(
-                     self.user_api_client,
-                     name="DefaultIsolatedNetworkOfferingWithSourceNatService"
-                     )
-        vm2network=Network.create(
-                                 self.user_api_client,
-                                self.services["network"],
-                                accountid=self.account.name,
-                                domainid=self.account.domainid,
-                                networkofferingid=noffering[0].id,
-                                zoneid=self.zone.id
-                                 )
+        noffering = NetworkOffering.list(
+            self.user_api_client,
+            name="DefaultIsolatedNetworkOfferingWithSourceNatService"
+        )
+        vm2network = Network.create(
+            self.user_api_client,
+            self.services["network"],
+            accountid=self.account.name,
+            domainid=self.account.domainid,
+            networkofferingid=noffering[0].id,
+            zoneid=self.zone.id
+        )
 
         list_nw_response = Network.list(
-                                            self.user_api_client,
-                                            id=vm2network.id
-                                            )
+            self.user_api_client,
+            id=vm2network.id
+        )
         self.assertEqual(
-                            isinstance(list_nw_response, list),
-                            True,
-                            "Check list response returns a valid networks list"
-                        )
+            isinstance(list_nw_response, list),
+            True,
+            "Check list response returns a valid networks list"
+        )
 
         templatevm = VirtualMachine.create(
-                                    self.user_api_client,
-                                    self.services["small"],
-                                    templateid=self.template.id,
-                                    accountid=self.account.name,
-                                    domainid=self.account.domainid,
-                                    networkids=vm2network.id,
-                                    serviceofferingid=self.service_offering.id,
-                                    mode=self.services['mode'],
-                                    startvm="true"
-                                    )
+            self.user_api_client,
+            self.services["small"],
+            templateid=self.template.id,
+            accountid=self.account.name,
+            domainid=self.account.domainid,
+            networkids=vm2network.id,
+            serviceofferingid=self.service_offering.id,
+            mode=self.services['mode'],
+            startvm="true"
+        )
         time.sleep(600)
         vm_response = VirtualMachine.list(
-                            self.user_api_client,
-                            id=templatevm.id)
+            self.user_api_client,
+            id=templatevm.id)
 
         self.assertNotEqual(
-                            len(vm_response),
-                            0,
-                            "Check VMs available in List VMs response"
-                        )
+            len(vm_response),
+            0,
+            "Check VMs available in List VMs response"
+        )
         vm = vm_response[0]
         self.assertEqual(
-                            vm.state,
-                            'Running',
-                            "Check the state of VM created from Template"
-                        )
+            vm.state,
+            'Running',
+            "Check the state of VM created from Template"
+        )
 
-        templatevm.stop(self.user_api_client,forced="false")
+        templatevm.stop(self.user_api_client, forced="false")
 
         vm_response = VirtualMachine.list(
-                            self.user_api_client,
-                            id=templatevm.id)
+            self.user_api_client,
+            id=templatevm.id)
 
         vm = vm_response[0]
         self.assertEqual(
-                            vm.state,
-                            'Stopped',
-                            "Check the state of VM is in Stopped state before creating the Template"
-                        )
+            vm.state,
+            'Stopped',
+            "Check the state of VM is in Stopped state before creating the Template"
+        )
 
         list_volume_response = Volume.list(
             self.user_api_client,
@@ -1019,122 +971,119 @@ class TestXDCCPInterop(cloudstackTestCase):
             listall=True
         )
 
-        #Create template from Virtual machine and Volume ID
+        # Create template from Virtual machine and Volume ID
         roottemplate = Template.create(
-                                self.user_api_client,
-                                self.services["interop"]["template"],
-                                volumeid=list_volume_response[0].id,
-                                account=self.account.name,
-                                domainid=self.domain.id,
-                                )
+            self.user_api_client,
+            self.services["interop"]["template"],
+            volumeid=list_volume_response[0].id,
+            account=self.account.name,
+            domainid=self.domain.id,
+        )
 
         time.sleep(600)
 
         list_template_response = Template.list(
-                                    self.user_api_client,
-                                    templatefilter=\
-                                    self.services["templatefilter"],
-                                    id=roottemplate.id
-                                    )
+            self.user_api_client,
+            templatefilter= \
+                self.services["templatefilter"],
+            id=roottemplate.id
+        )
 
         self.assertEqual(
-                            isinstance(list_template_response, list),
-                            True,
-                            "Check list response returns a valid list"
-                        )
-        #Verify template response to check whether template added successfully
+            isinstance(list_template_response, list),
+            True,
+            "Check list response returns a valid list"
+        )
+        # Verify template response to check whether template added successfully
         self.assertNotEqual(
-                            len(list_template_response),
-                            0,
-                            "Check template available in List Templates"
-                        )
+            len(list_template_response),
+            0,
+            "Check template available in List Templates"
+        )
         template_response = list_template_response[0]
 
         self.assertEqual(
-                            template_response.displaytext,
-                            self.services["interop"]["template"]["displaytext"],
-                            "Check display text of newly created template"
-                        )
+            template_response.displaytext,
+            self.services["interop"]["template"]["displaytext"],
+            "Check display text of newly created template"
+        )
         name = template_response.name
         self.assertEqual(
-                            name.count(self.services["interop"]["template"]["name"]),
-                            1,
-                            "Check name of newly created template"
-                        )
-
+            name.count(self.services["interop"]["template"]["name"]),
+            1,
+            "Check name of newly created template"
+        )
 
         templatevm.delete(self.apiclient)
         vm2network.delete(self.user_api_client)
 
-        vm3network=Network.create(
-                                 self.user_api_client,
-                                self.services["network"],
-                                accountid=self.account.name,
-                                domainid=self.account.domainid,
-                                networkofferingid=noffering[0].id,
-                                zoneid=self.zone.id
-                                 )
+        vm3network = Network.create(
+            self.user_api_client,
+            self.services["network"],
+            accountid=self.account.name,
+            domainid=self.account.domainid,
+            networkofferingid=noffering[0].id,
+            zoneid=self.zone.id
+        )
 
         list_nw_response = Network.list(
-                                            self.user_api_client,
-                                            id=vm3network.id
-                                            )
+            self.user_api_client,
+            id=vm3network.id
+        )
         self.assertEqual(
-                            isinstance(list_nw_response, list),
-                            True,
-                            "Check list response returns a valid networks list"
-                        )
-
+            isinstance(list_nw_response, list),
+            True,
+            "Check list response returns a valid networks list"
+        )
 
         templatevm = VirtualMachine.create(
-                                    self.user_api_client,
-                                    self.services["small"],
-                                    templateid=roottemplate.id,
-                                    networkids=vm3network.id,
-                                    serviceofferingid=self.service_offering.id,
-                                    accountid=self.account.name,
-                                    domainid=self.account.domainid,
-                                    mode=self.services['mode'],
-                                    startvm="true"
-                                    )
+            self.user_api_client,
+            self.services["small"],
+            templateid=roottemplate.id,
+            networkids=vm3network.id,
+            serviceofferingid=self.service_offering.id,
+            accountid=self.account.name,
+            domainid=self.account.domainid,
+            mode=self.services['mode'],
+            startvm="true"
+        )
         time.sleep(600)
         vm_response = VirtualMachine.list(
-                            self.user_api_client,
-                            id=templatevm.id)
+            self.user_api_client,
+            id=templatevm.id)
 
         self.assertNotEqual(
-                            len(vm_response),
-                            0,
-                            "Check VMs available in List VMs response"
-                        )
+            len(vm_response),
+            0,
+            "Check VMs available in List VMs response"
+        )
         vm = vm_response[0]
         self.assertEqual(
-                            vm.state,
-                            'Running',
-                            "Check the state of VM created from Template"
-                        )
+            vm.state,
+            'Running',
+            "Check the state of VM created from Template"
+        )
 
         # Delete the template
         roottemplate.delete(self.user_api_client)
 
         list_template_response = Template.list(
-                                    self.user_api_client,
-                                    templatefilter=\
-                                    self.services["template"]["templatefilter"],
-                                    id=roottemplate.id,
-                                    zoneid=self.zone.id
-                                    )
+            self.user_api_client,
+            templatefilter= \
+                self.services["template"]["templatefilter"],
+            id=roottemplate.id,
+            zoneid=self.zone.id
+        )
         self.assertEqual(
-                            list_template_response,
-                            None,
-                            "Check template available in List Templates"
-                        )
+            list_template_response,
+            None,
+            "Check template available in List Templates"
+        )
 
         templatevm.delete(self.apiclient)
 
         vm3network.delete(self.user_api_client)
         return
-
 
     @attr(tags=["basic", "advanced", "post"], required_hardware="true")
     def test_17_deployvm_userdata_post(self):
@@ -1188,50 +1137,47 @@ class TestXDCCPInterop(cloudstackTestCase):
 
         return
 
-
-
-
     @attr(tags=["advanced", "basic"], required_hardware="false")
     def test_19_template_tag(self):
         """ Test creation, listing and deletion tag on templates
         """
 
         try:
-            
-            noffering=NetworkOffering.list(
-                     self.user_api_client,
-                     name="DefaultIsolatedNetworkOfferingWithSourceNatService"
-                     )
-            vm4network=Network.create(
-                                 self.user_api_client,
-                                self.services["network"],
-                                accountid=self.account.name,
-                                domainid=self.account.domainid,
-                                networkofferingid=noffering[0].id,
-                                zoneid=self.zone.id
-                                 )
+
+            noffering = NetworkOffering.list(
+                self.user_api_client,
+                name="DefaultIsolatedNetworkOfferingWithSourceNatService"
+            )
+            vm4network = Network.create(
+                self.user_api_client,
+                self.services["network"],
+                accountid=self.account.name,
+                domainid=self.account.domainid,
+                networkofferingid=noffering[0].id,
+                zoneid=self.zone.id
+            )
 
             list_nw_response = Network.list(
-                                            self.user_api_client,
-                                            id=vm4network.id
-                                            )
+                self.user_api_client,
+                id=vm4network.id
+            )
             self.assertEqual(
-                            isinstance(list_nw_response, list),
-                            True,
-                            "Check list response returns a valid networks list"
-                        )
+                isinstance(list_nw_response, list),
+                True,
+                "Check list response returns a valid networks list"
+            )
 
             vm_1 = VirtualMachine.create(
-                                    self.user_api_client,
-                                    self.services["small"],
-                                    templateid=self.template.id,
-                                    networkids=vm4network.id,
-                                    serviceofferingid=self.service_offering.id,
-                                    accountid=self.account.name,
-                                    domainid=self.account.domainid,
-                                    mode=self.services['mode'],
-                                    startvm="true"
-                                    )
+                self.user_api_client,
+                self.services["small"],
+                templateid=self.template.id,
+                networkids=vm4network.id,
+                serviceofferingid=self.service_offering.id,
+                accountid=self.account.name,
+                domainid=self.account.domainid,
+                mode=self.services['mode'],
+                startvm="true"
+            )
             time.sleep(600)
             self.debug("Stopping the virtual machine: %s" % vm_1.name)
             # Stop virtual machine
@@ -1275,7 +1221,7 @@ class TestXDCCPInterop(cloudstackTestCase):
             self.user_api_client,
             resourceIds=template.id,
             resourceType='Template',
-            tags={'OS': 'windows8'}
+            tags={ 'OS': 'windows8' }
         )
         self.debug("Tag created: %s" % tag.__dict__)
 
@@ -1311,7 +1257,7 @@ class TestXDCCPInterop(cloudstackTestCase):
                 self.user_api_client,
                 resourceIds=template.id,
                 resourceType='Template',
-                tags={'OS': 'windows8'}
+                tags={ 'OS': 'windows8' }
             )
         except Exception as e:
             self.fail("Failed to delete the tag - %s" % e)

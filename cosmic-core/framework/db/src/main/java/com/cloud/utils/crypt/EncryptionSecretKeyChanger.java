@@ -1,20 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// the License.  You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.utils.crypt;
+
+import com.cloud.utils.PropertiesUtil;
+import com.cloud.utils.db.TransactionLegacy;
+import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,10 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import com.cloud.utils.PropertiesUtil;
-import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
@@ -51,13 +35,13 @@ import org.jasypt.properties.EncryptableProperties;
  */
 public class EncryptionSecretKeyChanger {
 
-    private StandardPBEStringEncryptor oldEncryptor = new StandardPBEStringEncryptor();
-    private StandardPBEStringEncryptor newEncryptor = new StandardPBEStringEncryptor();
     private static final String keyFile = "/etc/cloudstack/management/key";
+    private final StandardPBEStringEncryptor oldEncryptor = new StandardPBEStringEncryptor();
+    private final StandardPBEStringEncryptor newEncryptor = new StandardPBEStringEncryptor();
 
-    public static void main(String[] args) {
-        List<String> argsList = Arrays.asList(args);
-        Iterator<String> iter = argsList.iterator();
+    public static void main(final String[] args) {
+        final List<String> argsList = Arrays.asList(args);
+        final Iterator<String> iter = argsList.iterator();
         String oldMSKey = null;
         String oldDBKey = null;
         String newMSKey = null;
@@ -65,7 +49,7 @@ public class EncryptionSecretKeyChanger {
 
         //Parse command-line args
         while (iter.hasNext()) {
-            String arg = iter.next();
+            final String arg = iter.next();
             // Old MS Key
             if (arg.equals("-m")) {
                 oldMSKey = iter.next();
@@ -98,28 +82,28 @@ public class EncryptionSecretKeyChanger {
 
         final File dbPropsFile = PropertiesUtil.findConfigFile("db.properties");
         final Properties dbProps;
-        EncryptionSecretKeyChanger keyChanger = new EncryptionSecretKeyChanger();
-        StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
+        final EncryptionSecretKeyChanger keyChanger = new EncryptionSecretKeyChanger();
+        final StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
         keyChanger.initEncryptor(encryptor, oldMSKey);
         dbProps = new EncryptableProperties(encryptor);
         PropertiesConfiguration backupDBProps = null;
 
         System.out.println("Parsing db.properties file");
-        try(FileInputStream db_prop_fstream = new FileInputStream(dbPropsFile);) {
+        try (FileInputStream db_prop_fstream = new FileInputStream(dbPropsFile)) {
             dbProps.load(db_prop_fstream);
             backupDBProps = new PropertiesConfiguration(dbPropsFile);
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             System.out.println("db.properties file not found while reading DB secret key" + e.getMessage());
-        } catch (IOException e) {
+        } catch (final IOException e) {
             System.out.println("Error while reading DB secret key from db.properties" + e.getMessage());
-        } catch (ConfigurationException e) {
+        } catch (final ConfigurationException e) {
             e.printStackTrace();
         }
 
         String dbSecretKey = null;
         try {
             dbSecretKey = dbProps.getProperty("db.cloud.encrypt.secret");
-        } catch (EncryptionOperationNotPossibleException e) {
+        } catch (final EncryptionOperationNotPossibleException e) {
             System.out.println("Failed to decrypt existing DB secret key from db.properties. " + e.getMessage());
             return;
         }
@@ -143,10 +127,9 @@ public class EncryptionSecretKeyChanger {
                 if (encryptionType.equals("file")) {
                     //update key file with new MS key
                     try (FileWriter fwriter = new FileWriter(keyFile);
-                         BufferedWriter bwriter = new BufferedWriter(fwriter);)
-                    {
+                         BufferedWriter bwriter = new BufferedWriter(fwriter)) {
                         bwriter.write(newMSKey);
-                    } catch (IOException e) {
+                    } catch (final IOException e) {
                         System.out.println("Failed to write new secret to file. Please update the file manually");
                     }
                 }
@@ -160,7 +143,7 @@ public class EncryptionSecretKeyChanger {
             EncryptionSecretKeyChecker.initEncryptorForMigration(oldMSKey);
             try {
                 success = keyChanger.migrateData(oldDBKey, newDBKey);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 System.out.println("Error during data migration");
                 e.printStackTrace();
                 success = false;
@@ -174,30 +157,40 @@ public class EncryptionSecretKeyChanger {
             //revert db.properties
             try {
                 backupDBProps.save();
-            } catch (ConfigurationException e) {
+            } catch (final ConfigurationException e) {
                 e.printStackTrace();
             }
             if (encryptionType.equals("file")) {
                 //revert secret key in file
                 try (FileWriter fwriter = new FileWriter(keyFile);
-                     BufferedWriter bwriter = new BufferedWriter(fwriter);)
-                {
+                     BufferedWriter bwriter = new BufferedWriter(fwriter)) {
                     bwriter.write(oldMSKey);
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     System.out.println("Failed to revert to old secret to file. Please update the file manually");
                 }
             }
         }
     }
 
-    private boolean migrateProperties(File dbPropsFile, Properties dbProps, String newMSKey, String newDBKey) {
+    private static void usage() {
+        System.out.println("Usage: \tEncryptionSecretKeyChanger \n" + "\t\t-m <Mgmt Secret Key> \n" + "\t\t-d <DB Secret Key> \n" + "\t\t-n [New Mgmt Secret Key] \n"
+                + "\t\t-e [New DB Secret Key]");
+    }
+
+    private void initEncryptor(final StandardPBEStringEncryptor encryptor, final String secretKey) {
+        encryptor.setAlgorithm("PBEWithMD5AndDES");
+        final SimpleStringPBEConfig stringConfig = new SimpleStringPBEConfig();
+        stringConfig.setPassword(secretKey);
+        encryptor.setConfig(stringConfig);
+    }
+
+    private boolean migrateProperties(final File dbPropsFile, final Properties dbProps, final String newMSKey, final String newDBKey) {
         System.out.println("Migrating db.properties..");
-        StandardPBEStringEncryptor msEncryptor = new StandardPBEStringEncryptor();
-        ;
+        final StandardPBEStringEncryptor msEncryptor = new StandardPBEStringEncryptor();
         initEncryptor(msEncryptor, newMSKey);
 
         try {
-            PropertiesConfiguration newDBProps = new PropertiesConfiguration(dbPropsFile);
+            final PropertiesConfiguration newDBProps = new PropertiesConfiguration(dbPropsFile);
             if (newDBKey != null && !newDBKey.isEmpty()) {
                 newDBProps.setProperty("db.cloud.encrypt.secret", "ENC(" + msEncryptor.encrypt(newDBKey) + ")");
             }
@@ -210,7 +203,7 @@ public class EncryptionSecretKeyChanger {
                 newDBProps.setProperty("db.usage.password", "ENC(" + msEncryptor.encrypt(prop) + ")");
             }
             newDBProps.save(dbPropsFile.getAbsolutePath());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -218,19 +211,19 @@ public class EncryptionSecretKeyChanger {
         return true;
     }
 
-    private boolean migrateData(String oldDBKey, String newDBKey) {
+    private boolean migrateData(final String oldDBKey, final String newDBKey) {
         System.out.println("Begin Data migration");
         initEncryptor(oldEncryptor, oldDBKey);
         initEncryptor(newEncryptor, newDBKey);
         System.out.println("Initialised Encryptors");
 
-        TransactionLegacy txn = TransactionLegacy.open("Migrate");
+        final TransactionLegacy txn = TransactionLegacy.open("Migrate");
         txn.start();
         try {
-            Connection conn;
+            final Connection conn;
             try {
                 conn = txn.getConnection();
-            } catch (SQLException e) {
+            } catch (final SQLException e) {
                 throw new CloudRuntimeException("Unable to migrate encrypted data in the database", e);
             }
 
@@ -247,125 +240,113 @@ public class EncryptionSecretKeyChanger {
         return true;
     }
 
-    private void initEncryptor(StandardPBEStringEncryptor encryptor, String secretKey) {
-        encryptor.setAlgorithm("PBEWithMD5AndDES");
-        SimpleStringPBEConfig stringConfig = new SimpleStringPBEConfig();
-        stringConfig.setPassword(secretKey);
-        encryptor.setConfig(stringConfig);
-    }
-
-    private String migrateValue(String value) {
-        if (value == null || value.isEmpty()) {
-            return value;
-        }
-        String decryptVal = oldEncryptor.decrypt(value);
-        return newEncryptor.encrypt(decryptVal);
-    }
-
-    private void migrateConfigValues(Connection conn) {
+    private void migrateConfigValues(final Connection conn) {
         System.out.println("Begin migrate config values");
-        try(PreparedStatement select_pstmt = conn.prepareStatement("select name, value from configuration where category in ('Hidden', 'Secure')");
-            ResultSet rs = select_pstmt.executeQuery();
-            PreparedStatement update_pstmt = conn.prepareStatement("update configuration set value=? where name=?");
+        try (PreparedStatement select_pstmt = conn.prepareStatement("select name, value from configuration where category in ('Hidden', 'Secure')");
+             ResultSet rs = select_pstmt.executeQuery();
+             PreparedStatement update_pstmt = conn.prepareStatement("update configuration set value=? where name=?")
         ) {
             while (rs.next()) {
-                String name = rs.getString(1);
-                String value = rs.getString(2);
+                final String name = rs.getString(1);
+                final String value = rs.getString(2);
                 if (value == null || value.isEmpty()) {
                     continue;
                 }
-                String encryptedValue = migrateValue(value);
+                final String encryptedValue = migrateValue(value);
                 update_pstmt.setBytes(1, encryptedValue.getBytes("UTF-8"));
                 update_pstmt.setString(2, name);
                 update_pstmt.executeUpdate();
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new CloudRuntimeException("Unable to update configuration values ", e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             throw new CloudRuntimeException("Unable to update configuration values ", e);
         }
         System.out.println("End migrate config values");
     }
 
-    private void migrateHostDetails(Connection conn) {
+    private void migrateHostDetails(final Connection conn) {
         System.out.println("Begin migrate host details");
 
-        try( PreparedStatement sel_pstmt = conn.prepareStatement("select id, value from host_details where name = 'password'");
-        ResultSet rs = sel_pstmt.executeQuery();
-        PreparedStatement pstmt = conn.prepareStatement("update host_details set value=? where id=?");
+        try (PreparedStatement sel_pstmt = conn.prepareStatement("select id, value from host_details where name = 'password'");
+             ResultSet rs = sel_pstmt.executeQuery();
+             PreparedStatement pstmt = conn.prepareStatement("update host_details set value=? where id=?")
         ) {
             while (rs.next()) {
-                long id = rs.getLong(1);
-                String value = rs.getString(2);
+                final long id = rs.getLong(1);
+                final String value = rs.getString(2);
                 if (value == null || value.isEmpty()) {
                     continue;
                 }
-                String encryptedValue = migrateValue(value);
+                final String encryptedValue = migrateValue(value);
                 pstmt.setBytes(1, encryptedValue.getBytes("UTF-8"));
                 pstmt.setLong(2, id);
                 pstmt.executeUpdate();
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new CloudRuntimeException("Unable update host_details values ", e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             throw new CloudRuntimeException("Unable update host_details values ", e);
         }
         System.out.println("End migrate host details");
     }
 
-    private void migrateVNCPassword(Connection conn) {
+    private void migrateVNCPassword(final Connection conn) {
         System.out.println("Begin migrate VNC password");
-        try(PreparedStatement  select_pstmt = conn.prepareStatement("select id, vnc_password from vm_instance");
-        ResultSet rs = select_pstmt.executeQuery();
-        PreparedStatement pstmt = conn.prepareStatement("update vm_instance set vnc_password=? where id=?");
+        try (PreparedStatement select_pstmt = conn.prepareStatement("select id, vnc_password from vm_instance");
+             ResultSet rs = select_pstmt.executeQuery();
+             PreparedStatement pstmt = conn.prepareStatement("update vm_instance set vnc_password=? where id=?")
         ) {
             while (rs.next()) {
-                long id = rs.getLong(1);
-                String value = rs.getString(2);
+                final long id = rs.getLong(1);
+                final String value = rs.getString(2);
                 if (value == null || value.isEmpty()) {
                     continue;
                 }
-                String encryptedValue = migrateValue(value);
+                final String encryptedValue = migrateValue(value);
 
                 pstmt.setBytes(1, encryptedValue.getBytes("UTF-8"));
                 pstmt.setLong(2, id);
                 pstmt.executeUpdate();
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new CloudRuntimeException("Unable update vm_instance vnc_password ", e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             throw new CloudRuntimeException("Unable update vm_instance vnc_password ", e);
         }
         System.out.println("End migrate VNC password");
     }
 
-    private void migrateUserCredentials(Connection conn) {
+    private void migrateUserCredentials(final Connection conn) {
         System.out.println("Begin migrate user credentials");
-        try(PreparedStatement select_pstmt = conn.prepareStatement("select id, secret_key from user");
-        ResultSet rs = select_pstmt.executeQuery();
-        PreparedStatement pstmt = conn.prepareStatement("update user set secret_key=? where id=?");
+        try (PreparedStatement select_pstmt = conn.prepareStatement("select id, secret_key from user");
+             ResultSet rs = select_pstmt.executeQuery();
+             PreparedStatement pstmt = conn.prepareStatement("update user set secret_key=? where id=?")
         ) {
             while (rs.next()) {
-                long id = rs.getLong(1);
-                String secretKey = rs.getString(2);
+                final long id = rs.getLong(1);
+                final String secretKey = rs.getString(2);
                 if (secretKey == null || secretKey.isEmpty()) {
                     continue;
                 }
-                String encryptedSecretKey = migrateValue(secretKey);
+                final String encryptedSecretKey = migrateValue(secretKey);
                 pstmt.setBytes(1, encryptedSecretKey.getBytes("UTF-8"));
                 pstmt.setLong(2, id);
                 pstmt.executeUpdate();
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new CloudRuntimeException("Unable update user secret key ", e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             throw new CloudRuntimeException("Unable update user secret key ", e);
         }
         System.out.println("End migrate user credentials");
     }
 
-    private static void usage() {
-        System.out.println("Usage: \tEncryptionSecretKeyChanger \n" + "\t\t-m <Mgmt Secret Key> \n" + "\t\t-d <DB Secret Key> \n" + "\t\t-n [New Mgmt Secret Key] \n"
-            + "\t\t-e [New DB Secret Key]");
+    private String migrateValue(final String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+        final String decryptVal = oldEncryptor.decrypt(value);
+        return newEncryptor.encrypt(decryptVal);
     }
 }

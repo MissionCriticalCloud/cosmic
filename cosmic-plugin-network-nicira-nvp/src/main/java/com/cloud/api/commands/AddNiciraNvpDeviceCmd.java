@@ -1,25 +1,8 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.api.commands;
-
-import javax.inject.Inject;
 
 import com.cloud.api.response.NiciraNvpDeviceResponse;
 import com.cloud.event.EventTypes;
@@ -31,7 +14,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.NiciraNvpDeviceVO;
 import com.cloud.network.element.NiciraNvpElementService;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -40,6 +22,8 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import javax.inject.Inject;
 
 @APICommand(name = "addNiciraNvpDevice", responseObject = NiciraNvpDeviceResponse.class, description = "Adds a Nicira NVP device",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
@@ -53,10 +37,10 @@ public class AddNiciraNvpDeviceCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.PHYSICAL_NETWORK_ID,
-               type = CommandType.UUID,
-               entityType = PhysicalNetworkResponse.class,
-               required = true,
-               description = "the Physical Network ID")
+            type = CommandType.UUID,
+            entityType = PhysicalNetworkResponse.class,
+            required = true,
+            description = "the Physical Network ID")
     private Long physicalNetworkId;
 
     @Parameter(name = ApiConstants.HOST_NAME, type = CommandType.STRING, required = true, description = "Hostname of ip address of the Nicira NVP Controller.")
@@ -69,15 +53,15 @@ public class AddNiciraNvpDeviceCmd extends BaseAsyncCmd {
     private String password;
 
     @Parameter(name = ApiConstants.NICIRA_NVP_TRANSPORT_ZONE_UUID,
-               type = CommandType.STRING,
-               required = true,
-               description = "The Transportzone UUID configured on the Nicira Controller")
+            type = CommandType.STRING,
+            required = true,
+            description = "The Transportzone UUID configured on the Nicira Controller")
     private String transportzoneuuid;
 
     @Parameter(name = ApiConstants.NICIRA_NVP_GATEWAYSERVICE_UUID,
-               type = CommandType.STRING,
-               required = false,
-               description = "The L3 Gateway Service UUID configured on the Nicira Controller")
+            type = CommandType.STRING,
+            required = false,
+            description = "The L3 Gateway Service UUID configured on the Nicira Controller")
     private String l3gatewayserviceuuid;
 
     /////////////////////////////////////////////////////
@@ -114,20 +98,20 @@ public class AddNiciraNvpDeviceCmd extends BaseAsyncCmd {
 
     @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException {
+            ResourceAllocationException {
         try {
-            NiciraNvpDeviceVO niciraNvpDeviceVO = niciraNvpElementService.addNiciraNvpDevice(this);
+            final NiciraNvpDeviceVO niciraNvpDeviceVO = niciraNvpElementService.addNiciraNvpDevice(this);
             if (niciraNvpDeviceVO != null) {
-                NiciraNvpDeviceResponse response = niciraNvpElementService.createNiciraNvpDeviceResponse(niciraNvpDeviceVO);
+                final NiciraNvpDeviceResponse response = niciraNvpElementService.createNiciraNvpDeviceResponse(niciraNvpDeviceVO);
                 response.setObjectName("niciranvpdevice");
                 response.setResponseName(getCommandName());
                 setResponseObject(response);
             } else {
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to add Nicira NVP device due to internal error.");
             }
-        } catch (InvalidParameterValueException invalidParamExcp) {
+        } catch (final InvalidParameterValueException invalidParamExcp) {
             throw new ServerApiException(ApiErrorCode.PARAM_ERROR, invalidParamExcp.getMessage());
-        } catch (CloudRuntimeException runtimeExcp) {
+        } catch (final CloudRuntimeException runtimeExcp) {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, runtimeExcp.getMessage());
         }
     }

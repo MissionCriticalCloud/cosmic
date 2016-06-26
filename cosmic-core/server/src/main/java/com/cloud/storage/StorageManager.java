@@ -1,23 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.storage;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
@@ -33,22 +14,26 @@ import com.cloud.service.ServiceOfferingVO;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VMInstanceVO;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.HypervisorHostListener;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 public interface StorageManager extends StorageService {
-    static final ConfigKey<Integer> StorageCleanupInterval = new ConfigKey<Integer>(Integer.class, "storage.cleanup.interval", "Advanced", "86400",
+    static final ConfigKey<Integer> StorageCleanupInterval = new ConfigKey<>(Integer.class, "storage.cleanup.interval", "Advanced", "86400",
             "The interval (in seconds) to wait before running the storage cleanup thread.", false, ConfigKey.Scope.Global, null);
-    static final ConfigKey<Integer> StorageCleanupDelay = new ConfigKey<Integer>(Integer.class, "storage.cleanup.delay", "Advanced", "86400",
-            "Determines how long (in seconds) to wait before actually expunging destroyed volumes. The default value = the default value of storage.cleanup.interval.", false, ConfigKey.Scope.Global, null);
-    static final ConfigKey<Boolean> StorageCleanupEnabled = new ConfigKey<Boolean>(Boolean.class, "storage.cleanup.enabled", "Advanced", "true",
+    static final ConfigKey<Integer> StorageCleanupDelay = new ConfigKey<>(Integer.class, "storage.cleanup.delay", "Advanced", "86400",
+            "Determines how long (in seconds) to wait before actually expunging destroyed volumes. The default value = the default value of storage.cleanup.interval.", false,
+            ConfigKey.Scope.Global, null);
+    static final ConfigKey<Boolean> StorageCleanupEnabled = new ConfigKey<>(Boolean.class, "storage.cleanup.enabled", "Advanced", "true",
             "Enables/disables the storage cleanup thread.", false, ConfigKey.Scope.Global, null);
 
     /**
      * Returns a comma separated list of tags for the specified storage pool
+     *
      * @param poolId
      * @return comma separated list of tags
      */
@@ -68,12 +53,14 @@ public interface StorageManager extends StorageService {
 
     /**
      * Checks if a host has running VMs that are using its local storage pool.
+     *
      * @return true if local storage is active on the host
      */
     boolean isLocalStorageActiveOnHost(Long hostId);
 
     /**
      * Cleans up storage pools by removing unused templates.
+     *
      * @param recurring - true if this cleanup is part of a recurring garbage collection thread
      */
     void cleanupStorage(boolean recurring);

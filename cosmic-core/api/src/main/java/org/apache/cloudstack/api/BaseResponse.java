@@ -1,27 +1,18 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api;
 
 import com.cloud.serializer.Param;
+
 import com.google.gson.annotations.SerializedName;
 
 public abstract class BaseResponse implements ResponseObject {
+    @SerializedName(ApiConstants.JOB_ID)
+    @Param(description = "the UUID of the latest async job acting on this object")
+    protected String jobId;
     private transient String responseName;
     private transient String objectName;
+    @SerializedName(ApiConstants.JOB_STATUS)
+    @Param(description = "the current status of the latest async job acting on this object")
+    private Integer jobStatus;
 
     @Override
     public String getResponseName() {
@@ -29,7 +20,7 @@ public abstract class BaseResponse implements ResponseObject {
     }
 
     @Override
-    public void setResponseName(String responseName) {
+    public void setResponseName(final String responseName) {
         this.responseName = responseName;
     }
 
@@ -39,7 +30,7 @@ public abstract class BaseResponse implements ResponseObject {
     }
 
     @Override
-    public void setObjectName(String objectName) {
+    public void setObjectName(final String objectName) {
         this.objectName = objectName;
     }
 
@@ -48,21 +39,13 @@ public abstract class BaseResponse implements ResponseObject {
         return null;
     }
 
-    @SerializedName(ApiConstants.JOB_ID)
-    @Param(description = "the UUID of the latest async job acting on this object")
-    protected String jobId;
-
-    @SerializedName(ApiConstants.JOB_STATUS)
-    @Param(description = "the current status of the latest async job acting on this object")
-    private Integer jobStatus;
-
     @Override
     public String getJobId() {
         return jobId;
     }
 
     @Override
-    public void setJobId(String jobId) {
+    public void setJobId(final String jobId) {
         this.jobId = jobId;
     }
 
@@ -72,7 +55,7 @@ public abstract class BaseResponse implements ResponseObject {
     }
 
     @Override
-    public void setJobStatus(Integer jobStatus) {
+    public void setJobStatus(final Integer jobStatus) {
         this.jobStatus = jobStatus;
     }
 }

@@ -1,26 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.vm.dao;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.utils.db.Attribute;
 import com.cloud.utils.db.GenericDaoBase;
@@ -32,6 +10,12 @@ import com.cloud.vm.SecondaryStorageVm;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.VirtualMachine.State;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -39,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVmVO, Long> implements SecondaryStorageVmDao {
     private static final Logger s_logger = LoggerFactory.getLogger(SecondaryStorageVmDaoImpl.class);
-
+    protected final Attribute _updateTimeAttr;
     protected SearchBuilder<SecondaryStorageVmVO> DataCenterStatusSearch;
     protected SearchBuilder<SecondaryStorageVmVO> StateSearch;
     protected SearchBuilder<SecondaryStorageVmVO> HostSearch;
@@ -48,8 +32,6 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     protected SearchBuilder<SecondaryStorageVmVO> ZoneSearch;
     protected SearchBuilder<SecondaryStorageVmVO> StateChangeSearch;
     protected SearchBuilder<SecondaryStorageVmVO> InstanceSearch;
-
-    protected final Attribute _updateTimeAttr;
 
     public SecondaryStorageVmDaoImpl() {
         DataCenterStatusSearch = createSearchBuilder();
@@ -102,27 +84,27 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     }
 
     @Override
-    public boolean remove(Long id) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public boolean remove(final Long id) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
-        SecondaryStorageVmVO proxy = createForUpdate();
+        final SecondaryStorageVmVO proxy = createForUpdate();
         proxy.setPublicIpAddress(null);
         proxy.setPrivateIpAddress(null);
 
-        UpdateBuilder ub = getUpdateBuilder(proxy);
+        final UpdateBuilder ub = getUpdateBuilder(proxy);
         ub.set(proxy, "state", State.Destroyed);
         ub.set(proxy, "privateIpAddress", null);
         update(id, ub, proxy);
 
-        boolean result = super.remove(id);
+        final boolean result = super.remove(id);
         txn.commit();
         return result;
     }
 
     @Override
-    public List<SecondaryStorageVmVO> getSecStorageVmListInStates(SecondaryStorageVm.Role role, long dataCenterId, State... states) {
-        SearchCriteria<SecondaryStorageVmVO> sc = DataCenterStatusSearch.create();
-        sc.setParameters("states", (Object[])states);
+    public List<SecondaryStorageVmVO> getSecStorageVmListInStates(final SecondaryStorageVm.Role role, final long dataCenterId, final State... states) {
+        final SearchCriteria<SecondaryStorageVmVO> sc = DataCenterStatusSearch.create();
+        sc.setParameters("states", (Object[]) states);
         sc.setParameters("dc", dataCenterId);
         if (role != null) {
             sc.setParameters("role", role);
@@ -131,9 +113,9 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     }
 
     @Override
-    public List<SecondaryStorageVmVO> getSecStorageVmListInStates(SecondaryStorageVm.Role role, State... states) {
-        SearchCriteria<SecondaryStorageVmVO> sc = StateSearch.create();
-        sc.setParameters("states", (Object[])states);
+    public List<SecondaryStorageVmVO> getSecStorageVmListInStates(final SecondaryStorageVm.Role role, final State... states) {
+        final SearchCriteria<SecondaryStorageVmVO> sc = StateSearch.create();
+        sc.setParameters("states", (Object[]) states);
         if (role != null) {
             sc.setParameters("role", role);
         }
@@ -142,8 +124,8 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     }
 
     @Override
-    public List<SecondaryStorageVmVO> listByHostId(SecondaryStorageVm.Role role, long hostId) {
-        SearchCriteria<SecondaryStorageVmVO> sc = HostSearch.create();
+    public List<SecondaryStorageVmVO> listByHostId(final SecondaryStorageVm.Role role, final long hostId) {
+        final SearchCriteria<SecondaryStorageVmVO> sc = HostSearch.create();
         sc.setParameters("host", hostId);
         if (role != null) {
             sc.setParameters("role", role);
@@ -152,10 +134,22 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     }
 
     @Override
-    public List<SecondaryStorageVmVO> listUpByHostId(SecondaryStorageVm.Role role, long hostId) {
-        SearchCriteria<SecondaryStorageVmVO> sc = HostUpSearch.create();
+    public List<SecondaryStorageVmVO> listByLastHostId(final SecondaryStorageVm.Role role, final long hostId) {
+        final SearchCriteria<SecondaryStorageVmVO> sc = LastHostSearch.create();
+        sc.setParameters("lastHost", hostId);
+        sc.setParameters("state", State.Stopped);
+        if (role != null) {
+            sc.setParameters("role", role);
+        }
+
+        return listBy(sc);
+    }
+
+    @Override
+    public List<SecondaryStorageVmVO> listUpByHostId(final SecondaryStorageVm.Role role, final long hostId) {
+        final SearchCriteria<SecondaryStorageVmVO> sc = HostUpSearch.create();
         sc.setParameters("host", hostId);
-        sc.setParameters("states", new Object[] {State.Destroyed, State.Stopped, State.Expunging});
+        sc.setParameters("states", new Object[]{State.Destroyed, State.Stopped, State.Expunging});
         if (role != null) {
             sc.setParameters("role", role);
         }
@@ -163,20 +157,29 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     }
 
     @Override
-    public List<Long> getRunningSecStorageVmListByMsid(SecondaryStorageVm.Role role, long msid) {
-        List<Long> l = new ArrayList<Long>();
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        ;
+    public List<SecondaryStorageVmVO> listByZoneId(final SecondaryStorageVm.Role role, final long zoneId) {
+        final SearchCriteria<SecondaryStorageVmVO> sc = ZoneSearch.create();
+        sc.setParameters("zone", zoneId);
+        if (role != null) {
+            sc.setParameters("role", role);
+        }
+        return listBy(sc);
+    }
+
+    @Override
+    public List<Long> getRunningSecStorageVmListByMsid(final SecondaryStorageVm.Role role, final long msid) {
+        final List<Long> l = new ArrayList<>();
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         try {
-            String sql;
+            final String sql;
             if (role == null) {
                 sql =
-                    "SELECT s.id FROM secondary_storage_vm s, vm_instance v, host h " + "WHERE s.id=v.id AND v.state='Running' AND v.host_id=h.id AND h.mgmt_server_id=?";
+                        "SELECT s.id FROM secondary_storage_vm s, vm_instance v, host h " + "WHERE s.id=v.id AND v.state='Running' AND v.host_id=h.id AND h.mgmt_server_id=?";
             } else {
                 sql =
-                    "SELECT s.id FROM secondary_storage_vm s, vm_instance v, host h "
-                        + "WHERE s.id=v.id AND v.state='Running' AND s.role=? AND v.host_id=h.id AND h.mgmt_server_id=?";
+                        "SELECT s.id FROM secondary_storage_vm s, vm_instance v, host h "
+                                + "WHERE s.id=v.id AND v.state='Running' AND s.role=? AND v.host_id=h.id AND h.mgmt_server_id=?";
             }
 
             pstmt = txn.prepareAutoCloseStatement(sql);
@@ -188,65 +191,32 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
                 pstmt.setLong(2, msid);
             }
 
-            ResultSet rs = pstmt.executeQuery();
+            final ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 l.add(rs.getLong(1));
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             s_logger.debug("Caught SQLException: ", e);
         }
         return l;
     }
 
     @Override
-    public SecondaryStorageVmVO findByInstanceName(String instanceName) {
-        SearchCriteria<SecondaryStorageVmVO> sc = InstanceSearch.create();
-        sc.setParameters("instanceName", instanceName);
-        List<SecondaryStorageVmVO> list = listBy(sc);
-        if (list == null || list.size() == 0) {
-            return null;
-        } else {
-            return list.get(0);
-        }
-    }
+    public List<Long> listRunningSecStorageOrderByLoad(final SecondaryStorageVm.Role role, final long zoneId) {
 
-    @Override
-    public List<SecondaryStorageVmVO> listByZoneId(SecondaryStorageVm.Role role, long zoneId) {
-        SearchCriteria<SecondaryStorageVmVO> sc = ZoneSearch.create();
-        sc.setParameters("zone", zoneId);
-        if (role != null) {
-            sc.setParameters("role", role);
-        }
-        return listBy(sc);
-    }
-
-    @Override
-    public List<SecondaryStorageVmVO> listByLastHostId(SecondaryStorageVm.Role role, long hostId) {
-        SearchCriteria<SecondaryStorageVmVO> sc = LastHostSearch.create();
-        sc.setParameters("lastHost", hostId);
-        sc.setParameters("state", State.Stopped);
-        if (role != null) {
-            sc.setParameters("role", role);
-        }
-
-        return listBy(sc);
-    }
-
-    @Override
-    public List<Long> listRunningSecStorageOrderByLoad(SecondaryStorageVm.Role role, long zoneId) {
-
-        List<Long> l = new ArrayList<Long>();
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        ;
+        final List<Long> l = new ArrayList<>();
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         try {
-            String sql;
+            final String sql;
             if (role == null) {
                 sql =
-                    "SELECT s.id, count(l.id) as count FROM secondary_storage_vm s INNER JOIN vm_instance v ON s.id=v.id LEFT JOIN cmd_exec_log l ON s.id=l.instance_id WHERE v.state='Running' AND v.data_center_id=? GROUP BY s.id ORDER BY count";
+                        "SELECT s.id, count(l.id) as count FROM secondary_storage_vm s INNER JOIN vm_instance v ON s.id=v.id LEFT JOIN cmd_exec_log l ON s.id=l.instance_id WHERE" +
+                                " v.state='Running' AND v.data_center_id=? GROUP BY s.id ORDER BY count";
             } else {
                 sql =
-                    "SELECT s.id, count(l.id) as count FROM secondary_storage_vm s INNER JOIN vm_instance v ON s.id=v.id LEFT JOIN cmd_exec_log l ON s.id=l.instance_id WHERE v.state='Running' AND v.data_center_id=? AND s.role=? GROUP BY s.id ORDER BY count";
+                        "SELECT s.id, count(l.id) as count FROM secondary_storage_vm s INNER JOIN vm_instance v ON s.id=v.id LEFT JOIN cmd_exec_log l ON s.id=l.instance_id WHERE" +
+                                " v.state='Running' AND v.data_center_id=? AND s.role=? GROUP BY s.id ORDER BY count";
             }
 
             pstmt = txn.prepareAutoCloseStatement(sql);
@@ -258,14 +228,26 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
                 pstmt.setString(2, role.toString());
             }
 
-            ResultSet rs = pstmt.executeQuery();
+            final ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 l.add(rs.getLong(1));
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             s_logger.error("Unexpected exception ", e);
         }
 
         return l;
+    }
+
+    @Override
+    public SecondaryStorageVmVO findByInstanceName(final String instanceName) {
+        final SearchCriteria<SecondaryStorageVmVO> sc = InstanceSearch.create();
+        sc.setParameters("instanceName", instanceName);
+        final List<SecondaryStorageVmVO> list = listBy(sc);
+        if (list == null || list.size() == 0) {
+            return null;
+        } else {
+            return list.get(0);
+        }
     }
 }

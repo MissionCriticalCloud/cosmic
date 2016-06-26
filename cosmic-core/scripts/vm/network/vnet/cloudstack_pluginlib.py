@@ -1,28 +1,9 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 # cloudstack_pluginlib for openvswitch on KVM hypervisor
 
 import ConfigParser
 import logging
 import os
 import subprocess
-
-from time import localtime, asctime
 
 DEFAULT_LOG_FORMAT = "%(asctime)s %(levelname)8s [%(name)s] %(message)s"
 DEFAULT_LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -36,8 +17,10 @@ OVS_DAEMON_PATH = "ovs-vswitchd"
 VSCTL_PATH = "/usr/bin/ovs-vsctl"
 OFCTL_PATH = "/usr/bin/ovs-ofctl"
 
+
 class PluginError(Exception):
     """Base Exception class for all plugin errors."""
+
     def __init__(self, *args):
         Exception.__init__(self, *args)
 
@@ -164,10 +147,10 @@ def _build_flow_expr(**kwargs):
     is_delete_expr = kwargs.get('delete', False)
     flow = ""
     if not is_delete_expr:
-        flow = "hard_timeout=%s,idle_timeout=%s,priority=%s"\
-                % (kwargs.get('hard_timeout', '0'),
-                   kwargs.get('idle_timeout', '0'),
-                   kwargs.get('priority', '1'))
+        flow = "hard_timeout=%s,idle_timeout=%s,priority=%s" \
+               % (kwargs.get('hard_timeout', '0'),
+                  kwargs.get('idle_timeout', '0'),
+                  kwargs.get('priority', '1'))
     in_port = 'in_port' in kwargs and ",in_port=%s" % kwargs['in_port'] or ''
     dl_type = 'dl_type' in kwargs and ",dl_type=%s" % kwargs['dl_type'] or ''
     dl_src = 'dl_src' in kwargs and ",dl_src=%s" % kwargs['dl_src'] or ''
@@ -224,66 +207,78 @@ def get_network_id_for_vif(vif_name):
     domain_id, device_id = vif_name[3:len(vif_name)].split(".")
     dom_uuid = do_cmd([XE_PATH, "vm-list", "dom-id=%s" % domain_id, "--minimal"])
     vif_uuid = do_cmd([XE_PATH, "vif-list", "vm-uuid=%s" % dom_uuid, "device=%s" % device_id, "--minimal"])
-    vnet = do_cmd([XE_PATH, "vif-param-get", "uuid=%s" % vif_uuid,  "param-name=other-config",
-                             "param-key=cloudstack-network-id"])
+    vnet = do_cmd([XE_PATH, "vif-param-get", "uuid=%s" % vif_uuid, "param-name=other-config",
+                   "param-key=cloudstack-network-id"])
     return vnet
+
 
 def get_network_id_for_tunnel_port(tunnelif_name):
     vnet = do_cmd([VSCTL_PATH, "get", "interface", tunnelif_name, "options:cloudstack-network-id"])
     return vnet
 
+
 def clear_flooding_rules_for_port(bridge, ofport):
-        del_flows(bridge, in_port=ofport, table=2)
+    del_flows(bridge, in_port=ofport, table=2)
+
 
 def add_flooding_rules_for_port(bridge, in_ofport, out_ofports):
-        action = "".join("output:%s," %ofport for ofport in out_ofports)[:-1]
-        add_flow(bridge, priority=1100, in_port=in_ofport, table=1, actions=action)
+    action = "".join("output:%s," % ofport for ofport in out_ofports)[:-1]
+    add_flow(bridge, priority=1100, in_port=in_ofport, table=1, actions=action)
+
 
 def get_ofport_for_vif(vif_name):
     return do_cmd([VSCTL_PATH, "get", "interface", vif_name, "ofport"])
+
 
 def get_macaddress_of_vif(vif_name):
     domain_id, device_id = vif_name[3:len(vif_name)].split(".")
     dom_uuid = do_cmd([XE_PATH, "vm-list", "dom-id=%s" % domain_id, "--minimal"])
     vif_uuid = do_cmd([XE_PATH, "vif-list", "vm-uuid=%s" % dom_uuid, "device=%s" % device_id, "--minimal"])
-    mac = do_cmd([XE_PATH, "vif-param-get", "uuid=%s" % vif_uuid,  "param-name=MAC"])
+    mac = do_cmd([XE_PATH, "vif-param-get", "uuid=%s" % vif_uuid, "param-name=MAC"])
     return mac
+
 
 def get_vif_name_from_macaddress(macaddress):
     vif_uuid = do_cmd([XE_PATH, "vif-list", "MAC=%s" % macaddress, "--minimal"])
-    vif_device_id = do_cmd([XE_PATH, "vif-param-get", "uuid=%s" % vif_uuid,  "param-name=device"])
-    vm_uuid = do_cmd([XE_PATH, "vif-param-get", "uuid=%s" % vif_uuid,  "param-name=vm-uuid"])
-    vm_domain_id = do_cmd([XE_PATH, "vm-param-get", "uuid=%s" % vm_uuid,  "param-name=dom-id"])
-    return "vif"+vm_domain_id+"."+vif_device_id
+    vif_device_id = do_cmd([XE_PATH, "vif-param-get", "uuid=%s" % vif_uuid, "param-name=device"])
+    vm_uuid = do_cmd([XE_PATH, "vif-param-get", "uuid=%s" % vif_uuid, "param-name=vm-uuid"])
+    vm_domain_id = do_cmd([XE_PATH, "vm-param-get", "uuid=%s" % vm_uuid, "param-name=dom-id"])
+    return "vif" + vm_domain_id + "." + vif_device_id
+
 
 def add_mac_lookup_table_entry(bridge, mac_address, out_of_port):
     add_flow(bridge, priority=1100, dl_dst=mac_address, table=1, actions="output:%s" % out_of_port)
 
+
 def delete_mac_lookup_table_entry(bridge, mac_address):
     del_flows(bridge, dl_dst=mac_address, table=1)
 
+
 def add_ip_lookup_table_entry(bridge, ip, dst_tier_gateway_mac, dst_vm_mac):
-    action_str = "mod_dl_sr:%s" % dst_tier_gateway_mac + ",mod_dl_dst:%s" % dst_vm_mac +",resubmit(,5)"
-    addflow = [OFCTL_PATH, "add-flow", bridge, "table=4", "nw_dst=%s" % ip, "actions=%s" %action_str]
+    action_str = "mod_dl_sr:%s" % dst_tier_gateway_mac + ",mod_dl_dst:%s" % dst_vm_mac + ",resubmit(,5)"
+    addflow = [OFCTL_PATH, "add-flow", bridge, "table=4", "nw_dst=%s" % ip, "actions=%s" % action_str]
     do_cmd(addflow)
+
 
 def get_vms_on_host(vpc, host_id):
     all_vms = vpc.vms
     vms_on_host = []
     for vm in all_vms:
-      if vm.hostid == host_id:
-        vms_on_host.append(vm)
+        if vm.hostid == host_id:
+            vms_on_host.append(vm)
     return vms_on_host
+
 
 def get_network_details(vpc, network_uuid):
     tiers = vpc.tiers
     for tier in tiers:
-      if tier.networkuuid == network_uuid:
-        return tier
+        if tier.networkuuid == network_uuid:
+            return tier
     return None
 
+
 class jsonLoader(object):
-  def __init__(self, obj):
+    def __init__(self, obj):
         for k in obj:
             v = obj[k]
             if isinstance(v, dict):
@@ -296,19 +291,20 @@ class jsonLoader(object):
             else:
                 setattr(self, k, v)
 
-  def __getattr__(self, val):
+    def __getattr__(self, val):
         if val in self.__dict__:
             return self.__dict__[val]
         else:
             return None
 
-  def __repr__(self):
+    def __repr__(self):
         return '{%s}' % str(', '.join('%s : %s' % (k, repr(v)) for (k, v)
                                       in self.__dict__.iteritems()))
 
-  def __str__(self):
+    def __str__(self):
         return '{%s}' % str(', '.join('%s : %s' % (k, repr(v)) for (k, v)
                                       in self.__dict__.iteritems()))
+
 
 def configure_bridge_for_network_topology(bridge, this_host_id, json_config):
     vpconfig = jsonLoader(json.loads(json_config)).vpc
@@ -337,12 +333,12 @@ def configure_bridge_for_network_topology(bridge, this_host_id, json_config):
 
             # Add flow entry to send with intra tier traffic from the NIC to L2 lookup path)
             addflow = [OFCTL_PATH, "add-flow", bridge, "table=0", "in_port=%s" % of_port,
-                       "nw_dst=%s" %network.cidr, "actions=resubmit(,1)"]
+                       "nw_dst=%s" % network.cidr, "actions=resubmit(,1)"]
             do_cmd(addflow)
 
-            #add flow entry to send inter-tier traffic from the NIC to egress ACL table(to L3 lookup path)
+            # add flow entry to send inter-tier traffic from the NIC to egress ACL table(to L3 lookup path)
             addflow = [OFCTL_PATH, "add-flow", bridge, "table=0", "in_port=%s" % of_port,
-                       "dl_dst=%s" %network.gatewaymac, "nw_dst=%s" %vpconfig.cidr, "actions=resubmit(,3)"]
+                       "dl_dst=%s" % network.gatewaymac, "nw_dst=%s" % vpconfig.cidr, "actions=resubmit(,3)"]
             do_cmd(addflow)
 
     # get the list of hosts on which VPC spans from the JSON config
@@ -372,12 +368,14 @@ def configure_bridge_for_network_topology(bridge, this_host_id, json_config):
 
     return "SUCCESS: successfully configured bridge as per the VPC topology"
 
+
 def get_acl(vpcconfig, required_acl_id):
     acls = vpcconfig.acls
     for acl in acls:
         if acl.id == required_acl_id:
             return acl
     return None
+
 
 def configure_ovs_bridge_for_routing_policies(bridge, json_config):
     vpconfig = jsonLoader(json.loads(json_config)).vpc
@@ -415,10 +413,10 @@ def configure_ovs_bridge_for_routing_policies(bridge, json_config):
                     port = source_port_start
                     while (port < source_port_end):
                         if action is "deny":
-                            add_flow(bridge, priority= acl_priority, table=5, nw_src=source_cidr, nw_dst=tier_cidr, tp_dst=port,
+                            add_flow(bridge, priority=acl_priority, table=5, nw_src=source_cidr, nw_dst=tier_cidr, tp_dst=port,
                                      nw_proto=protocol, actions='drop')
                         if action is "allow":
-                            add_flow(bridge, priority= acl_priority,table=5, nw_src=source_cidr, nw_dst=tier_cidr, tp_dst=port,
+                            add_flow(bridge, priority=acl_priority, table=5, nw_src=source_cidr, nw_dst=tier_cidr, tp_dst=port,
                                      nw_proto=protocol, actions='resubmit(,1)')
                         port = port + 1
 
@@ -429,10 +427,10 @@ def configure_ovs_bridge_for_routing_policies(bridge, json_config):
                     port = source_port_start
                     while (port < source_port_end):
                         if action is "deny":
-                            add_flow(bridge, priority= acl_priority, table=5, nw_src=tier_cidr, nw_dst=source_cidr, tp_dst=port,
+                            add_flow(bridge, priority=acl_priority, table=5, nw_src=tier_cidr, nw_dst=source_cidr, tp_dst=port,
                                      nw_proto=protocol, actions='drop')
                         if action is "allow":
-                            add_flow(bridge, priority= acl_priority, table=5, nw_src=tier_cidr, nw_dst=source_cidr, tp_dst=port,
+                            add_flow(bridge, priority=acl_priority, table=5, nw_src=tier_cidr, nw_dst=source_cidr, tp_dst=port,
                                      nw_proto=protocol, actions='resubmit(,1)')
                         port = port + 1
 

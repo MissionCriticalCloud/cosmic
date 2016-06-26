@@ -1,28 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
+
+import com.cloud.serializer.Param;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
 
 import java.util.Date;
 
-import com.cloud.serializer.Param;
 import com.google.gson.annotations.SerializedName;
-
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
 
 public class TemplateZoneResponse extends BaseResponse {
     @SerializedName(ApiConstants.ZONE_ID)
@@ -50,25 +34,9 @@ public class TemplateZoneResponse extends BaseResponse {
         super();
     }
 
-    public TemplateZoneResponse(String zoneId, String zoneName) {
+    public TemplateZoneResponse(final String zoneId, final String zoneName) {
         super();
         this.zoneId = zoneId;
-        this.zoneName = zoneName;
-    }
-
-    public String getZoneId() {
-        return zoneId;
-    }
-
-    public void setZoneId(String zoneId) {
-        this.zoneId = zoneId;
-    }
-
-    public String getZoneName() {
-        return zoneName;
-    }
-
-    public void setZoneName(String zoneName) {
         this.zoneName = zoneName;
     }
 
@@ -76,7 +44,7 @@ public class TemplateZoneResponse extends BaseResponse {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(final String status) {
         this.status = status;
     }
 
@@ -84,7 +52,7 @@ public class TemplateZoneResponse extends BaseResponse {
         return isReady;
     }
 
-    public void setReady(boolean isReady) {
+    public void setReady(final boolean isReady) {
         this.isReady = isReady;
     }
 
@@ -92,7 +60,7 @@ public class TemplateZoneResponse extends BaseResponse {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 
@@ -100,13 +68,21 @@ public class TemplateZoneResponse extends BaseResponse {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        String oid = this.getZoneId();
+        final String oid = this.getZoneId();
         result = prime * result + ((oid == null) ? 0 : oid.hashCode());
         return result;
     }
 
+    public String getZoneId() {
+        return zoneId;
+    }
+
+    public void setZoneId(final String zoneId) {
+        this.zoneId = zoneId;
+    }
+
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -116,8 +92,8 @@ public class TemplateZoneResponse extends BaseResponse {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        TemplateZoneResponse other = (TemplateZoneResponse)obj;
-        String oid = this.getZoneId();
+        final TemplateZoneResponse other = (TemplateZoneResponse) obj;
+        final String oid = this.getZoneId();
         if (oid == null) {
             if (other.getZoneId() != null) {
                 return false;
@@ -130,4 +106,11 @@ public class TemplateZoneResponse extends BaseResponse {
         return true;
     }
 
+    public String getZoneName() {
+        return zoneName;
+    }
+
+    public void setZoneName(final String zoneName) {
+        this.zoneName = zoneName;
+    }
 }

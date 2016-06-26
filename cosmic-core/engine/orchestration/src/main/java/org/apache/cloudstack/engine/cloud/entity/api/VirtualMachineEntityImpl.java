@@ -1,27 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.engine.cloud.entity.api;
-
-import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner;
@@ -32,8 +9,14 @@ import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.vm.VirtualMachineProfile;
-
 import org.apache.cloudstack.engine.cloud.entity.api.db.VMEntityVO;
+
+import javax.inject.Inject;
+import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -47,12 +30,28 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
     public VirtualMachineEntityImpl() {
     }
 
-    public void init(String vmId) {
+    public VirtualMachineEntityImpl(final String vmId, final String owner, final String hostName, final String displayName, final int cpu, final int speed, final long memory,
+                                    final List<String> computeTags,
+                                    final List<String> rootDiskTags, final List<String> networks, final VMEntityManager manager) {
+        this(vmId, manager);
+        this.vmEntityVO.setOwner(owner);
+        this.vmEntityVO.setHostname(hostName);
+        this.vmEntityVO.setDisplayname(displayName);
+        this.vmEntityVO.setComputeTags(computeTags);
+        this.vmEntityVO.setRootDiskTags(rootDiskTags);
+        this.vmEntityVO.setNetworkIds(networks);
+
+        manager.saveVirtualMachine(vmEntityVO);
+    }
+
+    public VirtualMachineEntityImpl(final String vmId, final VMEntityManager manager) {
+        this.manager = manager;
         this.vmEntityVO = this.manager.loadVirtualMachine(vmId);
     }
 
-    public void init(String vmId, String owner, String hostName, String displayName, int cpu, int speed, long memory, List<String> computeTags,
-        List<String> rootDiskTags, List<String> networks) {
+    public void init(final String vmId, final String owner, final String hostName, final String displayName, final int cpu, final int speed, final long memory, final
+    List<String> computeTags,
+                     final List<String> rootDiskTags, final List<String> networks) {
         init(vmId);
         this.vmEntityVO.setOwner(owner);
         this.vmEntityVO.setHostname(hostName);
@@ -64,22 +63,8 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
         manager.saveVirtualMachine(vmEntityVO);
     }
 
-    public VirtualMachineEntityImpl(String vmId, VMEntityManager manager) {
-        this.manager = manager;
+    public void init(final String vmId) {
         this.vmEntityVO = this.manager.loadVirtualMachine(vmId);
-    }
-
-    public VirtualMachineEntityImpl(String vmId, String owner, String hostName, String displayName, int cpu, int speed, long memory, List<String> computeTags,
-            List<String> rootDiskTags, List<String> networks, VMEntityManager manager) {
-        this(vmId, manager);
-        this.vmEntityVO.setOwner(owner);
-        this.vmEntityVO.setHostname(hostName);
-        this.vmEntityVO.setDisplayname(displayName);
-        this.vmEntityVO.setComputeTags(computeTags);
-        this.vmEntityVO.setRootDiskTags(rootDiskTags);
-        this.vmEntityVO.setNetworkIds(networks);
-
-        manager.saveVirtualMachine(vmEntityVO);
     }
 
     @Override
@@ -126,17 +111,17 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
     }
 
     @Override
-    public void addDetail(String name, String value) {
+    public void addDetail(final String name, final String value) {
         vmEntityVO.setDetail(name, value);
     }
 
     @Override
-    public void delDetail(String name, String value) {
+    public void delDetail(final String name, final String value) {
         // TODO Auto-generated method stub
     }
 
     @Override
-    public void updateDetail(String name, String value) {
+    public void updateDetail(final String name, final String value) {
         // TODO Auto-generated method stub
     }
 
@@ -195,25 +180,25 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
     }
 
     @Override
-    public String reserve(DeploymentPlanner plannerToUse, DeploymentPlan plan, ExcludeList exclude, String caller) throws InsufficientCapacityException,
-        ResourceUnavailableException {
+    public String reserve(final DeploymentPlanner plannerToUse, final DeploymentPlan plan, final ExcludeList exclude, final String caller) throws InsufficientCapacityException,
+            ResourceUnavailableException {
         return manager.reserveVirtualMachine(this.vmEntityVO, plannerToUse, plan, exclude);
     }
 
     @Override
-    public void migrateTo(String reservationId, String caller) {
+    public void migrateTo(final String reservationId, final String caller) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void deploy(String reservationId, String caller, Map<VirtualMachineProfile.Param, Object> params) throws InsufficientCapacityException,
-        ResourceUnavailableException {
+    public void deploy(final String reservationId, final String caller, final Map<VirtualMachineProfile.Param, Object> params) throws InsufficientCapacityException,
+            ResourceUnavailableException {
         manager.deployVirtualMachine(reservationId, this.vmEntityVO, caller, params);
     }
 
     @Override
-    public boolean stop(String caller) throws ResourceUnavailableException {
+    public boolean stop(final String caller) throws ResourceUnavailableException {
         return manager.stopvirtualmachine(this.vmEntityVO, caller);
     }
 
@@ -224,12 +209,12 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
     }
 
     @Override
-    public boolean destroy(String caller) throws AgentUnavailableException, OperationTimedoutException, ConcurrentOperationException {
+    public boolean destroy(final String caller) throws AgentUnavailableException, OperationTimedoutException, ConcurrentOperationException {
         return manager.destroyVirtualMachine(this.vmEntityVO, caller);
     }
 
     @Override
-    public VirtualMachineEntity duplicate(String externalId) {
+    public VirtualMachineEntity duplicate(final String externalId) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -241,27 +226,26 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
     }
 
     @Override
-    public void attach(VolumeEntity volume, short deviceId) {
+    public void attach(final VolumeEntity volume, final short deviceId) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void detach(VolumeEntity volume) {
+    public void detach(final VolumeEntity volume) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void connectTo(NetworkEntity network, short nicId) {
+    public void connectTo(final NetworkEntity network, final short nicId) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void disconnectFrom(NetworkEntity netowrk, short nicId) {
+    public void disconnectFrom(final NetworkEntity netowrk, final short nicId) {
         // TODO Auto-generated method stub
 
     }
-
 }

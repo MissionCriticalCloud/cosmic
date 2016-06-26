@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.guru;
 
 import com.cloud.configuration.ConfigurationManager;
@@ -30,7 +14,11 @@ import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.State;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
-import com.cloud.network.Networks.*;
+import com.cloud.network.Networks.AddressFormat;
+import com.cloud.network.Networks.BroadcastDomainType;
+import com.cloud.network.Networks.IsolationType;
+import com.cloud.network.Networks.Mode;
+import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.vpc.PrivateIpAddress;
 import com.cloud.network.vpc.PrivateIpVO;
@@ -44,13 +32,15 @@ import com.cloud.vm.Nic.ReservationStrategy;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachineProfile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     private static final Logger s_logger = LoggerFactory.getLogger(PrivateNetworkGuru.class);
+    private static final TrafficType[] TrafficTypes = {TrafficType.Guest};
     @Inject
     protected ConfigurationManager _configMgr;
     @Inject
@@ -60,36 +50,8 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     @Inject
     EntityManager _entityMgr;
 
-    private static final TrafficType[] TrafficTypes = {TrafficType.Guest};
-
     protected PrivateNetworkGuru() {
         super();
-    }
-
-    @Override
-    public boolean isMyTrafficType(final TrafficType type) {
-        for (final TrafficType t : TrafficTypes) {
-            if (t == type) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public TrafficType[] getSupportedTrafficType() {
-        return TrafficTypes;
-    }
-
-    protected boolean canHandle(final NetworkOffering offering, final DataCenter dc) {
-        // This guru handles only system Guest network
-        if (dc.getNetworkType() == NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() == Network.GuestType.Isolated &&
-                offering.isSystemOnly()) {
-            return true;
-        } else {
-            s_logger.trace("We only take care of system Guest networks of type   " + GuestType.Isolated + " in zone of type " + NetworkType.Advanced);
-            return false;
-        }
     }
 
     @Override
@@ -126,23 +88,20 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
             }
         } else {
             throw new CloudRuntimeException("Can't design network " + network + "; netmask/gateway must be passed in");
-
         }
 
         return network;
     }
 
-    @Override
-    public void deallocate(final Network network, final NicProfile nic, final VirtualMachineProfile vm) {
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Deallocate network: networkId: " + nic.getNetworkId() + ", ip: " + nic.getIPv4Address());
+    protected boolean canHandle(final NetworkOffering offering, final DataCenter dc) {
+        // This guru handles only system Guest network
+        if (dc.getNetworkType() == NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() == Network.GuestType.Isolated &&
+                offering.isSystemOnly()) {
+            return true;
+        } else {
+            s_logger.trace("We only take care of system Guest networks of type   " + GuestType.Isolated + " in zone of type " + NetworkType.Advanced);
+            return false;
         }
-
-        final PrivateIpVO ip = _privateIpDao.findByIpAndSourceNetworkId(nic.getNetworkId(), nic.getIPv4Address());
-        if (ip != null) {
-            _privateIpDao.releaseIpAddress(nic.getIPv4Address(), nic.getNetworkId());
-        }
-        nic.deallocate();
     }
 
     @Override
@@ -176,7 +135,8 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
         return nic;
     }
 
-    protected void getIp(final NicProfile nic, final DataCenter dc, final Network network) throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
+    protected void getIp(final NicProfile nic, final DataCenter dc, final Network network) throws InsufficientVirtualNetworkCapacityException,
+            InsufficientAddressCapacityException {
         if (nic.getIPv4Address() == null) {
             final PrivateIpVO ipVO = _privateIpDao.allocateIpAddress(network.getDataCenterId(), network.getId(), null);
             final String vlanTag = BroadcastDomainType.getValue(network.getBroadcastUri());
@@ -200,15 +160,6 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     }
 
     @Override
-    public void updateNicProfile(final NicProfile profile, final Network network) {
-        final DataCenter dc = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
-        if (profile != null) {
-            profile.setIPv4Dns1(dc.getDns1());
-            profile.setIPv4Dns2(dc.getDns2());
-        }
-    }
-
-    @Override
     public void reserve(final NicProfile nic, final Network network, final VirtualMachineProfile vm, final DeployDestination dest, final ReservationContext context)
             throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
         if (nic.getIPv4Address() == null) {
@@ -220,6 +171,28 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     @Override
     public boolean release(final NicProfile nic, final VirtualMachineProfile vm, final String reservationId) {
         return true;
+    }
+
+    @Override
+    public void deallocate(final Network network, final NicProfile nic, final VirtualMachineProfile vm) {
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("Deallocate network: networkId: " + nic.getNetworkId() + ", ip: " + nic.getIPv4Address());
+        }
+
+        final PrivateIpVO ip = _privateIpDao.findByIpAndSourceNetworkId(nic.getNetworkId(), nic.getIPv4Address());
+        if (ip != null) {
+            _privateIpDao.releaseIpAddress(nic.getIPv4Address(), nic.getNetworkId());
+        }
+        nic.deallocate();
+    }
+
+    @Override
+    public void updateNicProfile(final NicProfile profile, final Network network) {
+        final DataCenter dc = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
+        if (profile != null) {
+            profile.setIPv4Dns1(dc.getDns1());
+            profile.setIPv4Dns2(dc.getDns2());
+        }
     }
 
     @Override
@@ -237,5 +210,20 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
         final DataCenter dc = _entityMgr.findById(DataCenter.class, networkProfile.getDataCenterId());
         networkProfile.setDns1(dc.getDns1());
         networkProfile.setDns2(dc.getDns2());
+    }
+
+    @Override
+    public TrafficType[] getSupportedTrafficType() {
+        return TrafficTypes;
+    }
+
+    @Override
+    public boolean isMyTrafficType(final TrafficType type) {
+        for (final TrafficType t : TrafficTypes) {
+            if (t == type) {
+                return true;
+            }
+        }
+        return false;
     }
 }

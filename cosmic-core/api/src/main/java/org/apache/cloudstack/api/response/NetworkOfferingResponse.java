@@ -1,35 +1,18 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
+
+import com.cloud.offering.NetworkOffering;
+import com.cloud.serializer.Param;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
+import org.apache.cloudstack.api.EntityReference;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.cloud.offering.NetworkOffering;
-import com.cloud.serializer.Param;
 import com.google.gson.annotations.SerializedName;
 
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.EntityReference;
-
 @EntityReference(value = NetworkOffering.class)
-@SuppressWarnings("unused")
 public class NetworkOfferingResponse extends BaseResponse {
     @SerializedName("id")
     @Param(description = "the id of the network offering")
@@ -119,91 +102,91 @@ public class NetworkOfferingResponse extends BaseResponse {
     @Param(description = "true if network offering supports network that span multiple zones", since = "4.4")
     private Boolean supportsStrechedL2Subnet;
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setDisplayText(String displayText) {
+    public void setDisplayText(final String displayText) {
         this.displayText = displayText;
     }
 
-    public void setTags(String tags) {
+    public void setTags(final String tags) {
         this.tags = tags;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 
-    public void setTrafficType(String trafficType) {
+    public void setTrafficType(final String trafficType) {
         this.trafficType = trafficType;
     }
 
-    public void setIsDefault(Boolean isDefault) {
+    public void setIsDefault(final Boolean isDefault) {
         this.isDefault = isDefault;
     }
 
-    public void setSpecifyVlan(Boolean specifyVlan) {
+    public void setSpecifyVlan(final Boolean specifyVlan) {
         this.specifyVlan = specifyVlan;
     }
 
-    public void setConserveMode(Boolean conserveMode) {
+    public void setConserveMode(final Boolean conserveMode) {
         this.conserveMode = conserveMode;
     }
 
-    public void setAvailability(String availability) {
+    public void setAvailability(final String availability) {
         this.availability = availability;
     }
 
-    public void setNetworkRate(Integer networkRate) {
+    public void setNetworkRate(final Integer networkRate) {
         this.networkRate = networkRate;
     }
 
-    public void setServices(List<ServiceResponse> services) {
+    public void setServices(final List<ServiceResponse> services) {
         this.services = services;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
-    public void setGuestIpType(String type) {
+    public void setGuestIpType(final String type) {
         this.guestIpType = type;
     }
 
-    public void setServiceOfferingId(String serviceOfferingId) {
+    public void setServiceOfferingId(final String serviceOfferingId) {
         this.serviceOfferingId = serviceOfferingId;
     }
 
-    public void setSpecifyIpRanges(Boolean specifyIpRanges) {
+    public void setSpecifyIpRanges(final Boolean specifyIpRanges) {
         this.specifyIpRanges = specifyIpRanges;
     }
 
-    public void setForVpc(Boolean forVpc) {
+    public void setForVpc(final Boolean forVpc) {
         this.forVpc = forVpc;
     }
 
-    public void setIsPersistent(Boolean isPersistent) {
+    public void setIsPersistent(final Boolean isPersistent) {
         this.isPersistent = isPersistent;
     }
 
-    public void setDetails(Map details) {
+    public void setDetails(final Map details) {
         this.details = details;
     }
 
-    public void setEgressDefaultPolicy(Boolean egressDefaultPolicy) {
+    public void setEgressDefaultPolicy(final Boolean egressDefaultPolicy) {
         this.egressDefaultPolicy = egressDefaultPolicy;
     }
 
-    public void setConcurrentConnections(Integer concurrentConnections) {
+    public void setConcurrentConnections(final Integer concurrentConnections) {
         this.concurrentConnections = concurrentConnections;
     }
 
-    public void setSupportsStrechedL2Subnet(Boolean supportsStrechedL2Subnet) {
+    public void setSupportsStrechedL2Subnet(final Boolean supportsStrechedL2Subnet) {
         this.supportsStrechedL2Subnet = supportsStrechedL2Subnet;
     }
 }

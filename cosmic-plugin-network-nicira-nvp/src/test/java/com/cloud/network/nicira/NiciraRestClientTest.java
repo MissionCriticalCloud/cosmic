@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.network.nicira;
@@ -32,13 +17,13 @@ import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.verifyPrivate;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.cloud.utils.rest.CloudstackRESTException;
 import com.cloud.utils.rest.HttpMethods;
 import com.cloud.utils.rest.HttpRequestMatcher;
 import com.cloud.utils.rest.HttpUriRequestBuilder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.HttpHost;
 import org.apache.http.ProtocolVersion;
@@ -72,7 +57,7 @@ public class NiciraRestClientTest {
     private static final StatusLine HTTP_200_STATUSLINE = new BasicStatusLine(new ProtocolVersion(HTTPS, 1, 1), 200, "OK");
     private static final StatusLine HTTP_401_STATUSLINE = new BasicStatusLine(new ProtocolVersion(HTTPS, 1, 1), 401, "Unauthorized");
 
-    private static final Map<String, String> loginParameters = new HashMap<String, String>();
+    private static final Map<String, String> loginParameters = new HashMap<>();
     private static HttpUriRequest request;
     private static HttpUriRequest loginRequest;
     private final CloseableHttpClient httpClient = mock(CloseableHttpClient.class);
@@ -85,28 +70,28 @@ public class NiciraRestClientTest {
         loginParameters.put("username", ADMIN);
         loginParameters.put("password", ADMIN_PASSWORD);
         request = HttpUriRequestBuilder.create()
-            .method(HttpMethods.GET)
-            .path("/path")
-            .build();
+                                       .method(HttpMethods.GET)
+                                       .path("/path")
+                                       .build();
         loginRequest = HttpUriRequestBuilder.create()
-            .method(HttpMethods.POST)
-            .methodParameters(loginParameters)
-            .path(LOGIN_PATH)
-            .build();
+                                            .method(HttpMethods.POST)
+                                            .methodParameters(loginParameters)
+                                            .path(LOGIN_PATH)
+                                            .build();
     }
 
     @Before
     public void setup() {
         httpClientContext = HttpClientContext.create();
         client = spy(NiciraRestClient.create()
-            .client(httpClient)
-            .clientContext(httpClientContext)
-            .hostname(LOCALHOST)
-            .username(ADMIN)
-            .password(ADMIN_PASSWORD)
-            .loginUrl(LOGIN_PATH)
-            .executionLimit(5)
-            .build());
+                                     .client(httpClient)
+                                     .clientContext(httpClientContext)
+                                     .hostname(LOCALHOST)
+                                     .username(ADMIN)
+                                     .password(ADMIN_PASSWORD)
+                                     .loginUrl(LOGIN_PATH)
+                                     .executionLimit(5)
+                                     .build());
     }
 
     @Test
@@ -124,14 +109,14 @@ public class NiciraRestClientTest {
     @Test
     public void testExecuteUnauthorizedThenSuccess() throws Exception {
         when(mockResponse.getStatusLine())
-            .thenReturn(HTTP_401_STATUSLINE)
-            .thenReturn(HTTP_200_STATUSLINE)
-            .thenReturn(HTTP_200_STATUSLINE);
+                .thenReturn(HTTP_401_STATUSLINE)
+                .thenReturn(HTTP_200_STATUSLINE)
+                .thenReturn(HTTP_200_STATUSLINE);
         when(httpClient.execute(eq(HTTP_HOST), HttpRequestMatcher.eq(request), eq(httpClientContext)))
-            .thenReturn(mockResponse)
-            .thenReturn(mockResponse);
+                .thenReturn(mockResponse)
+                .thenReturn(mockResponse);
         when(httpClient.execute(eq(HTTP_HOST), HttpRequestMatcher.eq(loginRequest), eq(httpClientContext)))
-            .thenReturn(mockResponse);
+                .thenReturn(mockResponse);
 
         final CloseableHttpResponse response = client.execute(request);
 
@@ -145,21 +130,21 @@ public class NiciraRestClientTest {
     @Test
     public void testExecuteTwoConsecutiveUnauthorizedExecutions() throws Exception {
         when(mockResponse.getStatusLine())
-            .thenReturn(HTTP_401_STATUSLINE)
-            .thenReturn(HTTP_401_STATUSLINE);
+                .thenReturn(HTTP_401_STATUSLINE)
+                .thenReturn(HTTP_401_STATUSLINE);
         when(httpClient.execute(eq(HTTP_HOST), HttpRequestMatcher.eq(request), eq(httpClientContext)))
-            .thenReturn(mockResponse);
+                .thenReturn(mockResponse);
         when(httpClient.execute(eq(HTTP_HOST), HttpRequestMatcher.eq(loginRequest), eq(httpClientContext)))
-            .thenReturn(mockResponse);
+                .thenReturn(mockResponse);
         final NiciraRestClient client = spy(NiciraRestClient.create()
-            .client(httpClient)
-            .clientContext(httpClientContext)
-            .hostname(LOCALHOST)
-            .username(ADMIN)
-            .password(ADMIN_PASSWORD)
-            .loginUrl(LOGIN_PATH)
-            .executionLimit(2)
-            .build());
+                                                            .client(httpClient)
+                                                            .clientContext(httpClientContext)
+                                                            .hostname(LOCALHOST)
+                                                            .username(ADMIN)
+                                                            .password(ADMIN_PASSWORD)
+                                                            .loginUrl(LOGIN_PATH)
+                                                            .executionLimit(2)
+                                                            .build());
 
         try {
             client.execute(request);
@@ -174,35 +159,35 @@ public class NiciraRestClientTest {
     @Test
     public void testExecuteLiveLockWhenControllerAllowsLoginAndFollowsWithUnauthorizedButDoesNotRediect() throws Exception {
         when(mockResponse.getStatusLine())
-            .thenReturn(HTTP_401_STATUSLINE)
-            .thenReturn(HTTP_200_STATUSLINE)
-            .thenReturn(HTTP_401_STATUSLINE)
-            .thenReturn(HTTP_200_STATUSLINE)
-            .thenReturn(HTTP_401_STATUSLINE)
-            .thenReturn(HTTP_200_STATUSLINE)
-            .thenReturn(HTTP_401_STATUSLINE)
-            .thenReturn(HTTP_200_STATUSLINE)
-            .thenReturn(HTTP_401_STATUSLINE);
+                .thenReturn(HTTP_401_STATUSLINE)
+                .thenReturn(HTTP_200_STATUSLINE)
+                .thenReturn(HTTP_401_STATUSLINE)
+                .thenReturn(HTTP_200_STATUSLINE)
+                .thenReturn(HTTP_401_STATUSLINE)
+                .thenReturn(HTTP_200_STATUSLINE)
+                .thenReturn(HTTP_401_STATUSLINE)
+                .thenReturn(HTTP_200_STATUSLINE)
+                .thenReturn(HTTP_401_STATUSLINE);
         when(httpClient.execute(eq(HTTP_HOST), HttpRequestMatcher.eq(request), eq(httpClientContext)))
-            .thenReturn(mockResponse)
-            .thenReturn(mockResponse)
-            .thenReturn(mockResponse)
-            .thenReturn(mockResponse)
-            .thenReturn(mockResponse);
+                .thenReturn(mockResponse)
+                .thenReturn(mockResponse)
+                .thenReturn(mockResponse)
+                .thenReturn(mockResponse)
+                .thenReturn(mockResponse);
         when(httpClient.execute(eq(HTTP_HOST), HttpRequestMatcher.eq(loginRequest), eq(httpClientContext)))
-            .thenReturn(mockResponse)
-            .thenReturn(mockResponse)
-            .thenReturn(mockResponse)
-            .thenReturn(mockResponse);
+                .thenReturn(mockResponse)
+                .thenReturn(mockResponse)
+                .thenReturn(mockResponse)
+                .thenReturn(mockResponse);
         final NiciraRestClient client = spy(NiciraRestClient.create()
-            .client(httpClient)
-            .clientContext(httpClientContext)
-            .hostname(LOCALHOST)
-            .username(ADMIN)
-            .password(ADMIN_PASSWORD)
-            .loginUrl(LOGIN_PATH)
-            .executionLimit(2)
-            .build());
+                                                            .client(httpClient)
+                                                            .clientContext(httpClientContext)
+                                                            .hostname(LOCALHOST)
+                                                            .username(ADMIN)
+                                                            .password(ADMIN_PASSWORD)
+                                                            .loginUrl(LOGIN_PATH)
+                                                            .executionLimit(2)
+                                                            .build());
 
         try {
             client.execute(request);

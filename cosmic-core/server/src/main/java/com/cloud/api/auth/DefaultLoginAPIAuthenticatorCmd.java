@@ -1,34 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.auth;
-
-import java.net.InetAddress;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import com.cloud.api.response.ApiResponseSerializer;
 import com.cloud.exception.CloudAuthenticationException;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -40,32 +14,41 @@ import org.apache.cloudstack.api.auth.APIAuthenticationType;
 import org.apache.cloudstack.api.auth.APIAuthenticator;
 import org.apache.cloudstack.api.auth.PluggableAPIAuthenticator;
 import org.apache.cloudstack.api.response.LoginCmdResponse;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.net.InetAddress;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "login", description = "Logs a user into the CloudStack. A successful login attempt will generate a JSESSIONID cookie value that can be passed in subsequent Query command calls until the \"logout\" command has been issued or the session has expired.", requestHasSensitiveInfo = true, responseObject = LoginCmdResponse.class, entityType = {})
+@APICommand(name = "login", description = "Logs a user into the CloudStack. A successful login attempt will generate a JSESSIONID cookie value that can be passed in subsequent " +
+        "Query command calls until the \"logout\" command has been issued or the session has expired.", requestHasSensitiveInfo = true, responseObject = LoginCmdResponse.class,
+        entityType = {})
 public class DefaultLoginAPIAuthenticatorCmd extends BaseCmd implements APIAuthenticator {
 
     public static final Logger s_logger = LoggerFactory.getLogger(DefaultLoginAPIAuthenticatorCmd.class.getName());
     private static final String s_name = "loginresponse";
-
+    @Inject
+    ApiServerService _apiServer;
     /////////////////////////////////////////////////////
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
     @Parameter(name = ApiConstants.USERNAME, type = CommandType.STRING, description = "Username", required = true)
     private String username;
-
-    @Parameter(name = ApiConstants.PASSWORD, type = CommandType.STRING, description = "Hashed password (Default is MD5). If you wish to use any other hashing algorithm, you would need to write a custom authentication adapter See Docs section.", required = true)
+    @Parameter(name = ApiConstants.PASSWORD, type = CommandType.STRING, description = "Hashed password (Default is MD5). If you wish to use any other hashing algorithm, you " +
+            "would need to write a custom authentication adapter See Docs section.", required = true)
     private String password;
-
-    @Parameter(name = ApiConstants.DOMAIN, type = CommandType.STRING, description = "Path of the domain that the user belongs to. Example: domain=/com/cloud/internal. If no domain is passed in, the ROOT (/) domain is assumed.")
+    @Parameter(name = ApiConstants.DOMAIN, type = CommandType.STRING, description = "Path of the domain that the user belongs to. Example: domain=/com/cloud/internal. If no " +
+            "domain is passed in, the ROOT (/) domain is assumed.")
     private String domain;
-
-    @Parameter(name = ApiConstants.DOMAIN__ID, type = CommandType.LONG, description = "The id of the domain that the user belongs to. If both domain and domainId are passed in, \"domainId\" parameter takes precendence")
+    @Parameter(name = ApiConstants.DOMAIN__ID, type = CommandType.LONG, description = "The id of the domain that the user belongs to. If both domain and domainId are passed in, " +
+            "\"domainId\" parameter takes precendence")
     private Long domainId;
-
-    @Inject
-    ApiServerService _apiServer;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -92,6 +75,12 @@ public class DefaultLoginAPIAuthenticatorCmd extends BaseCmd implements APIAuthe
     /////////////////////////////////////////////////////
 
     @Override
+    public void execute() throws ServerApiException {
+        // We should never reach here
+        throw new ServerApiException(ApiErrorCode.METHOD_NOT_ALLOWED, "This is an authentication api, cannot be used directly");
+    }
+
+    @Override
     public String getCommandName() {
         return s_name;
     }
@@ -102,26 +91,22 @@ public class DefaultLoginAPIAuthenticatorCmd extends BaseCmd implements APIAuthe
     }
 
     @Override
-    public void execute() throws ServerApiException {
-        // We should never reach here
-        throw new ServerApiException(ApiErrorCode.METHOD_NOT_ALLOWED, "This is an authentication api, cannot be used directly");
-    }
-
-    @Override
-    public String authenticate(String command, Map<String, Object[]> params, HttpSession session, InetAddress remoteAddress, String responseType, StringBuilder auditTrailSb, final HttpServletRequest req, final HttpServletResponse resp) throws ServerApiException {
+    public String authenticate(final String command, final Map<String, Object[]> params, final HttpSession session, final InetAddress remoteAddress, final String responseType,
+                               final StringBuilder auditTrailSb,
+                               final HttpServletRequest req, final HttpServletResponse resp) throws ServerApiException {
         // Disallow non POST requests
         if (HTTPMethod.valueOf(req.getMethod()) != HTTPMethod.POST) {
             throw new ServerApiException(ApiErrorCode.METHOD_NOT_ALLOWED, "Please use HTTP POST to authenticate using this API");
         }
         // FIXME: ported from ApiServlet, refactor and cleanup
-        final String[] username = (String[])params.get(ApiConstants.USERNAME);
-        final String[] password = (String[])params.get(ApiConstants.PASSWORD);
-        String[] domainIdArr = (String[])params.get(ApiConstants.DOMAIN_ID);
+        final String[] username = (String[]) params.get(ApiConstants.USERNAME);
+        final String[] password = (String[]) params.get(ApiConstants.PASSWORD);
+        String[] domainIdArr = (String[]) params.get(ApiConstants.DOMAIN_ID);
 
         if (domainIdArr == null) {
-            domainIdArr = (String[])params.get(ApiConstants.DOMAIN__ID);
+            domainIdArr = (String[]) params.get(ApiConstants.DOMAIN__ID);
         }
-        final String[] domainName = (String[])params.get(ApiConstants.DOMAIN);
+        final String[] domainName = (String[]) params.get(ApiConstants.DOMAIN);
         Long domainId = null;
         if ((domainIdArr != null) && (domainIdArr.length > 0)) {
             try {
@@ -184,6 +169,6 @@ public class DefaultLoginAPIAuthenticatorCmd extends BaseCmd implements APIAuthe
     }
 
     @Override
-    public void setAuthenticators(List<PluggableAPIAuthenticator> authenticators) {
+    public void setAuthenticators(final List<PluggableAPIAuthenticator> authenticators) {
     }
 }

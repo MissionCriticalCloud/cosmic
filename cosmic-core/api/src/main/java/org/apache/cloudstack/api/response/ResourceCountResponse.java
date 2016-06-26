@@ -1,28 +1,11 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 
-@SuppressWarnings("unused")
+import com.google.gson.annotations.SerializedName;
+
 public class ResourceCountResponse extends BaseResponse implements ControlledEntityResponse {
     @SerializedName(ApiConstants.ACCOUNT)
     @Param(description = "the account for which resource count's are updated")
@@ -53,36 +36,35 @@ public class ResourceCountResponse extends BaseResponse implements ControlledEnt
     private long resourceCount;
 
     @Override
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
     @Override
-    public void setDomainId(String domainId) {
-        this.domainId = domainId;
-    }
-
-    @Override
-    public void setDomainName(String domainName) {
-        this.domainName = domainName;
-    }
-
-    public void setResourceType(String resourceType) {
-        this.resourceType = resourceType;
-    }
-
-    public void setResourceCount(Long resourceCount) {
-        this.resourceCount = resourceCount;
-    }
-
-    @Override
-    public void setProjectId(String projectId) {
+    public void setProjectId(final String projectId) {
         this.projectId = projectId;
     }
 
     @Override
-    public void setProjectName(String projectName) {
+    public void setProjectName(final String projectName) {
         this.projectName = projectName;
     }
 
+    @Override
+    public void setDomainId(final String domainId) {
+        this.domainId = domainId;
+    }
+
+    @Override
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setResourceType(final String resourceType) {
+        this.resourceType = resourceType;
+    }
+
+    public void setResourceCount(final Long resourceCount) {
+        this.resourceCount = resourceCount;
+    }
 }

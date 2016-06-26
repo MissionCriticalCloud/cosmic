@@ -1,25 +1,9 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function(cloudStack, $) {
-    cloudStack.uiCustom.uploadVolume = function(args) {
+(function (cloudStack, $) {
+    cloudStack.uiCustom.uploadVolume = function (args) {
         var listView = args.listView;
         var action = args.action;
 
-        var validate = function($uploadVolume) {
+        var validate = function ($uploadVolume) {
             if (!$uploadVolume.find('input[type=text]').val()) {
                 cloudStack.dialog.notice({
                     message: _l('message.specify.url')
@@ -29,8 +13,8 @@
             }
 
             if (!$uploadVolume.find(
-                'input[type=radio]:checked, input[type=checkbox]:checked'
-            ).size()) {
+                    'input[type=radio]:checked, input[type=checkbox]:checked'
+                ).size()) {
                 cloudStack.dialog.notice({
                     message: _l('message.select.instance')
                 });
@@ -41,10 +25,10 @@
             return true;
         };
 
-        return function(args) {
+        return function (args) {
             var $uploadVolume = $('<div>').addClass('upload-volume');
             var context = args.context;
-            var topFields = function() {
+            var topFields = function () {
                 var $form = $('<form>').addClass('top-fields');
                 var $urlLabel = $('<label>').html(_l('label.url') + ':');
                 var $urlField = $('<div>').addClass('field url');
@@ -65,7 +49,7 @@
 
                 return $form;
             };
-            var vmList = function(args) {
+            var vmList = function (args) {
                 // Create a listing of instances, based on limited information
                 // from main instances list view
                 var $listView;
@@ -79,7 +63,7 @@
                         label: _l('label.select.instance'),
                         type: 'radio',
                         action: {
-                            uiCustom: function(args) {
+                            uiCustom: function (args) {
                                 var $item = args.$item;
                                 var $input = $item.find('td.actions input:visible');
 
@@ -121,7 +105,7 @@
                 buttons: [{
                     text: _l('label.upload'),
                     'class': 'ok',
-                    click: function() {
+                    click: function () {
                         if (!validate($uploadVolume)) return false;
 
                         var complete = args.complete;
@@ -136,12 +120,12 @@
                                 ]
                             }),
                             response: {
-                                success: function(args) {
-                                    $('.ui-dialog').fadeOut(function() {
+                                success: function (args) {
+                                    $('.ui-dialog').fadeOut(function () {
                                         $('.ui-dialog').remove();
                                         $(window).trigger('cloudStack.fullRefresh');
                                     });
-                                    $('div.overlay').fadeOut(function() {
+                                    $('div.overlay').fadeOut(function () {
                                         $('div.overlay').remove();
                                     });
                                     complete({
@@ -149,7 +133,7 @@
                                         _custom: args._custom
                                     });
                                 },
-                                error: function(args) {
+                                error: function (args) {
                                     $loading.remove();
                                     cloudStack.dialog.notice({
                                         message: args
@@ -161,11 +145,11 @@
                 }, {
                     text: _l('label.cancel'),
                     'class': 'cancel',
-                    click: function() {
-                        $('.ui-dialog').fadeOut(function() {
+                    click: function () {
+                        $('.ui-dialog').fadeOut(function () {
                             $('.ui-dialog').remove();
                         });
-                        $('div.overlay').fadeOut(function() {
+                        $('div.overlay').fadeOut(function () {
                             $('div.overlay').remove();
                         });
                     }

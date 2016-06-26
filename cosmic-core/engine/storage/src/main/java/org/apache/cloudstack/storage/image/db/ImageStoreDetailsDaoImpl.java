@@ -1,34 +1,18 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.storage.image.db;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.utils.crypt.DBEncryptionUtil;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.storage.datastore.db.ImageStoreDetailVO;
 import org.apache.cloudstack.storage.datastore.db.ImageStoreDetailsDao;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -44,29 +28,29 @@ public class ImageStoreDetailsDaoImpl extends GenericDaoBase<ImageStoreDetailVO,
     }
 
     @Override
-    public void update(long storeId, Map<String, String> details) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        SearchCriteria<ImageStoreDetailVO> sc = storeSearch.create();
+    public void update(final long storeId, final Map<String, String> details) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final SearchCriteria<ImageStoreDetailVO> sc = storeSearch.create();
         sc.setParameters("store", storeId);
 
         txn.start();
         expunge(sc);
-        for (Map.Entry<String, String> entry : details.entrySet()) {
-            ImageStoreDetailVO detail = new ImageStoreDetailVO(storeId, entry.getKey(), entry.getValue());
+        for (final Map.Entry<String, String> entry : details.entrySet()) {
+            final ImageStoreDetailVO detail = new ImageStoreDetailVO(storeId, entry.getKey(), entry.getValue());
             persist(detail);
         }
         txn.commit();
     }
 
     @Override
-    public Map<String, String> getDetails(long storeId) {
-        SearchCriteria<ImageStoreDetailVO> sc = storeSearch.create();
+    public Map<String, String> getDetails(final long storeId) {
+        final SearchCriteria<ImageStoreDetailVO> sc = storeSearch.create();
         sc.setParameters("store", storeId);
 
-        List<ImageStoreDetailVO> details = listBy(sc);
-        Map<String, String> detailsMap = new HashMap<String, String>();
-        for (ImageStoreDetailVO detail : details) {
-            String name = detail.getName();
+        final List<ImageStoreDetailVO> details = listBy(sc);
+        final Map<String, String> detailsMap = new HashMap<>();
+        for (final ImageStoreDetailVO detail : details) {
+            final String name = detail.getName();
             String value = detail.getValue();
             if (name.equals(ApiConstants.KEY) || name.equals(ApiConstants.S3_SECRET_KEY)) {
                 value = DBEncryptionUtil.decrypt(value);
@@ -78,15 +62,13 @@ public class ImageStoreDetailsDaoImpl extends GenericDaoBase<ImageStoreDetailVO,
     }
 
     @Override
-    public void deleteDetails(long storeId) {
-        SearchCriteria<ImageStoreDetailVO> sc = storeSearch.create();
+    public void deleteDetails(final long storeId) {
+        final SearchCriteria<ImageStoreDetailVO> sc = storeSearch.create();
         sc.setParameters("store", storeId);
 
-        List<ImageStoreDetailVO> results = search(sc, null);
-        for (ImageStoreDetailVO result : results) {
+        final List<ImageStoreDetailVO> results = search(sc, null);
+        for (final ImageStoreDetailVO result : results) {
             remove(result.getId());
         }
-
     }
-
 }

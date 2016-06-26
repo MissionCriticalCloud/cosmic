@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.guru;
-
-import javax.inject.Inject;
 
 import com.cloud.dc.Pod;
 import com.cloud.dc.StorageNetworkIpAddressVO;
@@ -41,11 +23,14 @@ import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachineProfile;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class StorageNetworkGuru extends PodBasedNetworkGuru implements NetworkGuru {
     private static final Logger s_logger = LoggerFactory.getLogger(StorageNetworkGuru.class);
+    private static final TrafficType[] TrafficTypes = {TrafficType.Storage};
     @Inject
     StorageNetworkManager _sNwMgr;
     @Inject
@@ -55,24 +40,19 @@ public class StorageNetworkGuru extends PodBasedNetworkGuru implements NetworkGu
         super();
     }
 
-    private static final TrafficType[] TrafficTypes = {TrafficType.Storage};
-
     @Override
-    public boolean isMyTrafficType(TrafficType type) {
-        for (TrafficType t : TrafficTypes) {
-            if (t == type) {
-                return true;
-            }
+    public Network design(final NetworkOffering offering, final DeploymentPlan plan, final Network userSpecified, final Account owner) {
+        if (!canHandle(offering)) {
+            return null;
         }
-        return false;
+
+        final NetworkVO config =
+                new NetworkVO(offering.getTrafficType(), Mode.Static, BroadcastDomainType.Native, offering.getId(), Network.State.Setup, plan.getDataCenterId(),
+                        plan.getPhysicalNetworkId(), offering.getRedundantRouter());
+        return config;
     }
 
-    @Override
-    public TrafficType[] getSupportedTrafficType() {
-        return TrafficTypes;
-    }
-
-    protected boolean canHandle(NetworkOffering offering) {
+    protected boolean canHandle(final NetworkOffering offering) {
         if (isMyTrafficType(offering.getTrafficType()) && offering.isSystemOnly()) {
             return true;
         } else {
@@ -82,20 +62,8 @@ public class StorageNetworkGuru extends PodBasedNetworkGuru implements NetworkGu
     }
 
     @Override
-    public Network design(NetworkOffering offering, DeploymentPlan plan, Network userSpecified, Account owner) {
-        if (!canHandle(offering)) {
-            return null;
-        }
-
-        NetworkVO config =
-            new NetworkVO(offering.getTrafficType(), Mode.Static, BroadcastDomainType.Native, offering.getId(), Network.State.Setup, plan.getDataCenterId(),
-                plan.getPhysicalNetworkId(), offering.getRedundantRouter());
-        return config;
-    }
-
-    @Override
-    public Network implement(Network network, NetworkOffering offering, DeployDestination destination, ReservationContext context)
-        throws InsufficientVirtualNetworkCapacityException {
+    public Network implement(final Network network, final NetworkOffering offering, final DeployDestination destination, final ReservationContext context)
+            throws InsufficientVirtualNetworkCapacityException {
         assert network.getTrafficType() == TrafficType.Storage : "Why are you sending this configuration to me " + network;
         if (!_sNwMgr.isStorageIpRangeAvailable(destination.getDataCenter().getId())) {
             return super.implement(network, offering, destination, context);
@@ -104,8 +72,8 @@ public class StorageNetworkGuru extends PodBasedNetworkGuru implements NetworkGu
     }
 
     @Override
-    public NicProfile allocate(Network network, NicProfile nic, VirtualMachineProfile vm) throws InsufficientVirtualNetworkCapacityException,
-        InsufficientAddressCapacityException {
+    public NicProfile allocate(final Network network, final NicProfile nic, final VirtualMachineProfile vm) throws InsufficientVirtualNetworkCapacityException,
+            InsufficientAddressCapacityException {
         assert network.getTrafficType() == TrafficType.Storage : "Well, I can't take care of this config now can I? " + network;
         if (!_sNwMgr.isStorageIpRangeAvailable(network.getDataCenterId())) {
             return super.allocate(network, nic, vm);
@@ -115,17 +83,17 @@ public class StorageNetworkGuru extends PodBasedNetworkGuru implements NetworkGu
     }
 
     @Override
-    public void reserve(NicProfile nic, Network network, VirtualMachineProfile vm, DeployDestination dest, ReservationContext context)
-        throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
+    public void reserve(final NicProfile nic, final Network network, final VirtualMachineProfile vm, final DeployDestination dest, final ReservationContext context)
+            throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
         if (!_sNwMgr.isStorageIpRangeAvailable(dest.getDataCenter().getId())) {
             super.reserve(nic, network, vm, dest, context);
             return;
         }
 
-        Pod pod = dest.getPod();
+        final Pod pod = dest.getPod();
         Integer vlan = null;
 
-        StorageNetworkIpAddressVO ip = _sNwMgr.acquireIpAddress(pod.getId());
+        final StorageNetworkIpAddressVO ip = _sNwMgr.acquireIpAddress(pod.getId());
         if (ip == null) {
             throw new InsufficientAddressCapacityException("Unable to get a storage network ip address", Pod.class, pod.getId());
         }
@@ -147,8 +115,8 @@ public class StorageNetworkGuru extends PodBasedNetworkGuru implements NetworkGu
     }
 
     @Override
-    public boolean release(NicProfile nic, VirtualMachineProfile vm, String reservationId) {
-        Network nw = _nwDao.findById(nic.getNetworkId());
+    public boolean release(final NicProfile nic, final VirtualMachineProfile vm, final String reservationId) {
+        final Network nw = _nwDao.findById(nic.getNetworkId());
         if (!_sNwMgr.isStorageIpRangeAvailable(nw.getDataCenterId())) {
             return super.release(nic, vm, reservationId);
         }
@@ -160,33 +128,47 @@ public class StorageNetworkGuru extends PodBasedNetworkGuru implements NetworkGu
     }
 
     @Override
-    public void deallocate(Network network, NicProfile nic, VirtualMachineProfile vm) {
+    public void deallocate(final Network network, final NicProfile nic, final VirtualMachineProfile vm) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void updateNicProfile(NicProfile profile, Network network) {
+    public void updateNicProfile(final NicProfile profile, final Network network) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void shutdown(NetworkProfile network, NetworkOffering offering) {
+    public void shutdown(final NetworkProfile network, final NetworkOffering offering) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public boolean trash(Network network, NetworkOffering offering) {
+    public boolean trash(final Network network, final NetworkOffering offering) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public void updateNetworkProfile(NetworkProfile networkProfile) {
+    public void updateNetworkProfile(final NetworkProfile networkProfile) {
         // TODO Auto-generated method stub
 
     }
 
+    @Override
+    public TrafficType[] getSupportedTrafficType() {
+        return TrafficTypes;
+    }
+
+    @Override
+    public boolean isMyTrafficType(final TrafficType type) {
+        for (final TrafficType t : TrafficTypes) {
+            if (t == type) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

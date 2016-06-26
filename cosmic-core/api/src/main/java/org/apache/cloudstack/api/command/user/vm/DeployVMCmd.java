@@ -1,28 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.vm;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
@@ -43,7 +19,6 @@ import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.affinity.AffinityGroupResponse;
 import org.apache.cloudstack.api.ACL;
@@ -66,10 +41,20 @@ import org.apache.cloudstack.api.response.TemplateResponse;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deployVirtualMachine", description = "Creates and automatically starts a virtual machine based on a service offering, disk offering, and template.", responseObject = UserVmResponse.class, responseView = ResponseView.Restricted, entityType = {VirtualMachine.class},
+@APICommand(name = "deployVirtualMachine", description = "Creates and automatically starts a virtual machine based on a service offering, disk offering, and template.",
+        responseObject = UserVmResponse.class, responseView = ResponseView.Restricted, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeployVMCmd.class.getName());
@@ -84,11 +69,13 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     private Long zoneId;
 
     @ACL
-    @Parameter(name = ApiConstants.SERVICE_OFFERING_ID, type = CommandType.UUID, entityType = ServiceOfferingResponse.class, required = true, description = "the ID of the service offering for the virtual machine")
+    @Parameter(name = ApiConstants.SERVICE_OFFERING_ID, type = CommandType.UUID, entityType = ServiceOfferingResponse.class, required = true, description = "the ID of the " +
+            "service offering for the virtual machine")
     private Long serviceOfferingId;
 
     @ACL
-    @Parameter(name = ApiConstants.TEMPLATE_ID, type = CommandType.UUID, entityType = TemplateResponse.class, required = true, description = "the ID of the template for the virtual machine")
+    @Parameter(name = ApiConstants.TEMPLATE_ID, type = CommandType.UUID, entityType = TemplateResponse.class, required = true, description = "the ID of the template for the " +
+            "virtual machine")
     private Long templateId;
 
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "host name for the virtual machine")
@@ -101,17 +88,20 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     @Parameter(name = ApiConstants.ACCOUNT, type = CommandType.STRING, description = "an optional account for the virtual machine. Must be used with domainId.")
     private String accountName;
 
-    @Parameter(name = ApiConstants.DOMAIN_ID, type = CommandType.UUID, entityType = DomainResponse.class, description = "an optional domainId for the virtual machine. If the account parameter is used, domainId must also be used.")
+    @Parameter(name = ApiConstants.DOMAIN_ID, type = CommandType.UUID, entityType = DomainResponse.class, description = "an optional domainId for the virtual machine. If the " +
+            "account parameter is used, domainId must also be used.")
     private Long domainId;
 
     //Network information
     //@ACL(accessType = AccessType.UseEntry)
-    @Parameter(name = ApiConstants.NETWORK_IDS, type = CommandType.LIST, collectionType = CommandType.UUID, entityType = NetworkResponse.class, description = "list of network ids used by virtual machine. Can't be specified with ipToNetworkList parameter")
+    @Parameter(name = ApiConstants.NETWORK_IDS, type = CommandType.LIST, collectionType = CommandType.UUID, entityType = NetworkResponse.class, description = "list of network " +
+            "ids used by virtual machine. Can't be specified with ipToNetworkList parameter")
     private List<Long> networkIds;
 
     //DataDisk information
     @ACL
-    @Parameter(name = ApiConstants.DISK_OFFERING_ID, type = CommandType.UUID, entityType = DiskOfferingResponse.class, description = "the ID of the disk offering for the virtual machine. If the template is of ISO format,"
+    @Parameter(name = ApiConstants.DISK_OFFERING_ID, type = CommandType.UUID, entityType = DiskOfferingResponse.class, description = "the ID of the disk offering for the virtual" +
+            " machine. If the template is of ISO format,"
             + " the diskOfferingId is for the root disk volume. Otherwise this parameter is used to indicate the "
             + "offering for the data disk volume. If the templateId parameter passed is from a Template object,"
             + " the diskOfferingId refers to a DATA Disk Volume created. If the templateId parameter passed is "
@@ -123,7 +113,8 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
 
     @Parameter(name = ApiConstants.ROOT_DISK_SIZE,
             type = CommandType.LONG,
-            description = "Optional field to resize root disk on deploy. Value is in GB. Only applies to template-based deployments. Analogous to details[0].rootdisksize, which takes precedence over this parameter if both are provided",
+            description = "Optional field to resize root disk on deploy. Value is in GB. Only applies to template-based deployments. Analogous to details[0].rootdisksize, which " +
+                    "takes precedence over this parameter if both are provided",
             since = "4.4")
     private Long rootdisksize;
 
@@ -134,27 +125,33 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
             + "The parameter is required and respected only when hypervisor info is not set on the ISO/Template passed to the call")
     private String hypervisor;
 
-    @Parameter(name = ApiConstants.USER_DATA, type = CommandType.STRING, description = "an optional binary data that can be sent to the virtual machine upon a successful deployment. This binary data must be base64 encoded before adding it to the request. Using HTTP GET (via querystring), you can send up to 2KB of data after base64 encoding. Using HTTP POST(via POST body), you can send up to 32K of data after base64 encoding.", length = 32768)
+    @Parameter(name = ApiConstants.USER_DATA, type = CommandType.STRING, description = "an optional binary data that can be sent to the virtual machine upon a successful " +
+            "deployment. This binary data must be base64 encoded before adding it to the request. Using HTTP GET (via querystring), you can send up to 2KB of data after base64 " +
+            "encoding. Using HTTP POST(via POST body), you can send up to 32K of data after base64 encoding.", length = 32768)
     private String userData;
 
     @Parameter(name = ApiConstants.SSH_KEYPAIR, type = CommandType.STRING, description = "name of the ssh key pair used to login to the virtual machine")
     private String sshKeyPairName;
 
-    @Parameter(name = ApiConstants.HOST_ID, type = CommandType.UUID, entityType = HostResponse.class, description = "destination Host ID to deploy the VM to - parameter available for root admin only")
+    @Parameter(name = ApiConstants.HOST_ID, type = CommandType.UUID, entityType = HostResponse.class, description = "destination Host ID to deploy the VM to - parameter " +
+            "available for root admin only")
     private Long hostId;
 
     @ACL
-    @Parameter(name = ApiConstants.SECURITY_GROUP_IDS, type = CommandType.LIST, collectionType = CommandType.UUID, entityType = SecurityGroupResponse.class, description = "comma separated list of security groups id that going to be applied to the virtual machine. "
+    @Parameter(name = ApiConstants.SECURITY_GROUP_IDS, type = CommandType.LIST, collectionType = CommandType.UUID, entityType = SecurityGroupResponse.class, description = "comma" +
+            " separated list of security groups id that going to be applied to the virtual machine. "
             + "Should be passed only when vm is created from a zone with Basic Network support." + " Mutually exclusive with securitygroupnames parameter")
     private List<Long> securityGroupIdList;
 
     @ACL
-    @Parameter(name = ApiConstants.SECURITY_GROUP_NAMES, type = CommandType.LIST, collectionType = CommandType.STRING, entityType = SecurityGroupResponse.class, description = "comma separated list of security groups names that going to be applied to the virtual machine."
-            + " Should be passed only when vm is created from a zone with Basic Network support. " + "Mutually exclusive with securitygroupids parameter")
+    @Parameter(name = ApiConstants.SECURITY_GROUP_NAMES, type = CommandType.LIST, collectionType = CommandType.STRING, entityType = SecurityGroupResponse.class, description =
+            "comma separated list of security groups names that going to be applied to the virtual machine."
+                    + " Should be passed only when vm is created from a zone with Basic Network support. " + "Mutually exclusive with securitygroupids parameter")
     private List<String> securityGroupNameList;
 
     @Parameter(name = ApiConstants.IP_NETWORK_LIST, type = CommandType.MAP, description = "ip to network mapping. Can't be specified with networkIds parameter."
-            + " Example: iptonetworklist[0].ip=10.10.10.11&iptonetworklist[0].ipv6=fc00:1234:5678::abcd&iptonetworklist[0].networkid=uuid - requests to use ip 10.10.10.11 in network id=uuid")
+            + " Example: iptonetworklist[0].ip=10.10.10.11&iptonetworklist[0].ipv6=fc00:1234:5678::abcd&iptonetworklist[0].networkid=uuid - requests to use ip 10.10.10.11 in " +
+            "network id=uuid")
     private Map ipToNetworkList;
 
     @Parameter(name = ApiConstants.IP_ADDRESS, type = CommandType.STRING, description = "the ip address for default vm's network")
@@ -163,7 +160,8 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     @Parameter(name = ApiConstants.IP6_ADDRESS, type = CommandType.STRING, description = "the ipv6 address for default vm's network")
     private String ip6Address;
 
-    @Parameter(name = ApiConstants.KEYBOARD, type = CommandType.STRING, description = "an optional keyboard device type for the virtual machine. valid value can be one of de,de-ch,es,fi,fr,fr-be,fr-ch,is,it,jp,nl-be,no,pt,uk,us")
+    @Parameter(name = ApiConstants.KEYBOARD, type = CommandType.STRING, description = "an optional keyboard device type for the virtual machine. valid value can be one of de," +
+            "de-ch,es,fi,fr,fr-be,fr-ch,is,it,jp,nl-be,no,pt,uk,us")
     private String keyboard;
 
     @Parameter(name = ApiConstants.PROJECT_ID, type = CommandType.UUID, entityType = ProjectResponse.class, description = "Deploy vm for the project")
@@ -173,27 +171,35 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     private Boolean startVm;
 
     @ACL
-    @Parameter(name = ApiConstants.AFFINITY_GROUP_IDS, type = CommandType.LIST, collectionType = CommandType.UUID, entityType = AffinityGroupResponse.class, description = "comma separated list of affinity groups id that are going to be applied to the virtual machine."
+    @Parameter(name = ApiConstants.AFFINITY_GROUP_IDS, type = CommandType.LIST, collectionType = CommandType.UUID, entityType = AffinityGroupResponse.class, description = "comma" +
+            " separated list of affinity groups id that are going to be applied to the virtual machine."
             + " Mutually exclusive with affinitygroupnames parameter")
     private List<Long> affinityGroupIdList;
 
     @ACL
-    @Parameter(name = ApiConstants.AFFINITY_GROUP_NAMES, type = CommandType.LIST, collectionType = CommandType.STRING, entityType = AffinityGroupResponse.class, description = "comma separated list of affinity groups names that are going to be applied to the virtual machine."
-            + "Mutually exclusive with affinitygroupids parameter")
+    @Parameter(name = ApiConstants.AFFINITY_GROUP_NAMES, type = CommandType.LIST, collectionType = CommandType.STRING, entityType = AffinityGroupResponse.class, description =
+            "comma separated list of affinity groups names that are going to be applied to the virtual machine."
+                    + "Mutually exclusive with affinitygroupids parameter")
     private List<String> affinityGroupNameList;
 
-    @Parameter(name = ApiConstants.DISPLAY_VM, type = CommandType.BOOLEAN, since = "4.2", description = "an optional field, whether to the display the vm to the end user or not.", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.DISPLAY_VM, type = CommandType.BOOLEAN, since = "4.2", description = "an optional field, whether to the display the vm to the end user or not" +
+            ".", authorized = {RoleType.Admin})
     private Boolean displayVm;
 
     @Parameter(name = ApiConstants.DETAILS, type = CommandType.MAP, since = "4.3", description = "used to specify the custom parameters.")
     private Map details;
 
-    @Parameter(name = ApiConstants.DEPLOYMENT_PLANNER, type = CommandType.STRING, description = "Deployment planner to use for vm allocation. Available to ROOT admin only", since = "4.4", authorized = { RoleType.Admin })
+    @Parameter(name = ApiConstants.DEPLOYMENT_PLANNER, type = CommandType.STRING, description = "Deployment planner to use for vm allocation. Available to ROOT admin only",
+            since = "4.4", authorized = {RoleType.Admin})
     private String deploymentPlanner;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
+
+    public static String getResultObjectName() {
+        return "virtualmachine";
+    }
 
     public String getAccountName() {
         if (accountName == null) {
@@ -222,14 +228,14 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     }
 
     public Map<String, String> getDetails() {
-        Map<String, String> customparameterMap = new HashMap<String, String>();
+        final Map<String, String> customparameterMap = new HashMap<>();
         if (details != null && details.size() != 0) {
-            Collection parameterCollection = details.values();
-            Iterator iter = parameterCollection.iterator();
+            final Collection parameterCollection = details.values();
+            final Iterator iter = parameterCollection.iterator();
             while (iter.hasNext()) {
-                HashMap<String, String> value = (HashMap<String, String>)iter.next();
-                for (Map.Entry<String,String> entry: value.entrySet()) {
-                    customparameterMap.put(entry.getKey(),entry.getValue());
+                final HashMap<String, String> value = (HashMap<String, String>) iter.next();
+                for (final Map.Entry<String, String> entry : value.entrySet()) {
+                    customparameterMap.put(entry.getKey(), entry.getValue());
                 }
             }
         }
@@ -251,24 +257,16 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
         return displayVm;
     }
 
-    @Override
-    public boolean isDisplay() {
-        if(displayVm == null)
-            return true;
-        else
-            return displayVm;
-    }
-
     public List<Long> getSecurityGroupIdList() {
         if (securityGroupNameList != null && securityGroupIdList != null) {
             throw new InvalidParameterValueException("securitygroupids parameter is mutually exclusive with securitygroupnames parameter");
         }
 
-       //transform group names to ids here
-       if (securityGroupNameList != null) {
-            List<Long> securityGroupIds = new ArrayList<Long>();
-            for (String groupName : securityGroupNameList) {
-                Long groupId = _responseGenerator.getSecurityGroupId(groupName, getEntityOwnerId());
+        //transform group names to ids here
+        if (securityGroupNameList != null) {
+            final List<Long> securityGroupIds = new ArrayList<>();
+            for (final String groupName : securityGroupNameList) {
+                final Long groupId = _responseGenerator.getSecurityGroupId(groupName, getEntityOwnerId());
                 if (groupId == null) {
                     throw new InvalidParameterValueException("Unable to find group by name " + groupName);
                 } else {
@@ -302,15 +300,15 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     }
 
     public List<Long> getNetworkIds() {
-       if (ipToNetworkList != null && !ipToNetworkList.isEmpty()) {
-           if ((networkIds != null && !networkIds.isEmpty()) || ipAddress != null || getIp6Address() != null) {
-               throw new InvalidParameterValueException("ipToNetworkMap can't be specified along with networkIds or ipAddress");
-           } else {
-               List<Long> networks = new ArrayList<Long>();
-               networks.addAll(getIpToNetworkMap().keySet());
-               return networks;
-           }
-       }
+        if (ipToNetworkList != null && !ipToNetworkList.isEmpty()) {
+            if ((networkIds != null && !networkIds.isEmpty()) || ipAddress != null || getIp6Address() != null) {
+                throw new InvalidParameterValueException("ipToNetworkMap can't be specified along with networkIds or ipAddress");
+            } else {
+                final List<Long> networks = new ArrayList<>();
+                networks.addAll(getIpToNetworkMap().keySet());
+                return networks;
+            }
+        }
         return networkIds;
     }
 
@@ -326,38 +324,34 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
         return hostId;
     }
 
-    public boolean getStartVm() {
-        return startVm == null ? true : startVm;
-    }
-
     private Map<Long, IpAddresses> getIpToNetworkMap() {
         if ((networkIds != null || ipAddress != null || getIp6Address() != null) && ipToNetworkList != null) {
             throw new InvalidParameterValueException("NetworkIds and ipAddress can't be specified along with ipToNetworkMap parameter");
         }
         LinkedHashMap<Long, IpAddresses> ipToNetworkMap = null;
         if (ipToNetworkList != null && !ipToNetworkList.isEmpty()) {
-            ipToNetworkMap = new LinkedHashMap<Long, IpAddresses>();
-            Collection ipsCollection = ipToNetworkList.values();
-            Iterator iter = ipsCollection.iterator();
+            ipToNetworkMap = new LinkedHashMap<>();
+            final Collection ipsCollection = ipToNetworkList.values();
+            final Iterator iter = ipsCollection.iterator();
             while (iter.hasNext()) {
-                HashMap<String, String> ips = (HashMap<String, String>)iter.next();
-                Long networkId;
-                Network network = _networkService.getNetwork(ips.get("networkid"));
+                final HashMap<String, String> ips = (HashMap<String, String>) iter.next();
+                final Long networkId;
+                final Network network = _networkService.getNetwork(ips.get("networkid"));
                 if (network != null) {
                     networkId = network.getId();
                 } else {
                     try {
                         networkId = Long.parseLong(ips.get("networkid"));
-                    } catch (NumberFormatException e) {
+                    } catch (final NumberFormatException e) {
                         throw new InvalidParameterValueException("Unable to translate and find entity with networkId: " + ips.get("networkid"));
                     }
                 }
-                String requestedIp = ips.get("ip");
+                final String requestedIp = ips.get("ip");
                 String requestedIpv6 = ips.get("ipv6");
                 if (requestedIpv6 != null) {
                     requestedIpv6 = NetUtils.standardizeIp6Address(requestedIpv6);
                 }
-                IpAddresses addrs = new IpAddresses(requestedIp, requestedIpv6);
+                final IpAddresses addrs = new IpAddresses(requestedIp, requestedIpv6);
                 ipToNetworkMap.put(networkId, addrs);
             }
         }
@@ -379,9 +373,9 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
 
         // transform group names to ids here
         if (affinityGroupNameList != null) {
-            List<Long> affinityGroupIds = new ArrayList<Long>();
-            for (String groupName : affinityGroupNameList) {
-                Long groupId = _responseGenerator.getAffinityGroupId(groupName, getEntityOwnerId());
+            final List<Long> affinityGroupIds = new ArrayList<>();
+            for (final String groupName : affinityGroupNameList) {
+                final Long groupId = _responseGenerator.getAffinityGroupId(groupName, getEntityOwnerId());
                 if (groupId == null) {
                     throw new InvalidParameterValueException("Unable to find affinity group by name " + groupName);
                 } else {
@@ -394,43 +388,14 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
         }
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public static String getResultObjectName() {
-        return "virtualmachine";
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, projectId, true);
-        if (accountId == null) {
-            return CallContext.current().getCallingAccount().getId();
-        }
-
-        return accountId;
-    }
-
     @Override
     public String getEventType() {
         return EventTypes.EVENT_VM_CREATE;
     }
 
-    @Override
-    public String getCreateEventType() {
-        return EventTypes.EVENT_VM_CREATE;
-    }
-
-    @Override
-    public String getCreateEventDescription() {
-        return "creating Vm";
-    }
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
 
     @Override
     public String getEventDescription() {
@@ -444,22 +409,22 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
 
     @Override
     public void execute() {
-        UserVm result;
+        final UserVm result;
 
         if (getStartVm()) {
             try {
                 CallContext.current().setEventDetails("Vm Id: " + getEntityId());
                 result = _userVmService.startVirtualMachine(this);
-            } catch (ResourceUnavailableException ex) {
+            } catch (final ResourceUnavailableException ex) {
                 s_logger.warn("Exception: ", ex);
                 throw new ServerApiException(ApiErrorCode.RESOURCE_UNAVAILABLE_ERROR, ex.getMessage());
-            } catch (ConcurrentOperationException ex) {
+            } catch (final ConcurrentOperationException ex) {
                 s_logger.warn("Exception: ", ex);
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, ex.getMessage());
-            } catch (InsufficientCapacityException ex) {
-                StringBuilder message = new StringBuilder(ex.getMessage());
+            } catch (final InsufficientCapacityException ex) {
+                final StringBuilder message = new StringBuilder(ex.getMessage());
                 if (ex instanceof InsufficientServerCapacityException) {
-                    if (((InsufficientServerCapacityException)ex).isAffinityApplied()) {
+                    if (((InsufficientServerCapacityException) ex).isAffinityApplied()) {
                         message.append(", Please check the affinity groups provided, there may not be sufficient capacity to follow them");
                     }
                 }
@@ -472,11 +437,39 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
         }
 
         if (result != null) {
-            UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Restricted, "virtualmachine", result).get(0);
+            final UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Restricted, "virtualmachine", result).get(0);
             response.setResponseName(getCommandName());
             setResponseObject(response);
         } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to deploy vm uuid:"+getEntityUuid());
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to deploy vm uuid:" + getEntityUuid());
+        }
+    }
+
+    public boolean getStartVm() {
+        return startVm == null ? true : startVm;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final Long accountId = _accountService.finalyzeAccountId(accountName, domainId, projectId, true);
+        if (accountId == null) {
+            return CallContext.current().getCallingAccount().getId();
+        }
+
+        return accountId;
+    }
+
+    @Override
+    public boolean isDisplay() {
+        if (displayVm == null) {
+            return true;
+        } else {
+            return displayVm;
         }
     }
 
@@ -484,51 +477,47 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     // for example, minIops and maxIops should either both be specified or neither be specified and,
     // if specified, minIops should be <= maxIops
     private void verifyDetails() {
-        Map<String, String> map = getDetails();
+        final Map<String, String> map = getDetails();
 
         if (map != null) {
-            String minIops = (String)map.get("minIops");
-            String maxIops = (String)map.get("maxIops");
+            String minIops = (String) map.get("minIops");
+            String maxIops = (String) map.get("maxIops");
 
             verifyMinAndMaxIops(minIops, maxIops);
 
-            minIops = (String)map.get("minIopsDo");
-            maxIops = (String)map.get("maxIopsDo");
+            minIops = (String) map.get("minIopsDo");
+            maxIops = (String) map.get("maxIopsDo");
 
             verifyMinAndMaxIops(minIops, maxIops);
         }
     }
 
-    private void verifyMinAndMaxIops(String minIops, String maxIops) {
+    private void verifyMinAndMaxIops(final String minIops, final String maxIops) {
         if ((minIops != null && maxIops == null) || (minIops == null && maxIops != null)) {
             throw new InvalidParameterValueException("Either 'Min IOPS' and 'Max IOPS' must both be specified or neither be specified.");
         }
 
-        long lMinIops;
+        final long lMinIops;
 
         try {
             if (minIops != null) {
                 lMinIops = Long.parseLong(minIops);
-            }
-            else {
+            } else {
                 lMinIops = 0;
             }
-        }
-        catch (NumberFormatException ex) {
+        } catch (final NumberFormatException ex) {
             throw new InvalidParameterValueException("'Min IOPS' must be a whole number.");
         }
 
-        long lMaxIops;
+        final long lMaxIops;
 
         try {
             if (maxIops != null) {
                 lMaxIops = Long.parseLong(maxIops);
-            }
-            else {
+            } else {
                 lMaxIops = 0;
             }
-        }
-        catch (NumberFormatException ex) {
+        } catch (final NumberFormatException ex) {
             throw new InvalidParameterValueException("'Max IOPS' must be a whole number.");
         }
 
@@ -541,21 +530,21 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     public void create() throws ResourceAllocationException {
         try {
             //Verify that all objects exist before passing them to the service
-            Account owner = _accountService.getActiveAccountById(getEntityOwnerId());
+            final Account owner = _accountService.getActiveAccountById(getEntityOwnerId());
 
             verifyDetails();
 
-            DataCenter zone = _entityMgr.findById(DataCenter.class, zoneId);
+            final DataCenter zone = _entityMgr.findById(DataCenter.class, zoneId);
             if (zone == null) {
                 throw new InvalidParameterValueException("Unable to find zone by id=" + zoneId);
             }
 
-            ServiceOffering serviceOffering = _entityMgr.findById(ServiceOffering.class, serviceOfferingId);
+            final ServiceOffering serviceOffering = _entityMgr.findById(ServiceOffering.class, serviceOfferingId);
             if (serviceOffering == null) {
                 throw new InvalidParameterValueException("Unable to find service offering: " + serviceOfferingId);
             }
 
-            VirtualMachineTemplate template = _entityMgr.findById(VirtualMachineTemplate.class, templateId);
+            final VirtualMachineTemplate template = _entityMgr.findById(VirtualMachineTemplate.class, templateId);
             // Make sure a valid template ID was specified
             if (template == null) {
                 throw new InvalidParameterValueException("Unable to find the template " + templateId);
@@ -579,7 +568,7 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
             }
 
             UserVm vm = null;
-            IpAddresses addrs = new IpAddresses(ipAddress, getIp6Address());
+            final IpAddresses addrs = new IpAddresses(ipAddress, getIp6Address());
             if (zone.getNetworkType() == NetworkType.Basic) {
                 if (getNetworkIds() != null) {
                     throw new InvalidParameterValueException("Can't specify network Ids in Basic zone");
@@ -589,11 +578,10 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
                             getDetails(), getCustomId());
                 }
             } else {
-                if (zone.isSecurityGroupEnabled())  {
+                if (zone.isSecurityGroupEnabled()) {
                     vm = _userVmService.createAdvancedSecurityGroupVirtualMachine(zone, serviceOffering, template, getNetworkIds(), getSecurityGroupIdList(), owner, name,
                             displayName, diskOfferingId, size, group, getHypervisor(), getHttpMethod(), userData, sshKeyPairName, getIpToNetworkMap(), addrs, displayVm, keyboard,
                             getAffinityGroupIdList(), getDetails(), getCustomId());
-
                 } else {
                     if (getSecurityGroupIdList() != null && !getSecurityGroupIdList().isEmpty()) {
                         throw new InvalidParameterValueException("Can't create vm with security groups; security group feature is not enabled per zone");
@@ -610,19 +598,29 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
             } else {
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to deploy vm");
             }
-        } catch (InsufficientCapacityException ex) {
+        } catch (final InsufficientCapacityException ex) {
             s_logger.info(ex.toString());
             s_logger.trace(ex.getMessage(), ex);
             throw new ServerApiException(ApiErrorCode.INSUFFICIENT_CAPACITY_ERROR, ex.getMessage());
-        } catch (ResourceUnavailableException ex) {
+        } catch (final ResourceUnavailableException ex) {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.RESOURCE_UNAVAILABLE_ERROR, ex.getMessage());
-        }  catch (ConcurrentOperationException ex) {
+        } catch (final ConcurrentOperationException ex) {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, ex.getMessage());
-        } catch (ResourceAllocationException ex) {
+        } catch (final ResourceAllocationException ex) {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.RESOURCE_ALLOCATION_ERROR, ex.getMessage());
         }
+    }
+
+    @Override
+    public String getCreateEventType() {
+        return EventTypes.EVENT_VM_CREATE;
+    }
+
+    @Override
+    public String getCreateEventDescription() {
+        return "creating Vm";
     }
 }

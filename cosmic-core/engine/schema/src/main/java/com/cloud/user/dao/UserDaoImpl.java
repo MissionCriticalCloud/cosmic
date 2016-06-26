@@ -1,28 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.user.dao;
-
-import java.util.List;
 
 import com.cloud.user.UserVO;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -69,60 +53,59 @@ public class UserDaoImpl extends GenericDaoBase<UserVO, Long> implements UserDao
     }
 
     @Override
-    public UserVO getUser(String username, String password) {
-        SearchCriteria<UserVO> sc = UsernamePasswordSearch.create();
+    public UserVO getUser(final String username, final String password) {
+        final SearchCriteria<UserVO> sc = UsernamePasswordSearch.create();
         sc.setParameters("username", username);
         sc.setParameters("password", password);
         return findOneBy(sc);
     }
 
     @Override
-    public List<UserVO> listByAccount(long accountId) {
-        SearchCriteria<UserVO> sc = AccountIdSearch.create();
-        sc.setParameters("account", accountId);
-        return listBy(sc, null);
-    }
-
-    @Override
-    public UserVO getUser(String username) {
-        SearchCriteria<UserVO> sc = UsernameSearch.create();
+    public UserVO getUser(final String username) {
+        final SearchCriteria<UserVO> sc = UsernameSearch.create();
         sc.setParameters("username", username);
         return findOneBy(sc);
     }
 
     @Override
-    public UserVO getUser(long userId) {
-        SearchCriteria<UserVO> sc = UserIdSearch.create();
+    public UserVO getUser(final long userId) {
+        final SearchCriteria<UserVO> sc = UserIdSearch.create();
         sc.setParameters("id", userId);
         return findOneBy(sc);
     }
 
     @Override
-    public List<UserVO> findUsersLike(String username) {
-        SearchCriteria<UserVO> sc = UsernameLikeSearch.create();
+    public List<UserVO> findUsersLike(final String username) {
+        final SearchCriteria<UserVO> sc = UsernameLikeSearch.create();
         sc.setParameters("username", "%" + username + "%");
         return listBy(sc);
     }
 
     @Override
-    public UserVO findUserBySecretKey(String secretKey) {
-        SearchCriteria<UserVO> sc = SecretKeySearch.create();
+    public List<UserVO> listByAccount(final long accountId) {
+        final SearchCriteria<UserVO> sc = AccountIdSearch.create();
+        sc.setParameters("account", accountId);
+        return listBy(sc, null);
+    }
+
+    @Override
+    public UserVO findUserBySecretKey(final String secretKey) {
+        final SearchCriteria<UserVO> sc = SecretKeySearch.create();
         sc.setParameters("secretKey", secretKey);
         return findOneBy(sc);
     }
 
     @Override
-    public UserVO findUserByRegistrationToken(String registrationToken) {
-        SearchCriteria<UserVO> sc = RegistrationTokenSearch.create();
+    public UserVO findUserByRegistrationToken(final String registrationToken) {
+        final SearchCriteria<UserVO> sc = RegistrationTokenSearch.create();
         sc.setParameters("registrationToken", registrationToken);
         return findOneBy(sc);
     }
 
     @Override
-    public List<UserVO> findUsersByName(String username) {
-        SearchCriteria<UserVO> sc = UsernameSearch.create();
+    public List<UserVO> findUsersByName(final String username) {
+        final SearchCriteria<UserVO> sc = UsernameSearch.create();
         sc.setParameters("username", username);
         return listBy(sc);
     }
-
 }

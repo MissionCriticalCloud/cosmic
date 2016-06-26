@@ -1,36 +1,36 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.network.resource;
 
-import com.cloud.agent.api.*;
-import com.cloud.network.nicira.*;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+
+import com.cloud.agent.api.Answer;
+import com.cloud.agent.api.ConfigurePublicIpsOnLogicalRouterCommand;
+import com.cloud.agent.api.CreateLogicalSwitchCommand;
+import com.cloud.agent.api.DeleteLogicalRouterCommand;
+import com.cloud.agent.api.DeleteLogicalSwitchCommand;
+import com.cloud.agent.api.DeleteLogicalSwitchPortCommand;
+import com.cloud.agent.api.MaintainCommand;
+import com.cloud.agent.api.ReadyCommand;
+import com.cloud.agent.api.UpdateLogicalSwitchPortCommand;
+import com.cloud.network.nicira.LogicalRouterPort;
+import com.cloud.network.nicira.LogicalSwitch;
+import com.cloud.network.nicira.NiciraNvpApi;
+import com.cloud.network.nicira.NiciraNvpApiException;
+import com.cloud.network.nicira.VifAttachment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 public class NiciraNvpRequestWrapperTest {
 

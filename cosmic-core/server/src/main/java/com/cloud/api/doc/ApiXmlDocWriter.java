@@ -1,20 +1,24 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.doc;
+
+import com.cloud.alert.AlertManager;
+import com.cloud.serializer.Param;
+import com.cloud.utils.IteratorUtil;
+import com.cloud.utils.ReflectUtil;
+import org.apache.cloudstack.api.APICommand;
+import org.apache.cloudstack.api.BaseAsyncCmd;
+import org.apache.cloudstack.api.BaseAsyncCreateCmd;
+import org.apache.cloudstack.api.BaseCmd;
+import org.apache.cloudstack.api.BaseResponse;
+import org.apache.cloudstack.api.Parameter;
+import org.apache.cloudstack.api.response.AsyncJobResponse;
+import org.apache.cloudstack.api.response.HostResponse;
+import org.apache.cloudstack.api.response.IPAddressResponse;
+import org.apache.cloudstack.api.response.SecurityGroupResponse;
+import org.apache.cloudstack.api.response.SnapshotResponse;
+import org.apache.cloudstack.api.response.StoragePoolResponse;
+import org.apache.cloudstack.api.response.TemplateResponse;
+import org.apache.cloudstack.api.response.UserVmResponse;
+import org.apache.cloudstack.api.response.VolumeResponse;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,28 +45,8 @@ import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import com.cloud.alert.AlertManager;
-import com.cloud.serializer.Param;
-import com.cloud.utils.IteratorUtil;
-import com.cloud.utils.ReflectUtil;
 import com.google.gson.annotations.SerializedName;
 import com.thoughtworks.xstream.XStream;
-
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.BaseAsyncCmd;
-import org.apache.cloudstack.api.BaseAsyncCreateCmd;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.AsyncJobResponse;
-import org.apache.cloudstack.api.response.HostResponse;
-import org.apache.cloudstack.api.response.IPAddressResponse;
-import org.apache.cloudstack.api.response.SecurityGroupResponse;
-import org.apache.cloudstack.api.response.SnapshotResponse;
-import org.apache.cloudstack.api.response.StoragePoolResponse;
-import org.apache.cloudstack.api.response.TemplateResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
-import org.apache.cloudstack.api.response.VolumeResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,18 +55,18 @@ public class ApiXmlDocWriter {
 
     private static final short DOMAIN_ADMIN_COMMAND = 4;
     private static final short USER_COMMAND = 8;
-    private static Map<String, Class<?>> s_apiNameCmdClassMap = new HashMap<String, Class<?>>();
-    private static LinkedHashMap<Object, String> s_allApiCommands = new LinkedHashMap<Object, String>();
-    private static LinkedHashMap<Object, String> s_domainAdminApiCommands = new LinkedHashMap<Object, String>();
-    private static LinkedHashMap<Object, String> s_regularUserApiCommands = new LinkedHashMap<Object, String>();
-    private static TreeMap<Object, String> s_allApiCommandsSorted = new TreeMap<Object, String>();
-    private static TreeMap<Object, String> s_domainAdminApiCommandsSorted = new TreeMap<Object, String>();
-    private static TreeMap<Object, String> s_regularUserApiCommandsSorted = new TreeMap<Object, String>();
-    private static String s_dirName = "";
     private static final List<String> AsyncResponses = setAsyncResponses();
+    private static final Map<String, Class<?>> s_apiNameCmdClassMap = new HashMap<>();
+    private static final LinkedHashMap<Object, String> s_allApiCommands = new LinkedHashMap<>();
+    private static final LinkedHashMap<Object, String> s_domainAdminApiCommands = new LinkedHashMap<>();
+    private static final LinkedHashMap<Object, String> s_regularUserApiCommands = new LinkedHashMap<>();
+    private static final TreeMap<Object, String> s_allApiCommandsSorted = new TreeMap<>();
+    private static final TreeMap<Object, String> s_domainAdminApiCommandsSorted = new TreeMap<>();
+    private static final TreeMap<Object, String> s_regularUserApiCommandsSorted = new TreeMap<>();
+    private static String s_dirName = "";
 
     private static List<String> setAsyncResponses() {
-        List<String> asyncResponses = new ArrayList<String>();
+        final List<String> asyncResponses = new ArrayList<>();
         asyncResponses.add(TemplateResponse.class.getName());
         asyncResponses.add(VolumeResponse.class.getName());
         //asyncResponses.add(LoadBalancerResponse.class.getName());
@@ -97,19 +81,19 @@ public class ApiXmlDocWriter {
         return asyncResponses;
     }
 
-    public static void main(String[] args) {
-        Set<Class<?>> cmdClasses = ReflectUtil.getClassesWithAnnotation(APICommand.class, new String[] {"org.apache.cloudstack.api", "com.cloud.api",
-            "com.cloud.api.commands", "org.apache.cloudstack.api.command.admin.zone", "org.apache.cloudstack.network.contrail.api.command"});
+    public static void main(final String[] args) {
+        final Set<Class<?>> cmdClasses = ReflectUtil.getClassesWithAnnotation(APICommand.class, new String[]{"org.apache.cloudstack.api", "com.cloud.api",
+                "com.cloud.api.commands", "org.apache.cloudstack.api.command.admin.zone", "org.apache.cloudstack.network.contrail.api.command"});
 
-        for (Class<?> cmdClass : cmdClasses) {
-            if(cmdClass.getAnnotation(APICommand.class)==null){
-               System.out.println("Warning, API Cmd class " + cmdClass.getName() + " has no APICommand annotation ");
-               continue;
+        for (final Class<?> cmdClass : cmdClasses) {
+            if (cmdClass.getAnnotation(APICommand.class) == null) {
+                System.out.println("Warning, API Cmd class " + cmdClass.getName() + " has no APICommand annotation ");
+                continue;
             }
-            String apiName = cmdClass.getAnnotation(APICommand.class).name();
+            final String apiName = cmdClass.getAnnotation(APICommand.class).name();
             if (s_apiNameCmdClassMap.containsKey(apiName)) {
                 // handle API cmd separation into admin cmd and user cmd with the common api name
-                Class<?> curCmd = s_apiNameCmdClassMap.get(apiName);
+                final Class<?> curCmd = s_apiNameCmdClassMap.get(apiName);
                 if (curCmd.isAssignableFrom(cmdClass)) {
                     // api_cmd map always keep the admin cmd class to get full response and parameters
                     s_apiNameCmdClassMap.put(apiName, cmdClass);
@@ -125,13 +109,13 @@ public class ApiXmlDocWriter {
             }
         }
 
-        LinkedProperties preProcessedCommands = new LinkedProperties();
+        final LinkedProperties preProcessedCommands = new LinkedProperties();
         String[] fileNames = null;
 
-        List<String> argsList = Arrays.asList(args);
-        Iterator<String> iter = argsList.iterator();
+        final List<String> argsList = Arrays.asList(args);
+        final Iterator<String> iter = argsList.iterator();
         while (iter.hasNext()) {
-            String arg = iter.next();
+            final String arg = iter.next();
             // populate the file names
             if (arg.equals("-f")) {
                 fileNames = iter.next().split(",");
@@ -146,31 +130,31 @@ public class ApiXmlDocWriter {
             System.exit(2);
         }
 
-        for (String fileName : fileNames) {
-            try(FileInputStream in = new FileInputStream(fileName);) {
+        for (final String fileName : fileNames) {
+            try (FileInputStream in = new FileInputStream(fileName)) {
                 preProcessedCommands.load(in);
-            } catch (FileNotFoundException ex) {
+            } catch (final FileNotFoundException ex) {
                 System.out.println("Can't find file " + fileName);
                 System.exit(2);
-            } catch (IOException ex1) {
+            } catch (final IOException ex1) {
                 System.out.println("Error reading from file " + ex1);
                 System.exit(2);
             }
         }
 
-        Iterator<?> propertiesIterator = preProcessedCommands.keys.iterator();
+        final Iterator<?> propertiesIterator = preProcessedCommands.keys.iterator();
         // Get command classes and response object classes
         while (propertiesIterator.hasNext()) {
-            String key = (String)propertiesIterator.next();
-            String preProcessedCommand = preProcessedCommands.getProperty(key);
-            int splitIndex = preProcessedCommand.lastIndexOf(";");
-            String commandRoleMask = preProcessedCommand.substring(splitIndex + 1);
-            Class<?> cmdClass = s_apiNameCmdClassMap.get(key);
+            final String key = (String) propertiesIterator.next();
+            final String preProcessedCommand = preProcessedCommands.getProperty(key);
+            final int splitIndex = preProcessedCommand.lastIndexOf(";");
+            final String commandRoleMask = preProcessedCommand.substring(splitIndex + 1);
+            final Class<?> cmdClass = s_apiNameCmdClassMap.get(key);
             if (cmdClass == null) {
                 System.out.println("Check, is this api part of another build profile? Null value for key: " + key + " preProcessedCommand=" + preProcessedCommand);
                 continue;
             }
-            String commandName = cmdClass.getName();
+            final String commandName = cmdClass.getName();
             s_allApiCommands.put(key, commandName);
 
             short cmdPermissions = 1;
@@ -192,49 +176,49 @@ public class ApiXmlDocWriter {
 
         try {
             // Create object writer
-            XStream xs = new XStream();
+            final XStream xs = new XStream();
             xs.alias("command", Command.class);
             xs.alias("arg", Argument.class);
-            String xmlDocDir = s_dirName + "/xmldoc";
-            String rootAdminDirName = xmlDocDir + "/root_admin";
-            String domainAdminDirName = xmlDocDir + "/domain_admin";
-            String regularUserDirName = xmlDocDir + "/regular_user";
+            final String xmlDocDir = s_dirName + "/xmldoc";
+            final String rootAdminDirName = xmlDocDir + "/root_admin";
+            final String domainAdminDirName = xmlDocDir + "/domain_admin";
+            final String regularUserDirName = xmlDocDir + "/regular_user";
             (new File(rootAdminDirName)).mkdirs();
             (new File(domainAdminDirName)).mkdirs();
             (new File(regularUserDirName)).mkdirs();
 
-            ObjectOutputStream out = xs.createObjectOutputStream(new FileWriter(s_dirName + "/commands.xml"), "commands");
-            ObjectOutputStream rootAdmin = xs.createObjectOutputStream(new FileWriter(rootAdminDirName + "/" + "rootAdminSummary.xml"), "commands");
-            ObjectOutputStream rootAdminSorted = xs.createObjectOutputStream(new FileWriter(rootAdminDirName + "/" + "rootAdminSummarySorted.xml"), "commands");
-            ObjectOutputStream domainAdmin = xs.createObjectOutputStream(new FileWriter(domainAdminDirName + "/" + "domainAdminSummary.xml"), "commands");
-            ObjectOutputStream outDomainAdminSorted = xs.createObjectOutputStream(new FileWriter(domainAdminDirName + "/" + "domainAdminSummarySorted.xml"), "commands");
-            ObjectOutputStream regularUser = xs.createObjectOutputStream(new FileWriter(regularUserDirName + "/regularUserSummary.xml"), "commands");
-            ObjectOutputStream regularUserSorted = xs.createObjectOutputStream(new FileWriter(regularUserDirName + "/regularUserSummarySorted.xml"), "commands");
+            final ObjectOutputStream out = xs.createObjectOutputStream(new FileWriter(s_dirName + "/commands.xml"), "commands");
+            final ObjectOutputStream rootAdmin = xs.createObjectOutputStream(new FileWriter(rootAdminDirName + "/" + "rootAdminSummary.xml"), "commands");
+            final ObjectOutputStream rootAdminSorted = xs.createObjectOutputStream(new FileWriter(rootAdminDirName + "/" + "rootAdminSummarySorted.xml"), "commands");
+            final ObjectOutputStream domainAdmin = xs.createObjectOutputStream(new FileWriter(domainAdminDirName + "/" + "domainAdminSummary.xml"), "commands");
+            final ObjectOutputStream outDomainAdminSorted = xs.createObjectOutputStream(new FileWriter(domainAdminDirName + "/" + "domainAdminSummarySorted.xml"), "commands");
+            final ObjectOutputStream regularUser = xs.createObjectOutputStream(new FileWriter(regularUserDirName + "/regularUserSummary.xml"), "commands");
+            final ObjectOutputStream regularUserSorted = xs.createObjectOutputStream(new FileWriter(regularUserDirName + "/regularUserSummarySorted.xml"), "commands");
 
             // Write commands in the order they are represented in commands.properties.in file
             Iterator<?> it = s_allApiCommands.keySet().iterator();
             while (it.hasNext()) {
-                String key = (String)it.next();
+                final String key = (String) it.next();
 
                 // Write admin commands
                 writeCommand(out, key);
                 writeCommand(rootAdmin, key);
 
                 // Write single commands to separate xml files
-                ObjectOutputStream singleRootAdminCommandOs = xs.createObjectOutputStream(new FileWriter(rootAdminDirName + "/" + key + ".xml"), "command");
+                final ObjectOutputStream singleRootAdminCommandOs = xs.createObjectOutputStream(new FileWriter(rootAdminDirName + "/" + key + ".xml"), "command");
                 writeCommand(singleRootAdminCommandOs, key);
                 singleRootAdminCommandOs.close();
 
                 if (s_domainAdminApiCommands.containsKey(key)) {
                     writeCommand(domainAdmin, key);
-                    ObjectOutputStream singleDomainAdminCommandOs = xs.createObjectOutputStream(new FileWriter(domainAdminDirName + "/" + key + ".xml"), "command");
+                    final ObjectOutputStream singleDomainAdminCommandOs = xs.createObjectOutputStream(new FileWriter(domainAdminDirName + "/" + key + ".xml"), "command");
                     writeCommand(singleDomainAdminCommandOs, key);
                     singleDomainAdminCommandOs.close();
                 }
 
                 if (s_regularUserApiCommands.containsKey(key)) {
                     writeCommand(regularUser, key);
-                    ObjectOutputStream singleRegularUserCommandOs = xs.createObjectOutputStream(new FileWriter(regularUserDirName + "/" + key + ".xml"), "command");
+                    final ObjectOutputStream singleRegularUserCommandOs = xs.createObjectOutputStream(new FileWriter(regularUserDirName + "/" + key + ".xml"), "command");
                     writeCommand(singleRegularUserCommandOs, key);
                     singleRegularUserCommandOs.close();
                 }
@@ -243,7 +227,7 @@ public class ApiXmlDocWriter {
             // Write sorted commands
             it = s_allApiCommandsSorted.keySet().iterator();
             while (it.hasNext()) {
-                String key = (String)it.next();
+                final String key = (String) it.next();
 
                 writeCommand(rootAdminSorted, key);
 
@@ -273,19 +257,19 @@ public class ApiXmlDocWriter {
             // Delete directory
             // deleteDir(new File(xmlDocDir));
 
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             ex.printStackTrace();
             System.exit(2);
         }
     }
 
-    private static void writeCommand(ObjectOutputStream out, String command) throws ClassNotFoundException, IOException {
-        Class<?> clas = Class.forName(s_allApiCommands.get(command));
-        ArrayList<Argument> request = new ArrayList<Argument>();
-        ArrayList<Argument> response = new ArrayList<Argument>();
+    private static void writeCommand(final ObjectOutputStream out, final String command) throws ClassNotFoundException, IOException {
+        final Class<?> clas = Class.forName(s_allApiCommands.get(command));
+        ArrayList<Argument> request = new ArrayList<>();
+        ArrayList<Argument> response = new ArrayList<>();
 
         // Create a new command, set name/description/usage
-        Command apiCommand = new Command();
+        final Command apiCommand = new Command();
         apiCommand.setName(command);
 
         APICommand impl = clas.getAnnotation(APICommand.class);
@@ -298,14 +282,14 @@ public class ApiXmlDocWriter {
         }
 
         if (impl.includeInApiDoc()) {
-            String commandDescription = impl.description();
+            final String commandDescription = impl.description();
             if (commandDescription != null && !commandDescription.isEmpty()) {
                 apiCommand.setDescription(commandDescription);
             } else {
                 System.out.println("Command " + apiCommand.getName() + " misses description");
             }
 
-            String commandUsage = impl.usage();
+            final String commandUsage = impl.usage();
             if (commandUsage != null && !commandUsage.isEmpty()) {
                 apiCommand.setUsage(commandUsage);
             }
@@ -315,17 +299,17 @@ public class ApiXmlDocWriter {
                 apiCommand.setSinceVersion(impl.since());
             }
 
-            boolean isAsync = ReflectUtil.isCmdClassAsync(clas, new Class<?>[] {BaseAsyncCmd.class, BaseAsyncCreateCmd.class});
+            final boolean isAsync = ReflectUtil.isCmdClassAsync(clas, new Class<?>[]{BaseAsyncCmd.class, BaseAsyncCreateCmd.class});
 
             apiCommand.setAsync(isAsync);
 
-            Set<Field> fields = ReflectUtil.getAllFieldsForClass(clas, new Class<?>[] {BaseCmd.class, BaseAsyncCmd.class, BaseAsyncCreateCmd.class});
+            final Set<Field> fields = ReflectUtil.getAllFieldsForClass(clas, new Class<?>[]{BaseCmd.class, BaseAsyncCmd.class, BaseAsyncCreateCmd.class});
 
             request = setRequestFields(fields);
 
             // Get response parameters
-            Class<?> responseClas = impl.responseObject();
-            Field[] responseFields = responseClas.getDeclaredFields();
+            final Class<?> responseClas = impl.responseObject();
+            final Field[] responseFields = responseClas.getDeclaredFields();
             response = setResponseFields(responseFields, responseClas);
 
             apiCommand.setRequest(request);
@@ -337,15 +321,15 @@ public class ApiXmlDocWriter {
         }
     }
 
-    private static ArrayList<Argument> setRequestFields(Set<Field> fields) {
-        ArrayList<Argument> arguments = new ArrayList<Argument>();
-        Set<Argument> requiredArguments = new HashSet<Argument>();
-        Set<Argument> optionalArguments = new HashSet<Argument>();
+    private static ArrayList<Argument> setRequestFields(final Set<Field> fields) {
+        final ArrayList<Argument> arguments = new ArrayList<>();
+        final Set<Argument> requiredArguments = new HashSet<>();
+        final Set<Argument> optionalArguments = new HashSet<>();
         Argument id = null;
-        for (Field f : fields) {
-            Parameter parameterAnnotation = f.getAnnotation(Parameter.class);
+        for (final Field f : fields) {
+            final Parameter parameterAnnotation = f.getAnnotation(Parameter.class);
             if (parameterAnnotation != null && parameterAnnotation.expose() && parameterAnnotation.includeInApiDoc()) {
-                Argument reqArg = new Argument(parameterAnnotation.name());
+                final Argument reqArg = new Argument(parameterAnnotation.name());
                 reqArg.setRequired(parameterAnnotation.required());
                 if (!parameterAnnotation.description().isEmpty()) {
                     reqArg.setDescription(parameterAnnotation.description());
@@ -383,23 +367,23 @@ public class ApiXmlDocWriter {
         return arguments;
     }
 
-    private static ArrayList<Argument> setResponseFields(Field[] responseFields, Class<?> responseClas) {
-        ArrayList<Argument> arguments = new ArrayList<Argument>();
-        ArrayList<Argument> sortedChildlessArguments = new ArrayList<Argument>();
-        ArrayList<Argument> sortedArguments = new ArrayList<Argument>();
+    private static ArrayList<Argument> setResponseFields(final Field[] responseFields, final Class<?> responseClas) {
+        final ArrayList<Argument> arguments = new ArrayList<>();
+        final ArrayList<Argument> sortedChildlessArguments = new ArrayList<>();
+        final ArrayList<Argument> sortedArguments = new ArrayList<>();
 
         Argument id = null;
 
-        for (Field responseField : responseFields) {
-            SerializedName nameAnnotation = responseField.getAnnotation(SerializedName.class);
+        for (final Field responseField : responseFields) {
+            final SerializedName nameAnnotation = responseField.getAnnotation(SerializedName.class);
             if (nameAnnotation != null) {
-                Param paramAnnotation = responseField.getAnnotation(Param.class);
-                Argument respArg = new Argument(nameAnnotation.value());
+                final Param paramAnnotation = responseField.getAnnotation(Param.class);
+                final Argument respArg = new Argument(nameAnnotation.value());
 
                 boolean hasChildren = false;
                 if (paramAnnotation != null && paramAnnotation.includeInApiDoc()) {
-                    String description = paramAnnotation.description();
-                    Class fieldClass = paramAnnotation.responseObject();
+                    final String description = paramAnnotation.description();
+                    final Class fieldClass = paramAnnotation.responseObject();
                     if (description != null && !description.isEmpty()) {
                         respArg.setDescription(description);
                     }
@@ -411,12 +395,12 @@ public class ApiXmlDocWriter {
                     }
 
                     if (fieldClass != null) {
-                        Class<?> superClass = fieldClass.getSuperclass();
+                        final Class<?> superClass = fieldClass.getSuperclass();
                         if (superClass != null) {
-                            String superName = superClass.getName();
+                            final String superName = superClass.getName();
                             if (superName.equals(BaseResponse.class.getName())) {
-                                ArrayList<Argument> fieldArguments = new ArrayList<Argument>();
-                                Field[] fields = fieldClass.getDeclaredFields();
+                                ArrayList<Argument> fieldArguments = new ArrayList<>();
+                                final Field[] fields = fieldClass.getDeclaredFields();
                                 fieldArguments = setResponseFields(fields, fieldClass);
                                 respArg.setArguments(fieldArguments);
                                 hasChildren = true;
@@ -450,11 +434,11 @@ public class ApiXmlDocWriter {
         arguments.addAll(sortedArguments);
 
         if (responseClas.getName().equalsIgnoreCase(AsyncJobResponse.class.getName())) {
-            Argument jobIdArg = new Argument("jobid", "the ID of the async job");
+            final Argument jobIdArg = new Argument("jobid", "the ID of the async job");
             arguments.add(jobIdArg);
         } else if (AsyncResponses.contains(responseClas.getName())) {
-            Argument jobIdArg = new Argument("jobid", "the ID of the latest async job acting on this object");
-            Argument jobStatusArg = new Argument("jobstatus", "the current status of the latest async job acting on this object");
+            final Argument jobIdArg = new Argument("jobid", "the ID of the latest async job acting on this object");
+            final Argument jobStatusArg = new Argument("jobstatus", "the current status of the latest async job acting on this object");
             arguments.add(jobIdArg);
             arguments.add(jobStatusArg);
         }
@@ -462,40 +446,39 @@ public class ApiXmlDocWriter {
         return arguments;
     }
 
-    private static void zipDir(String zipFileName, String dir) throws Exception {
-        File dirObj = new File(dir);
-        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFileName));
+    private static void zipDir(final String zipFileName, final String dir) throws Exception {
+        final File dirObj = new File(dir);
+        final ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFileName));
         addDir(dirObj, out);
         out.close();
     }
 
-    static void addDir(File dirObj, ZipOutputStream out) throws IOException {
-        File[] files = dirObj.listFiles();
-        byte[] tmpBuf = new byte[1024];
-        String pathToDir = s_dirName;
+    static void addDir(final File dirObj, final ZipOutputStream out) throws IOException {
+        final File[] files = dirObj.listFiles();
+        final byte[] tmpBuf = new byte[1024];
+        final String pathToDir = s_dirName;
 
         for (int i = 0; i < files.length; i++) {
             if (files[i].isDirectory()) {
                 addDir(files[i], out);
                 continue;
             }
-            try(FileInputStream in = new FileInputStream(files[i].getPath());) {
+            try (FileInputStream in = new FileInputStream(files[i].getPath())) {
                 out.putNextEntry(new ZipEntry(files[i].getPath().substring(pathToDir.length())));
                 int len;
                 while ((len = in.read(tmpBuf)) > 0) {
                     out.write(tmpBuf, 0, len);
                 }
                 out.closeEntry();
-            }catch(IOException ex)
-            {
-                s_logger.error("addDir:Exception:"+ ex.getMessage(),ex);
+            } catch (final IOException ex) {
+                s_logger.error("addDir:Exception:" + ex.getMessage(), ex);
             }
         }
     }
 
-    private static void deleteDir(File dir) {
+    private static void deleteDir(final File dir) {
         if (dir.isDirectory()) {
-            String[] children = dir.list();
+            final String[] children = dir.list();
             if (children != null) {
                 for (int i = 0; i < children.length; i++) {
                     deleteDir(new File(dir, children[i]));
@@ -505,38 +488,37 @@ public class ApiXmlDocWriter {
         dir.delete();
     }
 
-    private static void writeAlertTypes(String dirName) {
-        XStream xs = new XStream();
+    private static void writeAlertTypes(final String dirName) {
+        final XStream xs = new XStream();
         xs.alias("alert", Alert.class);
-        try(ObjectOutputStream out = xs.createObjectOutputStream(new FileWriter(dirName + "/alert_types.xml"), "alerts");) {
-            for (Field f : AlertManager.class.getFields()) {
+        try (ObjectOutputStream out = xs.createObjectOutputStream(new FileWriter(dirName + "/alert_types.xml"), "alerts")) {
+            for (final Field f : AlertManager.class.getFields()) {
                 if (f.getClass().isAssignableFrom(Number.class)) {
-                    String name = f.getName().substring(11);
-                    Alert alert = new Alert(name, f.getInt(null));
+                    final String name = f.getName().substring(11);
+                    final Alert alert = new Alert(name, f.getInt(null));
                     out.writeObject(alert);
                 }
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             s_logger.error("Failed to create output stream to write an alert types ", e);
-        } catch (IllegalAccessException e) {
+        } catch (final IllegalAccessException e) {
             s_logger.error("Failed to read alert fields ", e);
         }
     }
 
     private static class LinkedProperties extends Properties {
-        private final LinkedList<Object> keys = new LinkedList<Object>();
+        private final LinkedList<Object> keys = new LinkedList<>();
 
         @Override
         public Enumeration<Object> keys() {
-            return Collections.<Object> enumeration(keys);
+            return Collections.<Object>enumeration(keys);
         }
 
         @Override
-        public Object put(Object key, Object value) {
+        public Object put(final Object key, final Object value) {
             // System.out.println("Adding key" + key);
             keys.add(key);
             return super.put(key, value);
         }
     }
-
 }

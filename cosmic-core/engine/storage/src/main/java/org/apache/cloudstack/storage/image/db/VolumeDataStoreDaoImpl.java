@@ -1,29 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.storage.image.db;
-
-import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
@@ -35,7 +10,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
@@ -43,6 +17,15 @@ import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreState
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreVO;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -50,6 +33,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class VolumeDataStoreDaoImpl extends GenericDaoBase<VolumeDataStoreVO, Long> implements VolumeDataStoreDao {
     private static final Logger s_logger = LoggerFactory.getLogger(VolumeDataStoreDaoImpl.class);
+    private static final String EXPIRE_DOWNLOAD_URLS_FOR_ZONE = "update volume_store_ref set download_url_created=? where download_url_created is not null and store_id in " +
+            "(select id from image_store where data_center_id=?)";
+    @Inject
+    DataStoreManager storeMgr;
+    @Inject
+    VolumeDao volumeDao;
     private SearchBuilder<VolumeDataStoreVO> updateStateSearch;
     private SearchBuilder<VolumeDataStoreVO> volumeSearch;
     private SearchBuilder<VolumeDataStoreVO> storeSearch;
@@ -59,16 +48,9 @@ public class VolumeDataStoreDaoImpl extends GenericDaoBase<VolumeDataStoreVO, Lo
     private SearchBuilder<VolumeDataStoreVO> uploadVolumeSearch;
     private SearchBuilder<VolumeVO> volumeOnlySearch;
     private SearchBuilder<VolumeDataStoreVO> uploadVolumeStateSearch;
-    private static final String EXPIRE_DOWNLOAD_URLS_FOR_ZONE = "update volume_store_ref set download_url_created=? where download_url_created is not null and store_id in (select id from image_store where data_center_id=?)";
-
-
-    @Inject
-    DataStoreManager storeMgr;
-    @Inject
-    VolumeDao volumeDao;
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         super.configure(name, params);
 
         storeSearch = createSearchBuilder();
@@ -122,58 +104,58 @@ public class VolumeDataStoreDaoImpl extends GenericDaoBase<VolumeDataStoreVO, Lo
     }
 
     @Override
-    public boolean updateState(State currentState, Event event, State nextState, DataObjectInStore vo, Object data) {
-        VolumeDataStoreVO dataObj = (VolumeDataStoreVO)vo;
-        Long oldUpdated = dataObj.getUpdatedCount();
-        Date oldUpdatedTime = dataObj.getUpdated();
+    public boolean updateState(final State currentState, final Event event, final State nextState, final DataObjectInStore vo, final Object data) {
+        final VolumeDataStoreVO dataObj = (VolumeDataStoreVO) vo;
+        final Long oldUpdated = dataObj.getUpdatedCount();
+        final Date oldUpdatedTime = dataObj.getUpdated();
 
-        SearchCriteria<VolumeDataStoreVO> sc = updateStateSearch.create();
+        final SearchCriteria<VolumeDataStoreVO> sc = updateStateSearch.create();
         sc.setParameters("id", dataObj.getId());
         sc.setParameters("state", currentState);
         sc.setParameters("updatedCount", dataObj.getUpdatedCount());
 
         dataObj.incrUpdatedCount();
 
-        UpdateBuilder builder = getUpdateBuilder(dataObj);
+        final UpdateBuilder builder = getUpdateBuilder(dataObj);
         builder.set(dataObj, "state", nextState);
         builder.set(dataObj, "updated", new Date());
         if (nextState == State.Destroyed) {
             builder.set(dataObj, "destroyed", true);
         }
 
-        int rows = update(dataObj, sc);
+        final int rows = update(dataObj, sc);
         if (rows == 0 && s_logger.isDebugEnabled()) {
-            VolumeDataStoreVO dbVol = findByIdIncludingRemoved(dataObj.getId());
+            final VolumeDataStoreVO dbVol = findByIdIncludingRemoved(dataObj.getId());
             if (dbVol != null) {
-                StringBuilder str = new StringBuilder("Unable to update ").append(dataObj.toString());
+                final StringBuilder str = new StringBuilder("Unable to update ").append(dataObj.toString());
                 str.append(": DB Data={id=")
-                    .append(dbVol.getId())
-                    .append("; state=")
-                    .append(dbVol.getState())
-                    .append("; updatecount=")
-                    .append(dbVol.getUpdatedCount())
-                    .append(";updatedTime=")
-                    .append(dbVol.getUpdated());
+                   .append(dbVol.getId())
+                   .append("; state=")
+                   .append(dbVol.getState())
+                   .append("; updatecount=")
+                   .append(dbVol.getUpdatedCount())
+                   .append(";updatedTime=")
+                   .append(dbVol.getUpdated());
                 str.append(": New Data={id=")
-                    .append(dataObj.getId())
-                    .append("; state=")
-                    .append(nextState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatecount=")
-                    .append(dataObj.getUpdatedCount())
-                    .append("; updatedTime=")
-                    .append(dataObj.getUpdated());
+                   .append(dataObj.getId())
+                   .append("; state=")
+                   .append(nextState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatecount=")
+                   .append(dataObj.getUpdatedCount())
+                   .append("; updatedTime=")
+                   .append(dataObj.getUpdated());
                 str.append(": stale Data={id=")
-                    .append(dataObj.getId())
-                    .append("; state=")
-                    .append(currentState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatecount=")
-                    .append(oldUpdated)
-                    .append("; updatedTime=")
-                    .append(oldUpdatedTime);
+                   .append(dataObj.getId())
+                   .append("; state=")
+                   .append(currentState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatecount=")
+                   .append(oldUpdated)
+                   .append("; updatedTime=")
+                   .append(oldUpdatedTime);
             } else {
                 s_logger.debug("Unable to update objectIndatastore: id=" + dataObj.getId() + ", as there is no such object exists in the database anymore");
             }
@@ -182,16 +164,16 @@ public class VolumeDataStoreDaoImpl extends GenericDaoBase<VolumeDataStoreVO, Lo
     }
 
     @Override
-    public List<VolumeDataStoreVO> listByStoreId(long id) {
-        SearchCriteria<VolumeDataStoreVO> sc = storeSearch.create();
+    public List<VolumeDataStoreVO> listByStoreId(final long id) {
+        final SearchCriteria<VolumeDataStoreVO> sc = storeSearch.create();
         sc.setParameters("store_id", id);
         sc.setParameters("destroyed", false);
         return listIncludingRemovedBy(sc);
     }
 
     @Override
-    public List<VolumeDataStoreVO> listActiveOnCache(long id) {
-        SearchCriteria<VolumeDataStoreVO> sc = cacheSearch.create();
+    public List<VolumeDataStoreVO> listActiveOnCache(final long id) {
+        final SearchCriteria<VolumeDataStoreVO> sc = cacheSearch.create();
         sc.setParameters("store_id", id);
         sc.setParameters("destroyed", false);
         sc.setParameters("ref_cnt", 0);
@@ -199,26 +181,26 @@ public class VolumeDataStoreDaoImpl extends GenericDaoBase<VolumeDataStoreVO, Lo
     }
 
     @Override
-    public void deletePrimaryRecordsForStore(long id) {
-        SearchCriteria<VolumeDataStoreVO> sc = storeSearch.create();
+    public void deletePrimaryRecordsForStore(final long id) {
+        final SearchCriteria<VolumeDataStoreVO> sc = storeSearch.create();
         sc.setParameters("store_id", id);
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
         remove(sc);
         txn.commit();
     }
 
     @Override
-    public VolumeDataStoreVO findByVolume(long volumeId) {
-        SearchCriteria<VolumeDataStoreVO> sc = volumeSearch.create();
+    public VolumeDataStoreVO findByVolume(final long volumeId) {
+        final SearchCriteria<VolumeDataStoreVO> sc = volumeSearch.create();
         sc.setParameters("volume_id", volumeId);
         sc.setParameters("destroyed", false);
         return findOneBy(sc);
     }
 
     @Override
-    public VolumeDataStoreVO findByStoreVolume(long storeId, long volumeId) {
-        SearchCriteria<VolumeDataStoreVO> sc = storeVolumeSearch.create();
+    public VolumeDataStoreVO findByStoreVolume(final long storeId, final long volumeId) {
+        final SearchCriteria<VolumeDataStoreVO> sc = storeVolumeSearch.create();
         sc.setParameters("store_id", storeId);
         sc.setParameters("volume_id", volumeId);
         sc.setParameters("destroyed", false);
@@ -235,10 +217,10 @@ public class VolumeDataStoreDaoImpl extends GenericDaoBase<VolumeDataStoreVO, Lo
          migration (download_url/extracturl will be null in case of migration). Giving priority to
          download volume case is not needed as there will be only one entry in that case so no randomness.
         */
-        List<VolumeDataStoreVO> vos = listBy(sc);
-        if(vos.size() > 1) {
-            for(VolumeDataStoreVO vo : vos) {
-                if(vo.getExtractUrl() == null) {
+        final List<VolumeDataStoreVO> vos = listBy(sc);
+        if (vos.size() > 1) {
+            for (final VolumeDataStoreVO vo : vos) {
+                if (vo.getExtractUrl() == null) {
                     return vo;
                 }
             }
@@ -248,8 +230,8 @@ public class VolumeDataStoreDaoImpl extends GenericDaoBase<VolumeDataStoreVO, Lo
     }
 
     @Override
-    public VolumeDataStoreVO findByStoreVolume(long storeId, long volumeId, boolean lock) {
-        SearchCriteria<VolumeDataStoreVO> sc = storeVolumeSearch.create();
+    public VolumeDataStoreVO findByStoreVolume(final long storeId, final long volumeId, final boolean lock) {
+        final SearchCriteria<VolumeDataStoreVO> sc = storeVolumeSearch.create();
         sc.setParameters("store_id", storeId);
         sc.setParameters("volume_id", volumeId);
         sc.setParameters("destroyed", false);
@@ -261,36 +243,36 @@ public class VolumeDataStoreDaoImpl extends GenericDaoBase<VolumeDataStoreVO, Lo
     }
 
     @Override
-    public List<VolumeDataStoreVO> listDestroyed(long id) {
-        SearchCriteria<VolumeDataStoreVO> sc = storeSearch.create();
+    public List<VolumeDataStoreVO> listDestroyed(final long id) {
+        final SearchCriteria<VolumeDataStoreVO> sc = storeSearch.create();
         sc.setParameters("store_id", id);
         sc.setParameters("destroyed", true);
         return listIncludingRemovedBy(sc);
     }
 
     @Override
-    public void duplicateCacheRecordsOnRegionStore(long storeId) {
+    public void duplicateCacheRecordsOnRegionStore(final long storeId) {
         // find all records on image cache
-        List<DataStore> cacheStores = storeMgr.listImageCacheStores();
+        final List<DataStore> cacheStores = storeMgr.listImageCacheStores();
         if (cacheStores == null || cacheStores.size() == 0) {
             return;
         }
-        List<VolumeDataStoreVO> vols = new ArrayList<VolumeDataStoreVO>();
-        for (DataStore store : cacheStores) {
+        final List<VolumeDataStoreVO> vols = new ArrayList<>();
+        for (final DataStore store : cacheStores) {
             // check if the volume is stored there
             vols.addAll(listByStoreId(store.getId()));
         }
         // create an entry for each record, but with empty install path since the content is not yet on region-wide store yet
         if (vols != null) {
             s_logger.info("Duplicate " + vols.size() + " volume cache store records to region store");
-            for (VolumeDataStoreVO vol : vols) {
-                VolumeDataStoreVO volStore = findByStoreVolume(storeId, vol.getVolumeId());
+            for (final VolumeDataStoreVO vol : vols) {
+                final VolumeDataStoreVO volStore = findByStoreVolume(storeId, vol.getVolumeId());
                 if (volStore != null) {
                     s_logger.info("There is already entry for volume " + vol.getVolumeId() + " on region store " + storeId);
                     continue;
                 }
                 s_logger.info("Persisting an entry for volume " + vol.getVolumeId() + " on region store " + storeId);
-                VolumeDataStoreVO vs = new VolumeDataStoreVO();
+                final VolumeDataStoreVO vs = new VolumeDataStoreVO();
                 vs.setVolumeId(vol.getVolumeId());
                 vs.setDataStoreId(storeId);
                 vs.setState(vol.getState());
@@ -306,28 +288,26 @@ public class VolumeDataStoreDaoImpl extends GenericDaoBase<VolumeDataStoreVO, Lo
                 this.update(vol.getId(), vol);
             }
         }
-
     }
 
     @Override
     public List<VolumeDataStoreVO> listVolumeDownloadUrls() {
-        SearchCriteria<VolumeDataStoreVO> sc = downloadVolumeSearch.create();
+        final SearchCriteria<VolumeDataStoreVO> sc = downloadVolumeSearch.create();
         sc.setParameters("destroyed", false);
         return listBy(sc);
     }
 
     @Override
-    public List<VolumeDataStoreVO> listUploadedVolumesByStoreId(long id) {
-        SearchCriteria<VolumeDataStoreVO> sc = uploadVolumeSearch.create();
+    public List<VolumeDataStoreVO> listUploadedVolumesByStoreId(final long id) {
+        final SearchCriteria<VolumeDataStoreVO> sc = uploadVolumeSearch.create();
         sc.setParameters("store_id", id);
         sc.setParameters("destroyed", false);
         return listIncludingRemovedBy(sc);
     }
 
-
     @Override
-    public void expireDnldUrlsForZone(Long dcId){
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public void expireDnldUrlsForZone(final Long dcId) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         try {
             txn.start();
@@ -336,19 +316,17 @@ public class VolumeDataStoreDaoImpl extends GenericDaoBase<VolumeDataStoreVO, Lo
             pstmt.setLong(2, dcId);
             pstmt.executeUpdate();
             txn.commit();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             txn.rollback();
             s_logger.warn("Failed expiring download urls for dcId: " + dcId, e);
         }
-
     }
 
     @Override
-    public List<VolumeDataStoreVO> listByVolumeState(Volume.State... states) {
-        SearchCriteria<VolumeDataStoreVO> sc = uploadVolumeStateSearch.create();
-        sc.setJoinParameters("volumeOnlySearch", "states", (Object[])states);
+    public List<VolumeDataStoreVO> listByVolumeState(final Volume.State... states) {
+        final SearchCriteria<VolumeDataStoreVO> sc = uploadVolumeStateSearch.create();
+        sc.setJoinParameters("volumeOnlySearch", "states", (Object[]) states);
         sc.setParameters("destroyed", false);
         return listIncludingRemovedBy(sc);
     }
-
 }

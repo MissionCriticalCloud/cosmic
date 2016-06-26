@@ -1,26 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.cloud.network.router.deployment;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.dc.dao.VlanDao;
@@ -49,15 +27,26 @@ import com.cloud.vm.VirtualMachineProfile.Param;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 
 public class RouterDeploymentDefinitionBuilder {
 
     @Inject
     protected NetworkDao networkDao;
+    @Inject
+    @Qualifier("networkHelper")
+    protected NetworkHelper nwHelper;
+    @Inject
+    @Qualifier("vpcNetworkHelper")
+    protected VpcNetworkHelperImpl vpcNwHelper;
+    protected Long offeringId;
     @Inject
     private DomainRouterDao routerDao;
     @Inject
@@ -96,15 +85,6 @@ public class RouterDeploymentDefinitionBuilder {
     private VpcManager vpcMgr;
     @Inject
     private VlanDao vlanDao;
-
-    @Autowired
-    @Qualifier("networkHelper")
-    protected NetworkHelper nwHelper;
-    @Autowired
-    @Qualifier("vpcNetworkHelper")
-    protected VpcNetworkHelperImpl vpcNwHelper;
-
-    protected Long offeringId;
 
     public void setOfferingId(final Long offeringId) {
         this.offeringId = offeringId;
@@ -157,14 +137,13 @@ public class RouterDeploymentDefinitionBuilder {
 
     public class IntermediateStateBuilder {
 
-        RouterDeploymentDefinitionBuilder builder;
-
         protected Vpc vpc;
         protected Network guestNetwork;
         protected DeployDestination dest;
         protected Account owner;
         protected Map<Param, Object> params;
         protected List<DomainRouterVO> routers = new ArrayList<>();
+        RouterDeploymentDefinitionBuilder builder;
 
         protected IntermediateStateBuilder(final RouterDeploymentDefinitionBuilder builder) {
             this.builder = builder;
@@ -206,5 +185,4 @@ public class RouterDeploymentDefinitionBuilder {
             return builder.injectDependencies(routerDeploymentDefinition);
         }
     }
-
 }

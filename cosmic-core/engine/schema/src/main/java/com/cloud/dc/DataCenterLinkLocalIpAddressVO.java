@@ -1,22 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.dc;
 
-import java.util.Date;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,8 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "op_dc_link_local_ip_address_alloc")
@@ -60,7 +43,7 @@ public class DataCenterLinkLocalIpAddressVO implements InternalIdentity {
     protected DataCenterLinkLocalIpAddressVO() {
     }
 
-    public DataCenterLinkLocalIpAddressVO(String ipAddress, long dataCenterId, long podId) {
+    public DataCenterLinkLocalIpAddressVO(final String ipAddress, final long dataCenterId, final long podId) {
         this.ipAddress = ipAddress;
         this.dataCenterId = dataCenterId;
         this.podId = podId;
@@ -75,7 +58,7 @@ public class DataCenterLinkLocalIpAddressVO implements InternalIdentity {
         return instanceId;
     }
 
-    public void setInstanceId(Long instanceId) {
+    public void setInstanceId(final Long instanceId) {
         this.instanceId = instanceId;
     }
 
@@ -83,16 +66,12 @@ public class DataCenterLinkLocalIpAddressVO implements InternalIdentity {
         return podId;
     }
 
-    public void setTakenAt(Date takenDate) {
-        this.takenAt = takenDate;
-    }
-
-    public void setReservationId(String reservationId) {
-        this.reservationId = reservationId;
-    }
-
     public String getReservationId() {
         return reservationId;
+    }
+
+    public void setReservationId(final String reservationId) {
+        this.reservationId = reservationId;
     }
 
     public String getIpAddress() {
@@ -105,5 +84,9 @@ public class DataCenterLinkLocalIpAddressVO implements InternalIdentity {
 
     public Date getTakenAt() {
         return takenAt;
+    }
+
+    public void setTakenAt(final Date takenDate) {
+        this.takenAt = takenDate;
     }
 }

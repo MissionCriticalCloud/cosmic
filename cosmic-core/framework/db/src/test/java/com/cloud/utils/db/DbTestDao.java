@@ -1,32 +1,16 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// the License.  You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.utils.db;
 
-import java.sql.PreparedStatement;
-
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.sql.PreparedStatement;
 
 public class DbTestDao extends GenericDaoBase<DbTestVO, Long> implements GenericDao<DbTestVO, Long> {
     protected DbTestDao() {
     }
 
     @DB
-    public void create(int fldInt, long fldLong, String fldString) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public void create(final int fldInt, final long fldLong, final String fldString) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         try {
             txn.start();
@@ -37,14 +21,14 @@ public class DbTestDao extends GenericDaoBase<DbTestVO, Long> implements Generic
 
             pstmt.executeUpdate();
             txn.commit();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new CloudRuntimeException("Problem with creating a record in test table", e);
         }
     }
 
     @DB
-    public void update(int fldInt, long fldLong, String fldString) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public void update(final int fldInt, final long fldLong, final String fldString) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         try {
             txn.start();
@@ -55,7 +39,7 @@ public class DbTestDao extends GenericDaoBase<DbTestVO, Long> implements Generic
 
             pstmt.executeUpdate();
             txn.commit();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new CloudRuntimeException("Problem with creating a record in test table", e);
         }
     }

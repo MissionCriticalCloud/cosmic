@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.region;
 
 import com.cloud.user.AccountVO;
@@ -56,7 +40,7 @@ public class RegionAccount extends AccountVO {
         return accountUuid;
     }
 
-    public void setAccountuuid(String accountUuid) {
+    public void setAccountuuid(final String accountUuid) {
         this.accountUuid = accountUuid;
     }
 
@@ -64,7 +48,7 @@ public class RegionAccount extends AccountVO {
         return domainUuid;
     }
 
-    public void setDomainUuid(String domainUuid) {
+    public void setDomainUuid(final String domainUuid) {
         this.domainUuid = domainUuid;
     }
 
@@ -72,7 +56,7 @@ public class RegionAccount extends AccountVO {
         return domain;
     }
 
-    public void setDomain(String domain) {
+    public void setDomain(final String domain) {
         this.domain = domain;
     }
 
@@ -80,7 +64,7 @@ public class RegionAccount extends AccountVO {
         return receivedbytes;
     }
 
-    public void setReceivedbytes(String receivedbytes) {
+    public void setReceivedbytes(final String receivedbytes) {
         this.receivedbytes = receivedbytes;
     }
 
@@ -88,7 +72,7 @@ public class RegionAccount extends AccountVO {
         return sentbytes;
     }
 
-    public void setSentbytes(String sentbytes) {
+    public void setSentbytes(final String sentbytes) {
         this.sentbytes = sentbytes;
     }
 
@@ -96,7 +80,7 @@ public class RegionAccount extends AccountVO {
         return vmlimit;
     }
 
-    public void setVmlimit(String vmlimit) {
+    public void setVmlimit(final String vmlimit) {
         this.vmlimit = vmlimit;
     }
 
@@ -104,7 +88,7 @@ public class RegionAccount extends AccountVO {
         return vmtotal;
     }
 
-    public void setVmtotal(String vmtotal) {
+    public void setVmtotal(final String vmtotal) {
         this.vmtotal = vmtotal;
     }
 
@@ -112,7 +96,7 @@ public class RegionAccount extends AccountVO {
         return vmavailable;
     }
 
-    public void setVmavailable(String vmavailable) {
+    public void setVmavailable(final String vmavailable) {
         this.vmavailable = vmavailable;
     }
 
@@ -120,7 +104,7 @@ public class RegionAccount extends AccountVO {
         return iplimit;
     }
 
-    public void setIplimit(String iplimit) {
+    public void setIplimit(final String iplimit) {
         this.iplimit = iplimit;
     }
 
@@ -128,7 +112,7 @@ public class RegionAccount extends AccountVO {
         return iptotal;
     }
 
-    public void setIptotal(String iptotal) {
+    public void setIptotal(final String iptotal) {
         this.iptotal = iptotal;
     }
 
@@ -136,7 +120,7 @@ public class RegionAccount extends AccountVO {
         return ipavailable;
     }
 
-    public void setIpavailable(String ipavailable) {
+    public void setIpavailable(final String ipavailable) {
         this.ipavailable = ipavailable;
     }
 
@@ -144,7 +128,7 @@ public class RegionAccount extends AccountVO {
         return volumelimit;
     }
 
-    public void setVolumelimit(String volumelimit) {
+    public void setVolumelimit(final String volumelimit) {
         this.volumelimit = volumelimit;
     }
 
@@ -152,7 +136,7 @@ public class RegionAccount extends AccountVO {
         return volumetotal;
     }
 
-    public void setVolumetotal(String volumetotal) {
+    public void setVolumetotal(final String volumetotal) {
         this.volumetotal = volumetotal;
     }
 
@@ -160,7 +144,7 @@ public class RegionAccount extends AccountVO {
         return volumeavailable;
     }
 
-    public void setVolumeavailable(String volumeavailable) {
+    public void setVolumeavailable(final String volumeavailable) {
         this.volumeavailable = volumeavailable;
     }
 
@@ -168,7 +152,7 @@ public class RegionAccount extends AccountVO {
         return snapshotlimit;
     }
 
-    public void setSnapshotlimit(String snapshotlimit) {
+    public void setSnapshotlimit(final String snapshotlimit) {
         this.snapshotlimit = snapshotlimit;
     }
 
@@ -176,7 +160,7 @@ public class RegionAccount extends AccountVO {
         return snapshottotal;
     }
 
-    public void setSnapshottotal(String snapshottotal) {
+    public void setSnapshottotal(final String snapshottotal) {
         this.snapshottotal = snapshottotal;
     }
 
@@ -184,7 +168,7 @@ public class RegionAccount extends AccountVO {
         return snapshotavailable;
     }
 
-    public void setSnapshotavailable(String snapshotavailable) {
+    public void setSnapshotavailable(final String snapshotavailable) {
         this.snapshotavailable = snapshotavailable;
     }
 
@@ -192,7 +176,7 @@ public class RegionAccount extends AccountVO {
         return templatelimit;
     }
 
-    public void setTemplatelimit(String templatelimit) {
+    public void setTemplatelimit(final String templatelimit) {
         this.templatelimit = templatelimit;
     }
 
@@ -200,7 +184,7 @@ public class RegionAccount extends AccountVO {
         return templatetotal;
     }
 
-    public void setTemplatetotal(String templatetotal) {
+    public void setTemplatetotal(final String templatetotal) {
         this.templatetotal = templatetotal;
     }
 
@@ -208,7 +192,7 @@ public class RegionAccount extends AccountVO {
         return templateavailable;
     }
 
-    public void setTemplateavailable(String templateavailable) {
+    public void setTemplateavailable(final String templateavailable) {
         this.templateavailable = templateavailable;
     }
 
@@ -216,7 +200,7 @@ public class RegionAccount extends AccountVO {
         return vmstopped;
     }
 
-    public void setVmstopped(String vmstopped) {
+    public void setVmstopped(final String vmstopped) {
         this.vmstopped = vmstopped;
     }
 
@@ -224,7 +208,7 @@ public class RegionAccount extends AccountVO {
         return vmrunning;
     }
 
-    public void setVmrunning(String vmrunning) {
+    public void setVmrunning(final String vmrunning) {
         this.vmrunning = vmrunning;
     }
 
@@ -232,7 +216,7 @@ public class RegionAccount extends AccountVO {
         return projectlimit;
     }
 
-    public void setProjectlimit(String projectlimit) {
+    public void setProjectlimit(final String projectlimit) {
         this.projectlimit = projectlimit;
     }
 
@@ -240,7 +224,7 @@ public class RegionAccount extends AccountVO {
         return projecttotal;
     }
 
-    public void setProjecttotal(String projecttotal) {
+    public void setProjecttotal(final String projecttotal) {
         this.projecttotal = projecttotal;
     }
 
@@ -248,7 +232,7 @@ public class RegionAccount extends AccountVO {
         return projectavailable;
     }
 
-    public void setProjectavailable(String projectavailable) {
+    public void setProjectavailable(final String projectavailable) {
         this.projectavailable = projectavailable;
     }
 
@@ -256,7 +240,7 @@ public class RegionAccount extends AccountVO {
         return networklimit;
     }
 
-    public void setNetworklimit(String networklimit) {
+    public void setNetworklimit(final String networklimit) {
         this.networklimit = networklimit;
     }
 
@@ -264,7 +248,7 @@ public class RegionAccount extends AccountVO {
         return networktotal;
     }
 
-    public void setNetworktotal(String networktotal) {
+    public void setNetworktotal(final String networktotal) {
         this.networktotal = networktotal;
     }
 
@@ -272,7 +256,7 @@ public class RegionAccount extends AccountVO {
         return networkavailable;
     }
 
-    public void setNetworkavailable(String networkavailable) {
+    public void setNetworkavailable(final String networkavailable) {
         this.networkavailable = networkavailable;
     }
 
@@ -280,8 +264,7 @@ public class RegionAccount extends AccountVO {
         return user;
     }
 
-    public void setUser(RegionUser user) {
+    public void setUser(final RegionUser user) {
         this.user = user;
     }
-
 }

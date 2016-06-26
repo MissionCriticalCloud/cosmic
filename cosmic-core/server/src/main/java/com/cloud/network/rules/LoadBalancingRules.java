@@ -1,23 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.network.rules;
-
-import java.util.List;
 
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Network;
@@ -33,8 +14,9 @@ import com.cloud.network.lb.LoadBalancingRulesManager;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.utils.net.Ip;
-
 import org.apache.cloudstack.network.topology.NetworkTopologyVisitor;
+
+import java.util.List;
 
 public class LoadBalancingRules extends RuleApplier {
 
@@ -49,15 +31,15 @@ public class LoadBalancingRules extends RuleApplier {
     public boolean accept(final NetworkTopologyVisitor visitor, final VirtualRouter router) throws ResourceUnavailableException {
         _router = router;
 
-        LoadBalancerDao loadBalancerDao = visitor.getVirtualNetworkApplianceFactory().getLoadBalancerDao();
+        final LoadBalancerDao loadBalancerDao = visitor.getVirtualNetworkApplianceFactory().getLoadBalancerDao();
         // For load balancer we have to resend all lb rules for the network
         final List<LoadBalancerVO> lbs = loadBalancerDao.listByNetworkIdAndScheme(_network.getId(), Scheme.Public);
 
         // We are cleaning it before because all the rules have to be sent to the router.
         _rules.clear();
 
-        LoadBalancingRulesManager lbMgr = visitor.getVirtualNetworkApplianceFactory().getLbMgr();
-        NetworkModel networkModel = visitor.getVirtualNetworkApplianceFactory().getNetworkModel();
+        final LoadBalancingRulesManager lbMgr = visitor.getVirtualNetworkApplianceFactory().getLbMgr();
+        final NetworkModel networkModel = visitor.getVirtualNetworkApplianceFactory().getNetworkModel();
         for (final LoadBalancerVO lb : lbs) {
 
             final List<LbDestination> dstList = lbMgr.getExistingDestinations(lb.getId());

@@ -1,21 +1,11 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// the License.  You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.utils;
 
+import com.cloud.utils.db.DbUtil;
+import com.cloud.utils.db.TransactionLegacy;
+
+import javax.persistence.Column;
+import javax.persistence.Table;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -25,13 +15,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.persistence.Column;
-import javax.persistence.Table;
-import javax.sql.DataSource;
-
-import com.cloud.utils.db.DbUtil;
-import com.cloud.utils.db.TransactionLegacy;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -68,15 +51,6 @@ public class DbUtilTest {
 
     Map<String, Connection> connectionMap = null;
 
-    @Table(name = "test_table")
-    static class Testbean {
-        String noAnnotation;
-        @Column()
-        String withAnnotation;
-        @Column(name = "surprise")
-        String withAnnotationAndName;
-    }
-
     @Test
     public void getColumnName() throws SecurityException, NoSuchFieldException {
         // if no annotation, then the field name
@@ -91,15 +65,6 @@ public class DbUtilTest {
         // there is annotation, but no name defined, fallback to field name
         // this does not work this way, it probably should
         Assert.assertEquals("withAnnotation", DbUtil.getColumnName(Testbean.class.getDeclaredField("withAnnotation")));
-
-    }
-
-    static class IsPersistableTestBean {
-        static final String staticFinal = "no";
-        final String justFinal = "no";
-        transient String transientField;
-        transient static String strange = "";
-        String instanceField;
     }
 
     @Test
@@ -111,38 +76,33 @@ public class DbUtilTest {
         Assert.assertTrue(DbUtil.isPersistable(IsPersistableTestBean.class.getDeclaredField("instanceField")));
     }
 
-    class Bar {
-
-    }
-
     @Test
     public void getTableName() {
         Assert.assertEquals("test_table", DbUtil.getTableName(Testbean.class));
         Assert.assertEquals("Bar", DbUtil.getTableName(Bar.class));
     }
 
-    @SuppressWarnings("unchecked")
     @Before
     public void setup() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        Field globalLocks = DbUtil.class.getDeclaredField("s_connectionForGlobalLocks");
+        final Field globalLocks = DbUtil.class.getDeclaredField("s_connectionForGlobalLocks");
         globalLocks.setAccessible(true);
-        connectionMapBackup = (Map<String, Connection>)globalLocks.get(null);
-        connectionMap = new HashMap<String, Connection>();
+        connectionMapBackup = (Map<String, Connection>) globalLocks.get(null);
+        connectionMap = new HashMap<>();
         globalLocks.set(null, connectionMap);
 
-        Field dsField = TransactionLegacy.class.getDeclaredField("s_ds");
+        final Field dsField = TransactionLegacy.class.getDeclaredField("s_ds");
         dsField.setAccessible(true);
-        backup = (DataSource)dsField.get(null);
+        backup = (DataSource) dsField.get(null);
         dsField.set(null, dataSource);
     }
 
     @After
     public void cleanup() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        Field globalLocks = DbUtil.class.getDeclaredField("s_connectionForGlobalLocks");
+        final Field globalLocks = DbUtil.class.getDeclaredField("s_connectionForGlobalLocks");
         globalLocks.setAccessible(true);
         globalLocks.set(null, connectionMapBackup);
 
-        Field dsField = TransactionLegacy.class.getDeclaredField("s_ds");
+        final Field dsField = TransactionLegacy.class.getDeclaredField("s_ds");
         dsField.setAccessible(true);
         dsField.set(null, backup);
     }
@@ -181,9 +141,9 @@ public class DbUtilTest {
 
     @Test
     public void closeNull() {
-        DbUtil.closeStatement((Statement)null);
-        DbUtil.closeConnection((Connection)null);
-        DbUtil.closeResultSet((ResultSet)null);
+        DbUtil.closeStatement((Statement) null);
+        DbUtil.closeConnection((Connection) null);
+        DbUtil.closeResultSet((ResultSet) null);
         // no exception should be thrown
     }
 
@@ -229,8 +189,7 @@ public class DbUtilTest {
     @Test
     @Ignore
     //can not be performed since assertion embedded in this branch of execution
-        public
-        void releaseGlobalLockNotexisting() throws SQLException {
+    public void releaseGlobalLockNotexisting() throws SQLException {
         Assert.assertFalse(DbUtil.releaseGlobalLock("notexisting"));
         Mockito.verify(dataSource, Mockito.never()).getConnection();
     }
@@ -250,4 +209,24 @@ public class DbUtilTest {
         Assert.assertFalse(connectionMap.containsKey("testLock"));
     }
 
+    @Table(name = "test_table")
+    static class Testbean {
+        String noAnnotation;
+        @Column()
+        String withAnnotation;
+        @Column(name = "surprise")
+        String withAnnotationAndName;
+    }
+
+    static class IsPersistableTestBean {
+        static final String staticFinal = "no";
+        transient static String strange = "";
+        final String justFinal = "no";
+        transient String transientField;
+        String instanceField;
+    }
+
+    class Bar {
+
+    }
 }

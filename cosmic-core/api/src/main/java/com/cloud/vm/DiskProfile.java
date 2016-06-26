@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.vm;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
@@ -48,8 +32,22 @@ public class DiskProfile {
     protected DiskProfile() {
     }
 
-    public DiskProfile(long volumeId, Volume.Type type, String name, long diskOfferingId, long size, String[] tags, boolean useLocalStorage, boolean recreatable,
-            Long templateId) {
+    public DiskProfile(final Volume vol, final DiskOffering offering, final HypervisorType hyperType) {
+        this(vol.getId(),
+                vol.getVolumeType(),
+                vol.getName(),
+                offering.getId(),
+                vol.getSize(),
+                offering.getTagsArray(),
+                offering.getUseLocalStorage(),
+                offering.isCustomized(),
+                null);
+        this.hyperType = hyperType;
+    }
+
+    public DiskProfile(final long volumeId, final Volume.Type type, final String name, final long diskOfferingId, final long size, final String[] tags, final boolean
+            useLocalStorage, final boolean recreatable,
+                       final Long templateId) {
         this.type = type;
         this.name = name;
         this.size = size;
@@ -61,20 +59,7 @@ public class DiskProfile {
         this.volumeId = volumeId;
     }
 
-    public DiskProfile(Volume vol, DiskOffering offering, HypervisorType hyperType) {
-        this(vol.getId(),
-            vol.getVolumeType(),
-            vol.getName(),
-            offering.getId(),
-            vol.getSize(),
-            offering.getTagsArray(),
-            offering.getUseLocalStorage(),
-            offering.isCustomized(),
-            null);
-        this.hyperType = hyperType;
-    }
-
-    public DiskProfile(DiskProfile dp) {
+    public DiskProfile(final DiskProfile dp) {
 
     }
 
@@ -83,6 +68,10 @@ public class DiskProfile {
      */
     public long getSize() {
         return size;
+    }
+
+    public void setSize(final long size) {
+        this.size = size;
     }
 
     /**
@@ -120,13 +109,13 @@ public class DiskProfile {
         return useLocalStorage;
     }
 
-    public void setUseLocalStorage(boolean useLocalStorage) {
+    public void setUseLocalStorage(final boolean useLocalStorage) {
         this.useLocalStorage = useLocalStorage;
     }
 
     /**
      * @return Is this volume recreatable? A volume is recreatable if the disk's content can be
-     *         reconstructed from the template.
+     * reconstructed from the template.
      */
     public boolean isRecreatable() {
         return recreatable;
@@ -151,7 +140,7 @@ public class DiskProfile {
         return new StringBuilder("DskChr[").append(type).append("|").append(size).append("|").append("]").toString();
     }
 
-    public void setHyperType(HypervisorType hyperType) {
+    public void setHyperType(final HypervisorType hyperType) {
         this.hyperType = hyperType;
     }
 
@@ -159,63 +148,59 @@ public class DiskProfile {
         return this.hyperType;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public String getPath() {
         return this.path;
     }
 
-    public void setProvisioningType(ProvisioningType provisioningType){
-        this.provisioningType = provisioningType;
+    public void setPath(final String path) {
+        this.path = path;
     }
 
-    public ProvisioningType getProvisioningType(){
+    public ProvisioningType getProvisioningType() {
         return this.provisioningType;
     }
 
-    public void setSize(long size) {
-        this.size = size;
-    }
-
-    public void setBytesReadRate(Long bytesReadRate) {
-        this.bytesReadRate = bytesReadRate;
+    public void setProvisioningType(final ProvisioningType provisioningType) {
+        this.provisioningType = provisioningType;
     }
 
     public Long getBytesReadRate() {
         return bytesReadRate;
     }
 
-    public void setBytesWriteRate(Long bytesWriteRate) {
-        this.bytesWriteRate = bytesWriteRate;
+    public void setBytesReadRate(final Long bytesReadRate) {
+        this.bytesReadRate = bytesReadRate;
     }
 
     public Long getBytesWriteRate() {
         return bytesWriteRate;
     }
 
-    public void setIopsReadRate(Long iopsReadRate) {
-        this.iopsReadRate = iopsReadRate;
+    public void setBytesWriteRate(final Long bytesWriteRate) {
+        this.bytesWriteRate = bytesWriteRate;
     }
 
     public Long getIopsReadRate() {
         return iopsReadRate;
     }
 
-    public void setIopsWriteRate(Long iopsWriteRate) {
-        this.iopsWriteRate = iopsWriteRate;
+    public void setIopsReadRate(final Long iopsReadRate) {
+        this.iopsReadRate = iopsReadRate;
     }
 
     public Long getIopsWriteRate() {
         return iopsWriteRate;
     }
 
-    public void setCacheMode(String cacheMode) {
-        this.cacheMode = cacheMode;
+    public void setIopsWriteRate(final Long iopsWriteRate) {
+        this.iopsWriteRate = iopsWriteRate;
     }
 
     public String getCacheMode() {
         return cacheMode;
+    }
+
+    public void setCacheMode(final String cacheMode) {
+        this.cacheMode = cacheMode;
     }
 }

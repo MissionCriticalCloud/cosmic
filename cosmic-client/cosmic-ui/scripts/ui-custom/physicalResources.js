@@ -1,22 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function(cloudStack, $) {
-    cloudStack.uiCustom.physicalResources = function(args) {
-        var listView = function(targetID) {
+(function (cloudStack, $) {
+    cloudStack.uiCustom.physicalResources = function (args) {
+        var listView = function (targetID) {
             var target = args.sections.physicalResources.listView[targetID];
             var listViewArgs = $.isFunction(target) ? target() : target;
 
@@ -27,14 +11,14 @@
             );
         };
         var $dashboard = $('#template').find('.system-dashboard-view').clone();
-        var getData = function() {
+        var getData = function () {
             // Populate data
             $dashboard.find('[data-item]').hide();
             cloudStack.sections.system.dashboard.dataProvider({
                 response: {
-                    success: function(args) {
+                    success: function (args) {
                         var data = args.data;
-                        $.each(data, function(key, value) {
+                        $.each(data, function (key, value) {
                             var $elem = $dashboard.find('[data-item=' + key + ']');
                             $elem.hide().html(value).fadeIn();
                         });
@@ -42,7 +26,7 @@
                         // Socket info
                         var $socketInfo = $dashboard.find('.socket-info ul');
                         $socketInfo.find('li').remove(); // Clean up
-                        $(args.data.socketInfo).each(function() {
+                        $(args.data.socketInfo).each(function () {
                             var item = this;
                             var name = item.name;
                             var hosts = item.hosts;
@@ -66,10 +50,10 @@
                 }
             });
         };
-        var resourceChart = function(args) {
+        var resourceChart = function (args) {
             getData();
             return $dashboard
-                .click(function(event) {
+                .click(function (event) {
                     var $target = $(event.target);
                     if ($target.closest('[view-all-target]').size()) {
                         var targetID = $target.closest('[view-all-target]').attr('view-all-target');
@@ -78,20 +62,20 @@
                             data: '',
                             noSelectPanel: true,
                             maximizeIfSelected: true,
-                            complete: function($newPanel) {
+                            complete: function ($newPanel) {
                                 listView(targetID).appendTo($newPanel);
                             }
                         });
                     }
                 });
         };
-        $(window).bind('cloudStack.fullRefresh cloudStack.updateResources', function() {
+        $(window).bind('cloudStack.fullRefresh cloudStack.updateResources', function () {
             if ($dashboard.is(':visible')) {
                 getData();
             }
         });
-        return function(args) {
-            $dashboard.find('#update_ssl_button').click(function() {
+        return function (args) {
+            $dashboard.find('#update_ssl_button').click(function () {
                 cloudStack.dialog.createForm({
                     form: {
                         title: 'label.update.ssl',
@@ -110,9 +94,9 @@
                             var count = 0;
                             var $intermediatecertificate = $form.find('.form-item[rel=intermediatecertificate]');
 
-                            $addButton.click(function() {
+                            $addButton.click(function () {
                                 // clone the template intermediate certificate and make it visible
-                                var $newcertificate = $intermediatecertificate.clone().attr('id','intermediate'+count);
+                                var $newcertificate = $intermediatecertificate.clone().attr('id', 'intermediate' + count);
                                 $newcertificate.insertBefore($addButton);
                                 $newcertificate.css('display', 'inline-block');
                                 $newcertificate.addClass('sslcertificate');
@@ -126,7 +110,7 @@
                             rootcertificate: {
                                 label: 'label.root.certificate',
                                 isTextarea: true,
-                                validation: { required: true }
+                                validation: {required: true}
                             },
                             intermediatecertificate: { // this is the template 'intermediate certificate', always hidden
                                 label: 'label.intermediate.certificate',
@@ -136,32 +120,30 @@
                             certificate: {
                                 label: 'label.certificate',
                                 isTextarea: true,
-                                validation: { required: true }
+                                validation: {required: true}
                             },
                             privatekey: {
                                 label: 'label.privatekey',
                                 isTextarea: true,
-                                validation: { required: true }
+                                validation: {required: true}
                             },
                             domainsuffix: {
                                 label: 'label.domain.suffix',
-                                validation: { required: true }
+                                validation: {required: true}
                             }
                         }
                     },
-                    after: function(args) {
+                    after: function (args) {
                         var $loading = $('<div>').addClass('loading-overlay');
                         $('.system-dashboard-view:visible').prepend($loading);
 
                         // build a list with all certificates that need to be uploaded
                         var certificates = [];
                         certificates.push(args.data.rootcertificate);
-                        if ($.isArray(args.data.intermediatecertificate))
-                        {
+                        if ($.isArray(args.data.intermediatecertificate)) {
                             $.merge(certificates, args.data.intermediatecertificate);
                         }
-                        else
-                        {
+                        else {
                             certificates.push(args.data.intermediatecertificate);
                         }
                         certificates.push(args.data.certificate);
@@ -169,12 +151,11 @@
                         // Recursively uploads certificates.
                         // When the upload succeeds, proceeds to uploading the next certificate.
                         // When the upload fails, stops and reports failure.
-                        var uploadCertificate = function(index) {
-                            if (index >=  certificates.length)
-                            {
+                        var uploadCertificate = function (index) {
+                            if (index >= certificates.length) {
                                 return;
                             }
-                            if ( !$.trim(certificates[index])) // skip empty certificate
+                            if (!$.trim(certificates[index])) // skip empty certificate
                             {
                                 uploadCertificate(index + 1);
                                 return;
@@ -200,22 +181,22 @@
                             $.ajax({
                                 type: "POST",
                                 url: createURL('uploadCustomCertificate'),
-                                data:  certificateData,
+                                data: certificateData,
                                 dataType: 'json',
-                                success: function(json) {
+                                success: function (json) {
                                     var jid = json.uploadcustomcertificateresponse.jobid;
-                                    var uploadCustomCertificateIntervalID = setInterval(function() {
+                                    var uploadCustomCertificateIntervalID = setInterval(function () {
                                         $.ajax({
                                             url: createURL("queryAsyncJobResult&jobId=" + jid),
                                             dataType: "json",
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var result = json.queryasyncjobresultresponse;
                                                 if (result.jobstatus == 0) {
                                                     return; //Job has not completed
                                                 } else {
                                                     clearInterval(uploadCustomCertificateIntervalID);
                                                     if (result.jobstatus == 1) {
-                                                        if (index ==  certificates.length - 1) // last one, report success
+                                                        if (index == certificates.length - 1) // last one, report success
                                                         {
                                                             cloudStack.dialog.notice({
                                                                 message: 'message.update.ssl.succeeded'
@@ -234,7 +215,7 @@
                                                     }
                                                 }
                                             },
-                                            error: function(XMLHttpResponse) {
+                                            error: function (XMLHttpResponse) {
                                                 cloudStack.dialog.notice({
                                                     message: _l('message.update.ssl.failed') + ' ' + parseXMLHttpResponse(XMLHttpResponse)
                                                 });
@@ -243,7 +224,7 @@
                                         });
                                     }, g_queryAsyncJobResultInterval);
                                 },
-                                error: function(XMLHttpResponse) {
+                                error: function (XMLHttpResponse) {
                                     cloudStack.dialog.notice({
                                         message: _l('message.update.ssl.failed') + ' ' + parseXMLHttpResponse(XMLHttpResponse)
                                     });
@@ -260,7 +241,7 @@
                 });
                 return false;
             });
-            $dashboard.find('#refresh_button').click(function() {
+            $dashboard.find('#refresh_button').click(function () {
                 getData();
                 return false;
             });

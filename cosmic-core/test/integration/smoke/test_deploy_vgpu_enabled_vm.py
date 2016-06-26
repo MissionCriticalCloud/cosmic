@@ -1,20 +1,3 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 # Test from the Marvin - Testing in Python wiki
 
 # All tests inherit from cloudstackTestCase
@@ -40,10 +23,10 @@ from nose.plugins.attrib import attr
 
 
 class TestDeployvGPUenabledVM(cloudstackTestCase):
-
     """
     Test deploy a vGPU enabled VM into a user account
     """
+
     @classmethod
     def setUpClass(self):
         testClient = super(TestDeployvGPUenabledVM, self).getClsTestClient()
@@ -59,9 +42,9 @@ class TestDeployvGPUenabledVM(cloudstackTestCase):
             hypervisor="XenServer"
         )
         if hosts is None:
-             # GPU feature is supported only on XenServer.Check listhosts response
-             self.unsupportedHypervisor = True
-             return
+            # GPU feature is supported only on XenServer.Check listhosts response
+            self.unsupportedHypervisor = True
+            return
         else:
             gpuhosts = 0
             for ghost in hosts:
@@ -130,8 +113,8 @@ class TestDeployvGPUenabledVM(cloudstackTestCase):
 
         self.testdata["service_offerings"]["vgpu260qwin"]["serviceofferingdetails"] = [
             {
-                'pciDevice': 'Group of NVIDIA Corporation GK107GL [GRID K1] GPUs'}, {
-                'vgpuType': 'GRID K120Q'}]
+                'pciDevice': 'Group of NVIDIA Corporation GK107GL [GRID K1] GPUs' }, {
+                'vgpuType': 'GRID K120Q' }]
         # create a service offering
         self.service_offering = ServiceOffering.create(
             self.apiclient,

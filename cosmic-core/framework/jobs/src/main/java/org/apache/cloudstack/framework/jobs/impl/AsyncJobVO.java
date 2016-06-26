@@ -1,23 +1,9 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.framework.jobs.impl;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.UuidUtils;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.framework.jobs.AsyncJob;
+import org.apache.cloudstack.jobs.JobInfo;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -34,12 +20,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-
-import com.cloud.utils.UuidUtils;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.framework.jobs.AsyncJob;
-import org.apache.cloudstack.jobs.JobInfo;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "async_job")
@@ -49,21 +31,16 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
 
     public static final String JOB_DISPATCHER_PSEUDO = "pseudoJobDispatcher";
     public static final String PSEUDO_JOB_INSTANCE_TYPE = "Thread";
-
+    @Column(name = "job_type", length = 32)
+    protected String type;
+    @Column(name = "job_dispatcher", length = 64)
+    protected String dispatcher;
+    @Column(name = "job_pending_signals")
+    protected int pendingSignals;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
-    @Column(name = "job_type", length = 32)
-    protected String type;
-
-    @Column(name = "job_dispatcher", length = 64)
-    protected String dispatcher;
-
-    @Column(name = "job_pending_signals")
-    protected int pendingSignals;
-
     @Column(name = "user_id")
     private long userId;
 
@@ -136,12 +113,13 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         status = Status.IN_PROGRESS;
     }
 
-    public AsyncJobVO(String related, long userId, long accountId, String cmd, String cmdInfo, Long instanceId, String instanceType, String injectedUuid) {
+    public AsyncJobVO(final String related, final long userId, final long accountId, final String cmd, final String cmdInfo, final Long instanceId, final String instanceType,
+                      final String injectedUuid) {
         this.userId = userId;
         this.accountId = accountId;
         this.cmd = cmd;
         this.cmdInfo = cmdInfo;
-        uuid = ( injectedUuid == null ? UUID.randomUUID().toString() : injectedUuid );
+        uuid = (injectedUuid == null ? UUID.randomUUID().toString() : injectedUuid);
         this.related = related;
         this.instanceId = instanceId;
         this.instanceType = instanceType;
@@ -149,34 +127,11 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
     }
 
     @Override
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getShortUuid() {
-        return UuidUtils.first(uuid);
-    }
-
-    public void setRelated(String related) {
-        this.related = related;
-    }
-
-    @Override
-    public String getRelated() {
-        return related;
-    }
-
-    @Override
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -185,7 +140,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return dispatcher;
     }
 
-    public void setDispatcher(String dispatcher) {
+    public void setDispatcher(final String dispatcher) {
         this.dispatcher = dispatcher;
     }
 
@@ -194,7 +149,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return pendingSignals;
     }
 
-    public void setPendingSignals(int signals) {
+    public void setPendingSignals(final int signals) {
         pendingSignals = signals;
     }
 
@@ -203,7 +158,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(final long userId) {
         this.userId = userId;
     }
 
@@ -212,7 +167,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return accountId;
     }
 
-    public void setAccountId(long accountId) {
+    public void setAccountId(final long accountId) {
         this.accountId = accountId;
     }
 
@@ -221,7 +176,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return cmd;
     }
 
-    public void setCmd(String cmd) {
+    public void setCmd(final String cmd) {
         this.cmd = cmd;
     }
 
@@ -230,7 +185,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return cmdVersion;
     }
 
-    public void setCmdVersion(int version) {
+    public void setCmdVersion(final int version) {
         cmdVersion = version;
     }
 
@@ -239,7 +194,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return cmdInfo;
     }
 
-    public void setCmdInfo(String cmdInfo) {
+    public void setCmdInfo(final String cmdInfo) {
         this.cmdInfo = cmdInfo;
     }
 
@@ -248,7 +203,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(final Status status) {
         this.status = status;
     }
 
@@ -257,7 +212,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return processStatus;
     }
 
-    public void setProcessStatus(int status) {
+    public void setProcessStatus(final int status) {
         processStatus = status;
     }
 
@@ -266,7 +221,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return resultCode;
     }
 
-    public void setResultCode(int resultCode) {
+    public void setResultCode(final int resultCode) {
         this.resultCode = resultCode;
     }
 
@@ -275,7 +230,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return result;
     }
 
-    public void setResult(String result) {
+    public void setResult(final String result) {
         this.result = result;
     }
 
@@ -285,7 +240,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
     }
 
     @Override
-    public void setInitMsid(Long initMsid) {
+    public void setInitMsid(final Long initMsid) {
         this.initMsid = initMsid;
     }
 
@@ -294,7 +249,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return executingMsid;
     }
 
-    public void setExecutingMsid(Long executingMsid) {
+    public void setExecutingMsid(final Long executingMsid) {
         this.executingMsid = executingMsid;
     }
 
@@ -304,7 +259,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
     }
 
     @Override
-    public void setCompleteMsid(Long completeMsid) {
+    public void setCompleteMsid(final Long completeMsid) {
         this.completeMsid = completeMsid;
     }
 
@@ -313,7 +268,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 
@@ -322,7 +277,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return lastUpdated;
     }
 
-    public void setLastUpdated(Date lastUpdated) {
+    public void setLastUpdated(final Date lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
 
@@ -331,7 +286,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return lastPolled;
     }
 
-    public void setLastPolled(Date lastPolled) {
+    public void setLastPolled(final Date lastPolled) {
         this.lastPolled = lastPolled;
     }
 
@@ -340,7 +295,7 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return instanceType;
     }
 
-    public void setInstanceType(String instanceType) {
+    public void setInstanceType(final String instanceType) {
         this.instanceType = instanceType;
     }
 
@@ -349,8 +304,9 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return instanceId;
     }
 
-    public void setInstanceId(Long instanceId) {
-        this.instanceId = instanceId;
+    @Override
+    public String getShortUuid() {
+        return UuidUtils.first(uuid);
     }
 
     @Override
@@ -359,8 +315,21 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
     }
 
     @Override
-    public void setSyncSource(SyncQueueItem syncSource) {
+    public void setSyncSource(final SyncQueueItem syncSource) {
         this.syncSource = syncSource;
+    }
+
+    @Override
+    public String getRelated() {
+        return related;
+    }
+
+    public void setRelated(final String related) {
+        this.related = related;
+    }
+
+    public void setInstanceId(final Long instanceId) {
+        this.instanceId = instanceId;
     }
 
     @Override
@@ -368,13 +337,13 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(final String uuid) {
         this.uuid = uuid;
     }
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        final StringBuffer sb = new StringBuffer();
         sb.append("AsyncJobVO {id:").append(getId());
         sb.append(", userId: ").append(getUserId());
         sb.append(", accountId: ").append(getAccountId());
@@ -394,5 +363,14 @@ public class AsyncJobVO implements AsyncJob, JobInfo {
         sb.append(", created: ").append(getCreated());
         sb.append("}");
         return sb.toString();
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    public void setId(final long id) {
+        this.id = id;
     }
 }

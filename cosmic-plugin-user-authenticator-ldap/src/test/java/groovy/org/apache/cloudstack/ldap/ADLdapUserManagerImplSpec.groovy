@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package groovy.org.apache.cloudstack.ldap
 
 import org.apache.cloudstack.ldap.ADLdapUserManagerImpl
@@ -47,10 +29,10 @@ class ADLdapUserManagerImplSpec extends spock.lang.Specification {
 
         def result = adLdapUserManager.generateADGroupSearchFilter(group);
         expect:
-            assert result.contains("memberOf:1.2.840.113556.1.4.1941:=")
-            result == "(&(objectClass=user)(memberOf:1.2.840.113556.1.4.1941:=CN=" + group + ",DC=cloud,DC=citrix,DC=com))"
+        assert result.contains("memberOf:1.2.840.113556.1.4.1941:=")
+        result == "(&(objectClass=user)(memberOf:1.2.840.113556.1.4.1941:=CN=" + group + ",DC=cloud,DC=citrix,DC=com))"
         where:
-            group << ["dev", "dev-hyd"]
+        group << ["dev", "dev-hyd"]
     }
 
     def "test generate AD search filter with nested groups disabled"() {
@@ -75,11 +57,11 @@ class ADLdapUserManagerImplSpec extends spock.lang.Specification {
         LdapContext context = Mock(LdapContext);
 
         when:
-            def result = adLdapUserManager.getUsersInGroup(group, context)
+        def result = adLdapUserManager.getUsersInGroup(group, context)
         then:
-            thrown(IllegalArgumentException)
+        thrown(IllegalArgumentException)
         where:
-            group << [null, "group", null]
+        group << [null, "group", null]
 
     }
 }

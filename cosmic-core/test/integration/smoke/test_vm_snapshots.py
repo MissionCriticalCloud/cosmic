@@ -1,25 +1,7 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 # Import Local Modules
-from marvin.codes import FAILED, KVM, PASS
-from nose.plugins.attrib import attr
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import random_gen, cleanup_resources, validateList
+from marvin.codes import FAILED, KVM, PASS
 from marvin.lib.base import (
     Account,
     ServiceOffering,
@@ -34,11 +16,11 @@ from marvin.lib.common import (
     get_template,
     list_snapshots
 )
-import time
+from marvin.lib.utils import random_gen, cleanup_resources, validateList
+from nose.plugins.attrib import attr
 
 
 class TestVmSnapshot(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestVmSnapshot, cls).getClsTestClient()
@@ -284,8 +266,8 @@ class TestVmSnapshot(cloudstackTestCase):
             "Check list vm snapshot has be deleted"
         )
 
-class TestSnapshots(cloudstackTestCase):
 
+class TestSnapshots(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         try:
@@ -394,7 +376,7 @@ class TestSnapshots(cloudstackTestCase):
                               listall=True)
 
         self.assertEqual(validateList(volumes)[0], PASS,
-                "Failed to get root volume of the VM")
+                         "Failed to get root volume of the VM")
 
         snapshot = Snapshot.create(
             self.apiclient,

@@ -1,27 +1,8 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.network.nicira;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.cloud.utils.rest.BasicRestClient;
 import com.cloud.utils.rest.CloudstackRESTException;
@@ -29,6 +10,10 @@ import com.cloud.utils.rest.HttpConstants;
 import com.cloud.utils.rest.HttpMethods;
 import com.cloud.utils.rest.HttpStatusCodeHelper;
 import com.cloud.utils.rest.HttpUriRequestBuilder;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
@@ -98,7 +83,7 @@ public class NiciraRestClient extends BasicRestClient {
     }
 
     private CloseableHttpResponse handleUnauthorizedResponse(final HttpUriRequest request, final int previousStatusCode, final CloseableHttpResponse response, final int statusCode)
-                    throws CloudstackRESTException {
+            throws CloudstackRESTException {
         super.closeResponse(response);
         if (HttpStatusCodeHelper.isUnauthorized(previousStatusCode)) {
             s_logger.error(responseToErrorMessage(response));
@@ -123,10 +108,10 @@ public class NiciraRestClient extends BasicRestClient {
         parameters.put("username", username);
         parameters.put("password", password);
         return HttpUriRequestBuilder.create()
-            .method(HttpMethods.POST)
-            .methodParameters(parameters)
-            .path(loginUrl)
-            .build();
+                                    .method(HttpMethods.POST)
+                                    .methodParameters(parameters)
+                                    .path(loginUrl)
+                                    .build();
     }
 
     private String responseToErrorMessage(final CloseableHttpResponse response) {
@@ -186,6 +171,11 @@ public class NiciraRestClient extends BasicRestClient {
             return this;
         }
 
+        @Override
+        public NiciraRestClient build() {
+            return new NiciraRestClient(this);
+        }
+
         public Builder executionLimit(final int executionLimit) {
             this.executionLimit = executionLimit;
             return this;
@@ -195,11 +185,5 @@ public class NiciraRestClient extends BasicRestClient {
             this.maxResponseErrorMesageLength = maxResponseErrorMesageLength;
             return this;
         }
-
-        @Override
-        public NiciraRestClient build() {
-            return new NiciraRestClient(this);
-        }
-
     }
 }

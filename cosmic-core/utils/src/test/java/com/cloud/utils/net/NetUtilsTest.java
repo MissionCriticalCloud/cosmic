@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils.net;
@@ -31,14 +16,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.net.NetUtils.SupersetOrSubset;
+
 import java.math.BigInteger;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.net.NetUtils.SupersetOrSubset;
 import com.googlecode.ipv6.IPv6Address;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,10 +38,11 @@ public class NetUtilsTest {
         final int size = 24;
         final int netCharacters = 12;
 
-        final long ip = NetUtils.getRandomIpFromCidr(cidr, size, new TreeSet<Long>());
+        final long ip = NetUtils.getRandomIpFromCidr(cidr, size, new TreeSet<>());
 
         assertThat("The ip " + NetUtils.long2Ip(ip) + " retrieved must be within the cidr " + cidr + "/" + size, cidr.substring(0, netCharacters), equalTo(NetUtils.long2Ip(ip)
-                .substring(0, netCharacters)));
+                                                                                                                                                                   .substring(0,
+                                                                                                                                                                           netCharacters)));
     }
 
     @Test
@@ -65,10 +51,11 @@ public class NetUtilsTest {
         final int size = 16;
         final int netCharacters = 8;
 
-        final long ip = NetUtils.getRandomIpFromCidr(cidr, 16, new TreeSet<Long>());
+        final long ip = NetUtils.getRandomIpFromCidr(cidr, 16, new TreeSet<>());
 
         assertThat("The ip " + NetUtils.long2Ip(ip) + " retrieved must be within the cidr " + cidr + "/" + size, cidr.substring(0, netCharacters), equalTo(NetUtils.long2Ip(ip)
-                .substring(0, netCharacters)));
+                                                                                                                                                                   .substring(0,
+                                                                                                                                                                           netCharacters)));
     }
 
     @Test
@@ -77,10 +64,11 @@ public class NetUtilsTest {
         final int size = 8;
         final int netCharacters = 4;
 
-        final long ip = NetUtils.getRandomIpFromCidr(cidr, 16, new TreeSet<Long>());
+        final long ip = NetUtils.getRandomIpFromCidr(cidr, 16, new TreeSet<>());
 
         assertThat("The ip " + NetUtils.long2Ip(ip) + " retrieved must be within the cidr " + cidr + "/" + size, cidr.substring(0, netCharacters), equalTo(NetUtils.long2Ip(ip)
-                .substring(0, netCharacters)));
+                                                                                                                                                                   .substring(0,
+                                                                                                                                                                           netCharacters)));
     }
 
     @Test
@@ -88,7 +76,7 @@ public class NetUtilsTest {
         final String cidr = "192.168.124.1";
         final int size = 30;
 
-        final SortedSet<Long> avoid = new TreeSet<Long>();
+        final SortedSet<Long> avoid = new TreeSet<>();
         long ip = NetUtils.getRandomIpFromCidr(cidr, size, avoid);
         assertThat("We should be able to retrieve an ip on the first call.", ip, not(equalTo(-1L)));
         avoid.add(ip);
@@ -425,51 +413,51 @@ public class NetUtilsTest {
     @Test
     public void testGetCidrNetMask() {
         final String cidr = "10.10.0.0/16";
-        String netmask = NetUtils.getCidrNetmask("10.10.10.10/16");
-        assertTrue(cidr + " does not generate valid netmask " + netmask,NetUtils.isValidNetmask(netmask));
+        final String netmask = NetUtils.getCidrNetmask("10.10.10.10/16");
+        assertTrue(cidr + " does not generate valid netmask " + netmask, NetUtils.isValidNetmask(netmask));
     }
 
     @Test
     public void testGetCidrSubNet() {
         final String cidr = "10.10.0.0/16";
-        String subnet = NetUtils.getCidrSubNet("10.10.10.10/16");
-        assertTrue(cidr + " does not contain " + subnet,NetUtils.isIpWithtInCidrRange(subnet, cidr));
+        final String subnet = NetUtils.getCidrSubNet("10.10.10.10/16");
+        assertTrue(cidr + " does not contain " + subnet, NetUtils.isIpWithtInCidrRange(subnet, cidr));
     }
 
     @Test
     public void testGetCidrSubNetWithWidth() {
         final String cidr = "10.10.0.0/16";
-        String subnet = NetUtils.getCidrSubNet("10.10.10.10", 16);
-        assertTrue(cidr + " does not contain " + subnet,NetUtils.isIpWithtInCidrRange(subnet, cidr));
+        final String subnet = NetUtils.getCidrSubNet("10.10.10.10", 16);
+        assertTrue(cidr + " does not contain " + subnet, NetUtils.isIpWithtInCidrRange(subnet, cidr));
     }
 
     @Test
     public void testIsValidCidrSize() {
         final String cidrsize = "16";
-        long netbits = NetUtils.getCidrSizeFromString(cidrsize);
-        assertTrue(" does not compute " + cidrsize,netbits == 16);
+        final long netbits = NetUtils.getCidrSizeFromString(cidrsize);
+        assertTrue(" does not compute " + cidrsize, netbits == 16);
     }
 
-    @Test(expected=CloudRuntimeException.class)
+    @Test(expected = CloudRuntimeException.class)
     public void testIsInvalidCidrSize() {
         final String cidrsize = "33";
-        long netbits = NetUtils.getCidrSizeFromString(cidrsize);
-        assertTrue(" does not compute " + cidrsize,netbits == 16);
+        final long netbits = NetUtils.getCidrSizeFromString(cidrsize);
+        assertTrue(" does not compute " + cidrsize, netbits == 16);
     }
 
-    @Test(expected=CloudRuntimeException.class)
+    @Test(expected = CloudRuntimeException.class)
     public void testIsInvalidCidrString() {
         final String cidrsize = "ggg";
-        long netbits = NetUtils.getCidrSizeFromString(cidrsize);
-        assertTrue(" does not compute " + cidrsize,netbits == 16);
+        final long netbits = NetUtils.getCidrSizeFromString(cidrsize);
+        assertTrue(" does not compute " + cidrsize, netbits == 16);
     }
 
     @Test
     public void testCidrToLongArray() {
         final String cidr = "10.192.10.10/10";
-        Long[] netbits = NetUtils.cidrToLong(cidr);
-        assertEquals("unexpected cidrsize " + netbits[1],10l, netbits[1].longValue());
-        assertEquals("(un)expected <" + 0x0ac00000L + "> netaddress " + netbits[0].longValue(),netbits[0].longValue(),0x0ac00000l);
+        final Long[] netbits = NetUtils.cidrToLong(cidr);
+        assertEquals("unexpected cidrsize " + netbits[1], 10l, netbits[1].longValue());
+        assertEquals("(un)expected <" + 0x0ac00000L + "> netaddress " + netbits[0].longValue(), netbits[0].longValue(), 0x0ac00000l);
     }
 
     @Test
@@ -509,22 +497,22 @@ public class NetUtilsTest {
     public void testIsNetworksOverlapWithEmptyValues() {
         assertEquals(false, NetUtils.isNetworksOverlap("", null));
     }
+
     @Test
-    public void testisNetworkorBroadCastIP(){
-         //Checking the True conditions
-        assertTrue(NetUtils.isNetworkorBroadcastIP("192.168.0.0","255.255.255.0"));
-        assertTrue(NetUtils.isNetworkorBroadcastIP("192.168.0.255","255.255.255.0"));
-        assertTrue(NetUtils.isNetworkorBroadcastIP("192.168.0.127","255.255.255.128"));
-        assertTrue(NetUtils.isNetworkorBroadcastIP("192.168.0.63","255.255.255.192"));
+    public void testisNetworkorBroadCastIP() {
+        //Checking the True conditions
+        assertTrue(NetUtils.isNetworkorBroadcastIP("192.168.0.0", "255.255.255.0"));
+        assertTrue(NetUtils.isNetworkorBroadcastIP("192.168.0.255", "255.255.255.0"));
+        assertTrue(NetUtils.isNetworkorBroadcastIP("192.168.0.127", "255.255.255.128"));
+        assertTrue(NetUtils.isNetworkorBroadcastIP("192.168.0.63", "255.255.255.192"));
 
         //Checking the False conditions
-        assertFalse(NetUtils.isNetworkorBroadcastIP("192.168.0.1","255.255.255.0"));
-        assertFalse(NetUtils.isNetworkorBroadcastIP("192.168.0.127","255.255.255.0"));
-        assertFalse(NetUtils.isNetworkorBroadcastIP("192.168.0.126","255.255.255.128"));
-        assertFalse(NetUtils.isNetworkorBroadcastIP("192.168.0.62","255.255.255.192"));
+        assertFalse(NetUtils.isNetworkorBroadcastIP("192.168.0.1", "255.255.255.0"));
+        assertFalse(NetUtils.isNetworkorBroadcastIP("192.168.0.127", "255.255.255.0"));
+        assertFalse(NetUtils.isNetworkorBroadcastIP("192.168.0.126", "255.255.255.128"));
+        assertFalse(NetUtils.isNetworkorBroadcastIP("192.168.0.62", "255.255.255.192"));
 
-        assertTrue(NetUtils.isNetworkorBroadcastIP("192.168.0.63","255.255.255.192"));
-        assertFalse(NetUtils.isNetworkorBroadcastIP("192.168.0.63","255.255.255.128"));
+        assertTrue(NetUtils.isNetworkorBroadcastIP("192.168.0.63", "255.255.255.192"));
+        assertFalse(NetUtils.isNetworkorBroadcastIP("192.168.0.63", "255.255.255.128"));
     }
-
 }

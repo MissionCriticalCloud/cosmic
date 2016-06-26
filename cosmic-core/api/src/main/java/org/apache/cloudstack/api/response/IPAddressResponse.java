@@ -1,35 +1,18 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.Date;
-import java.util.List;
 
 import com.cloud.network.IpAddress;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
 
+import java.util.Date;
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
+
 @EntityReference(value = IpAddress.class)
-@SuppressWarnings("unused")
 public class IPAddressResponse extends BaseResponse implements ControlledEntityResponse {
     @SerializedName(ApiConstants.ID)
     @Param(description = "public IP address id")
@@ -151,11 +134,12 @@ public class IPAddressResponse extends BaseResponse implements ControlledEntityR
     private Boolean forDisplay;
 
     /*
-        @SerializedName(ApiConstants.JOB_ID) @Param(description="shows the current pending asynchronous job ID. This tag is not returned if no current pending jobs are acting on the volume")
+        @SerializedName(ApiConstants.JOB_ID) @Param(description="shows the current pending asynchronous job ID. This tag is not returned if no current pending jobs are acting on
+         the volume")
         private IdentityProxy jobId = new IdentityProxy("async_job");
     */
 
-    public void setIpAddress(String ipAddress) {
+    public void setIpAddress(final String ipAddress) {
         this.ipAddress = ipAddress;
     }
 
@@ -164,128 +148,128 @@ public class IPAddressResponse extends BaseResponse implements ControlledEntityR
         return this.getId();
     }
 
-    public void setAllocated(Date allocated) {
-        this.allocated = allocated;
-    }
-
-    public void setZoneId(String zoneId) {
-        this.zoneId = zoneId;
-    }
-
-    public void setZoneName(String zoneName) {
-        this.zoneName = zoneName;
-    }
-
-    public void setSourceNat(Boolean sourceNat) {
-        this.sourceNat = sourceNat;
-    }
-
-    @Override
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-    }
-
-    @Override
-    public void setDomainId(String domainId) {
-        this.domainId = domainId;
-    }
-
-    @Override
-    public void setDomainName(String domainName) {
-        this.domainName = domainName;
-    }
-
-    public void setForVirtualNetwork(Boolean forVirtualNetwork) {
-        this.forVirtualNetwork = forVirtualNetwork;
-    }
-
-    public void setVlanId(String vlanId) {
-        this.vlanId = vlanId;
-    }
-
-    public void setVlanName(String vlanName) {
-        this.vlanName = vlanName;
-    }
-
-    public void setStaticNat(Boolean staticNat) {
-        this.staticNat = staticNat;
-    }
-
-    public void setAssociatedNetworkId(String networkId) {
-        this.associatedNetworkId = networkId;
-    }
-
-    public void setNetworkId(String networkId) {
-        this.networkId = networkId;
-    }
-
-    public void setVirtualMachineId(String virtualMachineId) {
-        this.virtualMachineId = virtualMachineId;
-    }
-
-    public void setVirtualMachineIp(String virtualMachineIp) {
-        this.virtualMachineIp = virtualMachineIp;
-    }
-
-    public void setVirtualMachineName(String virtualMachineName) {
-        this.virtualMachineName = virtualMachineName;
-    }
-
-    public void setVirtualMachineDisplayName(String virtualMachineDisplayName) {
-        this.virtualMachineDisplayName = virtualMachineDisplayName;
-    }
-
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public void setAllocated(final Date allocated) {
+        this.allocated = allocated;
+    }
+
+    public void setZoneId(final String zoneId) {
+        this.zoneId = zoneId;
+    }
+
+    public void setZoneName(final String zoneName) {
+        this.zoneName = zoneName;
+    }
+
+    public void setSourceNat(final Boolean sourceNat) {
+        this.sourceNat = sourceNat;
     }
 
     @Override
-    public void setProjectId(String projectId) {
+    public void setAccountName(final String accountName) {
+        this.accountName = accountName;
+    }
+
+    @Override
+    public void setProjectId(final String projectId) {
         this.projectId = projectId;
     }
 
     @Override
-    public void setProjectName(String projectName) {
+    public void setProjectName(final String projectName) {
         this.projectName = projectName;
     }
 
-    public void setPhysicalNetworkId(String physicalNetworkId) {
+    @Override
+    public void setDomainId(final String domainId) {
+        this.domainId = domainId;
+    }
+
+    @Override
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setForVirtualNetwork(final Boolean forVirtualNetwork) {
+        this.forVirtualNetwork = forVirtualNetwork;
+    }
+
+    public void setVlanId(final String vlanId) {
+        this.vlanId = vlanId;
+    }
+
+    public void setVlanName(final String vlanName) {
+        this.vlanName = vlanName;
+    }
+
+    public void setStaticNat(final Boolean staticNat) {
+        this.staticNat = staticNat;
+    }
+
+    public void setAssociatedNetworkId(final String networkId) {
+        this.associatedNetworkId = networkId;
+    }
+
+    public void setNetworkId(final String networkId) {
+        this.networkId = networkId;
+    }
+
+    public void setVirtualMachineId(final String virtualMachineId) {
+        this.virtualMachineId = virtualMachineId;
+    }
+
+    public void setVirtualMachineIp(final String virtualMachineIp) {
+        this.virtualMachineIp = virtualMachineIp;
+    }
+
+    public void setVirtualMachineName(final String virtualMachineName) {
+        this.virtualMachineName = virtualMachineName;
+    }
+
+    public void setVirtualMachineDisplayName(final String virtualMachineDisplayName) {
+        this.virtualMachineDisplayName = virtualMachineDisplayName;
+    }
+
+    public void setState(final String state) {
+        this.state = state;
+    }
+
+    public void setPhysicalNetworkId(final String physicalNetworkId) {
         this.physicalNetworkId = physicalNetworkId;
     }
 
-    public void setIsSystem(Boolean isSystem) {
+    public void setIsSystem(final Boolean isSystem) {
         this.isSystem = isSystem;
     }
 
-    public void setPurpose(String purpose) {
+    public void setPurpose(final String purpose) {
         this.purpose = purpose;
     }
 
-    public void setVpcId(String vpcId) {
+    public void setVpcId(final String vpcId) {
         this.vpcId = vpcId;
     }
 
-    public void setTags(List<ResourceTagResponse> tags) {
+    public void setTags(final List<ResourceTagResponse> tags) {
         this.tags = tags;
     }
 
-    public void setAssociatedNetworkName(String associatedNetworkName) {
+    public void setAssociatedNetworkName(final String associatedNetworkName) {
         this.associatedNetworkName = associatedNetworkName;
     }
 
-    public void setPortable(Boolean portable) {
+    public void setPortable(final Boolean portable) {
         this.isPortable = portable;
     }
 
-    public void setForDisplay(Boolean forDisplay) {
+    public void setForDisplay(final Boolean forDisplay) {
         this.forDisplay = forDisplay;
     }
 }

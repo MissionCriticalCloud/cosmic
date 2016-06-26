@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.network.nicira;
@@ -102,10 +87,11 @@ public class Match {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        Match other = (Match)obj;
+        final Match other = (Match) obj;
         if (destinationIpAddresses == null) {
-            if (other.destinationIpAddresses != null)
+            if (other.destinationIpAddresses != null) {
                 return false;
+            }
         } else if (!destinationIpAddresses.equals(other.destinationIpAddresses)) {
             return false;
         }
@@ -117,30 +103,33 @@ public class Match {
             return false;
         }
         if (ethertype == null) {
-            if (other.ethertype != null)
+            if (other.ethertype != null) {
                 return false;
+            }
         } else if (!ethertype.equals(other.ethertype)) {
             return false;
         }
         if (protocol == null) {
-            if (other.protocol != null)
+            if (other.protocol != null) {
                 return false;
+            }
         } else if (!protocol.equals(other.protocol)) {
             return false;
         }
         if (sourceIpAddresses == null) {
-            if (other.sourceIpAddresses != null)
+            if (other.sourceIpAddresses != null) {
                 return false;
+            }
         } else if (!sourceIpAddresses.equals(other.sourceIpAddresses)) {
             return false;
         }
         if (sourcePort == null) {
-            if (other.sourcePort != null)
+            if (other.sourcePort != null) {
                 return false;
+            }
         } else if (!sourcePort.equals(other.sourcePort)) {
             return false;
         }
         return true;
     }
-
 }

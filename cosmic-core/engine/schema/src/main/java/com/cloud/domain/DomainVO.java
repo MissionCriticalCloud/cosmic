@@ -1,23 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.domain;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,8 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +60,7 @@ public class DomainVO implements Domain {
     public DomainVO() {
     }
 
-    public DomainVO(String name, long owner, Long parentId, String networkDomain) {
+    public DomainVO(final String name, final long owner, final Long parentId, final String networkDomain) {
         this.parent = parentId;
         this.name = name;
         this.accountId = owner;
@@ -88,7 +71,7 @@ public class DomainVO implements Domain {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public DomainVO(String name, long owner, Long parentId, String networkDomain, String uuid) {
+    public DomainVO(final String name, final long owner, final Long parentId, final String networkDomain, final String uuid) {
         this.parent = parentId;
         this.name = name;
         this.accountId = owner;
@@ -110,14 +93,15 @@ public class DomainVO implements Domain {
     }
 
     @Override
-    public void setParent(Long parent) {
+    public void setParent(final Long parent) {
         if (parent == null) {
             this.parent = Domain.ROOT_DOMAIN;
         } else {
-            if (parent.longValue() <= Domain.ROOT_DOMAIN)
+            if (parent.longValue() <= Domain.ROOT_DOMAIN) {
                 this.parent = Domain.ROOT_DOMAIN;
-            else
+            } else {
                 this.parent = parent;
+            }
         }
     }
 
@@ -127,13 +111,8 @@ public class DomainVO implements Domain {
     }
 
     @Override
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
-    }
-
-    @Override
-    public long getAccountId() {
-        return accountId;
     }
 
     @Override
@@ -147,7 +126,7 @@ public class DomainVO implements Domain {
     }
 
     @Override
-    public void setPath(String path) {
+    public void setPath(final String path) {
         this.path = path;
     }
 
@@ -156,7 +135,7 @@ public class DomainVO implements Domain {
         return level;
     }
 
-    public void setLevel(int level) {
+    public void setLevel(final int level) {
         this.level = level;
     }
 
@@ -165,7 +144,7 @@ public class DomainVO implements Domain {
         return childCount;
     }
 
-    public void setChildCount(int count) {
+    public void setChildCount(final int count) {
         childCount = count;
     }
 
@@ -174,7 +153,7 @@ public class DomainVO implements Domain {
         return nextChildSeq;
     }
 
-    public void setNextChildSeq(long seq) {
+    public void setNextChildSeq(final long seq) {
         nextChildSeq = seq;
     }
 
@@ -184,8 +163,22 @@ public class DomainVO implements Domain {
     }
 
     @Override
-    public void setState(Domain.State state) {
+    public void setState(final Domain.State state) {
         this.state = state;
+    }
+
+    @Override
+    public String getNetworkDomain() {
+        return networkDomain;
+    }
+
+    public void setNetworkDomain(final String domainSuffix) {
+        this.networkDomain = domainSuffix;
+    }
+
+    @Override
+    public long getAccountId() {
+        return accountId;
     }
 
     @Override
@@ -194,21 +187,11 @@ public class DomainVO implements Domain {
     }
 
     @Override
-    public String getNetworkDomain() {
-        return networkDomain;
-    }
-
-    public void setNetworkDomain(String domainSuffix) {
-        this.networkDomain = domainSuffix;
-    }
-
-    @Override
     public String getUuid() {
         return this.uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(final String uuid) {
         this.uuid = uuid;
     }
-
 }

@@ -1,22 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.event;
 
-import java.util.Date;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,15 +8,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
 
 @Entity
 @Table(name = "usage_event")
 public class UsageEventVO implements UsageEvent {
-    public enum DynamicParameters {
-        cpuSpeed, cpuNumber, memory
-    };
+    @Column(name = "processed")
+    boolean processed;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,17 +50,14 @@ public class UsageEventVO implements UsageEvent {
 
     @Column(name = "resource_type")
     private String resourceType;
-
-    @Column(name = "processed")
-    boolean processed;
-
     @Column(name = "virtual_size")
     private Long virtualSize;
 
     public UsageEventVO() {
     }
 
-    public UsageEventVO(String usageType, long accountId, long zoneId, long resourceId, String resourceName, Long offeringId, Long templateId, Long size) {
+    public UsageEventVO(final String usageType, final long accountId, final long zoneId, final long resourceId, final String resourceName, final Long offeringId, final Long
+            templateId, final Long size) {
         this.type = usageType;
         this.accountId = accountId;
         this.zoneId = zoneId;
@@ -89,7 +68,7 @@ public class UsageEventVO implements UsageEvent {
         this.size = size;
     }
 
-    public UsageEventVO(String usageType, long accountId, long zoneId, long resourceId, String resourceName) {
+    public UsageEventVO(final String usageType, final long accountId, final long zoneId, final long resourceId, final String resourceName) {
         this.type = usageType;
         this.accountId = accountId;
         this.zoneId = zoneId;
@@ -98,7 +77,8 @@ public class UsageEventVO implements UsageEvent {
     }
 
     //IPAddress usage event
-    public UsageEventVO(String usageType, long accountId, long zoneId, long ipAddressId, String ipAddress, boolean isSourceNat, String guestType, boolean isSystem) {
+    public UsageEventVO(final String usageType, final long accountId, final long zoneId, final long ipAddressId, final String ipAddress, final boolean isSourceNat, final String
+            guestType, final boolean isSystem) {
         this.type = usageType;
         this.accountId = accountId;
         this.zoneId = zoneId;
@@ -111,7 +91,8 @@ public class UsageEventVO implements UsageEvent {
 
     //Snapshot usage event
     //Snapshots have size as the actual (physical) size and virtual_size as the allocated size
-    public UsageEventVO(String usageType, long accountId, long zoneId, long resourceId, String resourceName, Long offeringId, Long templateId, Long size, Long virtualSize) {
+    public UsageEventVO(final String usageType, final long accountId, final long zoneId, final long resourceId, final String resourceName, final Long offeringId, final Long
+            templateId, final Long size, final Long virtualSize) {
         this.type = usageType;
         this.accountId = accountId;
         this.zoneId = zoneId;
@@ -123,7 +104,8 @@ public class UsageEventVO implements UsageEvent {
         this.virtualSize = virtualSize;
     }
 
-    public UsageEventVO(String usageType, long accountId, long zoneId, long resourceId, String resourceName, Long offeringId, Long templateId, String resourceType) {
+    public UsageEventVO(final String usageType, final long accountId, final long zoneId, final long resourceId, final String resourceName, final Long offeringId, final Long
+            templateId, final String resourceType) {
         this.type = usageType;
         this.accountId = accountId;
         this.zoneId = zoneId;
@@ -135,12 +117,36 @@ public class UsageEventVO implements UsageEvent {
     }
 
     //Security Group usage event
-    public UsageEventVO(String usageType, long accountId, long zoneId, long vmId, long securityGroupId) {
+    public UsageEventVO(final String usageType, final long accountId, final long zoneId, final long vmId, final long securityGroupId) {
         this.type = usageType;
         this.accountId = accountId;
         this.zoneId = zoneId;
         this.resourceId = vmId;
         this.offeringId = securityGroupId;
+    }
+
+    public void setId(final long id) {
+        this.id = id;
+    }
+
+    public void setCreateDate(final Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public void setOfferingId(final Long offeringId) {
+        this.offeringId = offeringId;
+    }
+
+    public void setTemplateId(final Long templateId) {
+        this.templateId = templateId;
+    }
+
+    public void setSize(final Long size) {
+        this.size = size;
+    }
+
+    public void setResourceType(final String resourceType) {
+        this.resourceType = resourceType;
     }
 
     @Override
@@ -153,7 +159,7 @@ public class UsageEventVO implements UsageEvent {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -162,65 +168,13 @@ public class UsageEventVO implements UsageEvent {
         return createDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
-        createDate = createdDate;
-    }
-
     @Override
     public long getAccountId() {
         return accountId;
     }
 
-    public void setAccountId(long accountId) {
+    public void setAccountId(final long accountId) {
         this.accountId = accountId;
-    }
-
-    public void setZoneId(long zoneId) {
-        this.zoneId = zoneId;
-    }
-
-    @Override
-    public long getZoneId() {
-        return zoneId;
-    }
-
-    public void setResourceId(long resourceId) {
-        this.resourceId = resourceId;
-    }
-
-    @Override
-    public long getResourceId() {
-        return resourceId;
-    }
-
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
-    }
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public void setOfferingId(long offeringId) {
-        this.offeringId = offeringId;
-    }
-
-    @Override
-    public Long getOfferingId() {
-        return offeringId;
-    }
-
-    public void setTemplateId(long templateId) {
-        this.templateId = templateId;
-    }
-
-    @Override
-    public Long getTemplateId() {
-        return templateId;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
     }
 
     @Override
@@ -228,11 +182,63 @@ public class UsageEventVO implements UsageEvent {
         return size;
     }
 
+    @Override
+    public Long getTemplateId() {
+        return templateId;
+    }
+
+    @Override
+    public Long getOfferingId() {
+        return offeringId;
+    }
+
+    @Override
+    public long getResourceId() {
+        return resourceId;
+    }
+
+    @Override
+    public long getZoneId() {
+        return zoneId;
+    }
+
+    public void setZoneId(final long zoneId) {
+        this.zoneId = zoneId;
+    }
+
+    public void setResourceId(final long resourceId) {
+        this.resourceId = resourceId;
+    }
+
+    public void setOfferingId(final long offeringId) {
+        this.offeringId = offeringId;
+    }
+
+    public void setTemplateId(final long templateId) {
+        this.templateId = templateId;
+    }
+
+    public void setSize(final long size) {
+        this.size = size;
+    }
+
+    public void setCreatedDate(final Date createdDate) {
+        createDate = createdDate;
+    }
+
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public void setResourceName(final String resourceName) {
+        this.resourceName = resourceName;
+    }
+
     public boolean isProcessed() {
         return processed;
     }
 
-    public void setProcessed(boolean processed) {
+    public void setProcessed(final boolean processed) {
         this.processed = processed;
     }
 
@@ -244,8 +250,11 @@ public class UsageEventVO implements UsageEvent {
         return virtualSize;
     }
 
-    public void setVirtualSize(Long virtualSize) {
+    public void setVirtualSize(final Long virtualSize) {
         this.virtualSize = virtualSize;
     }
 
+    public enum DynamicParameters {
+        cpuSpeed, cpuNumber, memory
+    }
 }

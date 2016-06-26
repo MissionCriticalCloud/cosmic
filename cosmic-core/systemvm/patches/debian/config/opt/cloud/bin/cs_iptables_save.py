@@ -35,7 +35,7 @@ class ConverterError():
 
     def __init__(self, message):
         """message to stdout to compatible testings 2.7 and 3.4"""
-        print (message)
+        print(message)
         sys.exit(1)
 
 
@@ -65,7 +65,7 @@ class Chains(UserDict):
                 msg = "Valid is one of %s, got: %s" % (legals, fname)
                 raise ValueError(msg)
             action = liste[0]
-            content = ""                       # rebuild content from here
+            content = ""  # rebuild content from here
             for elem in liste:
                 content = content + elem + " "
             if len(liste) > 1:
@@ -90,8 +90,8 @@ class Chains(UserDict):
                 msg = "Cannot remove predefined chain"
                 raise ValueError(msg)
             if rem_chain_name in self.data:
-                self.data[rem_chain_name] = []        # empty list
-                self.poli[rem_chain_name] = "-"       # empty policy, no need
+                self.data[rem_chain_name] = []  # empty list
+                self.poli[rem_chain_name] = "-"  # empty policy, no need
                 self.data.pop(rem_chain_name)
             return
         if "-N" in action:
@@ -100,8 +100,8 @@ class Chains(UserDict):
             if new_chain_name in existing:
                 logging.debug("Chain %s already exists" % new_chain_name)
                 return
-            self.data[new_chain_name] = []        # empty list
-            self.poli[new_chain_name] = "-"       # empty policy, no need
+            self.data[new_chain_name] = []  # empty list
+            self.poli[new_chain_name] = "-"  # empty policy, no need
             return
         if "-I" in action:  # or "-A" in action:
             chain_name = liste[1]
@@ -131,7 +131,7 @@ class Chains(UserDict):
         name is one of filter, nat, raw, mangle,
         tables is a list of tables in that table-class
         """
-        self.poli = {}               # empty dict
+        self.poli = { }  # empty dict
         self.length = 0
         self.policy = "-"
         for tabular in self.tables:
@@ -186,21 +186,21 @@ class Tables(UserDict):
     def put_into_tables(self, line):
         """put line into matching Chains-object"""
         liste = line.split()
-        liste.pop(0)                        # we always know, it's iptables
+        liste.pop(0)  # we always know, it's iptables
         rest = ""
-        for elem in liste:                  # remove redirects and the like
+        for elem in liste:  # remove redirects and the like
             if ">" not in elem:
-                rest = rest + elem + " "    # string again with single blanks
-        action = liste.pop(0)               # action is one of {N,F,A,I, etc.}
+                rest = rest + elem + " "  # string again with single blanks
+        action = liste.pop(0)  # action is one of {N,F,A,I, etc.}
         fam = "filter"
-        if "-t nat" in line:                # nat filter group
+        if "-t nat" in line:  # nat filter group
             fam = "nat"
-        elif "-t mangle" in line:           # mangle filter group
+        elif "-t mangle" in line:  # mangle filter group
             fam = "mangle"
-        elif "-t raw" in line:              # raw filter group
+        elif "-t raw" in line:  # raw filter group
             fam = "raw"
-        fam_dict = self.data[fam]           # select the group dictionary
-        fam_dict.put_into_fgr(rest)         # do action thers
+        fam_dict = self.data[fam]  # select the group dictionary
+        fam_dict.put_into_fgr(rest)  # do action thers
 
     def read_file(self, rules):
         """read file into Tables-object"""

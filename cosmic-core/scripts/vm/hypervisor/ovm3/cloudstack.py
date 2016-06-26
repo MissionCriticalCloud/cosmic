@@ -1,41 +1,24 @@
 #!/usr/bin/python
 #
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+
 #
 # TODO: Needs cleaning and sanitazation.
 #
 import logging
-import time
-import re
+import logging.handlers
 import os.path
 import paramiko
-import subprocess
+import re
 import socket
+import subprocess
 import tempfile
-import logging
-import logging.handlers
-
-from xen.util.xmlrpcclient import ServerProxy
-from xmlrpclib import Error
-from xen.xend import XendClient
+import time
 from agent.api.base import Agent
-from agent.lib.settings import get_api_version
+from xen.util.xmlrpcclient import ServerProxy
+from xen.xend import XendClient
 from xen.xend import sxp
+from xmlrpclib import Error
+
 
 class CloudStack(Agent):
     """
@@ -67,14 +50,15 @@ class CloudStack(Agent):
             'get_module_version': getModuleVersion,
             'get_ovs_version': ovmVersion,
             'ping': ping,
-#            'patch': ovmCsPatch,
-#            'ovs_agent_set_ssl': ovsAgentSetSsl,
-#            'ovs_agent_set_port': ovsAgentSetPort,
-#            'ovs_restart_agent': ovsRestartAgent,
+            #            'patch': ovmCsPatch,
+            #            'ovs_agent_set_ssl': ovsAgentSetSsl,
+            #            'ovs_agent_set_port': ovsAgentSetPort,
+            #            'ovs_restart_agent': ovsRestartAgent,
         }
 
     def getName(self):
         return self.__class__.__name__
+
 
 domrPort = 3922
 domrKeyFile = os.path.expanduser("~/.ssh/id_rsa.cloud")
@@ -82,20 +66,25 @@ domrRoot = "root"
 domrTimeout = 10
 
 """ The logger is here """
+
+
 def Logger(level=logging.DEBUG):
     logger = logging.getLogger('cloudstack-agent')
     logger.setLevel(level)
-    handler = logging.handlers.SysLogHandler(address = '/dev/log')
+    handler = logging.handlers.SysLogHandler(address='/dev/log')
     logger.addHandler(handler)
     return logger
+
 
 # which version are we intended for?
 def getModuleVersion():
     return "0.1"
 
+
 # call test
 def call(msg):
     return msg
+
 
 def paramikoOpts(con, keyfile=domrKeyFile):
     con.load_system_host_keys()
@@ -103,6 +92,7 @@ def paramikoOpts(con, keyfile=domrKeyFile):
     privatekeyfile = os.path.expanduser(keyfile)
     key = paramiko.RSAKey.from_private_key_file(privatekeyfile)
     return key
+
 
 # execute something on domr
 def domrExec(host, cmd, timeout=10, username=domrRoot, port=domrPort, keyfile=domrKeyFile):
@@ -113,8 +103,9 @@ def domrExec(host, cmd, timeout=10, username=domrRoot, port=domrPort, keyfile=do
     exit_status = ssh_stdout.channel.recv_exit_status()
     ssh.close()
     return { "rc": exit_status,
-        "out": ''.join(ssh_stdout.readlines()),
-        "err": ''.join(ssh_stderr.readlines()) };
+             "out": ''.join(ssh_stdout.readlines()),
+             "err": ''.join(ssh_stderr.readlines()) };
+
 
 # too bad sftp is missing.... Oh no it isn't it's just wrong in the svm config...
 # root@s-1-VM:/var/cache/cloud# grep sftp /etc/ssh/sshd_config
@@ -142,6 +133,7 @@ def domrSftp(host, localfile, remotefile, timeout=10, username=domrRoot, port=do
         raise e
     return True
 
+
 def domrScp(host, localfile, remotefile, timeout=10, username=domrRoot, port=domrPort, keyfile=domrKeyFile):
     try:
         target = "%s@%s:%s" % (username, host, remotefile)
@@ -153,9 +145,11 @@ def domrScp(host, localfile, remotefile, timeout=10, username=domrRoot, port=dom
         raise e
     return False
 
+
 # check a port on dom0
 def dom0CheckPort(ip, port=domrPort, timeout=3):
     return domrCheckPort(ip, port, timeout=timeout)
+
 
 # check a port on domr
 def domrCheckPort(ip, port=domrPort, timeout=3):
@@ -168,6 +162,7 @@ def domrCheckPort(ip, port=domrPort, timeout=3):
         return False
     return True
 
+
 # check ssh
 def domrCheckSsh(ip, port=domrPort, timeout=10):
     x = domrExec(ip, "", port=port, timeout=timeout)
@@ -175,16 +170,19 @@ def domrCheckSsh(ip, port=domrPort, timeout=10):
         return True
     return False
 
+
 def grep(file, string):
     c = 0
     for line in open(file):
         if string in line:
-           c = c + 1
+            c = c + 1
     return c
+
 
 def ovmVersion():
     path = "/etc/ovs-release"
     return re.findall("[\d\.]+$", open(path).readline())[0]
+
 
 # fix known bugs....
 def ovmCsPatch(version="3.2.1"):
@@ -211,20 +209,21 @@ def ovmCsPatch(version="3.2.1"):
         text_file.close()
     else:
         _replaceInFile(netconf,
-            netzero,
-            "no",
-            False)
+                       netzero,
+                       "no",
+                       False)
 
     # this is fixed in 3.3.1 and onwards
     if version == "3.2.1":
         if grep(xendConst, "%s = %s" % (xendRtime, 60)) == 1:
             _replaceInFile(xendConst,
-                "%s = %s" % (xendRtime, 60),
-                "%s = %s" % (xendRtime, 10),
-                True)
+                           "%s = %s" % (xendRtime, 60),
+                           "%s = %s" % (xendRtime, 10),
+                           True)
             ovsRestartXend()
 
     return True
+
 
 def _replaceInFile(file, orig, set, full=False):
     replaced = False
@@ -243,9 +242,11 @@ def _replaceInFile(file, orig, set, full=False):
             print line
     return replaced
 
+
 def _ovsIni(setting, change):
     ini = "/etc/ovs-agent/agent.ini"
     return _replaceInFile(ini, setting, change)
+
 
 # enable/disable ssl for the agent
 def ovsAgentSetSsl(state):
@@ -254,20 +255,25 @@ def ovsAgentSetSsl(state):
         ena = "enable"
     return _ovsIni("ssl", ena)
 
+
 def ovsAgentSetPort(port):
     return _ovsIni("port", port)
+
 
 def ovsRestartAgent():
     return restartService("ovs-agent")
 
+
 def ovsRestartXend():
     return restartService("xend")
+
 
 # replace with popen
 def restartService(service):
     command = ['service', service, 'restart']
     subprocess.call(command, shell=False)
     return True
+
 
 # sets the control interface and removes the route net entry
 def ovsControlInterface(dev, cidr):
@@ -298,6 +304,7 @@ def ovsControlInterface(dev, cidr):
     subprocess.call(command, shell=False)
     return True
 
+
 def dom0CheckIp(ip):
     command = ['ip addr show']
     p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
@@ -310,9 +317,10 @@ def dom0CheckIp(ip):
             break
     return False
 
+
 def dom0CheckStorageHealthCheck(path, script, guid, timeout, interval):
-    storagehealth="storagehealth.py"
-    path="/opt/cloudstack/bin"
+    storagehealth = "storagehealth.py"
+    path = "/opt/cloudstack/bin"
     running = False
     started = False
     c = 0
@@ -334,6 +342,7 @@ def dom0CheckStorageHealthCheck(path, script, guid, timeout, interval):
 
     return [running, started]
 
+
 def dom0CheckStorageHealth(path, script, guid, timeout):
     response = None
     delay = timeout
@@ -347,15 +356,16 @@ def dom0CheckStorageHealth(path, script, guid, timeout):
     else:
         log.warning("primary storage NOT is accessible for %s" % (guid))
         return False
-    # while True:
-    #    line = p.stdout.readline()
-    #   if line != '':
-    #        if re.search("False", line):
-    #            log.debug("primary storage NOT is accessible for %s, %s" % (guid, line))
-    #            return False
-    #    else:
-    #        break
-    # return True
+        # while True:
+        #    line = p.stdout.readline()
+        #   if line != '':
+        #        if re.search("False", line):
+        #            log.debug("primary storage NOT is accessible for %s, %s" % (guid, line))
+        #            return False
+        #    else:
+        #        break
+        # return True
+
 
 # create a dir if we need it
 def ovsMkdirs(dir, mode=0700):
@@ -363,11 +373,13 @@ def ovsMkdirs(dir, mode=0700):
         return os.makedirs(dir, mode)
     return True
 
+
 # if a file exists, easy
 def ovsCheckFile(file):
     if os.path.isfile(file):
         return True
     return False
+
 
 def ovsUploadFile(path, filename, content):
     file = "%s/%s" % (path, filename)
@@ -385,6 +397,7 @@ def ovsUploadFile(path, filename, content):
         return False
     return True
 
+
 def ovsDomrUploadFile(domr, path, file, content):
     remotefile = "%s/%s" % (path, file)
     try:
@@ -399,14 +412,16 @@ def ovsDomrUploadFile(domr, path, file, content):
         raise e
     return True
 
+
 # upload keys
 def ovsUploadSshKey(keyfile, content):
     keydir = os.path.expanduser("~/.ssh")
     return ovsUploadFile(keydir, keyfile, content)
 
+
 # older python,
 def ovsDom0Stats(bridge):
-    stats = {}
+    stats = { }
     stats['cpu'] = "%s" % (100 - float(os.popen("top -b -n 1 | grep Cpu\(s\): | cut -d% -f4|cut -d, -f2").read()))
     stats['free'] = "%s" % (1048576 * int(os.popen("xm info | grep free_memory | awk '{ print $3 }'").read()))
     stats['total'] = "%s" % (1048576 * int(os.popen("xm info | grep total_memory | awk '{ print $3 }'").read()))
@@ -414,21 +429,23 @@ def ovsDom0Stats(bridge):
     stats['rx'] = os.popen("netstat -in | grep %s | head -1 | awk '{print $8 }'" % bridge).read()
     return stats
 
+
 def getVncPort(domain):
     port = "0"
     if re.search("\w-(\d+-)?\d+-VM", domain):
         server = ServerProxy(XendClient.uri)
         dom = server.xend.domain(domain, 1)
         devices = [child for child in sxp.children(dom)
-            if len(child) > 0 and child[0] == "device"]
+                   if len(child) > 0 and child[0] == "device"]
         vfbs_sxp = map(lambda x: x[1], [device for device in devices
-            if device[1][0] == "vfb"])[0]
+                                        if device[1][0] == "vfb"])[0]
         loc = [child for child in vfbs_sxp
-            if child[0] == "location"][0][1]
+               if child[0] == "location"][0][1]
         listner, port = loc.split(":")
     else:
         print "no valid domain: %s" % domain
     return port
+
 
 def get_child_by_name(exp, childname, default=None):
     try:
@@ -437,6 +454,7 @@ def get_child_by_name(exp, childname, default=None):
     except:
         return default
 
+
 def ovsDomUStats(domain):
     _rd_bytes = 0
     _wr_bytes = 0
@@ -444,7 +462,7 @@ def ovsDomUStats(domain):
     _wr_ops = 0
     _tx_bytes = 0
     _rx_bytes = 0
-    stats = {}
+    stats = { }
     server = ServerProxy(XendClient.uri)
     dominfo = server.xend.domain(domain, 1)
     domid = get_child_by_name(dominfo, "domid")
@@ -480,10 +498,12 @@ def ovsDomUStats(domain):
     stats['vcpus'] = "%s" % get_child_by_name(dominfo, "online_vcpus")
     return stats
 
+
 def ping(host, count=3):
     if os.system("ping -c %s %s " % (count, host)) == 0:
         return True
     return False
+
 
 # add SystemVM stuff here....
 #
@@ -500,7 +520,7 @@ if __name__ == '__main__':
     from distutils.sysconfig import get_python_lib
     from agent.target.api import MODULES
     from shutil import copyfile
-    import inspect, os, hashlib, getopt, sys
+    import os, hashlib, getopt, sys
 
     # default vars
     exist = False
@@ -515,7 +535,7 @@ if __name__ == '__main__':
     # get options
     try:
         opts, args = getopt.getopt(sys.argv[1:], "eosp::",
-            [ 'port=', 'ssl=', 'exec=', 'opts='])
+                                   ['port=', 'ssl=', 'exec=', 'opts='])
     except getopt.GetoptError:
         print "Available Options: --port=<number>, --ssl=<true|false>, --exec=<method>, --opts=<arg1,arg2..>"
         sys.exit()
@@ -550,6 +570,7 @@ if __name__ == '__main__':
     if not exist:
         if os.path.isfile(api):
             import fileinput
+
             for line in fileinput.FileInput(api, inplace=1):
                 line = line.rstrip('\n')
                 if re.search("import common", line):

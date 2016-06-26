@@ -1,22 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.query.vo;
 
-import java.util.Date;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.ApiCommandJobType;
+import org.apache.cloudstack.framework.jobs.AsyncJob;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,14 +10,10 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.ApiCommandJobType;
-import org.apache.cloudstack.framework.jobs.AsyncJob;
+import java.util.Date;
 
 @Entity
-@Table(name="async_job_view")
+@Table(name = "async_job_view")
 public class AsyncJobJoinVO extends BaseViewVO implements ControlledViewEntity { //InternalIdentity, Identity {
     @Id
     @Column(name = "id")
@@ -104,6 +86,94 @@ public class AsyncJobJoinVO extends BaseViewVO implements ControlledViewEntity {
     public AsyncJobJoinVO() {
     }
 
+    public void setId(final long id) {
+        this.id = id;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
+    }
+
+    public void setAccountId(final long accountId) {
+        this.accountId = accountId;
+    }
+
+    public void setAccountUuid(final String accountUuid) {
+        this.accountUuid = accountUuid;
+    }
+
+    public void setAccountName(final String accountName) {
+        this.accountName = accountName;
+    }
+
+    public void setAccountType(final short accountType) {
+        this.accountType = accountType;
+    }
+
+    public void setDomainId(final long domainId) {
+        this.domainId = domainId;
+    }
+
+    public void setDomainUuid(final String domainUuid) {
+        this.domainUuid = domainUuid;
+    }
+
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setDomainPath(final String domainPath) {
+        this.domainPath = domainPath;
+    }
+
+    public void setUserId(final long userId) {
+        this.userId = userId;
+    }
+
+    public void setUserUuid(final String userUuid) {
+        this.userUuid = userUuid;
+    }
+
+    public void setCmd(final String cmd) {
+        this.cmd = cmd;
+    }
+
+    public void setStatus(final int status) {
+        this.status = status;
+    }
+
+    public void setProcessStatus(final int processStatus) {
+        this.processStatus = processStatus;
+    }
+
+    public void setResultCode(final int resultCode) {
+        this.resultCode = resultCode;
+    }
+
+    public void setResult(final String result) {
+        this.result = result;
+    }
+
+    public void setCreated(final Date created) {
+        this.created = created;
+    }
+
+    public void setRemoved(final Date removed) {
+        this.removed = removed;
+    }
+
+    public void setInstanceType(final ApiCommandJobType instanceType) {
+        this.instanceType = instanceType;
+    }
+
+    public void setInstanceId(final Long instanceId) {
+        this.instanceId = instanceId;
+    }
+
+    public void setInstanceUuid(final String instanceUuid) {
+        this.instanceUuid = instanceUuid;
+    }
+
     @Override
     public long getId() {
         return id;
@@ -120,13 +190,13 @@ public class AsyncJobJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     @Override
-    public String getAccountUuid() {
-        return accountUuid;
+    public long getDomainId() {
+        return domainId;
     }
 
     @Override
-    public String getAccountName() {
-        return accountName;
+    public String getDomainPath() {
+        return domainPath;
     }
 
     @Override
@@ -135,8 +205,13 @@ public class AsyncJobJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     @Override
-    public long getDomainId() {
-        return domainId;
+    public String getAccountUuid() {
+        return accountUuid;
+    }
+
+    @Override
+    public String getAccountName() {
+        return accountName;
     }
 
     @Override
@@ -150,8 +225,15 @@ public class AsyncJobJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     @Override
-    public String getDomainPath() {
-        return domainPath;
+    public String getProjectUuid() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getProjectName() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     public long getUserId() {
@@ -206,17 +288,4 @@ public class AsyncJobJoinVO extends BaseViewVO implements ControlledViewEntity {
     public Class<?> getEntityType() {
         return AsyncJob.class;
     }
-
-    @Override
-    public String getProjectUuid() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getProjectName() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

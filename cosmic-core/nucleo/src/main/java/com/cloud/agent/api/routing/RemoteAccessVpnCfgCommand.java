@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.api.routing;
@@ -22,11 +7,11 @@ package com.cloud.agent.api.routing;
 public class RemoteAccessVpnCfgCommand extends NetworkElementCommand {
 
     boolean create;
-    private boolean vpcEnabled;
     String vpnServerIp;
     String ipRange;
     String presharedKey;
     String localIp;
+    private boolean vpcEnabled;
     private String localCidr;
     private String publicInterface;
 
@@ -34,16 +19,8 @@ public class RemoteAccessVpnCfgCommand extends NetworkElementCommand {
         this.create = false;
     }
 
-    public boolean isCreate() {
-        return create;
-    }
-
-    @Override
-    public boolean executeInSequence() {
-        return true;
-    }
-
-    public RemoteAccessVpnCfgCommand(boolean create, String vpnServerAddress, String localIp, String ipRange, String ipsecPresharedKey, boolean vpcEnabled) {
+    public RemoteAccessVpnCfgCommand(final boolean create, final String vpnServerAddress, final String localIp, final String ipRange, final String ipsecPresharedKey, final
+    boolean vpcEnabled) {
         this.vpnServerIp = vpnServerAddress;
         this.ipRange = ipRange;
         this.presharedKey = ipsecPresharedKey;
@@ -57,11 +34,20 @@ public class RemoteAccessVpnCfgCommand extends NetworkElementCommand {
         }
     }
 
+    public boolean isCreate() {
+        return create;
+    }
+
+    @Override
+    public boolean executeInSequence() {
+        return true;
+    }
+
     public String getVpnServerIp() {
         return vpnServerIp;
     }
 
-    public void setVpnServerIp(String vpnServerIp) {
+    public void setVpnServerIp(final String vpnServerIp) {
         this.vpnServerIp = vpnServerIp;
     }
 
@@ -69,7 +55,7 @@ public class RemoteAccessVpnCfgCommand extends NetworkElementCommand {
         return ipRange;
     }
 
-    public void setIpRange(String ipRange) {
+    public void setIpRange(final String ipRange) {
         this.ipRange = ipRange;
     }
 
@@ -77,7 +63,7 @@ public class RemoteAccessVpnCfgCommand extends NetworkElementCommand {
         return presharedKey;
     }
 
-    public void setPresharedKey(String presharedKey) {
+    public void setPresharedKey(final String presharedKey) {
         this.presharedKey = presharedKey;
     }
 
@@ -89,7 +75,7 @@ public class RemoteAccessVpnCfgCommand extends NetworkElementCommand {
         return vpcEnabled;
     }
 
-    public void setVpcEnabled(boolean vpcEnabled) {
+    public void setVpcEnabled(final boolean vpcEnabled) {
         this.vpcEnabled = vpcEnabled;
     }
 
@@ -97,7 +83,7 @@ public class RemoteAccessVpnCfgCommand extends NetworkElementCommand {
         return localCidr;
     }
 
-    public void setLocalCidr(String localCidr) {
+    public void setLocalCidr(final String localCidr) {
         this.localCidr = localCidr;
     }
 
@@ -105,8 +91,7 @@ public class RemoteAccessVpnCfgCommand extends NetworkElementCommand {
         return publicInterface;
     }
 
-    public void setPublicInterface(String publicInterface) {
+    public void setPublicInterface(final String publicInterface) {
         this.publicInterface = publicInterface;
     }
-
 }

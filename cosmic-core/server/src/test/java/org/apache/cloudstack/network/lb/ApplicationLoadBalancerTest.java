@@ -1,27 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.network.lb;
-
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.InsufficientAddressCapacityException;
@@ -50,12 +27,19 @@ import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
-
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.lb.ApplicationLoadBalancerRuleVO;
 import org.apache.cloudstack.lb.dao.ApplicationLoadBalancerRuleDao;
 import org.apache.cloudstack.test.utils.SpringUtils;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+
+import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,20 +58,24 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-import junit.framework.TestCase;
-
 /**
  * This class is responsible for unittesting the methods defined in ApplicationLoadBalancerService
- *
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
 public class ApplicationLoadBalancerTest extends TestCase {
+    public static long existingLbId = 1L;
+    public static long nonExistingLbId = 2L;
+    public static long validGuestNetworkId = 1L;
+    public static long invalidGuestNetworkId = 2L;
+    public static long validPublicNetworkId = 3L;
+    public static long validAccountId = 1L;
+    public static long invalidAccountId = 2L;
+    public String validRequestedIp = "10.1.1.1";
     //The interface to test
     @Inject
     ApplicationLoadBalancerManagerImpl _appLbSvc;
-
     //The interfaces below are mocked
     @Inject
     ApplicationLoadBalancerRuleDao _lbDao;
@@ -104,18 +92,6 @@ public class ApplicationLoadBalancerTest extends TestCase {
     @Inject
     LoadBalancingRulesService _lbService;
 
-    public static long existingLbId = 1L;
-    public static long nonExistingLbId = 2L;
-
-    public static long validGuestNetworkId = 1L;
-    public static long invalidGuestNetworkId = 2L;
-    public static long validPublicNetworkId = 3L;
-
-    public static long validAccountId = 1L;
-    public static long invalidAccountId = 2L;
-
-    public String validRequestedIp = "10.1.1.1";
-
     @Override
     @Before
     public void setUp() {
@@ -129,11 +105,11 @@ public class ApplicationLoadBalancerTest extends TestCase {
         Mockito.when(_lbService.deleteLoadBalancerRule(nonExistingLbId, true)).thenReturn(false);
 
         //mockito for .createApplicationLoadBalancer tests
-        NetworkVO guestNetwork = new NetworkVO(TrafficType.Guest, null, null, 1, null, 1, 1L, false);
+        final NetworkVO guestNetwork = new NetworkVO(TrafficType.Guest, null, null, 1, null, 1, 1L, false);
         setId(guestNetwork, validGuestNetworkId);
         guestNetwork.setCidr("10.1.1.1/24");
 
-        NetworkVO publicNetwork = new NetworkVO(TrafficType.Public, null, null, 1, null, 1, 1L, false);
+        final NetworkVO publicNetwork = new NetworkVO(TrafficType.Public, null, null, 1, null, 1, 1L, false);
 
         Mockito.when(_ntwkModel.getNetwork(validGuestNetworkId)).thenReturn(guestNetwork);
         Mockito.when(_ntwkModel.getNetwork(invalidGuestNetworkId)).thenReturn(null);
@@ -144,9 +120,9 @@ public class ApplicationLoadBalancerTest extends TestCase {
         Mockito.when(_ntwkModel.areServicesSupportedInNetwork(validGuestNetworkId, Service.Lb)).thenReturn(true);
         Mockito.when(_ntwkModel.areServicesSupportedInNetwork(invalidGuestNetworkId, Service.Lb)).thenReturn(false);
 
-        ApplicationLoadBalancerRuleVO lbRule =
-            new ApplicationLoadBalancerRuleVO("new", "new", 22, 22, "roundrobin", validGuestNetworkId, validAccountId, 1L, new Ip(validRequestedIp), validGuestNetworkId,
-                Scheme.Internal);
+        final ApplicationLoadBalancerRuleVO lbRule =
+                new ApplicationLoadBalancerRuleVO("new", "new", 22, 22, "roundrobin", validGuestNetworkId, validAccountId, 1L, new Ip(validRequestedIp), validGuestNetworkId,
+                        Scheme.Internal);
         Mockito.when(_lbDao.persist(Matchers.any(ApplicationLoadBalancerRuleVO.class))).thenReturn(lbRule);
 
         Mockito.when(_lbMgr.validateLbRule(Matchers.any(LoadBalancingRule.class))).thenReturn(true);
@@ -159,12 +135,11 @@ public class ApplicationLoadBalancerTest extends TestCase {
 
         Mockito.when(_ntwkModel.areServicesSupportedInNetwork(Matchers.anyLong(), Matchers.any(Network.Service.class))).thenReturn(true);
 
-        Map<Network.Capability, String> caps = new HashMap<Network.Capability, String>();
+        final Map<Network.Capability, String> caps = new HashMap<>();
         caps.put(Capability.SupportedProtocols, NetUtils.TCP_PROTO);
         Mockito.when(_ntwkModel.getNetworkServiceCapabilities(Matchers.anyLong(), Matchers.any(Network.Service.class))).thenReturn(caps);
 
         Mockito.when(_lbDao.countBySourceIp(new Ip(validRequestedIp), validGuestNetworkId)).thenReturn(1L);
-
     }
 
     @Override
@@ -173,22 +148,36 @@ public class ApplicationLoadBalancerTest extends TestCase {
         CallContext.unregister();
     }
 
+    private static NetworkVO setId(final NetworkVO vo, final long id) {
+        final NetworkVO voToReturn = vo;
+        final Class<?> c = voToReturn.getClass();
+        try {
+            final Field f = c.getDeclaredField("id");
+            f.setAccessible(true);
+            f.setLong(voToReturn, id);
+        } catch (final NoSuchFieldException ex) {
+            return null;
+        } catch (final IllegalAccessException ex) {
+            return null;
+        }
+
+        return voToReturn;
+    }
+
     /**
      * TESTS FOR .getApplicationLoadBalancer
      */
 
     @Test
     //Positive test - retrieve existing lb
-        public
-        void searchForExistingLoadBalancer() {
-        ApplicationLoadBalancerRule rule = _appLbSvc.getApplicationLoadBalancer(existingLbId);
+    public void searchForExistingLoadBalancer() {
+        final ApplicationLoadBalancerRule rule = _appLbSvc.getApplicationLoadBalancer(existingLbId);
         assertNotNull("Couldn't find existing application load balancer", rule);
     }
 
     @Test
     //Negative test - try to retrieve non-existing lb
-        public
-        void searchForNonExistingLoadBalancer() {
+    public void searchForNonExistingLoadBalancer() {
         boolean notFound = false;
         ApplicationLoadBalancerRule rule = null;
         try {
@@ -196,7 +185,7 @@ public class ApplicationLoadBalancerTest extends TestCase {
             if (rule != null) {
                 notFound = false;
             }
-        } catch (InvalidParameterValueException ex) {
+        } catch (final InvalidParameterValueException ex) {
             notFound = true;
         }
 
@@ -209,8 +198,7 @@ public class ApplicationLoadBalancerTest extends TestCase {
 
     @Test
     //Positive test - delete existing lb
-        public
-        void deleteExistingLoadBalancer() {
+    public void deleteExistingLoadBalancer() {
         boolean result = false;
         try {
             result = _appLbSvc.deleteApplicationLoadBalancer(existingLbId);
@@ -221,8 +209,7 @@ public class ApplicationLoadBalancerTest extends TestCase {
 
     @Test
     //Negative test - try to delete non-existing lb
-        public
-        void deleteNonExistingLoadBalancer() {
+    public void deleteNonExistingLoadBalancer() {
         boolean result = true;
         try {
             result = _appLbSvc.deleteApplicationLoadBalancer(nonExistingLbId);
@@ -233,6 +220,7 @@ public class ApplicationLoadBalancerTest extends TestCase {
 
     /**
      * TESTS FOR .createApplicationLoadBalancer
+     *
      * @throws NetworkRuleConflictException
      * @throws InsufficientVirtualNetworkCapacityException
      * @throws InsufficientAddressCapacityException
@@ -240,85 +228,59 @@ public class ApplicationLoadBalancerTest extends TestCase {
 
     @Test(expected = CloudRuntimeException.class)
     //Positive test
-        public
-        void createValidLoadBalancer() throws InsufficientAddressCapacityException, InsufficientVirtualNetworkCapacityException, NetworkRuleConflictException {
+    public void createValidLoadBalancer() throws InsufficientAddressCapacityException, InsufficientVirtualNetworkCapacityException, NetworkRuleConflictException {
         _appLbSvc.createApplicationLoadBalancer("alena", "alena", Scheme.Internal, validGuestNetworkId, validRequestedIp, 22, 22, "roundrobin", validGuestNetworkId,
-            validAccountId, true);
+                validAccountId, true);
     }
 
     @Test(expected = UnsupportedServiceException.class)
     //Negative test - only internal scheme value is supported in the current release
-        public
-        void createPublicLoadBalancer() throws InsufficientAddressCapacityException, InsufficientVirtualNetworkCapacityException, NetworkRuleConflictException {
+    public void createPublicLoadBalancer() throws InsufficientAddressCapacityException, InsufficientVirtualNetworkCapacityException, NetworkRuleConflictException {
         _appLbSvc.createApplicationLoadBalancer("alena", "alena", Scheme.Public, validGuestNetworkId, validRequestedIp, 22, 22, "roundrobin", validGuestNetworkId,
-            validAccountId, true);
+                validAccountId, true);
     }
 
     @Test(expected = InvalidParameterValueException.class)
     //Negative test - invalid SourcePort
-        public
-        void createWithInvalidSourcePort() throws InsufficientAddressCapacityException, InsufficientVirtualNetworkCapacityException, NetworkRuleConflictException {
+    public void createWithInvalidSourcePort() throws InsufficientAddressCapacityException, InsufficientVirtualNetworkCapacityException, NetworkRuleConflictException {
         _appLbSvc.createApplicationLoadBalancer("alena", "alena", Scheme.Internal, validGuestNetworkId, validRequestedIp, 65536, 22, "roundrobin", validGuestNetworkId,
-            validAccountId, true);
+                validAccountId, true);
     }
 
     @Test(expected = InvalidParameterValueException.class)
     //Negative test - invalid instancePort
-        public
-        void createWithInvalidInstandePort() throws InsufficientAddressCapacityException, InsufficientVirtualNetworkCapacityException, NetworkRuleConflictException {
+    public void createWithInvalidInstandePort() throws InsufficientAddressCapacityException, InsufficientVirtualNetworkCapacityException, NetworkRuleConflictException {
         _appLbSvc.createApplicationLoadBalancer("alena", "alena", Scheme.Internal, validGuestNetworkId, validRequestedIp, 22, 65536, "roundrobin", validGuestNetworkId,
-            validAccountId, true);
-
+                validAccountId, true);
     }
 
     @Test(expected = InvalidParameterValueException.class)
     //Negative test - invalid algorithm
-        public
-        void createWithInvalidAlgorithm() throws InsufficientAddressCapacityException, InsufficientVirtualNetworkCapacityException, NetworkRuleConflictException {
-        String expectedExcText = null;
+    public void createWithInvalidAlgorithm() throws InsufficientAddressCapacityException, InsufficientVirtualNetworkCapacityException, NetworkRuleConflictException {
+        final String expectedExcText = null;
         _appLbSvc.createApplicationLoadBalancer("alena", "alena", Scheme.Internal, validGuestNetworkId, validRequestedIp, 22, 22, "invalidalgorithm",
-            validGuestNetworkId, validAccountId, true);
-
+                validGuestNetworkId, validAccountId, true);
     }
 
     @Test(expected = InvalidParameterValueException.class)
     //Negative test - invalid sourceNetworkId (of Public type, which is not supported)
-        public
-        void createWithInvalidSourceIpNtwk() throws InsufficientAddressCapacityException, InsufficientVirtualNetworkCapacityException, NetworkRuleConflictException {
+    public void createWithInvalidSourceIpNtwk() throws InsufficientAddressCapacityException, InsufficientVirtualNetworkCapacityException, NetworkRuleConflictException {
         _appLbSvc.createApplicationLoadBalancer("alena", "alena", Scheme.Internal, validPublicNetworkId, validRequestedIp, 22, 22, "roundrobin", validGuestNetworkId,
-            validAccountId, true);
-
+                validAccountId, true);
     }
 
     @Test(expected = InvalidParameterValueException.class)
     //Negative test - invalid requested IP (outside of guest network cidr range)
-        public
-        void createWithInvalidRequestedIp() throws InsufficientAddressCapacityException, InsufficientVirtualNetworkCapacityException, NetworkRuleConflictException {
+    public void createWithInvalidRequestedIp() throws InsufficientAddressCapacityException, InsufficientVirtualNetworkCapacityException, NetworkRuleConflictException {
 
         _appLbSvc.createApplicationLoadBalancer("alena", "alena", Scheme.Internal, validGuestNetworkId, "10.2.1.1", 22, 22, "roundrobin", validGuestNetworkId,
-            validAccountId, true);
-    }
-
-    private static NetworkVO setId(NetworkVO vo, long id) {
-        NetworkVO voToReturn = vo;
-        Class<?> c = voToReturn.getClass();
-        try {
-            Field f = c.getDeclaredField("id");
-            f.setAccessible(true);
-            f.setLong(voToReturn, id);
-        } catch (NoSuchFieldException ex) {
-            return null;
-        } catch (IllegalAccessException ex) {
-            return null;
-        }
-
-        return voToReturn;
+                validAccountId, true);
     }
 
     @Configuration
     @ComponentScan(basePackageClasses = {NetUtils.class, ApplicationLoadBalancerManagerImpl.class},
-                   includeFilters = {@Filter(value = TestConfiguration.Library.class, type = FilterType.CUSTOM)},
-                   useDefaultFilters = false)
+            includeFilters = {@Filter(value = TestConfiguration.Library.class, type = FilterType.CUSTOM)},
+            useDefaultFilters = false)
     public static class TestConfiguration extends SpringUtils.CloudStackTestConfiguration {
 
         @Bean
@@ -373,12 +335,11 @@ public class ApplicationLoadBalancerTest extends TestCase {
 
         public static class Library implements TypeFilter {
             @Override
-            public boolean match(MetadataReader mdr, MetadataReaderFactory arg1) throws IOException {
+            public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) throws IOException {
                 mdr.getClassMetadata().getClassName();
-                ComponentScan cs = TestConfiguration.class.getAnnotation(ComponentScan.class);
+                final ComponentScan cs = TestConfiguration.class.getAnnotation(ComponentScan.class);
                 return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);
             }
         }
     }
-
 }

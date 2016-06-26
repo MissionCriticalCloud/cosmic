@@ -1,30 +1,14 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils.cisco.n1kv.vsm;
 
-import java.io.IOException;
-import java.io.StringReader;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.StringReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,43 +23,10 @@ import org.xml.sax.SAXException;
 
 public abstract class VsmResponse {
 
-    // Following error tags, error types and severity have been taken from RFC 4741.
-    public enum ErrorTag {
-        InUse, // in-use
-        InvalidValue, // invalid-value
-        TooBig, // too-big
-        MissingAttribute, // missing-attribute
-        BadAttribute, // bad-attribute
-        UnknownAttribute, // unknown-attribute
-        MissingElement, // missing-element
-        BadElement, // bad-element
-        UnknownElement, // unknown-element
-        UnknownNamespace, // unknown-namespace
-        AccessDenied, // access-denied
-        LockDenied, // lock-denied
-        ResourceDenied, // resource-denied
-        RollbackFailed, // rollback-failed
-        DataExists, // data-exists
-        DataMissing, // data-missing
-        OperationNotSupported, // operation-not-supported
-        OperationFailed, // operation-failed
-        PartialOperation, // partial-operation
-    }
-
-    public enum ErrorType {
-        transport, rpc, protocol, application;
-    }
-
-    public enum ErrorSeverity {
-        error, warning;
-    }
-
     private static final Logger s_logger = LoggerFactory.getLogger(VsmResponse.class);
-
     protected String _xmlResponse;
     protected Document _docResponse;
     protected boolean _responseOk;
-
     protected ErrorTag _tag;
     protected ErrorType _type;
     protected ErrorSeverity _severity;
@@ -83,7 +34,7 @@ public abstract class VsmResponse {
     protected String _message;
     protected String _info;
 
-    VsmResponse(String response) {
+    VsmResponse(final String response) {
         _xmlResponse = response;
         _responseOk = false;
         _tag = ErrorTag.InUse;
@@ -94,21 +45,23 @@ public abstract class VsmResponse {
 
     protected void initialize() {
         try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            final DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             docFactory.setNamespaceAware(true);
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            final DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             _docResponse = docBuilder.parse(new InputSource(new StringReader(_xmlResponse)));
             if (_docResponse != null) {
                 parse(_docResponse.getDocumentElement());
             }
-        } catch (ParserConfigurationException e) {
+        } catch (final ParserConfigurationException e) {
             s_logger.error("Error parsing the response : " + e.toString());
-        } catch (SAXException e) {
+        } catch (final SAXException e) {
             s_logger.error("Error parsing the response : " + e.toString());
-        } catch (IOException e) {
+        } catch (final IOException e) {
             s_logger.error("Error parsing the response : " + e.toString());
         }
     }
+
+    protected abstract void parse(Element root);
 
     public boolean isResponseOk() {
         return _responseOk;
@@ -116,7 +69,7 @@ public abstract class VsmResponse {
 
     @Override
     public String toString() {
-        StringBuffer error = new StringBuffer("");
+        final StringBuffer error = new StringBuffer("");
 
         error.append(" Severity: " + _severity).append(", Error code: " + _tag).append(", Error type: " + _type);
 
@@ -135,10 +88,8 @@ public abstract class VsmResponse {
         return error.toString();
     }
 
-    protected abstract void parse(Element root);
-
-    protected void parseError(Node element) {
-        Element rpcError = (Element)element;
+    protected void parseError(final Node element) {
+        final Element rpcError = (Element) element;
 
         try {
             assert (rpcError.getNodeName().equalsIgnoreCase("nf:rpc-error"));
@@ -157,12 +108,12 @@ public abstract class VsmResponse {
                     _info = node.getTextContent();
                 }
             }
-        } catch (DOMException e) {
+        } catch (final DOMException e) {
             s_logger.error("Error parsing the response : " + e.toString());
         }
     }
 
-    protected ErrorTag getErrorTag(String tagText) {
+    protected ErrorTag getErrorTag(final String tagText) {
         ErrorTag tag = ErrorTag.InUse;
 
         if (tagText.equals("in-use")) {
@@ -211,13 +162,44 @@ public abstract class VsmResponse {
     // Helper routine to check for the response received.
     protected void printResponse() {
         try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-            DOMImplementationLS ls = (DOMImplementationLS)docBuilder.getDOMImplementation();
-            LSSerializer lss = ls.createLSSerializer();
+            final DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            final DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            final DOMImplementationLS ls = (DOMImplementationLS) docBuilder.getDOMImplementation();
+            final LSSerializer lss = ls.createLSSerializer();
             System.out.println(lss.writeToString(_docResponse));
-        } catch (ParserConfigurationException e) {
+        } catch (final ParserConfigurationException e) {
             s_logger.error("Error parsing the repsonse : " + e.toString());
         }
+    }
+
+    // Following error tags, error types and severity have been taken from RFC 4741.
+    public enum ErrorTag {
+        InUse, // in-use
+        InvalidValue, // invalid-value
+        TooBig, // too-big
+        MissingAttribute, // missing-attribute
+        BadAttribute, // bad-attribute
+        UnknownAttribute, // unknown-attribute
+        MissingElement, // missing-element
+        BadElement, // bad-element
+        UnknownElement, // unknown-element
+        UnknownNamespace, // unknown-namespace
+        AccessDenied, // access-denied
+        LockDenied, // lock-denied
+        ResourceDenied, // resource-denied
+        RollbackFailed, // rollback-failed
+        DataExists, // data-exists
+        DataMissing, // data-missing
+        OperationNotSupported, // operation-not-supported
+        OperationFailed, // operation-failed
+        PartialOperation, // partial-operation
+    }
+
+    public enum ErrorType {
+        transport, rpc, protocol, application
+    }
+
+    public enum ErrorSeverity {
+        error, warning
     }
 }

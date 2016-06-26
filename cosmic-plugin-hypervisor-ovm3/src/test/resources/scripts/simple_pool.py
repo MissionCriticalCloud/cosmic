@@ -1,29 +1,15 @@
 #!/usr/bin/python
 #
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
+
 #
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-#
-import os, sys, subprocess, socket, fcntl, struct
+import fcntl
+import socket
+import struct
+from socket import error as socket_error
 from socket import gethostname
 from xml.dom.minidom import parseString
-import errno
-from socket import error as socket_error
-
 from xmlrpclib import ServerProxy, Error
+
 
 def spCon(proto, auth, host, port):
     print "trying %s on %s@%s:%s" % (proto, auth, host, port)
@@ -36,6 +22,7 @@ def spCon(proto, auth, host, port):
     except socket_error, serr:
         return
 
+
 def getCon(auth, host, port):
     try:
         server = spCon("http", auth, host, port)
@@ -47,6 +34,7 @@ def getCon(auth, host, port):
         print "ERROR", v
     return server
 
+
 def get_ip_address(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     return socket.inet_ntoa(fcntl.ioctl(
@@ -54,6 +42,7 @@ def get_ip_address(ifname):
         0x8915,  # SIOCGIFADDR
         struct.pack('256s', ifname[:15])
     )[20:24])
+
 
 # hmm master actions don't apply to a slave
 master = "192.168.1.161"
@@ -99,7 +88,7 @@ try:
 
     # set the basics we require to "operate"
     print server.take_ownership(mgr, '')
-    print server.update_server_roles(role,)
+    print server.update_server_roles(role, )
 
     # setup the repository
     print server.mount_repository_fs(fsmntpoint2, repo)
@@ -148,24 +137,24 @@ try:
                     primuuid
                 )
                 print server.create_server_pool(poolalias,
-                    primuuid,
-                    poolmvip,
-                    poolCount,
-                    hostname,
-                    ip,
-                    role
-                )
+                                                primuuid,
+                                                poolmvip,
+                                                poolCount,
+                                                hostname,
+                                                ip,
+                                                role
+                                                )
             else:
                 try:
                     print "slave"
                     print server.join_server_pool(poolalias,
-                        primuuid,
-                        poolmvip,
-                        poolCount,
-                        hostname,
-                        ip,
-                        role
-                    )
+                                                  primuuid,
+                                                  poolmvip,
+                                                  poolCount,
+                                                  hostname,
+                                                  ip,
+                                                  role
+                                                  )
                 except Error, v:
                     print "host already part of pool?: %s" % (v)
 
@@ -174,7 +163,7 @@ try:
                 # con = getCon(auth, node, port)
                 # print con.set_pool_member_ip_list(nodes);
                 print mserver.dispatch("http://%s@%s:%s/api/3" % (auth, node, port), "set_pool_member_ip_list", nodes)
-            # print server.configure_virtual_ip(master, ip)
+                # print server.configure_virtual_ip(master, ip)
         except Error, e:
             print "something went wrong: %s" % (e)
 
@@ -187,8 +176,8 @@ try:
             'storage_desc': fsname,
             'access_host': fshost,
             'storage_type': 'FileSys',
-            'name':primuuid
-       },
+            'name': primuuid
+        },
         {
             'status': '',
             'uuid': ssuuid,

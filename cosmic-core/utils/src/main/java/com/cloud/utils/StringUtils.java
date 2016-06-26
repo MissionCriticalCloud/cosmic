@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils;
@@ -32,9 +17,15 @@ import org.owasp.esapi.StringUtilities;
 
 public class StringUtils {
     private static final char[] hexChar = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-
-    private static Charset preferredACSCharset;
     private static final String UTF8 = "UTF-8";
+    // removes a password request param and it's value, also considering password is in query parameter value which has been url encoded
+    private static final Pattern REGEX_PASSWORD_QUERYSTRING = Pattern.compile("(&|%26)?[^(&|%26)]*((p|P)assword|accesskey|secretkey)(=|%3D).*?(?=(%26|[&'\"]|$))");
+    // removes a password/accesskey/ property from a response json object
+    private static final Pattern REGEX_PASSWORD_JSON = Pattern.compile("\"((p|P)assword|privatekey|accesskey|secretkey)\":\\s?\".*?\",?");
+    private static final Pattern REGEX_PASSWORD_DETAILS = Pattern.compile("(&|%26)?details(\\[|%5B)\\d*(\\]|%5D)\\.key(=|%3D)((p|P)assword|accesskey|secretkey)(?=(%26|[&'\"]))");
+    private static final Pattern REGEX_PASSWORD_DETAILS_INDEX = Pattern.compile("details(\\[|%5B)\\d*(\\]|%5D)");
+    private static final Pattern REGEX_REDUNDANT_AND = Pattern.compile("(&|%26)(&|%26)+");
+    private static final Charset preferredACSCharset;
 
     static {
         if (isUtf8Supported()) {
@@ -103,7 +94,7 @@ public class StringUtils {
      * @return List of tags
      */
     public static List<String> csvTagsToList(final String tags) {
-        final List<String> tagsList = new ArrayList<String>();
+        final List<String> tagsList = new ArrayList<>();
 
         if (tags != null) {
             final String[] tokens = tags.split(",");
@@ -117,6 +108,7 @@ public class StringUtils {
 
     /**
      * Converts a List of tags to a comma separated list
+     *
      * @param tags
      * @return String containing a comma separated list of tags
      */
@@ -182,18 +174,6 @@ public class StringUtils {
         return sb.toString();
     }
 
-    // removes a password request param and it's value, also considering password is in query parameter value which has been url encoded
-    private static final Pattern REGEX_PASSWORD_QUERYSTRING = Pattern.compile("(&|%26)?[^(&|%26)]*((p|P)assword|accesskey|secretkey)(=|%3D).*?(?=(%26|[&'\"]|$))");
-
-    // removes a password/accesskey/ property from a response json object
-    private static final Pattern REGEX_PASSWORD_JSON = Pattern.compile("\"((p|P)assword|privatekey|accesskey|secretkey)\":\\s?\".*?\",?");
-
-    private static final Pattern REGEX_PASSWORD_DETAILS = Pattern.compile("(&|%26)?details(\\[|%5B)\\d*(\\]|%5D)\\.key(=|%3D)((p|P)assword|accesskey|secretkey)(?=(%26|[&'\"]))");
-
-    private static final Pattern REGEX_PASSWORD_DETAILS_INDEX = Pattern.compile("details(\\[|%5B)\\d*(\\]|%5D)");
-
-    private static final Pattern REGEX_REDUNDANT_AND = Pattern.compile("(&|%26)(&|%26)+");
-
     // Responsible for stripping sensitive content from request and response strings
     public static String cleanString(final String stringToClean) {
         String cleanResult = "";
@@ -237,14 +217,14 @@ public class StringUtils {
 
         final String delimiter = ",";
 
-        final List<String> lstTags1 = new ArrayList<String>();
+        final List<String> lstTags1 = new ArrayList<>();
         final String[] aTags1 = tags1.split(delimiter);
 
         for (final String tag1 : aTags1) {
             lstTags1.add(tag1.toLowerCase());
         }
 
-        final List<String> lstTags2 = new ArrayList<String>();
+        final List<String> lstTags2 = new ArrayList<>();
         final String[] aTags2 = tags2.split(delimiter);
 
         for (final String tag2 : aTags2) {
@@ -273,7 +253,7 @@ public class StringUtils {
     }
 
     public static Map<String, String> stringToMap(final String s) {
-        final Map<String, String> map = new HashMap<String, String>();
+        final Map<String, String> map = new HashMap<>();
         final String[] elements = s.split(";");
         for (final String parts : elements) {
             final String[] keyValue = parts.split(":");
@@ -298,20 +278,20 @@ public class StringUtils {
         final boolean applyPagination = startIndex != null && pageSizeVal != null
                 && startIndex <= Integer.MAX_VALUE && startIndex >= Integer.MIN_VALUE && pageSizeVal <= Integer.MAX_VALUE
                 && pageSizeVal >= Integer.MIN_VALUE;
-                List<T> listWPagination = null;
-                if (applyPagination) {
-                    listWPagination = new ArrayList<>();
-                    final int index = startIndex.intValue() == 0 ? 0 : startIndex.intValue() / pageSizeVal.intValue();
-                    final List<List<T>> partitions = StringUtils.partitionList(originalList, pageSizeVal.intValue());
-                    if (index < partitions.size()) {
-                        listWPagination = partitions.get(index);
-                    }
-                }
-                return listWPagination;
+        List<T> listWPagination = null;
+        if (applyPagination) {
+            listWPagination = new ArrayList<>();
+            final int index = startIndex.intValue() == 0 ? 0 : startIndex.intValue() / pageSizeVal.intValue();
+            final List<List<T>> partitions = StringUtils.partitionList(originalList, pageSizeVal.intValue());
+            if (index < partitions.size()) {
+                listWPagination = partitions.get(index);
+            }
+        }
+        return listWPagination;
     }
 
     private static <T> List<List<T>> partitionList(final List<T> originalList, final int chunkSize) {
-        final List<List<T>> listOfChunks = new ArrayList<List<T>>();
+        final List<List<T>> listOfChunks = new ArrayList<>();
         for (int i = 0; i < originalList.size() / chunkSize; i++) {
             listOfChunks.add(originalList.subList(i * chunkSize, i * chunkSize + chunkSize));
         }

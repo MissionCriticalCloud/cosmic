@@ -1,42 +1,23 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.engine.datacenter.entity.api;
+
+import com.cloud.org.Cluster;
+import com.cloud.org.Grouping.AllocationState;
+import com.cloud.utils.fsm.NoTransitionException;
+import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
+import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineHostPodVO;
 
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.cloud.org.Cluster;
-import com.cloud.org.Grouping.AllocationState;
-import com.cloud.utils.fsm.NoTransitionException;
-
-import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
-import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineHostPodVO;
-
 public class PodEntityImpl implements PodEntity {
 
-    private DataCenterResourceManager manager;
+    private final DataCenterResourceManager manager;
 
-    private EngineHostPodVO podVO;
+    private final EngineHostPodVO podVO;
 
-    public PodEntityImpl(String uuid, DataCenterResourceManager manager) {
+    public PodEntityImpl(final String uuid, final DataCenterResourceManager manager) {
         this.manager = manager;
         podVO = manager.loadPod(uuid);
     }
@@ -45,7 +26,7 @@ public class PodEntityImpl implements PodEntity {
     public boolean enable() {
         try {
             manager.changeState(this, Event.EnableRequest);
-        } catch (NoTransitionException e) {
+        } catch (final NoTransitionException e) {
             return false;
         }
         return true;
@@ -55,7 +36,7 @@ public class PodEntityImpl implements PodEntity {
     public boolean disable() {
         try {
             manager.changeState(this, Event.DisableRequest);
-        } catch (NoTransitionException e) {
+        } catch (final NoTransitionException e) {
             return false;
         }
         return true;
@@ -65,7 +46,7 @@ public class PodEntityImpl implements PodEntity {
     public boolean deactivate() {
         try {
             manager.changeState(this, Event.DeactivateRequest);
-        } catch (NoTransitionException e) {
+        } catch (final NoTransitionException e) {
             return false;
         }
         return true;
@@ -75,7 +56,7 @@ public class PodEntityImpl implements PodEntity {
     public boolean reactivate() {
         try {
             manager.changeState(this, Event.ActivatedRequest);
-        } catch (NoTransitionException e) {
+        } catch (final NoTransitionException e) {
             return false;
         }
         return true;
@@ -84,6 +65,20 @@ public class PodEntityImpl implements PodEntity {
     @Override
     public State getState() {
         return podVO.getState();
+    }
+
+    @Override
+    public void persist() {
+        manager.savePod(podVO);
+    }
+
+    @Override
+    public String getName() {
+        return podVO.getName();
+    }
+
+    public void setName(final String name) {
+        podVO.setName(name);
     }
 
     @Override
@@ -124,7 +119,39 @@ public class PodEntityImpl implements PodEntity {
     }
 
     @Override
+    public Map<String, String> getDetails() {
+        return null;
+    }
+
+    @Override
+    public void addDetail(final String name, final String value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void delDetail(final String name, final String value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void updateDetail(final String name, final String value) {
+
+    }
+
+    @Override
     public List<Method> getApplicableActions() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void setOwner(final String owner) {
+        podVO.setOwner(owner);
+    }
+
+    @Override
+    public List<Cluster> listClusters() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -150,11 +177,6 @@ public class PodEntityImpl implements PodEntity {
     }
 
     @Override
-    public String getName() {
-        return podVO.getName();
-    }
-
-    @Override
     public AllocationState getAllocationState() {
         return podVO.getAllocationState();
     }
@@ -163,47 +185,4 @@ public class PodEntityImpl implements PodEntity {
     public boolean getExternalDhcp() {
         return podVO.getExternalDhcp();
     }
-
-    @Override
-    public List<Cluster> listClusters() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void persist() {
-        manager.savePod(podVO);
-
-    }
-
-    @Override
-    public Map<String, String> getDetails() {
-        return null;
-    }
-
-    @Override
-    public void addDetail(String name, String value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void delDetail(String name, String value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void updateDetail(String name, String value) {
-
-    }
-
-    public void setOwner(String owner) {
-        podVO.setOwner(owner);
-    }
-
-    public void setName(String name) {
-        podVO.setName(name);
-    }
-
 }

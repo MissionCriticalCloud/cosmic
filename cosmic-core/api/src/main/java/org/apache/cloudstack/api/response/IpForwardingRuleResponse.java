@@ -1,26 +1,10 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 public class IpForwardingRuleResponse extends BaseResponse {
     @SerializedName(ApiConstants.ID)
@@ -67,7 +51,7 @@ public class IpForwardingRuleResponse extends BaseResponse {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -75,7 +59,7 @@ public class IpForwardingRuleResponse extends BaseResponse {
         return protocol;
     }
 
-    public void setProtocol(String protocol) {
+    public void setProtocol(final String protocol) {
         this.protocol = protocol;
     }
 
@@ -83,7 +67,7 @@ public class IpForwardingRuleResponse extends BaseResponse {
         return virtualMachineId;
     }
 
-    public void setVirtualMachineId(String virtualMachineId) {
+    public void setVirtualMachineId(final String virtualMachineId) {
         this.virtualMachineId = virtualMachineId;
     }
 
@@ -91,7 +75,7 @@ public class IpForwardingRuleResponse extends BaseResponse {
         return virtualMachineName;
     }
 
-    public void setVirtualMachineName(String virtualMachineName) {
+    public void setVirtualMachineName(final String virtualMachineName) {
         this.virtualMachineName = virtualMachineName;
     }
 
@@ -99,7 +83,7 @@ public class IpForwardingRuleResponse extends BaseResponse {
         return virtualMachineDisplayName;
     }
 
-    public void setVirtualMachineDisplayName(String virtualMachineDisplayName) {
+    public void setVirtualMachineDisplayName(final String virtualMachineDisplayName) {
         this.virtualMachineDisplayName = virtualMachineDisplayName;
     }
 
@@ -107,7 +91,7 @@ public class IpForwardingRuleResponse extends BaseResponse {
         return publicIpAddress;
     }
 
-    public void setPublicIpAddress(String publicIpAddress) {
+    public void setPublicIpAddress(final String publicIpAddress) {
         this.publicIpAddress = publicIpAddress;
     }
 
@@ -115,7 +99,7 @@ public class IpForwardingRuleResponse extends BaseResponse {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
@@ -123,7 +107,7 @@ public class IpForwardingRuleResponse extends BaseResponse {
         return startPort;
     }
 
-    public void setStartPort(Integer startPort) {
+    public void setStartPort(final Integer startPort) {
         this.startPort = startPort;
     }
 
@@ -131,7 +115,7 @@ public class IpForwardingRuleResponse extends BaseResponse {
         return endPort;
     }
 
-    public void setEndPort(Integer endPort) {
+    public void setEndPort(final Integer endPort) {
         this.endPort = endPort;
     }
 
@@ -139,7 +123,7 @@ public class IpForwardingRuleResponse extends BaseResponse {
         return publicIpAddressId;
     }
 
-    public void setPublicIpAddressId(Long publicIpAddressId) {
+    public void setPublicIpAddressId(final Long publicIpAddressId) {
         this.publicIpAddressId = publicIpAddressId;
     }
 }

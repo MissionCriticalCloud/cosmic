@@ -1,31 +1,14 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
+
+import com.cloud.serializer.Param;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import com.cloud.serializer.Param;
 import com.google.gson.annotations.SerializedName;
 
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
-
-@SuppressWarnings("unused")
 public class ApiDiscoveryResponse extends BaseResponse {
     @SerializedName(ApiConstants.NAME)
     @Param(description = "the name of the api command")
@@ -53,55 +36,55 @@ public class ApiDiscoveryResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.RESPONSE)
     @Param(description = "api response fields", responseObject = ApiResponseResponse.class)
-    private Set<ApiResponseResponse> apiResponse;
+    private final Set<ApiResponseResponse> apiResponse;
 
     @SerializedName(ApiConstants.TYPE)
     @Param(description = "response field type")
     private String type;
 
     public ApiDiscoveryResponse() {
-        params = new HashSet<ApiParameterResponse>();
-        apiResponse = new HashSet<ApiResponseResponse>();
+        params = new HashSet<>();
+        apiResponse = new HashSet<>();
         isAsync = false;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setName(final String name) {
+        this.name = name;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setSince(String since) {
-        this.since = since;
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     public String getSince() {
         return since;
     }
 
-    public void setAsync(Boolean isAsync) {
-        this.isAsync = isAsync;
+    public void setSince(final String since) {
+        this.since = since;
     }
 
     public boolean getAsync() {
         return isAsync;
     }
 
+    public void setAsync(final Boolean isAsync) {
+        this.isAsync = isAsync;
+    }
+
     public String getRelated() {
         return related;
     }
 
-    public void setRelated(String related) {
+    public void setRelated(final String related) {
         this.related = related;
     }
 
@@ -109,15 +92,15 @@ public class ApiDiscoveryResponse extends BaseResponse {
         return params;
     }
 
-    public void setParams(Set<ApiParameterResponse> params) {
+    public void setParams(final Set<ApiParameterResponse> params) {
         this.params = params;
     }
 
-    public void addParam(ApiParameterResponse param) {
+    public void addParam(final ApiParameterResponse param) {
         this.params.add(param);
     }
 
-    public void addApiResponse(ApiResponseResponse apiResponse) {
+    public void addApiResponse(final ApiResponseResponse apiResponse) {
         this.apiResponse.add(apiResponse);
     }
 }

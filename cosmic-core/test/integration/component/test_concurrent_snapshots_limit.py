@@ -1,25 +1,7 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ Test cases for validating global limit for concurrent snapshots
 """
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources,
-                              validateList)
+from marvin.codes import PASS, BACKED_UP
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              VirtualMachine,
@@ -31,13 +13,13 @@ from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template
                                )
-
-from marvin.codes import PASS, BACKED_UP
+from marvin.lib.utils import (cleanup_resources,
+                              validateList)
+from nose.plugins.attrib import attr
 from threading import Thread
 
 
 class TestConcurrentSnapshotLimit(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestConcurrentSnapshotLimit, cls).getClsTestClient()
@@ -162,14 +144,14 @@ class TestConcurrentSnapshotLimit(cloudstackTestCase):
             name="concurrent.snapshots.threshold.perhost"
         )
         if config[0].value:
-		self.assertEqual(
-				isinstance(
-					config,
-					list),
-				True,
-				"concurrent.snapshots.threshold.perhost should be present\
-				in global config")
-		concurrentSnapshots = int(config[0].value)
+            self.assertEqual(
+                isinstance(
+                    config,
+                    list),
+                True,
+                "concurrent.snapshots.threshold.perhost should be present\
+                in global config")
+            concurrentSnapshots = int(config[0].value)
         self.debug("concurrent Snapshots: %s" % concurrentSnapshots)
 
         threads = []
@@ -222,14 +204,14 @@ class TestConcurrentSnapshotLimit(cloudstackTestCase):
             name="concurrent.snapshots.threshold.perhost"
         )
         if config[0].value:
-		self.assertEqual(
-				isinstance(
-					config,
-					list),
-				True,
-				"concurrent.snapshots.threshold.perhost should be present\
-				in global config")
-		concurrentSnapshots = int(config[0].value)
+            self.assertEqual(
+                isinstance(
+                    config,
+                    list),
+                True,
+                "concurrent.snapshots.threshold.perhost should be present\
+                in global config")
+            concurrentSnapshots = int(config[0].value)
         else:
             self.skipTest("Skipping tests as the config value \
                     concurrent.snapshots.threshold.perhost is Null")

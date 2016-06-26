@@ -1,30 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.dc.dao;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.dc.AccountVlanMapVO;
 import com.cloud.dc.DomainVlanMapVO;
@@ -42,13 +16,22 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
 
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class VlanDaoImpl extends GenericDaoBase<VlanVO, Long> implements VlanDao {
 
     private final String FindZoneWideVlans =
-        "SELECT * FROM vlan WHERE data_center_id=? and vlan_type=? and vlan_id!=? and id not in (select vlan_db_id from account_vlan_map)";
+            "SELECT * FROM vlan WHERE data_center_id=? and vlan_type=? and vlan_id!=? and id not in (select vlan_db_id from account_vlan_map)";
 
     protected SearchBuilder<VlanVO> ZoneVlanIdSearch;
     protected SearchBuilder<VlanVO> ZoneSearch;
@@ -73,21 +56,6 @@ public class VlanDaoImpl extends GenericDaoBase<VlanVO, Long> implements VlanDao
     protected DomainVlanMapDao _domainVlanMapDao;
     @Inject
     protected IPAddressDao _ipAddressDao;
-
-    @Override
-    public VlanVO findByZoneAndVlanId(long zoneId, String vlanId) {
-        SearchCriteria<VlanVO> sc = ZoneVlanIdSearch.create();
-        sc.setParameters("zoneId", zoneId);
-        sc.setParameters("vlanId", vlanId);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public List<VlanVO> listByZone(long zoneId) {
-        SearchCriteria<VlanVO> sc = ZoneSearch.create();
-        sc.setParameters("zoneId", zoneId);
-        return listBy(sc);
-    }
 
     public VlanDaoImpl() {
         ZoneVlanIdSearch = createSearchBuilder();
@@ -119,47 +87,53 @@ public class VlanDaoImpl extends GenericDaoBase<VlanVO, Long> implements VlanDao
     }
 
     @Override
-    public List<VlanVO> listZoneWideVlans(long zoneId, VlanType vlanType, String vlanId) {
-        SearchCriteria<VlanVO> sc = ZoneVlanSearch.create();
+    public VlanVO findByZoneAndVlanId(final long zoneId, final String vlanId) {
+        final SearchCriteria<VlanVO> sc = ZoneVlanIdSearch.create();
         sc.setParameters("zoneId", zoneId);
         sc.setParameters("vlanId", vlanId);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public List<VlanVO> listByZone(final long zoneId) {
+        final SearchCriteria<VlanVO> sc = ZoneSearch.create();
+        sc.setParameters("zoneId", zoneId);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<VlanVO> listByType(final VlanType vlanType) {
+        final SearchCriteria<VlanVO> sc = ZoneTypeSearch.create();
         sc.setParameters("vlanType", vlanType);
         return listBy(sc);
     }
 
     @Override
-    public List<VlanVO> listByZoneAndType(long zoneId, VlanType vlanType) {
-        SearchCriteria<VlanVO> sc = ZoneTypeSearch.create();
+    public List<VlanVO> listByZoneAndType(final long zoneId, final VlanType vlanType) {
+        final SearchCriteria<VlanVO> sc = ZoneTypeSearch.create();
         sc.setParameters("zoneId", zoneId);
         sc.setParameters("vlanType", vlanType);
         return listBy(sc);
     }
 
     @Override
-    public List<VlanVO> listByType(VlanType vlanType) {
-        SearchCriteria<VlanVO> sc = ZoneTypeSearch.create();
-        sc.setParameters("vlanType", vlanType);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<VlanVO> listVlansForPod(long podId) {
+    public List<VlanVO> listVlansForPod(final long podId) {
         //FIXME: use a join statement to improve the performance (should be minor since we expect only one or two
-        List<PodVlanMapVO> vlanMaps = _podVlanMapDao.listPodVlanMapsByPod(podId);
-        List<VlanVO> result = new ArrayList<VlanVO>();
-        for (PodVlanMapVO pvmvo : vlanMaps) {
+        final List<PodVlanMapVO> vlanMaps = _podVlanMapDao.listPodVlanMapsByPod(podId);
+        final List<VlanVO> result = new ArrayList<>();
+        for (final PodVlanMapVO pvmvo : vlanMaps) {
             result.add(findById(pvmvo.getVlanDbId()));
         }
         return result;
     }
 
     @Override
-    public List<VlanVO> listVlansForPodByType(long podId, VlanType vlanType) {
+    public List<VlanVO> listVlansForPodByType(final long podId, final VlanType vlanType) {
         //FIXME: use a join statement to improve the performance (should be minor since we expect only one or two)
-        List<PodVlanMapVO> vlanMaps = _podVlanMapDao.listPodVlanMapsByPod(podId);
-        List<VlanVO> result = new ArrayList<VlanVO>();
-        for (PodVlanMapVO pvmvo : vlanMaps) {
-            VlanVO vlan = findById(pvmvo.getVlanDbId());
+        final List<PodVlanMapVO> vlanMaps = _podVlanMapDao.listPodVlanMapsByPod(podId);
+        final List<VlanVO> result = new ArrayList<>();
+        for (final PodVlanMapVO pvmvo : vlanMaps) {
+            final VlanVO vlan = findById(pvmvo.getVlanDbId());
             if (vlan.getVlanType() == vlanType) {
                 result.add(vlan);
             }
@@ -168,12 +142,18 @@ public class VlanDaoImpl extends GenericDaoBase<VlanVO, Long> implements VlanDao
     }
 
     @Override
-    public List<VlanVO> listVlansForAccountByType(Long zoneId, long accountId, VlanType vlanType) {
+    public void addToPod(final long podId, final long vlanDbId) {
+        final PodVlanMapVO pvmvo = new PodVlanMapVO(podId, vlanDbId);
+        _podVlanMapDao.persist(pvmvo);
+    }
+
+    @Override
+    public List<VlanVO> listVlansForAccountByType(final Long zoneId, final long accountId, final VlanType vlanType) {
         //FIXME: use a join statement to improve the performance (should be minor since we expect only one or two)
-        List<AccountVlanMapVO> vlanMaps = _accountVlanMapDao.listAccountVlanMapsByAccount(accountId);
-        List<VlanVO> result = new ArrayList<VlanVO>();
-        for (AccountVlanMapVO acvmvo : vlanMaps) {
-            VlanVO vlan = findById(acvmvo.getVlanDbId());
+        final List<AccountVlanMapVO> vlanMaps = _accountVlanMapDao.listAccountVlanMapsByAccount(accountId);
+        final List<VlanVO> result = new ArrayList<>();
+        for (final AccountVlanMapVO acvmvo : vlanMaps) {
+            final VlanVO vlan = findById(acvmvo.getVlanDbId());
             if (vlan.getVlanType() == vlanType && (zoneId == null || vlan.getDataCenterId() == zoneId)) {
                 result.add(vlan);
             }
@@ -182,20 +162,92 @@ public class VlanDaoImpl extends GenericDaoBase<VlanVO, Long> implements VlanDao
     }
 
     @Override
-    public void addToPod(long podId, long vlanDbId) {
-        PodVlanMapVO pvmvo = new PodVlanMapVO(podId, vlanDbId);
-        _podVlanMapDao.persist(pvmvo);
+    public boolean zoneHasDirectAttachUntaggedVlans(final long zoneId) {
+        final SearchCriteria<VlanVO> sc = ZoneTypeAllPodsSearch.create();
+        sc.setParameters("zoneId", zoneId);
+        sc.setParameters("vlanType", VlanType.DirectAttached);
 
+        return listIncludingRemovedBy(sc).size() > 0;
     }
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
-        boolean result = super.configure(name, params);
+    public List<VlanVO> listZoneWideVlans(final long zoneId, final VlanType vlanType, final String vlanId) {
+        final SearchCriteria<VlanVO> sc = ZoneVlanSearch.create();
+        sc.setParameters("zoneId", zoneId);
+        sc.setParameters("vlanId", vlanId);
+        sc.setParameters("vlanType", vlanType);
+        return listBy(sc);
+    }
+
+    @Override
+    @DB
+    public List<VlanVO> searchForZoneWideVlans(final long dcId, final String vlanType, final String vlanId) {
+        final StringBuilder sql = new StringBuilder(FindZoneWideVlans);
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final List<VlanVO> zoneWideVlans = new ArrayList<>();
+        try (PreparedStatement pstmt = txn.prepareStatement(sql.toString())) {
+            if (pstmt != null) {
+                pstmt.setLong(1, dcId);
+                pstmt.setString(2, vlanType);
+                pstmt.setString(3, vlanId);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    while (rs.next()) {
+                        zoneWideVlans.add(toEntityBean(rs, false));
+                    }
+                } catch (final SQLException e) {
+                    throw new CloudRuntimeException("searchForZoneWideVlans:Exception:" + e.getMessage(), e);
+                }
+            }
+            return zoneWideVlans;
+        } catch (final SQLException e) {
+            throw new CloudRuntimeException("searchForZoneWideVlans:Exception:" + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<VlanVO> listVlansByNetworkId(final long networkOfferingId) {
+        final SearchCriteria<VlanVO> sc = NetworkVlanSearch.create();
+        sc.setParameters("networkOfferingId", networkOfferingId);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<VlanVO> listVlansByPhysicalNetworkId(final long physicalNetworkId) {
+        final SearchCriteria<VlanVO> sc = PhysicalNetworkVlanSearch.create();
+        sc.setParameters("physicalNetworkId", physicalNetworkId);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<VlanVO> listZoneWideNonDedicatedVlans(final long zoneId) {
+        final SearchCriteria<VlanVO> sc = ZoneWideNonDedicatedVlanSearch.create();
+        sc.setParameters("zoneId", zoneId);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<VlanVO> listVlansByNetworkIdAndGateway(final long networkid, final String gateway) {
+        final SearchCriteria<VlanVO> sc = VlanGatewaysearch.create();
+        sc.setParameters("networkid", networkid);
+        sc.setParameters("gateway", gateway);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<VlanVO> listDedicatedVlans(final long accountId) {
+        final SearchCriteria<VlanVO> sc = DedicatedVlanSearch.create();
+        sc.setJoinParameters("AccountVlanMapSearch", "accountId", accountId);
+        return listBy(sc);
+    }
+
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+        final boolean result = super.configure(name, params);
         ZoneTypeAllPodsSearch = createSearchBuilder();
         ZoneTypeAllPodsSearch.and("zoneId", ZoneTypeAllPodsSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
         ZoneTypeAllPodsSearch.and("vlanType", ZoneTypeAllPodsSearch.entity().getVlanType(), SearchCriteria.Op.EQ);
 
-        SearchBuilder<PodVlanMapVO> PodVlanSearch = _podVlanMapDao.createSearchBuilder();
+        final SearchBuilder<PodVlanMapVO> PodVlanSearch = _podVlanMapDao.createSearchBuilder();
         PodVlanSearch.and("podId", PodVlanSearch.entity().getPodId(), SearchCriteria.Op.NNULL);
         ZoneTypeAllPodsSearch.join("vlan", PodVlanSearch, PodVlanSearch.entity().getVlanDbId(), ZoneTypeAllPodsSearch.entity().getId(), JoinBuilder.JoinType.INNER);
 
@@ -206,7 +258,7 @@ public class VlanDaoImpl extends GenericDaoBase<VlanVO, Long> implements VlanDao
         ZoneTypePodSearch.and("zoneId", ZoneTypePodSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
         ZoneTypePodSearch.and("vlanType", ZoneTypePodSearch.entity().getVlanType(), SearchCriteria.Op.EQ);
 
-        SearchBuilder<PodVlanMapVO> PodVlanSearch2 = _podVlanMapDao.createSearchBuilder();
+        final SearchBuilder<PodVlanMapVO> PodVlanSearch2 = _podVlanMapDao.createSearchBuilder();
         PodVlanSearch2.and("podId", PodVlanSearch2.entity().getPodId(), SearchCriteria.Op.EQ);
         ZoneTypePodSearch.join("vlan", PodVlanSearch2, PodVlanSearch2.entity().getVlanDbId(), ZoneTypePodSearch.entity().getId(), JoinBuilder.JoinType.INNER);
         PodVlanSearch2.done();
@@ -217,10 +269,12 @@ public class VlanDaoImpl extends GenericDaoBase<VlanVO, Long> implements VlanDao
         AccountVlanMapSearch = _accountVlanMapDao.createSearchBuilder();
         AccountVlanMapSearch.and("accountId", AccountVlanMapSearch.entity().getAccountId(), SearchCriteria.Op.NULL);
         ZoneWideNonDedicatedVlanSearch.join("AccountVlanMapSearch", AccountVlanMapSearch, ZoneWideNonDedicatedVlanSearch.entity().getId(), AccountVlanMapSearch.entity()
-            .getVlanDbId(), JoinBuilder.JoinType.LEFTOUTER);
+                                                                                                                                                               .getVlanDbId(),
+                JoinBuilder.JoinType.LEFTOUTER);
         DomainVlanMapSearch = _domainVlanMapDao.createSearchBuilder();
         DomainVlanMapSearch.and("domainId", DomainVlanMapSearch.entity().getDomainId(), SearchCriteria.Op.NULL);
-        ZoneWideNonDedicatedVlanSearch.join("DomainVlanMapSearch", DomainVlanMapSearch, ZoneWideNonDedicatedVlanSearch.entity().getId(), DomainVlanMapSearch.entity().getVlanDbId(), JoinBuilder.JoinType.LEFTOUTER);
+        ZoneWideNonDedicatedVlanSearch.join("DomainVlanMapSearch", DomainVlanMapSearch, ZoneWideNonDedicatedVlanSearch.entity().getId(), DomainVlanMapSearch.entity().getVlanDbId
+                (), JoinBuilder.JoinType.LEFTOUTER);
         ZoneWideNonDedicatedVlanSearch.done();
         AccountVlanMapSearch.done();
         DomainVlanMapSearch.done();
@@ -229,24 +283,24 @@ public class VlanDaoImpl extends GenericDaoBase<VlanVO, Long> implements VlanDao
         AccountVlanMapSearch = _accountVlanMapDao.createSearchBuilder();
         AccountVlanMapSearch.and("accountId", AccountVlanMapSearch.entity().getAccountId(), SearchCriteria.Op.EQ);
         DedicatedVlanSearch.join("AccountVlanMapSearch", AccountVlanMapSearch, DedicatedVlanSearch.entity().getId(), AccountVlanMapSearch.entity().getVlanDbId(),
-            JoinBuilder.JoinType.LEFTOUTER);
+                JoinBuilder.JoinType.LEFTOUTER);
         DedicatedVlanSearch.done();
         AccountVlanMapSearch.done();
 
         return result;
     }
 
-    private VlanVO findNextVlan(long zoneId, Vlan.VlanType vlanType) {
-        List<VlanVO> allVlans = listByZoneAndType(zoneId, vlanType);
-        List<VlanVO> emptyVlans = new ArrayList<VlanVO>();
-        List<VlanVO> fullVlans = new ArrayList<VlanVO>();
+    private VlanVO findNextVlan(final long zoneId, final Vlan.VlanType vlanType) {
+        final List<VlanVO> allVlans = listByZoneAndType(zoneId, vlanType);
+        final List<VlanVO> emptyVlans = new ArrayList<>();
+        final List<VlanVO> fullVlans = new ArrayList<>();
 
         // Try to find a VLAN that is partially allocated
-        for (VlanVO vlan : allVlans) {
-            long vlanDbId = vlan.getId();
+        for (final VlanVO vlan : allVlans) {
+            final long vlanDbId = vlan.getId();
 
-            int countOfAllocatedIps = _ipAddressDao.countIPs(zoneId, vlanDbId, true);
-            int countOfAllIps = _ipAddressDao.countIPs(zoneId, vlanDbId, false);
+            final int countOfAllocatedIps = _ipAddressDao.countIPs(zoneId, vlanDbId, true);
+            final int countOfAllIps = _ipAddressDao.countIPs(zoneId, vlanDbId, false);
 
             if ((countOfAllocatedIps > 0) && (countOfAllocatedIps < countOfAllIps)) {
                 return vlan;
@@ -262,10 +316,10 @@ public class VlanDaoImpl extends GenericDaoBase<VlanVO, Long> implements VlanDao
         }
 
         // Try to find an empty VLAN with the same tag/subnet as a VLAN that is full
-        for (VlanVO fullVlan : fullVlans) {
-            for (VlanVO emptyVlan : emptyVlans) {
+        for (final VlanVO fullVlan : fullVlans) {
+            for (final VlanVO emptyVlan : emptyVlans) {
                 if (fullVlan.getVlanTag().equals(emptyVlan.getVlanTag()) && fullVlan.getVlanGateway().equals(emptyVlan.getVlanGateway()) &&
-                    fullVlan.getVlanNetmask().equals(emptyVlan.getVlanNetmask())) {
+                        fullVlan.getVlanNetmask().equals(emptyVlan.getVlanNetmask())) {
                     return emptyVlan;
                 }
             }
@@ -275,94 +329,23 @@ public class VlanDaoImpl extends GenericDaoBase<VlanVO, Long> implements VlanDao
         return emptyVlans.get(0);
     }
 
-    @Override
-    public boolean zoneHasDirectAttachUntaggedVlans(long zoneId) {
-        SearchCriteria<VlanVO> sc = ZoneTypeAllPodsSearch.create();
-        sc.setParameters("zoneId", zoneId);
-        sc.setParameters("vlanType", VlanType.DirectAttached);
-
-        return listIncludingRemovedBy(sc).size() > 0;
-    }
-
-    public Pair<String, VlanVO> assignPodDirectAttachIpAddress(long zoneId, long podId, long accountId, long domainId) {
-        SearchCriteria<VlanVO> sc = ZoneTypePodSearch.create();
+    public Pair<String, VlanVO> assignPodDirectAttachIpAddress(final long zoneId, final long podId, final long accountId, final long domainId) {
+        final SearchCriteria<VlanVO> sc = ZoneTypePodSearch.create();
         sc.setParameters("zoneId", zoneId);
         sc.setParameters("vlanType", VlanType.DirectAttached);
         sc.setJoinParameters("vlan", "podId", podId);
 
-        VlanVO vlan = findOneIncludingRemovedBy(sc);
+        final VlanVO vlan = findOneIncludingRemovedBy(sc);
         if (vlan == null) {
             return null;
         }
 
         return null;
-//        String ipAddress = _ipAddressDao.assignIpAddress(accountId, domainId, vlan.getId(), false).getAddress();
-//        if (ipAddress == null) {
-//            return null;
-//        }
-//        return new Pair<String, VlanVO>(ipAddress, vlan);
+        //        String ipAddress = _ipAddressDao.assignIpAddress(accountId, domainId, vlan.getId(), false).getAddress();
+        //        if (ipAddress == null) {
+        //            return null;
+        //        }
+        //        return new Pair<String, VlanVO>(ipAddress, vlan);
 
     }
-
-    @Override
-    @DB
-    public List<VlanVO> searchForZoneWideVlans(long dcId, String vlanType, String vlanId) {
-        StringBuilder sql = new StringBuilder(FindZoneWideVlans);
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        List<VlanVO> zoneWideVlans = new ArrayList<VlanVO>();
-        try(PreparedStatement pstmt = txn.prepareStatement(sql.toString());){
-            if(pstmt != null) {
-                pstmt.setLong(1, dcId);
-                pstmt.setString(2, vlanType);
-                pstmt.setString(3, vlanId);
-                try(ResultSet rs = pstmt.executeQuery();) {
-                    while (rs.next()) {
-                        zoneWideVlans.add(toEntityBean(rs, false));
-                    }
-                }catch (SQLException e) {
-                    throw new CloudRuntimeException("searchForZoneWideVlans:Exception:" + e.getMessage(), e);
-                }
-            }
-            return zoneWideVlans;
-        } catch (SQLException e) {
-            throw new CloudRuntimeException("searchForZoneWideVlans:Exception:" + e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public List<VlanVO> listVlansByNetworkId(long networkOfferingId) {
-        SearchCriteria<VlanVO> sc = NetworkVlanSearch.create();
-        sc.setParameters("networkOfferingId", networkOfferingId);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<VlanVO> listVlansByNetworkIdAndGateway(long networkid, String gateway) {
-        SearchCriteria<VlanVO> sc = VlanGatewaysearch.create();
-        sc.setParameters("networkid", networkid);
-        sc.setParameters("gateway", gateway);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<VlanVO> listVlansByPhysicalNetworkId(long physicalNetworkId) {
-        SearchCriteria<VlanVO> sc = PhysicalNetworkVlanSearch.create();
-        sc.setParameters("physicalNetworkId", physicalNetworkId);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<VlanVO> listZoneWideNonDedicatedVlans(long zoneId) {
-        SearchCriteria<VlanVO> sc = ZoneWideNonDedicatedVlanSearch.create();
-        sc.setParameters("zoneId", zoneId);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<VlanVO> listDedicatedVlans(long accountId) {
-        SearchCriteria<VlanVO> sc = DedicatedVlanSearch.create();
-        sc.setJoinParameters("AccountVlanMapSearch", "accountId", accountId);
-        return listBy(sc);
-    }
-
 }

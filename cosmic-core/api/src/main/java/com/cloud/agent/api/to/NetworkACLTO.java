@@ -1,30 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.agent.api.to;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.network.vpc.NetworkACLItem;
 import com.cloud.network.vpc.NetworkACLItem.TrafficType;
 import com.cloud.utils.net.NetUtils;
-
 import org.apache.cloudstack.api.InternalIdentity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NetworkACLTO implements InternalIdentity {
     long id;
@@ -33,23 +15,40 @@ public class NetworkACLTO implements InternalIdentity {
     int[] portRange;
     boolean revoked;
     boolean alreadyAdded;
+    String action;
+    int number;
     private List<String> cidrList;
     private Integer icmpType;
     private Integer icmpCode;
     private TrafficType trafficType;
-    String action;
-    int number;
 
     protected NetworkACLTO() {
     }
 
-    public NetworkACLTO(long id, String vlanTag, String protocol, Integer portStart, Integer portEnd, boolean revoked, boolean alreadyAdded, List<String> cidrList,
-            Integer icmpType, Integer icmpCode, TrafficType trafficType, boolean allow, int number) {
+    public NetworkACLTO(final NetworkACLItem rule, final String vlanTag, final NetworkACLItem.TrafficType trafficType) {
+        this(rule.getId(),
+                vlanTag,
+                rule.getProtocol(),
+                rule.getSourcePortStart(),
+                rule.getSourcePortEnd(),
+                rule.getState() == NetworkACLItem.State.Revoke,
+                rule.getState() == NetworkACLItem.State.Active,
+                rule.getSourceCidrList(),
+                rule.getIcmpType(),
+                rule.getIcmpCode(),
+                trafficType,
+                rule.getAction() == NetworkACLItem.Action.Allow,
+                rule.getNumber());
+    }
+
+    public NetworkACLTO(final long id, final String vlanTag, final String protocol, final Integer portStart, final Integer portEnd, final boolean revoked, final boolean
+            alreadyAdded, final List<String> cidrList,
+                        final Integer icmpType, final Integer icmpCode, final TrafficType trafficType, final boolean allow, final int number) {
         this.vlanTag = vlanTag;
         this.protocol = protocol;
 
         if (portStart != null) {
-            List<Integer> range = new ArrayList<Integer>();
+            final List<Integer> range = new ArrayList<>();
             range.add(portStart);
             if (portEnd != null) {
                 range.add(portEnd);
@@ -57,7 +56,7 @@ public class NetworkACLTO implements InternalIdentity {
 
             portRange = new int[range.size()];
             int i = 0;
-            for (Integer port : range) {
+            for (final Integer port : range) {
                 portRange[i] = port.intValue();
                 i++;
             }
@@ -77,22 +76,6 @@ public class NetworkACLTO implements InternalIdentity {
         }
 
         this.number = number;
-    }
-
-    public NetworkACLTO(NetworkACLItem rule, String vlanTag, NetworkACLItem.TrafficType trafficType) {
-        this(rule.getId(),
-            vlanTag,
-            rule.getProtocol(),
-            rule.getSourcePortStart(),
-            rule.getSourcePortEnd(),
-            rule.getState() == NetworkACLItem.State.Revoke,
-            rule.getState() == NetworkACLItem.State.Active,
-            rule.getSourceCidrList(),
-            rule.getIcmpType(),
-            rule.getIcmpCode(),
-            trafficType,
-            rule.getAction() == NetworkACLItem.Action.Allow,
-            rule.getNumber());
     }
 
     @Override
@@ -121,10 +104,11 @@ public class NetworkACLTO implements InternalIdentity {
     }
 
     public String getStringPortRange() {
-        if (portRange == null || portRange.length < 2)
+        if (portRange == null || portRange.length < 2) {
             return "0:0";
-        else
+        } else {
             return NetUtils.portRangeToString(portRange);
+        }
     }
 
     public boolean revoked() {

@@ -1,29 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.dc.dao;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.dc.DataCenterVnetVO;
 import com.cloud.network.dao.AccountGuestVlanMapDao;
@@ -38,6 +13,14 @@ import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -66,212 +49,6 @@ public class DataCenterVnetDaoImpl extends GenericDaoBase<DataCenterVnetVO, Long
 
     @Inject
     protected AccountGuestVlanMapDao _accountGuestVlanMapDao;
-
-    @Override
-    public List<DataCenterVnetVO> listAllocatedVnets(long physicalNetworkId) {
-        SearchCriteria<DataCenterVnetVO> sc = DcSearchAllocated.create();
-        sc.setParameters("physicalNetworkId", physicalNetworkId);
-        return listBy(sc);
-    }
-
-    @Override
-    public int countAllocatedVnets(long physicalNetworkId) {
-        SearchCriteria<DataCenterVnetVO> sc = DcSearchAllocated.create();
-        sc.setParameters("physicalNetworkId", physicalNetworkId);
-        return listBy(sc).size();
-    }
-
-    @Override
-    public List<DataCenterVnetVO> listAllocatedVnetsInRange(long dcId, long physicalNetworkId, Integer start, Integer end) {
-        SearchCriteria<DataCenterVnetVO> sc = DcSearchAllocatedInRange.create();
-        sc.setParameters("dc", dcId);
-        sc.setParameters("physicalNetworkId", physicalNetworkId);
-        sc.setParameters("vnetRange", start.toString(), end.toString());
-        return listBy(sc);
-    }
-
-    @Override
-    public void lockRange(long dcId, long physicalNetworkId, Integer start, Integer end) {
-        SearchCriteria<DataCenterVnetVO> sc = SearchRange.create();
-        sc.setParameters("dc", dcId);
-        sc.setParameters("physicalNetworkId", physicalNetworkId);
-        sc.setParameters("vnetRange", start.toString(), end.toString());
-        lockRows(sc, null, true);
-    }
-
-    @Override
-    public List<DataCenterVnetVO> findVnet(long dcId, String vnet) {
-        SearchCriteria<DataCenterVnetVO> sc = VnetDcSearch.create();
-        ;
-        sc.setParameters("dc", dcId);
-        sc.setParameters("vnet", vnet);
-        return listBy(sc);
-    }
-
-    @Override
-    public int countZoneVlans(long dcId, boolean onlyCountAllocated) {
-        SearchCriteria<Integer> sc = onlyCountAllocated ? countAllocatedZoneVlans.create() : countZoneVlans.create();
-        sc.setParameters("dc", dcId);
-        return customSearch(sc, null).get(0);
-    }
-
-    @Override
-    public List<DataCenterVnetVO> findVnet(long dcId, long physicalNetworkId, String vnet) {
-        SearchCriteria<DataCenterVnetVO> sc = VnetDcSearch.create();
-        sc.setParameters("dc", dcId);
-        sc.setParameters("physicalNetworkId", physicalNetworkId);
-        sc.setParameters("vnet", vnet);
-
-        return listBy(sc);
-    }
-
-    @Override
-    @DB
-    //In the List<string> argument each string is a vlan. not a vlanRange.
-        public
-        void add(long dcId, long physicalNetworkId, List<String> vnets) {
-        String insertVnet = "INSERT INTO `cloud`.`op_dc_vnet_alloc` (vnet, data_center_id, physical_network_id) VALUES ( ?, ?, ?)";
-
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
-            txn.start();
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(insertVnet);
-            for (int i = 0; i <= vnets.size() - 1; i++) {
-                stmt.setString(1, vnets.get(i));
-                stmt.setLong(2, dcId);
-                stmt.setLong(3, physicalNetworkId);
-                stmt.addBatch();
-            }
-            stmt.executeBatch();
-            txn.commit();
-        } catch (SQLException e) {
-            throw new CloudRuntimeException(e.getMessage());
-        }
-    }
-
-    //In the List<string> argument each string is a vlan. not a vlanRange.
-    @Override
-    public void deleteVnets(TransactionLegacy txn, long dcId, long physicalNetworkId, List<String> vnets) {
-        String deleteVnet = "DELETE FROM `cloud`.`op_dc_vnet_alloc` WHERE data_center_id=? AND physical_network_id=? AND taken IS NULL AND vnet=?";
-        try {
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(deleteVnet);
-            for (int i = 0; i <= vnets.size() - 1; i++) {
-                stmt.setLong(1, dcId);
-                stmt.setLong(2, physicalNetworkId);
-                stmt.setString(3, vnets.get(i));
-                stmt.addBatch();
-            }
-            stmt.executeBatch();
-        } catch (SQLException e) {
-            throw new CloudRuntimeException("Exception caught adding vnet ", e);
-        }
-    }
-
-    @Override
-    public void delete(long physicalNetworkId) {
-        SearchCriteria<DataCenterVnetVO> sc = VnetDcSearch.create();
-        sc.setParameters("physicalNetworkId", physicalNetworkId);
-        remove(sc);
-    }
-
-    @Override
-    @DB
-    public DataCenterVnetVO take(long physicalNetworkId, long accountId, String reservationId, List<Long> vlanDbIds) {
-        SearchCriteria<DataCenterVnetVO> sc;
-        if (vlanDbIds != null) {
-            sc = FreeDedicatedVnetSearch.create();
-            sc.setParameters("accountGuestVlanMapId", vlanDbIds.toArray());
-        } else {
-            sc = FreeVnetSearch.create();
-        }
-        sc.setParameters("physicalNetworkId", physicalNetworkId);
-        Date now = new Date();
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        DataCenterVnetVO vo = lockOneRandomRow(sc, true);
-        if (vo == null) {
-            return null;
-        }
-
-        vo.setTakenAt(now);
-        vo.setAccountId(accountId);
-        vo.setReservationId(reservationId);
-        update(vo.getId(), vo);
-        txn.commit();
-        return vo;
-    }
-
-    @Override
-    public void release(String vnet, long physicalNetworkId, long accountId, String reservationId) {
-        SearchCriteria<DataCenterVnetVO> sc = VnetDcSearchAllocated.create();
-        sc.setParameters("vnet", vnet);
-        sc.setParameters("physicalNetworkId", physicalNetworkId);
-        sc.setParameters("account", accountId);
-        sc.setParameters("reservation", reservationId);
-
-        DataCenterVnetVO vo = findOneIncludingRemovedBy(sc);
-        if (vo == null) {
-            return;
-        }
-
-        vo.setTakenAt(null);
-        vo.setAccountId(null);
-        vo.setReservationId(null);
-        update(vo.getId(), vo);
-    }
-
-    @Override
-    public void releaseDedicatedGuestVlans(Long dedicatedGuestVlanRangeId) {
-        SearchCriteria<DataCenterVnetVO> sc = DedicatedGuestVlanRangeSearch.create();
-        sc.setParameters("dedicatedGuestVlanRangeId", dedicatedGuestVlanRangeId);
-        List<DataCenterVnetVO> vnets = listBy(sc);
-        for (DataCenterVnetVO vnet : vnets) {
-            vnet.setAccountGuestVlanMapId(null);
-            update(vnet.getId(), vnet);
-        }
-    }
-
-    @Override
-    public int countVnetsAllocatedToAccount(long dcId, long accountId) {
-        SearchCriteria<Integer> sc = countVnetsAllocatedToAccount.create();
-        sc.setParameters("dc", dcId);
-        sc.setParameters("accountId", accountId);
-        return customSearch(sc, null).get(0);
-    }
-
-    @Override
-    public int countVnetsDedicatedToAccount(long dcId, long accountId) {
-        SearchCriteria<Integer> sc = countVnetsDedicatedToAccount.create();
-        sc.setParameters("dc", dcId);
-        sc.setParameters("accountId", accountId);
-        return customSearch(sc, null).get(0);
-    }
-
-    @Override
-    public List<String> listVnetsByPhysicalNetworkAndDataCenter(long dcId, long physicalNetworkId) {
-        SearchCriteria<String> sc = ListAllVnetSearch.create();
-        sc.setParameters("dc", dcId);
-        sc.setParameters("physicalNetworkId", physicalNetworkId);
-        return customSearch(sc, null);
-    }
-
-    @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
-        boolean result = super.configure(name, params);
-
-        countVnetsDedicatedToAccount = createSearchBuilder(Integer.class);
-        countVnetsDedicatedToAccount.and("dc", countVnetsDedicatedToAccount.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        countVnetsDedicatedToAccount.and("accountGuestVlanMapId", countVnetsDedicatedToAccount.entity().getAccountGuestVlanMapId(), Op.NNULL);
-        AccountGuestVlanMapSearch = _accountGuestVlanMapDao.createSearchBuilder();
-        AccountGuestVlanMapSearch.and("accountId", AccountGuestVlanMapSearch.entity().getAccountId(), SearchCriteria.Op.EQ);
-        countVnetsDedicatedToAccount.join("AccountGuestVlanMapSearch", AccountGuestVlanMapSearch, countVnetsDedicatedToAccount.entity().getAccountGuestVlanMapId(),
-            AccountGuestVlanMapSearch.entity().getId(), JoinBuilder.JoinType.INNER);
-        countVnetsDedicatedToAccount.select(null, Func.COUNT, countVnetsDedicatedToAccount.entity().getId());
-        countVnetsDedicatedToAccount.done();
-        AccountGuestVlanMapSearch.done();
-
-        return result;
-    }
 
     public DataCenterVnetDaoImpl() {
         super();
@@ -348,6 +125,209 @@ public class DataCenterVnetDaoImpl extends GenericDaoBase<DataCenterVnetVO, Long
         ListAllVnetSearch.and("dc", ListAllVnetSearch.entity().getDataCenterId(), Op.EQ);
         ListAllVnetSearch.and("physicalNetworkId", ListAllVnetSearch.entity().getPhysicalNetworkId(), Op.EQ);
         ListAllVnetSearch.done();
+    }
 
+    @Override
+    public List<DataCenterVnetVO> listAllocatedVnets(final long physicalNetworkId) {
+        final SearchCriteria<DataCenterVnetVO> sc = DcSearchAllocated.create();
+        sc.setParameters("physicalNetworkId", physicalNetworkId);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<DataCenterVnetVO> listAllocatedVnetsInRange(final long dcId, final long physicalNetworkId, final Integer start, final Integer end) {
+        final SearchCriteria<DataCenterVnetVO> sc = DcSearchAllocatedInRange.create();
+        sc.setParameters("dc", dcId);
+        sc.setParameters("physicalNetworkId", physicalNetworkId);
+        sc.setParameters("vnetRange", start.toString(), end.toString());
+        return listBy(sc);
+    }
+
+    @Override
+    public List<DataCenterVnetVO> findVnet(final long dcId, final String vnet) {
+        final SearchCriteria<DataCenterVnetVO> sc = VnetDcSearch.create();
+        sc.setParameters("dc", dcId);
+        sc.setParameters("vnet", vnet);
+        return listBy(sc);
+    }
+
+    @Override
+    public int countZoneVlans(final long dcId, final boolean onlyCountAllocated) {
+        final SearchCriteria<Integer> sc = onlyCountAllocated ? countAllocatedZoneVlans.create() : countZoneVlans.create();
+        sc.setParameters("dc", dcId);
+        return customSearch(sc, null).get(0);
+    }
+
+    @Override
+    public List<DataCenterVnetVO> findVnet(final long dcId, final long physicalNetworkId, final String vnet) {
+        final SearchCriteria<DataCenterVnetVO> sc = VnetDcSearch.create();
+        sc.setParameters("dc", dcId);
+        sc.setParameters("physicalNetworkId", physicalNetworkId);
+        sc.setParameters("vnet", vnet);
+
+        return listBy(sc);
+    }
+
+    @Override
+    @DB
+    //In the List<string> argument each string is a vlan. not a vlanRange.
+    public void add(final long dcId, final long physicalNetworkId, final List<String> vnets) {
+        final String insertVnet = "INSERT INTO `cloud`.`op_dc_vnet_alloc` (vnet, data_center_id, physical_network_id) VALUES ( ?, ?, ?)";
+
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        try {
+            txn.start();
+            final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertVnet);
+            for (int i = 0; i <= vnets.size() - 1; i++) {
+                stmt.setString(1, vnets.get(i));
+                stmt.setLong(2, dcId);
+                stmt.setLong(3, physicalNetworkId);
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+            txn.commit();
+        } catch (final SQLException e) {
+            throw new CloudRuntimeException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void delete(final long physicalNetworkId) {
+        final SearchCriteria<DataCenterVnetVO> sc = VnetDcSearch.create();
+        sc.setParameters("physicalNetworkId", physicalNetworkId);
+        remove(sc);
+    }
+
+    //In the List<string> argument each string is a vlan. not a vlanRange.
+    @Override
+    public void deleteVnets(final TransactionLegacy txn, final long dcId, final long physicalNetworkId, final List<String> vnets) {
+        final String deleteVnet = "DELETE FROM `cloud`.`op_dc_vnet_alloc` WHERE data_center_id=? AND physical_network_id=? AND taken IS NULL AND vnet=?";
+        try {
+            final PreparedStatement stmt = txn.prepareAutoCloseStatement(deleteVnet);
+            for (int i = 0; i <= vnets.size() - 1; i++) {
+                stmt.setLong(1, dcId);
+                stmt.setLong(2, physicalNetworkId);
+                stmt.setString(3, vnets.get(i));
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+        } catch (final SQLException e) {
+            throw new CloudRuntimeException("Exception caught adding vnet ", e);
+        }
+    }
+
+    @Override
+    public void lockRange(final long dcId, final long physicalNetworkId, final Integer start, final Integer end) {
+        final SearchCriteria<DataCenterVnetVO> sc = SearchRange.create();
+        sc.setParameters("dc", dcId);
+        sc.setParameters("physicalNetworkId", physicalNetworkId);
+        sc.setParameters("vnetRange", start.toString(), end.toString());
+        lockRows(sc, null, true);
+    }
+
+    @Override
+    @DB
+    public DataCenterVnetVO take(final long physicalNetworkId, final long accountId, final String reservationId, final List<Long> vlanDbIds) {
+        final SearchCriteria<DataCenterVnetVO> sc;
+        if (vlanDbIds != null) {
+            sc = FreeDedicatedVnetSearch.create();
+            sc.setParameters("accountGuestVlanMapId", vlanDbIds.toArray());
+        } else {
+            sc = FreeVnetSearch.create();
+        }
+        sc.setParameters("physicalNetworkId", physicalNetworkId);
+        final Date now = new Date();
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        txn.start();
+        final DataCenterVnetVO vo = lockOneRandomRow(sc, true);
+        if (vo == null) {
+            return null;
+        }
+
+        vo.setTakenAt(now);
+        vo.setAccountId(accountId);
+        vo.setReservationId(reservationId);
+        update(vo.getId(), vo);
+        txn.commit();
+        return vo;
+    }
+
+    @Override
+    public void release(final String vnet, final long physicalNetworkId, final long accountId, final String reservationId) {
+        final SearchCriteria<DataCenterVnetVO> sc = VnetDcSearchAllocated.create();
+        sc.setParameters("vnet", vnet);
+        sc.setParameters("physicalNetworkId", physicalNetworkId);
+        sc.setParameters("account", accountId);
+        sc.setParameters("reservation", reservationId);
+
+        final DataCenterVnetVO vo = findOneIncludingRemovedBy(sc);
+        if (vo == null) {
+            return;
+        }
+
+        vo.setTakenAt(null);
+        vo.setAccountId(null);
+        vo.setReservationId(null);
+        update(vo.getId(), vo);
+    }
+
+    @Override
+    public void releaseDedicatedGuestVlans(final Long dedicatedGuestVlanRangeId) {
+        final SearchCriteria<DataCenterVnetVO> sc = DedicatedGuestVlanRangeSearch.create();
+        sc.setParameters("dedicatedGuestVlanRangeId", dedicatedGuestVlanRangeId);
+        final List<DataCenterVnetVO> vnets = listBy(sc);
+        for (final DataCenterVnetVO vnet : vnets) {
+            vnet.setAccountGuestVlanMapId(null);
+            update(vnet.getId(), vnet);
+        }
+    }
+
+    @Override
+    public int countVnetsAllocatedToAccount(final long dcId, final long accountId) {
+        final SearchCriteria<Integer> sc = countVnetsAllocatedToAccount.create();
+        sc.setParameters("dc", dcId);
+        sc.setParameters("accountId", accountId);
+        return customSearch(sc, null).get(0);
+    }
+
+    @Override
+    public int countVnetsDedicatedToAccount(final long dcId, final long accountId) {
+        final SearchCriteria<Integer> sc = countVnetsDedicatedToAccount.create();
+        sc.setParameters("dc", dcId);
+        sc.setParameters("accountId", accountId);
+        return customSearch(sc, null).get(0);
+    }
+
+    @Override
+    public List<String> listVnetsByPhysicalNetworkAndDataCenter(final long dcId, final long physicalNetworkId) {
+        final SearchCriteria<String> sc = ListAllVnetSearch.create();
+        sc.setParameters("dc", dcId);
+        sc.setParameters("physicalNetworkId", physicalNetworkId);
+        return customSearch(sc, null);
+    }
+
+    @Override
+    public int countAllocatedVnets(final long physicalNetworkId) {
+        final SearchCriteria<DataCenterVnetVO> sc = DcSearchAllocated.create();
+        sc.setParameters("physicalNetworkId", physicalNetworkId);
+        return listBy(sc).size();
+    }
+
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+        final boolean result = super.configure(name, params);
+
+        countVnetsDedicatedToAccount = createSearchBuilder(Integer.class);
+        countVnetsDedicatedToAccount.and("dc", countVnetsDedicatedToAccount.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        countVnetsDedicatedToAccount.and("accountGuestVlanMapId", countVnetsDedicatedToAccount.entity().getAccountGuestVlanMapId(), Op.NNULL);
+        AccountGuestVlanMapSearch = _accountGuestVlanMapDao.createSearchBuilder();
+        AccountGuestVlanMapSearch.and("accountId", AccountGuestVlanMapSearch.entity().getAccountId(), SearchCriteria.Op.EQ);
+        countVnetsDedicatedToAccount.join("AccountGuestVlanMapSearch", AccountGuestVlanMapSearch, countVnetsDedicatedToAccount.entity().getAccountGuestVlanMapId(),
+                AccountGuestVlanMapSearch.entity().getId(), JoinBuilder.JoinType.INNER);
+        countVnetsDedicatedToAccount.select(null, Func.COUNT, countVnetsDedicatedToAccount.entity().getId());
+        countVnetsDedicatedToAccount.done();
+        AccountGuestVlanMapSearch.done();
+
+        return result;
     }
 }

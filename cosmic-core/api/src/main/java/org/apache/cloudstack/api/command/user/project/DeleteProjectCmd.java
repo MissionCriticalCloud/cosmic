@@ -1,25 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.project;
 
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.projects.Project;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -29,6 +12,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,8 +39,15 @@ public class DeleteProjectCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public String getCommandName() {
-        return s_name;
+    public void execute() {
+        CallContext.current().setEventDetails("Project Id: " + id);
+        final boolean result = _projectService.deleteProject(id);
+        if (result) {
+            final SuccessResponse response = new SuccessResponse(getCommandName());
+            this.setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete project");
+        }
     }
 
     /////////////////////////////////////////////////////
@@ -64,15 +55,19 @@ public class DeleteProjectCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public void execute() {
-        CallContext.current().setEventDetails("Project Id: " + id);
-        boolean result = _projectService.deleteProject(id);
-        if (result) {
-            SuccessResponse response = new SuccessResponse(getCommandName());
-            this.setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete project");
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final Project project = _projectService.getProject(id);
+        //verify input parameters
+        if (project == null) {
+            throw new InvalidParameterValueException("Unable to find project by id " + id);
         }
+
+        return _projectService.getProjectOwner(id).getId();
     }
 
     @Override
@@ -84,16 +79,4 @@ public class DeleteProjectCmd extends BaseAsyncCmd {
     public String getEventDescription() {
         return "Deleting project: " + id;
     }
-
-    @Override
-    public long getEntityOwnerId() {
-        Project project = _projectService.getProject(id);
-        //verify input parameters
-        if (project == null) {
-            throw new InvalidParameterValueException("Unable to find project by id " + id);
-        }
-
-        return _projectService.getProjectOwner(id).getId();
-    }
-
 }

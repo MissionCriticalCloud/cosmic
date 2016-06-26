@@ -1,26 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.internallbvmmgr;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
 
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -43,9 +21,15 @@ import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.DomainRouterDao;
-
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.network.lb.InternalLoadBalancerVMService;
+
+import javax.inject.Inject;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,11 +39,8 @@ import org.mockito.Mockito;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import junit.framework.TestCase;
-
 /**
  * Set of unittests for InternalLoadBalancerVMService
- *
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -93,7 +74,7 @@ public class InternalLBVMServiceTest extends TestCase {
         ServiceOfferingVO off = new ServiceOfferingVO("alena", 1, 1,
                 1, 1, 1, false, "alena", Storage.ProvisioningType.THIN, false, false, null, false, VirtualMachine.Type.InternalLoadBalancerVm, false);
         off = setId(off, 1);
-        List<ServiceOfferingVO> list = new ArrayList<ServiceOfferingVO>();
+        final List<ServiceOfferingVO> list = new ArrayList<>();
         list.add(off);
         list.add(off);
         Mockito.when(_svcOffDao.createSystemServiceOfferings(Matchers.anyString(), Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt(), Matchers.anyInt(),
@@ -128,6 +109,22 @@ public class InternalLBVMServiceTest extends TestCase {
     }
 
     //TESTS FOR START COMMAND
+
+    private static ServiceOfferingVO setId(final ServiceOfferingVO vo, final long id) {
+        final ServiceOfferingVO voToReturn = vo;
+        final Class<?> c = voToReturn.getClass();
+        try {
+            final Field f = c.getSuperclass().getDeclaredField("id");
+            f.setAccessible(true);
+            f.setLong(voToReturn, id);
+        } catch (final NoSuchFieldException ex) {
+            return null;
+        } catch (final IllegalAccessException ex) {
+            return null;
+        }
+
+        return voToReturn;
+    }
 
     @Test(expected = InvalidParameterValueException.class)
     public void startNonExistingVm() {
@@ -243,21 +240,5 @@ public class InternalLBVMServiceTest extends TestCase {
         } finally {
             assertNotNull("Internal LB vm is null which means it failed to stop " + vr, vr);
         }
-    }
-
-    private static ServiceOfferingVO setId(final ServiceOfferingVO vo, final long id) {
-        final ServiceOfferingVO voToReturn = vo;
-        final Class<?> c = voToReturn.getClass();
-        try {
-            final Field f = c.getSuperclass().getDeclaredField("id");
-            f.setAccessible(true);
-            f.setLong(voToReturn, id);
-        } catch (final NoSuchFieldException ex) {
-            return null;
-        } catch (final IllegalAccessException ex) {
-            return null;
-        }
-
-        return voToReturn;
     }
 }

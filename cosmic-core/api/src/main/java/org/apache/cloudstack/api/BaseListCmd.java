@@ -1,35 +1,18 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api;
-
-import java.util.Map;
 
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.utils.exception.CSExceptionErrorCode;
 
+import java.util.Map;
+
 public abstract class BaseListCmd extends BaseCmd implements IBaseListCmd {
 
-    private static Long s_maxPageSize = null;
     public static final Long s_pageSizeUnlimited = -1L;
+    private static Long s_maxPageSize = null;
 
     // ///////////////////////////////////////////////////
     // ///////// BaseList API parameters /////////////////
     // ///////////////////////////////////////////////////
-
     @Parameter(name = ApiConstants.KEYWORD, type = CommandType.STRING, description = "List by keyword")
     private String keyword;
 
@@ -71,23 +54,6 @@ public abstract class BaseListCmd extends BaseCmd implements IBaseListCmd {
     }
 
     @Override
-    public void configure() {
-        if (s_maxPageSize == null) {
-            if (_configService.getDefaultPageSize().longValue() != s_pageSizeUnlimited) {
-                s_maxPageSize = _configService.getDefaultPageSize();
-            } else {
-                s_maxPageSize = s_pageSizeUnlimited;
-            }
-        }
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        // no owner is needed for list command
-        return 0;
-    }
-
-    @Override
     public Long getPageSizeVal() {
         Long defaultPageSize = s_maxPageSize;
         final Integer pageSizeInt = getPageSize();
@@ -123,13 +89,30 @@ public abstract class BaseListCmd extends BaseCmd implements IBaseListCmd {
     }
 
     @Override
-    public void validateSpecificParameters(final Map<String, String> params){
+    public void configure() {
+        if (s_maxPageSize == null) {
+            if (_configService.getDefaultPageSize().longValue() != s_pageSizeUnlimited) {
+                s_maxPageSize = _configService.getDefaultPageSize();
+            } else {
+                s_maxPageSize = s_pageSizeUnlimited;
+            }
+        }
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        // no owner is needed for list command
+        return 0;
+    }
+
+    @Override
+    public void validateSpecificParameters(final Map<String, String> params) {
         super.validateSpecificParameters(params);
 
         final Object pageSizeObj = params.get(ApiConstants.PAGE_SIZE);
         Long pageSize = null;
         if (pageSizeObj != null) {
-            pageSize = Long.valueOf((String)pageSizeObj);
+            pageSize = Long.valueOf((String) pageSizeObj);
         }
 
         if (params.get(ApiConstants.PAGE) == null &&

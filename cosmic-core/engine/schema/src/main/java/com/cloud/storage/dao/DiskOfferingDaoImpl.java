@@ -1,25 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.storage.dao;
-
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.EntityExistsException;
 
 import com.cloud.offering.DiskOffering.Type;
 import com.cloud.storage.DiskOfferingVO;
@@ -30,14 +9,18 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 
+import javax.persistence.EntityExistsException;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class DiskOfferingDaoImpl extends GenericDaoBase<DiskOfferingVO, Long> implements DiskOfferingDao {
+    protected final SearchBuilder<DiskOfferingVO> UniqueNameSearch;
     private final SearchBuilder<DiskOfferingVO> DomainIdSearch;
     private final SearchBuilder<DiskOfferingVO> PrivateDiskOfferingSearch;
     private final SearchBuilder<DiskOfferingVO> PublicDiskOfferingSearch;
-    protected final SearchBuilder<DiskOfferingVO> UniqueNameSearch;
     private final Attribute _typeAttr;
 
     protected DiskOfferingDaoImpl() {
@@ -64,8 +47,8 @@ public class DiskOfferingDaoImpl extends GenericDaoBase<DiskOfferingVO, Long> im
     }
 
     @Override
-    public List<DiskOfferingVO> listByDomainId(long domainId) {
-        SearchCriteria<DiskOfferingVO> sc = DomainIdSearch.create();
+    public List<DiskOfferingVO> listByDomainId(final long domainId) {
+        final SearchCriteria<DiskOfferingVO> sc = DomainIdSearch.create();
         sc.setParameters("domainId", domainId);
         // FIXME: this should not be exact match, but instead should find all
         // available disk offerings from parent domains
@@ -74,27 +57,61 @@ public class DiskOfferingDaoImpl extends GenericDaoBase<DiskOfferingVO, Long> im
 
     @Override
     public List<DiskOfferingVO> findPrivateDiskOffering() {
-        SearchCriteria<DiskOfferingVO> sc = PrivateDiskOfferingSearch.create();
+        final SearchCriteria<DiskOfferingVO> sc = PrivateDiskOfferingSearch.create();
         sc.setParameters("diskSize", 0);
         return listBy(sc);
     }
 
     @Override
-    public List<DiskOfferingVO> searchIncludingRemoved(SearchCriteria<DiskOfferingVO> sc, final Filter filter, final Boolean lock, final boolean cache) {
+    public List<DiskOfferingVO> findPublicDiskOfferings() {
+        final SearchCriteria<DiskOfferingVO> sc = PublicDiskOfferingSearch.create();
+        sc.setParameters("system", false);
+        return listBy(sc);
+    }
+
+    @Override
+    public DiskOfferingVO findByUniqueName(final String uniqueName) {
+        final SearchCriteria<DiskOfferingVO> sc = UniqueNameSearch.create();
+        sc.setParameters("name", uniqueName);
+        final List<DiskOfferingVO> vos = search(sc, null, null, false);
+        if (vos.size() == 0) {
+            return null;
+        }
+
+        return vos.get(0);
+    }
+
+    @Override
+    public DiskOfferingVO persistDeafultDiskOffering(final DiskOfferingVO offering) {
+        assert offering.getUniqueName() != null : "unique name shouldn't be null for the disk offering";
+        final DiskOfferingVO vo = findByUniqueName(offering.getUniqueName());
+        if (vo != null) {
+            return vo;
+        }
+        try {
+            return persist(offering);
+        } catch (final EntityExistsException e) {
+            // Assume it's conflict on unique name
+            return findByUniqueName(offering.getUniqueName());
+        }
+    }
+
+    @Override
+    public List<DiskOfferingVO> searchIncludingRemoved(final SearchCriteria<DiskOfferingVO> sc, final Filter filter, final Boolean lock, final boolean cache) {
         sc.addAnd(_typeAttr, Op.EQ, Type.Disk);
         return super.searchIncludingRemoved(sc, filter, lock, cache);
     }
 
     @Override
-    public <K> List<K> customSearchIncludingRemoved(SearchCriteria<K> sc, final Filter filter) {
+    public <K> List<K> customSearchIncludingRemoved(final SearchCriteria<K> sc, final Filter filter) {
         sc.addAnd(_typeAttr, Op.EQ, Type.Disk);
         return super.customSearchIncludingRemoved(sc, filter);
     }
 
     @Override
     protected List<DiskOfferingVO> executeList(final String sql, final Object... params) {
-        StringBuilder builder = new StringBuilder(sql);
-        int index = builder.indexOf("WHERE");
+        final StringBuilder builder = new StringBuilder(sql);
+        final int index = builder.indexOf("WHERE");
         if (index == -1) {
             builder.append(" WHERE type=?");
         } else {
@@ -105,42 +122,8 @@ public class DiskOfferingDaoImpl extends GenericDaoBase<DiskOfferingVO, Long> im
     }
 
     @Override
-    public List<DiskOfferingVO> findPublicDiskOfferings() {
-        SearchCriteria<DiskOfferingVO> sc = PublicDiskOfferingSearch.create();
-        sc.setParameters("system", false);
-        return listBy(sc);
-    }
-
-    @Override
-    public DiskOfferingVO findByUniqueName(String uniqueName) {
-        SearchCriteria<DiskOfferingVO> sc = UniqueNameSearch.create();
-        sc.setParameters("name", uniqueName);
-        List<DiskOfferingVO> vos = search(sc, null, null, false);
-        if (vos.size() == 0) {
-            return null;
-        }
-
-        return vos.get(0);
-    }
-
-    @Override
-    public DiskOfferingVO persistDeafultDiskOffering(DiskOfferingVO offering) {
-        assert offering.getUniqueName() != null : "unique name shouldn't be null for the disk offering";
-        DiskOfferingVO vo = findByUniqueName(offering.getUniqueName());
-        if (vo != null) {
-            return vo;
-        }
-        try {
-            return persist(offering);
-        } catch (EntityExistsException e) {
-            // Assume it's conflict on unique name
-            return findByUniqueName(offering.getUniqueName());
-        }
-    }
-
-    @Override
-    public boolean remove(Long id) {
-        DiskOfferingVO diskOffering = createForUpdate();
+    public boolean remove(final Long id) {
+        final DiskOfferingVO diskOffering = createForUpdate();
         diskOffering.setRemoved(new Date());
 
         return update(id, diskOffering);

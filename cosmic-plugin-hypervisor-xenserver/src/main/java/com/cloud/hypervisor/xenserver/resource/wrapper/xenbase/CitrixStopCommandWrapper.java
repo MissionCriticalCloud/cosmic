@@ -1,29 +1,8 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.StopAnswer;
@@ -34,6 +13,13 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Network;
 import com.xensource.xenapi.SR;
@@ -42,11 +28,10 @@ import com.xensource.xenapi.Types.XenAPIException;
 import com.xensource.xenapi.VGPU;
 import com.xensource.xenapi.VIF;
 import com.xensource.xenapi.VM;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  StopCommand.class)
+@ResourceWrapper(handles = StopCommand.class)
 public final class CitrixStopCommandWrapper extends CommandWrapper<StopCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixStopCommandWrapper.class);
@@ -87,8 +72,10 @@ public final class CitrixStopCommandWrapper extends CommandWrapper<StopCommand, 
                     return new StopAnswer(command, msg, false);
                 }
 
-                if (vmr.powerState == VmPowerState.RUNNING && !citrixResourceBase.isRefNull(vmr.residentOn) && !vmr.residentOn.getUuid(conn).equals(citrixResourceBase.getHost().getUuid())) {
-                    final String msg = "Stop Vm " + vmName + " failed due to this vm is not running on this host: " + citrixResourceBase.getHost().getUuid() + " but host:" + vmr.residentOn.getUuid(conn);
+                if (vmr.powerState == VmPowerState.RUNNING && !citrixResourceBase.isRefNull(vmr.residentOn) && !vmr.residentOn.getUuid(conn).equals(citrixResourceBase.getHost()
+                                                                                                                                                                      .getUuid())) {
+                    final String msg = "Stop Vm " + vmName + " failed due to this vm is not running on this host: " + citrixResourceBase.getHost().getUuid() + " but host:" + vmr
+                            .residentOn.getUuid(conn);
                     s_logger.warn(msg);
                     return new StopAnswer(command, msg, platformstring, false);
                 }
@@ -137,7 +124,7 @@ public final class CitrixStopCommandWrapper extends CommandWrapper<StopCommand, 
                             }
 
                             final Set<VIF> vifs = vm.getVIFs(conn);
-                            final List<Network> networks = new ArrayList<Network>();
+                            final List<Network> networks = new ArrayList<>();
                             for (final VIF vif : vifs) {
                                 networks.add(vif.getNetwork(conn));
                             }
@@ -165,7 +152,6 @@ public final class CitrixStopCommandWrapper extends CommandWrapper<StopCommand, 
                     }
                 }
             }
-
         } catch (final Exception e) {
             final String msg = "Stop Vm " + vmName + " fail due to " + e.toString();
             s_logger.warn(msg, e);

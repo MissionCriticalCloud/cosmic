@@ -1,38 +1,94 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
+
+import com.cloud.serializer.Param;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
 
 import java.util.Date;
 
-import com.cloud.serializer.Param;
 import com.google.gson.annotations.SerializedName;
-
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
 
 public class UpgradeVmResponse extends BaseResponse {
     @SerializedName("id")
     private String id;
+    @SerializedName("name")
+    @Param(description = "the ID of the virtual machine")
+    private String name;
+    @SerializedName("created")
+    @Param(description = "the date when this virtual machine was created")
+    private Date created;
+    @SerializedName("ipaddress")
+    @Param(description = "the ip address of the virtual machine")
+    private String ipAddress;
+    @SerializedName("state")
+    @Param(description = "the state of the virtual machine")
+    private String state;
+    @SerializedName("account")
+    @Param(description = "the account associated with the virtual machine")
+    private String account;
+    @SerializedName("domainid")
+    @Param(description = "the ID of the domain in which the virtual machine exists")
+    private String domainId;
+    @SerializedName("domain")
+    @Param(description = "the name of the domain in which the virtual machine exists")
+    private String domain;
+    @SerializedName("haenable")
+    @Param(description = "true if high-availability is enabled, false otherwise")
+    private boolean haEnable;
+    @SerializedName("zoneid")
+    @Param(description = "the ID of the availablility zone for the virtual machine")
+    private String zoneId;
+    @SerializedName("displayname")
+    @Param(description = "user generated name. The name of the virtual machine is returned if no displayname exists.")
+    private String displayName;
+    @SerializedName(ApiConstants.ZONE_NAME)
+    @Param(description = "the name of the availability zone for the virtual machine")
+    private String zoneName;
+    @SerializedName("hostid")
+    @Param(description = "the ID of the host for the virtual machine")
+    private String hostId;
+    @SerializedName("hostname")
+    @Param(description = "the name of the host for the virtual machine")
+    private String hostName;
+    @SerializedName("templateid")
+    @Param(description = "the ID of the template for the virtual machine. A -1 is returned if the virtual machine was created from an ISO file.")
+    private String templateId;
+    @SerializedName("templatename")
+    @Param(description = "the name of the template for the virtual machine")
+    private String templateName;
+    @SerializedName("templatedisplaytext")
+    @Param(description = " an alternate display text of the template for the virtual machine")
+    private String templateDisplayText;
+    @SerializedName("passwordenabled")
+    @Param(description = "true if the password rest feature is enabled, false otherwise")
+    private boolean passwordEnabled;
+    @SerializedName("serviceofferingid")
+    @Param(description = "the ID of the service offering of the virtual machine")
+    private String serviceOfferingId;
+    @SerializedName("serviceofferingname")
+    @Param(description = "the name of the service offering of the virtual machine")
+    private String serviceOfferingName;
+    @SerializedName("cpunumber")
+    @Param(description = "the number of cpu this virtual machine is running with")
+    private long cpuSpeed;
+    @SerializedName("memory")
+    @Param(description = "the memory allocated for the virtual machine")
+    private long memory;
+    @SerializedName("cpuused")
+    @Param(description = "the amount of the vm's CPU currently used")
+    private long cpuUsed;
+    @SerializedName("networkkbsread")
+    @Param(description = "the incoming network traffic on the vm")
+    private long networkKbsRead;
+    @SerializedName("networkkbswrite")
+    @Param(description = "the outgoing network traffic on the host")
+    private long networkKbsWrite;
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -40,7 +96,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 
@@ -48,7 +104,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return ipAddress;
     }
 
-    public void setIpAddress(String ipAddress) {
+    public void setIpAddress(final String ipAddress) {
         this.ipAddress = ipAddress;
     }
 
@@ -56,7 +112,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
@@ -64,7 +120,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return account;
     }
 
-    public void setAccount(String account) {
+    public void setAccount(final String account) {
         this.account = account;
     }
 
@@ -72,7 +128,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return domainId;
     }
 
-    public void setDomainId(String domainId) {
+    public void setDomainId(final String domainId) {
         this.domainId = domainId;
     }
 
@@ -80,7 +136,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return domain;
     }
 
-    public void setDomain(String domain) {
+    public void setDomain(final String domain) {
         this.domain = domain;
     }
 
@@ -88,7 +144,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return haEnable;
     }
 
-    public void setHaEnable(boolean haEnable) {
+    public void setHaEnable(final boolean haEnable) {
         this.haEnable = haEnable;
     }
 
@@ -96,7 +152,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return zoneId;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
@@ -104,7 +160,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return displayName;
     }
 
-    public void setDisplayName(String displayName) {
+    public void setDisplayName(final String displayName) {
         this.displayName = displayName;
     }
 
@@ -112,7 +168,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return zoneName;
     }
 
-    public void setZoneName(String zoneName) {
+    public void setZoneName(final String zoneName) {
         this.zoneName = zoneName;
     }
 
@@ -120,7 +176,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return hostId;
     }
 
-    public void setHostId(String hostId) {
+    public void setHostId(final String hostId) {
         this.hostId = hostId;
     }
 
@@ -128,7 +184,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return hostName;
     }
 
-    public void setHostName(String hostName) {
+    public void setHostName(final String hostName) {
         this.hostName = hostName;
     }
 
@@ -136,7 +192,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return templateId;
     }
 
-    public void setTemplateId(String templateId) {
+    public void setTemplateId(final String templateId) {
         this.templateId = templateId;
     }
 
@@ -144,7 +200,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return templateName;
     }
 
-    public void setTemplateName(String templateName) {
+    public void setTemplateName(final String templateName) {
         this.templateName = templateName;
     }
 
@@ -152,7 +208,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return templateDisplayText;
     }
 
-    public void setTemplateDisplayText(String templateDisplayText) {
+    public void setTemplateDisplayText(final String templateDisplayText) {
         this.templateDisplayText = templateDisplayText;
     }
 
@@ -160,7 +216,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return passwordEnabled;
     }
 
-    public void setPasswordEnabled(boolean passwordEnabled) {
+    public void setPasswordEnabled(final boolean passwordEnabled) {
         this.passwordEnabled = passwordEnabled;
     }
 
@@ -168,7 +224,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return serviceOfferingId;
     }
 
-    public void setServiceOfferingId(String serviceOfferingId) {
+    public void setServiceOfferingId(final String serviceOfferingId) {
         this.serviceOfferingId = serviceOfferingId;
     }
 
@@ -176,7 +232,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return serviceOfferingName;
     }
 
-    public void setServiceOfferingName(String serviceOfferingName) {
+    public void setServiceOfferingName(final String serviceOfferingName) {
         this.serviceOfferingName = serviceOfferingName;
     }
 
@@ -184,7 +240,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return cpuSpeed;
     }
 
-    public void setCpuSpeed(long cpuSpeed) {
+    public void setCpuSpeed(final long cpuSpeed) {
         this.cpuSpeed = cpuSpeed;
     }
 
@@ -192,7 +248,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return memory;
     }
 
-    public void setMemory(long memory) {
+    public void setMemory(final long memory) {
         this.memory = memory;
     }
 
@@ -200,7 +256,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return cpuUsed;
     }
 
-    public void setCpuUsed(long cpuUsed) {
+    public void setCpuUsed(final long cpuUsed) {
         this.cpuUsed = cpuUsed;
     }
 
@@ -208,7 +264,7 @@ public class UpgradeVmResponse extends BaseResponse {
         return networkKbsRead;
     }
 
-    public void setNetworkKbsRead(long networkKbsRead) {
+    public void setNetworkKbsRead(final long networkKbsRead) {
         this.networkKbsRead = networkKbsRead;
     }
 
@@ -216,107 +272,11 @@ public class UpgradeVmResponse extends BaseResponse {
         return networkKbsWrite;
     }
 
-    public void setNetworkKbsWrite(long networkKbsWrite) {
+    public void setNetworkKbsWrite(final long networkKbsWrite) {
         this.networkKbsWrite = networkKbsWrite;
     }
 
     public String isId() {
         return id;
     }
-
-    @SerializedName("name")
-    @Param(description = "the ID of the virtual machine")
-    private String name;
-
-    @SerializedName("created")
-    @Param(description = "the date when this virtual machine was created")
-    private Date created;
-
-    @SerializedName("ipaddress")
-    @Param(description = "the ip address of the virtual machine")
-    private String ipAddress;
-
-    @SerializedName("state")
-    @Param(description = "the state of the virtual machine")
-    private String state;
-
-    @SerializedName("account")
-    @Param(description = "the account associated with the virtual machine")
-    private String account;
-
-    @SerializedName("domainid")
-    @Param(description = "the ID of the domain in which the virtual machine exists")
-    private String domainId;
-
-    @SerializedName("domain")
-    @Param(description = "the name of the domain in which the virtual machine exists")
-    private String domain;
-
-    @SerializedName("haenable")
-    @Param(description = "true if high-availability is enabled, false otherwise")
-    private boolean haEnable;
-
-    @SerializedName("zoneid")
-    @Param(description = "the ID of the availablility zone for the virtual machine")
-    private String zoneId;
-
-    @SerializedName("displayname")
-    @Param(description = "user generated name. The name of the virtual machine is returned if no displayname exists.")
-    private String displayName;
-
-    @SerializedName(ApiConstants.ZONE_NAME)
-    @Param(description = "the name of the availability zone for the virtual machine")
-    private String zoneName;
-
-    @SerializedName("hostid")
-    @Param(description = "the ID of the host for the virtual machine")
-    private String hostId;
-
-    @SerializedName("hostname")
-    @Param(description = "the name of the host for the virtual machine")
-    private String hostName;
-
-    @SerializedName("templateid")
-    @Param(description = "the ID of the template for the virtual machine. A -1 is returned if the virtual machine was created from an ISO file.")
-    private String templateId;
-
-    @SerializedName("templatename")
-    @Param(description = "the name of the template for the virtual machine")
-    private String templateName;
-
-    @SerializedName("templatedisplaytext")
-    @Param(description = " an alternate display text of the template for the virtual machine")
-    private String templateDisplayText;
-
-    @SerializedName("passwordenabled")
-    @Param(description = "true if the password rest feature is enabled, false otherwise")
-    private boolean passwordEnabled;
-
-    @SerializedName("serviceofferingid")
-    @Param(description = "the ID of the service offering of the virtual machine")
-    private String serviceOfferingId;
-
-    @SerializedName("serviceofferingname")
-    @Param(description = "the name of the service offering of the virtual machine")
-    private String serviceOfferingName;
-
-    @SerializedName("cpunumber")
-    @Param(description = "the number of cpu this virtual machine is running with")
-    private long cpuSpeed;
-
-    @SerializedName("memory")
-    @Param(description = "the memory allocated for the virtual machine")
-    private long memory;
-
-    @SerializedName("cpuused")
-    @Param(description = "the amount of the vm's CPU currently used")
-    private long cpuUsed;
-
-    @SerializedName("networkkbsread")
-    @Param(description = "the incoming network traffic on the vm")
-    private long networkKbsRead;
-
-    @SerializedName("networkkbswrite")
-    @Param(description = "the outgoing network traffic on the host")
-    private long networkKbsWrite;
 }

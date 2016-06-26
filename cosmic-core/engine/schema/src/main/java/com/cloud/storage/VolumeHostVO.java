@@ -1,22 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.storage;
 
-import java.util.Date;
+import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.utils.db.GenericDaoBase;
+import org.apache.cloudstack.api.InternalIdentity;
+import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
+import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
+import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,175 +18,72 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
-import com.cloud.utils.db.GenericDaoBase;
-
-import org.apache.cloudstack.api.InternalIdentity;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
+import java.util.Date;
 
 /**
  * Join table for storage hosts and volumes
- *
  */
 @Entity
 @Table(name = "volume_host_ref")
 public class VolumeHostVO implements InternalIdentity, DataObjectInStore {
+    @Column(name = "update_count", updatable = true, nullable = false)
+    protected long updatedCount;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
-    @Column(name = "host_id")
-    private long hostId;
-
-    @Column(name = "volume_id")
-    private long volumeId;
-
-    @Column(name = "zone_id")
-    private long zoneId;
-
-    @Column(name = GenericDaoBase.CREATED_COLUMN)
-    private Date created = null;
-
-    @Column(name = "last_updated")
-    @Temporal(value = TemporalType.TIMESTAMP)
-    private Date lastUpdated = null;
-
-    @Column(name = "download_pct")
-    private int downloadPercent;
-
-    @Column(name = "size")
-    private long size;
-
-    @Column(name = "physical_size")
-    private long physicalSize;
-
-    @Column(name = "download_state")
-    @Enumerated(EnumType.STRING)
-    private Status downloadState;
-
-    @Column(name = "checksum")
-    private String checksum;
-
-    @Column(name = "local_path")
-    private String localDownloadPath;
-
-    @Column(name = "error_str")
-    private String errorString;
-
-    @Column(name = "job_id")
-    private String jobId;
-
-    @Column(name = "install_path")
-    private String installPath;
-
-    @Column(name = "url", length = 2048)
-    private String downloadUrl;
-
-    @Column(name = "format")
-    private Storage.ImageFormat format;
-
     @Column(name = "destroyed")
     boolean destroyed = false;
-
-    @Column(name = "update_count", updatable = true, nullable = false)
-    protected long updatedCount;
-
     @Column(name = "updated")
     @Temporal(value = TemporalType.TIMESTAMP)
     Date updated;
-
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     ObjectInDataStoreStateMachine.State state;
+    @Column(name = "host_id")
+    private long hostId;
+    @Column(name = "volume_id")
+    private long volumeId;
+    @Column(name = "zone_id")
+    private long zoneId;
+    @Column(name = GenericDaoBase.CREATED_COLUMN)
+    private Date created = null;
+    @Column(name = "last_updated")
+    @Temporal(value = TemporalType.TIMESTAMP)
+    private Date lastUpdated = null;
+    @Column(name = "download_pct")
+    private int downloadPercent;
+    @Column(name = "size")
+    private long size;
+    @Column(name = "physical_size")
+    private long physicalSize;
+    @Column(name = "download_state")
+    @Enumerated(EnumType.STRING)
+    private Status downloadState;
+    @Column(name = "checksum")
+    private String checksum;
+    @Column(name = "local_path")
+    private String localDownloadPath;
+    @Column(name = "error_str")
+    private String errorString;
+    @Column(name = "job_id")
+    private String jobId;
+    @Column(name = "install_path")
+    private String installPath;
+    @Column(name = "url", length = 2048)
+    private String downloadUrl;
+    @Column(name = "format")
+    private Storage.ImageFormat format;
 
-    @Override
-    public String getInstallPath() {
-        return installPath;
-    }
-
-    public long getHostId() {
-        return hostId;
-    }
-
-    public void setHostId(long hostId) {
-        this.hostId = hostId;
-    }
-
-    public long getVolumeId() {
-        return volumeId;
-    }
-
-    public void setVolumeId(long volumeId) {
-        this.volumeId = volumeId;
-    }
-
-    public long getZoneId() {
-        return zoneId;
-    }
-
-    public void setZoneId(long zoneId) {
-        this.zoneId = zoneId;
-    }
-
-    public int getDownloadPercent() {
-        return downloadPercent;
-    }
-
-    public void setDownloadPercent(int downloadPercent) {
-        this.downloadPercent = downloadPercent;
-    }
-
-    public void setDownloadState(Status downloadState) {
-        this.downloadState = downloadState;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public Date getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(Date date) {
-        lastUpdated = date;
-    }
-
-    @Override
-    public void setInstallPath(String installPath) {
-        this.installPath = installPath;
-    }
-
-    public Status getDownloadState() {
-        return downloadState;
-    }
-
-    public String getChecksum() {
-        return checksum;
-    }
-
-    public void setChecksum(String checksum) {
-        this.checksum = checksum;
-    }
-
-    public VolumeHostVO(long hostId, long volumeId) {
+    public VolumeHostVO(final long hostId, final long volumeId) {
         super();
         this.hostId = hostId;
         this.volumeId = volumeId;
         this.state = ObjectInDataStoreStateMachine.State.Allocated;
     }
 
-    public VolumeHostVO(long hostId, long volumeId, long zoneId, Date lastUpdated, int downloadPercent, Status downloadState, String localDownloadPath,
-            String errorString, String jobId, String installPath, String downloadUrl, String checksum, ImageFormat format) {
+    public VolumeHostVO(final long hostId, final long volumeId, final long zoneId, final Date lastUpdated, final int downloadPercent, final Status downloadState, final String
+            localDownloadPath,
+                        final String errorString, final String jobId, final String installPath, final String downloadUrl, final String checksum, final ImageFormat format) {
         // super();
         this.hostId = hostId;
         this.volumeId = volumeId;
@@ -217,93 +104,203 @@ public class VolumeHostVO implements InternalIdentity, DataObjectInStore {
 
     }
 
-    public void setLocalDownloadPath(String localPath) {
-        this.localDownloadPath = localPath;
+    public void setUpdatedCount(final long updatedCount) {
+        this.updatedCount = updatedCount;
+    }
+
+    public void setId(final Long id) {
+        this.id = id;
+    }
+
+    public void setUpdated(final Date updated) {
+        this.updated = updated;
+    }
+
+    public void setState(final State state) {
+        this.state = state;
+    }
+
+    public void setCreated(final Date created) {
+        this.created = created;
+    }
+
+    @Override
+    public String getInstallPath() {
+        return installPath;
+    }
+
+    @Override
+    public void setInstallPath(final String installPath) {
+        this.installPath = installPath;
+    }
+
+    @Override
+    public long getObjectId() {
+        return this.getVolumeId();
+    }
+
+    @Override
+    public long getDataStoreId() {
+        return this.getHostId();
+    }
+
+    @Override
+    public State getObjectInStoreState() {
+        return this.state;
+    }
+
+    public long getHostId() {
+        return hostId;
+    }
+
+    public void setHostId(final long hostId) {
+        this.hostId = hostId;
+    }
+
+    public long getVolumeId() {
+        return volumeId;
+    }
+
+    public void setVolumeId(final long volumeId) {
+        this.volumeId = volumeId;
+    }
+
+    public long getZoneId() {
+        return zoneId;
+    }
+
+    public void setZoneId(final long zoneId) {
+        this.zoneId = zoneId;
+    }
+
+    public int getDownloadPercent() {
+        return downloadPercent;
+    }
+
+    public void setDownloadPercent(final int downloadPercent) {
+        this.downloadPercent = downloadPercent;
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(final Date date) {
+        lastUpdated = date;
+    }
+
+    public Status getDownloadState() {
+        return downloadState;
+    }
+
+    public void setDownloadState(final Status downloadState) {
+        this.downloadState = downloadState;
+    }
+
+    public String getChecksum() {
+        return checksum;
+    }
+
+    public void setChecksum(final String checksum) {
+        this.checksum = checksum;
     }
 
     public String getLocalDownloadPath() {
         return localDownloadPath;
     }
 
-    public void setErrorString(String errorString) {
-        this.errorString = errorString;
+    public void setLocalDownloadPath(final String localPath) {
+        this.localDownloadPath = localPath;
     }
 
     public String getErrorString() {
         return errorString;
     }
 
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
+    public void setErrorString(final String errorString) {
+        this.errorString = errorString;
     }
 
     public String getJobId() {
         return jobId;
     }
 
+    public void setJobId(final String jobId) {
+        this.jobId = jobId;
+    }
+
     @Override
-    public boolean equals(Object obj) {
+    public int hashCode() {
+        final Long tid = new Long(volumeId);
+        final Long hid = new Long(hostId);
+        return tid.hashCode() + hid.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
         if (obj instanceof VolumeHostVO) {
-            VolumeHostVO other = (VolumeHostVO)obj;
+            final VolumeHostVO other = (VolumeHostVO) obj;
             return (this.volumeId == other.getVolumeId() && this.hostId == other.getHostId());
         }
         return false;
     }
 
     @Override
-    public int hashCode() {
-        Long tid = new Long(volumeId);
-        Long hid = new Long(hostId);
-        return tid.hashCode() + hid.hashCode();
-    }
-
-    public void setSize(long size) {
-        this.size = size;
+    public String toString() {
+        return new StringBuilder("VolumeHost[").append(id).append("-").append(volumeId).append("-").append(hostId).append(installPath).append("]").toString();
     }
 
     public long getSize() {
         return size;
     }
 
-    public void setPhysicalSize(long physicalSize) {
-        this.physicalSize = physicalSize;
+    public void setSize(final long size) {
+        this.size = size;
     }
 
     public long getPhysicalSize() {
         return physicalSize;
     }
 
-    public void setDestroyed(boolean destroyed) {
-        this.destroyed = destroyed;
+    public void setPhysicalSize(final long physicalSize) {
+        this.physicalSize = physicalSize;
     }
 
     public boolean getDestroyed() {
         return destroyed;
     }
 
-    public void setDownloadUrl(String downloadUrl) {
-        this.downloadUrl = downloadUrl;
+    public void setDestroyed(final boolean destroyed) {
+        this.destroyed = destroyed;
     }
 
     public String getDownloadUrl() {
         return downloadUrl;
     }
 
+    public void setDownloadUrl(final String downloadUrl) {
+        this.downloadUrl = downloadUrl;
+    }
+
     public Storage.ImageFormat getFormat() {
         return format;
     }
 
-    public void setFormat(Storage.ImageFormat format) {
+    public void setFormat(final Storage.ImageFormat format) {
         this.format = format;
     }
 
     public long getVolumeSize() {
         return -1;
-    }
-
-    @Override
-    public String toString() {
-        return new StringBuilder("VolumeHost[").append(id).append("-").append(volumeId).append("-").append(hostId).append(installPath).append("]").toString();
     }
 
     public long getUpdatedCount() {
@@ -327,20 +324,4 @@ public class VolumeHostVO implements InternalIdentity, DataObjectInStore {
         // TODO Auto-generated method stub
         return this.state;
     }
-
-    @Override
-    public long getObjectId() {
-        return this.getVolumeId();
-    }
-
-    @Override
-    public long getDataStoreId() {
-        return this.getHostId();
-    }
-
-    @Override
-    public State getObjectInStoreState() {
-        return this.state;
-    }
-
 }

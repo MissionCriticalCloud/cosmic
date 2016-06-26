@@ -1,27 +1,11 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.agent.manager;
-
-import java.nio.channels.ClosedChannelException;
 
 import com.cloud.agent.transport.Request;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.host.Status;
 import com.cloud.utils.nio.Link;
+
+import java.nio.channels.ClosedChannelException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,36 +27,9 @@ public class ConnectedAgentAttache extends AgentAttache {
     public synchronized void send(final Request req) throws AgentUnavailableException {
         try {
             _link.send(req.toBytes());
-        } catch (ClosedChannelException e) {
+        } catch (final ClosedChannelException e) {
             throw new AgentUnavailableException("Channel is closed", _id);
         }
-    }
-
-    @Override
-    public synchronized boolean isClosed() {
-        return _link == null;
-    }
-
-    @Override
-    public void disconnect(final Status state) {
-        synchronized (this) {
-            s_logger.debug("Processing Disconnect.");
-            if (_link != null) {
-                _link.close();
-                _link.terminated();
-            }
-            _link = null;
-        }
-        cancelAllCommands(state, true);
-        _requests.clear();
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((_link == null) ? 0 : _link.hashCode());
-        return result;
     }
 
     @Override
@@ -91,8 +48,35 @@ public class ConnectedAgentAttache extends AgentAttache {
         if (_link == null) {
             return false;
         }
-        ConnectedAgentAttache that = (ConnectedAgentAttache)obj;
+        final ConnectedAgentAttache that = (ConnectedAgentAttache) obj;
         return super.equals(obj) && _link == that._link;
+    }
+
+    @Override
+    public void disconnect(final Status state) {
+        synchronized (this) {
+            s_logger.debug("Processing Disconnect.");
+            if (_link != null) {
+                _link.close();
+                _link.terminated();
+            }
+            _link = null;
+        }
+        cancelAllCommands(state, true);
+        _requests.clear();
+    }
+
+    @Override
+    public synchronized boolean isClosed() {
+        return _link == null;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((_link == null) ? 0 : _link.hashCode());
+        return result;
     }
 
     @Override
@@ -109,5 +93,4 @@ public class ConnectedAgentAttache extends AgentAttache {
             super.finalize();
         }
     }
-
 }

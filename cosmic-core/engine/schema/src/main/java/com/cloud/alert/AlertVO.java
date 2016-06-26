@@ -1,23 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.alert;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,8 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "alert")
@@ -90,7 +73,7 @@ public class AlertVO implements Alert {
         return type;
     }
 
-    public void setType(short type) {
+    public void setType(final short type) {
         this.type = type;
     }
 
@@ -99,16 +82,8 @@ public class AlertVO implements Alert {
         return subject;
     }
 
-    public void setSubject(String subject) {
+    public void setSubject(final String subject) {
         this.subject = subject;
-    }
-
-    public Long getClusterId() {
-        return clusterId;
-    }
-
-    public void setClusterId(Long clusterId) {
-        this.clusterId = clusterId;
     }
 
     @Override
@@ -116,7 +91,7 @@ public class AlertVO implements Alert {
         return podId;
     }
 
-    public void setPodId(Long podId) {
+    public void setPodId(final Long podId) {
         this.podId = podId;
     }
 
@@ -125,7 +100,7 @@ public class AlertVO implements Alert {
         return dataCenterId;
     }
 
-    public void setDataCenterId(long dataCenterId) {
+    public void setDataCenterId(final long dataCenterId) {
         this.dataCenterId = dataCenterId;
     }
 
@@ -134,7 +109,7 @@ public class AlertVO implements Alert {
         return sentCount;
     }
 
-    public void setSentCount(int sentCount) {
+    public void setSentCount(final int sentCount) {
         this.sentCount = sentCount;
     }
 
@@ -143,7 +118,7 @@ public class AlertVO implements Alert {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(final Date createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -152,7 +127,7 @@ public class AlertVO implements Alert {
         return lastSent;
     }
 
-    public void setLastSent(Date lastSent) {
+    public void setLastSent(final Date lastSent) {
         this.lastSent = lastSent;
     }
 
@@ -161,17 +136,8 @@ public class AlertVO implements Alert {
         return resolved;
     }
 
-    public void setResolved(Date resolved) {
+    public void setResolved(final Date resolved) {
         this.resolved = resolved;
-    }
-
-    @Override
-    public String getUuid() {
-        return this.uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 
     @Override
@@ -179,7 +145,7 @@ public class AlertVO implements Alert {
         return archived;
     }
 
-    public void setArchived(Boolean archived) {
+    public void setArchived(final Boolean archived) {
         this.archived = archived;
     }
 
@@ -188,7 +154,24 @@ public class AlertVO implements Alert {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
+    }
+
+    public Long getClusterId() {
+        return clusterId;
+    }
+
+    public void setClusterId(final Long clusterId) {
+        this.clusterId = clusterId;
+    }
+
+    @Override
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 }

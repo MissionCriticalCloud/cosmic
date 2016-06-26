@@ -1,22 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.vm;
 
-import java.util.Date;
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -26,8 +10,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import java.util.Date;
 
 /**
  * ConsoleProxyVO domain object
@@ -66,10 +49,10 @@ public class ConsoleProxyVO extends VMInstanceVO implements ConsoleProxy {
 
     /**
      * Correct constructor to use.
-     *
      */
-    public ConsoleProxyVO(long id, long serviceOfferingId, String name, long templateId, HypervisorType hypervisorType, long guestOSId, long dataCenterId, long domainId,
-                          long accountId, long userId, int activeSession, boolean haEnabled) {
+    public ConsoleProxyVO(final long id, final long serviceOfferingId, final String name, final long templateId, final HypervisorType hypervisorType, final long guestOSId, final
+    long dataCenterId, final long domainId,
+                          final long accountId, final long userId, final int activeSession, final boolean haEnabled) {
         super(id, serviceOfferingId, name, name, Type.ConsoleProxy, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
         this.activeSession = activeSession;
         this.dataCenterId = dataCenterId;
@@ -79,33 +62,13 @@ public class ConsoleProxyVO extends VMInstanceVO implements ConsoleProxy {
         super();
     }
 
-    public void setPublicIpAddress(String publicIpAddress) {
-        this.publicIpAddress = publicIpAddress;
-    }
-
-    public void setPublicNetmask(String publicNetmask) {
-        this.publicNetmask = publicNetmask;
-    }
-
-    public void setPublicMacAddress(String publicMacAddress) {
-        this.publicMacAddress = publicMacAddress;
-    }
-
-    public void setActiveSession(int activeSession) {
-        this.activeSession = activeSession;
-    }
-
-    public void setLastUpdateTime(Date time) {
-        lastUpdateTime = time;
-    }
-
-    public void setSessionDetails(byte[] details) {
-        sessionDetails = details;
-    }
-
     @Override
     public String getPublicIpAddress() {
         return publicIpAddress;
+    }
+
+    public void setPublicIpAddress(final String publicIpAddress) {
+        this.publicIpAddress = publicIpAddress;
     }
 
     @Override
@@ -113,14 +76,17 @@ public class ConsoleProxyVO extends VMInstanceVO implements ConsoleProxy {
         return publicNetmask;
     }
 
+    public void setPublicNetmask(final String publicNetmask) {
+        this.publicNetmask = publicNetmask;
+    }
+
     @Override
     public String getPublicMacAddress() {
         return publicMacAddress;
     }
 
-    @Override
-    public int getActiveSession() {
-        return activeSession;
+    public void setPublicMacAddress(final String publicMacAddress) {
+        this.publicMacAddress = publicMacAddress;
     }
 
     @Override
@@ -128,25 +94,41 @@ public class ConsoleProxyVO extends VMInstanceVO implements ConsoleProxy {
         return lastUpdateTime;
     }
 
+    public void setLastUpdateTime(final Date time) {
+        lastUpdateTime = time;
+    }
+
+    @Override
+    public int getActiveSession() {
+        return activeSession;
+    }
+
+    public void setActiveSession(final int activeSession) {
+        this.activeSession = activeSession;
+    }
+
     @Override
     public byte[] getSessionDetails() {
         return sessionDetails;
+    }
+
+    public void setSessionDetails(final byte[] details) {
+        sessionDetails = details;
     }
 
     public boolean isSslEnabled() {
         return sslEnabled;
     }
 
-    public void setSslEnabled(boolean sslEnabled) {
+    public void setSslEnabled(final boolean sslEnabled) {
         this.sslEnabled = sslEnabled;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
     }
 
     public int getPort() {
         return port;
     }
 
+    public void setPort(final int port) {
+        this.port = port;
+    }
 }

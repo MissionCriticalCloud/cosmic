@@ -1,25 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.projects;
-
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
 
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceAllocationException;
@@ -28,106 +7,121 @@ import com.cloud.projects.ProjectAccount.Role;
 import com.cloud.user.Account;
 import com.cloud.utils.component.ManagerBase;
 
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
+
 public class MockProjectManagerImpl extends ManagerBase implements ProjectManager {
 
     @Override
-    public Project createProject(String name, String displayText, String accountName, Long domainId) throws ResourceAllocationException {
+    public Project createProject(final String name, final String displayText, final String accountName, final Long domainId) throws ResourceAllocationException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public boolean deleteProject(long id) {
+    public boolean deleteProject(final long id) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public Project getProject(long id) {
+    public Project getProject(final long id) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public ProjectAccount assignAccountToProject(Project project, long accountId, Role accountRole) {
+    public ProjectAccount assignAccountToProject(final Project project, final long accountId, final Role accountRole) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Account getProjectOwner(long projectId) {
+    public Account getProjectOwner(final long projectId) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public boolean unassignAccountFromProject(long projectId, long accountId) {
+    public boolean unassignAccountFromProject(final long projectId, final long accountId) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public Project findByProjectAccountId(long projectAccountId) {
+    public Project findByProjectAccountId(final long projectAccountId) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Project findByNameAndDomainId(String name, long domainId) {
+    public Project findByNameAndDomainId(final String name, final long domainId) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Project updateProject(long id, String displayText, String newOwnerName) throws ResourceAllocationException {
+    public Project updateProject(final long id, final String displayText, final String newOwnerName) throws ResourceAllocationException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public boolean addAccountToProject(long projectId, String accountName, String email) {
+    public boolean addAccountToProject(final long projectId, final String accountName, final String email) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean deleteAccountFromProject(long projectId, String accountName) {
+    public boolean deleteAccountFromProject(final long projectId, final String accountName) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean updateInvitation(long projectId, String accountName, String token, boolean accept) {
+    public boolean updateInvitation(final long projectId, final String accountName, final String token, final boolean accept) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public Project activateProject(long projectId) {
+    public Project activateProject(final long projectId) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Project suspendProject(long projectId) throws ConcurrentOperationException, ResourceUnavailableException {
+    public Project suspendProject(final long projectId) throws ConcurrentOperationException, ResourceUnavailableException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Project enableProject(long projectId) {
+    public Project enableProject(final long projectId) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public boolean deleteProjectInvitation(long invitationId) {
+    public boolean deleteProjectInvitation(final long invitationId) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public Project findByProjectAccountIdIncludingRemoved(final long projectAccountId) {
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         // TODO Auto-generated method stub
         return true;
     }
@@ -145,31 +139,25 @@ public class MockProjectManagerImpl extends ManagerBase implements ProjectManage
     }
 
     @Override
-    public String getName() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean canAccessProjectAccount(Account caller, long accountId) {
+    public boolean canAccessProjectAccount(final Account caller, final long accountId) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean canModifyProjectAccount(Account caller, long accountId) {
+    public boolean canModifyProjectAccount(final Account caller, final long accountId) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean deleteAccountFromProject(long projectId, long accountId) {
+    public boolean deleteAccountFromProject(final long projectId, final long accountId) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public List<Long> listPermittedProjectAccounts(long accountId) {
+    public List<Long> listPermittedProjectAccounts(final long accountId) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -187,7 +175,7 @@ public class MockProjectManagerImpl extends ManagerBase implements ProjectManage
     }
 
     @Override
-    public boolean deleteProject(Account caller, long callerUserId, ProjectVO project) {
+    public boolean deleteProject(final Account caller, final long callerUserId, final ProjectVO project) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -197,10 +185,4 @@ public class MockProjectManagerImpl extends ManagerBase implements ProjectManage
         // TODO Auto-generated method stub
         return 0;
     }
-
-    @Override
-    public Project findByProjectAccountIdIncludingRemoved(long projectAccountId) {
-        return null;
-    }
-
 }

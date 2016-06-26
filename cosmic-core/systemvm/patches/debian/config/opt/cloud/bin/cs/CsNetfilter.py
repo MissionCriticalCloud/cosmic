@@ -1,34 +1,19 @@
 # -- coding: utf-8 --
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+
 from __future__ import print_function
 
-import CsHelper
-from CsDatabag import CsCmdLine
 import logging
 from cs_iptables_save import Tables
 
+import CsHelper
+from CsDatabag import CsCmdLine
+
 
 class CsChain(object):
-
     def __init__(self):
-        self.chain = {}
+        self.chain = { }
         self.last_added = ''
-        self.count = {}
+        self.count = { }
 
     def add(self, table, chain):
         if table not in self.chain.keys():
@@ -44,7 +29,7 @@ class CsChain(object):
 
     def get(self, table):
         if table not in self.chain.keys():
-            return {}
+            return { }
         return self.chain[table]
 
     def get_count(self, chain):
@@ -62,7 +47,6 @@ class CsChain(object):
 
 
 class CsTable(object):
-
     def __init__(self):
         self.table = []
         self.last_added = ''
@@ -80,7 +64,6 @@ class CsTable(object):
 
 
 class CsNetfilters(object):
-
     def __init__(self, load=True):
         self.rules = []
         self.iptablerules = []
@@ -217,9 +200,8 @@ class CsNetfilters(object):
 
 
 class CsNetfilter(object):
-
     def __init__(self):
-        self.rule = {}
+        self.rule = { }
         self.table = ''
         self.chain = ''
         self.seen = False

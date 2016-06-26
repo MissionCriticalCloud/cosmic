@@ -1,35 +1,19 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
+
+import com.cloud.host.Host;
+import com.cloud.host.Status;
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.serializer.Param;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
+import org.apache.cloudstack.api.EntityReference;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cloud.host.Host;
-import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.serializer.Param;
 import com.google.gson.annotations.SerializedName;
-
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.EntityReference;
 
 @EntityReference(value = Host.class)
 public class HostResponse extends BaseResponse {
@@ -198,7 +182,8 @@ public class HostResponse extends BaseResponse {
     private Boolean hasEnoughCapacity;
 
     @SerializedName("suitableformigration")
-    @Param(description = "true if this host is suitable(has enough capacity and satisfies all conditions like hosttags, max guests vm limit etc) to migrate a VM to it , false otherwise")
+    @Param(description = "true if this host is suitable(has enough capacity and satisfies all conditions like hosttags, max guests vm limit etc) to migrate a VM to it , false " +
+            "otherwise")
     private Boolean suitableForMigration;
 
     @SerializedName("resourcestate")
@@ -217,218 +202,12 @@ public class HostResponse extends BaseResponse {
     @Param(description = "Host details in key/value pairs.", since = "4.5")
     private Map details;
 
-
     // Default visibility to support accessing the details from unit tests
     Map getDetails() {
         return details;
     }
 
-    @Override
-    public String getObjectId() {
-        return this.getId();
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setState(Status state) {
-        this.state = state;
-    }
-
-    public void setDisconnectedOn(Date disconnectedOn) {
-        this.disconnectedOn = disconnectedOn;
-    }
-
-    public void setHostType(Host.Type hostType) {
-        this.hostType = hostType;
-    }
-
-    public void setOsCategoryId(String osCategoryId) {
-        this.osCategoryId = osCategoryId;
-    }
-
-    public void setOsCategoryName(String osCategoryName) {
-        this.osCategoryName = osCategoryName;
-    }
-
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
-    }
-
-    public void setZoneId(String zoneId) {
-        this.zoneId = zoneId;
-    }
-
-    public void setZoneName(String zoneName) {
-        this.zoneName = zoneName;
-    }
-
-    public void setPodId(String podId) {
-        this.podId = podId;
-    }
-
-    public void setPodName(String podName) {
-        this.podName = podName;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public void setHypervisor(HypervisorType hypervisor) {
-        this.hypervisor = hypervisor;
-    }
-
-    public void setCpuSockets(Integer cpuSockets) {
-        this.cpuSockets = cpuSockets;
-    }
-
-    public void setCpuNumber(Integer cpuNumber) {
-        this.cpuNumber = cpuNumber;
-    }
-
-    public void setCpuSpeed(Long cpuSpeed) {
-        this.cpuSpeed = cpuSpeed;
-    }
-
-    public String getCpuAllocated() {
-        return cpuAllocated;
-    }
-
-    public void setCpuAllocated(String cpuAllocated) {
-        this.cpuAllocated = cpuAllocated;
-    }
-
-    public void setCpuUsed(String cpuUsed) {
-        this.cpuUsed = cpuUsed;
-    }
-
-    public void setAverageLoad(Long averageLoad) {
-        this.averageLoad = averageLoad;
-    }
-
-    public void setNetworkKbsRead(Long networkKbsRead) {
-        this.networkKbsRead = networkKbsRead;
-    }
-
-    public void setNetworkKbsWrite(Long networkKbsWrite) {
-        this.networkKbsWrite = networkKbsWrite;
-    }
-
-    public void setMemoryTotal(Long memoryTotal) {
-        this.memoryTotal = memoryTotal;
-    }
-
-    public void setMemoryAllocated(Long memoryAllocated) {
-        this.memoryAllocated = memoryAllocated;
-    }
-
-    public void setMemoryUsed(Long memoryUsed) {
-        this.memoryUsed = memoryUsed;
-    }
-
-    public void setGpuGroups(List<GpuResponse> gpuGroup) {
-        this.gpuGroup = gpuGroup;
-    }
-
-    public void setDiskSizeTotal(Long diskSizeTotal) {
-        this.diskSizeTotal = diskSizeTotal;
-    }
-
-    public void setDiskSizeAllocated(Long diskSizeAllocated) {
-        this.diskSizeAllocated = diskSizeAllocated;
-    }
-
-    public void setCapabilities(String capabilities) {
-        this.capabilities = capabilities;
-    }
-
-    public void setLastPinged(Date lastPinged) {
-        this.lastPinged = lastPinged;
-    }
-
-    public void setManagementServerId(Long managementServerId) {
-        this.managementServerId = managementServerId;
-    }
-
-    public void setClusterId(String clusterId) {
-        this.clusterId = clusterId;
-    }
-
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
-    }
-
-    public void setClusterType(String clusterType) {
-        this.clusterType = clusterType;
-    }
-
-    public void setLocalStorageActive(Boolean localStorageActive) {
-        this.localStorageActive = localStorageActive;
-    }
-
-    public void setCreated(Date created) {
-        this.created = created;
-    }
-
-    public void setRemoved(Date removed) {
-        this.removed = removed;
-    }
-
-    public void setEvents(String events) {
-        this.events = events;
-    }
-
-    public String getHostTags() {
-        return hostTags;
-    }
-
-    public void setHostTags(String hostTags) {
-        this.hostTags = hostTags;
-    }
-
-    public void setHasEnoughCapacity(Boolean hasEnoughCapacity) {
-        this.hasEnoughCapacity = hasEnoughCapacity;
-    }
-
-    public void setSuitableForMigration(Boolean suitableForMigration) {
-        this.suitableForMigration = suitableForMigration;
-    }
-
-    public String getResourceState() {
-        return resourceState;
-    }
-
-    public void setResourceState(String resourceState) {
-        this.resourceState = resourceState;
-    }
-
-    public String getCpuWithOverprovisioning() {
-        return cpuWithOverprovisioning;
-    }
-
-    public void setCpuWithOverprovisioning(String cpuWithOverprovisioning) {
-        this.cpuWithOverprovisioning = cpuWithOverprovisioning;
-    }
-
-    public void setHypervisorVersion(String hypervisorVersion) {
-        this.hypervisorVersion = hypervisorVersion;
-    }
-
-    public void setHaHost(Boolean haHost) {
-        this.haHost = haHost;
-    }
-
-    public void setDetails(Map details) {
+    public void setDetails(final Map details) {
 
         if (details == null) {
             return;
@@ -443,7 +222,210 @@ public class HostResponse extends BaseResponse {
         detailsCopy.remove("password");
 
         this.details = detailsCopy;
-
     }
 
+    @Override
+    public String getObjectId() {
+        return this.getId();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(final String id) {
+        this.id = id;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public void setState(final Status state) {
+        this.state = state;
+    }
+
+    public void setDisconnectedOn(final Date disconnectedOn) {
+        this.disconnectedOn = disconnectedOn;
+    }
+
+    public void setHostType(final Host.Type hostType) {
+        this.hostType = hostType;
+    }
+
+    public void setOsCategoryId(final String osCategoryId) {
+        this.osCategoryId = osCategoryId;
+    }
+
+    public void setOsCategoryName(final String osCategoryName) {
+        this.osCategoryName = osCategoryName;
+    }
+
+    public void setIpAddress(final String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public void setZoneId(final String zoneId) {
+        this.zoneId = zoneId;
+    }
+
+    public void setZoneName(final String zoneName) {
+        this.zoneName = zoneName;
+    }
+
+    public void setPodId(final String podId) {
+        this.podId = podId;
+    }
+
+    public void setPodName(final String podName) {
+        this.podName = podName;
+    }
+
+    public void setVersion(final String version) {
+        this.version = version;
+    }
+
+    public void setHypervisor(final HypervisorType hypervisor) {
+        this.hypervisor = hypervisor;
+    }
+
+    public void setCpuSockets(final Integer cpuSockets) {
+        this.cpuSockets = cpuSockets;
+    }
+
+    public void setCpuNumber(final Integer cpuNumber) {
+        this.cpuNumber = cpuNumber;
+    }
+
+    public void setCpuSpeed(final Long cpuSpeed) {
+        this.cpuSpeed = cpuSpeed;
+    }
+
+    public String getCpuAllocated() {
+        return cpuAllocated;
+    }
+
+    public void setCpuAllocated(final String cpuAllocated) {
+        this.cpuAllocated = cpuAllocated;
+    }
+
+    public void setCpuUsed(final String cpuUsed) {
+        this.cpuUsed = cpuUsed;
+    }
+
+    public void setAverageLoad(final Long averageLoad) {
+        this.averageLoad = averageLoad;
+    }
+
+    public void setNetworkKbsRead(final Long networkKbsRead) {
+        this.networkKbsRead = networkKbsRead;
+    }
+
+    public void setNetworkKbsWrite(final Long networkKbsWrite) {
+        this.networkKbsWrite = networkKbsWrite;
+    }
+
+    public void setMemoryTotal(final Long memoryTotal) {
+        this.memoryTotal = memoryTotal;
+    }
+
+    public void setMemoryAllocated(final Long memoryAllocated) {
+        this.memoryAllocated = memoryAllocated;
+    }
+
+    public void setMemoryUsed(final Long memoryUsed) {
+        this.memoryUsed = memoryUsed;
+    }
+
+    public void setGpuGroups(final List<GpuResponse> gpuGroup) {
+        this.gpuGroup = gpuGroup;
+    }
+
+    public void setDiskSizeTotal(final Long diskSizeTotal) {
+        this.diskSizeTotal = diskSizeTotal;
+    }
+
+    public void setDiskSizeAllocated(final Long diskSizeAllocated) {
+        this.diskSizeAllocated = diskSizeAllocated;
+    }
+
+    public void setCapabilities(final String capabilities) {
+        this.capabilities = capabilities;
+    }
+
+    public void setLastPinged(final Date lastPinged) {
+        this.lastPinged = lastPinged;
+    }
+
+    public void setManagementServerId(final Long managementServerId) {
+        this.managementServerId = managementServerId;
+    }
+
+    public void setClusterId(final String clusterId) {
+        this.clusterId = clusterId;
+    }
+
+    public void setClusterName(final String clusterName) {
+        this.clusterName = clusterName;
+    }
+
+    public void setClusterType(final String clusterType) {
+        this.clusterType = clusterType;
+    }
+
+    public void setLocalStorageActive(final Boolean localStorageActive) {
+        this.localStorageActive = localStorageActive;
+    }
+
+    public void setCreated(final Date created) {
+        this.created = created;
+    }
+
+    public void setRemoved(final Date removed) {
+        this.removed = removed;
+    }
+
+    public void setEvents(final String events) {
+        this.events = events;
+    }
+
+    public String getHostTags() {
+        return hostTags;
+    }
+
+    public void setHostTags(final String hostTags) {
+        this.hostTags = hostTags;
+    }
+
+    public void setHasEnoughCapacity(final Boolean hasEnoughCapacity) {
+        this.hasEnoughCapacity = hasEnoughCapacity;
+    }
+
+    public void setSuitableForMigration(final Boolean suitableForMigration) {
+        this.suitableForMigration = suitableForMigration;
+    }
+
+    public String getResourceState() {
+        return resourceState;
+    }
+
+    public void setResourceState(final String resourceState) {
+        this.resourceState = resourceState;
+    }
+
+    public String getCpuWithOverprovisioning() {
+        return cpuWithOverprovisioning;
+    }
+
+    public void setCpuWithOverprovisioning(final String cpuWithOverprovisioning) {
+        this.cpuWithOverprovisioning = cpuWithOverprovisioning;
+    }
+
+    public void setHypervisorVersion(final String hypervisorVersion) {
+        this.hypervisorVersion = hypervisorVersion;
+    }
+
+    public void setHaHost(final Boolean haHost) {
+        this.haHost = haHost;
+    }
 }

@@ -1,27 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package org.apache.cloudstack.api.command.user.autoscale;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.network.as.Condition;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListAccountResourcesCmd;
@@ -30,6 +9,10 @@ import org.apache.cloudstack.api.response.AutoScalePolicyResponse;
 import org.apache.cloudstack.api.response.ConditionResponse;
 import org.apache.cloudstack.api.response.CounterResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,10 +30,10 @@ public class ListConditionsCmd extends BaseListAccountResourcesCmd {
     private Long id;
 
     @Parameter(name = ApiConstants.COUNTER_ID,
-               type = CommandType.UUID,
-               entityType = CounterResponse.class,
-               required = false,
-               description = "Counter-id of the condition.")
+            type = CommandType.UUID,
+            entityType = CounterResponse.class,
+            required = false,
+            description = "Counter-id of the condition.")
     private Long counterId;
 
     @Parameter(name = ApiConstants.POLICY_ID, type = CommandType.UUID, entityType = AutoScalePolicyResponse.class, description = "the ID of the policy")
@@ -64,10 +47,10 @@ public class ListConditionsCmd extends BaseListAccountResourcesCmd {
     public void execute() {
         List<? extends Condition> conditions = null;
         conditions = _autoScaleService.listConditions(this);
-        ListResponse<ConditionResponse> response = new ListResponse<ConditionResponse>();
-        List<ConditionResponse> cndnResponses = new ArrayList<ConditionResponse>();
-        for (Condition cndn : conditions) {
-            ConditionResponse cndnResponse = _responseGenerator.createConditionResponse(cndn);
+        final ListResponse<ConditionResponse> response = new ListResponse<>();
+        final List<ConditionResponse> cndnResponses = new ArrayList<>();
+        for (final Condition cndn : conditions) {
+            final ConditionResponse cndnResponse = _responseGenerator.createConditionResponse(cndn);
             cndnResponses.add(cndnResponse);
         }
 
@@ -80,6 +63,11 @@ public class ListConditionsCmd extends BaseListAccountResourcesCmd {
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
 
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
     public Long getId() {
         return id;
     }
@@ -91,10 +79,4 @@ public class ListConditionsCmd extends BaseListAccountResourcesCmd {
     public Long getPolicyId() {
         return policyId;
     }
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
 }

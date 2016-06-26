@@ -1,25 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.ldap;
-
-import java.util.Map;
-import java.util.UUID;
-
-import javax.inject.Inject;
 
 import com.cloud.server.auth.UserAuthenticator;
 import com.cloud.user.Account;
@@ -29,6 +8,10 @@ import com.cloud.user.UserAccount;
 import com.cloud.user.dao.UserAccountDao;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;
+
+import javax.inject.Inject;
+import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -58,10 +41,10 @@ public class LdapAuthenticator extends AdapterBase implements UserAuthenticator 
 
     @Override
     public Pair<Boolean, ActionOnFailedAuthentication> authenticate(final String username, final String password, final Long domainId,
-                    final Map<String, Object[]> requestParameters) {
+                                                                    final Map<String, Object[]> requestParameters) {
         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
             s_logger.debug("Username or Password cannot be empty");
-            return new Pair<Boolean, ActionOnFailedAuthentication>(false, null);
+            return new Pair<>(false, null);
         }
 
         boolean result = false;
@@ -91,7 +74,6 @@ public class LdapAuthenticator extends AdapterBase implements UserAuthenticator 
                 } catch (final NoLdapUserMatchingQueryException e) {
                     s_logger.debug(e.getMessage());
                 }
-
             } else {
                 // domain is not linked to ldap follow normal authentication
                 if (user != null) {
@@ -112,13 +94,7 @@ public class LdapAuthenticator extends AdapterBase implements UserAuthenticator 
             }
         }
 
-        return new Pair<Boolean, ActionOnFailedAuthentication>(result, action);
-    }
-
-    private void enableUserInCloudStack(final UserAccount user) {
-        if (user != null && user.getState().equalsIgnoreCase(Account.State.disabled.toString())) {
-            _accountManager.enableUser(user.getId());
-        }
+        return new Pair<>(result, action);
     }
 
     private void createCloudStackUserAccount(final LdapUser user, final long domainId, final short accountType) {
@@ -127,11 +103,17 @@ public class LdapAuthenticator extends AdapterBase implements UserAuthenticator 
         if (account == null) {
             s_logger.info("Account (" + ldapGroupName + ") for LDAP group does not exist. Creating account and user (" + username + ").");
             _accountManager.createUserAccount(username, "", user.getFirstname(), user.getLastname(), user.getEmail(), null, ldapGroupName, accountType, domainId,
-                            null, null, UUID.randomUUID().toString(), UUID.randomUUID().toString(), User.Source.LDAP);
+                    null, null, UUID.randomUUID().toString(), UUID.randomUUID().toString(), User.Source.LDAP);
         } else {
             s_logger.debug("Account (" + ldapGroupName + ") for LDAP group already exists. Creating user (" + username + ").");
             _accountManager.createUser(username, "", user.getFirstname(), user.getLastname(), user.getEmail(), null, ldapGroupName, domainId,
-                            UUID.randomUUID().toString(), User.Source.LDAP);
+                    UUID.randomUUID().toString(), User.Source.LDAP);
+        }
+    }
+
+    private void enableUserInCloudStack(final UserAccount user) {
+        if (user != null && user.getState().equalsIgnoreCase(Account.State.disabled.toString())) {
+            _accountManager.enableUser(user.getId());
         }
     }
 

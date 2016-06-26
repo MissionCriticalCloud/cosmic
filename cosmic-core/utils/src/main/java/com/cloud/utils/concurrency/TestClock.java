@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils.concurrency;
@@ -25,16 +10,8 @@ import java.util.TimerTask;
 
 /**
  * A test clock which is also a TimerTask. The task calls a Scheduler's poll method
- *
  */
 public class TestClock extends TimerTask {
-    private int _minute = 0;
-    private int _hour = 0;
-    private int _day = 0;
-    private int _week = 0;
-    private int _month = 0;
-    private int _year = 0;
-    private Calendar _cal = null;
     private final int _minutesPerHour;
     private final int _hoursPerDay;
     private final int _daysPerWeek;
@@ -42,8 +19,16 @@ public class TestClock extends TimerTask {
     private final int _weeksPerMonth;
     private final int _monthsPerYear;
     private final Scheduler _scheduler;
+    private int _minute = 0;
+    private int _hour = 0;
+    private int _day = 0;
+    private int _week = 0;
+    private int _month = 0;
+    private int _year = 0;
+    private Calendar _cal = null;
 
-    public TestClock(Scheduler scheduler, int minutesPerHour, int hoursPerDay, int daysPerWeek, int daysPerMonth, int weeksPerMonth, int monthsPerYear) {
+    public TestClock(final Scheduler scheduler, final int minutesPerHour, final int hoursPerDay, final int daysPerWeek, final int daysPerMonth, final int weeksPerMonth, final
+    int monthsPerYear) {
         _minutesPerHour = minutesPerHour;
         _hoursPerDay = hoursPerDay;
         _daysPerWeek = daysPerWeek;
@@ -153,7 +138,7 @@ public class TestClock extends TimerTask {
                 // Later the time in the database will be changed to currentTimeInMillis.
                 // Then we can use System.getCurrentTimeInMillis() which is damn cheap.
                 _cal.set(_year, _month, _day, _hour, _minute);
-                Date currentTimestamp = _cal.getTime();
+                final Date currentTimestamp = _cal.getTime();
                 _scheduler.poll(currentTimestamp);
             }
         }

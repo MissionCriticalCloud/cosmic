@@ -1,30 +1,14 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.query.dao;
-
-import java.util.List;
 
 import com.cloud.api.query.vo.ProjectInvitationJoinVO;
 import com.cloud.projects.ProjectInvitation;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.response.ProjectInvitationResponse;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -33,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class ProjectInvitationJoinDaoImpl extends GenericDaoBase<ProjectInvitationJoinVO, Long> implements ProjectInvitationJoinDao {
     public static final Logger s_logger = LoggerFactory.getLogger(ProjectInvitationJoinDaoImpl.class);
 
-    private SearchBuilder<ProjectInvitationJoinVO> piIdSearch;
+    private final SearchBuilder<ProjectInvitationJoinVO> piIdSearch;
 
     protected ProjectInvitationJoinDaoImpl() {
 
@@ -45,8 +29,8 @@ public class ProjectInvitationJoinDaoImpl extends GenericDaoBase<ProjectInvitati
     }
 
     @Override
-    public ProjectInvitationResponse newProjectInvitationResponse(ProjectInvitationJoinVO invite) {
-        ProjectInvitationResponse response = new ProjectInvitationResponse();
+    public ProjectInvitationResponse newProjectInvitationResponse(final ProjectInvitationJoinVO invite) {
+        final ProjectInvitationResponse response = new ProjectInvitationResponse();
         response.setId(invite.getUuid());
         response.setProjectId(invite.getProjectUuid());
         response.setProjectName(invite.getProjectName());
@@ -68,12 +52,11 @@ public class ProjectInvitationJoinDaoImpl extends GenericDaoBase<ProjectInvitati
     }
 
     @Override
-    public ProjectInvitationJoinVO newProjectInvitationView(ProjectInvitation proj) {
-        SearchCriteria<ProjectInvitationJoinVO> sc = piIdSearch.create();
+    public ProjectInvitationJoinVO newProjectInvitationView(final ProjectInvitation proj) {
+        final SearchCriteria<ProjectInvitationJoinVO> sc = piIdSearch.create();
         sc.setParameters("id", proj.getId());
-        List<ProjectInvitationJoinVO> grps = searchIncludingRemoved(sc, null, null, false);
+        final List<ProjectInvitationJoinVO> grps = searchIncludingRemoved(sc, null, null, false);
         assert grps != null && grps.size() == 1 : "No project invitation found for id  " + proj.getId();
         return grps.get(0);
     }
-
 }

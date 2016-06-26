@@ -1,27 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.guru;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-
-import javax.inject.Inject;
 
 import com.cloud.configuration.Config;
 import com.cloud.dc.DataCenter;
@@ -74,18 +51,33 @@ import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
-
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGuru, Configurable {
+    static final ConfigKey<Boolean> UseSystemGuestVlans =
+            new ConfigKey<>(
+                    "Advanced",
+                    Boolean.class,
+                    "use.system.guest.vlans",
+                    "true",
+                    "If true, when account has dedicated guest vlan range(s), once the vlans dedicated to the account have been consumed vlans will be allocated from the system " +
+                            "pool",
+                    false, ConfigKey.Scope.Account);
     private static final Logger s_logger = LoggerFactory.getLogger(GuestNetworkGuru.class);
-
+    private static final TrafficType[] TrafficTypes = {TrafficType.Guest};
     @Inject
     protected VpcDao _vpcDao;
     @Inject
@@ -99,33 +91,20 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
     @Inject
     protected NicDao _nicDao;
     @Inject
-    ConfigurationDao _configDao;
-    @Inject
     protected NetworkDao _networkDao;
     @Inject
-    IPAddressDao _ipAddressDao;
-    @Inject
     protected PhysicalNetworkDao _physicalNetworkDao;
+    // Currently set to anything except STT for the Nicira integration.
+    protected IsolationMethod[] _isolationMethods;
+    @Inject
+    ConfigurationDao _configDao;
+    @Inject
+    IPAddressDao _ipAddressDao;
     @Inject
     ConfigurationServer _configServer;
     @Inject
     IpAddressManager _ipAddrMgr;
     Random _rand = new Random(System.currentTimeMillis());
-
-    static final ConfigKey<Boolean> UseSystemGuestVlans =
-            new ConfigKey<Boolean>(
-                    "Advanced",
-                    Boolean.class,
-                    "use.system.guest.vlans",
-                    "true",
-                    "If true, when account has dedicated guest vlan range(s), once the vlans dedicated to the account have been consumed vlans will be allocated from the system pool",
-                    false, ConfigKey.Scope.Account);
-
-    private static final TrafficType[] TrafficTypes = {TrafficType.Guest};
-
-    // Currently set to anything except STT for the Nicira integration.
-    protected IsolationMethod[] _isolationMethods;
-
     String _defaultGateway;
     String _defaultCidr;
 
@@ -134,36 +113,20 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
         _isolationMethods = null;
     }
 
-    @Override
-    public boolean isMyTrafficType(final TrafficType type) {
-        for (final TrafficType t : TrafficTypes) {
-            if (t == type) {
-                return true;
-            }
-        }
-        s_logger.debug("Traffic type " + type + " is not supported by this guru");
-        return false;
-    }
-
-    @Override
-    public TrafficType[] getSupportedTrafficType() {
-        return TrafficTypes;
-    }
-
     public boolean isMyIsolationMethod(final PhysicalNetwork physicalNetwork) {
         if (physicalNetwork == null) {
             // Can't tell if there is no physical network
             return false;
         }
 
-        List<String> methods = new ArrayList<String>();
+        List<String> methods = new ArrayList<>();
         for (final String method : physicalNetwork.getIsolationMethods()) {
             methods.add(method.toLowerCase());
         }
         if (methods.isEmpty()) {
             // The empty isolation method is assumed to be VLAN
             s_logger.debug("Empty physical isolation type for physical network " + physicalNetwork.getUuid());
-            methods = new ArrayList<String>(1);
+            methods = new ArrayList<>(1);
             methods.add("VLAN".toLowerCase());
         }
 
@@ -181,8 +144,6 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
     public IsolationMethod[] getIsolationMethods() {
         return _isolationMethods;
     }
-
-    protected abstract boolean canHandle(NetworkOffering offering, final NetworkType networkType, PhysicalNetwork physicalNetwork);
 
     @Override
     public Network design(final NetworkOffering offering, final DeploymentPlan plan, final Network userSpecified, final Account owner) {
@@ -232,75 +193,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
         return network;
     }
 
-    @Override
-    @DB
-    public void deallocate(final Network network, final NicProfile nic, final VirtualMachineProfile vm) {
-        if (network.getSpecifyIpRanges()) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Deallocate network: networkId: " + nic.getNetworkId() + ", ip: " + nic.getIPv4Address());
-            }
-
-            final IPAddressVO ip = _ipAddressDao.findByIpAndSourceNetworkId(nic.getNetworkId(), nic.getIPv4Address());
-            if (ip != null) {
-                Transaction.execute(new TransactionCallbackNoReturn() {
-                    @Override
-                    public void doInTransactionWithoutResult(final TransactionStatus status) {
-                        _ipAddrMgr.markIpAsUnavailable(ip.getId());
-                        _ipAddressDao.unassignIpAddress(ip.getId());
-                    }
-                });
-            }
-            nic.deallocate();
-        }
-    }
-
-    public int getVlanOffset(final long physicalNetworkId, final int vlanTag) {
-        final PhysicalNetworkVO pNetwork = _physicalNetworkDao.findById(physicalNetworkId);
-        if (pNetwork == null) {
-            throw new CloudRuntimeException("Could not find the physical Network " + physicalNetworkId + ".");
-        }
-
-        if (pNetwork.getVnet() == null) {
-            throw new CloudRuntimeException("Could not find vlan range for physical Network " + physicalNetworkId + ".");
-        }
-        Integer lowestVlanTag = null;
-        final List<Pair<Integer, Integer>> vnetList = pNetwork.getVnet();
-        //finding the vlanrange in which the vlanTag lies.
-        for (final Pair<Integer, Integer> vnet : vnetList) {
-            if (vlanTag >= vnet.first() && vlanTag <= vnet.second()) {
-                lowestVlanTag = vnet.first();
-            }
-        }
-        if (lowestVlanTag == null) {
-            throw new InvalidParameterValueException("The vlan tag does not belong to any of the existing vlan ranges");
-        }
-        return vlanTag - lowestVlanTag;
-    }
-
-    public int getGloballyConfiguredCidrSize() {
-        try {
-            final String globalVlanBits = _configDao.getValue(Config.GuestVlanBits.key());
-            return 8 + Integer.parseInt(globalVlanBits);
-        } catch (final Exception e) {
-            throw new CloudRuntimeException("Failed to read the globally configured VLAN bits size.");
-        }
-    }
-
-    protected void allocateVnet(final Network network, final NetworkVO implemented, final long dcId, final long physicalNetworkId, final String reservationId)
-            throws InsufficientVirtualNetworkCapacityException {
-        if (network.getBroadcastUri() == null) {
-            final String vnet = _dcDao.allocateVnet(dcId, physicalNetworkId, network.getAccountId(), reservationId, UseSystemGuestVlans.valueIn(network.getAccountId()));
-            if (vnet == null) {
-                throw new InsufficientVirtualNetworkCapacityException("Unable to allocate vnet as a " + "part of network " + network + " implement ", DataCenter.class,
-                        dcId);
-            }
-            implemented.setBroadcastUri(BroadcastDomainType.Vlan.toUri(vnet));
-            ActionEventUtils.onCompletedActionEvent(CallContext.current().getCallingUserId(), network.getAccountId(), EventVO.LEVEL_INFO,
-                    EventTypes.EVENT_ZONE_VLAN_ASSIGN, "Assigned Zone Vlan: " + vnet + " Network Id: " + network.getId(), 0);
-        } else {
-            implemented.setBroadcastUri(network.getBroadcastUri());
-        }
-    }
+    protected abstract boolean canHandle(NetworkOffering offering, final NetworkType networkType, PhysicalNetwork physicalNetwork);
 
     @Override
     public Network implement(final Network network, final NetworkOffering offering, final DeployDestination dest, final ReservationContext context)
@@ -333,9 +226,25 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
         return implemented;
     }
 
+    protected void allocateVnet(final Network network, final NetworkVO implemented, final long dcId, final long physicalNetworkId, final String reservationId)
+            throws InsufficientVirtualNetworkCapacityException {
+        if (network.getBroadcastUri() == null) {
+            final String vnet = _dcDao.allocateVnet(dcId, physicalNetworkId, network.getAccountId(), reservationId, UseSystemGuestVlans.valueIn(network.getAccountId()));
+            if (vnet == null) {
+                throw new InsufficientVirtualNetworkCapacityException("Unable to allocate vnet as a " + "part of network " + network + " implement ", DataCenter.class,
+                        dcId);
+            }
+            implemented.setBroadcastUri(BroadcastDomainType.Vlan.toUri(vnet));
+            ActionEventUtils.onCompletedActionEvent(CallContext.current().getCallingUserId(), network.getAccountId(), EventVO.LEVEL_INFO,
+                    EventTypes.EVENT_ZONE_VLAN_ASSIGN, "Assigned Zone Vlan: " + vnet + " Network Id: " + network.getId(), 0);
+        } else {
+            implemented.setBroadcastUri(network.getBroadcastUri());
+        }
+    }
+
     @Override
     public NicProfile allocate(final Network network, NicProfile nic, final VirtualMachineProfile vm) throws InsufficientVirtualNetworkCapacityException,
-    InsufficientAddressCapacityException {
+            InsufficientAddressCapacityException {
 
         assert network.getTrafficType() == TrafficType.Guest : "Look at my name!  Why are you calling" + " me when the traffic type is : " + network.getTrafficType();
 
@@ -402,15 +311,6 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
     }
 
     @Override
-    public void updateNicProfile(final NicProfile profile, final Network network) {
-        final DataCenter dc = _dcDao.findById(network.getDataCenterId());
-        if (profile != null) {
-            profile.setIPv4Dns1(dc.getDns1());
-            profile.setIPv4Dns2(dc.getDns2());
-        }
-    }
-
-    @Override
     public void reserve(final NicProfile nic, final Network network, final VirtualMachineProfile vm, final DeployDestination dest, final ReservationContext context)
             throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
         assert nic.getReservationStrategy() == ReservationStrategy.Start : "What can I do for nics that are not allocated at start? ";
@@ -424,6 +324,37 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
         nic.setBroadcastUri(null);
         nic.setIsolationUri(null);
         return true;
+    }
+
+    @Override
+    @DB
+    public void deallocate(final Network network, final NicProfile nic, final VirtualMachineProfile vm) {
+        if (network.getSpecifyIpRanges()) {
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("Deallocate network: networkId: " + nic.getNetworkId() + ", ip: " + nic.getIPv4Address());
+            }
+
+            final IPAddressVO ip = _ipAddressDao.findByIpAndSourceNetworkId(nic.getNetworkId(), nic.getIPv4Address());
+            if (ip != null) {
+                Transaction.execute(new TransactionCallbackNoReturn() {
+                    @Override
+                    public void doInTransactionWithoutResult(final TransactionStatus status) {
+                        _ipAddrMgr.markIpAsUnavailable(ip.getId());
+                        _ipAddressDao.unassignIpAddress(ip.getId());
+                    }
+                });
+            }
+            nic.deallocate();
+        }
+    }
+
+    @Override
+    public void updateNicProfile(final NicProfile profile, final Network network) {
+        final DataCenter dc = _dcDao.findById(network.getDataCenterId());
+        if (profile != null) {
+            profile.setIPv4Dns1(dc.getDns1());
+            profile.setIPv4Dns2(dc.getDns2());
+        }
     }
 
     @Override
@@ -456,12 +387,60 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
     }
 
     @Override
+    public TrafficType[] getSupportedTrafficType() {
+        return TrafficTypes;
+    }
+
+    @Override
+    public boolean isMyTrafficType(final TrafficType type) {
+        for (final TrafficType t : TrafficTypes) {
+            if (t == type) {
+                return true;
+            }
+        }
+        s_logger.debug("Traffic type " + type + " is not supported by this guru");
+        return false;
+    }
+
+    public int getVlanOffset(final long physicalNetworkId, final int vlanTag) {
+        final PhysicalNetworkVO pNetwork = _physicalNetworkDao.findById(physicalNetworkId);
+        if (pNetwork == null) {
+            throw new CloudRuntimeException("Could not find the physical Network " + physicalNetworkId + ".");
+        }
+
+        if (pNetwork.getVnet() == null) {
+            throw new CloudRuntimeException("Could not find vlan range for physical Network " + physicalNetworkId + ".");
+        }
+        Integer lowestVlanTag = null;
+        final List<Pair<Integer, Integer>> vnetList = pNetwork.getVnet();
+        //finding the vlanrange in which the vlanTag lies.
+        for (final Pair<Integer, Integer> vnet : vnetList) {
+            if (vlanTag >= vnet.first() && vlanTag <= vnet.second()) {
+                lowestVlanTag = vnet.first();
+            }
+        }
+        if (lowestVlanTag == null) {
+            throw new InvalidParameterValueException("The vlan tag does not belong to any of the existing vlan ranges");
+        }
+        return vlanTag - lowestVlanTag;
+    }
+
+    public int getGloballyConfiguredCidrSize() {
+        try {
+            final String globalVlanBits = _configDao.getValue(Config.GuestVlanBits.key());
+            return 8 + Integer.parseInt(globalVlanBits);
+        } catch (final Exception e) {
+            throw new CloudRuntimeException("Failed to read the globally configured VLAN bits size.");
+        }
+    }
+
+    @Override
     public String getConfigComponentName() {
         return GuestNetworkGuru.class.getSimpleName();
     }
 
     @Override
     public ConfigKey<?>[] getConfigKeys() {
-        return new ConfigKey<?>[] {UseSystemGuestVlans};
+        return new ConfigKey<?>[]{UseSystemGuestVlans};
     }
 }

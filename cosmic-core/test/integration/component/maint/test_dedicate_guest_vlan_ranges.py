@@ -1,19 +1,3 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ P1 tests for Dedicating guest VLAN ranges
 
     Test Plan: https://cwiki.apache.org/confluence/display/CLOUDSTACK/Dedicated+Resources+-+Public+IP+Addresses+and+VLANs+per+Tenant+Test+Plan
@@ -22,13 +6,9 @@
 
     Feature Specifications: https://cwiki.apache.org/confluence/display/CLOUDSTACK/FS-+Dedicate+Guest+VLANs+per+tenant
 """
-#Import Local Modules
-from nose.plugins.attrib import attr
+# Import Local Modules
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import (validateList,
-                              cleanup_resources,
-                              random_gen,
-			                  xsplit)
+from marvin.codes import PASS
 from marvin.lib.base import (Account,
                              Domain,
                              PhysicalNetwork,
@@ -41,22 +21,27 @@ from marvin.lib.common import (get_domain,
                                get_template,
                                setNonContiguousVlanIds,
                                isNetworkDeleted)
-from marvin.codes import PASS
+from marvin.lib.utils import (validateList,
+                              cleanup_resources,
+                              random_gen,
+                              xsplit)
+from nose.plugins.attrib import attr
+
 
 def LimitVlanRange(self, vlanrange, range=2):
     """Limits the length of vlan range"""
     vlan_endpoints = str(vlanrange).split("-")
     vlan_startid = int(vlan_endpoints[1])
-    vlan_endid = vlan_startid + (range-1)
+    vlan_endid = vlan_startid + (range - 1)
     return str(vlan_startid) + "-" + str(vlan_endid)
 
-class TestDedicateGuestVLANRange(cloudstackTestCase):
 
+class TestDedicateGuestVLANRange(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestDedicateGuestVLANRange, cls).getClsTestClient()
         cls.apiclient = cls.testClient.getApiClient()
-        cls.testdata =  cls.testClient.getParsedTestDataConfig()
+        cls.testdata = cls.testClient.getParsedTestDataConfig()
         # Get Zone, Domain
         cls.domain = get_domain(cls.apiclient)
         cls.zone = get_zone(cls.apiclient)
@@ -66,26 +51,26 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
             cls.apiclient,
             cls.zone.id,
             cls.testdata["ostype"]
-            )
+        )
         cls._cleanup = []
 
         try:
             cls.isolated_network_offering = NetworkOffering.create(
-                          cls.apiclient,
-                          cls.testdata["nw_off_isolated_persistent"])
+                cls.apiclient,
+                cls.testdata["nw_off_isolated_persistent"])
             cls._cleanup.append(cls.isolated_network_offering)
             cls.isolated_network_offering.update(cls.apiclient, state='Enabled')
 
             cls.testdata["nw_off_isolated_persistent"]["specifyVlan"] = True
             cls.isolated_network_offering_vlan = NetworkOffering.create(
-                          cls.apiclient,
-                          cls.testdata["nw_off_isolated_persistent"])
+                cls.apiclient,
+                cls.testdata["nw_off_isolated_persistent"])
             cls._cleanup.append(cls.isolated_network_offering_vlan)
             cls.isolated_network_offering_vlan.update(cls.apiclient, state='Enabled')
 
             cls.service_offering = ServiceOffering.create(
-                                                          cls.apiclient,
-                                                          cls.testdata["service_offering"])
+                cls.apiclient,
+                cls.testdata["service_offering"])
             cls._cleanup.append(cls.service_offering)
 
             cls.testdata["small"]["zoneid"] = cls.zone.id
@@ -109,7 +94,7 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
         self.dbclient = self.testClient.getDbConnection()
         self.cleanup = []
         self.physical_network, self.free_vlan = setNonContiguousVlanIds(self.apiclient,
-                                                                            self.zone.id)
+                                                                        self.zone.id)
         return
 
     def tearDown(self):
@@ -120,11 +105,11 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
             raise Exception("Warning: Exception during cleanup : %s" % e)
         finally:
             self.physical_network.update(self.apiclient,
-                        id=self.physical_network.id,
-                        vlan=self.physical_network.vlan)
+                                         id=self.physical_network.id,
+                                         vlan=self.physical_network.vlan)
         return
 
-    @attr(tags = ["advanced", "selfservice"], required_hardware="false")
+    @attr(tags=["advanced", "selfservice"], required_hardware="false")
     def test_01_dedicate_guest_vlan_range_root_domain(self):
         """Dedicate guest vlan range to account in root domain
 
@@ -144,60 +129,60 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
         # 12.Verify that ther list of dedicated vlans doesn't contain the vlan
         """
         self.account1 = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.domain.id
+        )
         self.cleanup.append(self.account1)
 
         self.account2 = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.domain.id
+        )
         self.cleanup.append(self.account2)
 
         new_vlan = self.physical_network.vlan + "," + self.free_vlan["partial_range"][0]
         self.physical_network.update(self.apiclient,
-                id=self.physical_network.id, vlan=new_vlan)
+                                     id=self.physical_network.id, vlan=new_vlan)
 
         # Dedicating guest vlan range
         dedicate_guest_vlan_range_response = PhysicalNetwork.dedicate(
-                                                self.apiclient,
-                                                self.free_vlan["partial_range"][0],
-                                                physicalnetworkid=self.physical_network.id,
-                                                account=self.account1.name,
-                                                domainid=self.account1.domainid
-                                            )
+            self.apiclient,
+            self.free_vlan["partial_range"][0],
+            physicalnetworkid=self.physical_network.id,
+            account=self.account1.name,
+            domainid=self.account1.domainid
+        )
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(
-                                                self.apiclient,
-                                                id=dedicate_guest_vlan_range_response.id
-                                        )
+            self.apiclient,
+            id=dedicate_guest_vlan_range_response.id
+        )
         dedicated_guest_vlan_response = list_dedicated_guest_vlan_range_response[0]
         self.assertEqual(
-                            dedicated_guest_vlan_response.account,
-                            self.account1.name,
-                            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
-                        )
+            dedicated_guest_vlan_response.account,
+            self.account1.name,
+            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
+        )
 
         dedicatedvlans = str(self.free_vlan["partial_range"][0]).split("-")
 
         with self.assertRaises(Exception):
             isolated_network1 = Network.create(
-                                   self.apiclient,
-                                   self.testdata["isolated_network"],
-                                   self.account2.name,
-                                   self.account2.domainid,
-                                   networkofferingid=self.isolated_network_offering_vlan.id,
-                                   vlan=int(dedicatedvlans[0]))
+                self.apiclient,
+                self.testdata["isolated_network"],
+                self.account2.name,
+                self.account2.domainid,
+                networkofferingid=self.isolated_network_offering_vlan.id,
+                vlan=int(dedicatedvlans[0]))
             isolated_network1.delete(self.apiclient)
 
         isolated_network2 = Network.create(
-                                   self.apiclient,
-                                   self.testdata["isolated_network"],
-                                   self.account1.name,
-                                   self.account1.domainid,
-                                   networkofferingid=self.isolated_network_offering.id)
+            self.apiclient,
+            self.testdata["isolated_network"],
+            self.account1.name,
+            self.account1.domainid,
+            networkofferingid=self.isolated_network_offering.id)
 
         networks = Network.list(self.apiclient, id=isolated_network2.id)
         self.assertEqual(validateList(networks)[0], PASS, "networks list validation failed")
@@ -211,28 +196,28 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
 
         # List after deleting all networks, it should still be dedicated to the account
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(
-                                                self.apiclient,
-                                                id=dedicate_guest_vlan_range_response.id
-                                        )
+            self.apiclient,
+            id=dedicate_guest_vlan_range_response.id
+        )
         dedicated_guest_vlan_response = list_dedicated_guest_vlan_range_response[0]
         self.assertEqual(
-                            dedicated_guest_vlan_response.account,
-                            self.account1.name,
-                            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
-                        )
+            dedicated_guest_vlan_response.account,
+            self.account1.name,
+            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
+        )
 
         self.debug("Releasing guest vlan range");
         dedicate_guest_vlan_range_response.release(self.apiclient)
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(self.apiclient)
         self.assertEqual(
-                        list_dedicated_guest_vlan_range_response,
-                        None,
-                        "Check vlan range is not available in listDedicatedGuestVlanRanges"
+            list_dedicated_guest_vlan_range_response,
+            None,
+            "Check vlan range is not available in listDedicatedGuestVlanRanges"
 
-                        )
+        )
         return
 
-    @attr(tags = ["advanced", "selfservice"], required_hardware="false")
+    @attr(tags=["advanced", "selfservice"], required_hardware="false")
     def test_02_dedicate_guest_vlan_range_user_domain(self):
         """Dedicate guest vlan range to account in user domain
 
@@ -252,68 +237,68 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
         # 12.Verify that ther list of dedicated vlans doesn't contain the vlan
         """
         self.user_domain1 = Domain.create(
-                                self.apiclient,
-                                services=self.testdata["domain"],
-                                parentdomainid=self.domain.id)
+            self.apiclient,
+            services=self.testdata["domain"],
+            parentdomainid=self.domain.id)
         self.cleanup.append(self.user_domain1)
 
-        #Create Account
+        # Create Account
         self.account1 = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.user_domain1.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.user_domain1.id
+        )
         self.cleanup.insert(-1, self.account1)
 
-        #Create Account
+        # Create Account
         self.account2 = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.user_domain1.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.user_domain1.id
+        )
         self.cleanup.insert(-1, self.account2)
 
         new_vlan = self.physical_network.vlan + "," + self.free_vlan["partial_range"][0]
         self.physical_network.update(self.apiclient,
-                id=self.physical_network.id, vlan=new_vlan)
+                                     id=self.physical_network.id, vlan=new_vlan)
 
         # Dedicating guest vlan range
         dedicate_guest_vlan_range_response = PhysicalNetwork.dedicate(
-                                                self.apiclient,
-                                                self.free_vlan["partial_range"][0],
-                                                physicalnetworkid=self.physical_network.id,
-                                                account=self.account1.name,
-                                                domainid=self.account1.domainid
-                                            )
+            self.apiclient,
+            self.free_vlan["partial_range"][0],
+            physicalnetworkid=self.physical_network.id,
+            account=self.account1.name,
+            domainid=self.account1.domainid
+        )
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(
-                                                self.apiclient,
-                                                id=dedicate_guest_vlan_range_response.id
-                                        )
+            self.apiclient,
+            id=dedicate_guest_vlan_range_response.id
+        )
         dedicated_guest_vlan_response = list_dedicated_guest_vlan_range_response[0]
         self.assertEqual(
-                            dedicated_guest_vlan_response.account,
-                            self.account1.name,
-                            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
-                        )
+            dedicated_guest_vlan_response.account,
+            self.account1.name,
+            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
+        )
 
         dedicatedvlans = str(self.free_vlan["partial_range"][0]).split("-")
 
         with self.assertRaises(Exception):
             isolated_network1 = Network.create(
-                                   self.apiclient,
-                                   self.testdata["isolated_network"],
-                                   self.account2.name,
-                                   self.account2.domainid,
-                                   networkofferingid=self.isolated_network_offering_vlan.id,
-                                   vlan=int(dedicatedvlans[0]))
+                self.apiclient,
+                self.testdata["isolated_network"],
+                self.account2.name,
+                self.account2.domainid,
+                networkofferingid=self.isolated_network_offering_vlan.id,
+                vlan=int(dedicatedvlans[0]))
             isolated_network1.delete(self.apiclient)
 
         isolated_network2 = Network.create(
-                                   self.apiclient,
-                                   self.testdata["isolated_network"],
-                                   self.account1.name,
-                                   self.account1.domainid,
-                                   networkofferingid=self.isolated_network_offering.id)
+            self.apiclient,
+            self.testdata["isolated_network"],
+            self.account1.name,
+            self.account1.domainid,
+            networkofferingid=self.isolated_network_offering.id)
 
         networks = Network.list(self.apiclient, id=isolated_network2.id, listall=True)
         self.assertEqual(validateList(networks)[0], PASS, "networks list validation failed")
@@ -329,14 +314,14 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
         dedicate_guest_vlan_range_response.release(self.apiclient)
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(self.apiclient)
         self.assertEqual(
-                        list_dedicated_guest_vlan_range_response,
-                        None,
-                        "Check vlan range is not available in listDedicatedGuestVlanRanges"
+            list_dedicated_guest_vlan_range_response,
+            None,
+            "Check vlan range is not available in listDedicatedGuestVlanRanges"
 
-                        )
+        )
         return
 
-    @attr(tags = ["advanced", "selfservice"], required_hardware="false")
+    @attr(tags=["advanced", "selfservice"], required_hardware="false")
     def test_03_multiple_guest_netwoks(self):
         """Dedicate multiple guest networks in account with dedicated vlan range
 
@@ -353,17 +338,17 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
              all the vlans in dedicated range are now exhausted
         """
         self.user_domain = Domain.create(
-                                self.apiclient,
-                                services=self.testdata["domain"],
-                                parentdomainid=self.domain.id)
+            self.apiclient,
+            services=self.testdata["domain"],
+            parentdomainid=self.domain.id)
         self.cleanup.append(self.user_domain)
 
-        #Create Account
+        # Create Account
         self.account = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.user_domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.user_domain.id
+        )
         self.cleanup.insert(-1, self.account)
 
         self.free_vlan["partial_range"][0] = LimitVlanRange(self, self.free_vlan["partial_range"][0], range=2)
@@ -372,33 +357,33 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
 
         new_vlan = self.physical_network.vlan + "," + self.free_vlan["partial_range"][0]
         self.physical_network.update(self.apiclient,
-                id=self.physical_network.id, vlan=new_vlan)
+                                     id=self.physical_network.id, vlan=new_vlan)
 
         # Dedicating guest vlan range
         dedicate_guest_vlan_range_response = PhysicalNetwork.dedicate(
-                                                self.apiclient,
-                                                self.free_vlan["partial_range"][0],
-                                                physicalnetworkid=self.physical_network.id,
-                                                account=self.account.name,
-                                                domainid=self.account.domainid
-                                            )
+            self.apiclient,
+            self.free_vlan["partial_range"][0],
+            physicalnetworkid=self.physical_network.id,
+            account=self.account.name,
+            domainid=self.account.domainid
+        )
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(
-                                                self.apiclient,
-                                                id=dedicate_guest_vlan_range_response.id
-                                        )
+            self.apiclient,
+            id=dedicate_guest_vlan_range_response.id
+        )
         dedicated_guest_vlan_response = list_dedicated_guest_vlan_range_response[0]
         self.assertEqual(
-                            dedicated_guest_vlan_response.account,
-                            self.account.name,
-                            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
-                        )
+            dedicated_guest_vlan_response.account,
+            self.account.name,
+            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
+        )
 
         isolated_network1 = Network.create(
-                                   self.apiclient,
-                                   self.testdata["isolated_network"],
-                                   self.account.name,
-                                   self.account.domainid,
-                                   networkofferingid=self.isolated_network_offering.id)
+            self.apiclient,
+            self.testdata["isolated_network"],
+            self.account.name,
+            self.account.domainid,
+            networkofferingid=self.isolated_network_offering.id)
 
         networks = Network.list(self.apiclient, id=isolated_network1.id, listall=True)
         self.assertEqual(validateList(networks)[0], PASS, "networks list validation failed")
@@ -407,11 +392,11 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
                         "Vlan of the network should be from the dedicated range")
 
         isolated_network2 = Network.create(
-                                   self.apiclient,
-                                   self.testdata["isolated_network"],
-                                   self.account.name,
-                                   self.account.domainid,
-                                   networkofferingid=self.isolated_network_offering.id)
+            self.apiclient,
+            self.testdata["isolated_network"],
+            self.account.name,
+            self.account.domainid,
+            networkofferingid=self.isolated_network_offering.id)
 
         networks = Network.list(self.apiclient, id=isolated_network2.id, listall=True)
         self.assertEqual(validateList(networks)[0], PASS, "networks list validation failed")
@@ -420,21 +405,20 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
                         "Vlan of the network should be from the dedicated range")
 
         isolated_network3 = Network.create(
-                                   self.apiclient,
-                                   self.testdata["isolated_network"],
-                                   self.account.name,
-                                   self.account.domainid,
-                                   networkofferingid=self.isolated_network_offering.id)
+            self.apiclient,
+            self.testdata["isolated_network"],
+            self.account.name,
+            self.account.domainid,
+            networkofferingid=self.isolated_network_offering.id)
 
         networks = Network.list(self.apiclient, id=isolated_network3.id, listall=True)
         self.assertEqual(validateList(networks)[0], PASS, "networks list validation failed")
 
         self.assertFalse(vlan_startid <= int(networks[0].vlan) <= vlan_endid,
-                        "Vlan of the network should not be from the dedicated range")
+                         "Vlan of the network should not be from the dedicated range")
         return
 
-
-    @attr(tags = ["invalid"])
+    @attr(tags=["invalid"])
     def test_04_dedicate_guest_vlan_in_project(self):
         """Dedicate guest vlan range project owner account and test guest network vlan in project
 
@@ -452,16 +436,16 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
              all the vlans in dedicated range are now exhausted
         """
         user_domain = Domain.create(
-                                self.apiclient,
-                                services=self.testdata["domain"],
-                                parentdomainid=self.domain.id)
+            self.apiclient,
+            services=self.testdata["domain"],
+            parentdomainid=self.domain.id)
         self.cleanup.append(user_domain)
-        #Create Account
+        # Create Account
         self.account = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=user_domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=user_domain.id
+        )
         self.cleanup.insert(-1, self.account)
         # Create project as a domain admin
         project = Project.create(self.apiclient,
@@ -476,32 +460,32 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
 
         new_vlan = self.physical_network.vlan + "," + self.free_vlan["partial_range"][0]
         self.physical_network.update(self.apiclient,
-                id=self.physical_network.id, vlan=new_vlan)
+                                     id=self.physical_network.id, vlan=new_vlan)
 
         # Dedicating guest vlan range
         dedicate_guest_vlan_range_response = PhysicalNetwork.dedicate(
-                                                self.apiclient,
-                                                self.free_vlan["partial_range"][0],
-                                                physicalnetworkid=self.physical_network.id,
-                                                account=self.account.name,
-                                                domainid=self.account.domainid
-                                                )
+            self.apiclient,
+            self.free_vlan["partial_range"][0],
+            physicalnetworkid=self.physical_network.id,
+            account=self.account.name,
+            domainid=self.account.domainid
+        )
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(
-                                                self.apiclient,
-                                                id=dedicate_guest_vlan_range_response.id
-                                        )
+            self.apiclient,
+            id=dedicate_guest_vlan_range_response.id
+        )
         dedicated_guest_vlan_response = list_dedicated_guest_vlan_range_response[0]
         self.assertEqual(
-                            dedicated_guest_vlan_response.account,
-                            self.account.name,
-                            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
-                        )
+            dedicated_guest_vlan_response.account,
+            self.account.name,
+            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
+        )
 
         isolated_network1 = Network.create(
-                                   self.apiclient,
-                                   self.testdata["isolated_network"],
-                                   projectid=project.id,
-                                   networkofferingid=self.isolated_network_offering.id)
+            self.apiclient,
+            self.testdata["isolated_network"],
+            projectid=project.id,
+            networkofferingid=self.isolated_network_offering.id)
 
         networks = Network.list(self.apiclient, id=isolated_network1.id, projectid=project.id, listall=True)
         self.assertEqual(validateList(networks)[0], PASS, "networks list validation failed")
@@ -510,10 +494,10 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
                         "Vlan of the network should be from the dedicated range")
 
         isolated_network2 = Network.create(
-                                   self.apiclient,
-                                   self.testdata["isolated_network"],
-                                   projectid=project.id,
-                                   networkofferingid=self.isolated_network_offering.id)
+            self.apiclient,
+            self.testdata["isolated_network"],
+            projectid=project.id,
+            networkofferingid=self.isolated_network_offering.id)
 
         networks = Network.list(self.apiclient, id=isolated_network2.id, projectid=project.id, listall=True)
         self.assertEqual(validateList(networks)[0], PASS, "networks list validation failed")
@@ -522,19 +506,19 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
                         "Vlan of the network should be from the dedicated range")
 
         isolated_network3 = Network.create(
-                                   self.apiclient,
-                                   self.testdata["isolated_network"],
-                                   projectid=project.id,
-                                   networkofferingid=self.isolated_network_offering.id)
+            self.apiclient,
+            self.testdata["isolated_network"],
+            projectid=project.id,
+            networkofferingid=self.isolated_network_offering.id)
 
         networks = Network.list(self.apiclient, id=isolated_network3.id, projectid=project.id, listall=True)
         self.assertEqual(validateList(networks)[0], PASS, "networks list validation failed")
 
         self.assertFalse(vlan_startid <= int(networks[0].vlan) <= vlan_endid,
-                        "Vlan of the network should be from the dedicated range")
+                         "Vlan of the network should be from the dedicated range")
         return
 
-    @attr(tags = ["advanced", "selfservice"], required_hardware="false")
+    @attr(tags=["advanced", "selfservice"], required_hardware="false")
     def test_05_dedicate_range_different_accounts(self):
         """Dedicate two different vlan ranges to two different accounts
 
@@ -546,65 +530,65 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
         # 5. Both the operations should be successful
         """
         self.account1 = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.domain.id
+        )
         self.cleanup.append(self.account1)
 
         self.account2 = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.domain.id
+        )
         self.cleanup.append(self.account2)
 
-        new_vlan = self.physical_network.vlan + "," + self.free_vlan["partial_range"][0] + ","+\
+        new_vlan = self.physical_network.vlan + "," + self.free_vlan["partial_range"][0] + "," + \
                    self.free_vlan["partial_range"][1]
         self.physical_network.update(self.apiclient,
-                id=self.physical_network.id, vlan=new_vlan)
+                                     id=self.physical_network.id, vlan=new_vlan)
 
         # Dedicating guest vlan range
         dedicate_guest_vlan_range_response = PhysicalNetwork.dedicate(
-                                                 self.apiclient,
-                                                 self.free_vlan["partial_range"][0],
-                                                 physicalnetworkid=self.physical_network.id,
-                                                 account=self.account1.name,
-                                                 domainid=self.account1.domainid
-                                                 )
+            self.apiclient,
+            self.free_vlan["partial_range"][0],
+            physicalnetworkid=self.physical_network.id,
+            account=self.account1.name,
+            domainid=self.account1.domainid
+        )
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(
-                                                       self.apiclient,
-                                                       id=dedicate_guest_vlan_range_response.id
-                                                       )
+            self.apiclient,
+            id=dedicate_guest_vlan_range_response.id
+        )
         dedicated_guest_vlan_response = list_dedicated_guest_vlan_range_response[0]
         self.assertEqual(
-                            dedicated_guest_vlan_response.account,
-                            self.account1.name,
-                            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
-                        )
+            dedicated_guest_vlan_response.account,
+            self.account1.name,
+            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
+        )
 
         # Dedicating guest vlan range
         dedicate_guest_vlan_range_response = PhysicalNetwork.dedicate(
-                                                 self.apiclient,
-                                                 self.free_vlan["partial_range"][1],
-                                                 physicalnetworkid=self.physical_network.id,
-                                                 account=self.account2.name,
-                                                 domainid=self.account2.domainid
-                                                 )
+            self.apiclient,
+            self.free_vlan["partial_range"][1],
+            physicalnetworkid=self.physical_network.id,
+            account=self.account2.name,
+            domainid=self.account2.domainid
+        )
 
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(
-                                                       self.apiclient,
-                                                       id=dedicate_guest_vlan_range_response.id
-                                                       )
+            self.apiclient,
+            id=dedicate_guest_vlan_range_response.id
+        )
         dedicated_guest_vlan_response = list_dedicated_guest_vlan_range_response[0]
         self.assertEqual(
-                         dedicated_guest_vlan_response.account,
-                         self.account2.name,
-                         "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
-                         )
+            dedicated_guest_vlan_response.account,
+            self.account2.name,
+            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
+        )
         return
 
-    @attr(tags = ["advanced", "selfservice"], required_hardware="false")
+    @attr(tags=["advanced", "selfservice"], required_hardware="false")
     def test_07_extend_vlan_range(self):
         """Dedicate vlan range to an account when some vlan in range are already acquired by same account
 
@@ -616,10 +600,10 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
         # 5. Operation should succeed
         """
         self.account = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.domain.id
+        )
         self.cleanup.append(self.account)
 
         vlans = str(self.free_vlan["partial_range"][0]).split("-")
@@ -627,49 +611,49 @@ class TestDedicateGuestVLANRange(cloudstackTestCase):
         endid = int(vlans[1])
 
         vlan_range1 = str(startid) + "-" + str(endid)
-        vlan_range2 = str(endid+1) + "-" + str(endid+2)
-        full_range = str(startid) + "-" + str(endid+2)
+        vlan_range2 = str(endid + 1) + "-" + str(endid + 2)
+        full_range = str(startid) + "-" + str(endid + 2)
 
         new_vlan = self.physical_network.vlan + "," + full_range
         self.physical_network.update(self.apiclient,
-                id=self.physical_network.id, vlan=new_vlan)
+                                     id=self.physical_network.id, vlan=new_vlan)
 
         # Dedicating first range
         PhysicalNetwork.dedicate(
-                                 self.apiclient,
-                                 vlan_range1,
-                                 physicalnetworkid=self.physical_network.id,
-                                 account=self.account.name,
-                                 domainid=self.account.domainid
-                                 )
+            self.apiclient,
+            vlan_range1,
+            physicalnetworkid=self.physical_network.id,
+            account=self.account.name,
+            domainid=self.account.domainid
+        )
 
         # Dedicating second range
         PhysicalNetwork.dedicate(
-                                 self.apiclient,
-                                 vlan_range2,
-                                 physicalnetworkid=self.physical_network.id,
-                                 account=self.account.name,
-                                 domainid=self.account.domainid
-                                 )
+            self.apiclient,
+            vlan_range2,
+            physicalnetworkid=self.physical_network.id,
+            account=self.account.name,
+            domainid=self.account.domainid
+        )
 
         dedicated_ranges = PhysicalNetwork.listDedicated(
-                                                self.apiclient,
-                                                account=self.account.name,
-                                                domainid=self.account.domainid,
-                                                listall=True
-                                                )
+            self.apiclient,
+            account=self.account.name,
+            domainid=self.account.domainid,
+            listall=True
+        )
         self.assertEqual(str(dedicated_ranges[0].guestvlanrange), full_range, "Dedicated vlan\
                          range not matching with expcted extended range")
 
         return
 
-class TestFailureScenarios(cloudstackTestCase):
 
+class TestFailureScenarios(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestFailureScenarios, cls).getClsTestClient()
         cls.apiclient = cls.testClient.getApiClient()
-        cls.testdata =  cls.testClient.getParsedTestDataConfig()
+        cls.testdata = cls.testClient.getParsedTestDataConfig()
         # Get Zone, Domain
         cls.domain = get_domain(cls.apiclient)
         cls.zone = get_zone(cls.apiclient)
@@ -679,26 +663,26 @@ class TestFailureScenarios(cloudstackTestCase):
             cls.apiclient,
             cls.zone.id,
             cls.testdata["ostype"]
-            )
+        )
         cls._cleanup = []
 
         try:
             cls.isolated_network_offering = NetworkOffering.create(
-                          cls.apiclient,
-                          cls.testdata["nw_off_isolated_persistent"])
+                cls.apiclient,
+                cls.testdata["nw_off_isolated_persistent"])
             cls._cleanup.append(cls.isolated_network_offering)
             cls.isolated_network_offering.update(cls.apiclient, state='Enabled')
 
             cls.testdata["nw_off_isolated_persistent"]["specifyVlan"] = True
             cls.isolated_network_offering_vlan = NetworkOffering.create(
-                          cls.apiclient,
-                          cls.testdata["nw_off_isolated_persistent"])
+                cls.apiclient,
+                cls.testdata["nw_off_isolated_persistent"])
             cls._cleanup.append(cls.isolated_network_offering_vlan)
             cls.isolated_network_offering_vlan.update(cls.apiclient, state='Enabled')
 
             cls.service_offering = ServiceOffering.create(
-                                                          cls.apiclient,
-                                                          cls.testdata["service_offering"])
+                cls.apiclient,
+                cls.testdata["service_offering"])
             cls._cleanup.append(cls.service_offering)
 
             cls.testdata["small"]["zoneid"] = cls.zone.id
@@ -722,7 +706,7 @@ class TestFailureScenarios(cloudstackTestCase):
         self.dbclient = self.testClient.getDbConnection()
         self.cleanup = []
         self.physical_network, self.free_vlan = setNonContiguousVlanIds(self.apiclient,
-                                                                            self.zone.id)
+                                                                        self.zone.id)
         return
 
     def tearDown(self):
@@ -733,11 +717,11 @@ class TestFailureScenarios(cloudstackTestCase):
             raise Exception("Warning: Exception during cleanup : %s" % e)
         finally:
             self.physical_network.update(self.apiclient,
-                        id=self.physical_network.id,
-                        vlan=self.physical_network.vlan)
+                                         id=self.physical_network.id,
+                                         vlan=self.physical_network.vlan)
         return
 
-    @attr(tags = ["advanced", "selfservice"], required_hardware="false")
+    @attr(tags=["advanced", "selfservice"], required_hardware="false")
     def test_01_dedicate_wrong_vlan_range(self):
         """Dedicate invalid vlan range to account
 
@@ -748,10 +732,10 @@ class TestFailureScenarios(cloudstackTestCase):
         # 3. The operation should fail
         """
         self.account = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.domain.id
+        )
         self.cleanup.append(self.account)
 
         vlan_range = "5000-5001"
@@ -765,15 +749,15 @@ class TestFailureScenarios(cloudstackTestCase):
 
             # Dedicating guest vlan range
             PhysicalNetwork.dedicate(
-                                     self.apiclient,
-                                     vlan_range,
-                                     physicalnetworkid=self.physical_network.id,
-                                     account=self.account.name,
-                                     domainid=self.account.domainid
-                                    )
+                self.apiclient,
+                vlan_range,
+                physicalnetworkid=self.physical_network.id,
+                account=self.account.name,
+                domainid=self.account.domainid
+            )
         return
 
-    @attr(tags = ["advanced", "selfservice"], required_hardware="false")
+    @attr(tags=["advanced", "selfservice"], required_hardware="false")
     def test_02_dedicate_vlan_range_invalid_account(self):
         """Dedicate a guest vlan range to invalid account
 
@@ -784,10 +768,10 @@ class TestFailureScenarios(cloudstackTestCase):
         # 4. The operation should fail
         """
         self.account = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.domain.id
+        )
         self.cleanup.append(self.account)
 
         new_vlan = self.physical_network.vlan + "," + self.free_vlan["partial_range"][0]
@@ -798,15 +782,15 @@ class TestFailureScenarios(cloudstackTestCase):
         with self.assertRaises(Exception):
             # Dedicating guest vlan range
             PhysicalNetwork.dedicate(
-                                     self.apiclient,
-                                     self.free_vlan["partial_range"][0],
-                                     physicalnetworkid=self.physical_network.id,
-                                     account=self.account.name+random_gen(),
-                                     domainid=self.account.domainid
-                                    )
+                self.apiclient,
+                self.free_vlan["partial_range"][0],
+                physicalnetworkid=self.physical_network.id,
+                account=self.account.name + random_gen(),
+                domainid=self.account.domainid
+            )
         return
 
-    @attr(tags = ["advanced", "selfservice"], required_hardware="false")
+    @attr(tags=["advanced", "selfservice"], required_hardware="false")
     def test_03_dedicate_already_dedicated_range(self):
         """Dedicate a guest vlan range which is already dedicated
 
@@ -817,17 +801,17 @@ class TestFailureScenarios(cloudstackTestCase):
         # 4. Try to dedicate the same range to account 2, operation should fail
         """
         self.account1 = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.domain.id
+        )
         self.cleanup.append(self.account1)
 
         self.account2 = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.domain.id
+        )
         self.cleanup.append(self.account2)
 
         new_vlan = self.physical_network.vlan + "," + self.free_vlan["partial_range"][0]
@@ -837,31 +821,31 @@ class TestFailureScenarios(cloudstackTestCase):
 
         # Dedicating guest vlan range
         PhysicalNetwork.dedicate(
-                                     self.apiclient,
-                                     self.free_vlan["partial_range"][0],
-                                     physicalnetworkid=self.physical_network.id,
-                                     account=self.account1.name,
-                                     domainid=self.account1.domainid
-                                    )
+            self.apiclient,
+            self.free_vlan["partial_range"][0],
+            physicalnetworkid=self.physical_network.id,
+            account=self.account1.name,
+            domainid=self.account1.domainid
+        )
 
         with self.assertRaises(Exception):
             # Dedicating guest vlan range
             PhysicalNetwork.dedicate(
-                                     self.apiclient,
-                                     self.free_vlan["partial_range"][0],
-                                     physicalnetworkid=self.physical_network.id,
-                                     account=self.account2.name,
-                                     domainid=self.account2.domainid
-                                    )
+                self.apiclient,
+                self.free_vlan["partial_range"][0],
+                physicalnetworkid=self.physical_network.id,
+                account=self.account2.name,
+                domainid=self.account2.domainid
+            )
         return
 
-class TestDeleteVlanRange(cloudstackTestCase):
 
+class TestDeleteVlanRange(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestDeleteVlanRange, cls).getClsTestClient()
         cls.apiclient = cls.testClient.getApiClient()
-        cls.testdata =  cls.testClient.getParsedTestDataConfig()
+        cls.testdata = cls.testClient.getParsedTestDataConfig()
         # Get Zone, Domain
         cls.domain = get_domain(cls.apiclient)
         cls.zone = get_zone(cls.apiclient)
@@ -871,32 +855,32 @@ class TestDeleteVlanRange(cloudstackTestCase):
             cls.apiclient,
             cls.zone.id,
             cls.testdata["ostype"]
-            )
+        )
         cls._cleanup = []
 
         try:
             cls.isolated_persistent_network_offering = NetworkOffering.create(
-                          cls.apiclient,
-                          cls.testdata["nw_off_isolated_persistent"])
+                cls.apiclient,
+                cls.testdata["nw_off_isolated_persistent"])
             cls._cleanup.append(cls.isolated_persistent_network_offering)
             cls.isolated_persistent_network_offering.update(cls.apiclient, state='Enabled')
 
             cls.isolated_network_offering = NetworkOffering.create(
-                          cls.apiclient,
-                          cls.testdata["isolated_network_offering"])
+                cls.apiclient,
+                cls.testdata["isolated_network_offering"])
             cls._cleanup.append(cls.isolated_network_offering)
             cls.isolated_network_offering.update(cls.apiclient, state='Enabled')
 
             cls.testdata["nw_off_isolated_persistent"]["specifyvlan"] = True
             cls.isolated_network_offering_vlan = NetworkOffering.create(
-                          cls.apiclient,
-                          cls.testdata["nw_off_isolated_persistent"])
+                cls.apiclient,
+                cls.testdata["nw_off_isolated_persistent"])
             cls._cleanup.append(cls.isolated_network_offering_vlan)
             cls.isolated_network_offering_vlan.update(cls.apiclient, state='Enabled')
 
             cls.service_offering = ServiceOffering.create(
-                                                          cls.apiclient,
-                                                          cls.testdata["service_offering"])
+                cls.apiclient,
+                cls.testdata["service_offering"])
             cls._cleanup.append(cls.service_offering)
 
             cls.testdata["small"]["zoneid"] = cls.zone.id
@@ -920,7 +904,7 @@ class TestDeleteVlanRange(cloudstackTestCase):
         self.dbclient = self.testClient.getDbConnection()
         self.cleanup = []
         self.physical_network, self.free_vlan = setNonContiguousVlanIds(self.apiclient,
-                                                                            self.zone.id)
+                                                                        self.zone.id)
         return
 
     def tearDown(self):
@@ -931,11 +915,11 @@ class TestDeleteVlanRange(cloudstackTestCase):
             raise Exception("Warning: Exception during cleanup : %s" % e)
         finally:
             self.physical_network.update(self.apiclient,
-                        id=self.physical_network.id,
-                        vlan=self.physical_network.vlan)
+                                         id=self.physical_network.id,
+                                         vlan=self.physical_network.vlan)
         return
 
-    @attr(tags = ["advanced", "selfservice"], required_hardware="false")
+    @attr(tags=["advanced", "selfservice"], required_hardware="false")
     def test_01_delete_dedicated_vlan_range(self):
         """Try to delete a dedicated vlan range which is not in use
 
@@ -950,53 +934,53 @@ class TestDeleteVlanRange(cloudstackTestCase):
         # 7. The operation should succeed
         """
         self.account = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.domain.id
+        )
         self.cleanup.append(self.account)
         new_vlan = self.free_vlan["partial_range"][0]
         extended_vlan = self.physical_network.vlan + "," + new_vlan
 
         self.physical_network.update(self.apiclient,
-                                         id=self.physical_network.id,
-                                         vlan=extended_vlan)
+                                     id=self.physical_network.id,
+                                     vlan=extended_vlan)
 
         # Dedicating guest vlan range
         dedicate_guest_vlan_range_response = PhysicalNetwork.dedicate(
-                                                self.apiclient,
-                                                self.free_vlan["partial_range"][0],
-                                                physicalnetworkid=self.physical_network.id,
-                                                account=self.account.name,
-                                                domainid=self.account.domainid
-                                                )
+            self.apiclient,
+            self.free_vlan["partial_range"][0],
+            physicalnetworkid=self.physical_network.id,
+            account=self.account.name,
+            domainid=self.account.domainid
+        )
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(
-                                                self.apiclient,
-                                                id=dedicate_guest_vlan_range_response.id
-                                        )
+            self.apiclient,
+            id=dedicate_guest_vlan_range_response.id
+        )
         dedicated_guest_vlan_response = list_dedicated_guest_vlan_range_response[0]
         self.assertEqual(
-                            dedicated_guest_vlan_response.account,
-                            self.account.name,
-                            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
-                        )
+            dedicated_guest_vlan_response.account,
+            self.account.name,
+            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
+        )
 
         with self.assertRaises(Exception):
             # Deleting the dedicated vlan range
             self.physical_network.update(self.apiclient,
-                        id=self.physical_network.id,
-                        vlan=self.physical_network.vlan)
+                                         id=self.physical_network.id,
+                                         vlan=self.physical_network.vlan)
 
         dedicate_guest_vlan_range_response.release(self.apiclient)
         self.physical_network.update(self.apiclient,
-                        id=self.physical_network.id,
-                        vlan=self.physical_network.vlan)
+                                     id=self.physical_network.id,
+                                     vlan=self.physical_network.vlan)
         physical_networks = PhysicalNetwork.list(self.apiclient, id=self.physical_network.id, listall=True)
         self.assertEqual(validateList(physical_networks)[0], PASS, "Physical networks list validation failed")
         vlans = xsplit(physical_networks[0].vlan, [','])
         self.assertFalse(new_vlan in vlans, "newly added vlan is not deleted from physical network")
 
-    @attr(tags = ["advanced", "selfservice"], required_hardware="false")
+    @attr(tags=["advanced", "selfservice"], required_hardware="false")
     def test_02_delete_dedicated_vlan_range_vlan_in_use(self):
         """Try to delete a dedicated vlan rang which is in use
 
@@ -1012,52 +996,52 @@ class TestDeleteVlanRange(cloudstackTestCase):
         # 7. The operation should fail
         """
         self.account = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.domain.id
+        )
         self.cleanup.append(self.account)
 
         new_vlan = self.physical_network.vlan + "," + self.free_vlan["partial_range"][0]
 
         self.physical_network.update(self.apiclient,
-                                         id=self.physical_network.id,
-                                         vlan=new_vlan)
+                                     id=self.physical_network.id,
+                                     vlan=new_vlan)
 
         # Dedicating guest vlan range
         dedicate_guest_vlan_range_response = PhysicalNetwork.dedicate(
-                                                self.apiclient,
-                                                self.free_vlan["partial_range"][0],
-                                                physicalnetworkid=self.physical_network.id,
-                                                account=self.account.name,
-                                                domainid=self.account.domainid
-                                                )
+            self.apiclient,
+            self.free_vlan["partial_range"][0],
+            physicalnetworkid=self.physical_network.id,
+            account=self.account.name,
+            domainid=self.account.domainid
+        )
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(
-                                                self.apiclient,
-                                                id=dedicate_guest_vlan_range_response.id
-                                        )
+            self.apiclient,
+            id=dedicate_guest_vlan_range_response.id
+        )
         dedicated_guest_vlan_response = list_dedicated_guest_vlan_range_response[0]
         self.assertEqual(
-                            dedicated_guest_vlan_response.account,
-                            self.account.name,
-                            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
-                        )
+            dedicated_guest_vlan_response.account,
+            self.account.name,
+            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
+        )
 
         Network.create(
-                                   self.apiclient,
-                                   self.testdata["isolated_network"],
-                                   self.account.name,
-                                   self.account.domainid,
-                                   networkofferingid=self.isolated_persistent_network_offering.id)
+            self.apiclient,
+            self.testdata["isolated_network"],
+            self.account.name,
+            self.account.domainid,
+            networkofferingid=self.isolated_persistent_network_offering.id)
 
         with self.assertRaises(Exception):
             # Deleting the dedicated vlan range
             self.physical_network.update(self.apiclient,
-                        id=self.physical_network.id,
-                        vlan=self.physical_network.vlan)
+                                         id=self.physical_network.id,
+                                         vlan=self.physical_network.vlan)
         return
 
-    @attr(tags = ["advanced", "selfservice"], required_hardware="false")
+    @attr(tags=["advanced", "selfservice"], required_hardware="false")
     def test_03_delete_account(self):
         """Try to delete a dedicated vlan rang which is in use
 
@@ -1072,43 +1056,43 @@ class TestDeleteVlanRange(cloudstackTestCase):
         # 7. Verify that the vlan of the physical network remains the same
         """
         self.account = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.domain.id
+        )
         self.cleanup.append(self.account)
 
         new_vlan = self.physical_network.vlan + "," + self.free_vlan["partial_range"][0]
 
         self.physical_network.update(self.apiclient,
-                                         id=self.physical_network.id,
-                                         vlan=new_vlan)
+                                     id=self.physical_network.id,
+                                     vlan=new_vlan)
 
         # Dedicating guest vlan range
         dedicate_guest_vlan_range_response = PhysicalNetwork.dedicate(
-                                                self.apiclient,
-                                                self.free_vlan["partial_range"][0],
-                                                physicalnetworkid=self.physical_network.id,
-                                                account=self.account.name,
-                                                domainid=self.account.domainid
-                                                )
+            self.apiclient,
+            self.free_vlan["partial_range"][0],
+            physicalnetworkid=self.physical_network.id,
+            account=self.account.name,
+            domainid=self.account.domainid
+        )
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(
-                                                self.apiclient,
-                                                id=dedicate_guest_vlan_range_response.id
-                                        )
+            self.apiclient,
+            id=dedicate_guest_vlan_range_response.id
+        )
         dedicated_guest_vlan_response = list_dedicated_guest_vlan_range_response[0]
         self.assertEqual(
-                            dedicated_guest_vlan_response.account,
-                            self.account.name,
-                            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
-                        )
+            dedicated_guest_vlan_response.account,
+            self.account.name,
+            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
+        )
 
         Network.create(
-                                   self.apiclient,
-                                   self.testdata["isolated_network"],
-                                   self.account.name,
-                                   self.account.domainid,
-                                   networkofferingid=self.isolated_persistent_network_offering.id)
+            self.apiclient,
+            self.testdata["isolated_network"],
+            self.account.name,
+            self.account.domainid,
+            networkofferingid=self.isolated_persistent_network_offering.id)
 
         self.account.delete(self.apiclient)
         self.cleanup.remove(self.account)
@@ -1119,7 +1103,7 @@ class TestDeleteVlanRange(cloudstackTestCase):
                          should be same after deleting account")
         return
 
-    @attr(tags = ["advanced", "selfservice"], required_hardware="false")
+    @attr(tags=["advanced", "selfservice"], required_hardware="false")
     def test_04_release_range_no_vlan_in_use(self):
         """Release a dedicated vlan range when no vlan id is in use
 
@@ -1132,47 +1116,47 @@ class TestDeleteVlanRange(cloudstackTestCase):
         # 5. Verify the range is released back to system by listing dedicated ranges (list should be empty)
         """
         self.account1 = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.domain.id
+        )
         self.cleanup.append(self.account1)
 
         new_vlan = self.physical_network.vlan + "," + self.free_vlan["partial_range"][0]
         self.physical_network.update(self.apiclient,
-                id=self.physical_network.id, vlan=new_vlan)
+                                     id=self.physical_network.id, vlan=new_vlan)
 
         # Dedicating guest vlan range
         dedicate_guest_vlan_range_response = PhysicalNetwork.dedicate(
-                                                self.apiclient,
-                                                self.free_vlan["partial_range"][0],
-                                                physicalnetworkid=self.physical_network.id,
-                                                account=self.account1.name,
-                                                domainid=self.account1.domainid
-                                            )
+            self.apiclient,
+            self.free_vlan["partial_range"][0],
+            physicalnetworkid=self.physical_network.id,
+            account=self.account1.name,
+            domainid=self.account1.domainid
+        )
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(
-                                                self.apiclient,
-                                                id=dedicate_guest_vlan_range_response.id
-                                        )
+            self.apiclient,
+            id=dedicate_guest_vlan_range_response.id
+        )
         dedicated_guest_vlan_response = list_dedicated_guest_vlan_range_response[0]
         self.assertEqual(
-                            dedicated_guest_vlan_response.account,
-                            self.account1.name,
-                            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
-                        )
+            dedicated_guest_vlan_response.account,
+            self.account1.name,
+            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
+        )
 
         self.debug("Releasing guest vlan range");
         dedicate_guest_vlan_range_response.release(self.apiclient)
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(self.apiclient)
         self.assertEqual(
-                        list_dedicated_guest_vlan_range_response,
-                        None,
-                        "Check vlan range is not available in listDedicatedGuestVlanRanges"
+            list_dedicated_guest_vlan_range_response,
+            None,
+            "Check vlan range is not available in listDedicatedGuestVlanRanges"
 
-                        )
+        )
         return
 
-    @attr(tags = ["advanced", "selfservice"], required_hardware="false")
+    @attr(tags=["advanced", "selfservice"], required_hardware="false")
     def test_05_release_range_vlan_in_use(self):
         """Release a dedicated vlan range when no vlan id is in use
 
@@ -1185,43 +1169,43 @@ class TestDeleteVlanRange(cloudstackTestCase):
         # 5. The operation should succeed, as all vlans which are not in use should be released
         """
         self.account1 = Account.create(
-                            self.apiclient,
-                            self.testdata["account"],
-                            domainid=self.domain.id
-                            )
+            self.apiclient,
+            self.testdata["account"],
+            domainid=self.domain.id
+        )
         self.cleanup.append(self.account1)
 
         new_vlan = self.physical_network.vlan + "," + self.free_vlan["partial_range"][0]
         self.physical_network.update(self.apiclient,
-                id=self.physical_network.id, vlan=new_vlan)
+                                     id=self.physical_network.id, vlan=new_vlan)
 
         # Dedicating guest vlan range
         dedicate_guest_vlan_range_response = PhysicalNetwork.dedicate(
-                                                self.apiclient,
-                                                self.free_vlan["partial_range"][0],
-                                                physicalnetworkid=self.physical_network.id,
-                                                account=self.account1.name,
-                                                domainid=self.account1.domainid
-                                            )
+            self.apiclient,
+            self.free_vlan["partial_range"][0],
+            physicalnetworkid=self.physical_network.id,
+            account=self.account1.name,
+            domainid=self.account1.domainid
+        )
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(
-                                                self.apiclient,
-                                                id=dedicate_guest_vlan_range_response.id
-                                                )
+            self.apiclient,
+            id=dedicate_guest_vlan_range_response.id
+        )
         dedicated_guest_vlan_response = list_dedicated_guest_vlan_range_response[0]
         self.assertEqual(
-                            dedicated_guest_vlan_response.account,
-                            self.account1.name,
-                            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
-                        )
+            dedicated_guest_vlan_response.account,
+            self.account1.name,
+            "Check account name is in listDedicatedGuestVlanRanges as the account the range is dedicated to"
+        )
 
         dedicatedvlans = str(self.free_vlan["partial_range"][0]).split("-")
 
         isolated_network = Network.create(
-                                   self.apiclient,
-                                   self.testdata["isolated_network"],
-                                   self.account1.name,
-                                   self.account1.domainid,
-                                   networkofferingid=self.isolated_persistent_network_offering.id)
+            self.apiclient,
+            self.testdata["isolated_network"],
+            self.account1.name,
+            self.account1.domainid,
+            networkofferingid=self.isolated_persistent_network_offering.id)
 
         networks = Network.list(self.apiclient, id=isolated_network.id)
         self.assertEqual(validateList(networks)[0], PASS, "networks list validation failed")
@@ -1233,9 +1217,9 @@ class TestDeleteVlanRange(cloudstackTestCase):
         dedicate_guest_vlan_range_response.release(self.apiclient)
         list_dedicated_guest_vlan_range_response = PhysicalNetwork.listDedicated(self.apiclient)
         self.assertEqual(
-                        list_dedicated_guest_vlan_range_response,
-                        None,
-                        "Check vlan range is not available in listDedicatedGuestVlanRanges"
+            list_dedicated_guest_vlan_range_response,
+            None,
+            "Check vlan range is not available in listDedicatedGuestVlanRanges"
 
-                        )
+        )
         return

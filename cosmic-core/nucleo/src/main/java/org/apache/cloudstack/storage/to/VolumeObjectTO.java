@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package org.apache.cloudstack.storage.to;
@@ -26,7 +11,6 @@ import com.cloud.hypervisor.Hypervisor;
 import com.cloud.offering.DiskOffering.DiskCacheMode;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Volume;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
 
 public class VolumeObjectTO implements DataTO {
@@ -56,7 +40,7 @@ public class VolumeObjectTO implements DataTO {
 
     }
 
-    public VolumeObjectTO(VolumeInfo volume) {
+    public VolumeObjectTO(final VolumeInfo volume) {
         uuid = volume.getUuid();
         path = volume.getPath();
         accountId = volume.getAccountId();
@@ -87,13 +71,37 @@ public class VolumeObjectTO implements DataTO {
         return uuid;
     }
 
-    @Override
-    public String getPath() {
-        return path;
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 
     public Volume.Type getVolumeType() {
         return volumeType;
+    }
+
+    public void setDataStore(final DataStoreTO store) {
+        dataStore = store;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(final long size) {
+        this.size = size;
+    }
+
+    @Override
+    public DataObjectType getObjectType() {
+        return DataObjectType.VOLUME;
     }
 
     @Override
@@ -106,73 +114,13 @@ public class VolumeObjectTO implements DataTO {
         return hypervisorType;
     }
 
-    public void setDataStore(DataStoreTO store) {
-        dataStore = store;
-    }
-
-    public void setDataStore(PrimaryDataStoreTO dataStore) {
-        this.dataStore = dataStore;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Long getSize() {
-        return size;
-    }
-
     @Override
-    public DataObjectType getObjectType() {
-        return DataObjectType.VOLUME;
+    public String getPath() {
+        return path;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
-    }
-
-    public void setPath(String path) {
+    public void setPath(final String path) {
         this.path = path;
-    }
-
-    public Long getVolumeId() {
-        return volumeId;
-    }
-
-    public void setVolumeId(Long volumeId) {
-        this.volumeId = volumeId;
-    }
-
-    public long getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(long accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getVmName() {
-        return vmName;
-    }
-
-    public void setVmName(String vmName) {
-        this.vmName = vmName;
-    }
-
-    public String getChainInfo() {
-        return chainInfo;
-    }
-
-    public void setChainInfo(String chainInfo) {
-        this.chainInfo = chainInfo;
     }
 
     @Override
@@ -180,23 +128,59 @@ public class VolumeObjectTO implements DataTO {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
+    }
+
+    public void setDataStore(final PrimaryDataStoreTO dataStore) {
+        this.dataStore = dataStore;
+    }
+
+    public Long getVolumeId() {
+        return volumeId;
+    }
+
+    public void setVolumeId(final Long volumeId) {
+        this.volumeId = volumeId;
+    }
+
+    public long getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(final long accountId) {
+        this.accountId = accountId;
+    }
+
+    public String getVmName() {
+        return vmName;
+    }
+
+    public void setVmName(final String vmName) {
+        this.vmName = vmName;
+    }
+
+    public String getChainInfo() {
+        return chainInfo;
+    }
+
+    public void setChainInfo(final String chainInfo) {
+        this.chainInfo = chainInfo;
     }
 
     public Storage.ImageFormat getFormat() {
         return format;
     }
 
-    public void setFormat(Storage.ImageFormat format) {
+    public void setFormat(final Storage.ImageFormat format) {
         this.format = format;
     }
 
-    public Storage.ProvisioningType getProvisioningType(){
+    public Storage.ProvisioningType getProvisioningType() {
         return provisioningType;
     }
 
-    public void setProvisioningType(Storage.ProvisioningType provisioningType){
+    public void setProvisioningType(final Storage.ProvisioningType provisioningType) {
         this.provisioningType = provisioningType;
     }
 
@@ -205,51 +189,51 @@ public class VolumeObjectTO implements DataTO {
         return new StringBuilder("volumeTO[uuid=").append(uuid).append("|path=").append(path).append("|datastore=").append(dataStore).append("]").toString();
     }
 
-    public void setBytesReadRate(Long bytesReadRate) {
-        this.bytesReadRate = bytesReadRate;
-    }
-
     public Long getBytesReadRate() {
         return bytesReadRate;
     }
 
-    public void setBytesWriteRate(Long bytesWriteRate) {
-        this.bytesWriteRate = bytesWriteRate;
+    public void setBytesReadRate(final Long bytesReadRate) {
+        this.bytesReadRate = bytesReadRate;
     }
 
     public Long getBytesWriteRate() {
         return bytesWriteRate;
     }
 
-    public void setIopsReadRate(Long iopsReadRate) {
-        this.iopsReadRate = iopsReadRate;
+    public void setBytesWriteRate(final Long bytesWriteRate) {
+        this.bytesWriteRate = bytesWriteRate;
     }
 
     public Long getIopsReadRate() {
         return iopsReadRate;
     }
 
-    public void setIopsWriteRate(Long iopsWriteRate) {
-        this.iopsWriteRate = iopsWriteRate;
+    public void setIopsReadRate(final Long iopsReadRate) {
+        this.iopsReadRate = iopsReadRate;
     }
 
     public Long getIopsWriteRate() {
         return iopsWriteRate;
     }
 
+    public void setIopsWriteRate(final Long iopsWriteRate) {
+        this.iopsWriteRate = iopsWriteRate;
+    }
+
     public Long getDeviceId() {
         return deviceId;
     }
 
-    public void setDeviceId(Long deviceId) {
+    public void setDeviceId(final Long deviceId) {
         this.deviceId = deviceId;
-    }
-
-    public void setCacheMode(DiskCacheMode cacheMode) {
-        this.cacheMode = cacheMode;
     }
 
     public DiskCacheMode getCacheMode() {
         return cacheMode;
+    }
+
+    public void setCacheMode(final DiskCacheMode cacheMode) {
+        this.cacheMode = cacheMode;
     }
 }

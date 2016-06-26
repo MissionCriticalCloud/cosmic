@@ -1,25 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.router;
-
-import java.net.URI;
-
-import javax.ejb.Local;
-import javax.inject.Inject;
 
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
@@ -39,16 +18,15 @@ import com.cloud.vm.NicProfile;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.VMInstanceDao;
 
-import org.cloud.network.router.deployment.RouterDeploymentDefinition;
+import javax.ejb.Local;
+import javax.inject.Inject;
+import java.net.URI;
 
+import org.cloud.network.router.deployment.RouterDeploymentDefinition;
 
 @Local(value = {NicProfileHelper.class})
 public class NicProfileHelperImpl implements NicProfileHelper {
 
-    @Inject
-    private VMInstanceDao _vmDao;
-    @Inject
-    private PrivateIpDao _privateIpDao;
     @Inject
     protected NetworkModel _networkModel;
     @Inject
@@ -57,6 +35,10 @@ public class NicProfileHelperImpl implements NicProfileHelper {
     protected NicDao _nicDao;
     @Inject
     protected IpAddressManager _ipAddrMgr;
+    @Inject
+    private VMInstanceDao _vmDao;
+    @Inject
+    private PrivateIpDao _privateIpDao;
 
     @Override
     @DB
@@ -83,11 +65,11 @@ public class NicProfileHelperImpl implements NicProfileHelper {
             privateNicProfile =
                     new NicProfile(privateNic, privateNetwork, privateNic.getBroadcastUri(), privateNic.getIsolationUri(), _networkModel.getNetworkRate(
                             privateNetwork.getId(), router.getId()), _networkModel.isSecurityGroupSupportedInNetwork(privateNetwork), _networkModel.getNetworkTag(
-                                    router.getHypervisorType(), privateNetwork));
+                            router.getHypervisorType(), privateNetwork));
 
             if (router.getIsRedundantRouter()) {
-              String newMacAddress = NetUtils.long2Mac(NetUtils.createSequenceBasedMacAddress(ipVO.getMacAddress()));
-              privateNicProfile.setMacAddress(newMacAddress);
+                final String newMacAddress = NetUtils.long2Mac(NetUtils.createSequenceBasedMacAddress(ipVO.getMacAddress()));
+                privateNicProfile.setMacAddress(newMacAddress);
             }
         } else {
             final String netmask = NetUtils.getCidrNetmask(privateNetwork.getCidr());
@@ -118,7 +100,7 @@ public class NicProfileHelperImpl implements NicProfileHelper {
 
         // Redundant VPCs should not acquire the gateway ip because that is the VIP between the two routers to which guest VMs connect
         // VPCs without sourcenat service also should not acquire the gateway ip because it is in use by an external device on the network
-        if (vpcRouterDeploymentDefinition.isRedundant() || ! vpcRouterDeploymentDefinition.hasSourceNatService()) {
+        if (vpcRouterDeploymentDefinition.isRedundant() || !vpcRouterDeploymentDefinition.hasSourceNatService()) {
             guestNic.setIPv4Address(_ipAddrMgr.acquireGuestIpAddress(guestNetwork, null));
         } else {
             guestNic.setIPv4Address(guestNetwork.getGateway());
@@ -133,5 +115,4 @@ public class NicProfileHelperImpl implements NicProfileHelper {
 
         return guestNic;
     }
-
 }

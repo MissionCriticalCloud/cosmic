@@ -1,166 +1,139 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.query.vo;
 
-import java.util.Date;
+import com.cloud.domain.Domain;
+import com.cloud.domain.DomainVO;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.Identity;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.domain.Domain;
-import com.cloud.domain.DomainVO;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
-@Table(name="domain_view")
+@Table(name = "domain_view")
 public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identity {
 
     @Id
-    @Column(name="id")
+    @Column(name = "id")
     private long id;
 
-    @Column(name="parent")
+    @Column(name = "parent")
     private Long parent = null;
 
-    @Column(name="name")
+    @Column(name = "name")
     private String name = null;
 
-    @Column(name="owner")
+    @Column(name = "owner")
     private long accountId;
 
-    @Column(name="path")
+    @Column(name = "path")
     private String path = null;
 
-    @Column(name="level")
+    @Column(name = "level")
     private int level;
 
-    @Column(name=GenericDao.REMOVED_COLUMN)
+    @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
 
-    @Column(name="child_count")
+    @Column(name = "child_count")
     private int childCount = 0;
 
-    @Column(name="next_child_seq")
+    @Column(name = "next_child_seq")
     private long nextChildSeq = 1L;
 
-    @Column(name="state")
+    @Column(name = "state")
     private Domain.State state;
 
-    @Column(name="network_domain")
+    @Column(name = "network_domain")
     private String networkDomain;
 
-    @Column(name="uuid")
+    @Column(name = "uuid")
     private String uuid;
 
-
-    @Column(name="vmLimit")
+    @Column(name = "vmLimit")
     private Long vmLimit;
 
-    @Column(name="vmTotal")
+    @Column(name = "vmTotal")
     private Long vmTotal;
 
-
-    @Column(name="ipLimit")
+    @Column(name = "ipLimit")
     private Long ipLimit;
 
-    @Column(name="ipTotal")
+    @Column(name = "ipTotal")
     private Long ipTotal;
 
-    @Column(name="volumeLimit")
+    @Column(name = "volumeLimit")
     private Long volumeLimit;
 
-    @Column(name="volumeTotal")
+    @Column(name = "volumeTotal")
     private Long volumeTotal;
 
-    @Column(name="snapshotLimit")
+    @Column(name = "snapshotLimit")
     private Long snapshotLimit;
 
-    @Column(name="snapshotTotal")
+    @Column(name = "snapshotTotal")
     private Long snapshotTotal;
 
-    @Column(name="templateLimit")
+    @Column(name = "templateLimit")
     private Long templateLimit;
 
-    @Column(name="templateTotal")
+    @Column(name = "templateTotal")
     private Long templateTotal;
 
-    @Column(name="projectLimit")
+    @Column(name = "projectLimit")
     private Long projectLimit;
 
-    @Column(name="projectTotal")
+    @Column(name = "projectTotal")
     private Long projectTotal;
 
-
-    @Column(name="networkLimit")
+    @Column(name = "networkLimit")
     private Long networkLimit;
 
-    @Column(name="networkTotal")
+    @Column(name = "networkTotal")
     private Long networkTotal;
 
-
-    @Column(name="vpcLimit")
+    @Column(name = "vpcLimit")
     private Long vpcLimit;
 
-    @Column(name="vpcTotal")
+    @Column(name = "vpcTotal")
     private Long vpcTotal;
 
-
-    @Column(name="cpuLimit")
+    @Column(name = "cpuLimit")
     private Long cpuLimit;
 
-    @Column(name="cpuTotal")
+    @Column(name = "cpuTotal")
     private Long cpuTotal;
 
-
-    @Column(name="memoryLimit")
+    @Column(name = "memoryLimit")
     private Long memoryLimit;
 
-    @Column(name="memoryTotal")
+    @Column(name = "memoryTotal")
     private Long memoryTotal;
 
-
-    @Column(name="primaryStorageLimit")
+    @Column(name = "primaryStorageLimit")
     private Long primaryStorageLimit;
 
-    @Column(name="primaryStorageTotal")
+    @Column(name = "primaryStorageTotal")
     private Long primaryStorageTotal;
 
-
-    @Column(name="secondaryStorageLimit")
+    @Column(name = "secondaryStorageLimit")
     private Long secondaryStorageLimit;
 
-    @Column(name="secondaryStorageTotal")
+    @Column(name = "secondaryStorageTotal")
     private Long secondaryStorageTotal;
 
     public DomainJoinVO() {
     }
-
 
     @Override
     public long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
@@ -169,24 +142,23 @@ public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identi
         return uuid;
     }
 
-
-    public void setUuid(String uuid) {
+    public void setUuid(final String uuid) {
         this.uuid = uuid;
     }
-
 
     public Long getParent() {
         return parent;
     }
 
-    public void setParent(Long parent) {
-        if(parent == null) {
+    public void setParent(final Long parent) {
+        if (parent == null) {
             this.parent = DomainVO.ROOT_DOMAIN;
         } else {
-            if(parent.longValue() <= DomainVO.ROOT_DOMAIN)
+            if (parent.longValue() <= DomainVO.ROOT_DOMAIN) {
                 this.parent = DomainVO.ROOT_DOMAIN;
-            else
+            } else {
                 this.parent = parent;
+            }
         }
     }
 
@@ -194,7 +166,7 @@ public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identi
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -210,7 +182,7 @@ public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identi
         return path;
     }
 
-    public void setPath(String path) {
+    public void setPath(final String path) {
         this.path = path;
     }
 
@@ -218,7 +190,7 @@ public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identi
         return level;
     }
 
-    public void setLevel(int level) {
+    public void setLevel(final int level) {
         this.level = level;
     }
 
@@ -226,7 +198,7 @@ public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identi
         return childCount;
     }
 
-    public void setChildCount(int count) {
+    public void setChildCount(final int count) {
         childCount = count;
     }
 
@@ -234,7 +206,7 @@ public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identi
         return nextChildSeq;
     }
 
-    public void setNextChildSeq(long seq) {
+    public void setNextChildSeq(final long seq) {
         nextChildSeq = seq;
     }
 
@@ -242,7 +214,7 @@ public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identi
         return state;
     }
 
-    public void setState(Domain.State state) {
+    public void setState(final Domain.State state) {
         this.state = state;
     }
 
@@ -254,27 +226,23 @@ public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identi
         return networkDomain;
     }
 
-    public void setNetworkDomain(String domainSuffix) {
+    public void setNetworkDomain(final String domainSuffix) {
         this.networkDomain = domainSuffix;
     }
-
 
     public Long getVmTotal() {
         return vmTotal;
     }
 
-
-    public void setVmTotal(Long vmTotal) {
+    public void setVmTotal(final Long vmTotal) {
         this.vmTotal = vmTotal;
     }
-
 
     public Long getIpTotal() {
         return ipTotal;
     }
 
-
-    public void setIpTotal(Long ipTotal) {
+    public void setIpTotal(final Long ipTotal) {
         this.ipTotal = ipTotal;
     }
 
@@ -282,92 +250,71 @@ public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identi
         return volumeTotal;
     }
 
-
-    public void setVolumeTotal(Long volumeTotal) {
+    public void setVolumeTotal(final Long volumeTotal) {
         this.volumeTotal = volumeTotal;
     }
-
-
 
     public Long getSnapshotTotal() {
         return snapshotTotal;
     }
 
-
-    public void setSnapshotTotal(Long snapshotTotal) {
+    public void setSnapshotTotal(final Long snapshotTotal) {
         this.snapshotTotal = snapshotTotal;
     }
-
-
-
 
     public Long getTemplateTotal() {
         return templateTotal;
     }
 
-
-    public void setTemplateTotal(Long templateTotal) {
+    public void setTemplateTotal(final Long templateTotal) {
         this.templateTotal = templateTotal;
     }
-
 
     public Long getProjectTotal() {
         return projectTotal;
     }
 
-
-    public void setProjectTotal(Long projectTotal) {
+    public void setProjectTotal(final Long projectTotal) {
         this.projectTotal = projectTotal;
     }
-
-
 
     public Long getNetworkTotal() {
         return networkTotal;
     }
 
-
-    public void setNetworkTotal(Long networkTotal) {
+    public void setNetworkTotal(final Long networkTotal) {
         this.networkTotal = networkTotal;
     }
-
 
     public Long getVpcTotal() {
         return vpcTotal;
     }
 
-
-    public void setVpcTotal(Long vpcTotal) {
+    public void setVpcTotal(final Long vpcTotal) {
         this.vpcTotal = vpcTotal;
     }
-
 
     public Long getCpuTotal() {
         return cpuTotal;
     }
 
-
-    public void setCpuTotal(Long cpuTotal) {
+    public void setCpuTotal(final Long cpuTotal) {
         this.cpuTotal = cpuTotal;
     }
-
 
     public Long getMemoryTotal() {
         return memoryTotal;
     }
 
-
-    public void setMemoryTotal(Long memoryTotal) {
+    public void setMemoryTotal(final Long memoryTotal) {
         this.memoryTotal = memoryTotal;
     }
-
 
     public Long getPrimaryStorageTotal() {
         return primaryStorageTotal;
     }
 
-
-    public void setPrimaryStorageTotal(Long primaryStorageTotal) {
+    public void setPrimaryStorageTotal(final Long primaryStorageTotal) {
         this.primaryStorageTotal = primaryStorageTotal;
     }
 
@@ -375,129 +322,103 @@ public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identi
         return secondaryStorageTotal;
     }
 
-
-    public void setSecondaryStorageTotal(Long secondaryStorageTotal) {
+    public void setSecondaryStorageTotal(final Long secondaryStorageTotal) {
         this.secondaryStorageTotal = secondaryStorageTotal;
     }
-
 
     public Long getVmLimit() {
         return vmLimit;
     }
 
-
-    public void setVmLimit(Long vmLimit) {
+    public void setVmLimit(final Long vmLimit) {
         this.vmLimit = vmLimit;
     }
-
 
     public Long getIpLimit() {
         return ipLimit;
     }
 
-
-    public void setIpLimit(Long ipLimit) {
+    public void setIpLimit(final Long ipLimit) {
         this.ipLimit = ipLimit;
     }
-
 
     public Long getVolumeLimit() {
         return volumeLimit;
     }
 
-
-    public void setVolumeLimit(Long volumeLimit) {
+    public void setVolumeLimit(final Long volumeLimit) {
         this.volumeLimit = volumeLimit;
     }
-
 
     public Long getSnapshotLimit() {
         return snapshotLimit;
     }
 
-
-    public void setSnapshotLimit(Long snapshotLimit) {
+    public void setSnapshotLimit(final Long snapshotLimit) {
         this.snapshotLimit = snapshotLimit;
     }
-
 
     public Long getTemplateLimit() {
         return templateLimit;
     }
 
-
-    public void setTemplateLimit(Long templateLimit) {
+    public void setTemplateLimit(final Long templateLimit) {
         this.templateLimit = templateLimit;
     }
-
 
     public Long getProjectLimit() {
         return projectLimit;
     }
 
-
-    public void setProjectLimit(Long projectLimit) {
+    public void setProjectLimit(final Long projectLimit) {
         this.projectLimit = projectLimit;
     }
-
 
     public Long getNetworkLimit() {
         return networkLimit;
     }
 
-
-    public void setNetworkLimit(Long networkLimit) {
+    public void setNetworkLimit(final Long networkLimit) {
         this.networkLimit = networkLimit;
     }
-
 
     public Long getVpcLimit() {
         return vpcLimit;
     }
 
-
-    public void setVpcLimit(Long vpcLimit) {
+    public void setVpcLimit(final Long vpcLimit) {
         this.vpcLimit = vpcLimit;
     }
-
 
     public Long getCpuLimit() {
         return cpuLimit;
     }
 
-
-    public void setCpuLimit(Long cpuLimit) {
+    public void setCpuLimit(final Long cpuLimit) {
         this.cpuLimit = cpuLimit;
     }
-
 
     public Long getMemoryLimit() {
         return memoryLimit;
     }
 
-
-    public void setMemoryLimit(Long memoryLimit) {
+    public void setMemoryLimit(final Long memoryLimit) {
         this.memoryLimit = memoryLimit;
     }
-
 
     public Long getPrimaryStorageLimit() {
         return primaryStorageLimit;
     }
 
-
-    public void setPrimaryStorageLimit(Long primaryStorageLimit) {
+    public void setPrimaryStorageLimit(final Long primaryStorageLimit) {
         this.primaryStorageLimit = primaryStorageLimit;
     }
-
 
     public Long getSecondaryStorageLimit() {
         return secondaryStorageLimit;
     }
 
-
-    public void setSecondaryStorageLimit(Long secondaryStorageLimit) {
+    public void setSecondaryStorageLimit(final Long secondaryStorageLimit) {
         this.secondaryStorageLimit = secondaryStorageLimit;
     }
-
 }

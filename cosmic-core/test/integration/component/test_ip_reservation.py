@@ -1,19 +1,3 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ Tests for IP reservation feature
 
     Test Plan: https://cwiki.apache.org/confluence/display/CLOUDSTACK/IP+Range+Reservation+within+a+Network+Test+Cases
@@ -22,8 +6,12 @@
 
     Feature Specifications: https://cwiki.apache.org/confluence/display/CLOUDSTACK/FS+-+IP+Range+Reservation+within+a+Network
 """
+import netaddr
+import random
+from ddt import ddt, data
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import validateList, cleanup_resources
+from marvin.codes import (PASS, FAIL, FAILED, UNKNOWN, FAULT, MASTER,
+                          NAT_RULE, STATIC_NAT_RULE)
 from marvin.lib.base import (
     Account,
     Network,
@@ -42,25 +30,22 @@ from marvin.lib.common import (
     verifyNetworkState,
     verifyRouterState
 )
-from marvin.codes import (PASS, FAIL, FAILED, UNKNOWN, FAULT, MASTER,
-                          NAT_RULE, STATIC_NAT_RULE)
-import netaddr
-
-import random
+from marvin.lib.utils import validateList, cleanup_resources
 from nose.plugins.attrib import attr
-from ddt import ddt, data
+
 
 def createIsolatedNetwork(self, network_offering_id, gateway=None):
     """Create isolated network with given network offering and gateway if provided
     and return"""
     try:
         isolated_network = Network.create(self.apiclient, self.testData["isolated_network"],
-                         networkofferingid=network_offering_id,accountid=self.account.name,
-                         domainid=self.domain.id,zoneid=self.zone.id,
-                         gateway=gateway, netmask='255.255.255.0' if gateway else None)
+                                          networkofferingid=network_offering_id, accountid=self.account.name,
+                                          domainid=self.domain.id, zoneid=self.zone.id,
+                                          gateway=gateway, netmask='255.255.255.0' if gateway else None)
     except Exception as e:
         return [FAIL, e]
     return [PASS, isolated_network]
+
 
 def matchNetworkGuestVmCIDR(self, networkid, guestvmcidr):
     """List networks with given network id and check if the guestvmcidr matches
@@ -73,6 +58,7 @@ def matchNetworkGuestVmCIDR(self, networkid, guestvmcidr):
 
     return
 
+
 def createVirtualMachine(self, network_id=None, ip_address=None):
     """Create and return virtual machine within network and ipaddress"""
     virtual_machine = VirtualMachine.create(self.apiclient,
@@ -84,6 +70,7 @@ def createVirtualMachine(self, network_id=None, ip_address=None):
                                             ipaddress=ip_address)
     return virtual_machine
 
+
 def CreateEnabledNetworkOffering(apiclient, networkServices):
     """Create network offering of given test data and enable it"""
 
@@ -91,10 +78,12 @@ def CreateEnabledNetworkOffering(apiclient, networkServices):
     assert result[0] == PASS, "Network offering creation/enabling failed due to %s" % result[2]
     return result[1]
 
+
 @ddt
 class TestIpReservation(cloudstackTestCase):
     """Test IP Range Reservation with a Network
     """
+
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestIpReservation, cls).getClsTestClient()
@@ -107,10 +96,10 @@ class TestIpReservation(cloudstackTestCase):
         cls.domain = get_domain(cls.api_client)
         cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
         cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.testData["ostype"]
-                            )
+            cls.api_client,
+            cls.zone.id,
+            cls.testData["ostype"]
+        )
         if cls.template == FAILED:
             assert False, "get_template() failed to return template with description %s" % cls.testData["ostype"]
         cls.testData["domainid"] = cls.domain.id
@@ -120,18 +109,18 @@ class TestIpReservation(cloudstackTestCase):
         cls._cleanup = []
         try:
             cls.service_offering = ServiceOffering.create(
-                                            cls.api_client,
-                                            cls.testData["service_offering"]
-                                            )
+                cls.api_client,
+                cls.testData["service_offering"]
+            )
             cls._cleanup.append(cls.service_offering)
             cls.isolated_network_offering = CreateEnabledNetworkOffering(cls.api_client,
-                                            cls.testData["isolated_network_offering"])
+                                                                         cls.testData["isolated_network_offering"])
             cls._cleanup.append(cls.isolated_network_offering)
             cls.isolated_persistent_network_offering = CreateEnabledNetworkOffering(cls.api_client,
-                                            cls.testData["nw_off_isolated_persistent"])
+                                                                                    cls.testData["nw_off_isolated_persistent"])
             cls._cleanup.append(cls.isolated_persistent_network_offering)
             cls.isolated_network_offering_RVR = CreateEnabledNetworkOffering(cls.api_client,
-                                            cls.testData["nw_off_isolated_RVR"])
+                                                                             cls.testData["nw_off_isolated_RVR"])
             cls._cleanup.append(cls.isolated_network_offering_RVR)
         except Exception as e:
             cls.tearDownClass()
@@ -153,7 +142,7 @@ class TestIpReservation(cloudstackTestCase):
         self.cleanup = []
         try:
             self.account = Account.create(self.apiclient, self.testData["account"],
-                                      domainid=self.domain.id)
+                                          domainid=self.domain.id)
             self.cleanup.append(self.account)
         except Exception as e:
             self.skipTest("Failed to create account: %s" % e)
@@ -180,29 +169,29 @@ class TestIpReservation(cloudstackTestCase):
         # 3. Newly created VM should get ip in guestvmcidr"""
 
         networkOffering = self.isolated_network_offering
-        subnet = "10.1."+str(random.randrange(1,254))
-        gateway = subnet +".1"
+        subnet = "10.1." + str(random.randrange(1, 254))
+        gateway = subnet + ".1"
         resultSet = createIsolatedNetwork(self, networkOffering.id, gateway=gateway)
         if resultSet[0] == FAIL:
             self.fail("Failed to create isolated network")
         else:
             isolated_network = resultSet[1]
-        guest_vm_cidr = subnet +".0/29"
+        guest_vm_cidr = subnet + ".0/29"
 
         try:
             virtual_machine_1 = createVirtualMachine(self, network_id=isolated_network.id,
-                    ip_address = subnet+".3")
+                                                     ip_address=subnet + ".3")
         except Exception as e:
             self.fail("VM creation failed: %s" % e)
 
         isolated_network.update(self.apiclient, guestvmcidr=guest_vm_cidr)
         matchNetworkGuestVmCIDR(self, isolated_network.id, guest_vm_cidr)
         vms = VirtualMachine.list(self.apiclient,
-                                       id=virtual_machine_1.id)
+                                  id=virtual_machine_1.id)
         self.assertEqual(validateList(vms)[0], PASS, "vm list validation failed")
         self.assertEqual(vms[0].nic[0].ipaddress,
-                          virtual_machine_1.ipaddress,
-                           "VM IP should not change after reservation")
+                         virtual_machine_1.ipaddress,
+                         "VM IP should not change after reservation")
         try:
             virtual_machine_2 = createVirtualMachine(self, network_id=isolated_network.id)
             if netaddr.IPAddress(virtual_machine_2.ipaddress) not in netaddr.IPNetwork(guest_vm_cidr):
@@ -223,20 +212,20 @@ class TestIpReservation(cloudstackTestCase):
         # 2  newly created VM should not be created and result in exception
 
         networkOffering = self.isolated_persistent_network_offering
-        subnet = "10.1."+str(random.randrange(1,254))
-        gateway = subnet +".1"
+        subnet = "10.1." + str(random.randrange(1, 254))
+        gateway = subnet + ".1"
         resultSet = createIsolatedNetwork(self, networkOffering.id, gateway=gateway)
         if resultSet[0] == FAIL:
             self.fail("Failed to create isolated network")
         else:
             isolated_network = resultSet[1]
-        guest_vm_cidr = subnet+".0/29"
+        guest_vm_cidr = subnet + ".0/29"
 
         isolated_network.update(self.apiclient, guestvmcidr=guest_vm_cidr)
         matchNetworkGuestVmCIDR(self, isolated_network.id, guest_vm_cidr)
         try:
             createVirtualMachine(self, network_id=self.isolated_network.id,
-                                 ip_address=subnet+".9")
+                                 ip_address=subnet + ".9")
             self.fail("vm should not be created ")
         except Exception as e:
             self.debug("exception as IP is outside of guestvmcidr %s" % e)
@@ -252,25 +241,25 @@ class TestIpReservation(cloudstackTestCase):
         # validation
         # 1. Network updation with this new range should fail"""
 
-        subnet = "10.1."+str(random.randrange(1,254))
-        gateway = subnet +".1"
+        subnet = "10.1." + str(random.randrange(1, 254))
+        gateway = subnet + ".1"
         resultSet = createIsolatedNetwork(self, self.isolated_network_offering.id,
                                           gateway=gateway)
         if resultSet[0] == FAIL:
             self.fail("Failed to create isolated network")
         else:
             isolated_network = resultSet[1]
-        guest_vm_cidr = subnet+".0/29"
+        guest_vm_cidr = subnet + ".0/29"
 
         try:
             createVirtualMachine(self, network_id=isolated_network.id,
-                    ip_address=subnet+".3")
+                                 ip_address=subnet + ".3")
         except Exception as e:
             self.fail("VM creation failed: %s" % e)
 
         try:
             createVirtualMachine(self, network_id=isolated_network.id,
-                    ip_address=subnet+".9")
+                                 ip_address=subnet + ".9")
         except Exception as e:
             self.fail("VM creation failed: %s" % e)
 
@@ -288,19 +277,19 @@ class TestIpReservation(cloudstackTestCase):
         #
         # validation
         # 1. Network updation with this new range should fail"""
-        subnet = "10.1."+str(random.randrange(1,254))
-        gateway = subnet +".1"
+        subnet = "10.1." + str(random.randrange(1, 254))
+        gateway = subnet + ".1"
         resultSet = createIsolatedNetwork(self, self.isolated_network_offering.id,
                                           gateway=gateway)
         if resultSet[0] == FAIL:
             self.fail("Failed to create isolated network")
         else:
             isolated_network = resultSet[1]
-        guest_vm_cidr = subnet+".0/29"
+        guest_vm_cidr = subnet + ".0/29"
 
         try:
             createVirtualMachine(self, network_id=isolated_network.id,
-                    ip_address=subnet+".9")
+                                 ip_address=subnet + ".9")
         except Exception as e:
             self.fail("VM creation failed: %s" % e)
 
@@ -324,23 +313,23 @@ class TestIpReservation(cloudstackTestCase):
         # 3. Newly created VM should get ip in guestvmcidr
         # 4. The network rules should be working"""
 
-        subnet = "10.1."+str(random.randrange(1,254))
-        gateway = subnet +".1"
+        subnet = "10.1." + str(random.randrange(1, 254))
+        gateway = subnet + ".1"
         resultSet = createIsolatedNetwork(self, self.isolated_network_offering.id,
                                           gateway=gateway)
         if resultSet[0] == FAIL:
             self.fail("Failed to create isolated network")
         else:
             isolated_network = resultSet[1]
-        guest_vm_cidr = subnet+".0/29"
+        guest_vm_cidr = subnet + ".0/29"
 
         try:
             virtual_machine_1 = createVirtualMachine(self, network_id=isolated_network.id,
-                    ip_address=subnet+".3")
+                                                     ip_address=subnet + ".3")
         except Exception as e:
             self.fail("VM creation failed: %s" % e)
 
-        result = createNetworkRulesForVM(self.apiclient, virtual_machine_1,value,
+        result = createNetworkRulesForVM(self.apiclient, virtual_machine_1, value,
                                          self.account, self.testData)
         if result[0] == FAIL:
             self.fail("Failed to create network rules for VM: %s" % result[1])
@@ -353,8 +342,8 @@ class TestIpReservation(cloudstackTestCase):
         vms = VirtualMachine.list(self.apiclient, id=virtual_machine_1.id)
         self.assertEqual(validateList(vms)[0], PASS, "vm list validation failed")
         self.assertEqual(vms[0].nic[0].ipaddress,
-                          virtual_machine_1.ipaddress,
-                           "VM IP should not change after reservation")
+                         virtual_machine_1.ipaddress,
+                         "VM IP should not change after reservation")
         try:
             virtual_machine_2 = createVirtualMachine(self, network_id=isolated_network.id)
             if netaddr.IPAddress(virtual_machine_2.ipaddress) not in netaddr.IPNetwork(guest_vm_cidr):
@@ -388,30 +377,30 @@ class TestIpReservation(cloudstackTestCase):
         # 4. Verify that the network has two routers associated with it
         # 5. Backup router should come up when master router is stopped"""
 
-        subnet = "10.1."+str(random.randrange(1,254))
-        gateway = subnet +".1"
+        subnet = "10.1." + str(random.randrange(1, 254))
+        gateway = subnet + ".1"
         resultSet = createIsolatedNetwork(self, self.isolated_network_offering_RVR.id,
                                           gateway=gateway)
         if resultSet[0] == FAIL:
             self.fail("Failed to create isolated network")
         else:
-            isolated_network_RVR= resultSet[1]
-        guest_vm_cidr = subnet+".0/29"
+            isolated_network_RVR = resultSet[1]
+        guest_vm_cidr = subnet + ".0/29"
 
         try:
             virtual_machine_1 = createVirtualMachine(self, network_id=isolated_network_RVR.id,
-                    ip_address=subnet+".3")
+                                                     ip_address=subnet + ".3")
         except Exception as e:
             self.fail("VM creation failed: %s" % e)
 
         isolated_network_RVR.update(self.apiclient, guestvmcidr=guest_vm_cidr)
         matchNetworkGuestVmCIDR(self, isolated_network_RVR.id, guest_vm_cidr)
         vms = VirtualMachine.list(self.apiclient,
-                                       id=virtual_machine_1.id)
+                                  id=virtual_machine_1.id)
         self.assertEqual(validateList(vms)[0], PASS, "vm list validation failed")
         self.assertEqual(vms[0].nic[0].ipaddress,
-                          virtual_machine_1.ipaddress,
-                           "VM IP should not change after reservation")
+                         virtual_machine_1.ipaddress,
+                         "VM IP should not change after reservation")
 
         self.debug("Listing routers for network: %s" % isolated_network_RVR.name)
         routers = Router.list(self.apiclient, networkid=isolated_network_RVR.id, listall=True)
@@ -435,7 +424,7 @@ class TestIpReservation(cloudstackTestCase):
         # wait for VR to update state
         wait_for_cleanup(self.apiclient, ["router.check.interval"])
 
-        result = verifyRouterState(self.apiclient, master_router.id, [UNKNOWN,FAULT])
+        result = verifyRouterState(self.apiclient, master_router.id, [UNKNOWN, FAULT])
         if result[0] == FAIL:
             self.fail(result[1])
         result = verifyRouterState(self.apiclient, backup_router.id, [MASTER])
@@ -466,82 +455,84 @@ class TestIpReservation(cloudstackTestCase):
         # 3. Newly created VM should get ip in guestvmcidr"""
 
         account_1 = Account.create(self.apiclient, self.testData["account"],
-                                      domainid=self.domain.id)
+                                   domainid=self.domain.id)
         self.cleanup.append(account_1)
 
-        random_subnet = str(random.randrange(1,254))
-        gateway = "10.1." + random_subnet +".1"
+        random_subnet = str(random.randrange(1, 254))
+        gateway = "10.1." + random_subnet + ".1"
         isolated_network_1 = Network.create(self.apiclient, self.testData["isolated_network"],
-                         networkofferingid=self.isolated_network_offering.id,accountid=account_1.name,
-                         domainid=self.domain.id,zoneid=self.zone.id,
-                         gateway=gateway, netmask='255.255.255.0')
-        guest_vm_cidr = "10.1."+random_subnet+".0/29"
+                                            networkofferingid=self.isolated_network_offering.id, accountid=account_1.name,
+                                            domainid=self.domain.id, zoneid=self.zone.id,
+                                            gateway=gateway, netmask='255.255.255.0')
+        guest_vm_cidr = "10.1." + random_subnet + ".0/29"
 
         try:
             virtual_machine_1 = VirtualMachine.create(self.apiclient, self.testData["virtual_machine"],
-                                            networkids=isolated_network_1.id, serviceofferingid=self.service_offering.id,
-                                            accountid=account_1.name, domainid=self.domain.id,
-                                            ipaddress="10.1."+random_subnet+".3")
+                                                      networkids=isolated_network_1.id, serviceofferingid=self.service_offering.id,
+                                                      accountid=account_1.name, domainid=self.domain.id,
+                                                      ipaddress="10.1." + random_subnet + ".3")
         except Exception as e:
             self.fail("VM creation failed: %s" % e)
 
         isolated_network_1.update(self.apiclient, guestvmcidr=guest_vm_cidr)
         matchNetworkGuestVmCIDR(self, isolated_network_1.id, guest_vm_cidr)
         vms = VirtualMachine.list(self.apiclient,
-                                       id=virtual_machine_1.id)
+                                  id=virtual_machine_1.id)
         self.assertEqual(validateList(vms)[0], PASS, "vm list validation failed")
         self.assertEqual(vms[0].nic[0].ipaddress,
-                          virtual_machine_1.ipaddress,
-                           "VM IP should not change after reservation")
+                         virtual_machine_1.ipaddress,
+                         "VM IP should not change after reservation")
 
         try:
             virtual_machine_2 = VirtualMachine.create(self.apiclient, self.testData["virtual_machine"],
-                                            networkids=isolated_network_1.id, serviceofferingid=self.service_offering.id,
-                                            accountid=account_1.name, domainid=self.domain.id)
+                                                      networkids=isolated_network_1.id, serviceofferingid=self.service_offering.id,
+                                                      accountid=account_1.name, domainid=self.domain.id)
             if netaddr.IPAddress(virtual_machine_2.ipaddress) not in netaddr.IPNetwork(guest_vm_cidr):
                 self.fail("Newly created VM doesn't get IP from reserverd CIDR")
         except Exception as e:
             self.fail("VM creation failed, cannot validate the condition: %s" % e)
 
-        random_subnet = str(random.randrange(1,254))
-        gateway = "10.1." + random_subnet +".1"
+        random_subnet = str(random.randrange(1, 254))
+        gateway = "10.1." + random_subnet + ".1"
         isolated_network_2 = Network.create(self.apiclient, self.testData["isolated_network"],
-                         networkofferingid=self.isolated_network_offering.id,accountid=account_1.name,
-                         domainid=self.domain.id,zoneid=self.zone.id,
-                         gateway=gateway, netmask='255.255.255.0')
-        guest_vm_cidr = "10.1."+random_subnet+".0/29"
+                                            networkofferingid=self.isolated_network_offering.id, accountid=account_1.name,
+                                            domainid=self.domain.id, zoneid=self.zone.id,
+                                            gateway=gateway, netmask='255.255.255.0')
+        guest_vm_cidr = "10.1." + random_subnet + ".0/29"
 
         try:
             virtual_machine_3 = VirtualMachine.create(self.apiclient, self.testData["virtual_machine"],
-                                            networkids=isolated_network_2.id, serviceofferingid=self.service_offering.id,
-                                            accountid=account_1.name, domainid=self.domain.id,
-                                            ipaddress="10.1."+random_subnet+".3")
+                                                      networkids=isolated_network_2.id, serviceofferingid=self.service_offering.id,
+                                                      accountid=account_1.name, domainid=self.domain.id,
+                                                      ipaddress="10.1." + random_subnet + ".3")
         except Exception as e:
             self.fail("VM creation failed: %s" % e)
 
         isolated_network_2.update(self.apiclient, guestvmcidr=guest_vm_cidr)
         matchNetworkGuestVmCIDR(self, isolated_network_2.id, guest_vm_cidr)
         vms = VirtualMachine.list(self.apiclient,
-                                       id=virtual_machine_3.id)
+                                  id=virtual_machine_3.id)
         self.assertEqual(validateList(vms)[0], PASS, "vm list validation failed")
         self.assertEqual(vms[0].nic[0].ipaddress,
-                          virtual_machine_3.ipaddress,
-                           "VM IP should not change after reservation")
+                         virtual_machine_3.ipaddress,
+                         "VM IP should not change after reservation")
 
         try:
             virtual_machine_4 = VirtualMachine.create(self.apiclient, self.testData["virtual_machine"],
-                                            networkids=isolated_network_2.id, serviceofferingid=self.service_offering.id,
-                                            accountid=account_1.name, domainid=self.domain.id)
+                                                      networkids=isolated_network_2.id, serviceofferingid=self.service_offering.id,
+                                                      accountid=account_1.name, domainid=self.domain.id)
             if netaddr.IPAddress(virtual_machine_4.ipaddress) not in netaddr.IPNetwork(guest_vm_cidr):
                 self.fail("Newly created VM doesn't get IP from reserverd CIDR")
         except Exception as e:
             self.fail("VM creation failed, cannot validate the condition: %s" % e)
         return
 
+
 @ddt
 class TestRestartNetwork(cloudstackTestCase):
     """Test Restart Network
     """
+
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestRestartNetwork, cls).getClsTestClient()
@@ -554,10 +545,10 @@ class TestRestartNetwork(cloudstackTestCase):
         cls.domain = get_domain(cls.api_client)
         cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
         cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.testData["ostype"]
-                            )
+            cls.api_client,
+            cls.zone.id,
+            cls.testData["ostype"]
+        )
         if cls.template == FAILED:
             assert False, "get_template() failed to return template with description %s" % cls.testData["ostype"]
         cls.testData["domainid"] = cls.domain.id
@@ -567,15 +558,15 @@ class TestRestartNetwork(cloudstackTestCase):
         cls._cleanup = []
         try:
             cls.service_offering = ServiceOffering.create(
-                                            cls.api_client,
-                                            cls.testData["service_offering"]
-                                            )
+                cls.api_client,
+                cls.testData["service_offering"]
+            )
             cls._cleanup.append(cls.service_offering)
             cls.isolated_network_offering = CreateEnabledNetworkOffering(cls.api_client,
-                                                cls.testData["isolated_network_offering"])
+                                                                         cls.testData["isolated_network_offering"])
             cls._cleanup.append(cls.isolated_network_offering)
             cls.isolated_persistent_network_offering = CreateEnabledNetworkOffering(cls.api_client,
-                                                        cls.testData["nw_off_isolated_persistent"])
+                                                                                    cls.testData["nw_off_isolated_persistent"])
             cls._cleanup.append(cls.isolated_persistent_network_offering)
         except Exception as e:
             cls.tearDownClass()
@@ -597,7 +588,7 @@ class TestRestartNetwork(cloudstackTestCase):
         self.cleanup = []
         try:
             self.account = Account.create(self.apiclient, self.testData["account"],
-                                      domainid=self.domain.id)
+                                          domainid=self.domain.id)
             self.cleanup.append(self.account)
         except Exception as e:
             self.skipTest("Failed to create account: %s" % e)
@@ -627,32 +618,32 @@ class TestRestartNetwork(cloudstackTestCase):
         # 3. Network should be restarted successfully with and without cleanup
         # 4. Newly created VM should get ip in guestvmcidr"""
 
-        subnet = "10.1."+str(random.randrange(1,254))
-        gateway = subnet +".1"
+        subnet = "10.1." + str(random.randrange(1, 254))
+        gateway = subnet + ".1"
         resultSet = createIsolatedNetwork(self, self.isolated_network_offering.id,
                                           gateway=gateway)
         if resultSet[0] == FAIL:
             self.fail("Failed to create isolated network")
         else:
-            isolated_network= resultSet[1]
-        guest_vm_cidr = subnet+".0/29"
+            isolated_network = resultSet[1]
+        guest_vm_cidr = subnet + ".0/29"
 
         try:
             virtual_machine_1 = createVirtualMachine(self, network_id=isolated_network.id,
-                    ip_address=subnet+".3")
+                                                     ip_address=subnet + ".3")
         except Exception as e:
             self.fail("VM creation failed: %s" % e)
 
         isolated_network.update(self.apiclient, guestvmcidr=guest_vm_cidr)
         matchNetworkGuestVmCIDR(self, isolated_network.id, guest_vm_cidr)
         vms = VirtualMachine.list(self.apiclient,
-                                       id=virtual_machine_1.id)
+                                  id=virtual_machine_1.id)
         self.assertEqual(validateList(vms)[0], PASS, "vm list validation failed")
         self.assertEqual(vms[0].nic[0].ipaddress,
-                          virtual_machine_1.ipaddress,
-                           "VM IP should not change after reservation")
+                         virtual_machine_1.ipaddress,
+                         "VM IP should not change after reservation")
 
-        #Restart Network
+        # Restart Network
         isolated_network.restart(self.apiclient, cleanup=value)
 
         try:
@@ -663,10 +654,12 @@ class TestRestartNetwork(cloudstackTestCase):
             self.fail("VM creation failed, cannot validate the condition: %s" % e)
         return
 
+
 @ddt
 class TestUpdateIPReservation(cloudstackTestCase):
     """Test Updating IP reservation multiple times
     """
+
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestUpdateIPReservation, cls).getClsTestClient()
@@ -679,10 +672,10 @@ class TestUpdateIPReservation(cloudstackTestCase):
         cls.domain = get_domain(cls.api_client)
         cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
         cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.testData["ostype"]
-                            )
+            cls.api_client,
+            cls.zone.id,
+            cls.testData["ostype"]
+        )
         if cls.template == FAILED:
             assert False, "get_template() failed to return template with description %s" % cls.testData["ostype"]
         cls.testData["domainid"] = cls.domain.id
@@ -692,15 +685,15 @@ class TestUpdateIPReservation(cloudstackTestCase):
         cls._cleanup = []
         try:
             cls.service_offering = ServiceOffering.create(
-                                            cls.api_client,
-                                            cls.testData["service_offering"]
-                                            )
+                cls.api_client,
+                cls.testData["service_offering"]
+            )
             cls._cleanup.append(cls.service_offering)
             cls.isolated_network_offering = CreateEnabledNetworkOffering(cls.api_client,
-                                            cls.testData["isolated_network_offering"])
+                                                                         cls.testData["isolated_network_offering"])
             cls._cleanup.append(cls.isolated_network_offering)
             cls.isolated_persistent_network_offering = CreateEnabledNetworkOffering(cls.api_client,
-                                                        cls.testData["nw_off_isolated_persistent"])
+                                                                                    cls.testData["nw_off_isolated_persistent"])
             cls._cleanup.append(cls.isolated_persistent_network_offering)
         except Exception as e:
             cls.tearDownClass()
@@ -722,7 +715,7 @@ class TestUpdateIPReservation(cloudstackTestCase):
         self.cleanup = []
         try:
             self.account = Account.create(self.apiclient, self.testData["account"],
-                                      domainid=self.domain.id)
+                                          domainid=self.domain.id)
             self.cleanup.append(self.account)
         except Exception as e:
             self.skipTest("Failed to create account: %s" % e)
@@ -754,30 +747,30 @@ class TestUpdateIPReservation(cloudstackTestCase):
         #    new VM should get IP from this range
         # 2. When VM IP is outside the guestvmcidr, updation should be unsuccessful"""
 
-        random_subnet = str(random.randrange(1,254))
-        gateway = "10.1." + random_subnet +".1"
+        random_subnet = str(random.randrange(1, 254))
+        gateway = "10.1." + random_subnet + ".1"
         resultSet = createIsolatedNetwork(self, self.isolated_network_offering.id,
                                           gateway=gateway)
         if resultSet[0] == FAIL:
             self.fail("Failed to create isolated network")
         else:
-            isolated_network= resultSet[1]
-        guest_vm_cidr = "10.1."+random_subnet+".0/29"
+            isolated_network = resultSet[1]
+        guest_vm_cidr = "10.1." + random_subnet + ".0/29"
 
         try:
             virtual_machine_1 = createVirtualMachine(self, network_id=isolated_network.id,
-                    ip_address=u"10.1."+random_subnet+".3")
+                                                     ip_address=u"10.1." + random_subnet + ".3")
         except Exception as e:
             self.fail("VM creation failed: %s" % e)
 
         isolated_network.update(self.apiclient, guestvmcidr=guest_vm_cidr)
         matchNetworkGuestVmCIDR(self, isolated_network.id, guest_vm_cidr)
         vms = VirtualMachine.list(self.apiclient,
-                                       id=virtual_machine_1.id)
+                                  id=virtual_machine_1.id)
         self.assertEqual(validateList(vms)[0], PASS, "vm list validation failed")
         self.assertEqual(vms[0].nic[0].ipaddress,
-                          virtual_machine_1.ipaddress,
-                           "VM IP should not change after reservation")
+                         virtual_machine_1.ipaddress,
+                         "VM IP should not change after reservation")
 
         try:
             virtual_machine_2 = createVirtualMachine(self, network_id=isolated_network.id)
@@ -788,7 +781,7 @@ class TestUpdateIPReservation(cloudstackTestCase):
 
         # Update guest vm cidr of network again
         if value == "existingVmExclusive":
-            guest_vm_cidr = "10.1."+random_subnet+".10/29"
+            guest_vm_cidr = "10.1." + random_subnet + ".10/29"
 
             try:
                 isolated_network.update(self.apiclient, guestvmcidr=guest_vm_cidr)
@@ -796,7 +789,7 @@ class TestUpdateIPReservation(cloudstackTestCase):
             except Exception as e:
                 self.debug("Failed to update guest VM cidr of network: %s" % e)
         elif value == "existingVmInclusive":
-            guest_vm_cidr = "10.1."+random_subnet+".0/28"
+            guest_vm_cidr = "10.1." + random_subnet + ".0/28"
 
             try:
                 isolated_network.update(self.apiclient, guestvmcidr=guest_vm_cidr)
@@ -813,10 +806,12 @@ class TestUpdateIPReservation(cloudstackTestCase):
                 self.fail("VM creation failed, cannot validate the condition: %s" % e)
         return
 
+
 @ddt
 class TestRouterOperations(cloudstackTestCase):
     """Test Router operations of network with IP reservation
     """
+
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestRouterOperations, cls).getClsTestClient()
@@ -829,10 +824,10 @@ class TestRouterOperations(cloudstackTestCase):
         cls.domain = get_domain(cls.api_client)
         cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
         cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.testData["ostype"]
-                            )
+            cls.api_client,
+            cls.zone.id,
+            cls.testData["ostype"]
+        )
         if cls.template == FAILED:
             assert False, "get_template() failed to return template with description %s" % cls.testData["ostype"]
         cls.testData["domainid"] = cls.domain.id
@@ -842,15 +837,15 @@ class TestRouterOperations(cloudstackTestCase):
         cls._cleanup = []
         try:
             cls.service_offering = ServiceOffering.create(
-                                            cls.api_client,
-                                            cls.testData["service_offering"]
-                                            )
+                cls.api_client,
+                cls.testData["service_offering"]
+            )
             cls._cleanup.append(cls.service_offering)
             cls.isolated_network_offering = CreateEnabledNetworkOffering(cls.api_client,
-                                                cls.testData["isolated_network_offering"])
+                                                                         cls.testData["isolated_network_offering"])
             cls._cleanup.append(cls.isolated_network_offering)
             cls.isolated_persistent_network_offering = CreateEnabledNetworkOffering(cls.api_client,
-                                                        cls.testData["nw_off_isolated_persistent"])
+                                                                                    cls.testData["nw_off_isolated_persistent"])
             cls._cleanup.append(cls.isolated_persistent_network_offering)
         except Exception as e:
             cls.tearDownClass()
@@ -872,7 +867,7 @@ class TestRouterOperations(cloudstackTestCase):
         self.cleanup = []
         try:
             self.account = Account.create(self.apiclient, self.testData["account"],
-                                      domainid=self.domain.id)
+                                          domainid=self.domain.id)
             self.cleanup.append(self.account)
         except Exception as e:
             self.skipTest("Failed to create account: %s" % e)
@@ -896,22 +891,22 @@ class TestRouterOperations(cloudstackTestCase):
         # validation
         # 1. Guest vm cidr should be successfully updated with correct value
         # 2. Network cidr should remain same after router restart"""
-        subnet = "10.1."+str(random.randrange(1,254))
-        gateway = subnet +".1"
+        subnet = "10.1." + str(random.randrange(1, 254))
+        gateway = subnet + ".1"
         resultSet = createIsolatedNetwork(self, self.isolated_persistent_network_offering.id,
                                           gateway=gateway)
         if resultSet[0] == FAIL:
             self.fail("Failed to create isolated network")
         else:
-            isolated_network= resultSet[1]
-        guest_vm_cidr = subnet+".0/29"
+            isolated_network = resultSet[1]
+        guest_vm_cidr = subnet + ".0/29"
 
         isolated_network.update(self.apiclient, guestvmcidr=guest_vm_cidr)
         matchNetworkGuestVmCIDR(self, isolated_network.id, guest_vm_cidr)
 
         routers = Router.list(self.apiclient,
-                             networkid=isolated_network.id,
-                             listall=True)
+                              networkid=isolated_network.id,
+                              listall=True)
         self.assertEqual(validateList(routers)[0], PASS, "routers list validation failed")
         if not routers:
             self.fail("Router list should not be empty")
@@ -938,30 +933,30 @@ class TestRouterOperations(cloudstackTestCase):
         # 3. Router should be destroyed and recreated when network is restarted
         # 4. New VM should be deployed in the guestvmcidr"""
 
-        subnet = "10.1."+str(random.randrange(1,254))
-        gateway = subnet +".1"
+        subnet = "10.1." + str(random.randrange(1, 254))
+        gateway = subnet + ".1"
         resultSet = createIsolatedNetwork(self, self.isolated_network_offering.id,
                                           gateway=gateway)
         if resultSet[0] == FAIL:
             self.fail("Failed to create isolated network")
         else:
-            isolated_network= resultSet[1]
-        guest_vm_cidr = subnet+".0/29"
+            isolated_network = resultSet[1]
+        guest_vm_cidr = subnet + ".0/29"
 
         try:
             virtual_machine_1 = createVirtualMachine(self, network_id=isolated_network.id,
-                    ip_address=subnet+".3")
+                                                     ip_address=subnet + ".3")
         except Exception as e:
             self.fail("VM creation failed: %s" % e)
 
         isolated_network.update(self.apiclient, guestvmcidr=guest_vm_cidr)
         matchNetworkGuestVmCIDR(self, isolated_network.id, guest_vm_cidr)
         vms = VirtualMachine.list(self.apiclient,
-                                       id=virtual_machine_1.id)
+                                  id=virtual_machine_1.id)
         self.assertEqual(validateList(vms)[0], PASS, "vm list validation failed")
         self.assertEqual(vms[0].nic[0].ipaddress,
-                          virtual_machine_1.ipaddress,
-                           "VM IP should not change after reservation")
+                         virtual_machine_1.ipaddress,
+                         "VM IP should not change after reservation")
 
         # List router and destroy it
         routers = Router.list(self.apiclient, networkid=isolated_network.id, listall=True)
@@ -970,7 +965,7 @@ class TestRouterOperations(cloudstackTestCase):
         # Destroy Router
         Router.destroy(self.apiclient, id=routers[0].id)
 
-        #Restart Network
+        # Restart Network
         isolated_network.restart(self.apiclient)
 
         try:
@@ -981,10 +976,12 @@ class TestRouterOperations(cloudstackTestCase):
             self.fail("VM creation failed, cannot validate the condition: %s" % e)
         return
 
+
 @ddt
 class TestFailureScnarios(cloudstackTestCase):
     """Test failure scenarios related to IP reservation in network
     """
+
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestFailureScnarios, cls).getClsTestClient()
@@ -997,10 +994,10 @@ class TestFailureScnarios(cloudstackTestCase):
         cls.domain = get_domain(cls.api_client)
         cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
         cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.testData["ostype"]
-                            )
+            cls.api_client,
+            cls.zone.id,
+            cls.testData["ostype"]
+        )
         if cls.template == FAILED:
             assert False, "get_template() failed to return template with description %s" % cls.testData["ostype"]
         cls.testData["domainid"] = cls.domain.id
@@ -1010,28 +1007,28 @@ class TestFailureScnarios(cloudstackTestCase):
         cls._cleanup = []
         try:
             cls.service_offering = ServiceOffering.create(
-                                            cls.api_client,
-                                            cls.testData["service_offering"]
-                                            )
+                cls.api_client,
+                cls.testData["service_offering"]
+            )
             cls._cleanup.append(cls.service_offering)
             cls.isolated_network_offering = CreateEnabledNetworkOffering(cls.api_client,
-                                            cls.testData["isolated_network_offering"])
+                                                                         cls.testData["isolated_network_offering"])
             cls._cleanup.append(cls.isolated_network_offering)
             cls.isolated_persistent_network_offering = CreateEnabledNetworkOffering(cls.api_client,
-                                                        cls.testData["nw_off_isolated_persistent"])
+                                                                                    cls.testData["nw_off_isolated_persistent"])
             cls._cleanup.append(cls.isolated_persistent_network_offering)
 
             cls.testData["shared_network_offering"]["specifyVlan"] = "True"
             cls.testData["shared_network_offering"]["specifyIpRanges"] = "True"
 
-            #Create Network Offering
+            # Create Network Offering
             cls.shared_network_offering = NetworkOffering.create(cls.api_client,
-                                        cls.testData["shared_network_offering"],
-                                        conservemode=False)
+                                                                 cls.testData["shared_network_offering"],
+                                                                 conservemode=False)
             cls._cleanup.append(cls.shared_network_offering)
 
-            #Update network offering state from disabled to enabled.
-            NetworkOffering.update(cls.shared_network_offering,cls.api_client,state="enabled")
+            # Update network offering state from disabled to enabled.
+            NetworkOffering.update(cls.shared_network_offering, cls.api_client, state="enabled")
         except Exception as e:
             cls.tearDownClass()
             raise unittest.SkipTest("Failure in setUpClass: %s" % e)
@@ -1052,7 +1049,7 @@ class TestFailureScnarios(cloudstackTestCase):
         self.cleanup = []
         try:
             self.account = Account.create(self.apiclient, self.testData["account"],
-                                      domainid=self.domain.id)
+                                          domainid=self.domain.id)
             self.cleanup.append(self.account)
         except Exception as e:
             self.skipTest("Failed to create account: %s" % e)
@@ -1098,7 +1095,7 @@ class TestFailureScnarios(cloudstackTestCase):
         # 3. newly created VM should get ip in guestvmcidr
 
         networkOffering = self.isolated_persistent_network_offering
-        subnet = "10.1."+str(random.randrange(1,254))
+        subnet = "10.1." + str(random.randrange(1, 254))
         gateway = subnet + ".1"
         isolated_persistent_network = None
         resultSet = createIsolatedNetwork(self, networkOffering.id, gateway=gateway)
@@ -1106,38 +1103,38 @@ class TestFailureScnarios(cloudstackTestCase):
             self.fail("Failed to create isolated network")
         else:
             isolated_persistent_network = resultSet[1]
-        guest_vm_cidr = subnet +".0/29"
+        guest_vm_cidr = subnet + ".0/29"
         virtual_machine_1 = None
         try:
             virtual_machine_1 = VirtualMachine.create(self.apiclient,
-                                                          self.testData["virtual_machine"],
-                                                          networkids=isolated_persistent_network.id,
-                                                          serviceofferingid=self.service_offering.id,
-                                                          accountid=self.account.name,
-                                                          domainid=self.domain.id,
-                                                          ipaddress=subnet+".3"
-                                                          )
+                                                      self.testData["virtual_machine"],
+                                                      networkids=isolated_persistent_network.id,
+                                                      serviceofferingid=self.service_offering.id,
+                                                      accountid=self.account.name,
+                                                      domainid=self.domain.id,
+                                                      ipaddress=subnet + ".3"
+                                                      )
         except Exception as e:
             self.fail("VM creation fails in network: %s" % e)
 
         update_response = Network.update(isolated_persistent_network, self.apiclient, id=isolated_persistent_network.id, guestvmcidr=guest_vm_cidr)
         self.assertEqual(guest_vm_cidr, update_response.cidr, "cidr in response is not as expected")
         vm_list = VirtualMachine.list(self.apiclient,
-                                       id=virtual_machine_1.id)
+                                      id=virtual_machine_1.id)
         self.assertEqual(isinstance(vm_list, list),
                          True,
                          "VM list response in not a valid list")
         self.assertEqual(vm_list[0].nic[0].ipaddress,
-                          virtual_machine_1.ipaddress,
-                           "VM IP should not change after reservation")
+                         virtual_machine_1.ipaddress,
+                         "VM IP should not change after reservation")
         try:
             virtual_machine_2 = VirtualMachine.create(self.apiclient,
-                                                          self.testData["virtual_machine"],
-                                                          networkids=isolated_persistent_network.id,
-                                                          serviceofferingid=self.service_offering.id,
-                                                          accountid=self.account.name,
-                                                          domainid=self.domain.id
-                                                          )
+                                                      self.testData["virtual_machine"],
+                                                      networkids=isolated_persistent_network.id,
+                                                      serviceofferingid=self.service_offering.id,
+                                                      accountid=self.account.name,
+                                                      domainid=self.domain.id
+                                                      )
             if netaddr.IPAddress(virtual_machine_2.ipaddress) not in netaddr.IPNetwork(guest_vm_cidr):
                 self.fail("Newly created VM doesn't get IP from reserverd CIDR")
         except Exception as e:
@@ -1154,7 +1151,7 @@ class TestFailureScnarios(cloudstackTestCase):
         # 1. guest vm cidr should be successfully updated with correct value
         # 2. network cidr should remain same after router restart
         networkOffering = self.isolated_persistent_network_offering
-        subnet = "10.1."+str(random.randrange(1,254))
+        subnet = "10.1." + str(random.randrange(1, 254))
         gateway = subnet + ".1"
         isolated_persistent_network = None
         resultSet = createIsolatedNetwork(self, networkOffering.id, gateway=gateway)
@@ -1163,37 +1160,37 @@ class TestFailureScnarios(cloudstackTestCase):
         else:
             isolated_persistent_network = resultSet[1]
 
-        response = verifyNetworkState(self.apiclient, isolated_persistent_network.id,\
-                        "implemented")
+        response = verifyNetworkState(self.apiclient, isolated_persistent_network.id, \
+                                      "implemented")
         exceptionOccured = response[0]
         isNetworkInDesiredState = response[1]
         exceptionMessage = response[2]
 
         if (exceptionOccured or (not isNetworkInDesiredState)):
             self.fail(exceptionMessage)
-        guest_vm_cidr = subnet +".0/29"
+        guest_vm_cidr = subnet + ".0/29"
 
         update_response = Network.update(isolated_persistent_network, self.apiclient, id=isolated_persistent_network.id, guestvmcidr=guest_vm_cidr)
         self.assertEqual(guest_vm_cidr, update_response.cidr, "cidr in response is not as expected")
 
         routers = Router.list(self.apiclient,
-                             networkid=isolated_persistent_network.id,
-                             listall=True)
+                              networkid=isolated_persistent_network.id,
+                              listall=True)
         self.assertEqual(
-                    isinstance(routers, list),
-                    True,
-                    "list router should return valid response"
-                    )
+            isinstance(routers, list),
+            True,
+            "list router should return valid response"
+        )
         if not routers:
             self.skipTest("Router list should not be empty, skipping test")
 
         Router.reboot(self.apiclient, routers[0].id)
         networks = Network.list(self.apiclient, id=isolated_persistent_network.id)
         self.assertEqual(
-                    isinstance(networks, list),
-                    True,
-                    "list Networks should return valid response"
-                    )
+            isinstance(networks, list),
+            True,
+            "list Networks should return valid response"
+        )
         self.assertEqual(networks[0].cidr, guest_vm_cidr, "guestvmcidr should match after router reboot")
         return
 
@@ -1207,7 +1204,7 @@ class TestFailureScnarios(cloudstackTestCase):
         # 1. guest vm cidr should be successfully updated with correct value
         # 2  newly created VM should not be created and result in exception
         networkOffering = self.isolated_persistent_network_offering
-        subnet = "10.1."+str(random.randrange(1,254))
+        subnet = "10.1." + str(random.randrange(1, 254))
         gateway = subnet + ".1"
         isolated_persistent_network = None
         resultSet = createIsolatedNetwork(self, networkOffering.id, gateway=gateway)
@@ -1215,7 +1212,7 @@ class TestFailureScnarios(cloudstackTestCase):
             self.fail("Failed to create isolated network")
         else:
             isolated_persistent_network = resultSet[1]
-        guest_vm_cidr = subnet +".0/29"
+        guest_vm_cidr = subnet + ".0/29"
         update_response = Network.update(isolated_persistent_network, self.apiclient, id=isolated_persistent_network.id, guestvmcidr=guest_vm_cidr)
         self.assertEqual(guest_vm_cidr, update_response.cidr, "cidr in response is not as expected")
         with self.assertRaises(Exception):

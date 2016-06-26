@@ -1,23 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.configuration.dao;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.configuration.Resource;
 import com.cloud.configuration.Resource.ResourceOwnerType;
@@ -28,11 +9,14 @@ import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class ResourceLimitDaoImpl extends GenericDaoBase<ResourceLimitVO, Long> implements ResourceLimitDao {
-    private SearchBuilder<ResourceLimitVO> IdTypeSearch;
+    private final SearchBuilder<ResourceLimitVO> IdTypeSearch;
 
     public ResourceLimitDaoImpl() {
         IdTypeSearch = createSearchBuilder();
@@ -43,8 +27,8 @@ public class ResourceLimitDaoImpl extends GenericDaoBase<ResourceLimitVO, Long> 
     }
 
     @Override
-    public List<ResourceLimitVO> listByOwner(Long ownerId, ResourceOwnerType ownerType) {
-        SearchCriteria<ResourceLimitVO> sc = IdTypeSearch.create();
+    public List<ResourceLimitVO> listByOwner(final Long ownerId, final ResourceOwnerType ownerType) {
+        final SearchCriteria<ResourceLimitVO> sc = IdTypeSearch.create();
 
         if (ownerType == ResourceOwnerType.Account) {
             sc.setParameters("accountId", ownerId);
@@ -53,25 +37,26 @@ public class ResourceLimitDaoImpl extends GenericDaoBase<ResourceLimitVO, Long> 
             sc.setParameters("domainId", ownerId);
             return listBy(sc);
         } else {
-            return new ArrayList<ResourceLimitVO>();
+            return new ArrayList<>();
         }
     }
 
     @Override
-    public boolean update(Long id, Long max) {
-        ResourceLimitVO limit = findById(id);
-        if (max != null)
+    public boolean update(final Long id, final Long max) {
+        final ResourceLimitVO limit = findById(id);
+        if (max != null) {
             limit.setMax(max);
-        else
+        } else {
             limit.setMax(new Long(-1));
+        }
         return update(id, limit);
     }
 
     @Override
-    public ResourceCount.ResourceType getLimitType(String type) {
-        ResourceType[] validTypes = Resource.ResourceType.values();
+    public ResourceCount.ResourceType getLimitType(final String type) {
+        final ResourceType[] validTypes = Resource.ResourceType.values();
 
-        for (ResourceType validType : validTypes) {
+        for (final ResourceType validType : validTypes) {
             if (validType.getName().equals(type)) {
                 return validType;
             }
@@ -80,8 +65,8 @@ public class ResourceLimitDaoImpl extends GenericDaoBase<ResourceLimitVO, Long> 
     }
 
     @Override
-    public ResourceLimitVO findByOwnerIdAndType(long ownerId, ResourceOwnerType ownerType, ResourceCount.ResourceType type) {
-        SearchCriteria<ResourceLimitVO> sc = IdTypeSearch.create();
+    public ResourceLimitVO findByOwnerIdAndType(final long ownerId, final ResourceOwnerType ownerType, final ResourceCount.ResourceType type) {
+        final SearchCriteria<ResourceLimitVO> sc = IdTypeSearch.create();
         sc.setParameters("type", type);
 
         if (ownerType == ResourceOwnerType.Account) {
@@ -96,8 +81,8 @@ public class ResourceLimitDaoImpl extends GenericDaoBase<ResourceLimitVO, Long> 
     }
 
     @Override
-    public long removeEntriesByOwner(Long ownerId, ResourceOwnerType ownerType) {
-        SearchCriteria<ResourceLimitVO> sc = IdTypeSearch.create();
+    public long removeEntriesByOwner(final Long ownerId, final ResourceOwnerType ownerType) {
+        final SearchCriteria<ResourceLimitVO> sc = IdTypeSearch.create();
 
         if (ownerType == ResourceOwnerType.Account) {
             sc.setParameters("accountId", ownerId);

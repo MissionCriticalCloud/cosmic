@@ -1,20 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function(cloudStack) {
+(function (cloudStack) {
 
     var domainObjs;
 
@@ -23,7 +7,7 @@
         id: 'accounts',
         sectionSelect: {
             label: 'label.select-view',
-            preFilter: function() {
+            preFilter: function () {
                 return ['accounts', 'sshkeypairs'];
             }
         },
@@ -40,7 +24,7 @@
                         },
                         accounttype: {
                             label: 'label.role',
-                            converter: function(args) {
+                            converter: function (args) {
                                 return cloudStack.converters.toRole(args);
                             }
                         },
@@ -48,7 +32,7 @@
                             label: 'label.domain'
                         },
                         state: {
-                            converter: function(str) {
+                            converter: function (str) {
                                 // For localization
                                 return str;
                             },
@@ -64,19 +48,19 @@
                     actions: {
                         add: {
                             label: 'label.add.account',
-                            preFilter: function(args) {
+                            preFilter: function (args) {
                                 if (isAdmin() || isDomainAdmin())
                                     return true;
                                 else
                                     return false;
                             },
                             messages: {
-                                notification: function(args) {
+                                notification: function (args) {
                                     return 'label.add.account';
                                 }
                             },
                             notification: {
-                                poll: function(args) {
+                                poll: function (args) {
                                     args.complete({
                                         actionFilter: accountActionfilter
                                     });
@@ -95,7 +79,7 @@
                         addLdapAccount: {
                             label: 'label.add.ldap.account',
                             isHeader: true,
-                            preFilter: function(args) {
+                            preFilter: function (args) {
                                 //if (isAdmin() && true) { //for testing only
                                 if (isAdmin() && isLdapEnabled()) {
                                     return true;
@@ -104,12 +88,12 @@
                                 }
                             },
                             messages: {
-                                notification: function(args) {
+                                notification: function (args) {
                                     return 'label.add.ldap.account';
                                 }
                             },
                             notification: {
-                                poll: function(args) {
+                                poll: function (args) {
                                     args.complete({
                                         actionFilter: accountActionfilter
                                     });
@@ -126,7 +110,7 @@
                         }
                     },
 
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var data = {};
                         listViewDataProvider(args, data);
 
@@ -140,7 +124,7 @@
                             url: createURL('listAccounts'),
                             data: data,
                             async: true,
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listaccountsresponse.account;
                                 args.response.success({
                                     actionFilter: accountActionfilter,
@@ -162,7 +146,7 @@
                             edit: {
                                 label: 'message.edit.account',
                                 compactLabel: 'label.edit',
-                                action: function(args) {
+                                action: function (args) {
                                     var accountObj = args.context.accounts[0];
 
                                     var data = {
@@ -176,10 +160,10 @@
                                         url: createURL('updateAccount'),
                                         data: data,
                                         async: false,
-                                        success: function(json) {
+                                        success: function (json) {
                                             accountObj = json.updateaccountresponse.account;
                                         },
-                                        error: function(json) {
+                                        error: function (json) {
                                             var errorMsg = parseXMLHttpResponse(json);
                                             args.response.error(errorMsg);
                                         }
@@ -196,7 +180,7 @@
                                             url: createURL('updateResourceLimit'),
                                             data: data,
                                             async: false,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 accountObj["vmLimit"] = args.data.vmLimit;
                                             }
                                         });
@@ -213,7 +197,7 @@
                                             url: createURL('updateResourceLimit'),
                                             data: data,
                                             async: false,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 accountObj["ipLimit"] = args.data.ipLimit;
                                             }
                                         });
@@ -230,7 +214,7 @@
                                             url: createURL('updateResourceLimit'),
                                             data: data,
                                             async: false,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 accountObj["volumeLimit"] = args.data.volumeLimit;
                                             }
                                         });
@@ -247,7 +231,7 @@
                                             url: createURL('updateResourceLimit'),
                                             data: data,
                                             async: false,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 accountObj["snapshotLimit"] = args.data.snapshotLimit;
                                             }
                                         });
@@ -264,7 +248,7 @@
                                             url: createURL('updateResourceLimit'),
                                             data: data,
                                             async: false,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 accountObj["templateLimit"] = args.data.templateLimit;
                                             }
                                         });
@@ -282,7 +266,7 @@
                                             url: createURL('updateResourceLimit'),
                                             data: data,
                                             async: false,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 accountObj["vpcLimit"] = args.data.vpcLimit;
                                             }
                                         });
@@ -300,7 +284,7 @@
                                             url: createURL('updateResourceLimit'),
                                             data: data,
                                             async: false,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 accountObj["cpuLimit"] = args.data.cpuLimit;
                                             }
                                         });
@@ -318,7 +302,7 @@
                                             url: createURL('updateResourceLimit'),
                                             data: data,
                                             async: false,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 accountObj["memoryLimit"] = args.data.memoryLimit;
                                             }
                                         });
@@ -336,7 +320,7 @@
                                             url: createURL('updateResourceLimit'),
                                             data: data,
                                             async: false,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 accountObj["networkLimit"] = args.data.networkLimit;
                                             }
                                         });
@@ -354,7 +338,7 @@
                                             url: createURL('updateResourceLimit'),
                                             data: data,
                                             async: false,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 accountObj["primaryStorageLimit"] = args.data.primaryStorageLimit;
                                             }
                                         });
@@ -372,7 +356,7 @@
                                             url: createURL('updateResourceLimit'),
                                             data: data,
                                             async: false,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 accountObj["secondaryStorageLimit"] = args.data.secondaryStorageLimit;
                                             }
                                         });
@@ -386,14 +370,14 @@
                             updateResourceCount: {
                                 label: 'label.action.update.resource.count',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.update.resource.count';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.update.resource.count';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var accountObj = args.context.accounts[0];
                                     var data = {
                                         domainid: accountObj.domainid,
@@ -404,49 +388,49 @@
                                         url: createURL('updateResourceCount'),
                                         data: data,
                                         async: true,
-                                        success: function(json) {
-                                            var resourcecounts= json.updateresourcecountresponse.resourcecount;
+                                        success: function (json) {
+                                            var resourcecounts = json.updateresourcecountresponse.resourcecount;
                                             //pop up API response in a dialog box since only updateResourceCount API returns resourcecount (listResourceLimits API does NOT return resourcecount)
                                             var msg = '';
                                             if (resourcecounts != null) {
                                                 for (var i = 0; i < resourcecounts.length; i++) {
                                                     switch (resourcecounts[i].resourcetype) {
-                                                    case '0':
-                                                        msg += 'Instance'; //vmLimit
-                                                        break;
-                                                    case '1':
-                                                        msg += 'Public IP'; //ipLimit
-                                                        break;
-                                                    case '2':
-                                                        msg += 'Volume'; //volumeLimit
-                                                        break;
-                                                    case '3':
-                                                        msg += 'Snapshot'; //snapshotLimit
-                                                        break;
-                                                    case '4':
-                                                        msg += 'Template'; //templateLimit
-                                                        break;
-                                                    case '5':
-                                                        continue; //resourcetype 5 is not in use. so, skip to next item.
-                                                        break;
-                                                    case '6':
-                                                        msg += 'Network'; //networkLimit
-                                                        break;
-                                                    case '7':
-                                                        msg += 'VPC'; //vpcLimit
-                                                        break;
-                                                    case '8':
-                                                        msg += 'CPU'; //cpuLimit
-                                                        break;
-                                                    case '9':
-                                                        msg += 'Memory'; //memoryLimit
-                                                        break;
-                                                    case '10':
-                                                        msg += 'Primary Storage'; //primaryStorageLimit
-                                                        break;
-                                                    case '11':
-                                                        msg += 'Secondary Storage'; //secondaryStorageLimit
-                                                        break;
+                                                        case '0':
+                                                            msg += 'Instance'; //vmLimit
+                                                            break;
+                                                        case '1':
+                                                            msg += 'Public IP'; //ipLimit
+                                                            break;
+                                                        case '2':
+                                                            msg += 'Volume'; //volumeLimit
+                                                            break;
+                                                        case '3':
+                                                            msg += 'Snapshot'; //snapshotLimit
+                                                            break;
+                                                        case '4':
+                                                            msg += 'Template'; //templateLimit
+                                                            break;
+                                                        case '5':
+                                                            continue; //resourcetype 5 is not in use. so, skip to next item.
+                                                            break;
+                                                        case '6':
+                                                            msg += 'Network'; //networkLimit
+                                                            break;
+                                                        case '7':
+                                                            msg += 'VPC'; //vpcLimit
+                                                            break;
+                                                        case '8':
+                                                            msg += 'CPU'; //cpuLimit
+                                                            break;
+                                                        case '9':
+                                                            msg += 'Memory'; //memoryLimit
+                                                            break;
+                                                        case '10':
+                                                            msg += 'Primary Storage'; //primaryStorageLimit
+                                                            break;
+                                                        case '11':
+                                                            msg += 'Secondary Storage'; //secondaryStorageLimit
+                                                            break;
                                                     }
 
                                                     msg += ' Count: ' + resourcecounts[i].resourcecount + ' <br> ';
@@ -460,13 +444,13 @@
 
                                             args.response.success();
                                         },
-                                        error: function(json) {
+                                        error: function (json) {
                                             args.response.error(parseXMLHttpResponse(json));
                                         }
                                     });
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete();
                                     }
                                 }
@@ -475,14 +459,14 @@
                             disable: {
                                 label: 'label.action.disable.account',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.disable.account';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.disable.account';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var accountObj = args.context.accounts[0];
                                     var data = {
                                         lock: false,
@@ -494,15 +478,15 @@
                                         url: createURL('disableAccount'),
                                         data: data,
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.disableaccountresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function(json) {
+                                                    getUpdatedItem: function (json) {
                                                         return json.queryasyncjobresultresponse.jobresult.account;
                                                     },
-                                                    getActionFilter: function() {
+                                                    getActionFilter: function () {
                                                         return accountActionfilter;
                                                     }
                                                 }
@@ -518,14 +502,14 @@
                             lock: {
                                 label: 'label.action.lock.account',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.lock.account';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.lock.account';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var accountObj = args.context.accounts[0];
                                     var data = {
                                         lock: true,
@@ -537,15 +521,15 @@
                                         url: createURL('disableAccount'),
                                         data: data,
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.disableaccountresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function(json) {
+                                                    getUpdatedItem: function (json) {
                                                         return json.queryasyncjobresultresponse.jobresult.account;
                                                     },
-                                                    getActionFilter: function() {
+                                                    getActionFilter: function () {
                                                         return accountActionfilter;
                                                     }
                                                 }
@@ -561,14 +545,14 @@
                             enable: {
                                 label: 'label.action.enable.account',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.enable.account';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.enable.account';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var accountObj = args.context.accounts[0];
                                     var data = {
                                         domainid: accountObj.domainid,
@@ -578,7 +562,7 @@
                                         url: createURL('enableAccount'),
                                         data: data,
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success({
                                                 data: json.enableaccountresponse.account
                                             });
@@ -586,7 +570,7 @@
                                     });
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete({
                                             data: {
                                                 state: 'enabled'
@@ -599,14 +583,14 @@
                             remove: {
                                 label: 'label.action.delete.account',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.delete.account';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.delete.account';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.accounts[0].id
                                     };
@@ -614,15 +598,15 @@
                                         url: createURL('deleteAccount'),
                                         data: data,
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.deleteaccountresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function(json) {
+                                                    getUpdatedItem: function (json) {
                                                         return {}; //nothing in this account needs to be updated, in fact, this whole account has being deleted
                                                     },
-                                                    getActionFilter: function() {
+                                                    getActionFilter: function () {
                                                         return accountActionfilter;
                                                     }
                                                 }
@@ -637,9 +621,9 @@
 
                         },
 
-                        tabFilter: function(args) {
+                        tabFilter: function (args) {
                             var hiddenTabs = [];
-                            if(!isAdmin()) {
+                            if (!isAdmin()) {
                                 hiddenTabs.push('settings');
                             }
                             return hiddenTabs;
@@ -663,7 +647,7 @@
                                     },
                                     accounttype: {
                                         label: 'label.role',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             return cloudStack.converters.toRole(args);
                                         }
                                     },
@@ -679,7 +663,7 @@
                                     },
                                     vmLimit: {
                                         label: 'label.instance.limits',
-                                        isEditable: function(context) {
+                                        isEditable: function (context) {
 
                                             if (context.accounts == undefined)
                                                 return false;
@@ -693,7 +677,7 @@
                                     },
                                     ipLimit: {
                                         label: 'label.ip.limits',
-                                        isEditable: function(context) {
+                                        isEditable: function (context) {
                                             if (context.accounts[0].accounttype == roleTypeUser || context.accounts[0].accounttype == roleTypeDomainAdmin) //updateResourceLimits is only allowed on account whose type is user or domain-admin
                                                 return true;
                                             else
@@ -702,7 +686,7 @@
                                     },
                                     volumeLimit: {
                                         label: 'label.volume.limits',
-                                        isEditable: function(context) {
+                                        isEditable: function (context) {
                                             if (context.accounts[0].accounttype == roleTypeUser || context.accounts[0].accounttype == roleTypeDomainAdmin) //updateResourceLimits is only allowed on account whose type is user or domain-admin
                                                 return true;
                                             else
@@ -711,7 +695,7 @@
                                     },
                                     snapshotLimit: {
                                         label: 'label.snapshot.limits',
-                                        isEditable: function(context) {
+                                        isEditable: function (context) {
                                             if (context.accounts[0].accounttype == roleTypeUser || context.accounts[0].accounttype == roleTypeDomainAdmin) //updateResourceLimits is only allowed on account whose type is user or domain-admin
                                                 return true;
                                             else
@@ -720,7 +704,7 @@
                                     },
                                     templateLimit: {
                                         label: 'label.template.limits',
-                                        isEditable: function(context) {
+                                        isEditable: function (context) {
                                             if (context.accounts[0].accounttype == roleTypeUser || context.accounts[0].accounttype == roleTypeDomainAdmin) //updateResourceLimits is only allowed on account whose type is user or domain-admin
                                                 return true;
                                             else
@@ -729,7 +713,7 @@
                                     },
                                     vpcLimit: {
                                         label: 'label.VPC.limits',
-                                        isEditable: function(context) {
+                                        isEditable: function (context) {
                                             if (context.accounts[0].accounttype == roleTypeUser || context.accounts[0].accounttype == roleTypeDomainAdmin) //updateResourceLimits is only allowed on account whose type is user or domain-admin
                                                 return true;
                                             else
@@ -738,7 +722,7 @@
                                     },
                                     cpuLimit: {
                                         label: 'label.cpu.limits',
-                                        isEditable: function(context) {
+                                        isEditable: function (context) {
                                             if (context.accounts[0].accounttype == roleTypeUser || context.accounts[0].accounttype == roleTypeDomainAdmin) //updateResourceLimits is only allowed on account whose type is user or domain-admin
                                                 return true;
                                             else
@@ -747,7 +731,7 @@
                                     },
                                     memoryLimit: {
                                         label: 'label.memory.limits',
-                                        isEditable: function(context) {
+                                        isEditable: function (context) {
                                             if (context.accounts[0].accounttype == roleTypeUser || context.accounts[0].accounttype == roleTypeDomainAdmin) //updateResourceLimits is only allowed on account whose type is user or domain-admin
                                                 return true;
                                             else
@@ -756,7 +740,7 @@
                                     },
                                     networkLimit: {
                                         label: 'label.network.limits',
-                                        isEditable: function(context) {
+                                        isEditable: function (context) {
                                             if (context.accounts[0].accounttype == roleTypeUser || context.accounts[0].accounttype == roleTypeDomainAdmin) //updateResourceLimits is only allowed on account whose type is user or domain-admin
                                                 return true;
                                             else
@@ -765,7 +749,7 @@
                                     },
                                     primaryStorageLimit: {
                                         label: 'label.primary.storage.limits',
-                                        isEditable: function(context) {
+                                        isEditable: function (context) {
                                             if (context.accounts[0].accounttype == roleTypeUser || context.accounts[0].accounttype == roleTypeDomainAdmin) //updateResourceLimits is only allowed on account whose type is user or domain-admin
                                                 return true;
                                             else
@@ -774,7 +758,7 @@
                                     },
                                     secondaryStorageLimit: {
                                         label: 'label.secondary.storage.limits',
-                                        isEditable: function(context) {
+                                        isEditable: function (context) {
                                             if (context.accounts[0].accounttype == roleTypeUser || context.accounts[0].accounttype == roleTypeDomainAdmin) //updateResourceLimits is only allowed on account whose type is user or domain-admin
                                                 return true;
                                             else
@@ -790,7 +774,7 @@
                                     },
                                     receivedbytes: {
                                         label: 'label.bytes.received',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args == null || args == 0)
                                                 return "";
                                             else
@@ -799,7 +783,7 @@
                                     },
                                     sentbytes: {
                                         label: 'label.bytes.sent',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args == null || args == 0)
                                                 return "";
                                             else
@@ -808,14 +792,14 @@
                                     }
                                 }],
 
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     var data = {
                                         id: args.context.accounts[0].id
                                     };
                                     $.ajax({
                                         url: createURL('listAccounts'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var accountObj = json.listaccountsresponse.account[0];
                                             var data = {
                                                 domainid: accountObj.domainid,
@@ -824,7 +808,7 @@
                                             $.ajax({
                                                 url: createURL('listResourceLimits'),
                                                 data: data,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var limits = json.listresourcelimitsresponse.resourcelimit;
                                                     if (limits != null) {
                                                         for (var i = 0; i < limits.length; i++) {
@@ -881,18 +865,18 @@
                             settings: {
                                 title: 'label.settings',
                                 custom: cloudStack.uiCustom.granularSettings({
-                                    dataProvider: function(args) {
+                                    dataProvider: function (args) {
                                         $.ajax({
                                             url: createURL('listConfigurations&accountid=' + args.context.accounts[0].id),
-                                            data: listViewDataProvider(args, {}, { searchBy: 'name' }),
-                                            success: function(json) {
+                                            data: listViewDataProvider(args, {}, {searchBy: 'name'}),
+                                            success: function (json) {
                                                 args.response.success({
                                                     data: json.listconfigurationsresponse.configuration
                                                 });
 
                                             },
 
-                                            error: function(json) {
+                                            error: function (json) {
                                                 args.response.error(parseXMLHttpResponse(json));
 
                                             }
@@ -900,7 +884,7 @@
 
                                     },
                                     actions: {
-                                        edit: function(args) {
+                                        edit: function (args) {
                                             // call updateAccountLevelParameters
                                             var data = {
                                                 name: args.data.jsonObj.name,
@@ -910,14 +894,14 @@
                                             $.ajax({
                                                 url: createURL('updateConfiguration&accountid=' + args.context.accounts[0].id),
                                                 data: data,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var item = json.updateconfigurationresponse.configuration;
                                                     args.response.success({
                                                         data: item
                                                     });
                                                 },
 
-                                                error: function(json) {
+                                                error: function (json) {
                                                     args.response.error(parseXMLHttpResponse(json));
                                                 }
 
@@ -949,7 +933,7 @@
                             label: 'label.last.name'
                         }
                     },
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var accountObj = args.context.accounts[0];
 
                         if (isAdmin() || isDomainAdmin()) {
@@ -962,7 +946,7 @@
                             $.ajax({
                                 url: createURL('listUsers'),
                                 data: data,
-                                success: function(json) {
+                                success: function (json) {
                                     args.response.success({
                                         actionFilter: userActionfilter,
                                         data: json.listusersresponse.user
@@ -980,7 +964,7 @@
                         add: {
                             label: 'label.add.user',
 
-                            preFilter: function(args) {
+                            preFilter: function (args) {
                                 if (isAdmin() || isDomainAdmin())
                                     return true;
                                 else
@@ -988,7 +972,7 @@
                             },
 
                             messages: {
-                                notification: function(args) {
+                                notification: function (args) {
                                     return 'label.add.user';
                                 }
                             },
@@ -1046,7 +1030,7 @@
                                     timezone: {
                                         label: 'label.timezone',
                                         docID: 'helpUserTimezone',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: "",
@@ -1080,10 +1064,10 @@
                                         validation: {
                                             required: false
                                         },
-                                        select: function(args) {
+                                        select: function (args) {
                                             var samlChecked = false;
                                             var idpUrl = args.$form.find('select[name=samlEntity]').children(':selected').val();
-                                            var appendDomainToUsername = function() {
+                                            var appendDomainToUsername = function () {
                                                 if (!g_appendIdpDomain) {
                                                     return;
                                                 }
@@ -1099,17 +1083,17 @@
                                                     args.$form.find('input[name=username]').val(username);
                                                 }
                                             };
-                                            args.$form.find('select[name=samlEntity]').change(function() {
+                                            args.$form.find('select[name=samlEntity]').change(function () {
                                                 idpUrl = $(this).children(':selected').val();
                                                 appendDomainToUsername();
                                             });
-                                            args.$form.find('input[name=samlEnable]').change(function() {
+                                            args.$form.find('input[name=samlEnable]').change(function () {
                                                 samlChecked = $(this).context.checked;
                                                 appendDomainToUsername();
                                             });
 
                                             var items = [];
-                                            $(g_idpList).each(function() {
+                                            $(g_idpList).each(function () {
                                                 items.push({
                                                     id: this.id,
                                                     description: this.orgName
@@ -1127,7 +1111,7 @@
                                 }
                             },
 
-                            action: function(args) {
+                            action: function (args) {
                                 var accountObj = args.context.accounts[0];
 
                                 var data = {
@@ -1165,7 +1149,7 @@
                                     for (var i = 0; i < users.length; i++) {
                                         $.ajax({
                                             url: createURL('authorizeSamlSso&enable=true&userid=' + users[i].id + "&entityid=" + entity),
-                                            error: function(XMLHttpResponse) {
+                                            error: function (XMLHttpResponse) {
                                                 args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                                             }
                                         });
@@ -1177,7 +1161,7 @@
                                     url: createURL('createUser'),
                                     type: "POST",
                                     data: data,
-                                    success: function(json) {
+                                    success: function (json) {
                                         var item = json.createuserresponse.user;
                                         if (args.data.samlEnable && args.data.samlEnable === 'on') {
                                             var entity = args.data.samlEntity;
@@ -1188,7 +1172,7 @@
                                             data: item
                                         });
                                     },
-                                    error: function(XMLHttpResponse) {
+                                    error: function (XMLHttpResponse) {
                                         var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
                                         args.response.error(errorMsg);
                                     }
@@ -1196,7 +1180,7 @@
                             },
 
                             notification: {
-                                poll: function(args) {
+                                poll: function (args) {
                                     args.complete();
                                 }
                             }
@@ -1209,7 +1193,7 @@
                         actions: {
                             edit: {
                                 label: 'label.edit',
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.users[0].id,
                                         username: args.data.username,
@@ -1221,13 +1205,13 @@
                                     $.ajax({
                                         url: createURL('updateUser'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.updateuserresponse.user;
                                             args.response.success({
                                                 data: item
                                             });
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
@@ -1238,19 +1222,19 @@
                             changePassword: {
                                 label: 'label.action.change.password',
                                 messages: {
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.change.password';
                                     }
                                 },
 
                                 action: {
-                                    custom: function(args) {
+                                    custom: function (args) {
                                         var start = args.start;
                                         var complete = args.complete;
                                         var context = args.context;
 
                                         if (isLdapEnabled()) {
-                                            cloudStack.dialog.notice({ message: _l('error.could.not.change.your.password.because.ldap.is.enabled') });
+                                            cloudStack.dialog.notice({message: _l('error.could.not.change.your.password.because.ldap.is.enabled')});
                                         } else {
                                             cloudStack.dialog.createForm({
                                                 form: {
@@ -1274,7 +1258,7 @@
                                                         }
                                                     }
                                                 },
-                                                after: function(args) {
+                                                after: function (args) {
                                                     start();
 
                                                     var password = args.data.newPassword;
@@ -1289,11 +1273,11 @@
                                                             password: password
                                                         },
                                                         type: "POST",
-                                                        success: function(json) {
+                                                        success: function (json) {
                                                             complete();
                                                         },
-                                                        error: function(json) {
-                                                            complete({ error: parseXMLHttpResponse(json) });
+                                                        error: function (json) {
+                                                            complete({error: parseXMLHttpResponse(json)});
                                                         }
                                                     });
                                                 }
@@ -1306,12 +1290,12 @@
                             configureSamlAuthorization: {
                                 label: 'label.action.configure.samlauthorization',
                                 messages: {
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.configure.samlauthorization';
                                     }
                                 },
                                 action: {
-                                    custom: function(args) {
+                                    custom: function (args) {
                                         var start = args.start;
                                         var complete = args.complete;
                                         var context = args.context;
@@ -1322,7 +1306,7 @@
                                                 data: {
                                                     userid: context.users[0].id
                                                 },
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var authorization = json.listsamlauthorizationsresponse.samlauthorization[0];
                                                     cloudStack.dialog.createForm({
                                                         form: {
@@ -1343,9 +1327,9 @@
                                                                     validation: {
                                                                         required: false
                                                                     },
-                                                                    select: function(args) {
+                                                                    select: function (args) {
                                                                         var items = [];
-                                                                        $(g_idpList).each(function() {
+                                                                        $(g_idpList).each(function () {
                                                                             items.push({
                                                                                 id: this.id,
                                                                                 description: this.orgName
@@ -1354,14 +1338,14 @@
                                                                         args.response.success({
                                                                             data: items
                                                                         });
-                                                                        args.$select.change(function() {
-                                                                            $('select[name="samlEntity"] option[value="' + authorization.idpid  + '"]').attr("selected", "selected");
+                                                                        args.$select.change(function () {
+                                                                            $('select[name="samlEntity"] option[value="' + authorization.idpid + '"]').attr("selected", "selected");
                                                                         });
                                                                     }
                                                                 }
                                                             }
                                                         },
-                                                        after: function(args) {
+                                                        after: function (args) {
                                                             start();
                                                             var enableSaml = false;
                                                             var idpId = '';
@@ -1379,18 +1363,18 @@
                                                                     entityid: idpId
                                                                 },
                                                                 type: "POST",
-                                                                success: function(json) {
+                                                                success: function (json) {
                                                                     complete();
                                                                 },
-                                                                error: function(json) {
-                                                                    complete({ error: parseXMLHttpResponse(json) });
+                                                                error: function (json) {
+                                                                    complete({error: parseXMLHttpResponse(json)});
                                                                 }
                                                             });
                                                         }
                                                     });
                                                 },
-                                                error: function(json) {
-                                                    complete({ error: parseXMLHttpResponse(json) });
+                                                error: function (json) {
+                                                    complete({error: parseXMLHttpResponse(json)});
                                                 }
                                             });
 
@@ -1402,21 +1386,21 @@
                             generateKeys: {
                                 label: 'label.action.generate.keys',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.generate.keys';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.generate.keys';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.users[0].id
                                     };
                                     $.ajax({
                                         url: createURL('registerUserKeys'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success({
                                                 data: json.registeruserkeysresponse.userkeys
                                             });
@@ -1424,7 +1408,7 @@
                                     });
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete();
                                     }
                                 }
@@ -1433,29 +1417,29 @@
                             disable: {
                                 label: 'label.action.disable.user',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.disable.user';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.disable.user';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.users[0].id
                                     };
                                     $.ajax({
                                         url: createURL('disableUser'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.disableuserresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function(json) {
+                                                    getUpdatedItem: function (json) {
                                                         return json.queryasyncjobresultresponse.jobresult.user;
                                                     },
-                                                    getActionFilter: function() {
+                                                    getActionFilter: function () {
                                                         return userActionfilter;
                                                     }
                                                 }
@@ -1471,32 +1455,32 @@
                             enable: {
                                 label: 'label.action.enable.user',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.enable.user';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.enable.user';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.users[0].id
                                     };
                                     $.ajax({
                                         url: createURL('enableUser'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success({
                                                 data: json.enableuserresponse.user
                                             });
                                         },
-                                        error: function(json) {
+                                        error: function (json) {
                                             args.response.error(parseXMLHttpResponse(json));
                                         }
                                     });
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete();
                                     }
                                 }
@@ -1505,27 +1489,27 @@
                             remove: {
                                 label: 'label.action.delete.user',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.delete.user';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.delete.user';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.users[0].id
                                     };
                                     $.ajax({
                                         url: createURL('deleteUser'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success();
                                         }
                                     });
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete();
                                     }
                                 }
@@ -1555,7 +1539,7 @@
                                     },
                                     accounttype: {
                                         label: 'label.role',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             return cloudStack.converters.toRole(args);
                                         }
                                     },
@@ -1594,14 +1578,14 @@
                                     },
                                     timezone: {
                                         label: 'label.timezone',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args == null || args.length == 0)
                                                 return "";
                                             else
                                                 return args;
                                         },
                                         isEditable: true,
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: "",
@@ -1619,14 +1603,14 @@
                                     }
                                 }],
 
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     if (isAdmin() || isDomainAdmin()) {
                                         $.ajax({
                                             url: createURL('listUsers'),
                                             data: {
                                                 id: args.context.users[0].id
                                             },
-                                            success: function(json) {
+                                            success: function (json) {
                                                 args.response.success({
                                                     actionFilter: userActionfilter,
                                                     data: json.listusersresponse.user[0]
@@ -1656,17 +1640,17 @@
                             label: 'label.name'
                         },
                         domain: {
-                           label: 'label.domain'
+                            label: 'label.domain'
                         },
                         account: {
-                           label: 'label.account'
+                            label: 'label.account'
                         },
                         privatekey: {
                             label: 'label.private.key',
                             span: false
                         }
                     },
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var data = {
 //                            domainid: g_domainid,
 //                            account: g_account
@@ -1677,7 +1661,7 @@
                         $.ajax({
                             url: createURL('listSSHKeyPairs'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listsshkeypairsresponse.sshkeypair;
                                 args.response.success({
                                     data: items
@@ -1689,12 +1673,12 @@
                         add: {
                             label: 'label.create.ssh.key.pair',
 
-                            preFilter: function(args) {
+                            preFilter: function (args) {
                                 return true;
                             },
 
                             messages: {
-                                notification: function(args) {
+                                notification: function (args) {
                                     return _l('message.desc.created.ssh.key.pair');
                                 }
                             },
@@ -1714,30 +1698,30 @@
                                     },
                                     domain: {
                                         label: 'label.domain',
-                                        isHidden: function(args) {
+                                        isHidden: function (args) {
                                             if (isAdmin() || isDomainAdmin())
                                                 return false;
                                             else
                                                 return true;
                                         },
-                                        select: function(args) {
+                                        select: function (args) {
                                             if (isAdmin() || isDomainAdmin()) {
                                                 $.ajax({
                                                     url: createURL("listDomains&listAll=true"),
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         var items = [];
                                                         items.push({
                                                             id: "",
                                                             description: ""
                                                         });
                                                         var domainObjs = json.listdomainsresponse.domain;
-                                                        $(domainObjs).each(function() {
+                                                        $(domainObjs).each(function () {
                                                             items.push({
                                                                 id: this.id,
                                                                 description: this.path
                                                             });
                                                         });
-                                                        items.sort(function(a, b) {
+                                                        items.sort(function (a, b) {
                                                             return a.description.localeCompare(b.description);
                                                         });
                                                         args.response.success({
@@ -1745,7 +1729,7 @@
                                                         });
                                                     }
                                                 });
-                                                args.$select.change(function() {
+                                                args.$select.change(function () {
                                                     var $form = $(this).closest('form');
                                                     if ($(this).val() == "") {
                                                         $form.find('.form-item[rel=account]').hide();
@@ -1767,7 +1751,7 @@
                                     },
                                     account: {
                                         label: 'label.account',
-                                        isHidden: function(args) {
+                                        isHidden: function (args) {
                                             if (isAdmin() || isDomainAdmin())
                                                 return false;
                                             else
@@ -1777,7 +1761,7 @@
                                 }
                             },
 
-                            action: function(args) {
+                            action: function (args) {
 
                                 var data = {
                                     name: args.data.name
@@ -1802,13 +1786,13 @@
                                         url: createURL('registerSSHKeyPair'),
                                         data: data,
                                         type: "POST",
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.registersshkeypairresponse.keypair;
                                             args.response.success({
                                                 data: item
                                             });
                                         },
-                                        error: function(XMLHttpResponse) {
+                                        error: function (XMLHttpResponse) {
                                             var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
                                             args.response.error(errorMsg);
                                         }
@@ -1817,13 +1801,13 @@
                                     $.ajax({
                                         url: createURL('createSSHKeyPair'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.createsshkeypairresponse.keypair;
                                             args.response.success({
                                                 data: item
                                             });
                                         },
-                                        error: function(XMLHttpResponse) {
+                                        error: function (XMLHttpResponse) {
                                             var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
                                             args.response.error(errorMsg);
                                         }
@@ -1832,7 +1816,7 @@
                             },
 
                             notification: {
-                                poll: function(args) {
+                                poll: function (args) {
                                     args.complete();
                                 }
                             }
@@ -1850,14 +1834,14 @@
                             remove: {
                                 label: 'label.remove.ssh.key.pair',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return _l('message.please.confirm.remove.ssh.key.pair');
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return _l('message.removed.ssh.key.pair');
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         name: args.context.sshkeypairs[0].name
                                     };
@@ -1870,7 +1854,7 @@
                                     $.ajax({
                                         url: createURL('deleteSSHKeyPair'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success();
                                             $(window).trigger('cloudStack.fullRefresh');
                                         }
@@ -1906,14 +1890,14 @@
                                     }
                                 }],
 
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     var data = {
                                         name: args.context.sshkeypairs[0].name
                                     };
                                     $.ajax({
                                         url: createURL('listSSHKeyPairs&listAll=true'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success({
                                                 actionFilter: sshkeypairActionfilter,
                                                 data: json.listsshkeypairsresponse.sshkeypair[0]
@@ -1929,7 +1913,7 @@
         }
     };
 
-    var accountActionfilter = function(args) {
+    var accountActionfilter = function (args) {
         var jsonObj = args.context.item;
         var allowedActions = [];
 
@@ -1966,7 +1950,7 @@
         return allowedActions;
     }
 
-    var userActionfilter = function(args) {
+    var userActionfilter = function (args) {
         var jsonObj = args.context.item;
         var allowedActions = [];
 
@@ -2009,7 +1993,7 @@
         return allowedActions;
     }
 
-    var sshkeypairActionfilter = function(args) {
+    var sshkeypairActionfilter = function (args) {
         var allowedActions = [];
         allowedActions.push("remove");
         return allowedActions;

@@ -1,20 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.user;
+
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,8 +8,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.cloudstack.api.InternalIdentity;
 
 @Entity
 @Table(name = "user_statistics")
@@ -72,7 +56,7 @@ public class UserStatisticsVO implements InternalIdentity {
     protected UserStatisticsVO() {
     }
 
-    public UserStatisticsVO(long accountId, long dcId, String publicIpAddress, Long deviceId, String deviceType, Long networkId) {
+    public UserStatisticsVO(final long accountId, final long dcId, final String publicIpAddress, final Long deviceId, final String deviceType, final Long networkId) {
         this.accountId = accountId;
         this.dataCenterId = dcId;
         this.publicIpAddress = publicIpAddress;
@@ -118,7 +102,7 @@ public class UserStatisticsVO implements InternalIdentity {
         return currentBytesReceived;
     }
 
-    public void setCurrentBytesReceived(long currentBytesReceived) {
+    public void setCurrentBytesReceived(final long currentBytesReceived) {
         this.currentBytesReceived = currentBytesReceived;
     }
 
@@ -126,7 +110,7 @@ public class UserStatisticsVO implements InternalIdentity {
         return currentBytesSent;
     }
 
-    public void setCurrentBytesSent(long currentBytesSent) {
+    public void setCurrentBytesSent(final long currentBytesSent) {
         this.currentBytesSent = currentBytesSent;
     }
 
@@ -134,15 +118,15 @@ public class UserStatisticsVO implements InternalIdentity {
         return netBytesReceived;
     }
 
+    public void setNetBytesReceived(final long netBytesReceived) {
+        this.netBytesReceived = netBytesReceived;
+    }
+
     public long getNetBytesSent() {
         return netBytesSent;
     }
 
-    public void setNetBytesReceived(long netBytesReceived) {
-        this.netBytesReceived = netBytesReceived;
-    }
-
-    public void setNetBytesSent(long netBytesSent) {
+    public void setNetBytesSent(final long netBytesSent) {
         this.netBytesSent = netBytesSent;
     }
 
@@ -150,7 +134,7 @@ public class UserStatisticsVO implements InternalIdentity {
         return aggBytesReceived;
     }
 
-    public void setAggBytesReceived(long aggBytesReceived) {
+    public void setAggBytesReceived(final long aggBytesReceived) {
         this.aggBytesReceived = aggBytesReceived;
     }
 
@@ -158,8 +142,7 @@ public class UserStatisticsVO implements InternalIdentity {
         return aggBytesSent;
     }
 
-    public void setAggBytesSent(long aggBytesSent) {
+    public void setAggBytesSent(final long aggBytesSent) {
         this.aggBytesSent = aggBytesSent;
     }
-
 }

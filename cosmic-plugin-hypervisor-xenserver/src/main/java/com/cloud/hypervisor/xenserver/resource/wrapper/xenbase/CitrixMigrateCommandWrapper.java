@@ -1,25 +1,8 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
-
-import java.util.Set;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.MigrateAnswer;
@@ -27,16 +10,18 @@ import com.cloud.agent.api.MigrateCommand;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
+
+import java.util.Set;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Host;
 import com.xensource.xenapi.Types;
 import com.xensource.xenapi.VBD;
 import com.xensource.xenapi.VM;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  MigrateCommand.class)
+@ResourceWrapper(handles = MigrateCommand.class)
 public final class CitrixMigrateCommandWrapper extends CommandWrapper<MigrateCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixMigrateCommandWrapper.class);
@@ -52,7 +37,7 @@ public final class CitrixMigrateCommandWrapper extends CommandWrapper<MigrateCom
 
             final Set<Host> hosts = Host.getAll(conn);
             Host dsthost = null;
-            if(hosts != null) {
+            if (hosts != null) {
                 for (final Host host : hosts) {
                     if (host.getAddress(conn).equals(dstHostIpAddr)) {
                         dsthost = host;
@@ -87,7 +72,7 @@ public final class CitrixMigrateCommandWrapper extends CommandWrapper<MigrateCom
             // The iso can be attached to vm only once the vm is (present in the host) migrated.
             // Attach the config drive iso device to VM
             if (!citrixResourceBase.attachConfigDriveToMigratedVm(conn, vmName, dstHostIpAddr)) {
-                s_logger.debug("Config drive ISO attach failed after migration for vm "+vmName);
+                s_logger.debug("Config drive ISO attach failed after migration for vm " + vmName);
             }
 
             return new MigrateAnswer(command, true, "migration succeeded", null);

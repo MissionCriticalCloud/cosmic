@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// the License.  You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.utils.db;
-
-import java.lang.reflect.Field;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
@@ -26,59 +8,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.lang.reflect.Field;
 
 /**
  * The Java annotation are somewhat incomplete.  This gives better information
  * about exactly what each field has.
- *
  */
 public class Attribute {
-    public enum Flag {
-        Insertable(0x01),
-        Updatable(0x02),
-        Nullable(0x04),
-        DaoGenerated(0x08),
-        DbGenerated(0x10),
-        Embedded(0x20),
-        Id(0x40),
-        Selectable(0x80),
-        Time(0x100),
-        Date(0x200),
-        TimeStamp(0x400),
-        SequenceGV(0x1000),
-        TableGV(0x2000),
-        AutoGV(0x4000),
-        Created(0x10000),
-        Removed(0x20000),
-        DC(0x40000),
-        CharDT(0x100000),
-        StringDT(0x200000),
-        IntegerDT(0x400000),
-        Encrypted(0x800000);
-
-        int place;
-
-        Flag(int place) {
-            this.place = place;
-        }
-
-        public int place() {
-            return place;
-        }
-
-        public boolean check(int value) {
-            return (value & place) == place;
-        }
-
-        public int setTrue(int value) {
-            return (value | place);
-        }
-
-        public int setFalse(int value) {
-            return (value & ~place);
-        }
-    }
-
     protected String table;
     protected String columnName;
     protected Field field;
@@ -86,23 +22,16 @@ public class Attribute {
     protected Column column;
     protected Object attache;
 
-    public Attribute(Class<?> clazz, AttributeOverride[] overrides, Field field, String tableName, boolean isEmbedded, boolean isId) {
+    public Attribute(final Class<?> clazz, final AttributeOverride[] overrides, final Field field, final String tableName, final boolean isEmbedded, final boolean isId) {
         this.field = field;
         flags = 0;
         table = tableName;
         setupColumnInfo(clazz, overrides, tableName, isEmbedded, isId);
     }
 
-    public Attribute(String table, String columnName) {
-        this.table = table;
-        this.columnName = columnName;
-        this.field = null;
-        this.column = null;
-    }
-
-    protected void setupColumnInfo(Class<?> clazz, AttributeOverride[] overrides, String tableName, boolean isEmbedded, boolean isId) {
+    protected void setupColumnInfo(final Class<?> clazz, final AttributeOverride[] overrides, final String tableName, final boolean isEmbedded, final boolean isId) {
         flags = Flag.Selectable.setTrue(flags);
-        GeneratedValue gv = field.getAnnotation(GeneratedValue.class);
+        final GeneratedValue gv = field.getAnnotation(GeneratedValue.class);
         if (gv != null) {
             if (gv.strategy() == GenerationType.IDENTITY) {
                 flags = Flag.DbGenerated.setTrue(flags);
@@ -129,7 +58,7 @@ public class Attribute {
         if (isId) {
             flags = Flag.Id.setTrue(flags);
         } else {
-            Id id = field.getAnnotation(Id.class);
+            final Id id = field.getAnnotation(Id.class);
             if (id != null) {
                 flags = Flag.Id.setTrue(flags);
             }
@@ -145,18 +74,18 @@ public class Attribute {
             if (column == null || column.nullable()) {
                 flags = Flag.Nullable.setTrue(flags);
             }
-            Encrypt encrypt = field.getAnnotation(Encrypt.class);
+            final Encrypt encrypt = field.getAnnotation(Encrypt.class);
             if (encrypt != null && encrypt.encrypt()) {
                 flags = Flag.Encrypted.setTrue(flags);
             }
         }
-        ElementCollection ec = field.getAnnotation(ElementCollection.class);
+        final ElementCollection ec = field.getAnnotation(ElementCollection.class);
         if (ec != null) {
             flags = Flag.Insertable.setFalse(flags);
             flags = Flag.Selectable.setFalse(flags);
         }
 
-        Temporal temporal = field.getAnnotation(Temporal.class);
+        final Temporal temporal = field.getAnnotation(Temporal.class);
         if (temporal != null) {
             if (temporal.value() == TemporalType.DATE) {
                 flags = Flag.Date.setTrue(flags);
@@ -172,6 +101,13 @@ public class Attribute {
         }
 
         columnName = DbUtil.getColumnName(field, overrides);
+    }
+
+    public Attribute(final String table, final String columnName) {
+        this.table = table;
+        this.columnName = columnName;
+        this.field = null;
+        this.column = null;
     }
 
     public final boolean isInsertable() {
@@ -194,15 +130,15 @@ public class Attribute {
         return Flag.Selectable.check(flags);
     }
 
-    public final boolean is(Flag flag) {
+    public final boolean is(final Flag flag) {
         return flag.check(flags);
     }
 
-    public final void setTrue(Flag flag) {
+    public final void setTrue(final Flag flag) {
         flags = flag.setTrue(flags);
     }
 
-    public final void setFalse(Flag flag) {
+    public final void setFalse(final Flag flag) {
         flags = flag.setFalse(flags);
     }
 
@@ -214,10 +150,10 @@ public class Attribute {
         return field;
     }
 
-    public Object get(Object entity) {
+    public Object get(final Object entity) {
         try {
             return field.get(entity);
-        } catch (IllegalAccessException e) {
+        } catch (final IllegalAccessException e) {
             assert (false) : "How did we get here?";
             return null;
         }
@@ -229,12 +165,12 @@ public class Attribute {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (!(obj instanceof Attribute)) {
             return false;
         }
 
-        Attribute that = (Attribute)obj;
+        final Attribute that = (Attribute) obj;
 
         return columnName.equals(that.columnName) && table.equals(that.table);
     }
@@ -248,7 +184,53 @@ public class Attribute {
         return columnName;
     }
 
-    public void setColumnName(String columnName) {
+    public void setColumnName(final String columnName) {
         this.columnName = columnName;
+    }
+
+    public enum Flag {
+        Insertable(0x01),
+        Updatable(0x02),
+        Nullable(0x04),
+        DaoGenerated(0x08),
+        DbGenerated(0x10),
+        Embedded(0x20),
+        Id(0x40),
+        Selectable(0x80),
+        Time(0x100),
+        Date(0x200),
+        TimeStamp(0x400),
+        SequenceGV(0x1000),
+        TableGV(0x2000),
+        AutoGV(0x4000),
+        Created(0x10000),
+        Removed(0x20000),
+        DC(0x40000),
+        CharDT(0x100000),
+        StringDT(0x200000),
+        IntegerDT(0x400000),
+        Encrypted(0x800000);
+
+        int place;
+
+        Flag(final int place) {
+            this.place = place;
+        }
+
+        public int place() {
+            return place;
+        }
+
+        public boolean check(final int value) {
+            return (value & place) == place;
+        }
+
+        public int setTrue(final int value) {
+            return (value | place);
+        }
+
+        public int setFalse(final int value) {
+            return (value & ~place);
+        }
     }
 }

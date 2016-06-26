@@ -1,24 +1,10 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 """ Test redundancy features for VPC routers
 """
 
-from nose.plugins.attrib import attr
+import inspect
+import logging
+import socket
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (stopRouter,
                              startRouter,
@@ -34,7 +20,6 @@ from marvin.lib.base import (stopRouter,
                              NetworkOffering,
                              Network,
                              VirtualMachine,
-                             LoadBalancerRule,
                              Configurations)
 from marvin.lib.common import (get_domain,
                                get_zone,
@@ -46,10 +31,8 @@ from marvin.lib.common import (get_domain,
 from marvin.lib.utils import (cleanup_resources,
                               get_process_status,
                               get_host_credentials)
-import socket
-import time
-import inspect
-import logging
+from nose.plugins.attrib import attr
+
 
 class Services:
     """Test VPC network services - Port Forwarding Rules Test Data Class.
@@ -199,7 +182,6 @@ class Services:
 
 
 class TestVPCRedundancy(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         # We want to fail quicker if it's failure
@@ -270,13 +252,13 @@ class TestVPCRedundancy(cloudstackTestCase):
             zoneid=self.zone.id,
             account=self.account.name,
             domainid=self.account.domainid)
-        
+
         self.cleanup = [self.vpc, self.vpc_off, self.account]
         return
 
     def tearDown(self):
         try:
-            #Stop/Destroy the routers so we are able to remove the networks. Issue CLOUDSTACK-8935
+            # Stop/Destroy the routers so we are able to remove the networks. Issue CLOUDSTACK-8935
             self.destroy_routers()
             cleanup_resources(self.api_client, self.cleanup)
         except Exception as e:
@@ -285,17 +267,17 @@ class TestVPCRedundancy(cloudstackTestCase):
 
     def find_public_gateway(self):
         networks = list_networks(self.apiclient,
-                                  zoneid = self.zone.id,
-                                  listall = True,
-                                  issystem = True,
-                                  traffictype = "Public")
+                                 zoneid=self.zone.id,
+                                 listall=True,
+                                 issystem=True,
+                                 traffictype="Public")
         self.logger.debug('::: Public Networks ::: ==> %s' % networks)
 
         self.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
-        
+
         ip_ranges = list_vlan_ipranges(self.apiclient,
-                                       zoneid = self.zone.id,
-                                       networkid = networks[0].id)
+                                       zoneid=self.zone.id,
+                                       networkid=networks[0].id)
         self.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)
 
         self.assertTrue(len(ip_ranges) == 1, "Test expects only 1 VLAN IP Range network but found -> '%s'" % len(ip_ranges))
@@ -318,7 +300,7 @@ class TestVPCRedundancy(cloudstackTestCase):
             len(self.routers), count,
             "Check that %s routers were indeed created" % count)
 
-    def check_routers_state(self,count=2, status_to_check="MASTER", expected_count=1, showall=False):
+    def check_routers_state(self, count=2, status_to_check="MASTER", expected_count=1, showall=False):
         vals = ["MASTER", "BACKUP", "UNKNOWN"]
         cnts = [0, 0, 0]
 
@@ -363,8 +345,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         if cnts[vals.index(status_to_check)] != expected_count:
             self.fail("Expected '%s' router[s] at state '%s', but found '%s'!" % (expected_count, status_to_check, cnts[vals.index(status_to_check)]))
 
-
-    def check_routers_interface(self,count=2, interface_to_check="eth1", expected_exists=True, showall=False):
+    def check_routers_interface(self, count=2, interface_to_check="eth1", expected_exists=True, showall=False):
         result = ""
 
         self.query_routers(count, showall)
@@ -555,12 +536,12 @@ class TestVPCRedundancy(cloudstackTestCase):
             traffictype='Ingress'
         )
         self.logger.debug('nwacl_nat=%s' % nwacl_nat.__dict__)
-        
+
         return nat_rule
 
     def check_ssh_into_vm(self, vm, public_ip, expectFail=False, retries=5):
         self.logger.debug("Checking if we can SSH into VM=%s on public_ip=%s (%r)" %
-                   (vm.name, public_ip.ipaddress.ipaddress, expectFail))
+                          (vm.name, public_ip.ipaddress.ipaddress, expectFail))
         vm.ssh_client = None
         try:
             if 'retries' in inspect.getargspec(vm.get_ssh_client).args:
@@ -572,7 +553,7 @@ class TestVPCRedundancy(cloudstackTestCase):
                           (vm.name, public_ip.ipaddress.ipaddress))
             else:
                 self.logger.debug("SSH into VM=%s on public_ip=%s is successful" %
-                           (vm.name, public_ip.ipaddress.ipaddress))
+                                  (vm.name, public_ip.ipaddress.ipaddress))
         except:
             if expectFail:
                 self.logger.debug("Failed to SSH into VM - %s (Expected)" % (public_ip.ipaddress.ipaddress))
@@ -589,7 +570,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.check_routers_state()
         self.add_nat_rules()
         self.do_vpc_test(False)
-        
+
         self.stop_router_by_type("MASTER")
         self.check_routers_state(1)
         self.do_vpc_test(False)
@@ -614,7 +595,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.check_routers_state()
         self.add_nat_rules()
         self.do_default_routes_test()
-    
+
     @attr(tags=["advanced", "intervlan"], required_hardware="true")
     def test_03_create_redundant_VPC_1tier_2VMs_2IPs_2PF_ACL_reboot_routers(self):
         """ Create a redundant VPC with two networks with two VMs in each network """
@@ -624,7 +605,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.check_routers_state()
         self.add_nat_rules()
         self.do_vpc_test(False)
-        
+
         self.reboot_router_by_type("MASTER")
         self.check_routers_state()
         self.do_vpc_test(False)
@@ -647,7 +628,7 @@ class TestVPCRedundancy(cloudstackTestCase):
 
         gc_wait = Configurations.list(self.apiclient, name="network.gc.wait")
         gc_interval = Configurations.list(self.apiclient, name="network.gc.interval")
-        
+
         self.logger.debug("network.gc.wait is ==> %s" % gc_wait)
         self.logger.debug("network.gc.interval is ==> %s" % gc_wait)
 
@@ -675,7 +656,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.networks.append(self.create_network(self.services["network_offering_no_lb"], "10.1.2.1", nr_vms=1))
         network_to_delete_2 = self.create_network(self.services["network_offering_no_lb"], "10.1.3.1", nr_vms=1, mark_net_cleanup=False)
         self.networks.append(network_to_delete_2)
-        
+
         self.check_routers_state()
         self.add_nat_rules()
         self.do_vpc_test(False)
@@ -685,7 +666,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.networks.remove(network_to_delete_1)
 
         vrrp_interval = Configurations.list(self.apiclient, name="router.redundant.vrrp.interval")
-        
+
         self.logger.debug("router.redundant.vrrp.interval is ==> %s" % vrrp_interval)
 
         total_sleep = 10
@@ -693,7 +674,7 @@ class TestVPCRedundancy(cloudstackTestCase):
             total_sleep = int(vrrp_interval[0].value) * 4
         else:
             self.logger.debug("Could not retrieve the key 'router.redundant.vrrp.interval'. Sleeping for 10 seconds.")
-            
+
         '''
         Sleep (router.redundant.vrrp.interval * 4) seconds here because since we are removing the first tier (NIC) the VRRP will have to reconfigure the interface it uses.
         Due to the configuration changes, it will start a new election and it might take up to 4 seconds, because each router has an
@@ -709,7 +690,7 @@ class TestVPCRedundancy(cloudstackTestCase):
 
         '''
         Let's be sure and sleep for 'total_sleep' seconds because removing/adding an interface will restart keepalived.
-        It restarts it because the keepalived configuration file changes in order to have the virtual_ipaddress section updated. 
+        It restarts it because the keepalived configuration file changes in order to have the virtual_ipaddress section updated.
         '''
         time.sleep(total_sleep)
         self.check_routers_state(status_to_check="MASTER")
@@ -777,9 +758,9 @@ class TestVPCRedundancy(cloudstackTestCase):
                     vm = vmObj.get_vm()
                     public_ip = vmObj.get_ip()
                     self.logger.debug("SSH into VM: %s" % public_ip.ipaddress.ipaddress)
-                    
+
                     ssh = vm.get_ssh_client(ipaddress=public_ip.ipaddress.ipaddress)
-        
+
                     self.logger.debug("Ping to google.com from VM")
                     result = str(ssh.execute(ssh_command))
 
@@ -788,12 +769,12 @@ class TestVPCRedundancy(cloudstackTestCase):
                     self.fail("SSH Access failed for %s: %s" % \
                               (vmObj.get_ip(), e)
                               )
-        
+
                 self.assertEqual(
-                                 result.count("3 packets received"),
-                                 1,
-                                 "Ping to outside world from VM should be successful"
-                                 )
+                    result.count("3 packets received"),
+                    1,
+                    "Ping to outside world from VM should be successful"
+                )
 
 
 class networkO(object):

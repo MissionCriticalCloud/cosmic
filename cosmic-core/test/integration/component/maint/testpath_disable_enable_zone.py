@@ -1,26 +1,20 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ Test cases for Disable enable Zone, Pod, Cluster, Host Test Path
 """
 
-from nose.plugins.attrib import attr
+import time
+from marvin.cloudstackAPI import (updateZone,
+                                  updateHost,
+                                  reconnectHost,
+                                  updatePod,
+                                  updateCluster
+                                  )
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources,
-                              validateList)
+from marvin.codes import (ENABLED,
+                          DISABLED,
+                          ENABLE,
+                          DISABLE,
+                          PASS
+                          )
 from marvin.lib.base import (Account,
                              VirtualMachine,
                              ServiceOffering,
@@ -42,26 +36,13 @@ from marvin.lib.common import (get_domain,
                                list_snapshots,
                                get_builtin_template_info
                                )
-
-from marvin.cloudstackAPI import (updateZone,
-                                  updateHost,
-                                  reconnectHost,
-                                  updatePod,
-                                  updateCluster
-                                  )
-
-from marvin.codes import (ENABLED,
-                          DISABLED,
-                          ENABLE,
-                          DISABLE,
-                          PASS
-                          )
-import time
+from marvin.lib.utils import (cleanup_resources,
+                              validateList)
 from marvin.sshClient import SshClient
+from nose.plugins.attrib import attr
 
 
 class TestDisableEnableZone(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestDisableEnableZone, cls).getClsTestClient()
@@ -480,7 +461,6 @@ class TestDisableEnableZone(cloudstackTestCase):
 
 
 class TestDisableEnablePod(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestDisableEnablePod, cls).getClsTestClient()
@@ -874,7 +854,6 @@ class TestDisableEnablePod(cloudstackTestCase):
 
 
 class TestDisableEnableCluster(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestDisableEnableCluster, cls).getClsTestClient()
@@ -1349,7 +1328,6 @@ class TestDisableEnableCluster(cloudstackTestCase):
 
 
 class TestDisableEnableHost(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestDisableEnableHost, cls).getClsTestClient()

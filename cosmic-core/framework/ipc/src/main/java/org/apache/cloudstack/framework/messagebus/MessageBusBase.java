@@ -1,23 +1,8 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 package org.apache.cloudstack.framework.messagebus;
+
+import com.cloud.utils.db.TransactionLegacy;
+import com.cloud.utils.exception.CloudRuntimeException;
+import org.apache.cloudstack.framework.serializer.MessageSerializer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,33 +11,49 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
-
-import org.apache.cloudstack.framework.serializer.MessageSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MessageBusBase implements MessageBus {
 
+    private static final Logger s_logger = LoggerFactory.getLogger(MessageBusBase.class);
     private final Gate _gate;
     private final List<ActionRecord> _pendingActions;
-
     private final SubscriptionNode _subscriberRoot;
     private MessageSerializer _messageSerializer;
 
-    private static final Logger s_logger = LoggerFactory.getLogger(MessageBusBase.class);
-
     public MessageBusBase() {
         _gate = new Gate();
-        _pendingActions = new ArrayList<ActionRecord>();
+        _pendingActions = new ArrayList<>();
 
         _subscriberRoot = new SubscriptionNode(null, "/", null);
     }
 
-    @Override
-    public void setMessageSerializer(MessageSerializer messageSerializer) {
-        _messageSerializer = messageSerializer;
+    private static SubscriptionNode locate(final String[] subjectPathTokens, final SubscriptionNode current, final List<SubscriptionNode> chainFromTop, final boolean createPath) {
+
+        assert (current != null);
+        assert (subjectPathTokens != null);
+        assert (subjectPathTokens.length > 0);
+
+        if (chainFromTop != null) {
+            chainFromTop.add(current);
+        }
+
+        SubscriptionNode next = current.getChild(subjectPathTokens[0]);
+        if (next == null) {
+            if (createPath) {
+                next = new SubscriptionNode(current, subjectPathTokens[0], null);
+                current.addChild(subjectPathTokens[0], next);
+            } else {
+                return null;
+            }
+        }
+
+        if (subjectPathTokens.length > 1) {
+            return locate(Arrays.copyOfRange(subjectPathTokens, 1, subjectPathTokens.length), next, chainFromTop, createPath);
+        } else {
+            return next;
+        }
     }
 
     @Override
@@ -61,7 +62,12 @@ public class MessageBusBase implements MessageBus {
     }
 
     @Override
-    public void subscribe(String subject, MessageSubscriber subscriber) {
+    public void setMessageSerializer(final MessageSerializer messageSerializer) {
+        _messageSerializer = messageSerializer;
+    }
+
+    @Override
+    public void subscribe(final String subject, final MessageSubscriber subscriber) {
         assert (subject != null);
         assert (subscriber != null);
         if (_gate.enter()) {
@@ -69,7 +75,7 @@ public class MessageBusBase implements MessageBus {
                 s_logger.trace("Enter gate in message bus subscribe");
             }
             try {
-                SubscriptionNode current = locate(subject, null, true);
+                final SubscriptionNode current = locate(subject, null, true);
                 assert (current != null);
                 current.addSubscriber(subscriber);
             } finally {
@@ -83,16 +89,17 @@ public class MessageBusBase implements MessageBus {
     }
 
     @Override
-    public void unsubscribe(String subject, MessageSubscriber subscriber) {
+    public void unsubscribe(final String subject, final MessageSubscriber subscriber) {
         if (_gate.enter()) {
             if (s_logger.isTraceEnabled()) {
                 s_logger.trace("Enter gate in message bus unsubscribe");
             }
             try {
                 if (subject != null) {
-                    SubscriptionNode current = locate(subject, null, false);
-                    if (current != null)
+                    final SubscriptionNode current = locate(subject, null, false);
+                    if (current != null) {
                         current.removeSubscriber(subscriber, false);
+                    }
                 } else {
                     _subscriberRoot.removeSubscriber(subscriber, true);
                 }
@@ -143,27 +150,11 @@ public class MessageBusBase implements MessageBus {
         }
     }
 
-    private void doPrune() {
-        List<SubscriptionNode> trimNodes = new ArrayList<SubscriptionNode>();
-        _subscriberRoot.prune(trimNodes);
-
-        while (trimNodes.size() > 0) {
-            SubscriptionNode node = trimNodes.remove(0);
-            SubscriptionNode parent = node.getParent();
-            if (parent != null) {
-                parent.removeChild(node.getNodeKey());
-                if (parent.isTrimmable()) {
-                    trimNodes.add(parent);
-                }
-            }
-        }
-    }
-
     @Override
-    public void publish(String senderAddress, String subject, PublishScope scope, Object args) {
+    public void publish(final String senderAddress, final String subject, final PublishScope scope, final Object args) {
         // publish cannot be in DB transaction, which may hold DB lock too long, and we are guarding this here
-        if (!noDbTxn()){
-            String errMsg = "NO EVENT PUBLISH CAN BE WRAPPED WITHIN DB TRANSACTION!";
+        if (!noDbTxn()) {
+            final String errMsg = "NO EVENT PUBLISH CAN BE WRAPPED WITHIN DB TRANSACTION!";
             s_logger.error(errMsg, new CloudRuntimeException(errMsg));
         }
         if (_gate.enter(true)) {
@@ -171,17 +162,35 @@ public class MessageBusBase implements MessageBus {
                 s_logger.trace("Enter gate in message bus publish");
             }
             try {
-                List<SubscriptionNode> chainFromTop = new ArrayList<SubscriptionNode>();
-                SubscriptionNode current = locate(subject, chainFromTop, false);
+                final List<SubscriptionNode> chainFromTop = new ArrayList<>();
+                final SubscriptionNode current = locate(subject, chainFromTop, false);
 
-                if (current != null)
+                if (current != null) {
                     current.notifySubscribers(senderAddress, subject, args);
+                }
 
                 Collections.reverse(chainFromTop);
-                for (SubscriptionNode node : chainFromTop)
+                for (final SubscriptionNode node : chainFromTop) {
                     node.notifySubscribers(senderAddress, subject, args);
+                }
             } finally {
                 _gate.leave();
+            }
+        }
+    }
+
+    private void doPrune() {
+        final List<SubscriptionNode> trimNodes = new ArrayList<>();
+        _subscriberRoot.prune(trimNodes);
+
+        while (trimNodes.size() > 0) {
+            final SubscriptionNode node = trimNodes.remove(0);
+            final SubscriptionNode parent = node.getParent();
+            if (parent != null) {
+                parent.removeChild(node.getNodeKey());
+                if (parent.isTrimmable()) {
+                    trimNodes.add(parent);
+                }
             }
         }
     }
@@ -193,17 +202,18 @@ public class MessageBusBase implements MessageBus {
                 record = _pendingActions.remove(0);
                 switch (record.getType()) {
                     case Subscribe: {
-                        SubscriptionNode current = locate(record.getSubject(), null, true);
+                        final SubscriptionNode current = locate(record.getSubject(), null, true);
                         assert (current != null);
                         current.addSubscriber(record.getSubscriber());
                     }
-                        break;
+                    break;
 
                     case Unsubscribe:
                         if (record.getSubject() != null) {
-                            SubscriptionNode current = locate(record.getSubject(), null, false);
-                            if (current != null)
+                            final SubscriptionNode current = locate(record.getSubject(), null, false);
+                            if (current != null) {
                                 current.removeSubscriber(record.getSubscriber(), false);
+                            }
                         } else {
                             _subscriberRoot.removeSubscriber(record.getSubscriber(), true);
                         }
@@ -220,51 +230,25 @@ public class MessageBusBase implements MessageBus {
                     default:
                         assert (false);
                         break;
-
                 }
             }
         }
     }
 
-    private SubscriptionNode locate(String subject, List<SubscriptionNode> chainFromTop, boolean createPath) {
+    private SubscriptionNode locate(final String subject, final List<SubscriptionNode> chainFromTop, final boolean createPath) {
 
         assert (subject != null);
         // "/" is special name for root node
-        if (subject.equals("/"))
+        if (subject.equals("/")) {
             return _subscriberRoot;
+        }
 
-        String[] subjectPathTokens = subject.split("\\.");
+        final String[] subjectPathTokens = subject.split("\\.");
         return locate(subjectPathTokens, _subscriberRoot, chainFromTop, createPath);
     }
 
-    private static SubscriptionNode locate(String[] subjectPathTokens, SubscriptionNode current, List<SubscriptionNode> chainFromTop, boolean createPath) {
-
-        assert (current != null);
-        assert (subjectPathTokens != null);
-        assert (subjectPathTokens.length > 0);
-
-        if (chainFromTop != null)
-            chainFromTop.add(current);
-
-        SubscriptionNode next = current.getChild(subjectPathTokens[0]);
-        if (next == null) {
-            if (createPath) {
-                next = new SubscriptionNode(current, subjectPathTokens[0], null);
-                current.addChild(subjectPathTokens[0], next);
-            } else {
-                return null;
-            }
-        }
-
-        if (subjectPathTokens.length > 1) {
-            return locate(Arrays.copyOfRange(subjectPathTokens, 1, subjectPathTokens.length), next, chainFromTop, createPath);
-        } else {
-            return next;
-        }
-    }
-
     private boolean noDbTxn() {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         return !txn.dbTxnStarted();
     }
 
@@ -280,7 +264,7 @@ public class MessageBusBase implements MessageBus {
         private final String _subject;
         private final MessageSubscriber _subscriber;
 
-        public ActionRecord(ActionType type, String subject, MessageSubscriber subscriber) {
+        public ActionRecord(final ActionType type, final String subject, final MessageSubscriber subscriber) {
             _type = type;
             _subject = subject;
             _subscriber = subscriber;
@@ -299,6 +283,95 @@ public class MessageBusBase implements MessageBus {
         }
     }
 
+    private static class SubscriptionNode {
+        private final String _nodeKey;
+        private final List<MessageSubscriber> _subscribers;
+        private final Map<String, SubscriptionNode> _children;
+        private final SubscriptionNode _parent;
+
+        public SubscriptionNode(final SubscriptionNode parent, final String nodeKey, final MessageSubscriber subscriber) {
+            assert (nodeKey != null);
+            _parent = parent;
+            _nodeKey = nodeKey;
+            _subscribers = new ArrayList<>();
+
+            if (subscriber != null) {
+                _subscribers.add(subscriber);
+            }
+
+            _children = new HashMap<>();
+        }
+
+        public SubscriptionNode getParent() {
+            return _parent;
+        }
+
+        public String getNodeKey() {
+            return _nodeKey;
+        }
+
+        public List<MessageSubscriber> getSubscriber() {
+            return _subscribers;
+        }
+
+        public void addSubscriber(final MessageSubscriber subscriber) {
+            if (!_subscribers.contains(subscriber)) {
+                _subscribers.add(subscriber);
+            }
+        }
+
+        public void removeSubscriber(final MessageSubscriber subscriber, final boolean recursively) {
+            if (recursively) {
+                for (final Map.Entry<String, SubscriptionNode> entry : _children.entrySet()) {
+                    entry.getValue().removeSubscriber(subscriber, true);
+                }
+            }
+            _subscribers.remove(subscriber);
+        }
+
+        public SubscriptionNode getChild(final String key) {
+            return _children.get(key);
+        }
+
+        public void addChild(final String key, final SubscriptionNode childNode) {
+            _children.put(key, childNode);
+        }
+
+        public void removeChild(final String key) {
+            _children.remove(key);
+        }
+
+        public void clearAll() {
+            // depth-first
+            for (final Map.Entry<String, SubscriptionNode> entry : _children.entrySet()) {
+                entry.getValue().clearAll();
+            }
+            _subscribers.clear();
+        }
+
+        public void prune(final List<SubscriptionNode> trimNodes) {
+            assert (trimNodes != null);
+
+            for (final Map.Entry<String, SubscriptionNode> entry : _children.entrySet()) {
+                entry.getValue().prune(trimNodes);
+            }
+
+            if (isTrimmable()) {
+                trimNodes.add(this);
+            }
+        }
+
+        public void notifySubscribers(final String senderAddress, final String subject, final Object args) {
+            for (final MessageSubscriber subscriber : _subscribers) {
+                subscriber.onPublishMessage(senderAddress, subject, args);
+            }
+        }
+
+        public boolean isTrimmable() {
+            return _children.size() == 0 && _subscribers.size() == 0;
+        }
+    }
+
     private class Gate {
         private int _reentranceCount;
         private Thread _gateOwner;
@@ -312,7 +385,7 @@ public class MessageBusBase implements MessageBus {
             return enter(false);
         }
 
-        public boolean enter(boolean wait) {
+        public boolean enter(final boolean wait) {
             while (true) {
                 synchronized (this) {
                     if (_reentranceCount == 0) {
@@ -325,7 +398,7 @@ public class MessageBusBase implements MessageBus {
                         if (wait) {
                             try {
                                 wait();
-                            } catch (InterruptedException e) {
+                            } catch (final InterruptedException e) {
                                 s_logger.debug("[ignored] interupted while guarding re-entrance on message bus.");
                             }
                         } else {
@@ -357,93 +430,6 @@ public class MessageBusBase implements MessageBus {
                     }
                 }
             }
-        }
-    }
-
-    private static class SubscriptionNode {
-        private final String _nodeKey;
-        private final List<MessageSubscriber> _subscribers;
-        private final Map<String, SubscriptionNode> _children;
-        private final SubscriptionNode _parent;
-
-        public SubscriptionNode(SubscriptionNode parent, String nodeKey, MessageSubscriber subscriber) {
-            assert (nodeKey != null);
-            _parent = parent;
-            _nodeKey = nodeKey;
-            _subscribers = new ArrayList<MessageSubscriber>();
-
-            if (subscriber != null)
-                _subscribers.add(subscriber);
-
-            _children = new HashMap<String, SubscriptionNode>();
-        }
-
-        public SubscriptionNode getParent() {
-            return _parent;
-        }
-
-        public String getNodeKey() {
-            return _nodeKey;
-        }
-
-        @SuppressWarnings("unused")
-        public List<MessageSubscriber> getSubscriber() {
-            return _subscribers;
-        }
-
-        public void addSubscriber(MessageSubscriber subscriber) {
-            if (!_subscribers.contains(subscriber))
-                _subscribers.add(subscriber);
-        }
-
-        public void removeSubscriber(MessageSubscriber subscriber, boolean recursively) {
-            if (recursively) {
-                for (Map.Entry<String, SubscriptionNode> entry : _children.entrySet()) {
-                    entry.getValue().removeSubscriber(subscriber, true);
-                }
-            }
-            _subscribers.remove(subscriber);
-        }
-
-        public SubscriptionNode getChild(String key) {
-            return _children.get(key);
-        }
-
-        public void addChild(String key, SubscriptionNode childNode) {
-            _children.put(key, childNode);
-        }
-
-        public void removeChild(String key) {
-            _children.remove(key);
-        }
-
-        public void clearAll() {
-            // depth-first
-            for (Map.Entry<String, SubscriptionNode> entry : _children.entrySet()) {
-                entry.getValue().clearAll();
-            }
-            _subscribers.clear();
-        }
-
-        public void prune(List<SubscriptionNode> trimNodes) {
-            assert (trimNodes != null);
-
-            for (Map.Entry<String, SubscriptionNode> entry : _children.entrySet()) {
-                entry.getValue().prune(trimNodes);
-            }
-
-            if (isTrimmable())
-                trimNodes.add(this);
-        }
-
-        public void notifySubscribers(String senderAddress, String subject, Object args) {
-            for (MessageSubscriber subscriber : _subscribers) {
-                subscriber.onPublishMessage(senderAddress, subject, args);
-            }
-        }
-
-        public boolean isTrimmable() {
-            return _children.size() == 0 && _subscribers.size() == 0;
         }
     }
 }

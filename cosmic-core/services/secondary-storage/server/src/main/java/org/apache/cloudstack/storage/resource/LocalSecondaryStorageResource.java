@@ -1,25 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.storage.resource;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CheckHealthAnswer;
@@ -44,11 +23,15 @@ import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.template.TemplateProp;
 import com.cloud.utils.component.ComponentContext;
-
 import org.apache.cloudstack.storage.command.DownloadCommand;
 import org.apache.cloudstack.storage.command.DownloadProgressCommand;
 import org.apache.cloudstack.storage.template.DownloadManager;
 import org.apache.cloudstack.storage.template.DownloadManagerImpl;
+
+import javax.naming.ConfigurationException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,48 +51,12 @@ public class LocalSecondaryStorageResource extends ServerResourceBase implements
     DownloadManager _dlMgr;
 
     @Override
-    public void disconnected() {
-    }
-
-    @Override
-    public String getRootDir(String url) {
+    public String getRootDir(final String url) {
         return getRootDir();
-
     }
 
     public String getRootDir() {
         return _parent;
-    }
-
-    @Override
-    public Answer executeRequest(Command cmd) {
-        if (cmd instanceof DownloadProgressCommand) {
-            return _dlMgr.handleDownloadCommand(this, (DownloadProgressCommand)cmd);
-        } else if (cmd instanceof DownloadCommand) {
-            return _dlMgr.handleDownloadCommand(this, (DownloadCommand)cmd);
-        } else if (cmd instanceof CheckHealthCommand) {
-            return new CheckHealthAnswer((CheckHealthCommand)cmd, true);
-        } else if (cmd instanceof SecStorageSetupCommand) {
-            return new Answer(cmd, true, "success");
-        } else if (cmd instanceof ReadyCommand) {
-            return new ReadyAnswer((ReadyCommand)cmd);
-        } else if (cmd instanceof ListTemplateCommand) {
-            return execute((ListTemplateCommand)cmd);
-        } else if (cmd instanceof ComputeChecksumCommand) {
-            return execute((ComputeChecksumCommand)cmd);
-        } else {
-            return Answer.createUnsupportedCommandAnswer(cmd);
-        }
-    }
-
-    private Answer execute(ComputeChecksumCommand cmd) {
-        return new Answer(cmd, false, null);
-    }
-
-    private Answer execute(ListTemplateCommand cmd) {
-        String root = getRootDir();
-        Map<String, TemplateProp> templateInfos = _dlMgr.gatherTemplateInfo(root);
-        return new ListTemplateAnswer(((NfsTO)cmd.getDataStore()).getUrl(), templateInfos);
     }
 
     @Override
@@ -118,44 +65,91 @@ public class LocalSecondaryStorageResource extends ServerResourceBase implements
     }
 
     @Override
-    public PingCommand getCurrentStatus(final long id) {
-        return new PingStorageCommand(Host.Type.Storage, id, new HashMap<String, Boolean>());
+    public StartupCommand[] initialize() {
+
+        final StartupStorageCommand cmd =
+                new StartupStorageCommand(_parent, StoragePoolType.Filesystem, 1024l * 1024l * 1024l * 1024l, _dlMgr.gatherTemplateInfo(_parent));
+        cmd.setResourceType(Storage.StorageResourceType.LOCAL_SECONDARY_STORAGE);
+        cmd.setIqn("local://");
+        fillNetworkInformation(cmd);
+        cmd.setDataCenter(_dc);
+        cmd.setPod(_pod);
+        cmd.setGuid(_guid);
+        cmd.setName(_guid);
+        cmd.setVersion(LocalSecondaryStorageResource.class.getPackage().getImplementationVersion());
+
+        return new StartupCommand[]{cmd};
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public PingCommand getCurrentStatus(final long id) {
+        return new PingStorageCommand(Host.Type.Storage, id, new HashMap<>());
+    }
+
+    @Override
+    public Answer executeRequest(final Command cmd) {
+        if (cmd instanceof DownloadProgressCommand) {
+            return _dlMgr.handleDownloadCommand(this, (DownloadProgressCommand) cmd);
+        } else if (cmd instanceof DownloadCommand) {
+            return _dlMgr.handleDownloadCommand(this, (DownloadCommand) cmd);
+        } else if (cmd instanceof CheckHealthCommand) {
+            return new CheckHealthAnswer((CheckHealthCommand) cmd, true);
+        } else if (cmd instanceof SecStorageSetupCommand) {
+            return new Answer(cmd, true, "success");
+        } else if (cmd instanceof ReadyCommand) {
+            return new ReadyAnswer((ReadyCommand) cmd);
+        } else if (cmd instanceof ListTemplateCommand) {
+            return execute((ListTemplateCommand) cmd);
+        } else if (cmd instanceof ComputeChecksumCommand) {
+            return execute((ComputeChecksumCommand) cmd);
+        } else {
+            return Answer.createUnsupportedCommandAnswer(cmd);
+        }
+    }
+
+    private Answer execute(final ListTemplateCommand cmd) {
+        final String root = getRootDir();
+        final Map<String, TemplateProp> templateInfos = _dlMgr.gatherTemplateInfo(root);
+        return new ListTemplateAnswer(((NfsTO) cmd.getDataStore()).getUrl(), templateInfos);
+    }
+
+    private Answer execute(final ComputeChecksumCommand cmd) {
+        return new Answer(cmd, false, null);
+    }
+
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         super.configure(name, params);
 
-        _guid = (String)params.get("guid");
+        _guid = (String) params.get("guid");
         if (_guid == null) {
             throw new ConfigurationException("Unable to find the guid");
         }
 
-        _dc = (String)params.get("zone");
+        _dc = (String) params.get("zone");
         if (_dc == null) {
             throw new ConfigurationException("Unable to find the zone");
         }
-        _pod = (String)params.get("pod");
+        _pod = (String) params.get("pod");
 
-        _instance = (String)params.get("instance");
+        _instance = (String) params.get("instance");
 
-        _parent = (String)params.get("mount.path");
+        _parent = (String) params.get("mount.path");
         if (_parent == null) {
             throw new ConfigurationException("No directory specified.");
         }
 
-        _storage = (StorageLayer)params.get(StorageLayer.InstanceConfigKey);
+        _storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
         if (_storage == null) {
-            String value = (String)params.get(StorageLayer.ClassConfigKey);
+            String value = (String) params.get(StorageLayer.ClassConfigKey);
             if (value == null) {
                 value = "com.cloud.storage.JavaStorageLayer";
             }
 
             try {
-                Class<StorageLayer> clazz = (Class<StorageLayer>)Class.forName(value);
+                final Class<StorageLayer> clazz = (Class<StorageLayer>) Class.forName(value);
                 _storage = ComponentContext.inject(clazz);
-            } catch (ClassNotFoundException e) {
+            } catch (final ClassNotFoundException e) {
                 throw new ConfigurationException("Unable to find class " + value);
             }
         }
@@ -187,35 +181,16 @@ public class LocalSecondaryStorageResource extends ServerResourceBase implements
     }
 
     @Override
-    public StartupCommand[] initialize() {
-
-        final StartupStorageCommand cmd =
-            new StartupStorageCommand(_parent, StoragePoolType.Filesystem, 1024l * 1024l * 1024l * 1024l, _dlMgr.gatherTemplateInfo(_parent));
-        cmd.setResourceType(Storage.StorageResourceType.LOCAL_SECONDARY_STORAGE);
-        cmd.setIqn("local://");
-        fillNetworkInformation(cmd);
-        cmd.setDataCenter(_dc);
-        cmd.setPod(_pod);
-        cmd.setGuid(_guid);
-        cmd.setName(_guid);
-        cmd.setVersion(LocalSecondaryStorageResource.class.getPackage().getImplementationVersion());
-
-        return new StartupCommand[] {cmd};
-    }
-
-    @Override
     protected String getDefaultScriptsDir() {
         return "scripts/storage/secondary";
     }
 
     @Override
-    public void setName(String name) {
-        // TODO Auto-generated method stub
-
+    public void disconnected() {
     }
 
     @Override
-    public void setConfigParams(Map<String, Object> params) {
+    public void setName(final String name) {
         // TODO Auto-generated method stub
 
     }
@@ -227,13 +202,19 @@ public class LocalSecondaryStorageResource extends ServerResourceBase implements
     }
 
     @Override
+    public void setConfigParams(final Map<String, Object> params) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
     public int getRunLevel() {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    public void setRunLevel(int level) {
+    public void setRunLevel(final int level) {
         // TODO Auto-generated method stub
 
     }

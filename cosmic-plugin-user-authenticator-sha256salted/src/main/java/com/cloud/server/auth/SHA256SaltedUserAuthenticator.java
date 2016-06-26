@@ -1,34 +1,17 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.server.auth;
-
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 import com.cloud.user.UserAccount;
 import com.cloud.user.dao.UserAccountDao;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import javax.inject.Inject;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.util.encoders.Base64;
@@ -39,26 +22,27 @@ public class SHA256SaltedUserAuthenticator extends AdapterBase implements UserAu
     public static final Logger s_logger = LoggerFactory.getLogger(SHA256SaltedUserAuthenticator.class);
     private static final String s_defaultPassword = "000000000000000000000000000=";
     private static final String s_defaultSalt = "0000000000000000000000000000000=";
+    private static final int s_saltlen = 32;
     @Inject
     private UserAccountDao _userAccountDao;
-    private static final int s_saltlen = 32;
 
     /* (non-Javadoc)
      * @see com.cloud.server.auth.UserAuthenticator#authenticate(java.lang.String, java.lang.String, java.lang.Long, java.util.Map)
      */
     @Override
-    public Pair<Boolean, ActionOnFailedAuthentication> authenticate(String username, String password, Long domainId, Map<String, Object[]> requestParameters) {
+    public Pair<Boolean, ActionOnFailedAuthentication> authenticate(final String username, final String password, final Long domainId, final Map<String, Object[]>
+            requestParameters) {
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Retrieving user: " + username);
         }
 
         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
             s_logger.debug("Username or Password cannot be empty");
-            return new Pair<Boolean, ActionOnFailedAuthentication>(false, null);
+            return new Pair<>(false, null);
         }
 
         boolean realUser = true;
-        UserAccount user = _userAccountDao.getUserAccount(username, domainId);
+        final UserAccount user = _userAccountDao.getUserAccount(username, domainId);
         if (user == null) {
             s_logger.debug("Unable to find user with " + username + " in domain " + domainId);
             realUser = false;
@@ -67,7 +51,7 @@ public class SHA256SaltedUserAuthenticator extends AdapterBase implements UserAu
         String realPassword = new String(s_defaultPassword);
         byte[] salt = new String(s_defaultSalt).getBytes();
         if (realUser) {
-            String storedPassword[] = user.getPassword().split(":");
+            final String[] storedPassword = user.getPassword().split(":");
             if (storedPassword.length != 2) {
                 s_logger.warn("The stored password for " + username + " isn't in the right format for this authenticator");
                 realUser = false;
@@ -77,17 +61,17 @@ public class SHA256SaltedUserAuthenticator extends AdapterBase implements UserAu
             }
         }
         try {
-            String hashedPassword = encode(password, salt);
+            final String hashedPassword = encode(password, salt);
             /* constantTimeEquals comes first in boolean since we need to thwart timing attacks */
-            boolean result = constantTimeEquals(realPassword, hashedPassword) && realUser;
+            final boolean result = constantTimeEquals(realPassword, hashedPassword) && realUser;
             ActionOnFailedAuthentication action = null;
             if (!result && realUser) {
                 action = ActionOnFailedAuthentication.INCREMENT_INCORRECT_LOGIN_ATTEMPT_COUNT;
             }
-            return new Pair<Boolean, ActionOnFailedAuthentication>(result, action);
-        } catch (NoSuchAlgorithmException e) {
+            return new Pair<>(result, action);
+        } catch (final NoSuchAlgorithmException e) {
             throw new CloudRuntimeException("Unable to hash password", e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             throw new CloudRuntimeException("Unable to hash password", e);
         }
     }
@@ -96,44 +80,44 @@ public class SHA256SaltedUserAuthenticator extends AdapterBase implements UserAu
      * @see com.cloud.server.auth.UserAuthenticator#encode(java.lang.String)
      */
     @Override
-    public String encode(String password) {
+    public String encode(final String password) {
         // 1. Generate the salt
-        SecureRandom randomGen;
+        final SecureRandom randomGen;
         try {
             randomGen = SecureRandom.getInstance("SHA1PRNG");
 
-            byte salt[] = new byte[s_saltlen];
+            final byte[] salt = new byte[s_saltlen];
             randomGen.nextBytes(salt);
 
-            String saltString = new String(Base64.encode(salt));
-            String hashString = encode(password, salt);
+            final String saltString = new String(Base64.encode(salt));
+            final String hashString = encode(password, salt);
 
             // 3. concatenate the two and return
             return saltString + ":" + hashString;
-        } catch (NoSuchAlgorithmException e) {
+        } catch (final NoSuchAlgorithmException e) {
             throw new CloudRuntimeException("Unable to hash password", e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             throw new CloudRuntimeException("Unable to hash password", e);
         }
     }
 
-    public String encode(String password, byte[] salt) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        byte[] passwordBytes = password.getBytes("UTF-8");
-        byte[] hashSource = new byte[passwordBytes.length + salt.length];
+    public String encode(final String password, final byte[] salt) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        final byte[] passwordBytes = password.getBytes("UTF-8");
+        final byte[] hashSource = new byte[passwordBytes.length + salt.length];
         System.arraycopy(passwordBytes, 0, hashSource, 0, passwordBytes.length);
         System.arraycopy(salt, 0, hashSource, passwordBytes.length, salt.length);
 
         // 2. Hash the password with the salt
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        final MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.update(hashSource);
-        byte[] digest = md.digest();
+        final byte[] digest = md.digest();
 
         return new String(Base64.encode(digest));
     }
 
-    private static boolean constantTimeEquals(String a, String b) {
-        byte[] aBytes = a.getBytes();
-        byte[] bBytes = b.getBytes();
+    private static boolean constantTimeEquals(final String a, final String b) {
+        final byte[] aBytes = a.getBytes();
+        final byte[] bBytes = b.getBytes();
         int result = aBytes.length ^ bBytes.length;
         for (int i = 0; i < aBytes.length && i < bBytes.length; i++) {
             result |= aBytes[i] ^ bBytes[i];

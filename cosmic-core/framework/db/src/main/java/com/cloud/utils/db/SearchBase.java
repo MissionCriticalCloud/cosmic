@@ -1,22 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.utils.db;
 
+import com.cloud.utils.db.SearchCriteria.Func;
+import com.cloud.utils.db.SearchCriteria.Op;
+import com.cloud.utils.db.SearchCriteria.SelectType;
+import com.cloud.utils.exception.CloudRuntimeException;
+
+import javax.persistence.Column;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -24,14 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.persistence.Column;
-import javax.persistence.Transient;
-
-import com.cloud.utils.db.SearchCriteria.Func;
-import com.cloud.utils.db.SearchCriteria.Op;
-import com.cloud.utils.db.SearchCriteria.SelectType;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import net.sf.cglib.proxy.Factory;
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -42,28 +24,25 @@ import net.sf.cglib.proxy.MethodProxy;
  * queries.  While this class is public it's not really meant for public
  * consumption.  Unfortunately, it has to be public for methods to be mocked.
  *
- * @see GenericSearchBuilder
- * @see GenericQueryBuilder
- *
  * @param <J> Child class that inherited from SearchBase
  * @param <T> Entity Type to perform the searches on
  * @param <K> Type to place the search results.  This can be a native type,
  *            composite object, or the entity type itself.
+ * @see GenericSearchBuilder
+ * @see GenericQueryBuilder
  */
 public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
-
-    Map<String, Attribute> _attrs;
-    Class<T> _entityBeanType;
-    Class<K> _resultType;
-    GenericDaoBase<? extends T, ? extends Serializable> _dao;
-
-    ArrayList<Condition> _conditions;
-    ArrayList<Attribute> _specifiedAttrs;
 
     protected HashMap<String, JoinBuilder<SearchBase<?, ?, ?>>> _joins;
     protected ArrayList<Select> _selects;
     protected GroupBy<J, T, K> _groupBy = null;
     protected SelectType _selectType;
+    Map<String, Attribute> _attrs;
+    Class<T> _entityBeanType;
+    Class<K> _resultType;
+    GenericDaoBase<? extends T, ? extends Serializable> _dao;
+    ArrayList<Condition> _conditions;
+    ArrayList<Attribute> _specifiedAttrs;
     T _entity;
 
     SearchBase(final Class<T> entityType, final Class<K> resultType) {
@@ -71,7 +50,7 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
     }
 
     protected void init(final Class<T> entityType, final Class<K> resultType) {
-        _dao = (GenericDaoBase<? extends T, ? extends Serializable>)GenericDaoBase.getDao(entityType);
+        _dao = (GenericDaoBase<? extends T, ? extends Serializable>) GenericDaoBase.getDao(entityType);
         if (_dao == null) {
             throw new CloudRuntimeException("Unable to find DAO for " + entityType);
         }
@@ -81,10 +60,11 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
         _attrs = _dao.getAllAttributes();
 
         _entity = _dao.createSearchEntity(new Interceptor());
-        _conditions = new ArrayList<Condition>();
+        _conditions = new ArrayList<>();
         _joins = null;
-        _specifiedAttrs = new ArrayList<Attribute>();
+        _specifiedAttrs = new ArrayList<>();
     }
+
     /**
      * Specifies how the search query should be grouped
      *
@@ -92,23 +72,22 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
      * @return GroupBy object to perform more operations on.
      * @see GroupBy
      */
-    @SuppressWarnings("unchecked")
     public GroupBy<J, T, K> groupBy(final Object... fields) {
         assert _groupBy == null : "Can't do more than one group bys";
-        _groupBy = new GroupBy<J, T, K>((J)this);
+        _groupBy = new GroupBy<>((J) this);
         return _groupBy;
     }
 
     /**
      * Specifies what to select in the search.
      *
-     * @param fieldName The field name of the result object to put the value of the field selected.  This can be null if you're selecting only one field and the result is not a complex object.
-     * @param func function to place.
-     * @param field column to select.  Call this with this.entity() method.
-     * @param params parameters to the function.
+     * @param fieldName The field name of the result object to put the value of the field selected.  This can be null if you're selecting only one field and the result is not a
+     *                  complex object.
+     * @param func      function to place.
+     * @param field     column to select.  Call this with this.entity() method.
+     * @param params    parameters to the function.
      * @return itself to build more search parts.
      */
-    @SuppressWarnings("unchecked")
     public J select(final String fieldName, final Func func, final Object field, final Object... params) {
         if (_entity == null) {
             throw new RuntimeException("SearchBuilder cannot be modified once it has been setup");
@@ -121,7 +100,7 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
         }
 
         if (_selects == null) {
-            _selects = new ArrayList<Select>();
+            _selects = new ArrayList<>();
         }
 
         Field declaredField = null;
@@ -137,7 +116,7 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
         } else {
             if (_selects.size() != 0) {
                 throw new RuntimeException(
-                    "You're selecting more than one item and yet is not providing a container class to put these items in.  So what do you expect me to do.  Spin magic?");
+                        "You're selecting more than one item and yet is not providing a container class to put these items in.  So what do you expect me to do.  Spin magic?");
             }
         }
 
@@ -146,7 +125,7 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
 
         _specifiedAttrs.clear();
 
-        return (J)this;
+        return (J) this;
     }
 
     /**
@@ -155,7 +134,6 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
      * @param fields fields from the entity object
      * @return itself
      */
-    @SuppressWarnings("unchecked")
     public J selectFields(final Object... fields) {
         if (_entity == null) {
             throw new RuntimeException("SearchBuilder cannot be modified once it has been setup");
@@ -165,7 +143,7 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
         }
 
         if (_selects == null) {
-            _selects = new ArrayList<Select>();
+            _selects = new ArrayList<>();
         }
 
         for (final Attribute attr : _specifiedAttrs) {
@@ -181,20 +159,19 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
 
         _specifiedAttrs.clear();
 
-        return (J)this;
+        return (J) this;
     }
 
     /**
      * joins this search with another search
      *
-     * @param name name given to the other search.  used for setJoinParameters.
-     * @param builder The other search
+     * @param name       name given to the other search.  used for setJoinParameters.
+     * @param builder    The other search
      * @param joinField1 field of the first table used to perform the join
      * @param joinField2 field of the second table used to perform the join
-     * @param joinType type of join
+     * @param joinType   type of join
      * @return itself
      */
-    @SuppressWarnings("unchecked")
     public J join(final String name, final SearchBase<?, ?, ?> builder, final Object joinField1, final Object joinField2, final JoinBuilder.JoinType joinType) {
         assert _entity != null : "SearchBuilder cannot be modified once it has been setup";
         assert _specifiedAttrs.size() == 1 : "You didn't select the attribute.";
@@ -202,15 +179,15 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
         assert builder._specifiedAttrs.size() == 1 : "You didn't select the attribute.";
         assert builder != this : "You can't add yourself, can you?  Really think about it!";
 
-        final JoinBuilder<SearchBase<?, ?, ?>> t = new JoinBuilder<SearchBase<?, ?, ?>>(builder, _specifiedAttrs.get(0), builder._specifiedAttrs.get(0), joinType);
+        final JoinBuilder<SearchBase<?, ?, ?>> t = new JoinBuilder<>(builder, _specifiedAttrs.get(0), builder._specifiedAttrs.get(0), joinType);
         if (_joins == null) {
-            _joins = new HashMap<String, JoinBuilder<SearchBase<?, ?, ?>>>();
+            _joins = new HashMap<>();
         }
         _joins.put(name, t);
 
         builder._specifiedAttrs.clear();
         _specifiedAttrs.clear();
-        return (J)this;
+        return (J) this;
     }
 
     public SelectType getSelectType() {
@@ -242,6 +219,35 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
         return _specifiedAttrs;
     }
 
+    /**
+     * creates the SearchCriteria so the actual values can be filled in.
+     *
+     * @return SearchCriteria
+     */
+    public SearchCriteria<K> create() {
+        if (_entity != null) {
+            finalize();
+        }
+        return new SearchCriteria<>(this);
+    }
+
+    /**
+     * Adds an OR condition to the search.  Normally you should use this to
+     * perform an 'OR' with a big conditional in parenthesis.  For example,
+     * <p>
+     * search.or().op(entity.getId(), Op.Eq, "abc").cp()
+     * <p>
+     * The above fragment produces something similar to
+     * <p>
+     * "OR (id = $abc) where abc is the token to be replaced by a value later.
+     *
+     * @return this
+     */
+    public J or() {
+        constructCondition(null, " OR ", null, null);
+        return (J) this;
+    }
+
     protected Condition constructCondition(final String conditionName, final String cond, final Attribute attr, final Op op) {
         assert _entity != null : "SearchBuilder cannot be modified once it has been setup";
         assert op == null || _specifiedAttrs.size() == 1 : "You didn't select the attribute.";
@@ -254,111 +260,42 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
     }
 
     /**
-     * creates the SearchCriteria so the actual values can be filled in.
-     *
-     * @return SearchCriteria
-     */
-    public SearchCriteria<K> create() {
-        if (_entity != null) {
-            finalize();
-        }
-        return new SearchCriteria<K>(this);
-    }
-
-    /**
-     * Adds an OR condition to the search.  Normally you should use this to
-     * perform an 'OR' with a big conditional in parenthesis.  For example,
-     *
-     * search.or().op(entity.getId(), Op.Eq, "abc").cp()
-     *
-     * The above fragment produces something similar to
-     *
-     * "OR (id = $abc) where abc is the token to be replaced by a value later.
-     *
-     * @return this
-     */
-    @SuppressWarnings("unchecked")
-    public J or() {
-        constructCondition(null, " OR ", null, null);
-        return (J)this;
-    }
-
-    /**
      * Adds an AND condition to the search.  Normally you should use this to
      * perform an 'AND' with a big conditional in parenthesis.  For example,
-     *
+     * <p>
      * search.and().op(entity.getId(), Op.Eq, "abc").cp()
-     *
+     * <p>
      * The above fragment produces something similar to
-     *
+     * <p>
      * "AND (id = $abc) where abc is the token to be replaced by a value later.
      *
      * @return this
      */
-    @SuppressWarnings("unchecked")
     public J and() {
         constructCondition(null, " AND ", null, null);
-        return (J)this;
+        return (J) this;
     }
 
     /**
      * Closes a parenthesis that's started by op()
+     *
      * @return this
      */
-    @SuppressWarnings("unchecked")
     public J cp() {
         final Condition condition = new Condition(null, " ) ", null, Op.RP);
         _conditions.add(condition);
-        return (J)this;
+        return (J) this;
     }
 
     /**
      * Writes an open parenthesis into the search
+     *
      * @return this
      */
-    @SuppressWarnings("unchecked")
     public J op() {
         final Condition condition = new Condition(null, " ( ", null, Op.RP);
         _conditions.add(condition);
-        return (J)this;
-    }
-
-    /**
-     * Marks the SearchBuilder as completed in building the search conditions.
-     */
-    @Override
-    protected synchronized void finalize() {
-        if (_entity != null) {
-            final Factory factory = (Factory)_entity;
-            factory.setCallback(0, null);
-            _entity = null;
-        }
-
-        if (_joins != null) {
-            for (final JoinBuilder<SearchBase<?, ?, ?>> join : _joins.values()) {
-                join.getT().finalize();
-            }
-        }
-
-        if (_selects == null || _selects.size() == 0) {
-            _selectType = SelectType.Entity;
-            assert _entityBeanType.equals(_resultType) : "Expecting " + _entityBeanType + " because you didn't specify any selects but instead got " + _resultType;
-            return;
-        }
-
-        for (final Select select : _selects) {
-            if (select.field == null) {
-                assert (_selects.size() == 1) : "You didn't specify any fields to put the result in but you're specifying more than one select so where should I put the selects?";
-                _selectType = SelectType.Single;
-                return;
-            }
-            if (select.func != null) {
-                _selectType = SelectType.Result;
-                return;
-            }
-        }
-
-        _selectType = SelectType.Fields;
+        return (J) this;
     }
 
     protected static class Condition {
@@ -384,12 +321,12 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
             return presets != null;
         }
 
-        public void setPresets(final Object... presets) {
-            this.presets = presets;
-        }
-
         public Object[] getPresets() {
             return presets;
+        }
+
+        public void setPresets(final Object... presets) {
+            this.presets = presets;
         }
 
         public void toSql(final StringBuilder sql, final Object[] params, final int count) {
@@ -402,7 +339,7 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
             }
 
             if (op == Op.SC) {
-                sql.append(" (").append(((SearchCriteria<?>)params[0]).getWhereClause()).append(") ");
+                sql.append(" (").append(((SearchCriteria<?>) params[0]).getWhereClause()).append(") ");
                 return;
             }
 
@@ -446,7 +383,7 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
                 return false;
             }
 
-            final Condition condition = (Condition)obj;
+            final Condition condition = (Condition) obj;
             return name.equals(condition.name);
         }
     }
@@ -466,6 +403,44 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
             this.params = params;
             this.field = field;
         }
+    }
+
+    /**
+     * Marks the SearchBuilder as completed in building the search conditions.
+     */
+    @Override
+    protected synchronized void finalize() {
+        if (_entity != null) {
+            final Factory factory = (Factory) _entity;
+            factory.setCallback(0, null);
+            _entity = null;
+        }
+
+        if (_joins != null) {
+            for (final JoinBuilder<SearchBase<?, ?, ?>> join : _joins.values()) {
+                join.getT().finalize();
+            }
+        }
+
+        if (_selects == null || _selects.size() == 0) {
+            _selectType = SelectType.Entity;
+            assert _entityBeanType.equals(_resultType) : "Expecting " + _entityBeanType + " because you didn't specify any selects but instead got " + _resultType;
+            return;
+        }
+
+        for (final Select select : _selects) {
+            if (select.field == null) {
+                assert (_selects.size() == 1) : "You didn't specify any fields to put the result in but you're specifying more than one select so where should I put the selects?";
+                _selectType = SelectType.Single;
+                return;
+            }
+            if (select.func != null) {
+                _selectType = SelectType.Result;
+                return;
+            }
+        }
+
+        _selectType = SelectType.Fields;
     }
 
     protected class Interceptor implements MethodInterceptor {
@@ -497,6 +472,5 @@ public abstract class SearchBase<J extends SearchBase<?, T, K>, T, K> {
             }
             return methodProxy.invokeSuper(object, args);
         }
-
     }
 }

@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.query.dao;
-
-import java.util.List;
 
 import com.cloud.api.query.vo.UserAccountJoinVO;
 import com.cloud.user.User;
@@ -24,8 +6,10 @@ import com.cloud.user.UserAccount;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.response.UserResponse;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -34,9 +18,9 @@ import org.springframework.stereotype.Component;
 public class UserAccountJoinDaoImpl extends GenericDaoBase<UserAccountJoinVO, Long> implements UserAccountJoinDao {
     public static final Logger s_logger = LoggerFactory.getLogger(UserAccountJoinDaoImpl.class);
 
-    private SearchBuilder<UserAccountJoinVO> vrIdSearch;
+    private final SearchBuilder<UserAccountJoinVO> vrIdSearch;
 
-    private SearchBuilder<UserAccountJoinVO> vrAcctIdSearch;
+    private final SearchBuilder<UserAccountJoinVO> vrAcctIdSearch;
 
     protected UserAccountJoinDaoImpl() {
 
@@ -52,8 +36,8 @@ public class UserAccountJoinDaoImpl extends GenericDaoBase<UserAccountJoinVO, Lo
     }
 
     @Override
-    public UserResponse newUserResponse(UserAccountJoinVO usr) {
-        UserResponse userResponse = new UserResponse();
+    public UserResponse newUserResponse(final UserAccountJoinVO usr) {
+        final UserResponse userResponse = new UserResponse();
         userResponse.setAccountId(usr.getAccountUuid());
         userResponse.setAccountName(usr.getAccountName());
         userResponse.setAccountType(usr.getAccountType());
@@ -83,28 +67,27 @@ public class UserAccountJoinDaoImpl extends GenericDaoBase<UserAccountJoinVO, Lo
     }
 
     @Override
-    public UserAccountJoinVO newUserView(User usr) {
-        SearchCriteria<UserAccountJoinVO> sc = vrIdSearch.create();
+    public UserAccountJoinVO newUserView(final User usr) {
+        final SearchCriteria<UserAccountJoinVO> sc = vrIdSearch.create();
         sc.setParameters("id", usr.getId());
-        List<UserAccountJoinVO> users = searchIncludingRemoved(sc, null, null, false);
+        final List<UserAccountJoinVO> users = searchIncludingRemoved(sc, null, null, false);
         assert users != null && users.size() == 1 : "No user found for user id " + usr.getId();
         return users.get(0);
     }
 
     @Override
-    public UserAccountJoinVO newUserView(UserAccount usr) {
-        SearchCriteria<UserAccountJoinVO> sc = vrIdSearch.create();
+    public UserAccountJoinVO newUserView(final UserAccount usr) {
+        final SearchCriteria<UserAccountJoinVO> sc = vrIdSearch.create();
         sc.setParameters("id", usr.getId());
-        List<UserAccountJoinVO> users = searchIncludingRemoved(sc, null, null, false);
+        final List<UserAccountJoinVO> users = searchIncludingRemoved(sc, null, null, false);
         assert users != null && users.size() == 1 : "No user found for user id " + usr.getId();
         return users.get(0);
     }
 
     @Override
-    public List<UserAccountJoinVO> searchByAccountId(Long accountId) {
-        SearchCriteria<UserAccountJoinVO> sc = vrAcctIdSearch.create();
+    public List<UserAccountJoinVO> searchByAccountId(final Long accountId) {
+        final SearchCriteria<UserAccountJoinVO> sc = vrAcctIdSearch.create();
         sc.setParameters("accountId", accountId);
         return search(sc, null, null, false);
     }
-
 }

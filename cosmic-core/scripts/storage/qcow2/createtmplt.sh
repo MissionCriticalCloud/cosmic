@@ -1,20 +1,4 @@
-#!/usr/bin/env bash
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+#! /usr/bin/env bash
 
 
 # $Id: createtmplt.sh 11601 2010-08-11 17:26:15Z kris $ $HeadURL: svn://svn.lab.vmops.com/repos/branches/2.1.refactor/java/scripts/storage/qcow2/createtmplt.sh $
@@ -51,7 +35,7 @@ verify_cksum() {
   esac
   echo  "$1  $2" | $digestalgo  -c --status
   #printf "$1\t$2" | $digestalgo  -c --status
-  if [ $? -gt 0 ] 
+  if [ $? -gt 0 ]
   then
     printf "Checksum failed, not proceeding with install\n"
     exit 3
@@ -91,12 +75,12 @@ uncompress() {
 	;;
   esac
 
-  if [ $? -gt 0 ] 
+  if [ $? -gt 0 ]
   then
     printf "Failed to uncompress file, exiting "
-    exit 1 
+    exit 1
   fi
- 
+
   mv $tmpfile $imgfile
   printf "$imgfile"
 
@@ -110,7 +94,7 @@ create_from_file() {
   if [ -b $tmpltimg ]; then
       $qemu_img convert -f raw -O qcow2 "$tmpltimg" /$tmpltfs/$tmpltname
   else
-    # if backing image exists, we need to combine them, otherwise 
+    # if backing image exists, we need to combine them, otherwise
     # copy the image to preserve snapshots/compression
     if $qemu_img info "$tmpltimg" | grep -q backing; then
       $qemu_img convert -f qcow2 -O qcow2 "$tmpltimg" /$tmpltfs/$tmpltname >& /dev/null
@@ -118,7 +102,7 @@ create_from_file() {
       cp -f $tmpltimg /$tmpltfs/$tmpltname
     fi
   fi
-  
+
   if [ "$cleanup" == "true" ]
   then
     rm -f "$tmpltimg"
@@ -183,17 +167,17 @@ do
 done
 
 
-if [ ! -d /$tmpltfs ] 
+if [ ! -d /$tmpltfs ]
 then
   mkdir -p /$tmpltfs
-  if [ $? -gt 0 ] 
+  if [ $? -gt 0 ]
   then
     printf "Failed to create user fs $tmpltfs\n" >&2
     exit 1
   fi
 fi
 
-if [ ! -f $tmpltimg -a ! -b $tmpltimg ] 
+if [ ! -f $tmpltimg -a ! -b $tmpltimg ]
 then
   printf "root disk file $tmpltimg doesn't exist\n"
   exit 3

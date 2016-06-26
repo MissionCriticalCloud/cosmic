@@ -1,28 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.network;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 import com.cloud.event.EventCategory;
 import com.cloud.event.dao.UsageEventDao;
@@ -32,16 +8,24 @@ import com.cloud.network.dao.NetworkDao;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.fsm.StateListener;
 import com.cloud.utils.fsm.StateMachine2;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.events.EventBus;
 import org.apache.cloudstack.framework.events.EventBusException;
+
+import javax.inject.Inject;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 public class NetworkStateListener implements StateListener<State, Event, Network> {
 
+    private static final Logger s_logger = LoggerFactory.getLogger(NetworkStateListener.class);
+    protected static EventBus s_eventBus = null;
     @Inject
     protected UsageEventDao _usageEventDao;
     @Inject
@@ -49,66 +33,63 @@ public class NetworkStateListener implements StateListener<State, Event, Network
     @Inject
     protected ConfigurationDao _configDao;
 
-    protected static EventBus s_eventBus = null;
-
-    private static final Logger s_logger = LoggerFactory.getLogger(NetworkStateListener.class);
-
-    public NetworkStateListener(UsageEventDao usageEventDao, NetworkDao networkDao, ConfigurationDao configDao) {
+    public NetworkStateListener(final UsageEventDao usageEventDao, final NetworkDao networkDao, final ConfigurationDao configDao) {
         _usageEventDao = usageEventDao;
         _networkDao = networkDao;
         _configDao = configDao;
     }
 
     @Override
-    public boolean preStateTransitionEvent(State oldState, Event event, State newState, Network vo, boolean status, Object opaque) {
+    public boolean preStateTransitionEvent(final State oldState, final Event event, final State newState, final Network vo, final boolean status, final Object opaque) {
         pubishOnEventBus(event.name(), "preStateTransitionEvent", vo, oldState, newState);
         return true;
     }
 
     @Override
-    public boolean postStateTransitionEvent(StateMachine2.Transition<State, Event> transition, Network vo, boolean status, Object opaque) {
-      State oldState = transition.getCurrentState();
-      State newState = transition.getToState();
-      Event event = transition.getEvent();
-      pubishOnEventBus(event.name(), "postStateTransitionEvent", vo, oldState, newState);
-      return true;
+    public boolean postStateTransitionEvent(final StateMachine2.Transition<State, Event> transition, final Network vo, final boolean status, final Object opaque) {
+        final State oldState = transition.getCurrentState();
+        final State newState = transition.getToState();
+        final Event event = transition.getEvent();
+        pubishOnEventBus(event.name(), "postStateTransitionEvent", vo, oldState, newState);
+        return true;
     }
 
-  private void pubishOnEventBus(String event, String status, Network vo, State oldState, State newState) {
+    private void pubishOnEventBus(final String event, final String status, final Network vo, final State oldState, final State newState) {
 
-        String configKey = "publish.resource.state.events";
-        String value = _configDao.getValue(configKey);
-        boolean configValue = Boolean.parseBoolean(value);
-        if(!configValue)
+        final String configKey = "publish.resource.state.events";
+        final String value = _configDao.getValue(configKey);
+        final boolean configValue = Boolean.parseBoolean(value);
+        if (!configValue) {
             return;
+        }
         try {
             s_eventBus = ComponentContext.getComponent(EventBus.class);
-        } catch (NoSuchBeanDefinitionException nbe) {
+        } catch (final NoSuchBeanDefinitionException nbe) {
             return; // no provider is configured to provide events bus, so just return
         }
 
-        String resourceName = getEntityFromClassName(Network.class.getName());
-        org.apache.cloudstack.framework.events.Event eventMsg =
-            new org.apache.cloudstack.framework.events.Event("management-server", EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName, vo.getUuid());
-        Map<String, String> eventDescription = new HashMap<String, String>();
+        final String resourceName = getEntityFromClassName(Network.class.getName());
+        final org.apache.cloudstack.framework.events.Event eventMsg =
+                new org.apache.cloudstack.framework.events.Event("management-server", EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName, vo.getUuid());
+        final Map<String, String> eventDescription = new HashMap<>();
         eventDescription.put("resource", resourceName);
         eventDescription.put("id", vo.getUuid());
         eventDescription.put("old-state", oldState.name());
         eventDescription.put("new-state", newState.name());
 
-        String eventDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").format(new Date());
+        final String eventDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").format(new Date());
         eventDescription.put("eventDateTime", eventDate);
 
         eventMsg.setDescription(eventDescription);
         try {
             s_eventBus.publish(eventMsg);
-        } catch (EventBusException e) {
+        } catch (final EventBusException e) {
             s_logger.warn("Failed to publish state change event on the the event bus.");
         }
     }
 
-    private String getEntityFromClassName(String entityClassName) {
-        int index = entityClassName.lastIndexOf(".");
+    private String getEntityFromClassName(final String entityClassName) {
+        final int index = entityClassName.lastIndexOf(".");
         String entityName = entityClassName;
         if (index != -1) {
             entityName = entityClassName.substring(index + 1);

@@ -1,28 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.storage.allocator;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.deploy.DeploymentPlan;
@@ -36,9 +12,16 @@ import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -60,8 +43,21 @@ public class LocalStoragePoolAllocator extends AbstractStoragePoolAllocator {
     @Inject
     ConfigurationDao _configDao;
 
+    public LocalStoragePoolAllocator() {
+    }
+
     @Override
-    protected List<StoragePool> select(DiskProfile dskCh, VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoid, int returnUpTo) {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+        super.configure(name, params);
+
+        _storageOverprovisioningFactor = new BigDecimal(1);
+        _extraBytesPerVolume = NumbersUtil.parseLong((String) params.get("extra.bytes.per.volume"), 50 * 1024L * 1024L);
+
+        return true;
+    }
+
+    @Override
+    protected List<StoragePool> select(final DiskProfile dskCh, final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid, final int returnUpTo) {
         s_logger.debug("LocalStoragePoolAllocator trying to find storage pool to fit the vm");
 
         if (!dskCh.useLocalStorage()) {
@@ -70,22 +66,22 @@ public class LocalStoragePoolAllocator extends AbstractStoragePoolAllocator {
 
         if (s_logger.isTraceEnabled()) {
             // Log the pools details that are ignored because they are in disabled state
-            List<StoragePoolVO> disabledPools = _storagePoolDao.findDisabledPoolsByScope(plan.getDataCenterId(), plan.getPodId(), plan.getClusterId(), ScopeType.HOST);
+            final List<StoragePoolVO> disabledPools = _storagePoolDao.findDisabledPoolsByScope(plan.getDataCenterId(), plan.getPodId(), plan.getClusterId(), ScopeType.HOST);
             if (disabledPools != null && !disabledPools.isEmpty()) {
-                for (StoragePoolVO pool : disabledPools) {
+                for (final StoragePoolVO pool : disabledPools) {
                     s_logger.trace("Ignoring pool " + pool + " as it is in disabled state.");
                 }
             }
         }
 
-        List<StoragePool> suitablePools = new ArrayList<StoragePool>();
+        final List<StoragePool> suitablePools = new ArrayList<>();
 
         // data disk and host identified from deploying vm (attach volume case)
         if (plan.getHostId() != null) {
-            List<StoragePoolVO> hostTagsPools = _storagePoolDao.findLocalStoragePoolsByHostAndTags(plan.getHostId(), dskCh.getTags());
-            for (StoragePoolVO pool : hostTagsPools) {
+            final List<StoragePoolVO> hostTagsPools = _storagePoolDao.findLocalStoragePoolsByHostAndTags(plan.getHostId(), dskCh.getTags());
+            for (final StoragePoolVO pool : hostTagsPools) {
                 if (pool != null && pool.isLocal()) {
-                    StoragePool storagePool = (StoragePool)this.dataStoreMgr.getPrimaryDataStore(pool.getId());
+                    final StoragePool storagePool = (StoragePool) this.dataStoreMgr.getPrimaryDataStore(pool.getId());
                     if (filter(avoid, storagePool, dskCh, plan)) {
                         s_logger.debug("Found suitable local storage pool " + pool.getId() + ", adding to list");
                         suitablePools.add(storagePool);
@@ -103,13 +99,13 @@ public class LocalStoragePoolAllocator extends AbstractStoragePoolAllocator {
                 // zone wide primary storage deployment
                 return null;
             }
-            List<StoragePoolVO> availablePools =
-                _storagePoolDao.findLocalStoragePoolsByTags(plan.getDataCenterId(), plan.getPodId(), plan.getClusterId(), dskCh.getTags());
-            for (StoragePoolVO pool : availablePools) {
+            final List<StoragePoolVO> availablePools =
+                    _storagePoolDao.findLocalStoragePoolsByTags(plan.getDataCenterId(), plan.getPodId(), plan.getClusterId(), dskCh.getTags());
+            for (final StoragePoolVO pool : availablePools) {
                 if (suitablePools.size() == returnUpTo) {
                     break;
                 }
-                StoragePool storagePool = (StoragePool)this.dataStoreMgr.getPrimaryDataStore(pool.getId());
+                final StoragePool storagePool = (StoragePool) this.dataStoreMgr.getPrimaryDataStore(pool.getId());
                 if (filter(avoid, storagePool, dskCh, plan)) {
                     suitablePools.add(storagePool);
                 } else {
@@ -119,9 +115,9 @@ public class LocalStoragePoolAllocator extends AbstractStoragePoolAllocator {
 
             // add remaining pools in cluster, that did not match tags, to avoid
             // set
-            List<StoragePoolVO> allPools = _storagePoolDao.findLocalStoragePoolsByTags(plan.getDataCenterId(), plan.getPodId(), plan.getClusterId(), null);
+            final List<StoragePoolVO> allPools = _storagePoolDao.findLocalStoragePoolsByTags(plan.getDataCenterId(), plan.getPodId(), plan.getClusterId(), null);
             allPools.removeAll(availablePools);
-            for (StoragePoolVO pool : allPools) {
+            for (final StoragePoolVO pool : allPools) {
                 avoid.addPool(pool.getId());
             }
         }
@@ -131,18 +127,5 @@ public class LocalStoragePoolAllocator extends AbstractStoragePoolAllocator {
         }
 
         return suitablePools;
-    }
-
-    @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
-        super.configure(name, params);
-
-        _storageOverprovisioningFactor = new BigDecimal(1);
-        _extraBytesPerVolume = NumbersUtil.parseLong((String)params.get("extra.bytes.per.volume"), 50 * 1024L * 1024L);
-
-        return true;
-    }
-
-    public LocalStoragePoolAllocator() {
     }
 }

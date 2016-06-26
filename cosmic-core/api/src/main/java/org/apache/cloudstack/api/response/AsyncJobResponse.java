@@ -1,31 +1,15 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.Date;
-
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
 import org.apache.cloudstack.api.ResponseObject;
 import org.apache.cloudstack.jobs.JobInfo;
+
+import java.util.Date;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = JobInfo.class)
 public class AsyncJobResponse extends BaseResponse {
@@ -74,48 +58,48 @@ public class AsyncJobResponse extends BaseResponse {
     @Param(description = "  the created date of the job")
     private Date created;
 
-    public void setAccountId(String accountId) {
+    public void setAccountId(final String accountId) {
         this.accountId = accountId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(final String userId) {
         this.userId = userId;
     }
 
-    public void setCmd(String cmd) {
+    public void setCmd(final String cmd) {
         this.cmd = cmd;
     }
 
     @Override
-    public void setJobStatus(Integer jobStatus) {
+    public void setJobStatus(final Integer jobStatus) {
         this.jobStatus = jobStatus;
     }
 
-    public void setJobProcStatus(Integer jobProcStatus) {
+    public void setJobProcStatus(final Integer jobProcStatus) {
         this.jobProcStatus = jobProcStatus;
     }
 
-    public void setJobResultCode(Integer jobResultCode) {
+    public void setJobResultCode(final Integer jobResultCode) {
         this.jobResultCode = jobResultCode;
     }
 
-    public void setJobResultType(String jobResultType) {
+    public void setJobResultType(final String jobResultType) {
         this.jobResultType = jobResultType;
     }
 
-    public void setJobResult(ResponseObject jobResult) {
+    public void setJobResult(final ResponseObject jobResult) {
         this.jobResult = jobResult;
     }
 
-    public void setJobInstanceType(String jobInstanceType) {
+    public void setJobInstanceType(final String jobInstanceType) {
         this.jobInstanceType = jobInstanceType;
     }
 
-    public void setJobInstanceId(String jobInstanceId) {
+    public void setJobInstanceId(final String jobInstanceId) {
         this.jobInstanceId = jobInstanceId;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 }

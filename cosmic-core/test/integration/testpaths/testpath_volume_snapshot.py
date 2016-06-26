@@ -1,27 +1,7 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ Test cases for VM/Volume snapshot Test Path
 """
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import (
-    cleanup_resources,
-    validateList
-)
+from marvin.codes import PASS
 from marvin.lib.base import (
     Account,
     ServiceOffering,
@@ -42,13 +22,15 @@ from marvin.lib.common import (
     compareChecksum,
     is_snapshot_on_nfs
 )
-
-from marvin.codes import PASS
+from marvin.lib.utils import (
+    cleanup_resources,
+    validateList
+)
+from nose.plugins.attrib import attr
 from threading import Thread
 
 
 class TestVolumeSnapshot(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestVolumeSnapshot, cls).getClsTestClient()
@@ -68,9 +50,9 @@ class TestVolumeSnapshot(cloudstackTestCase):
         cls._cleanup = []
 
         if cls.hypervisor.lower() not in [
-                "vmware",
-                "kvm",
-                "xenserver"]:
+            "vmware",
+            "kvm",
+            "xenserver"]:
             raise unittest.SkipTest(
                 "Storage migration not supported on %s" %
                 cls.hypervisor)
@@ -100,7 +82,7 @@ class TestVolumeSnapshot(cloudstackTestCase):
                 cls.testdata["disk_offering"],
             )
             cls._cleanup.append(cls.disk_offering)
-            #Create VM_1 and  VM_2
+            # Create VM_1 and  VM_2
             cls.vm_1 = VirtualMachine.create(
                 cls.userapiclient,
                 cls.testdata["small"],
@@ -145,20 +127,18 @@ class TestVolumeSnapshot(cloudstackTestCase):
     def tearDown(self):
         try:
             root_volume = list_volumes(
-                    self.apiclient,
-                    virtualmachineid=self.vm_1.id,
-                    type='ROOT',
-                    listall=True
-                    )
+                self.apiclient,
+                virtualmachineid=self.vm_1.id,
+                type='ROOT',
+                listall=True
+            )
 
             self.vm_1.stop(self.apiclient)
             snaps = []
             for i in range(2):
-
                 root_vol_snap = Snapshot.create(
                     self.apiclient,
                     root_volume[0].id)
-
 
                 self.assertEqual(
                     root_vol_snap.state,
@@ -169,41 +149,40 @@ class TestVolumeSnapshot(cloudstackTestCase):
                 snaps.append(root_vol_snap)
 
             for snap in snaps:
-
                 self.assertNotEqual(
-                        self.dbclient.execute(
-                            "select status from snapshots where name='%s'" %
-                            snap.name),
-                        "Destroyed"
-                        )
+                    self.dbclient.execute(
+                        "select status from snapshots where name='%s'" %
+                        snap.name),
+                    "Destroyed"
+                )
 
             for snap in snaps:
                 self.assertTrue(
-                       is_snapshot_on_nfs(
-                           self.apiclient,
-                           self.dbclient,
-                           self.config,
-                           self.zone.id,
-                           snap.id))
+                    is_snapshot_on_nfs(
+                        self.apiclient,
+                        self.dbclient,
+                        self.config,
+                        self.zone.id,
+                        snap.id))
 
             self.account.delete(self.apiclient)
 
             for snap in snaps:
                 self.assertEqual(
-                        self.dbclient.execute(
-                            "select status from snapshots where name='%s'" %
-                            snap.name)[0][0],
-                        "Destroyed"
-                        )
+                    self.dbclient.execute(
+                        "select status from snapshots where name='%s'" %
+                        snap.name)[0][0],
+                    "Destroyed"
+                )
 
             for snap in snaps:
                 self.assertFalse(
-                       is_snapshot_on_nfs(
-                           self.apiclient,
-                           self.dbclient,
-                           self.config,
-                           self.zone.id,
-                           snap.id))
+                    is_snapshot_on_nfs(
+                        self.apiclient,
+                        self.dbclient,
+                        self.config,
+                        self.zone.id,
+                        snap.id))
 
             cleanup_resources(self.apiclient, self.cleanup)
         except Exception as e:
@@ -358,30 +337,30 @@ class TestVolumeSnapshot(cloudstackTestCase):
             "Check SNAPSHOT.CREATE event in events table"
         )
 
-        #Usage_Event
+        # Usage_Event
         qresultset = self.dbclient.execute(
-                "select * from usage_event where type='SNAPSHOT.CREATE' AND \
-                        resource_name='%s'" %
-                root_vol_snap.name)
+            "select * from usage_event where type='SNAPSHOT.CREATE' AND \
+                    resource_name='%s'" %
+            root_vol_snap.name)
 
         usage_event_validation_result = validateList(qresultset)
 
         self.assertEqual(
-               usage_event_validation_result[0],
-               PASS,
-               "event list validation failed due to %s" %
-               usage_event_validation_result[2])
+            usage_event_validation_result[0],
+            PASS,
+            "event list validation failed due to %s" %
+            usage_event_validation_result[2])
 
         self.assertNotEqual(
-               len(qresultset),
-               0,
-               "Check DB Query result set"
-              )
+            len(qresultset),
+            0,
+            "Check DB Query result set"
+        )
 
         self.assertEqual(
             self.dbclient.execute("select size from usage_event where type='SNAPSHOT.CREATE' AND \
             resource_name='%s'" %
-            root_vol_snap.name)[0][0],
+                                  root_vol_snap.name)[0][0],
             root_vol_snap.physicalsize)
 
         # Step 3
@@ -532,7 +511,6 @@ class TestVolumeSnapshot(cloudstackTestCase):
         self.vm_1.stop(self.apiclient)
         snaps = []
         for i in range(2):
-
             root_vol_snap = Snapshot.create(
                 self.apiclient,
                 root_volume_cluster.id)
@@ -596,7 +574,6 @@ class TestVolumeSnapshot(cloudstackTestCase):
 
         # Step 8
         for snap in snaps:
-
             templateFromSnapshot = Template.create_from_snapshot(
                 self.apiclient,
                 snap,
@@ -897,7 +874,7 @@ class TestVolumeSnapshot(cloudstackTestCase):
 
         # Step 13
         self.vm_1.detach_volume(self.apiclient,
-                           data_volume_2)
+                                data_volume_2)
 
         self.vm_1.reboot(self.apiclient)
 

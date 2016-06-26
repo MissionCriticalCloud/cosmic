@@ -1,19 +1,18 @@
 package com.cloud.agent.api;
 
 public class FindLogicalSwitchCommand extends Command {
-  private final String logicalSwitchUuid;
+    private final String logicalSwitchUuid;
 
-  public FindLogicalSwitchCommand(String logicalSwitchUuid) {
-      this.logicalSwitchUuid = logicalSwitchUuid;
-  }
+    public FindLogicalSwitchCommand(final String logicalSwitchUuid) {
+        this.logicalSwitchUuid = logicalSwitchUuid;
+    }
 
-  public String getLogicalSwitchUuid() {
-      return logicalSwitchUuid;
-  }
+    public String getLogicalSwitchUuid() {
+        return logicalSwitchUuid;
+    }
 
-  @Override
-  public boolean executeInSequence() {
-      return false;
-  }
-
+    @Override
+    public boolean executeInSequence() {
+        return false;
+    }
 }

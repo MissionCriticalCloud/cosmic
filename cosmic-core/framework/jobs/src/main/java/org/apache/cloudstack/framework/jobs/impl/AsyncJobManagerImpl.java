@@ -1,37 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package org.apache.cloudstack.framework.jobs.impl;
-
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.cluster.ClusterManagerListener;
 import com.cloud.cluster.ManagementServerHost;
@@ -59,7 +26,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionUtil;
 import com.cloud.utils.mgmt.JmxUtil;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.ConfigKey;
@@ -79,6 +45,22 @@ import org.apache.cloudstack.jobs.JobInfo;
 import org.apache.cloudstack.jobs.JobInfo.Status;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 import org.apache.cloudstack.utils.identity.ManagementServerNode;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.log4j.NDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,11 +68,11 @@ import org.slf4j.MDC;
 
 public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager, ClusterManagerListener, Configurable {
     // Advanced
-    private static final ConfigKey<Long> JobExpireMinutes = new ConfigKey<Long>("Advanced", Long.class, "job.expire.minutes", "1440",
-        "Time (in minutes) for async-jobs to be kept in system", true, ConfigKey.Scope.Global);
-    private static final ConfigKey<Long> JobCancelThresholdMinutes = new ConfigKey<Long>("Advanced", Long.class, "job.cancel.threshold.minutes", "60",
-        "Time (in minutes) for async-jobs to be forcely cancelled if it has been in process for long", true, ConfigKey.Scope.Global);
-    private static final ConfigKey<Integer> VmJobLockTimeout = new ConfigKey<Integer>("Advanced",
+    private static final ConfigKey<Long> JobExpireMinutes = new ConfigKey<>("Advanced", Long.class, "job.expire.minutes", "1440",
+            "Time (in minutes) for async-jobs to be kept in system", true, ConfigKey.Scope.Global);
+    private static final ConfigKey<Long> JobCancelThresholdMinutes = new ConfigKey<>("Advanced", Long.class, "job.cancel.threshold.minutes", "60",
+            "Time (in minutes) for async-jobs to be forcely cancelled if it has been in process for long", true, ConfigKey.Scope.Global);
+    private static final ConfigKey<Integer> VmJobLockTimeout = new ConfigKey<>("Advanced",
             Integer.class, "vm.job.lock.timeout", "1800",
             "Time in seconds to wait in acquiring lock to submit a vm worker job", false);
 
@@ -101,7 +83,7 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
     private static final int MAX_ONETIME_SCHEDULE_SIZE = 50;
     private static final int HEARTBEAT_INTERVAL = 2000;
     private static final int GC_INTERVAL = 10000;                // 10 seconds
-
+    private final ScheduledExecutorService _heartbeatScheduler = Executors.newScheduledThreadPool(1, new NamedThreadFactory("AsyncJobMgr-Heartbeat"));
     @Inject
     private SyncQueueItemDao _queueItemDao;
     @Inject
@@ -120,12 +102,21 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
     private AsyncJobMonitor _jobMonitor;
     @Inject
     private VMInstanceDao _vmInstanceDao;
-
     private volatile long _executionRunNumber = 1;
-
-    private final ScheduledExecutorService _heartbeatScheduler = Executors.newScheduledThreadPool(1, new NamedThreadFactory("AsyncJobMgr-Heartbeat"));
     private ExecutorService _apiJobExecutor;
     private ExecutorService _workerJobExecutor;
+    private GenericSearchBuilder<SyncQueueItemVO, Long> ContentIdsSearch;
+    private GenericSearchBuilder<AsyncJobJoinMapVO, Long> JoinJobSearch;
+    private SearchBuilder<AsyncJobVO> JobIdsSearch;
+    private SearchBuilder<SyncQueueItemVO> QueueJobIdsSearch;
+    private GenericSearchBuilder<AsyncJobJoinMapVO, Long> JoinJobIdsSearch;
+    private GenericSearchBuilder<AsyncJobJoinMapVO, Long> JoinJobTimeSearch;
+
+    protected AsyncJobManagerImpl() {
+        // override default run level for manager components to start this early, otherwise, VirtualMachineManagerImpl will
+        // get stuck in non-initializing job queue
+        setRunLevel(ComponentLifecycle.RUN_LEVEL_FRAMEWORK);
+    }
 
     @Override
     public String getConfigComponentName() {
@@ -134,45 +125,27 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
 
     @Override
     public ConfigKey<?>[] getConfigKeys() {
-        return new ConfigKey<?>[] {JobExpireMinutes, JobCancelThresholdMinutes, VmJobLockTimeout};
+        return new ConfigKey<?>[]{JobExpireMinutes, JobCancelThresholdMinutes, VmJobLockTimeout};
     }
 
     @Override
-    public AsyncJobVO getAsyncJob(long jobId) {
+    public AsyncJobVO getAsyncJob(final long jobId) {
         return _jobDao.findById(jobId);
     }
 
     @Override
-    public List<AsyncJobVO> findInstancePendingAsyncJobs(String instanceType, Long accountId) {
+    public List<AsyncJobVO> findInstancePendingAsyncJobs(final String instanceType, final Long accountId) {
         return _jobDao.findInstancePendingAsyncJobs(instanceType, accountId);
     }
 
     @Override
-    @DB
-    public AsyncJob getPseudoJob(long accountId, long userId) {
-        AsyncJobVO job = _jobDao.findPseudoJob(Thread.currentThread().getId(), getMsid());
-        if (job == null) {
-            job = new AsyncJobVO();
-            job.setAccountId(accountId);
-            job.setUserId(userId);
-            job.setInitMsid(getMsid());
-            job.setDispatcher(AsyncJobVO.JOB_DISPATCHER_PSEUDO);
-            job.setInstanceType(AsyncJobVO.PSEUDO_JOB_INSTANCE_TYPE);
-            job.setInstanceId(Thread.currentThread().getId());
-            _jobDao.persist(job);
-        }
-        return job;
-    }
-
-    @Override
-    public long submitAsyncJob(AsyncJob job) {
+    public long submitAsyncJob(final AsyncJob job) {
         return submitAsyncJob(job, false);
     }
 
-    @SuppressWarnings("unchecked")
     @DB
-    public long submitAsyncJob(AsyncJob job, boolean scheduleJobExecutionInContext) {
-        @SuppressWarnings("rawtypes")
+    public long submitAsyncJob(final AsyncJob job, final boolean scheduleJobExecutionInContext) {
+        final
         GenericDao dao = GenericDaoBase.getDao(job.getClass());
         job.setInitMsid(getMsid());
         job.setSyncSource(null);        // no sync source originally
@@ -186,17 +159,228 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
         return job.getId();
     }
 
-    @SuppressWarnings("unchecked")
+    private long getMsid() {
+        return ManagementServerNode.getManagementServerId();
+    }
+
+    private void publishOnEventBus(final AsyncJob job, final String jobEvent) {
+        _messageBus.publish(null, AsyncJob.Topics.JOB_EVENT_PUBLISH, PublishScope.LOCAL,
+                new Pair<>(job, jobEvent));
+    }
+
+    private void scheduleExecution(final AsyncJob job, final boolean executeInContext) {
+        final Runnable runnable = getExecutorRunnable(job);
+        if (executeInContext) {
+            runnable.run();
+        } else {
+            if (job.getDispatcher() == null || job.getDispatcher().equalsIgnoreCase("ApiAsyncJobDispatcher")) {
+                _apiJobExecutor.submit(runnable);
+            } else {
+                _workerJobExecutor.submit(runnable);
+            }
+        }
+    }
+
+    private Runnable getExecutorRunnable(final AsyncJob job) {
+        return new ManagedContextRunnable() {
+
+            @Override
+            public void run() {
+                // register place-holder context to avoid installing system account call context
+                if (CallContext.current() == null) {
+                    CallContext.registerPlaceHolderContext();
+                }
+
+                final String related = job.getRelated();
+                String logContext = job.getShortUuid();
+                if (related != null && !related.isEmpty()) {
+                    NDC.push("job-" + related + "/" + "job-" + job.getId());
+                    final AsyncJob relatedJob = _jobDao.findByIdIncludingRemoved(Long.parseLong(related));
+                    if (relatedJob != null) {
+                        logContext = relatedJob.getShortUuid();
+                    }
+                } else {
+                    NDC.push("job-" + job.getId());
+                }
+                MDC.put("logcontextid", logContext);
+                try {
+                    super.run();
+                } finally {
+                    NDC.pop();
+                }
+            }
+
+            @Override
+            protected void runInContext() {
+                final long runNumber = getJobRunNumber();
+
+                try {
+                    //
+                    // setup execution environment
+                    //
+                    try {
+                        JmxUtil.registerMBean("AsyncJobManager", "Active Job " + job.getId(), new AsyncJobMBeanImpl(job));
+                    } catch (final Exception e) {
+                        // Due to co-existence of normal-dispatched-job/wakeup-dispatched-job, MBean register() call
+                        // is expected to fail under situations
+                        if (s_logger.isTraceEnabled()) {
+                            s_logger.trace("Unable to register active job " + job.getId() + " to JMX monitoring due to exception " + ExceptionUtil.toString(e));
+                        }
+                    }
+
+                    _jobMonitor.registerActiveTask(runNumber, job.getId());
+                    AsyncJobExecutionContext.setCurrentExecutionContext(new AsyncJobExecutionContext(job));
+                    final String related = job.getRelated();
+                    String logContext = job.getShortUuid();
+                    if (related != null && !related.isEmpty()) {
+                        final AsyncJob relatedJob = _jobDao.findByIdIncludingRemoved(Long.parseLong(related));
+                        if (relatedJob != null) {
+                            logContext = relatedJob.getShortUuid();
+                        }
+                    }
+                    MDC.put("logcontextid", logContext);
+
+                    // execute the job
+                    if (s_logger.isDebugEnabled()) {
+                        s_logger.debug("Executing " + StringUtils.cleanString(job.toString()));
+                    }
+
+                    if ((getAndResetPendingSignals(job) & AsyncJob.Constants.SIGNAL_MASK_WAKEUP) != 0) {
+                        final AsyncJobDispatcher jobDispatcher = getWakeupDispatcher(job);
+                        if (jobDispatcher != null) {
+                            jobDispatcher.runJob(job);
+                        } else {
+                            // TODO, job wakeup is not in use yet
+                            if (s_logger.isTraceEnabled()) {
+                                s_logger.trace("Unable to find a wakeup dispatcher from the joined job: " + job);
+                            }
+                        }
+                    } else {
+                        final AsyncJobDispatcher jobDispatcher = getDispatcher(job.getDispatcher());
+                        if (jobDispatcher != null) {
+                            jobDispatcher.runJob(job);
+                        } else {
+                            s_logger.error("Unable to find job dispatcher, job will be cancelled");
+                            completeAsyncJob(job.getId(), JobInfo.Status.FAILED, ApiErrorCode.INTERNAL_ERROR.getHttpCode(), null);
+                        }
+                    }
+
+                    if (s_logger.isDebugEnabled()) {
+                        s_logger.debug("Done executing " + job.getCmd() + " for job-" + job.getId());
+                    }
+                } catch (final Throwable e) {
+                    s_logger.error("Unexpected exception", e);
+                    completeAsyncJob(job.getId(), JobInfo.Status.FAILED, ApiErrorCode.INTERNAL_ERROR.getHttpCode(), null);
+                } finally {
+                    // guard final clause as well
+                    try {
+                        if (job.getSyncSource() != null) {
+                            // here check queue item one more time to double make sure that queue item is removed in case of any uncaught exception
+                            _queueMgr.purgeItem(job.getSyncSource().getId());
+                        }
+
+                        try {
+                            JmxUtil.unregisterMBean("AsyncJobManager", "Active Job " + job.getId());
+                        } catch (final Exception e) {
+                            // Due to co-existence of normal-dispatched-job/wakeup-dispatched-job, MBean unregister() call
+                            // is expected to fail under situations
+                            if (s_logger.isTraceEnabled()) {
+                                s_logger.trace("Unable to unregister job " + job.getId() + " to JMX monitoring due to exception " + ExceptionUtil.toString(e));
+                            }
+                        }
+
+                        //
+                        // clean execution environment
+                        //
+                        AsyncJobExecutionContext.unregister();
+                        _jobMonitor.unregisterActiveTask(runNumber);
+                    } catch (final Throwable e) {
+                        s_logger.error("Double exception", e);
+                    }
+                }
+            }
+        };
+    }
+
+    private long getJobRunNumber() {
+        synchronized (this) {
+            return _executionRunNumber++;
+        }
+    }
+
+    private int getAndResetPendingSignals(final AsyncJob job) {
+        final int signals = job.getPendingSignals();
+        if (signals != 0) {
+            final AsyncJobVO jobRecord = _jobDao.findById(job.getId());
+            jobRecord.setPendingSignals(0);
+            _jobDao.update(job.getId(), jobRecord);
+        }
+        return signals;
+    }
+
+    private AsyncJobDispatcher getWakeupDispatcher(final AsyncJob job) {
+        if (_jobDispatchers != null) {
+            final List<AsyncJobJoinMapVO> joinRecords = _joinMapDao.listJoinRecords(job.getId());
+            if (joinRecords.size() > 0) {
+                final AsyncJobJoinMapVO joinRecord = joinRecords.get(0);
+                for (final AsyncJobDispatcher dispatcher : _jobDispatchers) {
+                    if (dispatcher.getName().equals(joinRecord.getWakeupDispatcher())) {
+                        return dispatcher;
+                    }
+                }
+            } else {
+                s_logger.warn("job-" + job.getId() + " is scheduled for wakeup run, but there is no joining info anymore");
+            }
+        }
+        return null;
+    }
+
+    private AsyncJobDispatcher getDispatcher(final String dispatcherName) {
+        assert (dispatcherName != null && !dispatcherName.isEmpty()) : "Who's not setting the dispatcher when submitting a job?  Who am I suppose to call if you do that!";
+
+        for (final AsyncJobDispatcher dispatcher : _jobDispatchers) {
+            if (dispatcherName.equals(dispatcher.getName())) {
+                return dispatcher;
+            }
+        }
+
+        throw new CloudRuntimeException("Unable to find dispatcher name: " + dispatcherName);
+    }
+
+    @DB
+    protected List<Long> wakeupByJoinedJobCompletion(final long joinedJobId) {
+        final SearchCriteria<Long> joinJobSC = JoinJobSearch.create("joinJobId", joinedJobId);
+
+        final List<Long> result = _joinMapDao.customSearch(joinJobSC, null);
+        if (result.size() > 0) {
+            Collections.sort(result);
+            final Long[] ids = result.toArray(new Long[result.size()]);
+
+            final SearchCriteria<AsyncJobVO> jobsSC = JobIdsSearch.create("ids", ids);
+            final SearchCriteria<SyncQueueItemVO> queueItemsSC = QueueJobIdsSearch.create("contentIds", ids);
+
+            final AsyncJobVO job = _jobDao.createForUpdate();
+            job.setPendingSignals(AsyncJob.Constants.SIGNAL_MASK_WAKEUP);
+            _jobDao.update(job, jobsSC);
+
+            final SyncQueueItemVO item = _queueItemDao.createForUpdate();
+            item.setLastProcessNumber(null);
+            item.setLastProcessMsid(null);
+            _queueItemDao.update(item, queueItemsSC);
+        }
+
+        return _joinMapDao.findJobsToWake(joinedJobId);
+    }
+
     @Override
     @DB
     public long submitAsyncJob(final AsyncJob job, final String syncObjType, final long syncObjId) {
         try {
-            @SuppressWarnings("rawtypes")
             final GenericDao dao = GenericDaoBase.getDao(job.getClass());
 
             publishOnEventBus(job, "submit");
 
-            if (!_vmInstanceDao.lockInLockTable(String.valueOf(syncObjId), VmJobLockTimeout.value())){
+            if (!_vmInstanceDao.lockInLockTable(String.valueOf(syncObjId), VmJobLockTimeout.value())) {
                 throw new CloudRuntimeException("Failed to acquire lock in submitting async job: " + job.getCmd() + " with timeout value = " + VmJobLockTimeout.value());
             }
 
@@ -204,7 +388,7 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
                 // lock is acquired
                 return Transaction.execute(new TransactionCallback<Long>() {
                     @Override
-                    public Long doInTransaction(TransactionStatus status) {
+                    public Long doInTransaction(final TransactionStatus status) {
                         job.setInitMsid(getMsid());
                         dao.persist(job);
 
@@ -215,8 +399,8 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
             } finally {
                 _vmInstanceDao.unlockFromLockTable(String.valueOf(syncObjId));
             }
-        } catch (Exception e) {
-            String errMsg = "Unable to schedule async job for command " + job.getCmd() + ", unexpected exception.";
+        } catch (final Exception e) {
+            final String errMsg = "Unable to schedule async job for command " + job.getCmd() + ", unexpected exception.";
             s_logger.warn(errMsg, e);
             throw new CloudRuntimeException(errMsg);
         }
@@ -233,7 +417,7 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
         if (job == null) {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("job-" + jobId + " no longer exists, we just log completion info here. " + jobStatus + ", resultCode: " + resultCode + ", result: " +
-                    resultObject);
+                        resultObject);
             }
             // still purge item from queue to avoid any blocking
             _queueMgr.purgeAsyncJobQueueItemId(jobId);
@@ -260,9 +444,9 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Wake up jobs related to job-" + jobId);
         }
-        List<Long> wakeupList = Transaction.execute(new TransactionCallback<List<Long>>() {
+        final List<Long> wakeupList = Transaction.execute(new TransactionCallback<List<Long>>() {
             @Override
-            public List<Long> doInTransaction(TransactionStatus status) {
+            public List<Long> doInTransaction(final TransactionStatus status) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Update db status for job-" + jobId);
                 }
@@ -283,7 +467,7 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Wake up jobs joined with job-" + jobId + " and disjoin all subjobs created from job- " + jobId);
                 }
-                List<Long> wakeupList = wakeupByJoinedJobCompletion(jobId);
+                final List<Long> wakeupList = wakeupByJoinedJobCompletion(jobId);
                 _joinMapDao.disjoinAllJobs(jobId);
 
                 // purge the job sync item from queue
@@ -328,7 +512,7 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
         publishOnEventBus(job, "update");
         Transaction.execute(new TransactionCallbackNoReturn() {
             @Override
-            public void doInTransactionWithoutResult(TransactionStatus status) {
+            public void doInTransactionWithoutResult(final TransactionStatus status) {
                 job.setProcessStatus(processStatus);
                 if (resultObject != null) {
                     job.setResult(resultObject);
@@ -351,8 +535,8 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
 
         Transaction.execute(new TransactionCallbackNoReturn() {
             @Override
-            public void doInTransactionWithoutResult(TransactionStatus status) {
-                AsyncJobVO job = _jobDao.createForUpdate();
+            public void doInTransactionWithoutResult(final TransactionStatus status) {
+                final AsyncJobVO job = _jobDao.createForUpdate();
                 job.setInstanceType(instanceType);
                 job.setInstanceId(instanceId);
                 job.setLastUpdated(DateUtil.currentGMTTime());
@@ -363,8 +547,8 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
 
     @Override
     @DB
-    public void logJobJournal(long jobId, AsyncJob.JournalType journalType, String journalText, String journalObjJson) {
-        AsyncJobJournalVO journal = new AsyncJobJournalVO();
+    public void logJobJournal(final long jobId, final AsyncJob.JournalType journalType, final String journalText, final String journalObjJson) {
+        final AsyncJobJournalVO journal = new AsyncJobJournalVO();
         journal.setJobId(jobId);
         journal.setJournalType(journalType);
         journal.setJournalText(journalText);
@@ -375,17 +559,35 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
 
     @Override
     @DB
-    public void joinJob(long jobId, long joinJobId) {
+    public AsyncJob getPseudoJob(final long accountId, final long userId) {
+        AsyncJobVO job = _jobDao.findPseudoJob(Thread.currentThread().getId(), getMsid());
+        if (job == null) {
+            job = new AsyncJobVO();
+            job.setAccountId(accountId);
+            job.setUserId(userId);
+            job.setInitMsid(getMsid());
+            job.setDispatcher(AsyncJobVO.JOB_DISPATCHER_PSEUDO);
+            job.setInstanceType(AsyncJobVO.PSEUDO_JOB_INSTANCE_TYPE);
+            job.setInstanceId(Thread.currentThread().getId());
+            _jobDao.persist(job);
+        }
+        return job;
+    }
+
+    @Override
+    @DB
+    public void joinJob(final long jobId, final long joinJobId) {
         _joinMapDao.joinJob(jobId, joinJobId, getMsid(), 0, 0, null, null, null);
     }
 
     @Override
     @DB
-    public void joinJob(long jobId, long joinJobId, String wakeupHandler, String wakeupDispatcher, String[] wakeupTopcisOnMessageBus, long wakeupIntervalInMilliSeconds,
-        long timeoutInMilliSeconds) {
+    public void joinJob(final long jobId, final long joinJobId, final String wakeupHandler, final String wakeupDispatcher, final String[] wakeupTopcisOnMessageBus, final long
+            wakeupIntervalInMilliSeconds,
+                        final long timeoutInMilliSeconds) {
 
         Long syncSourceId = null;
-        AsyncJobExecutionContext context = AsyncJobExecutionContext.getCurrentExecutionContext();
+        final AsyncJobExecutionContext context = AsyncJobExecutionContext.getCurrentExecutionContext();
         assert (context.getJob() != null);
         if (context.getJob().getSyncSource() != null) {
             syncSourceId = context.getJob().getSyncSource().getQueueId();
@@ -396,281 +598,25 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
 
     @Override
     @DB
-    public void disjoinJob(long jobId, long joinedJobId) {
+    public void disjoinJob(final long jobId, final long joinedJobId) {
         _joinMapDao.disjoinJob(jobId, joinedJobId);
     }
 
     @Override
     @DB
-    public void completeJoin(long joinJobId, JobInfo.Status joinStatus, String joinResult) {
+    public void completeJoin(final long joinJobId, final JobInfo.Status joinStatus, final String joinResult) {
         _joinMapDao.completeJoin(joinJobId, joinStatus, joinResult, getMsid());
     }
 
     @Override
-    public void syncAsyncJobExecution(AsyncJob job, String syncObjType, long syncObjId, long queueSizeLimit) {
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Sync job-" + job.getId() + " execution on object " + syncObjType + "." + syncObjId);
-        }
-
-        SyncQueueVO queue = null;
-        queue = _queueMgr.queue(syncObjType, syncObjId, SyncQueueItem.AsyncJobContentType, job.getId(), queueSizeLimit);
-        if (queue == null)
-            throw new CloudRuntimeException("Unable to insert queue item into database, DB is full?");
-    }
-
-    @Override
-    public AsyncJob queryJob(long jobId, boolean updatePollTime) {
-        AsyncJobVO job = _jobDao.findById(jobId);
-
-        if (updatePollTime) {
-            job.setLastPolled(DateUtil.currentGMTTime());
-            _jobDao.update(jobId, job);
-        }
-        return job;
-    }
-
-    private void scheduleExecution(final AsyncJobVO job) {
-        scheduleExecution(job, false);
-    }
-
-    private void scheduleExecution(final AsyncJob job, boolean executeInContext) {
-        Runnable runnable = getExecutorRunnable(job);
-        if (executeInContext) {
-            runnable.run();
-        } else {
-            if (job.getDispatcher() == null || job.getDispatcher().equalsIgnoreCase("ApiAsyncJobDispatcher"))
-                _apiJobExecutor.submit(runnable);
-            else
-                _workerJobExecutor.submit(runnable);
-        }
-    }
-
-    private AsyncJobDispatcher getDispatcher(String dispatcherName) {
-        assert (dispatcherName != null && !dispatcherName.isEmpty()) : "Who's not setting the dispatcher when submitting a job?  Who am I suppose to call if you do that!";
-
-        for (AsyncJobDispatcher dispatcher : _jobDispatchers) {
-            if (dispatcherName.equals(dispatcher.getName()))
-                return dispatcher;
-        }
-
-        throw new CloudRuntimeException("Unable to find dispatcher name: " + dispatcherName);
-    }
-
-    private AsyncJobDispatcher getWakeupDispatcher(AsyncJob job) {
-        if (_jobDispatchers != null) {
-            List<AsyncJobJoinMapVO> joinRecords = _joinMapDao.listJoinRecords(job.getId());
-            if (joinRecords.size() > 0) {
-                AsyncJobJoinMapVO joinRecord = joinRecords.get(0);
-                for (AsyncJobDispatcher dispatcher : _jobDispatchers) {
-                    if (dispatcher.getName().equals(joinRecord.getWakeupDispatcher()))
-                        return dispatcher;
-                }
-            } else {
-                s_logger.warn("job-" + job.getId() + " is scheduled for wakeup run, but there is no joining info anymore");
-            }
-        }
-        return null;
-    }
-
-    private long getJobRunNumber() {
-        synchronized (this) {
-            return _executionRunNumber++;
-        }
-    }
-
-    private Runnable getExecutorRunnable(final AsyncJob job) {
-        return new ManagedContextRunnable() {
-
-            @Override
-            public void run() {
-                // register place-holder context to avoid installing system account call context
-                if (CallContext.current() == null)
-                    CallContext.registerPlaceHolderContext();
-
-                String related = job.getRelated();
-                String logContext = job.getShortUuid();
-                if (related != null && !related.isEmpty()) {
-                    NDC.push("job-" + related + "/" + "job-" + job.getId());
-                    AsyncJob relatedJob = _jobDao.findByIdIncludingRemoved(Long.parseLong(related));
-                    if (relatedJob != null) {
-                        logContext = relatedJob.getShortUuid();
-                    }
-                } else {
-                    NDC.push("job-" + job.getId());
-                }
-                MDC.put("logcontextid", logContext);
-                try {
-                    super.run();
-                } finally {
-                    NDC.pop();
-                }
-            }
-
-            @Override
-            protected void runInContext() {
-                long runNumber = getJobRunNumber();
-
-                try {
-                    //
-                    // setup execution environment
-                    //
-                    try {
-                        JmxUtil.registerMBean("AsyncJobManager", "Active Job " + job.getId(), new AsyncJobMBeanImpl(job));
-                    } catch (Exception e) {
-                        // Due to co-existence of normal-dispatched-job/wakeup-dispatched-job, MBean register() call
-                        // is expected to fail under situations
-                        if (s_logger.isTraceEnabled())
-                            s_logger.trace("Unable to register active job " + job.getId() + " to JMX monitoring due to exception " + ExceptionUtil.toString(e));
-                    }
-
-                    _jobMonitor.registerActiveTask(runNumber, job.getId());
-                    AsyncJobExecutionContext.setCurrentExecutionContext(new AsyncJobExecutionContext(job));
-                    String related = job.getRelated();
-                    String logContext = job.getShortUuid();
-                    if (related != null && !related.isEmpty()) {
-                        AsyncJob relatedJob = _jobDao.findByIdIncludingRemoved(Long.parseLong(related));
-                        if (relatedJob != null) {
-                            logContext = relatedJob.getShortUuid();
-                        }
-                    }
-                    MDC.put("logcontextid", logContext);
-
-                    // execute the job
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Executing " + StringUtils.cleanString(job.toString()));
-                    }
-
-                    if ((getAndResetPendingSignals(job) & AsyncJob.Constants.SIGNAL_MASK_WAKEUP) != 0) {
-                        AsyncJobDispatcher jobDispatcher = getWakeupDispatcher(job);
-                        if (jobDispatcher != null) {
-                            jobDispatcher.runJob(job);
-                        } else {
-                            // TODO, job wakeup is not in use yet
-                            if (s_logger.isTraceEnabled())
-                                s_logger.trace("Unable to find a wakeup dispatcher from the joined job: " + job);
-                        }
-                    } else {
-                        AsyncJobDispatcher jobDispatcher = getDispatcher(job.getDispatcher());
-                        if (jobDispatcher != null) {
-                            jobDispatcher.runJob(job);
-                        } else {
-                            s_logger.error("Unable to find job dispatcher, job will be cancelled");
-                            completeAsyncJob(job.getId(), JobInfo.Status.FAILED, ApiErrorCode.INTERNAL_ERROR.getHttpCode(), null);
-                        }
-                    }
-
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Done executing " + job.getCmd() + " for job-" + job.getId());
-                    }
-
-                } catch (Throwable e) {
-                    s_logger.error("Unexpected exception", e);
-                    completeAsyncJob(job.getId(), JobInfo.Status.FAILED, ApiErrorCode.INTERNAL_ERROR.getHttpCode(), null);
-                } finally {
-                    // guard final clause as well
-                    try {
-                        if (job.getSyncSource() != null) {
-                            // here check queue item one more time to double make sure that queue item is removed in case of any uncaught exception
-                            _queueMgr.purgeItem(job.getSyncSource().getId());
-                        }
-
-                        try {
-                            JmxUtil.unregisterMBean("AsyncJobManager", "Active Job " + job.getId());
-                        } catch (Exception e) {
-                            // Due to co-existence of normal-dispatched-job/wakeup-dispatched-job, MBean unregister() call
-                            // is expected to fail under situations
-                            if (s_logger.isTraceEnabled())
-                                s_logger.trace("Unable to unregister job " + job.getId() + " to JMX monitoring due to exception " + ExceptionUtil.toString(e));
-                        }
-
-                        //
-                        // clean execution environment
-                        //
-                        AsyncJobExecutionContext.unregister();
-                        _jobMonitor.unregisterActiveTask(runNumber);
-
-                    } catch (Throwable e) {
-                        s_logger.error("Double exception", e);
-                    }
-                }
-            }
-        };
-    }
-
-    private int getAndResetPendingSignals(AsyncJob job) {
-        int signals = job.getPendingSignals();
-        if (signals != 0) {
-            AsyncJobVO jobRecord = _jobDao.findById(job.getId());
-            jobRecord.setPendingSignals(0);
-            _jobDao.update(job.getId(), jobRecord);
-        }
-        return signals;
-    }
-
-    private void executeQueueItem(SyncQueueItemVO item, boolean fromPreviousSession) {
-        AsyncJobVO job = _jobDao.findById(item.getContentId());
-        if (job != null) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Schedule queued job-" + job.getId());
-            }
-
-            job.setSyncSource(item);
-
-            //
-            // TODO: a temporary solution to work-around DB deadlock situation
-            //
-            // to live with DB deadlocks, we will give a chance for job to be rescheduled
-            // in case of exceptions (most-likely DB deadlock exceptions)
-            try {
-                job.setExecutingMsid(getMsid());
-                _jobDao.update(job.getId(), job);
-            } catch (Exception e) {
-                s_logger.warn("Unexpected exception while dispatching job-" + item.getContentId(), e);
-
-                try {
-                    _queueMgr.returnItem(item.getId());
-                } catch (Throwable thr) {
-                    s_logger.error("Unexpected exception while returning job-" + item.getContentId() + " to queue", thr);
-                }
-            }
-
-            try {
-                scheduleExecution(job);
-            } catch (RejectedExecutionException e) {
-                s_logger.warn("Execution for job-" + job.getId() + " is rejected, return it to the queue for next turn");
-
-                try {
-                    _queueMgr.returnItem(item.getId());
-                } catch (Exception e2) {
-                    s_logger.error("Unexpected exception while returning job-" + item.getContentId() + " to queue", e2);
-                }
-
-                try {
-                    job.setExecutingMsid(null);
-                    _jobDao.update(job.getId(), job);
-                } catch (Exception e3) {
-                    s_logger.warn("Unexpected exception while update job-" + item.getContentId() + " msid for bookkeeping");
-                }
-            }
-
-        } else {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Unable to find related job for queue item: " + item.toString());
-            }
-
-            _queueMgr.purgeItem(item.getId());
-        }
-    }
-
-    @Override
     public void releaseSyncSource() {
-        AsyncJobExecutionContext executionContext = AsyncJobExecutionContext.getCurrentExecutionContext();
+        final AsyncJobExecutionContext executionContext = AsyncJobExecutionContext.getCurrentExecutionContext();
         assert (executionContext != null);
 
         if (executionContext.getSyncSource() != null) {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("Release sync source for job-" + executionContext.getJob().getId() + " sync source: " + executionContext.getSyncSource().getContentType() +
-                    "-" + executionContext.getSyncSource().getContentId());
+                        "-" + executionContext.getSyncSource().getContentId());
             }
 
             _queueMgr.purgeItem(executionContext.getSyncSource().getId());
@@ -679,15 +625,29 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
     }
 
     @Override
-    public boolean waitAndCheck(AsyncJob job, String[] wakeupTopicsOnMessageBus, long checkIntervalInMilliSeconds, long timeoutInMiliseconds, Predicate predicate) {
+    public void syncAsyncJobExecution(final AsyncJob job, final String syncObjType, final long syncObjId, final long queueSizeLimit) {
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("Sync job-" + job.getId() + " execution on object " + syncObjType + "." + syncObjId);
+        }
 
-        MessageDetector msgDetector = new MessageDetector();
-        String[] topics = Arrays.copyOf(wakeupTopicsOnMessageBus, wakeupTopicsOnMessageBus.length + 1);
+        SyncQueueVO queue = null;
+        queue = _queueMgr.queue(syncObjType, syncObjId, SyncQueueItem.AsyncJobContentType, job.getId(), queueSizeLimit);
+        if (queue == null) {
+            throw new CloudRuntimeException("Unable to insert queue item into database, DB is full?");
+        }
+    }
+
+    @Override
+    public boolean waitAndCheck(AsyncJob job, final String[] wakeupTopicsOnMessageBus, final long checkIntervalInMilliSeconds, final long timeoutInMiliseconds, final Predicate
+            predicate) {
+
+        final MessageDetector msgDetector = new MessageDetector();
+        final String[] topics = Arrays.copyOf(wakeupTopicsOnMessageBus, wakeupTopicsOnMessageBus.length + 1);
         topics[topics.length - 1] = AsyncJob.Topics.JOB_STATE;
 
         msgDetector.open(_messageBus, topics);
         try {
-            long startTick = System.currentTimeMillis();
+            final long startTick = System.currentTimeMillis();
             while (timeoutInMiliseconds < 0 || System.currentTimeMillis() - startTick < timeoutInMiliseconds) {
                 msgDetector.waitAny(checkIntervalInMilliSeconds);
                 job = _jobDao.findById(job.getId());
@@ -707,24 +667,42 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
     }
 
     @Override
-    public String marshallResultObject(Serializable obj) {
-        if (obj != null)
+    public AsyncJob queryJob(final long jobId, final boolean updatePollTime) {
+        final AsyncJobVO job = _jobDao.findById(jobId);
+
+        if (updatePollTime) {
+            job.setLastPolled(DateUtil.currentGMTTime());
+            _jobDao.update(jobId, job);
+        }
+        return job;
+    }
+
+    @Override
+    public String marshallResultObject(final Serializable obj) {
+        if (obj != null) {
             return JobSerializerHelper.toObjectSerializedString(obj);
+        }
 
         return null;
     }
 
     @Override
-    public Object unmarshallResultObject(AsyncJob job) {
-        if(job != null && job.getResult() != null)
+    public Object unmarshallResultObject(final AsyncJob job) {
+        if (job != null && job.getResult() != null) {
             return JobSerializerHelper.fromObjectSerializedString(job.getResult());
+        }
         return null;
     }
 
-    private void checkQueue(long queueId) {
+    @Override
+    public List<AsyncJobVO> findFailureAsyncJobs(final String... cmds) {
+        return _jobDao.getFailureJobsSinceLastMsStart(getMsid(), cmds);
+    }
+
+    private void checkQueue(final long queueId) {
         while (true) {
             try {
-                SyncQueueItemVO item = _queueMgr.dequeueFromOne(queueId, getMsid());
+                final SyncQueueItemVO item = _queueMgr.dequeueFromOne(queueId, getMsid());
                 if (item != null) {
                     if (s_logger.isDebugEnabled()) {
                         s_logger.debug("Executing sync queue item: " + item.toString());
@@ -734,11 +712,69 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
                 } else {
                     break;
                 }
-            } catch (Throwable e) {
+            } catch (final Throwable e) {
                 s_logger.error("Unexpected exception when kicking sync queue-" + queueId, e);
                 break;
             }
         }
+    }
+
+    private void executeQueueItem(final SyncQueueItemVO item, final boolean fromPreviousSession) {
+        final AsyncJobVO job = _jobDao.findById(item.getContentId());
+        if (job != null) {
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("Schedule queued job-" + job.getId());
+            }
+
+            job.setSyncSource(item);
+
+            //
+            // TODO: a temporary solution to work-around DB deadlock situation
+            //
+            // to live with DB deadlocks, we will give a chance for job to be rescheduled
+            // in case of exceptions (most-likely DB deadlock exceptions)
+            try {
+                job.setExecutingMsid(getMsid());
+                _jobDao.update(job.getId(), job);
+            } catch (final Exception e) {
+                s_logger.warn("Unexpected exception while dispatching job-" + item.getContentId(), e);
+
+                try {
+                    _queueMgr.returnItem(item.getId());
+                } catch (final Throwable thr) {
+                    s_logger.error("Unexpected exception while returning job-" + item.getContentId() + " to queue", thr);
+                }
+            }
+
+            try {
+                scheduleExecution(job);
+            } catch (final RejectedExecutionException e) {
+                s_logger.warn("Execution for job-" + job.getId() + " is rejected, return it to the queue for next turn");
+
+                try {
+                    _queueMgr.returnItem(item.getId());
+                } catch (final Exception e2) {
+                    s_logger.error("Unexpected exception while returning job-" + item.getContentId() + " to queue", e2);
+                }
+
+                try {
+                    job.setExecutingMsid(null);
+                    _jobDao.update(job.getId(), job);
+                } catch (final Exception e3) {
+                    s_logger.warn("Unexpected exception while update job-" + item.getContentId() + " msid for bookkeeping");
+                }
+            }
+        } else {
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("Unable to find related job for queue item: " + item.toString());
+            }
+
+            _queueMgr.purgeItem(item.getId());
+        }
+    }
+
+    private void scheduleExecution(final AsyncJobVO job) {
+        scheduleExecution(job, false);
     }
 
     private Runnable getHeartbeatTask() {
@@ -746,7 +782,7 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
 
             @Override
             protected void runInContext() {
-                GlobalLock scanLock = GlobalLock.getInternLock("AsyncJobManagerHeartbeat");
+                final GlobalLock scanLock = GlobalLock.getInternLock("AsyncJobManagerHeartbeat");
                 try {
                     if (scanLock.lock(ACQUIRE_GLOBAL_LOCK_TIMEOUT_FOR_COOPERATION)) {
                         try {
@@ -762,9 +798,9 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
 
             protected void reallyRun() {
                 try {
-                    List<SyncQueueItemVO> l = _queueMgr.dequeueFromAny(getMsid(), MAX_ONETIME_SCHEDULE_SIZE);
+                    final List<SyncQueueItemVO> l = _queueMgr.dequeueFromAny(getMsid(), MAX_ONETIME_SCHEDULE_SIZE);
                     if (l != null && l.size() > 0) {
-                        for (SyncQueueItemVO item : l) {
+                        for (final SyncQueueItemVO item : l) {
                             if (s_logger.isDebugEnabled()) {
                                 s_logger.debug("Execute sync-queue item: " + item.toString());
                             }
@@ -772,14 +808,15 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
                         }
                     }
 
-                    List<Long> standaloneWakeupJobs = wakeupScan();
-                    for (Long jobId : standaloneWakeupJobs) {
+                    final List<Long> standaloneWakeupJobs = wakeupScan();
+                    for (final Long jobId : standaloneWakeupJobs) {
                         // TODO, we assume that all jobs in this category is API job only
-                        AsyncJobVO job = _jobDao.findById(jobId);
-                        if (job != null && (job.getPendingSignals() & AsyncJob.Constants.SIGNAL_MASK_WAKEUP) != 0)
+                        final AsyncJobVO job = _jobDao.findById(jobId);
+                        if (job != null && (job.getPendingSignals() & AsyncJob.Constants.SIGNAL_MASK_WAKEUP) != 0) {
                             scheduleExecution(job, false);
+                        }
                     }
-                } catch (Throwable e) {
+                } catch (final Throwable e) {
                     s_logger.error("Unexpected exception when trying to execute queue item, ", e);
                 }
             }
@@ -791,7 +828,7 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
         return new ManagedContextRunnable() {
             @Override
             protected void runInContext() {
-                GlobalLock scanLock = GlobalLock.getInternLock("AsyncJobManagerGC");
+                final GlobalLock scanLock = GlobalLock.getInternLock("AsyncJobManagerGC");
                 try {
                     if (scanLock.lock(ACQUIRE_GLOBAL_LOCK_TIMEOUT_FOR_COOPERATION)) {
                         try {
@@ -810,9 +847,9 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
                     s_logger.info("Begin cleanup expired async-jobs");
 
                     // forcefully cancel blocking queue items if they've been staying there for too long
-                    List<SyncQueueItemVO> blockItems = _queueMgr.getBlockedQueueItems(JobCancelThresholdMinutes.value() * 60000, false);
+                    final List<SyncQueueItemVO> blockItems = _queueMgr.getBlockedQueueItems(JobCancelThresholdMinutes.value() * 60000, false);
                     if (blockItems != null && blockItems.size() > 0) {
-                        for (SyncQueueItemVO item : blockItems) {
+                        for (final SyncQueueItemVO item : blockItems) {
                             try {
                                 if (item.getContentType().equalsIgnoreCase(SyncQueueItem.AsyncJobContentType)) {
                                     s_logger.info("Remove Job-" + item.getContentId() + " from Queue-" + item.getId() + " since it has been blocked for too long");
@@ -823,42 +860,42 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
 
                                 // purge the item and resume queue processing
                                 _queueMgr.purgeItem(item.getId());
-                            } catch (Throwable e) {
+                            } catch (final Throwable e) {
                                 s_logger.error("Unexpected exception when trying to remove job from sync queue, ", e);
                             }
                         }
                     }
 
-                    Date cutTime = new Date(DateUtil.currentGMTTime().getTime() - JobExpireMinutes.value() * 60000);
+                    final Date cutTime = new Date(DateUtil.currentGMTTime().getTime() - JobExpireMinutes.value() * 60000);
                     // limit to 100 jobs per turn, this gives cleanup throughput as 600 jobs per minute
                     // hopefully this will be fast enough to balance potential growth of job table
                     // 1) Expire unfinished jobs that weren't processed yet
-                    List<AsyncJobVO> unfinishedJobs = _jobDao.getExpiredUnfinishedJobs(cutTime, 100);
-                    for (AsyncJobVO job : unfinishedJobs) {
+                    final List<AsyncJobVO> unfinishedJobs = _jobDao.getExpiredUnfinishedJobs(cutTime, 100);
+                    for (final AsyncJobVO job : unfinishedJobs) {
                         try {
                             s_logger.info("Expunging unfinished job-" + job.getId());
 
                             _jobMonitor.unregisterByJobId(job.getId());
                             expungeAsyncJob(job);
-                        } catch (Throwable e) {
+                        } catch (final Throwable e) {
                             s_logger.error("Unexpected exception when trying to expunge job-" + job.getId(), e);
                         }
                     }
 
                     // 2) Expunge finished jobs
-                    List<AsyncJobVO> completedJobs = _jobDao.getExpiredCompletedJobs(cutTime, 100);
-                    for (AsyncJobVO job : completedJobs) {
+                    final List<AsyncJobVO> completedJobs = _jobDao.getExpiredCompletedJobs(cutTime, 100);
+                    for (final AsyncJobVO job : completedJobs) {
                         try {
                             s_logger.info("Expunging completed job-" + job.getId());
 
                             expungeAsyncJob(job);
-                        } catch (Throwable e) {
+                        } catch (final Throwable e) {
                             s_logger.error("Unexpected exception when trying to expunge job-" + job.getId(), e);
                         }
                     }
 
                     s_logger.info("End cleanup expired async-jobs");
-                } catch (Throwable e) {
+                } catch (final Throwable e) {
                     s_logger.error("Unexpected exception when trying to execute queue item, ", e);
                 }
             }
@@ -869,7 +906,7 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
     protected void expungeAsyncJob(final AsyncJobVO job) {
         Transaction.execute(new TransactionCallbackNoReturn() {
             @Override
-            public void doInTransactionWithoutResult(TransactionStatus status) {
+            public void doInTransactionWithoutResult(final TransactionStatus status) {
                 _jobDao.expunge(job.getId());
                 // purge corresponding sync queue item
                 _queueMgr.purgeAsyncJobQueueItemId(job.getId());
@@ -877,40 +914,11 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
         });
     }
 
-    private long getMsid() {
-        return ManagementServerNode.getManagementServerId();
-    }
-
-    @DB
-    protected List<Long> wakeupByJoinedJobCompletion(long joinedJobId) {
-        SearchCriteria<Long> joinJobSC = JoinJobSearch.create("joinJobId", joinedJobId);
-
-        List<Long> result = _joinMapDao.customSearch(joinJobSC, null);
-        if (result.size() > 0) {
-            Collections.sort(result);
-            Long[] ids = result.toArray(new Long[result.size()]);
-
-            final SearchCriteria<AsyncJobVO> jobsSC = JobIdsSearch.create("ids", ids);
-            final SearchCriteria<SyncQueueItemVO> queueItemsSC = QueueJobIdsSearch.create("contentIds", ids);
-
-            AsyncJobVO job = _jobDao.createForUpdate();
-            job.setPendingSignals(AsyncJob.Constants.SIGNAL_MASK_WAKEUP);
-            _jobDao.update(job, jobsSC);
-
-            SyncQueueItemVO item = _queueItemDao.createForUpdate();
-            item.setLastProcessNumber(null);
-            item.setLastProcessMsid(null);
-            _queueItemDao.update(item, queueItemsSC);
-        }
-
-        return _joinMapDao.findJobsToWake(joinedJobId);
-    }
-
     @DB
     protected List<Long> wakeupScan() {
         final Date cutDate = DateUtil.currentGMTTime();
 
-        SearchCriteria<Long> sc = JoinJobTimeSearch.create();
+        final SearchCriteria<Long> sc = JoinJobTimeSearch.create();
         sc.setParameters("beginTime", cutDate);
         sc.setParameters("endTime", cutDate);
 
@@ -918,20 +926,20 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
 
         return Transaction.execute(new TransactionCallback<List<Long>>() {
             @Override
-            public List<Long> doInTransaction(TransactionStatus status) {
+            public List<Long> doInTransaction(final TransactionStatus status) {
                 if (result.size() > 0) {
                     Collections.sort(result);
-                    Long[] ids = result.toArray(new Long[result.size()]);
+                    final Long[] ids = result.toArray(new Long[result.size()]);
 
-                    AsyncJobVO job = _jobDao.createForUpdate();
+                    final AsyncJobVO job = _jobDao.createForUpdate();
                     job.setPendingSignals(AsyncJob.Constants.SIGNAL_MASK_WAKEUP);
 
-                    SearchCriteria<AsyncJobVO> sc2 = JobIdsSearch.create("ids", ids);
-                    SearchCriteria<SyncQueueItemVO> queueItemsSC = QueueJobIdsSearch.create("contentIds", ids);
+                    final SearchCriteria<AsyncJobVO> sc2 = JobIdsSearch.create("ids", ids);
+                    final SearchCriteria<SyncQueueItemVO> queueItemsSC = QueueJobIdsSearch.create("contentIds", ids);
 
                     _jobDao.update(job, sc2);
 
-                    SyncQueueItemVO item = _queueItemDao.createForUpdate();
+                    final SyncQueueItemVO item = _queueItemDao.createForUpdate();
                     item.setLastProcessNumber(null);
                     item.setLastProcessMsid(null);
                     _queueItemDao.update(item, queueItemsSC);
@@ -943,13 +951,13 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
     }
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         try {
             final Properties dbProps = DbProperties.getDbProperties();
             final int cloudMaxActive = Integer.parseInt(dbProps.getProperty("db.cloud.maxActive"));
 
-            int apiPoolSize = cloudMaxActive / 2;
-            int workPoolSize = (cloudMaxActive * 2) / 3;
+            final int apiPoolSize = cloudMaxActive / 2;
+            final int workPoolSize = (cloudMaxActive * 2) / 3;
 
             s_logger.info("Start AsyncJobManager API executor thread pool in size " + apiPoolSize);
             _apiJobExecutor = Executors.newFixedThreadPool(apiPoolSize, new NamedThreadFactory(AsyncJobManager.API_JOB_POOL_THREAD_PREFIX));
@@ -991,51 +999,6 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
         return true;
     }
 
-    private void cleanupLeftOverJobs(final long msid) {
-        try {
-            Transaction.execute(new TransactionCallbackNoReturn() {
-                @Override
-                public void doInTransactionWithoutResult(TransactionStatus status) {
-                    // purge sync queue item running on this ms node
-                    _queueMgr.cleanupActiveQueueItems(msid, true);
-                    // reset job status for all jobs running on this ms node
-                    List<AsyncJobVO> jobs = _jobDao.getResetJobs(msid);
-                    for (AsyncJobVO job : jobs) {
-                        if (s_logger.isDebugEnabled()) {
-                            s_logger.debug("Cancel left-over job-" + job.getId());
-                        }
-                        job.setStatus(JobInfo.Status.FAILED);
-                        job.setResultCode(ApiErrorCode.INTERNAL_ERROR.getHttpCode());
-                        job.setResult("job cancelled because of management server restart or shutdown");
-                        job.setCompleteMsid(msid);
-                        _jobDao.update(job.getId(), job);
-                        if (s_logger.isDebugEnabled()) {
-                            s_logger.debug("Purge queue item for cancelled job-" + job.getId());
-                        }
-                        _queueMgr.purgeAsyncJobQueueItemId(job.getId());
-                    }
-                }
-            });
-        } catch (Throwable e) {
-            s_logger.warn("Unexpected exception in cleaning up left over jobs for mamagement server node " + msid, e);
-        }
-    }
-
-    @Override
-    public void onManagementNodeJoined(List<? extends ManagementServerHost> nodeList, long selfNodeId) {
-    }
-
-    @Override
-    public void onManagementNodeLeft(List<? extends ManagementServerHost> nodeList, long selfNodeId) {
-        for (final ManagementServerHost msHost : nodeList) {
-            cleanupLeftOverJobs(msHost.getId());
-        }
-    }
-
-    @Override
-    public void onManagementNodeIsolated() {
-    }
-
     @Override
     public boolean start() {
         cleanupLeftOverJobs(getMsid());
@@ -1054,26 +1017,48 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
         return true;
     }
 
-    private GenericSearchBuilder<SyncQueueItemVO, Long> ContentIdsSearch;
-    private GenericSearchBuilder<AsyncJobJoinMapVO, Long> JoinJobSearch;
-    private SearchBuilder<AsyncJobVO> JobIdsSearch;
-    private SearchBuilder<SyncQueueItemVO> QueueJobIdsSearch;
-    private GenericSearchBuilder<AsyncJobJoinMapVO, Long> JoinJobIdsSearch;
-    private GenericSearchBuilder<AsyncJobJoinMapVO, Long> JoinJobTimeSearch;
-
-    protected AsyncJobManagerImpl() {
-        // override default run level for manager components to start this early, otherwise, VirtualMachineManagerImpl will
-        // get stuck in non-initializing job queue
-        setRunLevel(ComponentLifecycle.RUN_LEVEL_FRAMEWORK);
-    }
-
-    private void publishOnEventBus(AsyncJob job, String jobEvent) {
-        _messageBus.publish(null, AsyncJob.Topics.JOB_EVENT_PUBLISH, PublishScope.LOCAL,
-            new Pair<AsyncJob, String>(job, jobEvent));
+    @Override
+    public void onManagementNodeJoined(final List<? extends ManagementServerHost> nodeList, final long selfNodeId) {
     }
 
     @Override
-    public List<AsyncJobVO> findFailureAsyncJobs(String... cmds) {
-        return _jobDao.getFailureJobsSinceLastMsStart(getMsid(), cmds);
+    public void onManagementNodeLeft(final List<? extends ManagementServerHost> nodeList, final long selfNodeId) {
+        for (final ManagementServerHost msHost : nodeList) {
+            cleanupLeftOverJobs(msHost.getId());
+        }
+    }
+
+    private void cleanupLeftOverJobs(final long msid) {
+        try {
+            Transaction.execute(new TransactionCallbackNoReturn() {
+                @Override
+                public void doInTransactionWithoutResult(final TransactionStatus status) {
+                    // purge sync queue item running on this ms node
+                    _queueMgr.cleanupActiveQueueItems(msid, true);
+                    // reset job status for all jobs running on this ms node
+                    final List<AsyncJobVO> jobs = _jobDao.getResetJobs(msid);
+                    for (final AsyncJobVO job : jobs) {
+                        if (s_logger.isDebugEnabled()) {
+                            s_logger.debug("Cancel left-over job-" + job.getId());
+                        }
+                        job.setStatus(JobInfo.Status.FAILED);
+                        job.setResultCode(ApiErrorCode.INTERNAL_ERROR.getHttpCode());
+                        job.setResult("job cancelled because of management server restart or shutdown");
+                        job.setCompleteMsid(msid);
+                        _jobDao.update(job.getId(), job);
+                        if (s_logger.isDebugEnabled()) {
+                            s_logger.debug("Purge queue item for cancelled job-" + job.getId());
+                        }
+                        _queueMgr.purgeAsyncJobQueueItemId(job.getId());
+                    }
+                }
+            });
+        } catch (final Throwable e) {
+            s_logger.warn("Unexpected exception in cleaning up left over jobs for mamagement server node " + msid, e);
+        }
+    }
+
+    @Override
+    public void onManagementNodeIsolated() {
     }
 }

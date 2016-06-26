@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.servlet;
 
 import com.cloud.dao.EntityManager;
@@ -33,14 +17,7 @@ import com.cloud.vm.UserVmDetailVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.UserVmDetailsDao;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.cloudstack.framework.security.keys.KeysManager;
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -53,7 +30,20 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 /**
  * Thumbnail access : /console?cmd=thumbnail&vm=xxx&w=xxx&h=xxx
@@ -62,11 +52,12 @@ import java.util.*;
  */
 @Component("consoleServlet")
 public class ConsoleProxyServlet extends HttpServlet {
-    private static final long serialVersionUID = -5515382620323808168L;
     public static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyServlet.class.getName());
+    private static final long serialVersionUID = -5515382620323808168L;
     private static final int DEFAULT_THUMBNAIL_WIDTH = 144;
     private static final int DEFAULT_THUMBNAIL_HEIGHT = 110;
-
+    static KeysManager s_keysMgr;
+    private final Gson _gson = new GsonBuilder().create();
     @Inject
     AccountManager _accountMgr;
     @Inject
@@ -80,22 +71,104 @@ public class ConsoleProxyServlet extends HttpServlet {
     @Inject
     KeysManager _keysMgr;
 
-    static KeysManager s_keysMgr;
-
-    private final Gson _gson = new GsonBuilder().create();
-
     public ConsoleProxyServlet() {
+    }
+
+    // put the ugly stuff here
+    static public Ternary<String, String, String> parseHostInfo(final String hostInfo) {
+        String host = null;
+        String tunnelUrl = null;
+        String tunnelSession = null;
+
+        s_logger.info("Parse host info returned from executing GetVNCPortCommand. host info: " + hostInfo);
+
+        if (hostInfo != null) {
+            if (hostInfo.startsWith("consoleurl")) {
+                final String[] tokens = hostInfo.split("&");
+
+                if (hostInfo.length() > 19 && hostInfo.indexOf('/', 19) > 19) {
+                    host = hostInfo.substring(19, hostInfo.indexOf('/', 19)).trim();
+                    tunnelUrl = tokens[0].substring("consoleurl=".length());
+                    tunnelSession = tokens[1].split("=")[1];
+                } else {
+                    host = "";
+                }
+            } else if (hostInfo.startsWith("instanceId")) {
+                host = hostInfo.substring(hostInfo.indexOf('=') + 1);
+            } else {
+                host = hostInfo;
+            }
+        } else {
+            host = hostInfo;
+        }
+
+        return new Ternary<>(host, tunnelUrl, tunnelSession);
+    }
+
+    public static String genAccessTicket(final String host, final String port, final String sid, final String tag) {
+        return genAccessTicket(host, port, sid, tag, new Date());
+    }
+
+    public static String genAccessTicket(final String host, final String port, final String sid, final String tag, final Date normalizedHashTime) {
+        final String params = "host=" + host + "&port=" + port + "&sid=" + sid + "&tag=" + tag;
+
+        try {
+            final Mac mac = Mac.getInstance("HmacSHA1");
+
+            long ts = normalizedHashTime.getTime();
+            ts = ts / 60000;        // round up to 1 minute
+            final String secretKey = s_keysMgr.getHashKey();
+
+            final SecretKeySpec keySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA1");
+            mac.init(keySpec);
+            mac.update(params.getBytes());
+            mac.update(String.valueOf(ts).getBytes());
+
+            final byte[] encryptedBytes = mac.doFinal();
+
+            return Base64.encodeBase64String(encryptedBytes);
+        } catch (final Exception e) {
+            s_logger.error("Unexpected exception ", e);
+        }
+        return "";
+    }
+
+    public static final String escapeHTML(final String content) {
+        if (content == null || content.isEmpty()) {
+            return content;
+        }
+
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < content.length(); i++) {
+            final char c = content.charAt(i);
+            switch (c) {
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                case ' ':
+                    sb.append("&nbsp;");
+                    break;
+                default:
+                    sb.append(c);
+                    break;
+            }
+        }
+        return sb.toString();
     }
 
     @Override
     public void init(final ServletConfig config) throws ServletException {
         SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
         s_keysMgr = _keysMgr;
-    }
-
-    @Override
-    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) {
-        doGet(req, resp);
     }
 
     @Override
@@ -183,6 +256,11 @@ public class ConsoleProxyServlet extends HttpServlet {
             s_logger.error("Unexepected exception in ConsoleProxyServlet", e);
             sendResponse(resp, "Server Internal Error");
         }
+    }
+
+    @Override
+    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) {
+        doGet(req, resp);
     }
 
     private void handleThumbnailRequest(final HttpServletRequest req, final HttpServletResponse resp, final long vmId) {
@@ -313,37 +391,6 @@ public class ConsoleProxyServlet extends HttpServlet {
         sendResponse(resp, "success");
     }
 
-    // put the ugly stuff here
-    static public Ternary<String, String, String> parseHostInfo(final String hostInfo) {
-        String host = null;
-        String tunnelUrl = null;
-        String tunnelSession = null;
-
-        s_logger.info("Parse host info returned from executing GetVNCPortCommand. host info: " + hostInfo);
-
-        if (hostInfo != null) {
-            if (hostInfo.startsWith("consoleurl")) {
-                final String[] tokens = hostInfo.split("&");
-
-                if (hostInfo.length() > 19 && hostInfo.indexOf('/', 19) > 19) {
-                    host = hostInfo.substring(19, hostInfo.indexOf('/', 19)).trim();
-                    tunnelUrl = tokens[0].substring("consoleurl=".length());
-                    tunnelSession = tokens[1].split("=")[1];
-                } else {
-                    host = "";
-                }
-            } else if (hostInfo.startsWith("instanceId")) {
-                host = hostInfo.substring(hostInfo.indexOf('=') + 1);
-            } else {
-                host = hostInfo;
-            }
-        } else {
-            host = hostInfo;
-        }
-
-        return new Ternary<>(host, tunnelUrl, tunnelSession);
-    }
-
     private String getEncryptorPassword() {
         final String key = _keysMgr.getEncryptionKey();
         final String iv = _keysMgr.getEncryptionIV();
@@ -397,8 +444,9 @@ public class ConsoleProxyServlet extends HttpServlet {
         final String host = hostVo.getPrivateIpAddress();
 
         final Pair<String, Integer> portInfo = _ms.getVncPort(vm);
-        if (s_logger.isDebugEnabled())
+        if (s_logger.isDebugEnabled()) {
             s_logger.debug("Port info " + portInfo.first());
+        }
 
         final Ternary<String, String, String> parsedHostInfo = parseHostInfo(portInfo.first());
 
@@ -436,41 +484,14 @@ public class ConsoleProxyServlet extends HttpServlet {
         // for console access, we need guest OS type to help implement keyboard
         final long guestOs = vm.getGuestOSId();
         final GuestOSVO guestOsVo = _ms.getGuestOs(guestOs);
-        if (guestOsVo.getCategoryId() == 6)
+        if (guestOsVo.getCategoryId() == 6) {
             sb.append("&guest=windows");
+        }
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Compose console url: " + sb.toString());
         }
         return sb.toString();
-    }
-
-    public static String genAccessTicket(final String host, final String port, final String sid, final String tag) {
-        return genAccessTicket(host, port, sid, tag, new Date());
-    }
-
-    public static String genAccessTicket(final String host, final String port, final String sid, final String tag, final Date normalizedHashTime) {
-        final String params = "host=" + host + "&port=" + port + "&sid=" + sid + "&tag=" + tag;
-
-        try {
-            final Mac mac = Mac.getInstance("HmacSHA1");
-
-            long ts = normalizedHashTime.getTime();
-            ts = ts / 60000;        // round up to 1 minute
-            final String secretKey = s_keysMgr.getHashKey();
-
-            final SecretKeySpec keySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA1");
-            mac.init(keySpec);
-            mac.update(params.getBytes());
-            mac.update(String.valueOf(ts).getBytes());
-
-            final byte[] encryptedBytes = mac.doFinal();
-
-            return Base64.encodeBase64String(encryptedBytes);
-        } catch (final Exception e) {
-            s_logger.error("Unexpected exception ", e);
-        }
-        return "";
     }
 
     private void sendResponse(final HttpServletResponse resp, final String content) {
@@ -491,8 +512,9 @@ public class ConsoleProxyServlet extends HttpServlet {
         }
 
         // root admin can access anything
-        if (_accountMgr.isRootAdmin(accountObj.getId()))
+        if (_accountMgr.isRootAdmin(accountObj.getId())) {
             return true;
+        }
 
         switch (vm.getType()) {
             case User:
@@ -647,36 +669,5 @@ public class ConsoleProxyServlet extends HttpServlet {
             s_logger.error("unable to verifty request signature", ex);
         }
         return false;
-    }
-
-    public static final String escapeHTML(final String content) {
-        if (content == null || content.isEmpty())
-            return content;
-
-        final StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < content.length(); i++) {
-            final char c = content.charAt(i);
-            switch (c) {
-                case '<':
-                    sb.append("&lt;");
-                    break;
-                case '>':
-                    sb.append("&gt;");
-                    break;
-                case '&':
-                    sb.append("&amp;");
-                    break;
-                case '"':
-                    sb.append("&quot;");
-                    break;
-                case ' ':
-                    sb.append("&nbsp;");
-                    break;
-                default:
-                    sb.append(c);
-                    break;
-            }
-        }
-        return sb.toString();
     }
 }

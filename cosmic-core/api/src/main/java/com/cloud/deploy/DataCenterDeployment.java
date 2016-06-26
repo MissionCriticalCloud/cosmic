@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.deploy;
 
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
@@ -30,15 +14,16 @@ public class DataCenterDeployment implements DeploymentPlan {
     boolean _recreateDisks;
     ReservationContext _context;
 
-    public DataCenterDeployment(long dataCenterId) {
+    public DataCenterDeployment(final long dataCenterId) {
         this(dataCenterId, null, null, null, null, null);
     }
 
-    public DataCenterDeployment(long dataCenterId, Long podId, Long clusterId, Long hostId, Long poolId, Long physicalNetworkId) {
+    public DataCenterDeployment(final long dataCenterId, final Long podId, final Long clusterId, final Long hostId, final Long poolId, final Long physicalNetworkId) {
         this(dataCenterId, podId, clusterId, hostId, poolId, physicalNetworkId, null);
     }
 
-    public DataCenterDeployment(long dataCenterId, Long podId, Long clusterId, Long hostId, Long poolId, Long physicalNetworkId, ReservationContext context) {
+    public DataCenterDeployment(final long dataCenterId, final Long podId, final Long clusterId, final Long hostId, final Long poolId, final Long physicalNetworkId, final
+    ReservationContext context) {
         _dcId = dataCenterId;
         _podId = podId;
         _clusterId = clusterId;
@@ -79,7 +64,7 @@ public class DataCenterDeployment implements DeploymentPlan {
     }
 
     @Override
-    public void setAvoids(ExcludeList avoids) {
+    public void setAvoids(final ExcludeList avoids) {
         _avoids = avoids;
     }
 
@@ -92,5 +77,4 @@ public class DataCenterDeployment implements DeploymentPlan {
     public ReservationContext getReservationContext() {
         return _context;
     }
-
 }

@@ -11,5 +11,4 @@ public class RabbitMQEventBusTest {
     public void testConstructorHasNoDependencies() throws Exception {
         assertThat(new RabbitMQEventBus(), notNullValue());
     }
-    
 }

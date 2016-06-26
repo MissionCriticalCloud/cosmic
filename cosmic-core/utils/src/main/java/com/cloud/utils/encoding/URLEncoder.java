@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils.encoding;
@@ -27,12 +12,11 @@ import java.nio.charset.CharsetEncoder;
 import java.util.BitSet;
 
 /**
- *
  * This class is very similar to the java.net.URLEncoder class.
- *
+ * <p>
  * Unfortunately, with java.net.URLEncoder there is no way to specify to the
  * java.net.URLEncoder which characters should NOT be encoded.
- *
+ * <p>
  * This code was moved from DefaultServlet.java
  *
  * @author Craig R. McClanahan
@@ -59,44 +43,44 @@ public class URLEncoder {
         }
     }
 
-    private void addSafeCharacter(char c) {
+    private void addSafeCharacter(final char c) {
         safeCharacters.set(c);
     }
 
-    public String encode(String path) {
-        int maxBytesPerChar = 10;
-        StringBuffer rewrittenPath = new StringBuffer(path.length());
-        ByteArrayOutputStream buf = new ByteArrayOutputStream(maxBytesPerChar);
+    public String encode(final String path) {
+        final int maxBytesPerChar = 10;
+        final StringBuffer rewrittenPath = new StringBuffer(path.length());
+        final ByteArrayOutputStream buf = new ByteArrayOutputStream(maxBytesPerChar);
         OutputStreamWriter writer = null;
         try {
             writer = new OutputStreamWriter(buf, "UTF8");
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             writer = new OutputStreamWriter(buf);
         }
 
         for (int i = 0; i < path.length(); i++) {
-            int c = path.charAt(i);
+            final int c = path.charAt(i);
             // NOTICE - !isPureAscii(path.charAt(i)) check was added by
             // CloudStack
             if (safeCharacters.get(c) || !isPureAscii(path.charAt(i))) {
-                rewrittenPath.append((char)c);
+                rewrittenPath.append((char) c);
             } else {
                 // convert to external encoding before hex conversion
                 try {
-                    writer.write((char)c);
+                    writer.write((char) c);
                     writer.flush();
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     buf.reset();
                     continue;
                 }
-                byte[] ba = buf.toByteArray();
+                final byte[] ba = buf.toByteArray();
                 for (int j = 0; j < ba.length; j++) {
                     // Converting each byte in the buffer
-                    byte toEncode = ba[j];
+                    final byte toEncode = ba[j];
                     rewrittenPath.append('%');
-                    int low = toEncode & 0x0f;
-                    int high = (toEncode & 0xf0) >> 4;
+                    final int low = toEncode & 0x0f;
+                    final int high = (toEncode & 0xf0) >> 4;
                     rewrittenPath.append(hexadecimal[high]);
                     rewrittenPath.append(hexadecimal[low]);
                 }
@@ -107,7 +91,7 @@ public class URLEncoder {
     }
 
     // NOTICE - this part was added by CloudStack
-    public static boolean isPureAscii(Character v) {
+    public static boolean isPureAscii(final Character v) {
         return asciiEncoder.canEncode(v);
     }
 }

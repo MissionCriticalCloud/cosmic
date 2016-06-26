@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package com.cloud.utils.db;
 
 import static org.junit.Assert.assertEquals;
@@ -43,7 +25,7 @@ public class TestTransaction {
         setup(TransactionLegacy.CLOUD_DB);
     }
 
-    public void setup(short db) {
+    public void setup(final short db) {
         txn = TransactionLegacy.open(db);
         conn = Mockito.mock(Connection.class);
         txn.setConnection(conn);
@@ -58,7 +40,7 @@ public class TestTransaction {
     public void testCommit() throws Exception {
         assertEquals(42L, Transaction.execute(new TransactionCallback<Object>() {
             @Override
-            public Object doInTransaction(TransactionStatus status) {
+            public Object doInTransaction(final TransactionStatus status) {
                 return 42L;
             }
         }));
@@ -74,12 +56,12 @@ public class TestTransaction {
         try {
             Transaction.execute(new TransactionCallback<Object>() {
                 @Override
-                public Object doInTransaction(TransactionStatus status) {
+                public Object doInTransaction(final TransactionStatus status) {
                     throw new RuntimeException("Panic!");
                 }
             });
             fail();
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             assertEquals("Panic!", e.getMessage());
         }
 
@@ -94,14 +76,14 @@ public class TestTransaction {
         try {
             Transaction.execute(new TransactionCallbackWithException<Object, FileNotFoundException>() {
                 @Override
-                public Object doInTransaction(TransactionStatus status) throws FileNotFoundException {
+                public Object doInTransaction(final TransactionStatus status) throws FileNotFoundException {
                     assertEquals(TransactionLegacy.CLOUD_DB, TransactionLegacy.currentTxn().getDatabaseId().shortValue());
 
                     throw new FileNotFoundException("Panic!");
                 }
             });
             fail();
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             assertEquals("Panic!", e.getMessage());
         }
 
@@ -116,7 +98,7 @@ public class TestTransaction {
         final AtomicInteger i = new AtomicInteger(0);
         assertTrue(Transaction.execute(new TransactionCallbackWithExceptionNoReturn<FileNotFoundException>() {
             @Override
-            public void doInTransactionWithoutResult(TransactionStatus status) throws FileNotFoundException {
+            public void doInTransactionWithoutResult(final TransactionStatus status) throws FileNotFoundException {
                 i.incrementAndGet();
             }
         }));

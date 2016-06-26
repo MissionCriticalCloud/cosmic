@@ -1,43 +1,28 @@
 #!/usr/bin/python
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+
 
 # Version @VERSION@
 #
-# A plugin for executing script needed by vmops cloud 
+# A plugin for executing script needed by vmops cloud
 
-import os, sys, time
 import XenAPIPlugin
+import os
+import sys
+import time
+
 if os.path.exists("/opt/xensource/sm"):
     sys.path.extend(["/opt/xensource/sm/", "/usr/local/sbin/", "/sbin/"])
 if os.path.exists("/usr/lib/xcp/sm"):
     sys.path.extend(["/usr/lib/xcp/sm/", "/usr/local/sbin/", "/sbin/"])
 
-import SR, VDI, SRCommand, util, lvutil
+import SR, util
 from util import CommandException
 import vhdutil
-import shutil
 import lvhdutil
-import errno
 import subprocess
 import xs_errors
 import cleanup
 import stat
-import random
 import cloudstack_pluginlib as lib
 import logging
 
@@ -47,13 +32,15 @@ VHDUTIL = "vhd-util"
 VHD_PREFIX = 'VHD-'
 CLOUD_DIR = '/var/run/cloud_mount'
 
+
 def echo(fn):
     def wrapped(*v, **k):
         name = fn.__name__
-        logging.debug("#### CLOUD enter  %s ####" % name )
+        logging.debug("#### CLOUD enter  %s ####" % name)
         res = fn(*v, **k)
-        logging.debug("#### CLOUD exit  %s ####" % name )
+        logging.debug("#### CLOUD exit  %s ####" % name)
         return res
+
     return wrapped
 
 
@@ -90,8 +77,9 @@ def create_secondary_storage_folder(session, args):
             umount(local_mount_path)
             # Remove the local folder
             os.system("rmdir " + local_mount_path)
-        
+
     return "1"
+
 
 @echo
 def delete_secondary_storage_folder(session, args):
@@ -125,15 +113,16 @@ def delete_secondary_storage_folder(session, args):
             umount(local_mount_path)
             # Remove the local folder
             os.system("rmdir " + local_mount_path)
-        
+
     return "1"
-     
+
+
 @echo
 def post_create_private_template(session, args):
     local_mount_path = None
     try:
         try:
-            # get local template folder 
+            # get local template folder
             templatePath = args["templatePath"]
             local_mount_path = os.path.join(CLOUD_DIR, util.gen_uuid())
             mount(templatePath, local_mount_path)
@@ -145,7 +134,7 @@ def post_create_private_template(session, args):
             file_size = args["size"]
             virtual_size = args["virtualSize"]
             template_id = args["templateId"]
-           
+
             # Create the template.properties file
             template_properties_install_path = local_mount_path + "/template.properties"
             f = open(template_properties_install_path, "w")
@@ -164,7 +153,7 @@ def post_create_private_template(session, args):
             f.write("size=" + str(file_size) + "\n")
             f.close()
             logging.debug("Created template.properties file")
-           
+
             # Set permissions
             permissions = stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH
             os.chmod(template_properties_install_path, permissions)
@@ -181,8 +170,9 @@ def post_create_private_template(session, args):
             umount(local_mount_path)
             # Remove the local folder
             os.system("rmdir " + local_mount_path)
-    return "1" 
-  
+    return "1"
+
+
 def isfile(path, isISCSI):
     errMsg = ''
     exists = True
@@ -190,12 +180,13 @@ def isfile(path, isISCSI):
         exists = checkVolumeAvailablility(path)
     else:
         exists = os.path.isfile(path)
-        
+
     if not exists:
         errMsg = "File " + path + " does not exist."
         logging.debug(errMsg)
         raise xs_errors.XenError(errMsg)
     return errMsg
+
 
 def copyfile(fromFile, toFile, isISCSI):
     logging.debug("Starting to copy " + fromFile + " to " + toFile)
@@ -221,6 +212,7 @@ def copyfile(fromFile, toFile, isISCSI):
     logging.debug("Successfully copied " + fromFile + " to " + toFile)
     return errMsg
 
+
 def chdir(path):
     try:
         os.chdir(path)
@@ -231,6 +223,7 @@ def chdir(path):
     logging.debug("Chdired to " + path)
     return
 
+
 def scanParent(path):
     # Do a scan for the parent for ISCSI volumes
     # Note that the parent need not be visible on the XenServer
@@ -238,7 +231,7 @@ def scanParent(path):
     try:
         lvName = os.path.basename(path)
         dirname = os.path.dirname(path)
-        vgName = os.path.basename(dirname) 
+        vgName = os.path.basename(dirname)
         vhdInfo = vhdutil.getVHDInfoLVM(lvName, lvhdutil.extractUuid, vgName)
         parentUUID = vhdInfo.parentUuid
     except:
@@ -247,9 +240,10 @@ def scanParent(path):
         raise xs_errors.XenError(errMsg)
     return parentUUID
 
+
 def getParent(path, isISCSI):
     parentUUID = ''
-    try :
+    try:
         if isISCSI:
             parentUUID = vhdutil.getParent(path, lvhdutil.extractUuid)
         else:
@@ -260,9 +254,10 @@ def getParent(path, isISCSI):
         raise xs_errors.XenError(errMsg)
     return parentUUID
 
+
 def getParentOfSnapshot(snapshotUuid, primarySRPath, isISCSI):
-    snapshotVHD    = getVHD(snapshotUuid, isISCSI)
-    snapshotPath   = os.path.join(primarySRPath, snapshotVHD)
+    snapshotVHD = getVHD(snapshotUuid, isISCSI)
+    snapshotPath = os.path.join(primarySRPath, snapshotVHD)
 
     baseCopyUuid = ''
     if isISCSI:
@@ -270,20 +265,22 @@ def getParentOfSnapshot(snapshotUuid, primarySRPath, isISCSI):
         baseCopyUuid = scanParent(snapshotPath)
     else:
         baseCopyUuid = getParent(snapshotPath, isISCSI)
-    
+
     logging.debug("Base copy of snapshotUuid: " + snapshotUuid + " is " + baseCopyUuid)
     return baseCopyUuid
+
 
 def setParent(parent, child):
     try:
         cmd = [VHDUTIL, "modify", "-p", parent, "-n", child]
         txt = util.pread2(cmd)
     except:
-        errMsg = "Unexpected error while trying to set parent of " + child + " to " + parent 
+        errMsg = "Unexpected error while trying to set parent of " + child + " to " + parent
         logging.debug(errMsg)
         raise xs_errors.XenError(errMsg)
     logging.debug("Successfully set parent of " + child + " to " + parent)
     return
+
 
 def rename(originalVHD, newVHD):
     try:
@@ -293,6 +290,7 @@ def rename(originalVHD, newVHD):
         logging.debug(errMsg)
         raise xs_errors.XenError(errMsg)
     return
+
 
 def makedirs(path):
     if not os.path.isdir(path):
@@ -307,35 +305,38 @@ def makedirs(path):
             raise xs_errors.XenError(errMsg)
     return
 
+
 def mount(remoteDir, localDir):
     makedirs(localDir)
     options = "soft,tcp,timeo=133,retrans=1"
-    try: 
+    try:
         cmd = ['mount', '-o', options, remoteDir, localDir]
         txt = util.pread2(cmd)
     except:
         txt = ''
-        errMsg = "Unexpected error while trying to mount " + remoteDir + " to " + localDir 
+        errMsg = "Unexpected error while trying to mount " + remoteDir + " to " + localDir
         logging.debug(errMsg)
         raise xs_errors.XenError(errMsg)
     logging.debug("Successfully mounted " + remoteDir + " to " + localDir)
 
     return
 
+
 def umount(localDir):
-    try: 
+    try:
         cmd = ['umount', localDir]
         util.pread2(cmd)
     except CommandException:
-        errMsg = "CommandException raised while trying to umount " + localDir 
+        errMsg = "CommandException raised while trying to umount " + localDir
         logging.debug(errMsg)
         raise xs_errors.XenError(errMsg)
 
     logging.debug("Successfully unmounted " + localDir)
     return
 
+
 def mountSnapshotsDir(secondaryStorageMountPath, localMountPointPath, path):
-    # The aim is to mount secondaryStorageMountPath on 
+    # The aim is to mount secondaryStorageMountPath on
     # And create <accountId>/<instanceId> dir on it, if it doesn't exist already.
     # Assuming that secondaryStorageMountPath  exists remotely
 
@@ -362,6 +363,7 @@ def mountSnapshotsDir(secondaryStorageMountPath, localMountPointPath, path):
     makedirs(backupsDir)
     return backupsDir
 
+
 def unmountAll(path):
     try:
         for dir in os.listdir(path):
@@ -371,6 +373,7 @@ def unmountAll(path):
                 umount(localMountPointPath)
     except:
         logging.debug("Ignoring the error while trying to unmount the snapshots dir")
+
 
 @echo
 def unmountSnapshotsDir(session, args):
@@ -385,6 +388,7 @@ def unmountSnapshotsDir(session, args):
 
     return "1"
 
+
 def getPrimarySRPath(primaryStorageSRUuid, isISCSI):
     if isISCSI:
         primarySRDir = lvhdutil.VG_PREFIX + primaryStorageSRUuid
@@ -392,8 +396,10 @@ def getPrimarySRPath(primaryStorageSRUuid, isISCSI):
     else:
         return os.path.join(SR.MOUNT_BASE, primaryStorageSRUuid)
 
+
 def getBackupVHD(UUID):
     return UUID + '.' + SR.DEFAULT_TAP
+
 
 def getVHD(UUID, isISCSI):
     if isISCSI:
@@ -401,11 +407,13 @@ def getVHD(UUID, isISCSI):
     else:
         return UUID + '.' + SR.DEFAULT_TAP
 
+
 def getIsTrueString(stringValue):
     booleanValue = False
     if (stringValue and stringValue == 'true'):
         booleanValue = True
-    return booleanValue 
+    return booleanValue
+
 
 def makeUnavailable(uuid, primarySRPath, isISCSI):
     if not isISCSI:
@@ -415,6 +423,7 @@ def makeUnavailable(uuid, primarySRPath, isISCSI):
     manageAvailability(path, '-an')
     return
 
+
 def manageAvailability(path, value):
     if path.__contains__("/var/run/sr-mount"):
         return
@@ -422,13 +431,13 @@ def manageAvailability(path, value):
     try:
         cmd = ['/usr/sbin/lvchange', value, path]
         util.pread2(cmd)
-    except: #CommandException, (rc, cmdListStr, stderr):
-        #errMsg = "CommandException thrown while executing: " + cmdListStr + " with return code: " + str(rc) + " and stderr: " + stderr
+    except:  # CommandException, (rc, cmdListStr, stderr):
+        # errMsg = "CommandException thrown while executing: " + cmdListStr + " with return code: " + str(rc) + " and stderr: " + stderr
         errMsg = "Unexpected exception thrown by lvchange"
         logging.debug(errMsg)
         if value == "-ay":
             # Raise an error only if we are trying to make it available.
-            # Just warn if we are trying to make it unavailable after the 
+            # Just warn if we are trying to make it unavailable after the
             # snapshot operation is done.
             raise xs_errors.XenError(errMsg)
     return
@@ -445,7 +454,7 @@ def checkVolumeAvailablility(path):
         errMsg = "Could not determine status of ISCSI path: " + path
         logging.debug(errMsg)
         raise xs_errors.XenError(errMsg)
-    
+
     success = False
     i = 0
     while i < 6:
@@ -462,9 +471,10 @@ def checkVolumeAvailablility(path):
 
     # If not visible within 1 min fail
     if not success:
-        logging.debug("Could not make vhd: " +  path + " available despite waiting for 1 minute. Does it exist?")
+        logging.debug("Could not make vhd: " + path + " available despite waiting for 1 minute. Does it exist?")
 
     return success
+
 
 def isVolumeAvailable(path):
     # Check if iscsi volume is available on this XenServer.
@@ -477,52 +487,54 @@ def isVolumeAvailable(path):
         logging.debug(errMsg)
         raise xs_errors.XenError(errMsg)
 
-    return (status == "1")  
+    return (status == "1")
+
 
 def getVhdParent(session, args):
     logging.debug("getParent with " + str(args))
-    primaryStorageSRUuid      = args['primaryStorageSRUuid']
-    snapshotUuid              = args['snapshotUuid']
-    isISCSI                   = getIsTrueString(args['isISCSI']) 
+    primaryStorageSRUuid = args['primaryStorageSRUuid']
+    snapshotUuid = args['snapshotUuid']
+    isISCSI = getIsTrueString(args['isISCSI'])
 
     primarySRPath = getPrimarySRPath(primaryStorageSRUuid, isISCSI)
     logging.debug("primarySRPath: " + primarySRPath)
 
     baseCopyUuid = getParentOfSnapshot(snapshotUuid, primarySRPath, isISCSI)
 
-    return  baseCopyUuid
+    return baseCopyUuid
+
 
 def getSnapshotSize(session, args):
-    primaryStorageSRUuid      = args['primaryStorageSRUuid']
-    snapshotUuid              = args['snapshotUuid']
-    isISCSI                   = getIsTrueString(args['isISCSI'])
+    primaryStorageSRUuid = args['primaryStorageSRUuid']
+    snapshotUuid = args['snapshotUuid']
+    isISCSI = getIsTrueString(args['isISCSI'])
 
     primarySRPath = getPrimarySRPath(primaryStorageSRUuid, isISCSI)
     logging.debug("primarySRPath: " + primarySRPath)
 
-    snapshotVHD  = getVHD(snapshotUuid, isISCSI)
+    snapshotVHD = getVHD(snapshotUuid, isISCSI)
     snapshotPath = os.path.join(primarySRPath, snapshotVHD)
     physicalSize = vhdutil.getSizePhys(snapshotPath)
     return str(physicalSize)
 
+
 def backupSnapshot(session, args):
     logging.debug("Called backupSnapshot with " + str(args))
-    primaryStorageSRUuid      = args['primaryStorageSRUuid']
+    primaryStorageSRUuid = args['primaryStorageSRUuid']
     secondaryStorageMountPath = args['secondaryStorageMountPath']
-    snapshotUuid              = args['snapshotUuid']
-    prevBackupUuid            = args['prevBackupUuid']
-    backupUuid                = args['backupUuid']
-    isISCSI                   = getIsTrueString(args['isISCSI'])
+    snapshotUuid = args['snapshotUuid']
+    prevBackupUuid = args['prevBackupUuid']
+    backupUuid = args['backupUuid']
+    isISCSI = getIsTrueString(args['isISCSI'])
     path = args['path']
     localMountPoint = args['localMountPoint']
     primarySRPath = getPrimarySRPath(primaryStorageSRUuid, isISCSI)
     logging.debug("primarySRPath: " + primarySRPath)
 
     baseCopyUuid = getParentOfSnapshot(snapshotUuid, primarySRPath, isISCSI)
-    baseCopyVHD  = getVHD(baseCopyUuid, isISCSI)
+    baseCopyVHD = getVHD(baseCopyUuid, isISCSI)
     baseCopyPath = os.path.join(primarySRPath, baseCopyVHD)
     logging.debug("Base copy path: " + baseCopyPath)
-
 
     # Mount secondary storage mount path on XenServer along the path
     # /var/run/sr-mount/<dcId>/snapshots/ and create <accountId>/<volumeId> dir
@@ -540,7 +552,7 @@ def backupSnapshot(session, args):
         isfile(prevBackupFile, False)
 
     # copy baseCopyPath to backupsDir with new uuid
-    backupVHD = getBackupVHD(backupUuid)  
+    backupVHD = getBackupVHD(backupUuid)
     backupFile = os.path.join(backupsDir, backupVHD)
     logging.debug("Back up " + baseCopyUuid + " to Secondary Storage as " + backupUuid)
     copyfile(baseCopyPath, backupFile, isISCSI)
@@ -548,7 +560,7 @@ def backupSnapshot(session, args):
 
     # Because the primary storage is always scanned, the parent of this base copy is always the first base copy.
     # We don't want that, we want a chain of VHDs each of which is a delta from the previous.
-    # So set the parent of the current baseCopyVHD to prevBackupVHD 
+    # So set the parent of the current baseCopyVHD to prevBackupVHD
     if prevBackupUuid:
         # If there was a previous snapshot
         setParent(prevBackupFile, backupFile)
@@ -556,11 +568,12 @@ def backupSnapshot(session, args):
     txt = "1#" + backupUuid + "#" + str(physicalSize)
     return txt
 
+
 @echo
 def deleteSnapshotBackup(session, args):
     logging.debug("Calling deleteSnapshotBackup with " + str(args))
     secondaryStorageMountPath = args['secondaryStorageMountPath']
-    backupUUID                = args['backupUUID']
+    backupUUID = args['backupUUID']
     path = args['path']
     localMountPoint = args['localMountPoint']
 
@@ -576,7 +589,7 @@ def deleteSnapshotBackup(session, args):
         logging.debug("backupVHD " + backupVHD + "does not exist. Not trying to delete it")
         return "1"
     logging.debug("backupVHD " + backupVHD + " exists.")
-        
+
     # Just delete the backupVHD
     try:
         os.remove(backupVHD)
@@ -586,7 +599,8 @@ def deleteSnapshotBackup(session, args):
         raise xs_errors.XenError(errMsg)
 
     return "1"
-   
+
+
 @echo
 def revert_memory_snapshot(session, args):
     logging.debug("Calling revert_memory_snapshot with " + str(args))
@@ -613,7 +627,9 @@ def revert_memory_snapshot(session, args):
         raise xs_errors.XenError(errMsg)
     return "0"
 
-if __name__ == "__main__":
-    XenAPIPlugin.dispatch({"getVhdParent":getVhdParent,  "create_secondary_storage_folder":create_secondary_storage_folder, "delete_secondary_storage_folder":delete_secondary_storage_folder, "post_create_private_template":post_create_private_template, "backupSnapshot": backupSnapshot, "deleteSnapshotBackup": deleteSnapshotBackup, "unmountSnapshotsDir": unmountSnapshotsDir, "revert_memory_snapshot":revert_memory_snapshot, "getSnapshotSize":getSnapshotSize})
-    
 
+if __name__ == "__main__":
+    XenAPIPlugin.dispatch(
+        { "getVhdParent": getVhdParent, "create_secondary_storage_folder": create_secondary_storage_folder, "delete_secondary_storage_folder": delete_secondary_storage_folder,
+          "post_create_private_template": post_create_private_template, "backupSnapshot": backupSnapshot, "deleteSnapshotBackup": deleteSnapshotBackup,
+          "unmountSnapshotsDir": unmountSnapshotsDir, "revert_memory_snapshot": revert_memory_snapshot, "getSnapshotSize": getSnapshotSize })

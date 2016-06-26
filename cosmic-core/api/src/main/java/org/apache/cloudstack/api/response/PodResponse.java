@@ -1,30 +1,14 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.List;
 
 import com.cloud.dc.Pod;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = Pod.class)
 public class PodResponse extends BaseResponse {
@@ -72,7 +56,7 @@ public class PodResponse extends BaseResponse {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -80,7 +64,7 @@ public class PodResponse extends BaseResponse {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -88,7 +72,7 @@ public class PodResponse extends BaseResponse {
         return zoneId;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
@@ -96,7 +80,7 @@ public class PodResponse extends BaseResponse {
         return zoneName;
     }
 
-    public void setZoneName(String zoneName) {
+    public void setZoneName(final String zoneName) {
         this.zoneName = zoneName;
     }
 
@@ -104,7 +88,7 @@ public class PodResponse extends BaseResponse {
         return gateway;
     }
 
-    public void setGateway(String gateway) {
+    public void setGateway(final String gateway) {
         this.gateway = gateway;
     }
 
@@ -112,7 +96,7 @@ public class PodResponse extends BaseResponse {
         return netmask;
     }
 
-    public void setNetmask(String netmask) {
+    public void setNetmask(final String netmask) {
         this.netmask = netmask;
     }
 
@@ -120,7 +104,7 @@ public class PodResponse extends BaseResponse {
         return startIp;
     }
 
-    public void setStartIp(String startIp) {
+    public void setStartIp(final String startIp) {
         this.startIp = startIp;
     }
 
@@ -128,7 +112,7 @@ public class PodResponse extends BaseResponse {
         return endIp;
     }
 
-    public void setEndIp(String endIp) {
+    public void setEndIp(final String endIp) {
         this.endIp = endIp;
     }
 
@@ -136,7 +120,7 @@ public class PodResponse extends BaseResponse {
         return allocationState;
     }
 
-    public void setAllocationState(String allocationState) {
+    public void setAllocationState(final String allocationState) {
         this.allocationState = allocationState;
     }
 
@@ -144,7 +128,7 @@ public class PodResponse extends BaseResponse {
         return capacitites;
     }
 
-    public void setCapacitites(List<CapacityResponse> capacitites) {
+    public void setCapacitites(final List<CapacityResponse> capacitites) {
         this.capacitites = capacitites;
     }
 }

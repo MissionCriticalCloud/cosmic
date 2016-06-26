@@ -1,24 +1,13 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.engine.datacenter.entity.api.db;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
+import com.cloud.network.Network.Provider;
+import com.cloud.org.Grouping;
+import com.cloud.utils.NumbersUtil;
+import com.cloud.utils.db.GenericDao;
+import com.cloud.utils.db.StateMachine;
+import org.apache.cloudstack.api.Identity;
+import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State;
+import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,127 +21,19 @@ import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-
-import com.cloud.network.Network.Provider;
-import com.cloud.org.Grouping;
-import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.db.GenericDao;
-import com.cloud.utils.db.StateMachine;
-
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State;
-import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
 
 @Entity
 @Table(name = "data_center")
 public class EngineDataCenterVO implements EngineDataCenter, Identity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private long id;
-
-    @Column(name = "name")
-    private String name = null;
-
-    @Column(name = "description")
-    private String description = null;
-
-    @Column(name = "dns1")
-    private String dns1 = null;
-
-    @Column(name = "dns2")
-    private String dns2 = null;
-
-    @Column(name = "ip6Dns1")
-    private String ip6Dns1 = null;
-
-    @Column(name = "ip6Dns2")
-    private String ip6Dns2 = null;
-
-    @Column(name = "internal_dns1")
-    private String internalDns1 = null;
-
-    @Column(name = "internal_dns2")
-    private String internalDns2 = null;
-
-    @Column(name = "router_mac_address", updatable = false, nullable = false)
-    private String routerMacAddress = "02:00:00:00:00:01";
-
-    @Column(name = "guest_network_cidr")
-    private String guestNetworkCidr = null;
-
-    @Column(name = "domain_id")
-    private Long domainId = null;
-
-    @Column(name = "domain")
-    private String domain;
-
-    @Column(name = "networktype")
-    @Enumerated(EnumType.STRING)
-    NetworkType networkType;
-
-    @Column(name = "dns_provider")
-    private String dnsProvider;
-
-    @Column(name = "dhcp_provider")
-    private String dhcpProvider;
-
-    @Column(name = "gateway_provider")
-    private String gatewayProvider;
-
-    @Column(name = "vpn_provider")
-    private String vpnProvider;
-
-    @Column(name = "userdata_provider")
-    private String userDataProvider;
-
-    @Column(name = "lb_provider")
-    private String loadBalancerProvider;
-
-    @Column(name = "firewall_provider")
-    private String firewallProvider;
-
-    @Column(name = "mac_address", nullable = false)
-    @TableGenerator(name = "mac_address_sq", table = "data_center", pkColumnName = "id", valueColumnName = "mac_address", allocationSize = 1)
-    private long macAddress = 1;
-
-    @Column(name = "zone_token")
-    private String zoneToken;
-
-    @Column(name = GenericDao.REMOVED_COLUMN)
-    private Date removed;
-
-    // This is a delayed load value.  If the value is null,
-    // then this field has not been loaded yet.
-    // Call the dao to load it.
-    @Transient
-    Map<String, String> details;
-
-    @Column(name = "allocation_state")
-    @Enumerated(value = EnumType.STRING)
-    AllocationState allocationState;
-
-    @Column(name = "uuid")
-    private String uuid;
-
-    @Column(name = "is_security_group_enabled")
-    boolean securityGroupEnabled;
-
-    @Column(name = "is_local_storage_enabled")
-    boolean localStorageEnabled;
-
-    //orchestration
-    @Column(name = "owner")
-    private String owner = null;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     protected Date created;
-
     @Column(name = "lastUpdated", updatable = true)
     @Temporal(value = TemporalType.TIMESTAMP)
     protected Date lastUpdated;
-
     /**
      * Note that state is intentionally missing the setter.  Any updates to
      * the state machine needs to go through the DAO object because someone
@@ -162,62 +43,90 @@ public class EngineDataCenterVO implements EngineDataCenter, Identity {
     @StateMachine(state = State.class, event = Event.class)
     @Column(name = "engine_state", updatable = true, nullable = false, length = 32)
     protected State state = null;
+    @Column(name = "networktype")
+    @Enumerated(EnumType.STRING)
+    NetworkType networkType;
+    // This is a delayed load value.  If the value is null,
+    // then this field has not been loaded yet.
+    // Call the dao to load it.
+    @Transient
+    Map<String, String> details;
+    @Column(name = "allocation_state")
+    @Enumerated(value = EnumType.STRING)
+    AllocationState allocationState;
+    @Column(name = "is_security_group_enabled")
+    boolean securityGroupEnabled;
+    @Column(name = "is_local_storage_enabled")
+    boolean localStorageEnabled;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private long id;
+    @Column(name = "name")
+    private String name = null;
+    @Column(name = "description")
+    private String description = null;
+    @Column(name = "dns1")
+    private String dns1 = null;
+    @Column(name = "dns2")
+    private String dns2 = null;
+    @Column(name = "ip6Dns1")
+    private String ip6Dns1 = null;
+    @Column(name = "ip6Dns2")
+    private String ip6Dns2 = null;
+    @Column(name = "internal_dns1")
+    private String internalDns1 = null;
+    @Column(name = "internal_dns2")
+    private String internalDns2 = null;
+    @Column(name = "router_mac_address", updatable = false, nullable = false)
+    private String routerMacAddress = "02:00:00:00:00:01";
+    @Column(name = "guest_network_cidr")
+    private String guestNetworkCidr = null;
+    @Column(name = "domain_id")
+    private Long domainId = null;
+    @Column(name = "domain")
+    private String domain;
+    @Column(name = "dns_provider")
+    private String dnsProvider;
+    @Column(name = "dhcp_provider")
+    private String dhcpProvider;
+    @Column(name = "gateway_provider")
+    private String gatewayProvider;
+    @Column(name = "vpn_provider")
+    private String vpnProvider;
+    @Column(name = "userdata_provider")
+    private String userDataProvider;
+    @Column(name = "lb_provider")
+    private String loadBalancerProvider;
+    @Column(name = "firewall_provider")
+    private String firewallProvider;
+    @Column(name = "mac_address", nullable = false)
+    @TableGenerator(name = "mac_address_sq", table = "data_center", pkColumnName = "id", valueColumnName = "mac_address", allocationSize = 1)
+    private long macAddress = 1;
+    @Column(name = "zone_token")
+    private String zoneToken;
+    @Column(name = GenericDao.REMOVED_COLUMN)
+    private Date removed;
+    @Column(name = "uuid")
+    private String uuid;
+    //orchestration
+    @Column(name = "owner")
+    private String owner = null;
 
-    @Override
-    public String getDnsProvider() {
-        return dnsProvider;
-    }
-
-    public void setDnsProvider(String dnsProvider) {
-        this.dnsProvider = dnsProvider;
-    }
-
-    @Override
-    public String getDhcpProvider() {
-        return dhcpProvider;
-    }
-
-    public void setDhcpProvider(String dhcpProvider) {
-        this.dhcpProvider = dhcpProvider;
-    }
-
-    @Override
-    public String getGatewayProvider() {
-        return gatewayProvider;
-    }
-
-    public void setGatewayProvider(String gatewayProvider) {
-        this.gatewayProvider = gatewayProvider;
-    }
-
-    @Override
-    public String getLoadBalancerProvider() {
-        return loadBalancerProvider;
-    }
-
-    public void setLoadBalancerProvider(String loadBalancerProvider) {
-        this.loadBalancerProvider = loadBalancerProvider;
-    }
-
-    @Override
-    public String getFirewallProvider() {
-        return firewallProvider;
-    }
-
-    public void setFirewallProvider(String firewallProvider) {
-        this.firewallProvider = firewallProvider;
-    }
-
-    public EngineDataCenterVO(long id, String name, String description, String dns1, String dns2, String dns3, String dns4, String guestCidr, String domain,
-            Long domainId, NetworkType zoneType, String zoneToken, String domainSuffix) {
+    public EngineDataCenterVO(final long id, final String name, final String description, final String dns1, final String dns2, final String dns3, final String dns4, final
+    String guestCidr, final String domain,
+                              final Long domainId, final NetworkType zoneType, final String zoneToken, final String domainSuffix) {
         this(name, description, dns1, dns2, dns3, dns4, guestCidr, domain, domainId, zoneType, zoneToken, domainSuffix, false, false, null, null);
         this.id = id;
         this.allocationState = Grouping.AllocationState.Enabled;
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public EngineDataCenterVO(String name, String description, String dns1, String dns2, String dns3, String dns4, String guestCidr, String domain, Long domainId,
-            NetworkType zoneType, String zoneToken, String domainSuffix, boolean securityGroupEnabled, boolean localStorageEnabled, String ip6Dns1, String ip6Dns2) {
+    public EngineDataCenterVO(final String name, final String description, final String dns1, final String dns2, final String dns3, final String dns4, final String guestCidr,
+                              final String domain, final Long domainId,
+                              final NetworkType zoneType, final String zoneToken, final String domainSuffix, final boolean securityGroupEnabled, final boolean
+                                      localStorageEnabled, final String ip6Dns1, final String
+                                      ip6Dns2) {
         this.name = name;
         this.description = description;
         this.dns1 = dns1;
@@ -253,49 +162,15 @@ public class EngineDataCenterVO implements EngineDataCenter, Identity {
         this.state = State.Disabled;
     }
 
-    @Override
-    public String getVpnProvider() {
-        return vpnProvider;
-    }
-
-    public void setVpnProvider(String vpnProvider) {
-        this.vpnProvider = vpnProvider;
-    }
-
-    @Override
-    public String getUserDataProvider() {
-        return userDataProvider;
-    }
-
-    public void setUserDataProvider(String userDataProvider) {
-        this.userDataProvider = userDataProvider;
-    }
-
-    @Override
-    public String getGuestNetworkCidr() {
-        return guestNetworkCidr;
-    }
-
-    public void setGuestNetworkCidr(String guestNetworkCidr) {
-        this.guestNetworkCidr = guestNetworkCidr;
-    }
-
-    @Override
-    public Long getDomainId() {
-        return domainId;
-    }
-
-    public void setDomainId(Long domainId) {
-        this.domainId = domainId;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
+    protected EngineDataCenterVO() {
     }
 
     public String getRouterMacAddress() {
         return routerMacAddress;
+    }
+
+    public void setRouterMacAddress(final String routerMacAddress) {
+        this.routerMacAddress = routerMacAddress;
     }
 
     @Override
@@ -308,6 +183,66 @@ public class EngineDataCenterVO implements EngineDataCenter, Identity {
         return dns2;
     }
 
+    public void setDns2(final String dns2) {
+        this.dns2 = dns2;
+    }
+
+    @Override
+    public String getIp6Dns1() {
+        return ip6Dns1;
+    }
+
+    public void setIp6Dns1(final String ip6Dns1) {
+        this.ip6Dns1 = ip6Dns1;
+    }
+
+    @Override
+    public String getIp6Dns2() {
+        return ip6Dns2;
+    }
+
+    @Override
+    public String getGuestNetworkCidr() {
+        return guestNetworkCidr;
+    }
+
+    public void setGuestNetworkCidr(final String guestNetworkCidr) {
+        this.guestNetworkCidr = guestNetworkCidr;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public Long getDomainId() {
+        return domainId;
+    }
+
+    public void setDomainId(final Long domainId) {
+        this.domainId = domainId;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(final String domain) {
+        this.domain = domain;
+    }
+
+    @Override
+    public NetworkType getNetworkType() {
+        return networkType;
+    }
+
     @Override
     public String getInternalDns1() {
         return internalDns1;
@@ -318,59 +253,59 @@ public class EngineDataCenterVO implements EngineDataCenter, Identity {
         return internalDns2;
     }
 
-    protected EngineDataCenterVO() {
+    @Override
+    public String getDnsProvider() {
+        return dnsProvider;
+    }
+
+    public void setDnsProvider(final String dnsProvider) {
+        this.dnsProvider = dnsProvider;
     }
 
     @Override
-    public long getId() {
-        return id;
+    public String getGatewayProvider() {
+        return gatewayProvider;
+    }
+
+    public void setGatewayProvider(final String gatewayProvider) {
+        this.gatewayProvider = gatewayProvider;
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDns1(String dns1) {
-        this.dns1 = dns1;
-    }
-
-    public void setDns2(String dns2) {
-        this.dns2 = dns2;
-    }
-
-    public void setInternalDns1(String dns3) {
-        this.internalDns1 = dns3;
-    }
-
-    public void setInternalDns2(String dns4) {
-        this.internalDns2 = dns4;
-    }
-
-    public void setRouterMacAddress(String routerMacAddress) {
-        this.routerMacAddress = routerMacAddress;
+    public String getFirewallProvider() {
+        return firewallProvider;
     }
 
     @Override
-    public String getDomain() {
-        return domain;
+    public String getDhcpProvider() {
+        return dhcpProvider;
     }
 
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-
-    public void setNetworkType(NetworkType zoneNetworkType) {
-        this.networkType = zoneNetworkType;
+    public void setDhcpProvider(final String dhcpProvider) {
+        this.dhcpProvider = dhcpProvider;
     }
 
     @Override
-    public NetworkType getNetworkType() {
-        return networkType;
+    public String getLoadBalancerProvider() {
+        return loadBalancerProvider;
+    }
+
+    public void setLoadBalancerProvider(final String loadBalancerProvider) {
+        this.loadBalancerProvider = loadBalancerProvider;
+    }
+
+    @Override
+    public String getUserDataProvider() {
+        return userDataProvider;
+    }
+
+    @Override
+    public String getVpnProvider() {
+        return vpnProvider;
+    }
+
+    public void setVpnProvider(final String vpnProvider) {
+        this.vpnProvider = vpnProvider;
     }
 
     @Override
@@ -378,17 +313,8 @@ public class EngineDataCenterVO implements EngineDataCenter, Identity {
         return securityGroupEnabled;
     }
 
-    public void setSecurityGroupEnabled(boolean enabled) {
+    public void setSecurityGroupEnabled(final boolean enabled) {
         this.securityGroupEnabled = enabled;
-    }
-
-    @Override
-    public boolean isLocalStorageEnabled() {
-        return localStorageEnabled;
-    }
-
-    public void setLocalStorageEnabled(boolean enabled) {
-        this.localStorageEnabled = enabled;
     }
 
     @Override
@@ -397,18 +323,8 @@ public class EngineDataCenterVO implements EngineDataCenter, Identity {
     }
 
     @Override
-    public void setDetails(Map<String, String> details2) {
+    public void setDetails(final Map<String, String> details2) {
         details = details2;
-    }
-
-    public String getDetail(String name) {
-        return details != null ? details.get(name) : null;
-    }
-
-    public void setDetail(String name, String value) {
-        assert (details != null) : "Did you forget to load the details?";
-
-        details.put(name, value);
     }
 
     @Override
@@ -416,8 +332,73 @@ public class EngineDataCenterVO implements EngineDataCenter, Identity {
         return allocationState;
     }
 
-    public void setAllocationState(AllocationState allocationState) {
+    public void setAllocationState(final AllocationState allocationState) {
         this.allocationState = allocationState;
+    }
+
+    @Override
+    public String getZoneToken() {
+        return zoneToken;
+    }
+
+    @Override
+    public boolean isLocalStorageEnabled() {
+        return localStorageEnabled;
+    }
+
+    public void setLocalStorageEnabled(final boolean enabled) {
+        this.localStorageEnabled = enabled;
+    }
+
+    public void setZoneToken(final String zoneToken) {
+        this.zoneToken = zoneToken;
+    }
+
+    public void setUserDataProvider(final String userDataProvider) {
+        this.userDataProvider = userDataProvider;
+    }
+
+    public void setFirewallProvider(final String firewallProvider) {
+        this.firewallProvider = firewallProvider;
+    }
+
+    public void setInternalDns2(final String dns4) {
+        this.internalDns2 = dns4;
+    }
+
+    public void setInternalDns1(final String dns3) {
+        this.internalDns1 = dns3;
+    }
+
+    public void setNetworkType(final NetworkType zoneNetworkType) {
+        this.networkType = zoneNetworkType;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public void setIp6Dns2(final String ip6Dns2) {
+        this.ip6Dns2 = ip6Dns2;
+    }
+
+    public void setDns1(final String dns1) {
+        this.dns1 = dns1;
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    public String getDetail(final String name) {
+        return details != null ? details.get(name) : null;
+    }
+
+    public void setDetail(final String name, final String value) {
+        assert (details != null) : "Did you forget to load the details?";
+
+        details.put(name, value);
     }
 
     @Override
@@ -426,21 +407,12 @@ public class EngineDataCenterVO implements EngineDataCenter, Identity {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (!(obj instanceof EngineDataCenterVO)) {
             return false;
         }
-        EngineDataCenterVO that = (EngineDataCenterVO)obj;
+        final EngineDataCenterVO that = (EngineDataCenterVO) obj;
         return this.id == that.id;
-    }
-
-    @Override
-    public String getZoneToken() {
-        return zoneToken;
-    }
-
-    public void setZoneToken(String zoneToken) {
-        this.zoneToken = zoneToken;
     }
 
     public Date getRemoved() {
@@ -452,7 +424,7 @@ public class EngineDataCenterVO implements EngineDataCenter, Identity {
         return this.uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(final String uuid) {
         this.uuid = uuid;
     }
 
@@ -460,7 +432,7 @@ public class EngineDataCenterVO implements EngineDataCenter, Identity {
         return macAddress;
     }
 
-    public void setMacAddress(long macAddress) {
+    public void setMacAddress(final long macAddress) {
         this.macAddress = macAddress;
     }
 
@@ -468,7 +440,7 @@ public class EngineDataCenterVO implements EngineDataCenter, Identity {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(final String owner) {
         this.owner = owner;
     }
 
@@ -482,23 +454,5 @@ public class EngineDataCenterVO implements EngineDataCenter, Identity {
 
     public State getState() {
         return state;
-    }
-
-    @Override
-    public String getIp6Dns1() {
-        return ip6Dns1;
-    }
-
-    public void setIp6Dns1(String ip6Dns1) {
-        this.ip6Dns1 = ip6Dns1;
-    }
-
-    @Override
-    public String getIp6Dns2() {
-        return ip6Dns2;
-    }
-
-    public void setIp6Dns2(String ip6Dns2) {
-        this.ip6Dns2 = ip6Dns2;
     }
 }

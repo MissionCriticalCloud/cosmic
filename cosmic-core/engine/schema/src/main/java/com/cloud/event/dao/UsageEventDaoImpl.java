@@ -1,29 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.event.dao;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
-import javax.inject.Inject;
 
 import com.cloud.dc.Vlan;
 import com.cloud.event.EventTypes;
@@ -37,6 +12,14 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
 
+import javax.inject.Inject;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -44,20 +27,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class UsageEventDaoImpl extends GenericDaoBase<UsageEventVO, Long> implements UsageEventDao {
     public static final Logger s_logger = LoggerFactory.getLogger(UsageEventDaoImpl.class.getName());
-
-    private final SearchBuilder<UsageEventVO> latestEventsSearch;
-    private final SearchBuilder<UsageEventVO> IpeventsSearch;
     private static final String COPY_EVENTS =
-        "INSERT INTO cloud_usage.usage_event (id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size) "
-            + "SELECT id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size FROM cloud.usage_event vmevt WHERE vmevt.id > ? and vmevt.id <= ? ";
+            "INSERT INTO cloud_usage.usage_event (id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size) "
+                    + "SELECT id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size FROM cloud" +
+                    ".usage_event vmevt WHERE vmevt.id > ? and vmevt.id <= ? ";
     private static final String COPY_ALL_EVENTS =
-        "INSERT INTO cloud_usage.usage_event (id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size) "
-            + "SELECT id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size FROM cloud.usage_event vmevt WHERE vmevt.id <= ?";
+            "INSERT INTO cloud_usage.usage_event (id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size) "
+                    + "SELECT id, type, account_id, created, zone_id, resource_id, resource_name, offering_id, template_id, size, resource_type, virtual_size FROM cloud" +
+                    ".usage_event vmevt WHERE vmevt.id <= ?";
     private static final String COPY_EVENT_DETAILS = "INSERT INTO cloud_usage.usage_event_details (id, usage_event_id, name, value) "
             + "SELECT id, usage_event_id, name, value FROM cloud.usage_event_details vmevtDetails WHERE vmevtDetails.usage_event_id > ? and vmevtDetails.usage_event_id <= ? ";
     private static final String COPY_ALL_EVENT_DETAILS = "INSERT INTO cloud_usage.usage_event_details (id, usage_event_id, name, value) "
             + "SELECT id, usage_event_id, name, value FROM cloud.usage_event_details vmevtDetails WHERE vmevtDetails.usage_event_id <= ?";
     private static final String MAX_EVENT = "select max(id) from cloud.usage_event where created <= ?";
+    private final SearchBuilder<UsageEventVO> latestEventsSearch;
+    private final SearchBuilder<UsageEventVO> IpeventsSearch;
     @Inject
     protected UsageEventDetailsDao usageEventDetailsDao;
 
@@ -79,9 +63,9 @@ public class UsageEventDaoImpl extends GenericDaoBase<UsageEventVO, Long> implem
     }
 
     @Override
-    public List<UsageEventVO> listLatestEvents(Date endDate) {
-        Filter filter = new Filter(UsageEventVO.class, "createDate", Boolean.TRUE, null, null);
-        SearchCriteria<UsageEventVO> sc = latestEventsSearch.create();
+    public List<UsageEventVO> listLatestEvents(final Date endDate) {
+        final Filter filter = new Filter(UsageEventVO.class, "createDate", Boolean.TRUE, null, null);
+        final SearchCriteria<UsageEventVO> sc = latestEventsSearch.create();
         sc.setParameters("processed", false);
         sc.setParameters("enddate", endDate);
         return listBy(sc, filter);
@@ -89,16 +73,16 @@ public class UsageEventDaoImpl extends GenericDaoBase<UsageEventVO, Long> implem
 
     @Override
     public List<UsageEventVO> getLatestEvent() {
-        Filter filter = new Filter(UsageEventVO.class, "id", Boolean.FALSE, Long.valueOf(0), Long.valueOf(1));
+        final Filter filter = new Filter(UsageEventVO.class, "id", Boolean.FALSE, Long.valueOf(0), Long.valueOf(1));
         return listAll(filter);
     }
 
     @Override
     @DB
-    public synchronized List<UsageEventVO> getRecentEvents(Date endDate) {
-        long recentEventId = getMostRecentEventId();
-        long maxEventId = getMaxEventId(endDate);
-        TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
+    public synchronized List<UsageEventVO> getRecentEvents(final Date endDate) {
+        final long recentEventId = getMostRecentEventId();
+        final long maxEventId = getMaxEventId(endDate);
+        final TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
         // Copy events from cloud db to usage db
         String sql = COPY_EVENTS;
         if (recentEventId == 0) {
@@ -119,7 +103,7 @@ public class UsageEventDaoImpl extends GenericDaoBase<UsageEventVO, Long> implem
             pstmt.setLong(i++, maxEventId);
             pstmt.executeUpdate();
             txn.commit();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             txn.rollback();
             s_logger.error("error copying events from cloud db to usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
@@ -147,7 +131,7 @@ public class UsageEventDaoImpl extends GenericDaoBase<UsageEventVO, Long> implem
             pstmt.setLong(i++, maxEventId);
             pstmt.executeUpdate();
             txn.commit();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             txn.rollback();
             s_logger.error("error copying event details from cloud db to usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
@@ -160,18 +144,18 @@ public class UsageEventDaoImpl extends GenericDaoBase<UsageEventVO, Long> implem
 
     @DB
     private long getMostRecentEventId() {
-        TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
+        final TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
         try {
-            List<UsageEventVO> latestEvents = getLatestEvent();
+            final List<UsageEventVO> latestEvents = getLatestEvent();
 
             if (latestEvents != null && latestEvents.size() == 1) {
-                UsageEventVO latestEvent = latestEvents.get(0);
+                final UsageEventVO latestEvent = latestEvents.get(0);
                 if (latestEvent != null) {
                     return latestEvent.getId();
                 }
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             s_logger.error("error getting most recent event id", ex);
             throw new CloudRuntimeException(ex.getMessage());
         } finally {
@@ -179,11 +163,11 @@ public class UsageEventDaoImpl extends GenericDaoBase<UsageEventVO, Long> implem
         }
     }
 
-    private List<UsageEventVO> findRecentEvents(Date endDate) {
-        TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
+    private List<UsageEventVO> findRecentEvents(final Date endDate) {
+        final TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
         try {
             return listLatestEvents(endDate);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             s_logger.error("error getting most recent event date", ex);
             throw new CloudRuntimeException(ex.getMessage());
         } finally {
@@ -191,19 +175,19 @@ public class UsageEventDaoImpl extends GenericDaoBase<UsageEventVO, Long> implem
         }
     }
 
-    private long getMaxEventId(Date endDate) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    private long getMaxEventId(final Date endDate) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         try {
-            String sql = MAX_EVENT;
+            final String sql = MAX_EVENT;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setString(1, DateUtil.getDateDisplayString(TimeZone.getTimeZone("GMT"), endDate));
-            ResultSet rs = pstmt.executeQuery();
+            final ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 return Long.valueOf(rs.getLong(1));
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             s_logger.error("error getting max event id", ex);
             throw new CloudRuntimeException(ex.getMessage());
         } finally {
@@ -212,9 +196,9 @@ public class UsageEventDaoImpl extends GenericDaoBase<UsageEventVO, Long> implem
     }
 
     @Override
-    public List<UsageEventVO> listDirectIpEvents(Date startDate, Date endDate, long zoneId) {
-        Filter filter = new Filter(UsageEventVO.class, "createDate", Boolean.TRUE, null, null);
-        SearchCriteria<UsageEventVO> sc = IpeventsSearch.create();
+    public List<UsageEventVO> listDirectIpEvents(final Date startDate, final Date endDate, final long zoneId) {
+        final Filter filter = new Filter(UsageEventVO.class, "createDate", Boolean.TRUE, null, null);
+        final SearchCriteria<UsageEventVO> sc = IpeventsSearch.create();
         sc.setParameters("startdate", startDate);
         sc.setParameters("enddate", endDate);
         sc.setParameters("assignEvent", EventTypes.EVENT_NET_IP_ASSIGN);
@@ -225,8 +209,7 @@ public class UsageEventDaoImpl extends GenericDaoBase<UsageEventVO, Long> implem
     }
 
     @Override
-    public void saveDetails(long eventId, Map<String, String> details) {
+    public void saveDetails(final long eventId, final Map<String, String> details) {
         usageEventDetailsDao.persist(eventId, details);
     }
-
 }

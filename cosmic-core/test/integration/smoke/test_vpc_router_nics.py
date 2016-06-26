@@ -1,26 +1,10 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 """ Test VPC nics after router is destroyed """
 
-from nose.plugins.attrib import attr
+import logging
+import socket
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (stopRouter,
-                             startRouter,
                              destroyRouter,
                              Account,
                              VpcOffering,
@@ -31,8 +15,7 @@ from marvin.lib.base import (stopRouter,
                              PublicIPAddress,
                              NetworkOffering,
                              Network,
-                             VirtualMachine,
-                             LoadBalancerRule)
+                             VirtualMachine)
 from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template,
@@ -40,10 +23,8 @@ from marvin.lib.common import (get_domain,
                                list_networks,
                                list_vlan_ipranges)
 from marvin.lib.utils import cleanup_resources
-import socket
-import time
-import inspect
-import logging
+from nose.plugins.attrib import attr
+
 
 class Services:
     """Test VPC network services - Port Forwarding Rules Test Data Class.
@@ -175,7 +156,6 @@ class Services:
 
 
 class TestVPCNics(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         # We want to fail quicker if it's failure
@@ -243,7 +223,7 @@ class TestVPCNics(cloudstackTestCase):
             zoneid=self.zone.id,
             account=self.account.name,
             domainid=self.account.domainid)
-        
+
         self.cleanup = [self.vpc, self.vpc_off, self.account]
         return
 
@@ -257,17 +237,17 @@ class TestVPCNics(cloudstackTestCase):
 
     def find_public_gateway(self):
         networks = list_networks(self.apiclient,
-                                  zoneid = self.zone.id,
-                                  listall = True,
-                                  issystem = True,
-                                  traffictype = "Public")
+                                 zoneid=self.zone.id,
+                                 listall=True,
+                                 issystem=True,
+                                 traffictype="Public")
         self.logger.debug('::: Public Networks ::: ==> %s' % networks)
 
         self.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
-        
+
         ip_ranges = list_vlan_ipranges(self.apiclient,
-                                       zoneid = self.zone.id,
-                                       networkid = networks[0].id)
+                                       zoneid=self.zone.id,
+                                       networkid=networks[0].id)
         self.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)
 
         self.assertTrue(len(ip_ranges) == 1, "Test expects only 1 VLAN IP Range network but found -> '%s'" % len(ip_ranges))
@@ -325,12 +305,11 @@ class TestVPCNics(cloudstackTestCase):
                 vpcid=vpc.id if vpc else self.vpc.id
             )
 
-
             self.logger.debug("Created network with ID: %s" % obj_network.id)
         except Exception, e:
             self.fail('Unable to create a Network with offering=%s because of %s ' % (net_offerring, e))
         o = networkO(obj_network)
-        
+
         vm1 = self.deployvm_in_network(obj_network)
 
         self.cleanup.insert(1, obj_network)
@@ -416,7 +395,7 @@ class TestVPCNics(cloudstackTestCase):
 
         net1.add_vm(self.deployvm_in_network(net1.get_net()))
         self.query_routers()
-        
+
         self.add_nat_rules()
         self.check_ssh_into_vm()
 
@@ -461,11 +440,11 @@ class TestVPCNics(cloudstackTestCase):
                     public_ip = vm.get_ip()
 
                     self.logger.debug("Checking if we can SSH into VM=%s on public_ip=%s" %
-                               (virtual_machine.name, public_ip.ipaddress.ipaddress))
+                                      (virtual_machine.name, public_ip.ipaddress.ipaddress))
 
                     virtual_machine.get_ssh_client(ipaddress=public_ip.ipaddress.ipaddress)
                     self.logger.debug("SSH into VM=%s on public_ip=%s is successful" %
-                               (virtual_machine.name, public_ip.ipaddress.ipaddress))
+                                      (virtual_machine.name, public_ip.ipaddress.ipaddress))
                 except:
                     self.fail("Failed to SSH into VM - %s" % (public_ip.ipaddress.ipaddress))
 
@@ -481,9 +460,9 @@ class TestVPCNics(cloudstackTestCase):
                     vm = vmObj.get_vm()
                     public_ip = vmObj.get_ip()
                     self.logger.debug("SSH into VM: %s" % public_ip.ipaddress.ipaddress)
-                    
+
                     ssh = vm.get_ssh_client(ipaddress=public_ip.ipaddress.ipaddress)
-        
+
                     self.logger.debug("Ping to google.com from VM")
                     result = str(ssh.execute(ssh_command))
 
@@ -492,12 +471,12 @@ class TestVPCNics(cloudstackTestCase):
                     self.fail("SSH Access failed for %s: %s" % \
                               (vmObj.get_ip(), e)
                               )
-        
+
                 self.assertEqual(
-                                 result.count("3 packets received"),
-                                 1,
-                                 "Ping to outside world from VM should be successful"
-                                 )
+                    result.count("3 packets received"),
+                    1,
+                    "Ping to outside world from VM should be successful"
+                )
 
 
 class networkO(object):

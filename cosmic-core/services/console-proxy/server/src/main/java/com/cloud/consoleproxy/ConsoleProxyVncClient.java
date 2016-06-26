@@ -1,35 +1,17 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.consoleproxy;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.UnknownHostException;
 
 import com.cloud.consoleproxy.vnc.FrameBufferCanvas;
 import com.cloud.consoleproxy.vnc.RfbConstants;
 import com.cloud.consoleproxy.vnc.VncClient;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.UnknownHostException;
+
 import org.apache.log4j.Logger;
 
 /**
- *
  * ConsoleProxyVncClient bridges a VNC engine with the front-end AJAX viewer
- *
  */
 public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
     private static final Logger s_logger = Logger.getLogger(ConsoleProxyVncClient.class);
@@ -56,8 +38,9 @@ public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
 
     @Override
     public boolean isHostConnected() {
-        if (client != null)
+        if (client != null) {
             return client.isHostConnected();
+        }
 
         return false;
     }
@@ -72,105 +55,38 @@ public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
     }
 
     @Override
-    public void initClient(ConsoleProxyClientParam param) {
-        setClientParam(param);
-
-        client = new VncClient(this);
-        worker = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String tunnelUrl = getClientParam().getClientTunnelUrl();
-                String tunnelSession = getClientParam().getClientTunnelSession();
-
-                try {
-                    if (tunnelUrl != null && !tunnelUrl.isEmpty() && tunnelSession != null && !tunnelSession.isEmpty()) {
-                        URI uri = new URI(tunnelUrl);
-                        s_logger.info("Connect to VNC server via tunnel. url: " + tunnelUrl + ", session: " + tunnelSession);
-
-                        ConsoleProxy.ensureRoute(uri.getHost());
-                        client.connectTo(
-                                uri.getHost(), uri.getPort(),
-                                uri.getPath() + "?" + uri.getQuery(),
-                                tunnelSession, "https".equalsIgnoreCase(uri.getScheme()),
-                                getClientHostPassword());
-                    } else {
-                        s_logger.info("Connect to VNC server directly. host: " + getClientHostAddress() + ", port: " + getClientHostPort());
-                        ConsoleProxy.ensureRoute(getClientHostAddress());
-                        client.connectTo(getClientHostAddress(), getClientHostPort(), getClientHostPassword());
-                    }
-                } catch (UnknownHostException e) {
-                    s_logger.error("Unexpected exception", e);
-                } catch (IOException e) {
-                    s_logger.error("Unexpected exception", e);
-                } catch (Throwable e) {
-                    s_logger.error("Unexpected exception", e);
-                }
-
-                s_logger.info("Receiver thread stopped.");
-                workerDone = true;
-                client.getClientListener().onClientClose();
-            }
-        });
-
-        worker.setDaemon(true);
-        worker.start();
-    }
-
-    @Override
-    public void closeClient() {
-        workerDone = true;
-        if (client != null)
-            client.shutdown();
-    }
-
-    @Override
-    public void onClientConnected() {
-    }
-
-    @Override
-    public void onClientClose() {
-        s_logger.info("Received client close indication. remove viewer from map.");
-
-        ConsoleProxy.removeViewer(this);
-    }
-
-    @Override
-    public void onFramebufferUpdate(int x, int y, int w, int h) {
-        super.onFramebufferUpdate(x, y, w, h);
-        client.requestUpdate(false);
-    }
-
-    @Override
-    public void sendClientRawKeyboardEvent(InputEventType event, int code, int modifiers) {
-        if (client == null)
+    public void sendClientRawKeyboardEvent(final InputEventType event, final int code, final int modifiers) {
+        if (client == null) {
             return;
+        }
 
         updateFrontEndActivityTime();
 
-        switch(event) {
-        case KEY_DOWN :
-            sendModifierEvents(modifiers);
-            client.sendClientKeyboardEvent(RfbConstants.KEY_DOWN, code, 0);
-            break;
+        switch (event) {
+            case KEY_DOWN:
+                sendModifierEvents(modifiers);
+                client.sendClientKeyboardEvent(RfbConstants.KEY_DOWN, code, 0);
+                break;
 
-        case KEY_UP :
-            client.sendClientKeyboardEvent(RfbConstants.KEY_UP, code, 0);
-            sendModifierEvents(0);
-            break;
+            case KEY_UP:
+                client.sendClientKeyboardEvent(RfbConstants.KEY_UP, code, 0);
+                sendModifierEvents(0);
+                break;
 
-        case KEY_PRESS :
-            break;
+            case KEY_PRESS:
+                break;
 
-        default :
-            assert(false);
-            break;
+            default:
+                assert (false);
+                break;
         }
     }
 
     @Override
-    public void sendClientMouseEvent(InputEventType event, int x, int y, int code, int modifiers) {
-        if (client == null)
+    public void sendClientMouseEvent(final InputEventType event, final int x, final int y, final int code, final int modifiers) {
+        if (client == null) {
             return;
+        }
 
         updateFrontEndActivityTime();
 
@@ -192,30 +108,106 @@ public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
 
         sendModifierEvents(modifiers);
         client.sendClientMouseEvent(lastPointerMask, x, y, code, modifiers);
-        if (lastPointerMask == 0)
+        if (lastPointerMask == 0) {
             sendModifierEvents(0);
+        }
+    }
+
+    @Override
+    public void initClient(final ConsoleProxyClientParam param) {
+        setClientParam(param);
+
+        client = new VncClient(this);
+        worker = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final String tunnelUrl = getClientParam().getClientTunnelUrl();
+                final String tunnelSession = getClientParam().getClientTunnelSession();
+
+                try {
+                    if (tunnelUrl != null && !tunnelUrl.isEmpty() && tunnelSession != null && !tunnelSession.isEmpty()) {
+                        final URI uri = new URI(tunnelUrl);
+                        s_logger.info("Connect to VNC server via tunnel. url: " + tunnelUrl + ", session: " + tunnelSession);
+
+                        ConsoleProxy.ensureRoute(uri.getHost());
+                        client.connectTo(
+                                uri.getHost(), uri.getPort(),
+                                uri.getPath() + "?" + uri.getQuery(),
+                                tunnelSession, "https".equalsIgnoreCase(uri.getScheme()),
+                                getClientHostPassword());
+                    } else {
+                        s_logger.info("Connect to VNC server directly. host: " + getClientHostAddress() + ", port: " + getClientHostPort());
+                        ConsoleProxy.ensureRoute(getClientHostAddress());
+                        client.connectTo(getClientHostAddress(), getClientHostPort(), getClientHostPassword());
+                    }
+                } catch (final UnknownHostException e) {
+                    s_logger.error("Unexpected exception", e);
+                } catch (final IOException e) {
+                    s_logger.error("Unexpected exception", e);
+                } catch (final Throwable e) {
+                    s_logger.error("Unexpected exception", e);
+                }
+
+                s_logger.info("Receiver thread stopped.");
+                workerDone = true;
+                client.getClientListener().onClientClose();
+            }
+        });
+
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    @Override
+    public void closeClient() {
+        workerDone = true;
+        if (client != null) {
+            client.shutdown();
+        }
     }
 
     @Override
     protected FrameBufferCanvas getFrameBufferCavas() {
-        if (client != null)
+        if (client != null) {
             return client.getFrameBufferCanvas();
+        }
         return null;
     }
 
-    private void sendModifierEvents(int modifiers) {
-        if ((modifiers & SHIFT_KEY_MASK) != (lastModifierStates & SHIFT_KEY_MASK))
+    @Override
+    public void onFramebufferUpdate(final int x, final int y, final int w, final int h) {
+        super.onFramebufferUpdate(x, y, w, h);
+        client.requestUpdate(false);
+    }
+
+    private void sendModifierEvents(final int modifiers) {
+        if ((modifiers & SHIFT_KEY_MASK) != (lastModifierStates & SHIFT_KEY_MASK)) {
             client.sendClientKeyboardEvent((modifiers & SHIFT_KEY_MASK) != 0 ? RfbConstants.KEY_DOWN : RfbConstants.KEY_UP, X11_KEY_SHIFT, 0);
+        }
 
-        if((modifiers & CTRL_KEY_MASK) != (lastModifierStates & CTRL_KEY_MASK))
+        if ((modifiers & CTRL_KEY_MASK) != (lastModifierStates & CTRL_KEY_MASK)) {
             client.sendClientKeyboardEvent((modifiers & CTRL_KEY_MASK) != 0 ? RfbConstants.KEY_DOWN : RfbConstants.KEY_UP, X11_KEY_CTRL, 0);
+        }
 
-        if ((modifiers & META_KEY_MASK) != (lastModifierStates & META_KEY_MASK))
+        if ((modifiers & META_KEY_MASK) != (lastModifierStates & META_KEY_MASK)) {
             client.sendClientKeyboardEvent((modifiers & META_KEY_MASK) != 0 ? RfbConstants.KEY_DOWN : RfbConstants.KEY_UP, X11_KEY_META, 0);
+        }
 
-        if((modifiers & ALT_KEY_MASK) != (lastModifierStates & ALT_KEY_MASK))
+        if ((modifiers & ALT_KEY_MASK) != (lastModifierStates & ALT_KEY_MASK)) {
             client.sendClientKeyboardEvent((modifiers & ALT_KEY_MASK) != 0 ? RfbConstants.KEY_DOWN : RfbConstants.KEY_UP, X11_KEY_ALT, 0);
+        }
 
         lastModifierStates = modifiers;
+    }
+
+    @Override
+    public void onClientConnected() {
+    }
+
+    @Override
+    public void onClientClose() {
+        s_logger.info("Received client close indication. remove viewer from map.");
+
+        ConsoleProxy.removeViewer(this);
     }
 }

@@ -1,31 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package com.cloud.hypervisor.xenserver.resource;
-
-import java.io.File;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.to.DataObjectType;
@@ -39,6 +12,22 @@ import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.Storage;
 import com.cloud.utils.exception.CloudRuntimeException;
+import org.apache.cloudstack.storage.command.CopyCmdAnswer;
+import org.apache.cloudstack.storage.command.CopyCommand;
+import org.apache.cloudstack.storage.to.PrimaryDataStoreTO;
+import org.apache.cloudstack.storage.to.SnapshotObjectTO;
+import org.apache.cloudstack.storage.to.TemplateObjectTO;
+import org.apache.cloudstack.storage.to.VolumeObjectTO;
+
+import java.io.File;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Host;
 import com.xensource.xenapi.PBD;
@@ -48,13 +37,6 @@ import com.xensource.xenapi.Types;
 import com.xensource.xenapi.Types.BadServerResponse;
 import com.xensource.xenapi.Types.XenAPIException;
 import com.xensource.xenapi.VDI;
-
-import org.apache.cloudstack.storage.command.CopyCmdAnswer;
-import org.apache.cloudstack.storage.command.CopyCommand;
-import org.apache.cloudstack.storage.to.PrimaryDataStoreTO;
-import org.apache.cloudstack.storage.to.SnapshotObjectTO;
-import org.apache.cloudstack.storage.to.TemplateObjectTO;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.xmlrpc.XmlRpcException;
 import org.slf4j.Logger;
@@ -65,103 +47,6 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
 
     public Xenserver625StorageProcessor(final CitrixResourceBase resource) {
         super(resource);
-    }
-
-    protected boolean mountNfs(final Connection conn, final String remoteDir, String localDir) {
-        if (localDir == null) {
-            localDir = "/var/cloud_mount/" + UUID.nameUUIDFromBytes(remoteDir.getBytes());
-        }
-
-        final String results = hypervisorResource.callHostPluginAsync(conn, "cloud-plugin-storage", "mountNfsSecondaryStorage", 100 * 1000, "localDir", localDir, "remoteDir",
-                remoteDir);
-
-        if (results == null || results.isEmpty()) {
-            final String errMsg = "Could not mount secondary storage " + remoteDir + " on host " + localDir;
-
-            s_logger.warn(errMsg);
-
-            throw new CloudRuntimeException(errMsg);
-        }
-
-        return true;
-    }
-
-    protected boolean makeDirectory(final Connection conn, final String path) {
-        final String result = hypervisorResource.callHostPlugin(conn, "cloud-plugin-storage", "makeDirectory", "path", path);
-
-        if (result == null || result.isEmpty()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    protected SR createFileSR(final Connection conn, final String path) {
-        SR sr = null;
-        PBD pbd = null;
-
-        try {
-            final String srname = hypervisorResource.getHost().getUuid() + path.trim();
-
-            final Set<SR> srs = SR.getByNameLabel(conn, srname);
-
-            if (srs != null && !srs.isEmpty()) {
-                return srs.iterator().next();
-            }
-
-            final Map<String, String> smConfig = new HashMap<String, String>();
-
-            final Host host = Host.getByUuid(conn, hypervisorResource.getHost().getUuid());
-            final String uuid = UUID.randomUUID().toString();
-
-            sr = SR.introduce(conn, uuid, srname, srname, "file", "file", false, smConfig);
-
-            final PBD.Record record = new PBD.Record();
-
-            record.host = host;
-            record.SR = sr;
-
-            smConfig.put("location", path);
-
-            record.deviceConfig = smConfig;
-
-            pbd = PBD.create(conn, record);
-
-            pbd.plug(conn);
-
-            sr.scan(conn);
-
-            return sr;
-        } catch (final Exception ex) {
-            try {
-                if (pbd != null) {
-                    pbd.destroy(conn);
-                }
-            } catch (final Exception e1) {
-                s_logger.debug("Failed to destroy PBD", ex);
-            }
-
-            try {
-                if (sr != null) {
-                    sr.forget(conn);
-                }
-            } catch (final Exception e2) {
-                s_logger.error("Failed to forget SR", ex);
-            }
-
-            final String msg = "createFileSR failed! due to the following: " + ex.toString();
-
-            s_logger.warn(msg, ex);
-
-            throw new CloudRuntimeException(msg, ex);
-        }
-    }
-
-    protected SR createFileSr(final Connection conn, final String remotePath, final String dir) {
-        final String localDir = "/var/cloud_mount/" + UUID.nameUUIDFromBytes(remotePath.getBytes());
-        mountNfs(conn, remotePath, localDir);
-        final SR sr = createFileSR(conn, localDir + "/" + dir);
-        return sr;
     }
 
     @Override
@@ -199,7 +84,8 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
                 final Set<VDI> setVdis = srcSr.getVDIs(conn);
 
                 if (setVdis.size() != 1) {
-                    return new CopyCmdAnswer("Expected 1 VDI template but found " + setVdis.size() + " VDI template(s) on: " + uri.getHost() + ":" + uri.getPath() + "/" + volumeDirectory);
+                    return new CopyCmdAnswer("Expected 1 VDI template but found " + setVdis.size() + " VDI template(s) on: " + uri.getHost() + ":" + uri.getPath() + "/" +
+                            volumeDirectory);
                 }
 
                 final VDI srcVdi = setVdis.iterator().next();
@@ -232,7 +118,7 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
                 final SR destSr;
 
                 if (managed) {
-                    details = new HashMap<String, String>();
+                    details = new HashMap<>();
 
                     details.put(DiskTO.STORAGE_HOST, storageHost);
                     details.put(DiskTO.IQN, managedStoragePoolName);
@@ -272,7 +158,7 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
 
                     tmplVdi.setNameLabel(conn, managedStoragePoolRootVolumeName);
                 } else {
-                    final VDI snapshotVdi = tmplVdi.snapshot(conn, new HashMap<String, String>());
+                    final VDI snapshotVdi = tmplVdi.snapshot(conn, new HashMap<>());
 
                     uuidToReturn = snapshotVdi.getUuid(conn);
 
@@ -322,38 +208,196 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
         return new CopyCmdAnswer("not implemented yet");
     }
 
-    protected String backupSnapshot(final Connection conn, final String primaryStorageSRUuid, final String localMountPoint, final String path,
-            final String secondaryStorageMountPath, final String snapshotUuid, String prevBackupUuid, final String prevSnapshotUuid, final Boolean isISCSI, int wait) {
-        boolean filesrcreated = false;
-        // boolean copied = false;
+    protected SR createFileSr(final Connection conn, final String remotePath, final String dir) {
+        final String localDir = "/var/cloud_mount/" + UUID.nameUUIDFromBytes(remotePath.getBytes());
+        mountNfs(conn, remotePath, localDir);
+        final SR sr = createFileSR(conn, localDir + "/" + dir);
+        return sr;
+    }
 
-        if (prevBackupUuid == null) {
-            prevBackupUuid = "";
+    protected boolean mountNfs(final Connection conn, final String remoteDir, String localDir) {
+        if (localDir == null) {
+            localDir = "/var/cloud_mount/" + UUID.nameUUIDFromBytes(remoteDir.getBytes());
         }
-        SR ssSR = null;
 
-        final String remoteDir = secondaryStorageMountPath;
+        final String results = hypervisorResource.callHostPluginAsync(conn, "cloud-plugin-storage", "mountNfsSecondaryStorage", 100 * 1000, "localDir", localDir, "remoteDir",
+                remoteDir);
+
+        if (results == null || results.isEmpty()) {
+            final String errMsg = "Could not mount secondary storage " + remoteDir + " on host " + localDir;
+
+            s_logger.warn(errMsg);
+
+            throw new CloudRuntimeException(errMsg);
+        }
+
+        return true;
+    }
+
+    protected SR createFileSR(final Connection conn, final String path) {
+        SR sr = null;
+        PBD pbd = null;
+
         try {
-            ssSR = createFileSr(conn, remoteDir, path);
-            filesrcreated = true;
+            final String srname = hypervisorResource.getHost().getUuid() + path.trim();
 
-            final VDI snapshotvdi = VDI.getByUuid(conn, snapshotUuid);
-            if (wait == 0) {
-                wait = 2 * 60 * 60;
+            final Set<SR> srs = SR.getByNameLabel(conn, srname);
+
+            if (srs != null && !srs.isEmpty()) {
+                return srs.iterator().next();
             }
-            VDI dvdi = null;
+
+            final Map<String, String> smConfig = new HashMap<>();
+
+            final Host host = Host.getByUuid(conn, hypervisorResource.getHost().getUuid());
+            final String uuid = UUID.randomUUID().toString();
+
+            sr = SR.introduce(conn, uuid, srname, srname, "file", "file", false, smConfig);
+
+            final PBD.Record record = new PBD.Record();
+
+            record.host = host;
+            record.SR = sr;
+
+            smConfig.put("location", path);
+
+            record.deviceConfig = smConfig;
+
+            pbd = PBD.create(conn, record);
+
+            pbd.plug(conn);
+
+            sr.scan(conn);
+
+            return sr;
+        } catch (final Exception ex) {
+            try {
+                if (pbd != null) {
+                    pbd.destroy(conn);
+                }
+            } catch (final Exception e1) {
+                s_logger.debug("Failed to destroy PBD", ex);
+            }
+
+            try {
+                if (sr != null) {
+                    sr.forget(conn);
+                }
+            } catch (final Exception e2) {
+                s_logger.error("Failed to forget SR", ex);
+            }
+
+            final String msg = "createFileSR failed! due to the following: " + ex.toString();
+
+            s_logger.warn(msg, ex);
+
+            throw new CloudRuntimeException(msg, ex);
+        }
+    }
+
+    @Override
+    public Answer copyVolumeFromImageCacheToPrimary(final CopyCommand cmd) {
+        final Connection conn = hypervisorResource.getConnection();
+        final DataTO srcData = cmd.getSrcTO();
+        final DataTO destData = cmd.getDestTO();
+        final int wait = cmd.getWait();
+        final VolumeObjectTO srcVolume = (VolumeObjectTO) srcData;
+        final VolumeObjectTO destVolume = (VolumeObjectTO) destData;
+        final PrimaryDataStoreTO primaryStore = (PrimaryDataStoreTO) destVolume.getDataStore();
+        final DataStoreTO srcStore = srcVolume.getDataStore();
+
+        if (srcStore instanceof NfsTO) {
+            final NfsTO nfsStore = (NfsTO) srcStore;
+            final String volumePath = srcVolume.getPath();
+            int index = volumePath.lastIndexOf("/");
+            final String volumeDirectory = volumePath.substring(0, index);
+            String volumeUuid = volumePath.substring(index + 1);
+            index = volumeUuid.indexOf(".");
+            if (index != -1) {
+                volumeUuid = volumeUuid.substring(0, index);
+            }
+            URI uri = null;
+            try {
+                uri = new URI(nfsStore.getUrl());
+            } catch (final Exception e) {
+                return new CopyCmdAnswer(e.toString());
+            }
+            final SR srcSr = createFileSr(conn, uri.getHost() + ":" + uri.getPath(), volumeDirectory);
             Task task = null;
             try {
-                VDI previousSnapshotVdi = null;
-                if (prevSnapshotUuid != null) {
-                    previousSnapshotVdi = VDI.getByUuid(conn, prevSnapshotUuid);
-                }
-                task = snapshotvdi.copyAsync(conn, ssSR, previousSnapshotVdi, null);
+                final SR primaryStoragePool = hypervisorResource.getStorageRepository(conn, primaryStore.getUuid());
+                final VDI srcVdi = VDI.getByUuid(conn, volumeUuid);
+                task = srcVdi.copyAsync(conn, primaryStoragePool, null, null);
                 // poll every 1 seconds ,
                 hypervisorResource.waitForTask(conn, task, 1000, wait * 1000);
                 hypervisorResource.checkForSuccess(conn, task);
-                dvdi = Types.toVDI(task, conn);
-                // copied = true;
+                final VDI destVdi = Types.toVDI(task, conn);
+                final VolumeObjectTO newVol = new VolumeObjectTO();
+                destVdi.setNameLabel(conn, srcVolume.getName());
+                newVol.setPath(destVdi.getUuid(conn));
+                newVol.setSize(srcVolume.getSize());
+
+                return new CopyCmdAnswer(newVol);
+            } catch (final Exception e) {
+                final String msg = "Catch Exception " + e.getClass().getName() + " due to " + e.toString();
+                s_logger.warn(msg, e);
+                return new CopyCmdAnswer(e.toString());
+            } finally {
+                if (task != null) {
+                    try {
+                        task.destroy(conn);
+                    } catch (final Exception e) {
+                        s_logger.warn("unable to destroy task(" + task.toString() + ") due to " + e.toString());
+                    }
+                }
+                if (srcSr != null) {
+                    hypervisorResource.removeSR(conn, srcSr);
+                }
+            }
+        }
+
+        s_logger.debug("unsupported protocol");
+        return new CopyCmdAnswer("unsupported protocol");
+    }
+
+    @Override
+    public Answer copyVolumeFromPrimaryToSecondary(final CopyCommand cmd) {
+        final Connection conn = hypervisorResource.getConnection();
+        final VolumeObjectTO srcVolume = (VolumeObjectTO) cmd.getSrcTO();
+        final VolumeObjectTO destVolume = (VolumeObjectTO) cmd.getDestTO();
+        final int wait = cmd.getWait();
+        final DataStoreTO destStore = destVolume.getDataStore();
+
+        if (destStore instanceof NfsTO) {
+            SR secondaryStorage = null;
+            Task task = null;
+            try {
+                final NfsTO nfsStore = (NfsTO) destStore;
+                final URI uri = new URI(nfsStore.getUrl());
+                // Create the volume folder
+                if (!hypervisorResource.createSecondaryStorageFolder(conn, uri.getHost() + ":" + uri.getPath(), destVolume.getPath())) {
+                    throw new InternalErrorException("Failed to create the volume folder.");
+                }
+
+                // Create a SR for the volume UUID folder
+                secondaryStorage = createFileSr(conn, uri.getHost() + ":" + uri.getPath(), destVolume.getPath());
+                // Look up the volume on the source primary storage pool
+                final VDI srcVdi = getVDIbyUuid(conn, srcVolume.getPath());
+                // Copy the volume to secondary storage
+                task = srcVdi.copyAsync(conn, secondaryStorage, null, null);
+                // poll every 1 seconds ,
+                hypervisorResource.waitForTask(conn, task, 1000, wait * 1000);
+                hypervisorResource.checkForSuccess(conn, task);
+                final VDI destVdi = Types.toVDI(task, conn);
+                final String destVolumeUUID = destVdi.getUuid(conn);
+
+                final VolumeObjectTO newVol = new VolumeObjectTO();
+                newVol.setPath(destVolume.getPath() + File.separator + destVolumeUUID + ".vhd");
+                newVol.setSize(srcVolume.getSize());
+                return new CopyCmdAnswer(newVol);
+            } catch (final Exception e) {
+                s_logger.debug("Failed to copy volume to secondary: " + e.toString());
+                return new CopyCmdAnswer("Failed to copy volume to secondary: " + e.toString());
             } finally {
                 if (task != null) {
                     try {
@@ -362,199 +406,10 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
                         s_logger.warn("unable to destroy task(" + task.toWireString() + ") due to " + e.toString());
                     }
                 }
-            }
-            final String result = dvdi.getUuid(conn).concat("#").concat(dvdi.getPhysicalUtilisation(conn).toString());
-            return result;
-        } catch (final Exception e) {
-            final String msg = "Exception in backupsnapshot stage due to " + e.toString();
-            s_logger.debug(msg);
-            throw new CloudRuntimeException(msg, e);
-        } finally {
-            try {
-                if (filesrcreated && ssSR != null) {
-                    hypervisorResource.removeSR(conn, ssSR);
-                }
-            } catch (final Exception e) {
-                s_logger.debug("Exception in backupsnapshot cleanup stage due to " + e.toString());
+                hypervisorResource.removeSR(conn, secondaryStorage);
             }
         }
-    }
-
-    @Override
-    protected String getVhdParent(final Connection conn, final String primaryStorageSRUuid, final String snapshotUuid, final Boolean isISCSI) {
-        final String parentUuid = hypervisorResource.callHostPlugin(conn, "cloud-plugin-storage", "getVhdParent", "primaryStorageSRUuid", primaryStorageSRUuid, "snapshotUuid",
-                snapshotUuid, "isISCSI", isISCSI.toString());
-
-        if (parentUuid == null || parentUuid.isEmpty() || parentUuid.equalsIgnoreCase("None")) {
-            s_logger.debug("Unable to get parent of VHD " + snapshotUuid + " in SR " + primaryStorageSRUuid);
-            // errString is already logged.
-            return null;
-        }
-        return parentUuid;
-    }
-
-    @Override
-    public Answer backupSnapshot(final CopyCommand cmd) {
-        final Connection conn = hypervisorResource.getConnection();
-        final DataTO srcData = cmd.getSrcTO();
-        final DataTO cacheData = cmd.getCacheTO();
-        final DataTO destData = cmd.getDestTO();
-        final int wait = cmd.getWait();
-        final PrimaryDataStoreTO primaryStore = (PrimaryDataStoreTO) srcData.getDataStore();
-        final String primaryStorageNameLabel = primaryStore.getUuid();
-        String secondaryStorageUrl = null;
-        NfsTO cacheStore = null;
-        String destPath = null;
-        if (cacheData != null) {
-            cacheStore = (NfsTO) cacheData.getDataStore();
-            secondaryStorageUrl = cacheStore.getUrl();
-            destPath = cacheData.getPath();
-        } else {
-            cacheStore = (NfsTO) destData.getDataStore();
-            secondaryStorageUrl = cacheStore.getUrl();
-            destPath = destData.getPath();
-        }
-
-        final SnapshotObjectTO snapshotTO = (SnapshotObjectTO) srcData;
-        final SnapshotObjectTO snapshotOnImage = (SnapshotObjectTO) destData;
-        final String snapshotUuid = snapshotTO.getPath();
-
-        final String prevBackupUuid = snapshotOnImage.getParentSnapshotPath();
-        final String prevSnapshotUuid = snapshotTO.getParentSnapshotPath();
-        final Map<String, String> options = cmd.getOptions();
-        // By default assume failure
-        String details = null;
-        String snapshotBackupUuid = null;
-        final boolean fullbackup = Boolean.parseBoolean(options.get("fullSnapshot"));
-        Long physicalSize = null;
-        try {
-            final SR primaryStorageSR = hypervisorResource.getSRByNameLabelandHost(conn, primaryStorageNameLabel);
-            if (primaryStorageSR == null) {
-                throw new InternalErrorException("Could not backup snapshot because the primary Storage SR could not be created from the name label: " + primaryStorageNameLabel);
-            }
-            // String psUuid = primaryStorageSR.getUuid(conn);
-            final Boolean isISCSI = IsISCSI(primaryStorageSR.getType(conn));
-
-            final VDI snapshotVdi = getVDIbyUuid(conn, snapshotUuid);
-            final String snapshotPaUuid = null;
-
-            final URI uri = new URI(secondaryStorageUrl);
-            final String secondaryStorageMountPath = uri.getHost() + ":" + uri.getPath();
-            final DataStoreTO destStore = destData.getDataStore();
-            final String folder = destPath;
-            String finalPath = null;
-
-            final String localMountPoint = BaseMountPointOnHost + File.separator + UUID.nameUUIDFromBytes(secondaryStorageUrl.getBytes()).toString();
-            if (fullbackup) {
-                SR snapshotSr = null;
-                Task task = null;
-                try {
-                    final String localDir = "/var/cloud_mount/" + UUID.nameUUIDFromBytes(secondaryStorageMountPath.getBytes());
-                    mountNfs(conn, secondaryStorageMountPath, localDir);
-                    final boolean result = makeDirectory(conn, localDir + "/" + folder);
-                    if (!result) {
-                        details = " Filed to create folder " + folder + " in secondary storage";
-                        s_logger.warn(details);
-                        return new CopyCmdAnswer(details);
-                    }
-
-                    snapshotSr = createFileSr(conn, secondaryStorageMountPath, folder);
-
-                    task = snapshotVdi.copyAsync(conn, snapshotSr, null, null);
-                    // poll every 1 seconds ,
-                    hypervisorResource.waitForTask(conn, task, 1000, wait * 1000);
-                    hypervisorResource.checkForSuccess(conn, task);
-                    final VDI backedVdi = Types.toVDI(task, conn);
-                    snapshotBackupUuid = backedVdi.getUuid(conn);
-                    physicalSize = backedVdi.getPhysicalUtilisation(conn);
-
-                    if (destStore instanceof SwiftTO) {
-                        try {
-                            final String container = "S-" + snapshotTO.getVolume().getVolumeId().toString();
-                            final String destSnapshotName = swiftBackupSnapshot(conn, (SwiftTO) destStore, snapshotSr.getUuid(conn), snapshotBackupUuid, container, false, wait);
-                            final String swiftPath = container + File.separator + destSnapshotName;
-                            finalPath = swiftPath;
-                        } finally {
-                            try {
-                                deleteSnapshotBackup(conn, localMountPoint, folder, secondaryStorageMountPath, snapshotBackupUuid);
-                            } catch (final Exception e) {
-                                s_logger.debug("Failed to delete snapshot on cache storages", e);
-                            }
-                        }
-
-                    } else if (destStore instanceof S3TO) {
-                        try {
-                            finalPath = backupSnapshotToS3(conn, (S3TO) destStore, snapshotSr.getUuid(conn), folder, snapshotBackupUuid, isISCSI, wait);
-                            if (finalPath == null) {
-                                throw new CloudRuntimeException("S3 upload of snapshots " + snapshotBackupUuid + " failed");
-                            }
-                        } finally {
-                            try {
-                                deleteSnapshotBackup(conn, localMountPoint, folder, secondaryStorageMountPath, snapshotBackupUuid);
-                            } catch (final Exception e) {
-                                s_logger.debug("Failed to delete snapshot on cache storages", e);
-                            }
-                        }
-                        // finalPath = folder + File.separator +
-                        // snapshotBackupUuid;
-                    } else {
-                        finalPath = folder + File.separator + snapshotBackupUuid;
-                    }
-
-                } finally {
-                    if (task != null) {
-                        try {
-                            task.destroy(conn);
-                        } catch (final Exception e) {
-                            s_logger.warn("unable to destroy task(" + task.toWireString() + ") due to " + e.toString());
-                        }
-                    }
-                    if (snapshotSr != null) {
-                        hypervisorResource.removeSR(conn, snapshotSr);
-                    }
-                }
-            } else {
-                final String primaryStorageSRUuid = primaryStorageSR.getUuid(conn);
-                if (destStore instanceof SwiftTO) {
-                    final String container = "S-" + snapshotTO.getVolume().getVolumeId().toString();
-                    snapshotBackupUuid = swiftBackupSnapshot(conn, (SwiftTO) destStore, primaryStorageSRUuid, snapshotPaUuid, "S-"
-                            + snapshotTO.getVolume().getVolumeId().toString(), isISCSI, wait);
-                    finalPath = container + File.separator + snapshotBackupUuid;
-                } else if (destStore instanceof S3TO) {
-                    finalPath = backupSnapshotToS3(conn, (S3TO) destStore, primaryStorageSRUuid, folder, snapshotPaUuid, isISCSI, wait);
-                    if (finalPath == null) {
-                        throw new CloudRuntimeException("S3 upload of snapshots " + snapshotPaUuid + " failed");
-                    }
-                } else {
-                    final String result = backupSnapshot(conn, primaryStorageSRUuid, localMountPoint, folder, secondaryStorageMountPath, snapshotUuid, prevBackupUuid,
-                            prevSnapshotUuid, isISCSI, wait);
-                    final String[] tmp = result.split("#");
-                    snapshotBackupUuid = tmp[0];
-                    physicalSize = Long.parseLong(tmp[1]);
-                    finalPath = folder + File.separator + snapshotBackupUuid;
-                }
-            }
-            final String volumeUuid = snapshotTO.getVolume().getPath();
-            destroySnapshotOnPrimaryStorageExceptThis(conn, volumeUuid, snapshotUuid);
-
-            final SnapshotObjectTO newSnapshot = new SnapshotObjectTO();
-            newSnapshot.setPath(finalPath);
-            newSnapshot.setPhysicalSize(physicalSize);
-            if (fullbackup) {
-                newSnapshot.setParentSnapshotPath(null);
-            } else {
-                newSnapshot.setParentSnapshotPath(prevBackupUuid);
-            }
-            return new CopyCmdAnswer(newSnapshot);
-        } catch (final Types.XenAPIException e) {
-            details = "BackupSnapshot Failed due to " + e.toString();
-            s_logger.warn(details, e);
-        } catch (final Exception e) {
-            details = "BackupSnapshot Failed due to " + e.getMessage();
-            s_logger.warn(details, e);
-        }
-
-        return new CopyCmdAnswer(details);
+        return new CopyCmdAnswer("unsupported protocol");
     }
 
     @Override
@@ -645,239 +500,6 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
         return new CopyCmdAnswer(details);
     }
 
-    protected String getSnapshotUuid(final String snapshotPath) {
-        int index = snapshotPath.lastIndexOf(File.separator);
-        String snapshotUuid = snapshotPath.substring(index + 1);
-        index = snapshotUuid.lastIndexOf(".");
-        if (index != -1) {
-            snapshotUuid = snapshotUuid.substring(0, index);
-        }
-        return snapshotUuid;
-    }
-
-    @Override
-    public Answer createVolumeFromSnapshot(final CopyCommand cmd) {
-        final Connection conn = hypervisorResource.getConnection();
-        final DataTO srcData = cmd.getSrcTO();
-        final SnapshotObjectTO snapshot = (SnapshotObjectTO) srcData;
-        final DataTO destData = cmd.getDestTO();
-        final PrimaryDataStoreTO pool = (PrimaryDataStoreTO) destData.getDataStore();
-        final VolumeObjectTO volume = (VolumeObjectTO) destData;
-        final DataStoreTO imageStore = srcData.getDataStore();
-
-        if (srcData.getDataStore() instanceof PrimaryDataStoreTO && destData.getDataStore() instanceof PrimaryDataStoreTO) {
-            return createVolumeFromSnapshot2(cmd);
-        }
-
-        if (!(imageStore instanceof NfsTO)) {
-            return new CopyCmdAnswer("unsupported protocol");
-        }
-
-        final NfsTO nfsImageStore = (NfsTO) imageStore;
-        final String primaryStorageNameLabel = pool.getUuid();
-        final String secondaryStorageUrl = nfsImageStore.getUrl();
-        final int wait = cmd.getWait();
-        boolean result = false;
-        // Generic error message.
-        String details = null;
-        String volumeUUID = null;
-
-        if (secondaryStorageUrl == null) {
-            details += " because the URL passed: " + secondaryStorageUrl + " is invalid.";
-            return new CopyCmdAnswer(details);
-        }
-        SR srcSr = null;
-        VDI destVdi = null;
-        try {
-            final SR primaryStorageSR = hypervisorResource.getSRByNameLabelandHost(conn, primaryStorageNameLabel);
-            if (primaryStorageSR == null) {
-                throw new InternalErrorException("Could not create volume from snapshot because the primary Storage SR could not be created from the name label: "
-                        + primaryStorageNameLabel);
-            }
-            final String nameLabel = "cloud-" + UUID.randomUUID().toString();
-            destVdi = createVdi(conn, nameLabel, primaryStorageSR, volume.getSize());
-            volumeUUID = destVdi.getUuid(conn);
-            final String snapshotInstallPath = snapshot.getPath();
-            final int index = snapshotInstallPath.lastIndexOf(File.separator);
-            final String snapshotDirectory = snapshotInstallPath.substring(0, index);
-            final String snapshotUuid = getSnapshotUuid(snapshotInstallPath);
-
-            final URI uri = new URI(secondaryStorageUrl);
-            srcSr = createFileSr(conn, uri.getHost() + ":" + uri.getPath(), snapshotDirectory);
-
-            final String[] parents = snapshot.getParents();
-            final List<VDI> snapshotChains = new ArrayList<VDI>();
-            if (parents != null) {
-                for (int i = 0; i < parents.length; i++) {
-                    final String snChainPath = parents[i];
-                    final String uuid = getSnapshotUuid(snChainPath);
-                    final VDI chain = VDI.getByUuid(conn, uuid);
-                    snapshotChains.add(chain);
-                }
-            }
-
-            final VDI snapshotVdi = VDI.getByUuid(conn, snapshotUuid);
-            snapshotChains.add(snapshotVdi);
-
-            for (final VDI snapChain : snapshotChains) {
-                final Task task = snapChain.copyAsync(conn, null, null, destVdi);
-                // poll every 1 seconds ,
-                hypervisorResource.waitForTask(conn, task, 1000, wait * 1000);
-                hypervisorResource.checkForSuccess(conn, task);
-                task.destroy(conn);
-            }
-
-            result = true;
-            destVdi = VDI.getByUuid(conn, volumeUUID);
-            final VDI.Record vdir = destVdi.getRecord(conn);
-            final VolumeObjectTO newVol = new VolumeObjectTO();
-            newVol.setPath(volumeUUID);
-            newVol.setSize(vdir.virtualSize);
-            return new CopyCmdAnswer(newVol);
-        } catch (final Types.XenAPIException e) {
-            details += " due to " + e.toString();
-            s_logger.warn(details, e);
-        } catch (final Exception e) {
-            details += " due to " + e.getMessage();
-            s_logger.warn(details, e);
-        } finally {
-            if (srcSr != null) {
-                hypervisorResource.removeSR(conn, srcSr);
-            }
-            if (!result && destVdi != null) {
-                try {
-                    destVdi.destroy(conn);
-                } catch (final Exception e) {
-                    s_logger.debug("destroy dest vdi failed", e);
-                }
-            }
-        }
-        if (!result) {
-            // Is this logged at a higher level?
-            s_logger.error(details);
-        }
-
-        // In all cases return something.
-        return new CopyCmdAnswer(details);
-    }
-
-    @Override
-    public Answer copyVolumeFromPrimaryToSecondary(final CopyCommand cmd) {
-        final Connection conn = hypervisorResource.getConnection();
-        final VolumeObjectTO srcVolume = (VolumeObjectTO) cmd.getSrcTO();
-        final VolumeObjectTO destVolume = (VolumeObjectTO) cmd.getDestTO();
-        final int wait = cmd.getWait();
-        final DataStoreTO destStore = destVolume.getDataStore();
-
-        if (destStore instanceof NfsTO) {
-            SR secondaryStorage = null;
-            Task task = null;
-            try {
-                final NfsTO nfsStore = (NfsTO) destStore;
-                final URI uri = new URI(nfsStore.getUrl());
-                // Create the volume folder
-                if (!hypervisorResource.createSecondaryStorageFolder(conn, uri.getHost() + ":" + uri.getPath(), destVolume.getPath())) {
-                    throw new InternalErrorException("Failed to create the volume folder.");
-                }
-
-                // Create a SR for the volume UUID folder
-                secondaryStorage = createFileSr(conn, uri.getHost() + ":" + uri.getPath(), destVolume.getPath());
-                // Look up the volume on the source primary storage pool
-                final VDI srcVdi = getVDIbyUuid(conn, srcVolume.getPath());
-                // Copy the volume to secondary storage
-                task = srcVdi.copyAsync(conn, secondaryStorage, null, null);
-                // poll every 1 seconds ,
-                hypervisorResource.waitForTask(conn, task, 1000, wait * 1000);
-                hypervisorResource.checkForSuccess(conn, task);
-                final VDI destVdi = Types.toVDI(task, conn);
-                final String destVolumeUUID = destVdi.getUuid(conn);
-
-                final VolumeObjectTO newVol = new VolumeObjectTO();
-                newVol.setPath(destVolume.getPath() + File.separator + destVolumeUUID + ".vhd");
-                newVol.setSize(srcVolume.getSize());
-                return new CopyCmdAnswer(newVol);
-            } catch (final Exception e) {
-                s_logger.debug("Failed to copy volume to secondary: " + e.toString());
-                return new CopyCmdAnswer("Failed to copy volume to secondary: " + e.toString());
-            } finally {
-                if (task != null) {
-                    try {
-                        task.destroy(conn);
-                    } catch (final Exception e) {
-                        s_logger.warn("unable to destroy task(" + task.toWireString() + ") due to " + e.toString());
-                    }
-                }
-                hypervisorResource.removeSR(conn, secondaryStorage);
-            }
-        }
-        return new CopyCmdAnswer("unsupported protocol");
-    }
-
-    @Override
-    public Answer copyVolumeFromImageCacheToPrimary(final CopyCommand cmd) {
-        final Connection conn = hypervisorResource.getConnection();
-        final DataTO srcData = cmd.getSrcTO();
-        final DataTO destData = cmd.getDestTO();
-        final int wait = cmd.getWait();
-        final VolumeObjectTO srcVolume = (VolumeObjectTO) srcData;
-        final VolumeObjectTO destVolume = (VolumeObjectTO) destData;
-        final PrimaryDataStoreTO primaryStore = (PrimaryDataStoreTO) destVolume.getDataStore();
-        final DataStoreTO srcStore = srcVolume.getDataStore();
-
-        if (srcStore instanceof NfsTO) {
-            final NfsTO nfsStore = (NfsTO) srcStore;
-            final String volumePath = srcVolume.getPath();
-            int index = volumePath.lastIndexOf("/");
-            final String volumeDirectory = volumePath.substring(0, index);
-            String volumeUuid = volumePath.substring(index + 1);
-            index = volumeUuid.indexOf(".");
-            if (index != -1) {
-                volumeUuid = volumeUuid.substring(0, index);
-            }
-            URI uri = null;
-            try {
-                uri = new URI(nfsStore.getUrl());
-            } catch (final Exception e) {
-                return new CopyCmdAnswer(e.toString());
-            }
-            final SR srcSr = createFileSr(conn, uri.getHost() + ":" + uri.getPath(), volumeDirectory);
-            Task task = null;
-            try {
-                final SR primaryStoragePool = hypervisorResource.getStorageRepository(conn, primaryStore.getUuid());
-                final VDI srcVdi = VDI.getByUuid(conn, volumeUuid);
-                task = srcVdi.copyAsync(conn, primaryStoragePool, null, null);
-                // poll every 1 seconds ,
-                hypervisorResource.waitForTask(conn, task, 1000, wait * 1000);
-                hypervisorResource.checkForSuccess(conn, task);
-                final VDI destVdi = Types.toVDI(task, conn);
-                final VolumeObjectTO newVol = new VolumeObjectTO();
-                destVdi.setNameLabel(conn, srcVolume.getName());
-                newVol.setPath(destVdi.getUuid(conn));
-                newVol.setSize(srcVolume.getSize());
-
-                return new CopyCmdAnswer(newVol);
-            } catch (final Exception e) {
-                final String msg = "Catch Exception " + e.getClass().getName() + " due to " + e.toString();
-                s_logger.warn(msg, e);
-                return new CopyCmdAnswer(e.toString());
-            } finally {
-                if (task != null) {
-                    try {
-                        task.destroy(conn);
-                    } catch (final Exception e) {
-                        s_logger.warn("unable to destroy task(" + task.toString() + ") due to " + e.toString());
-                    }
-                }
-                if (srcSr != null) {
-                    hypervisorResource.removeSR(conn, srcSr);
-                }
-            }
-        }
-
-        s_logger.debug("unsupported protocol");
-        return new CopyCmdAnswer("unsupported protocol");
-    }
-
     @Override
     public Answer createTemplateFromSnapshot(final CopyCommand cmd) {
         final Connection conn = hypervisorResource.getConnection();
@@ -935,7 +557,7 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
             final String nameLabel = "cloud-" + UUID.randomUUID().toString();
 
             final String[] parents = srcObj.getParents();
-            final List<VDI> snapshotChains = new ArrayList<VDI>();
+            final List<VDI> snapshotChains = new ArrayList<>();
 
             if (parents != null) {
                 for (int i = 0; i < parents.length; i++) {
@@ -1021,6 +643,366 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
                 hypervisorResource.removeSR(conn, destSr);
             }
         }
+    }
+
+    @Override
+    public Answer backupSnapshot(final CopyCommand cmd) {
+        final Connection conn = hypervisorResource.getConnection();
+        final DataTO srcData = cmd.getSrcTO();
+        final DataTO cacheData = cmd.getCacheTO();
+        final DataTO destData = cmd.getDestTO();
+        final int wait = cmd.getWait();
+        final PrimaryDataStoreTO primaryStore = (PrimaryDataStoreTO) srcData.getDataStore();
+        final String primaryStorageNameLabel = primaryStore.getUuid();
+        String secondaryStorageUrl = null;
+        NfsTO cacheStore = null;
+        String destPath = null;
+        if (cacheData != null) {
+            cacheStore = (NfsTO) cacheData.getDataStore();
+            secondaryStorageUrl = cacheStore.getUrl();
+            destPath = cacheData.getPath();
+        } else {
+            cacheStore = (NfsTO) destData.getDataStore();
+            secondaryStorageUrl = cacheStore.getUrl();
+            destPath = destData.getPath();
+        }
+
+        final SnapshotObjectTO snapshotTO = (SnapshotObjectTO) srcData;
+        final SnapshotObjectTO snapshotOnImage = (SnapshotObjectTO) destData;
+        final String snapshotUuid = snapshotTO.getPath();
+
+        final String prevBackupUuid = snapshotOnImage.getParentSnapshotPath();
+        final String prevSnapshotUuid = snapshotTO.getParentSnapshotPath();
+        final Map<String, String> options = cmd.getOptions();
+        // By default assume failure
+        String details = null;
+        String snapshotBackupUuid = null;
+        final boolean fullbackup = Boolean.parseBoolean(options.get("fullSnapshot"));
+        Long physicalSize = null;
+        try {
+            final SR primaryStorageSR = hypervisorResource.getSRByNameLabelandHost(conn, primaryStorageNameLabel);
+            if (primaryStorageSR == null) {
+                throw new InternalErrorException("Could not backup snapshot because the primary Storage SR could not be created from the name label: " + primaryStorageNameLabel);
+            }
+            // String psUuid = primaryStorageSR.getUuid(conn);
+            final Boolean isISCSI = IsISCSI(primaryStorageSR.getType(conn));
+
+            final VDI snapshotVdi = getVDIbyUuid(conn, snapshotUuid);
+            final String snapshotPaUuid = null;
+
+            final URI uri = new URI(secondaryStorageUrl);
+            final String secondaryStorageMountPath = uri.getHost() + ":" + uri.getPath();
+            final DataStoreTO destStore = destData.getDataStore();
+            final String folder = destPath;
+            String finalPath = null;
+
+            final String localMountPoint = BaseMountPointOnHost + File.separator + UUID.nameUUIDFromBytes(secondaryStorageUrl.getBytes()).toString();
+            if (fullbackup) {
+                SR snapshotSr = null;
+                Task task = null;
+                try {
+                    final String localDir = "/var/cloud_mount/" + UUID.nameUUIDFromBytes(secondaryStorageMountPath.getBytes());
+                    mountNfs(conn, secondaryStorageMountPath, localDir);
+                    final boolean result = makeDirectory(conn, localDir + "/" + folder);
+                    if (!result) {
+                        details = " Filed to create folder " + folder + " in secondary storage";
+                        s_logger.warn(details);
+                        return new CopyCmdAnswer(details);
+                    }
+
+                    snapshotSr = createFileSr(conn, secondaryStorageMountPath, folder);
+
+                    task = snapshotVdi.copyAsync(conn, snapshotSr, null, null);
+                    // poll every 1 seconds ,
+                    hypervisorResource.waitForTask(conn, task, 1000, wait * 1000);
+                    hypervisorResource.checkForSuccess(conn, task);
+                    final VDI backedVdi = Types.toVDI(task, conn);
+                    snapshotBackupUuid = backedVdi.getUuid(conn);
+                    physicalSize = backedVdi.getPhysicalUtilisation(conn);
+
+                    if (destStore instanceof SwiftTO) {
+                        try {
+                            final String container = "S-" + snapshotTO.getVolume().getVolumeId().toString();
+                            final String destSnapshotName = swiftBackupSnapshot(conn, (SwiftTO) destStore, snapshotSr.getUuid(conn), snapshotBackupUuid, container, false, wait);
+                            final String swiftPath = container + File.separator + destSnapshotName;
+                            finalPath = swiftPath;
+                        } finally {
+                            try {
+                                deleteSnapshotBackup(conn, localMountPoint, folder, secondaryStorageMountPath, snapshotBackupUuid);
+                            } catch (final Exception e) {
+                                s_logger.debug("Failed to delete snapshot on cache storages", e);
+                            }
+                        }
+                    } else if (destStore instanceof S3TO) {
+                        try {
+                            finalPath = backupSnapshotToS3(conn, (S3TO) destStore, snapshotSr.getUuid(conn), folder, snapshotBackupUuid, isISCSI, wait);
+                            if (finalPath == null) {
+                                throw new CloudRuntimeException("S3 upload of snapshots " + snapshotBackupUuid + " failed");
+                            }
+                        } finally {
+                            try {
+                                deleteSnapshotBackup(conn, localMountPoint, folder, secondaryStorageMountPath, snapshotBackupUuid);
+                            } catch (final Exception e) {
+                                s_logger.debug("Failed to delete snapshot on cache storages", e);
+                            }
+                        }
+                        // finalPath = folder + File.separator +
+                        // snapshotBackupUuid;
+                    } else {
+                        finalPath = folder + File.separator + snapshotBackupUuid;
+                    }
+                } finally {
+                    if (task != null) {
+                        try {
+                            task.destroy(conn);
+                        } catch (final Exception e) {
+                            s_logger.warn("unable to destroy task(" + task.toWireString() + ") due to " + e.toString());
+                        }
+                    }
+                    if (snapshotSr != null) {
+                        hypervisorResource.removeSR(conn, snapshotSr);
+                    }
+                }
+            } else {
+                final String primaryStorageSRUuid = primaryStorageSR.getUuid(conn);
+                if (destStore instanceof SwiftTO) {
+                    final String container = "S-" + snapshotTO.getVolume().getVolumeId().toString();
+                    snapshotBackupUuid = swiftBackupSnapshot(conn, (SwiftTO) destStore, primaryStorageSRUuid, snapshotPaUuid, "S-"
+                            + snapshotTO.getVolume().getVolumeId().toString(), isISCSI, wait);
+                    finalPath = container + File.separator + snapshotBackupUuid;
+                } else if (destStore instanceof S3TO) {
+                    finalPath = backupSnapshotToS3(conn, (S3TO) destStore, primaryStorageSRUuid, folder, snapshotPaUuid, isISCSI, wait);
+                    if (finalPath == null) {
+                        throw new CloudRuntimeException("S3 upload of snapshots " + snapshotPaUuid + " failed");
+                    }
+                } else {
+                    final String result = backupSnapshot(conn, primaryStorageSRUuid, localMountPoint, folder, secondaryStorageMountPath, snapshotUuid, prevBackupUuid,
+                            prevSnapshotUuid, isISCSI, wait);
+                    final String[] tmp = result.split("#");
+                    snapshotBackupUuid = tmp[0];
+                    physicalSize = Long.parseLong(tmp[1]);
+                    finalPath = folder + File.separator + snapshotBackupUuid;
+                }
+            }
+            final String volumeUuid = snapshotTO.getVolume().getPath();
+            destroySnapshotOnPrimaryStorageExceptThis(conn, volumeUuid, snapshotUuid);
+
+            final SnapshotObjectTO newSnapshot = new SnapshotObjectTO();
+            newSnapshot.setPath(finalPath);
+            newSnapshot.setPhysicalSize(physicalSize);
+            if (fullbackup) {
+                newSnapshot.setParentSnapshotPath(null);
+            } else {
+                newSnapshot.setParentSnapshotPath(prevBackupUuid);
+            }
+            return new CopyCmdAnswer(newSnapshot);
+        } catch (final Types.XenAPIException e) {
+            details = "BackupSnapshot Failed due to " + e.toString();
+            s_logger.warn(details, e);
+        } catch (final Exception e) {
+            details = "BackupSnapshot Failed due to " + e.getMessage();
+            s_logger.warn(details, e);
+        }
+
+        return new CopyCmdAnswer(details);
+    }
+
+    protected boolean makeDirectory(final Connection conn, final String path) {
+        final String result = hypervisorResource.callHostPlugin(conn, "cloud-plugin-storage", "makeDirectory", "path", path);
+
+        if (result == null || result.isEmpty()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected String backupSnapshot(final Connection conn, final String primaryStorageSRUuid, final String localMountPoint, final String path,
+                                    final String secondaryStorageMountPath, final String snapshotUuid, String prevBackupUuid, final String prevSnapshotUuid, final Boolean
+                                            isISCSI, int wait) {
+        boolean filesrcreated = false;
+        // boolean copied = false;
+
+        if (prevBackupUuid == null) {
+            prevBackupUuid = "";
+        }
+        SR ssSR = null;
+
+        final String remoteDir = secondaryStorageMountPath;
+        try {
+            ssSR = createFileSr(conn, remoteDir, path);
+            filesrcreated = true;
+
+            final VDI snapshotvdi = VDI.getByUuid(conn, snapshotUuid);
+            if (wait == 0) {
+                wait = 2 * 60 * 60;
+            }
+            VDI dvdi = null;
+            Task task = null;
+            try {
+                VDI previousSnapshotVdi = null;
+                if (prevSnapshotUuid != null) {
+                    previousSnapshotVdi = VDI.getByUuid(conn, prevSnapshotUuid);
+                }
+                task = snapshotvdi.copyAsync(conn, ssSR, previousSnapshotVdi, null);
+                // poll every 1 seconds ,
+                hypervisorResource.waitForTask(conn, task, 1000, wait * 1000);
+                hypervisorResource.checkForSuccess(conn, task);
+                dvdi = Types.toVDI(task, conn);
+                // copied = true;
+            } finally {
+                if (task != null) {
+                    try {
+                        task.destroy(conn);
+                    } catch (final Exception e) {
+                        s_logger.warn("unable to destroy task(" + task.toWireString() + ") due to " + e.toString());
+                    }
+                }
+            }
+            final String result = dvdi.getUuid(conn).concat("#").concat(dvdi.getPhysicalUtilisation(conn).toString());
+            return result;
+        } catch (final Exception e) {
+            final String msg = "Exception in backupsnapshot stage due to " + e.toString();
+            s_logger.debug(msg);
+            throw new CloudRuntimeException(msg, e);
+        } finally {
+            try {
+                if (filesrcreated && ssSR != null) {
+                    hypervisorResource.removeSR(conn, ssSR);
+                }
+            } catch (final Exception e) {
+                s_logger.debug("Exception in backupsnapshot cleanup stage due to " + e.toString());
+            }
+        }
+    }
+
+    @Override
+    public Answer createVolumeFromSnapshot(final CopyCommand cmd) {
+        final Connection conn = hypervisorResource.getConnection();
+        final DataTO srcData = cmd.getSrcTO();
+        final SnapshotObjectTO snapshot = (SnapshotObjectTO) srcData;
+        final DataTO destData = cmd.getDestTO();
+        final PrimaryDataStoreTO pool = (PrimaryDataStoreTO) destData.getDataStore();
+        final VolumeObjectTO volume = (VolumeObjectTO) destData;
+        final DataStoreTO imageStore = srcData.getDataStore();
+
+        if (srcData.getDataStore() instanceof PrimaryDataStoreTO && destData.getDataStore() instanceof PrimaryDataStoreTO) {
+            return createVolumeFromSnapshot2(cmd);
+        }
+
+        if (!(imageStore instanceof NfsTO)) {
+            return new CopyCmdAnswer("unsupported protocol");
+        }
+
+        final NfsTO nfsImageStore = (NfsTO) imageStore;
+        final String primaryStorageNameLabel = pool.getUuid();
+        final String secondaryStorageUrl = nfsImageStore.getUrl();
+        final int wait = cmd.getWait();
+        boolean result = false;
+        // Generic error message.
+        String details = null;
+        String volumeUUID = null;
+
+        if (secondaryStorageUrl == null) {
+            details += " because the URL passed: " + secondaryStorageUrl + " is invalid.";
+            return new CopyCmdAnswer(details);
+        }
+        SR srcSr = null;
+        VDI destVdi = null;
+        try {
+            final SR primaryStorageSR = hypervisorResource.getSRByNameLabelandHost(conn, primaryStorageNameLabel);
+            if (primaryStorageSR == null) {
+                throw new InternalErrorException("Could not create volume from snapshot because the primary Storage SR could not be created from the name label: "
+                        + primaryStorageNameLabel);
+            }
+            final String nameLabel = "cloud-" + UUID.randomUUID().toString();
+            destVdi = createVdi(conn, nameLabel, primaryStorageSR, volume.getSize());
+            volumeUUID = destVdi.getUuid(conn);
+            final String snapshotInstallPath = snapshot.getPath();
+            final int index = snapshotInstallPath.lastIndexOf(File.separator);
+            final String snapshotDirectory = snapshotInstallPath.substring(0, index);
+            final String snapshotUuid = getSnapshotUuid(snapshotInstallPath);
+
+            final URI uri = new URI(secondaryStorageUrl);
+            srcSr = createFileSr(conn, uri.getHost() + ":" + uri.getPath(), snapshotDirectory);
+
+            final String[] parents = snapshot.getParents();
+            final List<VDI> snapshotChains = new ArrayList<>();
+            if (parents != null) {
+                for (int i = 0; i < parents.length; i++) {
+                    final String snChainPath = parents[i];
+                    final String uuid = getSnapshotUuid(snChainPath);
+                    final VDI chain = VDI.getByUuid(conn, uuid);
+                    snapshotChains.add(chain);
+                }
+            }
+
+            final VDI snapshotVdi = VDI.getByUuid(conn, snapshotUuid);
+            snapshotChains.add(snapshotVdi);
+
+            for (final VDI snapChain : snapshotChains) {
+                final Task task = snapChain.copyAsync(conn, null, null, destVdi);
+                // poll every 1 seconds ,
+                hypervisorResource.waitForTask(conn, task, 1000, wait * 1000);
+                hypervisorResource.checkForSuccess(conn, task);
+                task.destroy(conn);
+            }
+
+            result = true;
+            destVdi = VDI.getByUuid(conn, volumeUUID);
+            final VDI.Record vdir = destVdi.getRecord(conn);
+            final VolumeObjectTO newVol = new VolumeObjectTO();
+            newVol.setPath(volumeUUID);
+            newVol.setSize(vdir.virtualSize);
+            return new CopyCmdAnswer(newVol);
+        } catch (final Types.XenAPIException e) {
+            details += " due to " + e.toString();
+            s_logger.warn(details, e);
+        } catch (final Exception e) {
+            details += " due to " + e.getMessage();
+            s_logger.warn(details, e);
+        } finally {
+            if (srcSr != null) {
+                hypervisorResource.removeSR(conn, srcSr);
+            }
+            if (!result && destVdi != null) {
+                try {
+                    destVdi.destroy(conn);
+                } catch (final Exception e) {
+                    s_logger.debug("destroy dest vdi failed", e);
+                }
+            }
+        }
+        if (!result) {
+            // Is this logged at a higher level?
+            s_logger.error(details);
+        }
+
+        // In all cases return something.
+        return new CopyCmdAnswer(details);
+    }
+
+    @Override
+    protected String getVhdParent(final Connection conn, final String primaryStorageSRUuid, final String snapshotUuid, final Boolean isISCSI) {
+        final String parentUuid = hypervisorResource.callHostPlugin(conn, "cloud-plugin-storage", "getVhdParent", "primaryStorageSRUuid", primaryStorageSRUuid, "snapshotUuid",
+                snapshotUuid, "isISCSI", isISCSI.toString());
+
+        if (parentUuid == null || parentUuid.isEmpty() || parentUuid.equalsIgnoreCase("None")) {
+            s_logger.debug("Unable to get parent of VHD " + snapshotUuid + " in SR " + primaryStorageSRUuid);
+            // errString is already logged.
+            return null;
+        }
+        return parentUuid;
+    }
+
+    protected String getSnapshotUuid(final String snapshotPath) {
+        int index = snapshotPath.lastIndexOf(File.separator);
+        String snapshotUuid = snapshotPath.substring(index + 1);
+        index = snapshotUuid.lastIndexOf(".");
+        if (index != -1) {
+            snapshotUuid = snapshotUuid.substring(0, index);
+        }
+        return snapshotUuid;
     }
 
     public Answer createTemplateFromSnapshot2(final CopyCommand cmd) {

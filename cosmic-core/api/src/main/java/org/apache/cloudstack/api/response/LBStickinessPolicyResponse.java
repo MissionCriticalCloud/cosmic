@@ -1,33 +1,17 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
+
+import com.cloud.network.rules.StickinessPolicy;
+import com.cloud.serializer.Param;
+import com.cloud.utils.Pair;
+import org.apache.cloudstack.acl.RoleType;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cloud.network.rules.StickinessPolicy;
-import com.cloud.serializer.Param;
-import com.cloud.utils.Pair;
 import com.google.gson.annotations.SerializedName;
-
-import org.apache.cloudstack.acl.RoleType;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
 
 public class LBStickinessPolicyResponse extends BaseResponse {
     @SerializedName("id")
@@ -40,11 +24,11 @@ public class LBStickinessPolicyResponse extends BaseResponse {
 
     @SerializedName("methodname")
     @Param(description = "the method name of the Stickiness policy")
-    private String methodName;
+    private final String methodName;
 
     @SerializedName("description")
     @Param(description = "the description of the Stickiness policy")
-    private String description;;
+    private String description;
 
     @SerializedName("state")
     @Param(description = "the state of the policy")
@@ -60,55 +44,20 @@ public class LBStickinessPolicyResponse extends BaseResponse {
     // in the above there are two domains with values www.yahoo.com and www.google.com
     @SerializedName("params")
     @Param(description = "the params of the policy")
-    private Map<String, String> params;
+    private final Map<String, String> params;
 
-    public Map<String, String> getParams() {
-        return params;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getMethodName() {
-        return methodName;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public LBStickinessPolicyResponse(StickinessPolicy stickinesspolicy) {
+    public LBStickinessPolicyResponse(final StickinessPolicy stickinesspolicy) {
         this.name = stickinesspolicy.getName();
-        List<Pair<String, String>> paramsList = stickinesspolicy.getParams();
+        final List<Pair<String, String>> paramsList = stickinesspolicy.getParams();
         this.methodName = stickinesspolicy.getMethodName();
         this.description = stickinesspolicy.getDescription();
         this.forDisplay = stickinesspolicy.isDisplay();
         if (stickinesspolicy.isRevoke()) {
             this.setState("Revoked");
         }
-        if (stickinesspolicy.getUuid() != null)
+        if (stickinesspolicy.getUuid() != null) {
             setId(stickinesspolicy.getUuid());
+        }
 
         /* Get the param and values from the database and fill the response object
          *  The following loop is to
@@ -116,11 +65,11 @@ public class LBStickinessPolicyResponse extends BaseResponse {
          *    2)  combine all params with name with ":" , currently we have one param called "domain" that can appear multiple times.
          * */
 
-        Map<String, String> tempParamList = new HashMap<String, String>();
-        for (Pair<String, String> paramKV : paramsList) {
-            String key = paramKV.first();
-            String value = paramKV.second();
-            StringBuilder sb = new StringBuilder();
+        final Map<String, String> tempParamList = new HashMap<>();
+        for (final Pair<String, String> paramKV : paramsList) {
+            final String key = paramKV.first();
+            final String value = paramKV.second();
+            final StringBuilder sb = new StringBuilder();
             sb.append(value);
             if (tempParamList.get(key) != null) {
                 sb.append(":").append(tempParamList.get(key));
@@ -133,7 +82,43 @@ public class LBStickinessPolicyResponse extends BaseResponse {
         setObjectName("stickinesspolicy");
     }
 
-    public void setForDisplay(Boolean forDisplay) {
+    public void setId(final String id) {
+        this.id = id;
+    }
+
+    public Map<String, String> getParams() {
+        return params;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(final String state) {
+        this.state = state;
+    }
+
+    public void setForDisplay(final Boolean forDisplay) {
         this.forDisplay = forDisplay;
     }
 }

@@ -1,30 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.dc.dao;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.HostPodVO;
@@ -40,22 +14,29 @@ import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
 
+import javax.inject.Inject;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class ClusterDaoImpl extends GenericDaoBase<ClusterVO, Long> implements ClusterDao {
 
+    private static final String GET_POD_CLUSTER_MAP_PREFIX = "SELECT pod_id, id FROM cloud.cluster WHERE cluster.id IN( ";
+    private static final String GET_POD_CLUSTER_MAP_SUFFIX = " )";
     protected final SearchBuilder<ClusterVO> PodSearch;
     protected final SearchBuilder<ClusterVO> HyTypeWithoutGuidSearch;
     protected final SearchBuilder<ClusterVO> AvailHyperSearch;
     protected final SearchBuilder<ClusterVO> ZoneSearch;
     protected final SearchBuilder<ClusterVO> ZoneHyTypeSearch;
     protected final SearchBuilder<ClusterVO> ZoneClusterSearch;
-
     protected GenericSearchBuilder<ClusterVO, Long> ClusterIdSearch;
-
-    private static final String GET_POD_CLUSTER_MAP_PREFIX = "SELECT pod_id, id FROM cloud.cluster WHERE cluster.id IN( ";
-    private static final String GET_POD_CLUSTER_MAP_SUFFIX = " )";
     @Inject
     protected HostPodDao _hostPodDao;
 
@@ -98,23 +79,16 @@ public class ClusterDaoImpl extends GenericDaoBase<ClusterVO, Long> implements C
     }
 
     @Override
-    public List<ClusterVO> listByZoneId(long zoneId) {
-        SearchCriteria<ClusterVO> sc = ZoneSearch.create();
-        sc.setParameters("dataCenterId", zoneId);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<ClusterVO> listByPodId(long podId) {
-        SearchCriteria<ClusterVO> sc = PodSearch.create();
+    public List<ClusterVO> listByPodId(final long podId) {
+        final SearchCriteria<ClusterVO> sc = PodSearch.create();
         sc.setParameters("pod", podId);
 
         return listBy(sc);
     }
 
     @Override
-    public ClusterVO findBy(String name, long podId) {
-        SearchCriteria<ClusterVO> sc = PodSearch.create();
+    public ClusterVO findBy(final String name, final long podId) {
+        final SearchCriteria<ClusterVO> sc = PodSearch.create();
         sc.setParameters("pod", podId);
         sc.setParameters("name", name);
 
@@ -122,30 +96,29 @@ public class ClusterDaoImpl extends GenericDaoBase<ClusterVO, Long> implements C
     }
 
     @Override
-    public List<ClusterVO> listByHyTypeWithoutGuid(String hyType) {
-        SearchCriteria<ClusterVO> sc = HyTypeWithoutGuidSearch.create();
+    public List<ClusterVO> listByHyTypeWithoutGuid(final String hyType) {
+        final SearchCriteria<ClusterVO> sc = HyTypeWithoutGuidSearch.create();
         sc.setParameters("hypervisorType", hyType);
 
         return listBy(sc);
     }
 
     @Override
-    public List<ClusterVO> listByDcHyType(long dcId, String hyType) {
-        SearchCriteria<ClusterVO> sc = ZoneHyTypeSearch.create();
-        sc.setParameters("dataCenterId", dcId);
-        sc.setParameters("hypervisorType", hyType);
+    public List<ClusterVO> listByZoneId(final long zoneId) {
+        final SearchCriteria<ClusterVO> sc = ZoneSearch.create();
+        sc.setParameters("dataCenterId", zoneId);
         return listBy(sc);
     }
 
     @Override
-    public List<HypervisorType> getAvailableHypervisorInZone(Long zoneId) {
-        SearchCriteria<ClusterVO> sc = AvailHyperSearch.create();
+    public List<HypervisorType> getAvailableHypervisorInZone(final Long zoneId) {
+        final SearchCriteria<ClusterVO> sc = AvailHyperSearch.create();
         if (zoneId != null) {
             sc.setParameters("zoneId", zoneId);
         }
-        List<ClusterVO> clusters = listBy(sc);
-        List<HypervisorType> hypers = new ArrayList<HypervisorType>(4);
-        for (ClusterVO cluster : clusters) {
+        final List<ClusterVO> clusters = listBy(sc);
+        final List<HypervisorType> hypers = new ArrayList<>(4);
+        for (final ClusterVO cluster : clusters) {
             hypers.add(cluster.getHypervisorType());
         }
 
@@ -153,15 +126,23 @@ public class ClusterDaoImpl extends GenericDaoBase<ClusterVO, Long> implements C
     }
 
     @Override
-    public Map<Long, List<Long>> getPodClusterIdMap(List<Long> clusterIds) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public List<ClusterVO> listByDcHyType(final long dcId, final String hyType) {
+        final SearchCriteria<ClusterVO> sc = ZoneHyTypeSearch.create();
+        sc.setParameters("dataCenterId", dcId);
+        sc.setParameters("hypervisorType", hyType);
+        return listBy(sc);
+    }
+
+    @Override
+    public Map<Long, List<Long>> getPodClusterIdMap(final List<Long> clusterIds) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
-        Map<Long, List<Long>> result = new HashMap<Long, List<Long>>();
+        final Map<Long, List<Long>> result = new HashMap<>();
 
         try {
-            StringBuilder sql = new StringBuilder(GET_POD_CLUSTER_MAP_PREFIX);
+            final StringBuilder sql = new StringBuilder(GET_POD_CLUSTER_MAP_PREFIX);
             if (clusterIds.size() > 0) {
-                for (Long clusterId : clusterIds) {
+                for (final Long clusterId : clusterIds) {
                     sql.append(clusterId).append(",");
                 }
                 sql.delete(sql.length() - 1, sql.length());
@@ -169,31 +150,31 @@ public class ClusterDaoImpl extends GenericDaoBase<ClusterVO, Long> implements C
             }
 
             pstmt = txn.prepareAutoCloseStatement(sql.toString());
-            ResultSet rs = pstmt.executeQuery();
+            final ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                Long podId = rs.getLong(1);
-                Long clusterIdInPod = rs.getLong(2);
+                final Long podId = rs.getLong(1);
+                final Long clusterIdInPod = rs.getLong(2);
                 if (result.containsKey(podId)) {
-                    List<Long> clusterList = result.get(podId);
+                    final List<Long> clusterList = result.get(podId);
                     clusterList.add(clusterIdInPod);
                     result.put(podId, clusterList);
                 } else {
-                    List<Long> clusterList = new ArrayList<Long>();
+                    final List<Long> clusterList = new ArrayList<>();
                     clusterList.add(clusterIdInPod);
                     result.put(podId, clusterList);
                 }
             }
             return result;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + GET_POD_CLUSTER_MAP_PREFIX, e);
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             throw new CloudRuntimeException("Caught: " + GET_POD_CLUSTER_MAP_PREFIX, e);
         }
     }
 
     @Override
-    public List<Long> listDisabledClusters(long zoneId, Long podId) {
-        GenericSearchBuilder<ClusterVO, Long> clusterIdSearch = createSearchBuilder(Long.class);
+    public List<Long> listDisabledClusters(final long zoneId, final Long podId) {
+        final GenericSearchBuilder<ClusterVO, Long> clusterIdSearch = createSearchBuilder(Long.class);
         clusterIdSearch.selectFields(clusterIdSearch.entity().getId());
         clusterIdSearch.and("dataCenterId", clusterIdSearch.entity().getDataCenterId(), Op.EQ);
         if (podId != null) {
@@ -202,7 +183,7 @@ public class ClusterDaoImpl extends GenericDaoBase<ClusterVO, Long> implements C
         clusterIdSearch.and("allocationState", clusterIdSearch.entity().getAllocationState(), Op.EQ);
         clusterIdSearch.done();
 
-        SearchCriteria<Long> sc = clusterIdSearch.create();
+        final SearchCriteria<Long> sc = clusterIdSearch.create();
         sc.addAnd("dataCenterId", SearchCriteria.Op.EQ, zoneId);
         if (podId != null) {
             sc.addAnd("podId", SearchCriteria.Op.EQ, podId);
@@ -212,20 +193,20 @@ public class ClusterDaoImpl extends GenericDaoBase<ClusterVO, Long> implements C
     }
 
     @Override
-    public List<Long> listClustersWithDisabledPods(long zoneId) {
+    public List<Long> listClustersWithDisabledPods(final long zoneId) {
 
-        GenericSearchBuilder<HostPodVO, Long> disabledPodIdSearch = _hostPodDao.createSearchBuilder(Long.class);
+        final GenericSearchBuilder<HostPodVO, Long> disabledPodIdSearch = _hostPodDao.createSearchBuilder(Long.class);
         disabledPodIdSearch.selectFields(disabledPodIdSearch.entity().getId());
         disabledPodIdSearch.and("dataCenterId", disabledPodIdSearch.entity().getDataCenterId(), Op.EQ);
         disabledPodIdSearch.and("allocationState", disabledPodIdSearch.entity().getAllocationState(), Op.EQ);
 
-        GenericSearchBuilder<ClusterVO, Long> clusterIdSearch = createSearchBuilder(Long.class);
+        final GenericSearchBuilder<ClusterVO, Long> clusterIdSearch = createSearchBuilder(Long.class);
         clusterIdSearch.selectFields(clusterIdSearch.entity().getId());
         clusterIdSearch.join("disabledPodIdSearch", disabledPodIdSearch, clusterIdSearch.entity().getPodId(), disabledPodIdSearch.entity().getId(),
-            JoinBuilder.JoinType.INNER);
+                JoinBuilder.JoinType.INNER);
         clusterIdSearch.done();
 
-        SearchCriteria<Long> sc = clusterIdSearch.create();
+        final SearchCriteria<Long> sc = clusterIdSearch.create();
         sc.setJoinParameters("disabledPodIdSearch", "dataCenterId", zoneId);
         sc.setJoinParameters("disabledPodIdSearch", "allocationState", Grouping.AllocationState.Disabled);
 
@@ -233,31 +214,31 @@ public class ClusterDaoImpl extends GenericDaoBase<ClusterVO, Long> implements C
     }
 
     @Override
-    public List<ClusterVO> listClustersByDcId(long zoneId) {
-        SearchCriteria<ClusterVO> sc = ZoneClusterSearch.create();
+    public List<ClusterVO> listClustersByDcId(final long zoneId) {
+        final SearchCriteria<ClusterVO> sc = ZoneClusterSearch.create();
         sc.setParameters("dataCenterId", zoneId);
         return listBy(sc);
     }
 
     @Override
-    public boolean remove(Long id) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public List<Long> listAllCusters(final long zoneId) {
+        final SearchCriteria<Long> sc = ClusterIdSearch.create();
+        sc.setParameters("dataCenterId", zoneId);
+        return customSearch(sc, null);
+    }
+
+    @Override
+    public boolean remove(final Long id) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
-        ClusterVO cluster = createForUpdate();
+        final ClusterVO cluster = createForUpdate();
         cluster.setName(null);
         cluster.setGuid(null);
 
         update(id, cluster);
 
-        boolean result = super.remove(id);
+        final boolean result = super.remove(id);
         txn.commit();
         return result;
-    }
-
-    @Override
-    public List<Long> listAllCusters(long zoneId) {
-        SearchCriteria<Long> sc = ClusterIdSearch.create();
-        sc.setParameters("dataCenterId", zoneId);
-        return customSearch(sc, null);
     }
 }

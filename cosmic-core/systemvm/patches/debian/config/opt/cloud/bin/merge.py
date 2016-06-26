@@ -1,50 +1,34 @@
 #!/usr/bin/python
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 
-import json
-import os
-import time
-import uuid
-import logging
+
 import gzip
+import json
+import logging
+import os
 import shutil
-import cs_ip
-import cs_guestnetwork
+import uuid
+
 import cs_cmdline
-import cs_network_acl
+import cs_dhcp
 import cs_firewallrules
+import cs_forwardingrules
+import cs_guestnetwork
+import cs_ip
 import cs_loadbalancer
 import cs_monitorservice
-import cs_vmdata
-import cs_dhcp
-import cs_forwardingrules
-import cs_site2sitevpn
+import cs_network_acl
 import cs_remoteaccessvpn
-import cs_vpnusers
+import cs_site2sitevpn
 import cs_staticroutes
+import cs_vmdata
+import cs_vpnusers
 
 
 class DataBag:
-
     DPATH = "/etc/cloudstack"
 
     def __init__(self):
-        self.bdata = {}
+        self.bdata = { }
 
     def load(self):
         data = self.bdata
@@ -55,9 +39,9 @@ class DataBag:
             handle = open(self.fpath)
         except IOError:
             logging.debug("Creating data bag type %s", self.key)
-            data.update({"id": self.key})
+            data.update({ "id": self.key })
         else:
-            logging.debug("Loading data bag type %s",  self.key)
+            logging.debug("Loading data bag type %s", self.key)
             data = json.load(handle)
             handle.close()
         self.dbag = data
@@ -81,13 +65,12 @@ class DataBag:
 
 
 class updateDataBag:
-
     DPATH = "/etc/cloudstack"
 
     def __init__(self, qFile):
         self.qFile = qFile
         self.fpath = ''
-        self.bdata = {}
+        self.bdata = { }
         self.process()
 
     def process(self):
@@ -134,7 +117,7 @@ class updateDataBag:
 
     def processGuestNetwork(self, dbag):
         d = self.qFile.data
-        dp = {}
+        dp = { }
         dp['public_ip'] = d['router_guest_ip']
         dp['netmask'] = d['router_guest_netmask']
         dp['source_nat'] = False
@@ -145,7 +128,7 @@ class updateDataBag:
         dp['nw_type'] = 'guest'
         dp = PrivateGatewayHack.update_network_type_for_privategateway(dbag, dp)
         qf = QueueFile()
-        qf.load({'ip_address': [dp], 'type': 'ips'})
+        qf.load({ 'ip_address': [dp], 'type': 'ips' })
         if 'domain_name' not in d.keys() or d['domain_name'] == '':
             d['domain_name'] = "cloudnine.internal"
 
@@ -206,21 +189,21 @@ class updateDataBag:
 
     def processCLItem(self, num, nw_type):
         key = 'eth' + num + 'ip'
-        dp = {}
-        if(key in self.qFile.data['cmd_line']):
+        dp = { }
+        if (key in self.qFile.data['cmd_line']):
             dp['public_ip'] = self.qFile.data['cmd_line'][key]
             dp['netmask'] = self.qFile.data['cmd_line']['eth' + num + 'mask']
             dp['source_nat'] = False
             dp['add'] = True
             dp['one_to_one_nat'] = False
-            if('localgw' in self.qFile.data['cmd_line']):
+            if ('localgw' in self.qFile.data['cmd_line']):
                 dp['gateway'] = self.qFile.data['cmd_line']['localgw']
             else:
                 dp['gateway'] = 'None'
             dp['nic_dev_id'] = num
             dp['nw_type'] = nw_type
             qf = QueueFile()
-            qf.load({'ip_address': [dp], 'type': 'ips'})
+            qf.load({ 'ip_address': [dp], 'type': 'ips' })
 
     def processVmData(self, dbag):
         cs_vmdata.merge(dbag, self.qFile.data)
@@ -228,12 +211,11 @@ class updateDataBag:
 
 
 class QueueFile:
-
     fileName = ''
     configCache = "/var/cache/cloud"
     keep = True
     do_merge = True
-    data = {}
+    data = { }
 
     def update_databag(self):
         if self.do_merge:
@@ -248,15 +230,15 @@ class QueueFile:
             self.type = self.data["type"]
             self.update_databag()
             return
-        filename = '{cache_location}/{json_file}'.format(cache_location = self.configCache, json_file = self.fileName)
+        filename = '{cache_location}/{json_file}'.format(cache_location=self.configCache, json_file=self.fileName)
         try:
             handle = open(filename)
         except IOError as exception:
             error_message = ("Exception occurred with the following exception error '{error}'. Could not open '{file}'. "
-                              "It seems that the file has already been moved.".format(error = exception, file = filename))
+                             "It seems that the file has already been moved.".format(error=exception, file=filename))
             logging.error(error_message)
         else:
-            logging.info("Continuing with the processing of file '{file}'".format(file = filename))
+            logging.info("Continuing with the processing of file '{file}'".format(file=filename))
 
             self.data = json.load(handle)
             self.type = self.data["type"]
@@ -296,9 +278,8 @@ class QueueFile:
 
         logging.debug("Processed file written to %s", zipped_file_name)
 
+
 class PrivateGatewayHack:
-
-
     @classmethod
     def update_network_type_for_privategateway(cls, dbag, data):
         ip = data['router_guest_ip'] if 'router_guest_ip' in data.keys() else data['public_ip']
@@ -314,11 +295,9 @@ class PrivateGatewayHack:
             logging.debug("Not updating nw_type for ip %s because has_private_gw_ip = %s and private_gw_matches = %s " % (ip, has_private_gw_ip, private_gw_matches))
         return data
 
-
     @classmethod
     def if_config_has_privategateway(cls, dbag):
         return 'privategateway' in dbag['config'].keys() and dbag['config']['privategateway'] != "None"
-
 
     @classmethod
     def ip_matches_private_gateway_ip(cls, ip, private_gateway_ip):
@@ -326,7 +305,6 @@ class PrivateGatewayHack:
         if ip == private_gateway_ip:
             new_ip_matches_private_gateway_ip = True
         return new_ip_matches_private_gateway_ip
-
 
     @classmethod
     def load_inital_data(cls):

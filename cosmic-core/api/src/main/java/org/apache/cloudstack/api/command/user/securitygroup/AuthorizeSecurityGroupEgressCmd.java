@@ -1,33 +1,10 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.securitygroup;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.network.security.SecurityRule;
 import com.cloud.utils.StringUtils;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -42,13 +19,20 @@ import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.api.response.SecurityGroupResponse;
 import org.apache.cloudstack.api.response.SecurityGroupRuleResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "authorizeSecurityGroupEgress", responseObject = SecurityGroupRuleResponse.class, description = "Authorizes a particular egress rule for this security group", since = "3.0.0", entityType = {SecurityGroup.class},
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = false)
-@SuppressWarnings("rawtypes")
+@APICommand(name = "authorizeSecurityGroupEgress", responseObject = SecurityGroupRuleResponse.class, description = "Authorizes a particular egress rule for this security group",
+        since = "3.0.0", entityType = {SecurityGroup.class},
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = false)
 public class AuthorizeSecurityGroupEgressCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(AuthorizeSecurityGroupIngressCmd.class.getName());
 
@@ -80,9 +64,9 @@ public class AuthorizeSecurityGroupEgressCmd extends BaseAsyncCmd {
     private Map userSecurityGroupList;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               description = "an optional domainId for the security group. If the account parameter is used, domainId must also be used.",
-               entityType = DomainResponse.class)
+            type = CommandType.UUID,
+            description = "an optional domainId for the security group. If the account parameter is used, domainId must also be used.",
+            entityType = DomainResponse.class)
     private Long domainId;
 
     @Parameter(name = ApiConstants.ACCOUNT, type = CommandType.STRING, description = "an optional account for the security group. Must be used with domainId.")
@@ -92,24 +76,26 @@ public class AuthorizeSecurityGroupEgressCmd extends BaseAsyncCmd {
     private Long projectId;
 
     @ACL(accessType = AccessType.OperateEntry)
-    @Parameter(name=ApiConstants.SECURITY_GROUP_ID, type=CommandType.UUID, description="The ID of the security group. Mutually exclusive with securityGroupName parameter", entityType=SecurityGroupResponse.class)
+    @Parameter(name = ApiConstants.SECURITY_GROUP_ID, type = CommandType.UUID, description = "The ID of the security group. Mutually exclusive with securityGroupName parameter",
+            entityType = SecurityGroupResponse.class)
     private Long securityGroupId;
 
     // This @ACL will not work, since we don't have a way to convert this parameter to the entity like securityGroupId.
     //@ACL(accessType = AccessType.OperateEntry)
-    @Parameter(name=ApiConstants.SECURITY_GROUP_NAME, type=CommandType.STRING, description="The name of the security group. Mutually exclusive with securityGroupId parameter")
+    @Parameter(name = ApiConstants.SECURITY_GROUP_NAME, type = CommandType.STRING, description = "The name of the security group. Mutually exclusive with securityGroupId " +
+            "parameter")
     private String securityGroupName;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public String getAccountName() {
-        return accountName;
+    public static String getResultObjectName() {
+        return "securitygroup";
     }
 
-    public List<String> getCidrList() {
-        return cidrList;
+    public String getAccountName() {
+        return accountName;
     }
 
     public Integer getEndPort() {
@@ -122,6 +108,63 @@ public class AuthorizeSecurityGroupEgressCmd extends BaseAsyncCmd {
 
     public Integer getIcmpType() {
         return icmpType;
+    }
+
+    public String getProtocol() {
+        if (protocol == null) {
+            return "all";
+        }
+        return protocol;
+    }
+
+    public Integer getStartPort() {
+        return startPort;
+    }
+
+    @Override
+    public String getEventType() {
+        return EventTypes.EVENT_SECURITY_GROUP_AUTHORIZE_EGRESS;
+    }
+
+    @Override
+    public String getEventDescription() {
+        final StringBuilder sb = new StringBuilder();
+        if (getUserSecurityGroupList() != null) {
+            sb.append("group list(group/account): ");
+            final Collection userGroupCollection = getUserSecurityGroupList().values();
+            final Iterator iter = userGroupCollection.iterator();
+
+            HashMap userGroup = (HashMap) iter.next();
+            String group = (String) userGroup.get("group");
+            String authorizedAccountName = (String) userGroup.get("account");
+            sb.append(group + "/" + authorizedAccountName);
+
+            while (iter.hasNext()) {
+                userGroup = (HashMap) iter.next();
+                group = (String) userGroup.get("group");
+                authorizedAccountName = (String) userGroup.get("account");
+                sb.append(", " + group + "/" + authorizedAccountName);
+            }
+        } else if (getCidrList() != null) {
+            sb.append("cidr list: ");
+            sb.append(StringUtils.join(getCidrList(), ", "));
+        } else {
+            sb.append("<error:  no egress parameters>");
+        }
+
+        return "authorizing egress to group: " + getSecurityGroupId() + " to " + sb.toString();
+    }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
+
+    public Map getUserSecurityGroupList() {
+        return userSecurityGroupList;
+    }
+
+    public List<String> getCidrList() {
+        return cidrList;
     }
 
     public Long getSecurityGroupId() {
@@ -144,88 +187,9 @@ public class AuthorizeSecurityGroupEgressCmd extends BaseAsyncCmd {
         return securityGroupId;
     }
 
-    public String getProtocol() {
-        if (protocol == null) {
-            return "all";
-        }
-        return protocol;
-    }
-
-    public Integer getStartPort() {
-        return startPort;
-    }
-
-    public Map getUserSecurityGroupList() {
-        return userSecurityGroupList;
-    }
-
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public static String getResultObjectName() {
-        return "securitygroup";
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, projectId, true);
-        if (accountId == null) {
-            return CallContext.current().getCallingAccount().getId();
-        }
-
-        return accountId;
-    }
-
-    @Override
-    public String getEventType() {
-        return EventTypes.EVENT_SECURITY_GROUP_AUTHORIZE_EGRESS;
-    }
-
-    @Override
-    public String getEventDescription() {
-        StringBuilder sb = new StringBuilder();
-        if (getUserSecurityGroupList() != null) {
-            sb.append("group list(group/account): ");
-            Collection userGroupCollection = getUserSecurityGroupList().values();
-            Iterator iter = userGroupCollection.iterator();
-
-            HashMap userGroup = (HashMap)iter.next();
-            String group = (String)userGroup.get("group");
-            String authorizedAccountName = (String)userGroup.get("account");
-            sb.append(group + "/" + authorizedAccountName);
-
-            while (iter.hasNext()) {
-                userGroup = (HashMap)iter.next();
-                group = (String)userGroup.get("group");
-                authorizedAccountName = (String)userGroup.get("account");
-                sb.append(", " + group + "/" + authorizedAccountName);
-            }
-        } else if (getCidrList() != null) {
-            sb.append("cidr list: ");
-            sb.append(StringUtils.join(getCidrList(), ", "));
-        } else {
-            sb.append("<error:  no egress parameters>");
-        }
-
-        return "authorizing egress to group: " + getSecurityGroupId() + " to " + sb.toString();
-    }
-
-    @Override
-    public void execute() {
-        List<? extends SecurityRule> egressRules = _securityGroupService.authorizeSecurityGroupEgress(this);
-        if (egressRules != null && !egressRules.isEmpty()) {
-            SecurityGroupResponse response = _responseGenerator.createSecurityGroupResponseFromSecurityGroupRule(egressRules);
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to authorize security group egress rule(s)");
-        }
-
+    public Long getInstanceId() {
+        return getSecurityGroupId();
     }
 
     @Override
@@ -234,7 +198,28 @@ public class AuthorizeSecurityGroupEgressCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public Long getInstanceId() {
-        return getSecurityGroupId();
+    public void execute() {
+        final List<? extends SecurityRule> egressRules = _securityGroupService.authorizeSecurityGroupEgress(this);
+        if (egressRules != null && !egressRules.isEmpty()) {
+            final SecurityGroupResponse response = _responseGenerator.createSecurityGroupResponseFromSecurityGroupRule(egressRules);
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to authorize security group egress rule(s)");
+        }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final Long accountId = _accountService.finalyzeAccountId(accountName, domainId, projectId, true);
+        if (accountId == null) {
+            return CallContext.current().getCallingAccount().getId();
+        }
+
+        return accountId;
     }
 }

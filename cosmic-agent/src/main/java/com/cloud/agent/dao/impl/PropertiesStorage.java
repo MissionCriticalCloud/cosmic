@@ -1,32 +1,15 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.agent.dao.impl;
 
+import com.cloud.agent.dao.StorageComponent;
+import com.cloud.utils.PropertiesUtil;
+
+import javax.ejb.Local;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
-
-import javax.ejb.Local;
-
-import com.cloud.agent.dao.StorageComponent;
-import com.cloud.utils.PropertiesUtil;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -36,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * Uses Properties to implement storage.
  *
  * @config {@table || Param Name | Description | Values | Default || || path |
- *         path to the properties _file | String | db/db.properties || * }
+ * path to the properties _file | String | db/db.properties || * }
  **/
 @Local(value = {StorageComponent.class})
 public class PropertiesStorage implements StorageComponent {
@@ -46,12 +29,12 @@ public class PropertiesStorage implements StorageComponent {
     String _name;
 
     @Override
-    public synchronized String get(String key) {
+    public synchronized String get(final String key) {
         return _properties.getProperty(key);
     }
 
     @Override
-    public synchronized void persist(String key, String value) {
+    public synchronized void persist(final String key, final String value) {
         _properties.setProperty(key, value);
         FileOutputStream output = null;
         try {
@@ -59,7 +42,7 @@ public class PropertiesStorage implements StorageComponent {
             _properties.store(output, _name);
             output.flush();
             output.close();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             s_logger.error("Uh-oh: ", e);
         } finally {
             IOUtils.closeQuietly(output);
@@ -67,9 +50,43 @@ public class PropertiesStorage implements StorageComponent {
     }
 
     @Override
-    public synchronized boolean configure(String name, Map<String, Object> params) {
+    public synchronized String getName() {
+        return _name;
+    }
+
+    @Override
+    public void setName(final String name) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public Map<String, Object> getConfigParams() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setConfigParams(final Map<String, Object> params) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public int getRunLevel() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void setRunLevel(final int level) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public synchronized boolean configure(final String name, final Map<String, Object> params) {
         _name = name;
-        String path = (String)params.get("path");
+        String path = (String) params.get("path");
         if (path == null) {
             path = "agent.properties";
         }
@@ -82,7 +99,7 @@ public class PropertiesStorage implements StorageComponent {
                     s_logger.error("Unable to create _file: " + file.getAbsolutePath());
                     return false;
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 s_logger.error("Unable to create _file: " + file.getAbsolutePath(), e);
                 return false;
             }
@@ -90,19 +107,14 @@ public class PropertiesStorage implements StorageComponent {
         try {
             PropertiesUtil.loadFromFile(_properties, file);
             _file = file;
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             s_logger.error("How did we get here? ", e);
             return false;
-        } catch (IOException e) {
+        } catch (final IOException e) {
             s_logger.error("IOException: ", e);
             return false;
         }
         return true;
-    }
-
-    @Override
-    public synchronized String getName() {
-        return _name;
     }
 
     @Override
@@ -114,34 +126,4 @@ public class PropertiesStorage implements StorageComponent {
     public boolean stop() {
         return true;
     }
-
-    @Override
-    public void setName(String name) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setConfigParams(Map<String, Object> params) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Map<String, Object> getConfigParams() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public int getRunLevel() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public void setRunLevel(int level) {
-        // TODO Auto-generated method stub
-    }
-
 }

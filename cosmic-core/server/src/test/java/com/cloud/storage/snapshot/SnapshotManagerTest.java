@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.storage.snapshot;
 
 import static org.mockito.Matchers.any;
@@ -21,9 +5,6 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.UUID;
 
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.exception.InvalidParameterValueException;
@@ -53,7 +34,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.context.CallContext;
@@ -67,6 +47,10 @@ import org.apache.cloudstack.engine.subsystem.api.storage.VolumeDataFactory;
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import java.util.List;
+import java.util.UUID;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -77,6 +61,10 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
 public class SnapshotManagerTest {
+    private static final long TEST_SNAPSHOT_ID = 3L;
+    private static final long TEST_VOLUME_ID = 4L;
+    private static final long TEST_VM_ID = 5L;
+    private static final long TEST_STORAGE_POOL_ID = 6L;
     @Spy
     SnapshotManagerImpl _snapshotMgr = new SnapshotManagerImpl();
     @Mock
@@ -120,11 +108,6 @@ public class SnapshotManagerTest {
     @Mock
     DataStore storeMock;
 
-    private static final long TEST_SNAPSHOT_ID = 3L;
-    private static final long TEST_VOLUME_ID = 4L;
-    private static final long TEST_VM_ID = 5L;
-    private static final long TEST_STORAGE_POOL_ID = 6L;
-
     @Before
     public void setup() throws ResourceAllocationException {
         MockitoAnnotations.initMocks(this);
@@ -161,8 +144,8 @@ public class SnapshotManagerTest {
         doNothing().when(_snapshotMgr._resourceLimitMgr).incrementResourceCount(anyLong(), any(ResourceType.class));
         doNothing().when(_snapshotMgr._resourceLimitMgr).incrementResourceCount(anyLong(), any(ResourceType.class), anyLong());
 
-        Account account = new AccountVO("testaccount", 1L, "networkdomain", (short)0, "uuid");
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
         CallContext.register(user, account);
         when(_accountMgr.getAccount(anyLong())).thenReturn(account);
 
@@ -186,7 +169,6 @@ public class SnapshotManagerTest {
     }
 
     // active snapshots
-    @SuppressWarnings("unchecked")
     @Test(expected = InvalidParameterValueException.class)
     public void testAllocSnapshotF2() throws ResourceAllocationException {
         when(_vmDao.findById(anyLong())).thenReturn(vmMock);
@@ -194,14 +176,13 @@ public class SnapshotManagerTest {
         when(vmMock.getState()).thenReturn(State.Stopped);
         when(vmMock.getHypervisorType()).thenReturn(Hypervisor.HypervisorType.KVM);
         when(volumeInfoMock.getInstanceId()).thenReturn(TEST_VM_ID);
-        List<SnapshotVO> mockList = mock(List.class);
+        final List<SnapshotVO> mockList = mock(List.class);
         when(mockList.size()).thenReturn(1);
         when(_snapshotDao.listByInstanceId(TEST_VM_ID, Snapshot.State.Creating, Snapshot.State.CreatedOnPrimary, Snapshot.State.BackingUp)).thenReturn(mockList);
         _snapshotMgr.allocSnapshot(TEST_VOLUME_ID, Snapshot.MANUAL_POLICY_ID, null);
     }
 
     // active vm snapshots
-    @SuppressWarnings("unchecked")
     @Test(expected = CloudRuntimeException.class)
     public void testAllocSnapshotF3() throws ResourceAllocationException {
         when(_vmDao.findById(anyLong())).thenReturn(vmMock);
@@ -209,17 +190,16 @@ public class SnapshotManagerTest {
         when(vmMock.getState()).thenReturn(State.Stopped);
         when(vmMock.getHypervisorType()).thenReturn(Hypervisor.HypervisorType.KVM);
         when(volumeInfoMock.getInstanceId()).thenReturn(TEST_VM_ID);
-        List<SnapshotVO> mockList = mock(List.class);
+        final List<SnapshotVO> mockList = mock(List.class);
         when(mockList.size()).thenReturn(0);
         when(_snapshotDao.listByInstanceId(TEST_VM_ID, Snapshot.State.Creating, Snapshot.State.CreatedOnPrimary, Snapshot.State.BackingUp)).thenReturn(mockList);
-        List<VMSnapshotVO> mockList2 = mock(List.class);
+        final List<VMSnapshotVO> mockList2 = mock(List.class);
         when(mockList2.size()).thenReturn(1);
         when(_vmSnapshotDao.listByInstanceId(TEST_VM_ID, VMSnapshot.State.Creating, VMSnapshot.State.Reverting, VMSnapshot.State.Expunging)).thenReturn(mockList2);
         _snapshotMgr.allocSnapshot(TEST_VOLUME_ID, Snapshot.MANUAL_POLICY_ID, null);
     }
 
     // successful test
-    @SuppressWarnings("unchecked")
     @Test
     public void testAllocSnapshotF4() throws ResourceAllocationException {
         when(_vmDao.findById(anyLong())).thenReturn(vmMock);
@@ -227,10 +207,10 @@ public class SnapshotManagerTest {
         when(vmMock.getState()).thenReturn(State.Stopped);
         when(vmMock.getHypervisorType()).thenReturn(Hypervisor.HypervisorType.KVM);
         when(volumeInfoMock.getInstanceId()).thenReturn(TEST_VM_ID);
-        List<SnapshotVO> mockList = mock(List.class);
+        final List<SnapshotVO> mockList = mock(List.class);
         when(mockList.size()).thenReturn(0);
         when(_snapshotDao.listByInstanceId(TEST_VM_ID, Snapshot.State.Creating, Snapshot.State.CreatedOnPrimary, Snapshot.State.BackingUp)).thenReturn(mockList);
-        List<VMSnapshotVO> mockList2 = mock(List.class);
+        final List<VMSnapshotVO> mockList2 = mock(List.class);
         when(mockList2.size()).thenReturn(0);
         when(_vmSnapshotDao.listByInstanceId(TEST_VM_ID, VMSnapshot.State.Creating, VMSnapshot.State.Reverting, VMSnapshot.State.Expunging)).thenReturn(mockList2);
         when(_snapshotDao.persist(any(SnapshotVO.class))).thenReturn(snapshotMock);
@@ -243,7 +223,7 @@ public class SnapshotManagerTest {
         when(snapshotMock.getState()).thenReturn(Snapshot.State.Destroyed);
         when(snapshotMock.getAccountId()).thenReturn(2L);
         when(snapshotMock.getDataCenterId()).thenReturn(2L);
-        boolean result =_snapshotMgr.deleteSnapshot(TEST_SNAPSHOT_ID);
+        final boolean result = _snapshotMgr.deleteSnapshot(TEST_SNAPSHOT_ID);
         Assert.assertTrue(result);
     }
 
@@ -263,7 +243,7 @@ public class SnapshotManagerTest {
         when(vmMock.getState()).thenReturn(State.Stopped);
         when(vmMock.getHypervisorType()).thenReturn(Hypervisor.HypervisorType.XenServer);
         when(volumeMock.getFormat()).thenReturn(ImageFormat.VHD);
-        Snapshot snapshot = _snapshotMgr.revertSnapshot(TEST_SNAPSHOT_ID);
+        final Snapshot snapshot = _snapshotMgr.revertSnapshot(TEST_SNAPSHOT_ID);
         Assert.assertNull(snapshot);
     }
 
@@ -274,9 +254,9 @@ public class SnapshotManagerTest {
         when(vmMock.getState()).thenReturn(State.Stopped);
         when(vmMock.getHypervisorType()).thenReturn(Hypervisor.HypervisorType.KVM);
         when(volumeMock.getFormat()).thenReturn(ImageFormat.QCOW2);
-        when (snapshotStrategy.revertSnapshot(Mockito.any(SnapshotInfo.class))).thenReturn(true);
+        when(snapshotStrategy.revertSnapshot(Mockito.any(SnapshotInfo.class))).thenReturn(true);
         when(_volumeDao.update(anyLong(), any(VolumeVO.class))).thenReturn(true);
-        Snapshot snapshot = _snapshotMgr.revertSnapshot(TEST_SNAPSHOT_ID);
+        final Snapshot snapshot = _snapshotMgr.revertSnapshot(TEST_SNAPSHOT_ID);
         Assert.assertNotNull(snapshot);
     }
 }

@@ -1,123 +1,77 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.query.vo;
 
-import java.util.Date;
+import com.cloud.storage.Storage;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.Identity;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.storage.Storage;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "service_offering_view")
 public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentity, Identity {
 
+    @Column(name = "provisioning_type")
+    Storage.ProvisioningType provisioningType;
+    @Column(name = "tags", length = 4096)
+    String tags;
+    @Column(name = "sort_key")
+    int sortKey;
+    @Column(name = "bytes_read_rate")
+    Long bytesReadRate;
+    @Column(name = "bytes_write_rate")
+    Long bytesWriteRate;
+    @Column(name = "iops_read_rate")
+    Long iopsReadRate;
+    @Column(name = "iops_write_rate")
+    Long iopsWriteRate;
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
-
     @Column(name = "uuid")
     private String uuid;
-
     @Column(name = "name")
     private String name;
-
     @Column(name = "display_text")
     private String displayText;
-
-    @Column(name = "provisioning_type")
-    Storage.ProvisioningType provisioningType;
-
-    @Column(name = "tags", length = 4096)
-    String tags;
-
     @Column(name = "use_local_storage")
     private boolean useLocalStorage;
-
     @Column(name = "system_use")
     private boolean systemUse;
-
     @Column(name = "cpu")
     private Integer cpu;
-
     @Column(name = "speed")
     private Integer speed;
-
     @Column(name = "ram_size")
     private Integer ramSize;
-
     @Column(name = "nw_rate")
     private Integer rateMbps;
-
     @Column(name = "mc_rate")
     private Integer multicastRateMbps;
-
     @Column(name = "ha_enabled")
     private boolean offerHA;
-
     @Column(name = "limit_cpu_use")
     private boolean limitCpuUse;
-
     @Column(name = "is_volatile")
     private boolean volatileVm;
-
     @Column(name = "host_tag")
     private String hostTag;
-
     @Column(name = "default_use")
     private boolean defaultUse;
-
     @Column(name = "vm_type")
     private String vmType;
-
     @Column(name = "customized_iops")
     private Boolean customizedIops;
-
     @Column(name = "min_iops")
     private Long minIops;
-
     @Column(name = "max_iops")
     private Long maxIops;
-
     @Column(name = "hv_ss_reserve")
     private Integer hypervisorSnapshotReserve;
-
-    @Column(name = "sort_key")
-    int sortKey;
-
-    @Column(name = "bytes_read_rate")
-    Long bytesReadRate;
-
-    @Column(name = "bytes_write_rate")
-    Long bytesWriteRate;
-
-    @Column(name = "iops_read_rate")
-    Long iopsReadRate;
-
-    @Column(name = "iops_write_rate")
-    Long iopsWriteRate;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
 
@@ -142,6 +96,146 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
     public ServiceOfferingJoinVO() {
     }
 
+    public void setProvisioningType(final Storage.ProvisioningType provisioningType) {
+        this.provisioningType = provisioningType;
+    }
+
+    public void setTags(final String tags) {
+        this.tags = tags;
+    }
+
+    public void setSortKey(final int sortKey) {
+        this.sortKey = sortKey;
+    }
+
+    public void setBytesReadRate(final Long bytesReadRate) {
+        this.bytesReadRate = bytesReadRate;
+    }
+
+    public void setBytesWriteRate(final Long bytesWriteRate) {
+        this.bytesWriteRate = bytesWriteRate;
+    }
+
+    public void setIopsReadRate(final Long iopsReadRate) {
+        this.iopsReadRate = iopsReadRate;
+    }
+
+    public void setIopsWriteRate(final Long iopsWriteRate) {
+        this.iopsWriteRate = iopsWriteRate;
+    }
+
+    public void setId(final long id) {
+        this.id = id;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public void setDisplayText(final String displayText) {
+        this.displayText = displayText;
+    }
+
+    public void setUseLocalStorage(final boolean useLocalStorage) {
+        this.useLocalStorage = useLocalStorage;
+    }
+
+    public void setSystemUse(final boolean systemUse) {
+        this.systemUse = systemUse;
+    }
+
+    public void setCpu(final Integer cpu) {
+        this.cpu = cpu;
+    }
+
+    public void setSpeed(final Integer speed) {
+        this.speed = speed;
+    }
+
+    public void setRamSize(final Integer ramSize) {
+        this.ramSize = ramSize;
+    }
+
+    public void setRateMbps(final Integer rateMbps) {
+        this.rateMbps = rateMbps;
+    }
+
+    public void setMulticastRateMbps(final Integer multicastRateMbps) {
+        this.multicastRateMbps = multicastRateMbps;
+    }
+
+    public void setOfferHA(final boolean offerHA) {
+        this.offerHA = offerHA;
+    }
+
+    public void setLimitCpuUse(final boolean limitCpuUse) {
+        this.limitCpuUse = limitCpuUse;
+    }
+
+    public void setVolatileVm(final boolean volatileVm) {
+        this.volatileVm = volatileVm;
+    }
+
+    public void setHostTag(final String hostTag) {
+        this.hostTag = hostTag;
+    }
+
+    public void setDefaultUse(final boolean defaultUse) {
+        this.defaultUse = defaultUse;
+    }
+
+    public void setVmType(final String vmType) {
+        this.vmType = vmType;
+    }
+
+    public void setCustomizedIops(final Boolean customizedIops) {
+        this.customizedIops = customizedIops;
+    }
+
+    public void setMinIops(final Long minIops) {
+        this.minIops = minIops;
+    }
+
+    public void setMaxIops(final Long maxIops) {
+        this.maxIops = maxIops;
+    }
+
+    public void setHypervisorSnapshotReserve(final Integer hypervisorSnapshotReserve) {
+        this.hypervisorSnapshotReserve = hypervisorSnapshotReserve;
+    }
+
+    public void setCreated(final Date created) {
+        this.created = created;
+    }
+
+    public void setRemoved(final Date removed) {
+        this.removed = removed;
+    }
+
+    public void setDomainId(final long domainId) {
+        this.domainId = domainId;
+    }
+
+    public void setDomainUuid(final String domainUuid) {
+        this.domainUuid = domainUuid;
+    }
+
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setDomainPath(final String domainPath) {
+        this.domainPath = domainPath;
+    }
+
+    public void setDeploymentPlanner(final String deploymentPlanner) {
+        this.deploymentPlanner = deploymentPlanner;
+    }
+
     @Override
     public long getId() {
         return id;
@@ -160,7 +254,7 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
         return displayText;
     }
 
-    public Storage.ProvisioningType getProvisioningType(){
+    public Storage.ProvisioningType getProvisioningType() {
         return provisioningType;
     }
 

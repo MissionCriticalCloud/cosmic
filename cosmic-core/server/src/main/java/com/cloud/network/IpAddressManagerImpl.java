@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network;
 
 import com.cloud.agent.AgentManager;
@@ -22,10 +6,21 @@ import com.cloud.api.ApiDBUtils;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.dao.EntityManager;
-import com.cloud.dc.*;
+import com.cloud.dc.AccountVlanMapVO;
+import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
+import com.cloud.dc.DomainVlanMapVO;
+import com.cloud.dc.Pod;
+import com.cloud.dc.PodVlanMapVO;
+import com.cloud.dc.Vlan;
 import com.cloud.dc.Vlan.VlanType;
-import com.cloud.dc.dao.*;
+import com.cloud.dc.VlanVO;
+import com.cloud.dc.dao.AccountVlanMapDao;
+import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.dc.dao.DataCenterVnetDao;
+import com.cloud.dc.dao.DomainVlanMapDao;
+import com.cloud.dc.dao.PodVlanMapDao;
+import com.cloud.dc.dao.VlanDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.domain.Domain;
 import com.cloud.domain.dao.DomainDao;
@@ -33,7 +28,15 @@ import com.cloud.event.ActionEventUtils;
 import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventUtils;
 import com.cloud.event.dao.UsageEventDao;
-import com.cloud.exception.*;
+import com.cloud.exception.AccountLimitException;
+import com.cloud.exception.ConcurrentOperationException;
+import com.cloud.exception.InsufficientAddressCapacityException;
+import com.cloud.exception.InsufficientCapacityException;
+import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
+import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.exception.PermissionDeniedException;
+import com.cloud.exception.ResourceAllocationException;
+import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.host.dao.HostDao;
 import com.cloud.network.IpAddress.State;
 import com.cloud.network.Network.Capability;
@@ -45,15 +48,31 @@ import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.IsolationType;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.addr.PublicIp;
-import com.cloud.network.dao.*;
+import com.cloud.network.dao.AccountGuestVlanMapDao;
+import com.cloud.network.dao.FirewallRulesDao;
+import com.cloud.network.dao.IPAddressDao;
+import com.cloud.network.dao.IPAddressVO;
+import com.cloud.network.dao.LoadBalancerDao;
+import com.cloud.network.dao.NetworkAccountDao;
+import com.cloud.network.dao.NetworkDao;
+import com.cloud.network.dao.NetworkDomainDao;
+import com.cloud.network.dao.NetworkServiceMapDao;
+import com.cloud.network.dao.PhysicalNetworkDao;
+import com.cloud.network.dao.PhysicalNetworkServiceProviderDao;
+import com.cloud.network.dao.PhysicalNetworkTrafficTypeDao;
+import com.cloud.network.dao.UserIpv6AddressDao;
 import com.cloud.network.element.IpDeployer;
 import com.cloud.network.element.IpDeployingRequester;
 import com.cloud.network.element.NetworkElement;
 import com.cloud.network.element.StaticNatServiceProvider;
 import com.cloud.network.guru.NetworkGuru;
 import com.cloud.network.lb.LoadBalancingRulesManager;
-import com.cloud.network.rules.*;
+import com.cloud.network.rules.FirewallManager;
+import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.Purpose;
+import com.cloud.network.rules.FirewallRuleVO;
+import com.cloud.network.rules.RulesManager;
+import com.cloud.network.rules.StaticNat;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
 import com.cloud.network.vpc.NetworkACLManager;
 import com.cloud.network.vpc.VpcManager;
@@ -68,22 +87,45 @@ import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingDetailsDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.org.Grouping;
-import com.cloud.user.*;
+import com.cloud.user.Account;
+import com.cloud.user.AccountManager;
+import com.cloud.user.ResourceLimitService;
+import com.cloud.user.User;
+import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.Journal;
 import com.cloud.utils.Pair;
 import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.db.*;
+import com.cloud.utils.db.DB;
+import com.cloud.utils.db.Filter;
+import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.JoinBuilder.JoinType;
+import com.cloud.utils.db.SearchBuilder;
+import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
+import com.cloud.utils.db.Transaction;
+import com.cloud.utils.db.TransactionCallback;
+import com.cloud.utils.db.TransactionCallbackNoReturn;
+import com.cloud.utils.db.TransactionCallbackWithException;
+import com.cloud.utils.db.TransactionCallbackWithExceptionNoReturn;
+import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionUtil;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.*;
-import com.cloud.vm.dao.*;
+import com.cloud.vm.Nic;
+import com.cloud.vm.NicProfile;
+import com.cloud.vm.ReservationContext;
+import com.cloud.vm.ReservationContextImpl;
+import com.cloud.vm.VirtualMachine;
+import com.cloud.vm.VirtualMachineProfile;
+import com.cloud.vm.dao.NicDao;
+import com.cloud.vm.dao.NicIpAliasDao;
+import com.cloud.vm.dao.NicSecondaryIpDao;
+import com.cloud.vm.dao.UserVmDao;
+import com.cloud.vm.dao.VMInstanceDao;
 import org.apache.cloudstack.acl.ControlledEntity.ACLType;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.context.CallContext;
@@ -95,14 +137,27 @@ import org.apache.cloudstack.region.PortableIp;
 import org.apache.cloudstack.region.PortableIpDao;
 import org.apache.cloudstack.region.PortableIpVO;
 import org.apache.cloudstack.region.Region;
-import org.apache.log4j.Logger;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+
+import org.apache.log4j.Logger;
 
 public class IpAddressManagerImpl extends ManagerBase implements IpAddressManager, Configurable {
     private static final Logger s_logger = Logger.getLogger(IpAddressManagerImpl.class);
-
+    @Inject
+    protected NicIpAliasDao _nicIpAliasDao;
+    @Inject
+    protected IPAddressDao _publicIpAddressDao;
     @Inject
     NetworkOrchestrationService _networkMgr = null;
     @Inject
@@ -156,10 +211,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
     @Inject
     NetworkAccountDao _networkAccountDao;
     @Inject
-    protected NicIpAliasDao _nicIpAliasDao;
-    @Inject
-    protected IPAddressDao _publicIpAddressDao;
-    @Inject
     NetworkDomainDao _networkDomainDao;
     @Inject
     VMInstanceDao _vmDao;
@@ -212,6 +263,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
     VpcDao _vpcDao;
     SearchBuilder<IPAddressVO> AssignIpAddressSearch;
     SearchBuilder<IPAddressVO> AssignIpAddressFromPodVlanSearch;
+    Random _rand = new Random(System.currentTimeMillis());
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) {
@@ -335,10 +387,56 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         final DataCenter zone = _entityMgr.findById(DataCenter.class, zoneId);
 
         return allocateIp(ipOwner, isSystem, caller, callerUserId, zone, null);
-    }
+    }    // An IP association is required in below cases
 
-    // An IP association is required in below cases
-    //  1.there is at least one public IP associated with the network on which first rule (PF/static NAT/LB) is being applied.
+    protected boolean cleanupIpResources(final long ipId, final long userId, final Account caller) {
+        boolean success = true;
+
+        // Revoke all firewall rules for the ip
+        try {
+            s_logger.debug("Revoking all " + Purpose.Firewall + "rules as a part of public IP id=" + ipId + " release...");
+            if (!_firewallMgr.revokeFirewallRulesForIp(ipId, userId, caller)) {
+                s_logger.warn("Unable to revoke all the firewall rules for ip id=" + ipId + " as a part of ip release");
+                success = false;
+            }
+        } catch (final ResourceUnavailableException e) {
+            s_logger.warn("Unable to revoke all firewall rules for ip id=" + ipId + " as a part of ip release", e);
+            success = false;
+        }
+
+        // Revoke all PF/Static nat rules for the ip
+        try {
+            s_logger.debug("Revoking all " + Purpose.PortForwarding + "/" + Purpose.StaticNat + " rules as a part of public IP id=" + ipId + " release...");
+            if (!_rulesMgr.revokeAllPFAndStaticNatRulesForIp(ipId, userId, caller)) {
+                s_logger.warn("Unable to revoke all the port forwarding rules for ip id=" + ipId + " as a part of ip release");
+                success = false;
+            }
+        } catch (final ResourceUnavailableException e) {
+            s_logger.warn("Unable to revoke all the port forwarding rules for ip id=" + ipId + " as a part of ip release", e);
+            success = false;
+        }
+
+        s_logger.debug("Revoking all " + Purpose.LoadBalancing + " rules as a part of public IP id=" + ipId + " release...");
+        if (!_lbMgr.removeAllLoadBalanacersForIp(ipId, caller, userId)) {
+            s_logger.warn("Unable to revoke all the load balancer rules for ip id=" + ipId + " as a part of ip release");
+            success = false;
+        }
+
+        // remote access vpn can be enabled only for static nat ip, so this part should never be executed under normal
+        // conditions
+        // only when ip address failed to be cleaned up as a part of account destroy and was marked as Releasing, this part of
+        // the code would be triggered
+        s_logger.debug("Cleaning up remote access vpns as a part of public IP id=" + ipId + " release...");
+        try {
+            _vpnMgr.destroyRemoteAccessVpnForIp(ipId, caller);
+        } catch (final ResourceUnavailableException e) {
+            s_logger.warn("Unable to destroy remote access vpn for ip id=" + ipId + " as a part of ip release", e);
+            success = false;
+        }
+
+        return success;
+    }    //  1.there is at least one public IP associated with the network on which first rule (PF/static NAT/LB) is being applied.
+
     //  2.last rule (PF/static NAT/LB) on the public IP has been revoked. So the public IP should not be associated with any provider
     boolean checkIfIpAssocRequired(final Network network, final boolean postApplyRules, final List<PublicIp> publicIps) {
 
@@ -392,6 +490,47 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         return false;
     }
 
+    protected IPAddressVO getExistingSourceNatInNetwork(final long ownerId, final Long networkId) {
+        final List<? extends IpAddress> addrs;
+        final Network guestNetwork = _networksDao.findById(networkId);
+        if (guestNetwork.getGuestType() == GuestType.Shared) {
+            // ignore the account id for the shared network
+            addrs = _networkModel.listPublicIpsAssignedToGuestNtwk(networkId, true);
+        } else {
+            addrs = _networkModel.listPublicIpsAssignedToGuestNtwk(ownerId, networkId, true);
+        }
+
+        IPAddressVO sourceNatIp = null;
+        if (addrs.isEmpty()) {
+            return null;
+        } else {
+            // Account already has ip addresses
+            for (final IpAddress addr : addrs) {
+                if (addr.isSourceNat()) {
+                    sourceNatIp = _ipAddressDao.findById(addr.getId());
+                    return sourceNatIp;
+                }
+            }
+
+            assert (sourceNatIp != null) : "How do we get a bunch of ip addresses but none of them are source nat? " + "account=" + ownerId + "; networkId=" + networkId;
+        }
+
+        return sourceNatIp;
+    }
+
+    protected boolean isSharedNetworkOfferingWithServices(final long networkOfferingId) {
+        final NetworkOfferingVO networkOffering = _networkOfferingDao.findById(networkOfferingId);
+        if ((networkOffering.getGuestType() == Network.GuestType.Shared)
+                && (_networkModel.areServicesSupportedByNetworkOffering(networkOfferingId, Service.SourceNat)
+                || _networkModel.areServicesSupportedByNetworkOffering(networkOfferingId, Service.StaticNat)
+                || _networkModel.areServicesSupportedByNetworkOffering(networkOfferingId, Service.Firewall)
+                || _networkModel.areServicesSupportedByNetworkOffering(networkOfferingId, Service.PortForwarding) || _networkModel.areServicesSupportedByNetworkOffering(
+                networkOfferingId, Service.Lb))) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean applyRules(final List<? extends FirewallRule> rules, final FirewallRule.Purpose purpose, final NetworkRuleApplier applier, final boolean continueOnError)
             throws ResourceUnavailableException {
@@ -440,52 +579,14 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         return success;
     }
 
-    protected boolean cleanupIpResources(final long ipId, final long userId, final Account caller) {
-        boolean success = true;
+    @Override
+    public String getConfigComponentName() {
+        return IpAddressManager.class.getSimpleName();
+    }
 
-        // Revoke all firewall rules for the ip
-        try {
-            s_logger.debug("Revoking all " + Purpose.Firewall + "rules as a part of public IP id=" + ipId + " release...");
-            if (!_firewallMgr.revokeFirewallRulesForIp(ipId, userId, caller)) {
-                s_logger.warn("Unable to revoke all the firewall rules for ip id=" + ipId + " as a part of ip release");
-                success = false;
-            }
-        } catch (final ResourceUnavailableException e) {
-            s_logger.warn("Unable to revoke all firewall rules for ip id=" + ipId + " as a part of ip release", e);
-            success = false;
-        }
-
-        // Revoke all PF/Static nat rules for the ip
-        try {
-            s_logger.debug("Revoking all " + Purpose.PortForwarding + "/" + Purpose.StaticNat + " rules as a part of public IP id=" + ipId + " release...");
-            if (!_rulesMgr.revokeAllPFAndStaticNatRulesForIp(ipId, userId, caller)) {
-                s_logger.warn("Unable to revoke all the port forwarding rules for ip id=" + ipId + " as a part of ip release");
-                success = false;
-            }
-        } catch (final ResourceUnavailableException e) {
-            s_logger.warn("Unable to revoke all the port forwarding rules for ip id=" + ipId + " as a part of ip release", e);
-            success = false;
-        }
-
-        s_logger.debug("Revoking all " + Purpose.LoadBalancing + " rules as a part of public IP id=" + ipId + " release...");
-        if (!_lbMgr.removeAllLoadBalanacersForIp(ipId, caller, userId)) {
-            s_logger.warn("Unable to revoke all the load balancer rules for ip id=" + ipId + " as a part of ip release");
-            success = false;
-        }
-
-        // remote access vpn can be enabled only for static nat ip, so this part should never be executed under normal
-        // conditions
-        // only when ip address failed to be cleaned up as a part of account destroy and was marked as Releasing, this part of
-        // the code would be triggered
-        s_logger.debug("Cleaning up remote access vpns as a part of public IP id=" + ipId + " release...");
-        try {
-            _vpnMgr.destroyRemoteAccessVpnForIp(ipId, caller);
-        } catch (final ResourceUnavailableException e) {
-            s_logger.warn("Unable to destroy remote access vpn for ip id=" + ipId + " as a part of ip release", e);
-            success = false;
-        }
-
-        return success;
+    @Override
+    public ConfigKey<?>[] getConfigKeys() {
+        return new ConfigKey<?>[]{UseSystemPublicIps};
     }
 
     @Override
@@ -566,13 +667,15 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
     }
 
     @Override
-    public PublicIp assignPublicIpAddress(final long dcId, final Long podId, final Account owner, final VlanType type, final Long networkId, final String requestedIp, final boolean isSystem)
+    public PublicIp assignPublicIpAddress(final long dcId, final Long podId, final Account owner, final VlanType type, final Long networkId, final String requestedIp, final
+    boolean isSystem)
             throws InsufficientAddressCapacityException {
         return fetchNewPublicIp(dcId, podId, null, owner, type, networkId, false, true, requestedIp, isSystem, null, null);
     }
 
     @Override
-    public PublicIp assignPublicIpAddressFromVlans(final long dcId, final Long podId, final Account owner, final VlanType type, final List<Long> vlanDbIds, final Long networkId, final String requestedIp, final boolean isSystem)
+    public PublicIp assignPublicIpAddressFromVlans(final long dcId, final Long podId, final Account owner, final VlanType type, final List<Long> vlanDbIds, final Long networkId,
+                                                   final String requestedIp, final boolean isSystem)
             throws InsufficientAddressCapacityException {
         return fetchNewPublicIp(dcId, podId, vlanDbIds, owner, type, networkId, false, true, requestedIp, isSystem, null, null);
     }
@@ -603,18 +706,21 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                 // Otherwise fetch IP from the system pool
                 final List<AccountVlanMapVO> maps = _accountVlanMapDao.listAccountVlanMapsByAccount(owner.getId());
                 for (final AccountVlanMapVO map : maps) {
-                    if (vlanDbIds == null || vlanDbIds.contains(map.getVlanDbId()))
+                    if (vlanDbIds == null || vlanDbIds.contains(map.getVlanDbId())) {
                         dedicatedVlanDbIds.add(map.getVlanDbId());
+                    }
                 }
                 final List<DomainVlanMapVO> domainMaps = _domainVlanMapDao.listDomainVlanMapsByDomain(owner.getDomainId());
                 for (final DomainVlanMapVO map : domainMaps) {
-                    if (vlanDbIds == null || vlanDbIds.contains(map.getVlanDbId()))
+                    if (vlanDbIds == null || vlanDbIds.contains(map.getVlanDbId())) {
                         dedicatedVlanDbIds.add(map.getVlanDbId());
+                    }
                 }
                 final List<VlanVO> nonDedicatedVlans = _vlanDao.listZoneWideNonDedicatedVlans(dcId);
                 for (final VlanVO nonDedicatedVlan : nonDedicatedVlans) {
-                    if (vlanDbIds == null || vlanDbIds.contains(nonDedicatedVlan.getId()))
+                    if (vlanDbIds == null || vlanDbIds.contains(nonDedicatedVlan.getId())) {
                         nonDedicatedVlanDbIds.add(nonDedicatedVlan.getId());
+                    }
                 }
                 if (dedicatedVlanDbIds != null && !dedicatedVlanDbIds.isEmpty()) {
                     fetchFromDedicatedRange = true;
@@ -746,7 +852,8 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                                 final VlanVO vlan = _vlanDao.findById(addr.getVlanId());
                                 final String guestType = vlan.getVlanType().toString();
                                 if (!isIpDedicated(addr)) {
-                                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NET_IP_ASSIGN, owner.getId(), addr.getDataCenterId(), addr.getId(), addr.getAddress().toString(),
+                                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NET_IP_ASSIGN, owner.getId(), addr.getDataCenterId(), addr.getId(), addr.getAddress()
+                                                                                                                                                               .toString(),
                                             addr.isSourceNat(), guestType, addr.getSystem(), addr.getClass().getName(), addr.getUuid());
                                 }
                                 if (updateIpResourceCount(addr)) {
@@ -762,13 +869,15 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
 
     private boolean isIpDedicated(final IPAddressVO addr) {
         final List<AccountVlanMapVO> maps = _accountVlanMapDao.listAccountVlanMapsByVlan(addr.getVlanId());
-        if (maps != null && !maps.isEmpty())
+        if (maps != null && !maps.isEmpty()) {
             return true;
+        }
         return false;
     }
 
     @Override
-    public PublicIp assignSourceNatIpAddressToGuestNetwork(final Account owner, final Network guestNetwork) throws InsufficientAddressCapacityException, ConcurrentOperationException {
+    public PublicIp assignSourceNatIpAddressToGuestNetwork(final Account owner, final Network guestNetwork) throws InsufficientAddressCapacityException,
+            ConcurrentOperationException {
         assert (guestNetwork.getTrafficType() != null) : "You're asking for a source nat but your network "
                 + "can't participate in source nat.  What do you have to say for yourself?";
         final long dcId = guestNetwork.getDataCenterId();
@@ -954,7 +1063,8 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                     final PublicIp ip = fetchNewPublicIp(zone.getId(), null, null, ipOwner, vlanType, null, false, assign, null, isSystem, null, displayIp);
 
                     if (ip == null) {
-                        final InsufficientAddressCapacityException ex = new InsufficientAddressCapacityException("Unable to find available public IP addresses", DataCenter.class, zone
+                        final InsufficientAddressCapacityException ex = new InsufficientAddressCapacityException("Unable to find available public IP addresses", DataCenter
+                                .class, zone
                                 .getId());
                         ex.addProxyObject(ApiDBUtils.findZoneById(zone.getId()).getUuid());
                         throw ex;
@@ -967,7 +1077,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                     return ip;
                 }
             });
-
         } finally {
             if (accountToLock != null) {
                 if (s_logger.isDebugEnabled()) {
@@ -1045,37 +1154,10 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         return ipaddr;
     }
 
-    protected IPAddressVO getExistingSourceNatInNetwork(final long ownerId, final Long networkId) {
-        final List<? extends IpAddress> addrs;
-        final Network guestNetwork = _networksDao.findById(networkId);
-        if (guestNetwork.getGuestType() == GuestType.Shared) {
-            // ignore the account id for the shared network
-            addrs = _networkModel.listPublicIpsAssignedToGuestNtwk(networkId, true);
-        } else {
-            addrs = _networkModel.listPublicIpsAssignedToGuestNtwk(ownerId, networkId, true);
-        }
-
-        IPAddressVO sourceNatIp = null;
-        if (addrs.isEmpty()) {
-            return null;
-        } else {
-            // Account already has ip addresses
-            for (final IpAddress addr : addrs) {
-                if (addr.isSourceNat()) {
-                    sourceNatIp = _ipAddressDao.findById(addr.getId());
-                    return sourceNatIp;
-                }
-            }
-
-            assert (sourceNatIp != null) : "How do we get a bunch of ip addresses but none of them are source nat? " + "account=" + ownerId + "; networkId=" + networkId;
-        }
-
-        return sourceNatIp;
-    }
-
     @DB
     @Override
-    public IPAddressVO associateIPToGuestNetwork(final long ipId, final long networkId, final boolean releaseOnFailure) throws ResourceAllocationException, ResourceUnavailableException,
+    public IPAddressVO associateIPToGuestNetwork(final long ipId, final long networkId, final boolean releaseOnFailure) throws ResourceAllocationException,
+            ResourceUnavailableException,
             InsufficientAddressCapacityException, ConcurrentOperationException {
         final Account caller = CallContext.current().getCallingAccount();
         Account owner = null;
@@ -1199,21 +1281,9 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         }
     }
 
-    protected boolean isSharedNetworkOfferingWithServices(final long networkOfferingId) {
-        final NetworkOfferingVO networkOffering = _networkOfferingDao.findById(networkOfferingId);
-        if ((networkOffering.getGuestType() == Network.GuestType.Shared)
-                && (_networkModel.areServicesSupportedByNetworkOffering(networkOfferingId, Service.SourceNat)
-                || _networkModel.areServicesSupportedByNetworkOffering(networkOfferingId, Service.StaticNat)
-                || _networkModel.areServicesSupportedByNetworkOffering(networkOfferingId, Service.Firewall)
-                || _networkModel.areServicesSupportedByNetworkOffering(networkOfferingId, Service.PortForwarding) || _networkModel.areServicesSupportedByNetworkOffering(
-                networkOfferingId, Service.Lb))) {
-            return true;
-        }
-        return false;
-    }
-
     @Override
-    public IPAddressVO associatePortableIPToGuestNetwork(final long ipAddrId, final long networkId, final boolean releaseOnFailure) throws ResourceAllocationException, ResourceUnavailableException,
+    public IPAddressVO associatePortableIPToGuestNetwork(final long ipAddrId, final long networkId, final boolean releaseOnFailure) throws ResourceAllocationException,
+            ResourceUnavailableException,
             InsufficientAddressCapacityException, ConcurrentOperationException {
         return associateIPToGuestNetwork(ipAddrId, networkId, releaseOnFailure);
     }
@@ -1444,7 +1514,8 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                     }
                     if (createNetwork) {
                         if (requiredOfferings.get(0).getState() == NetworkOffering.State.Enabled) {
-                            final long physicalNetworkId = _networkModel.findPhysicalNetworkId(zoneId, requiredOfferings.get(0).getTags(), requiredOfferings.get(0).getTrafficType());
+                            final long physicalNetworkId = _networkModel.findPhysicalNetworkId(zoneId, requiredOfferings.get(0).getTags(), requiredOfferings.get(0)
+                                                                                                                                                            .getTrafficType());
                             // Validate physical network
                             final PhysicalNetwork physicalNetwork = _physicalNetworkDao.findById(physicalNetworkId);
                             if (physicalNetwork == null) {
@@ -1612,8 +1683,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
 
         return NetUtils.long2Ip(array[_rand.nextInt(array.length)]);
     }
-
-    Random _rand = new Random(System.currentTimeMillis());
 
     @Override
     public boolean applyStaticNats(final List<? extends StaticNat> staticNats, final boolean continueOnError, final boolean forRevoke) throws ResourceUnavailableException {
@@ -1791,10 +1860,11 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         //nic.setBroadcastType(BroadcastDomainType.Vlan);
                         //nic.setBroadcastUri(BroadcastDomainType.Vlan.toUri(ip.getVlanTag()));
                         nic.setBroadcastType(network.getBroadcastDomainType());
-                        if (network.getBroadcastUri() != null)
+                        if (network.getBroadcastUri() != null) {
                             nic.setBroadcastUri(network.getBroadcastUri());
-                        else
+                        } else {
                             nic.setBroadcastUri(BroadcastDomainType.Vlan.toUri(ip.getVlanTag()));
+                        }
                         nic.setFormat(AddressFormat.Ip4);
                         nic.setReservationId(String.valueOf(ip.getVlanTag()));
                         nic.setMacAddress(ip.getMacAddress());
@@ -1829,7 +1899,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         });
     }
 
-
     @Override
     @DB
     public void allocateNicValues(final NicProfile nic, final DataCenter dc, final VirtualMachineProfile vm, final Network network, final String requestedIpv4,
@@ -1848,7 +1917,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         //Get ip address from the placeholder and don't allocate a new one
                         if (requestedIpv4 != null && vm.getType() == VirtualMachine.Type.DomainRouter) {
                             s_logger.debug("There won't be nic assignment for VR id " + vm.getId() + "  in this network " + network);
-
                         }
 
                         // nic ip address is not set here. Because the DHCP is external to cloudstack
@@ -1924,15 +1992,5 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
     @Override
     public String allocateGuestIP(final Network network, final String requestedIp) throws InsufficientAddressCapacityException {
         return acquireGuestIpAddress(network, requestedIp);
-    }
-
-    @Override
-    public String getConfigComponentName() {
-        return IpAddressManager.class.getSimpleName();
-    }
-
-    @Override
-    public ConfigKey<?>[] getConfigKeys() {
-        return new ConfigKey<?>[]{UseSystemPublicIps};
     }
 }

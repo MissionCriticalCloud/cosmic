@@ -1,30 +1,14 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function(cloudStack, $) {
-    cloudStack.uiCustom.enableStaticNAT = function(args) {
+(function (cloudStack, $) {
+    cloudStack.uiCustom.enableStaticNAT = function (args) {
         var listView = args.listView;
         var action = args.action;
         var tierSelect = args.tierSelect;
 
-        return function(args) {
+        return function (args) {
             var context = args.context;
             var $instanceRow = args.$instanceRow;
 
-            var vmList = function(args) {
+            var vmList = function (args) {
                 // Create a listing of instances, based on limited information
                 // from main instances list view
                 var $listView;
@@ -40,7 +24,7 @@
                         label: _l('label.select.instance'),
                         type: 'radio',
                         action: {
-                            uiCustom: function(args) {
+                            uiCustom: function (args) {
                                 var $item = args.$item;
                                 var $input = $item.find('td.actions input:visible');
 
@@ -75,7 +59,7 @@
                 buttons: [{
                     text: _l('label.apply'),
                     'class': 'ok',
-                    click: function() {
+                    click: function () {
                         if ($dataList.find('.tier-select select').val() == -1) {
                             cloudStack.dialog.notice({
                                 message: ('Please select a tier')
@@ -84,8 +68,8 @@
                         }
 
                         if (!$dataList.find(
-                            'input[type=radio]:checked, input[type=checkbox]:checked'
-                        ).size()) {
+                                'input[type=radio]:checked, input[type=checkbox]:checked'
+                            ).size()) {
                             cloudStack.dialog.notice({
                                 message: _l('message.select.instance')
                             });
@@ -97,7 +81,7 @@
                         var start = args.start;
 
                         start();
-                        $dataList.fadeOut(function() {
+                        $dataList.fadeOut(function () {
                             action({
                                 tierID: $dataList.find('.tier-select select').val(),
                                 _subselect: $dataList.find('tr.multi-edit-selected .subselect select').val(),
@@ -107,12 +91,12 @@
                                     ]
                                 }),
                                 response: {
-                                    success: function(args) {
+                                    success: function (args) {
                                         complete({
                                             $item: $instanceRow
                                         });
                                     },
-                                    error: function(args) {
+                                    error: function (args) {
                                         cloudStack.dialog.notice({
                                             message: args
                                         });
@@ -122,18 +106,18 @@
                             $dataList.remove();
                         });
 
-                        $('div.overlay').fadeOut(function() {
+                        $('div.overlay').fadeOut(function () {
                             $('div.overlay').remove();
                         });
                     }
                 }, {
                     text: _l('label.cancel'),
                     'class': 'cancel',
-                    click: function() {
-                        $dataList.fadeOut(function() {
+                    click: function () {
+                        $dataList.fadeOut(function () {
                             $dataList.remove();
                         });
-                        $('div.overlay').fadeOut(function() {
+                        $('div.overlay').fadeOut(function () {
                             $('div.overlay').remove();
                         });
                     }
@@ -152,10 +136,10 @@
                     context: context,
                     $tierSelect: $tierSelect,
                     response: {
-                        success: function(args) {
+                        success: function (args) {
                             var data = args.data;
 
-                            $(data).map(function(index, item) {
+                            $(data).map(function (index, item) {
                                 var $option = $('<option>');
 
                                 $option.attr('value', item.id);
@@ -163,7 +147,7 @@
                                 $option.appendTo($tierSelectInput);
                             });
                         },
-                        error: function(message) {
+                        error: function (message) {
                             cloudStack.dialog.notice({
                                 message: message ? message : 'Could not retrieve VPC tiers'
                             });

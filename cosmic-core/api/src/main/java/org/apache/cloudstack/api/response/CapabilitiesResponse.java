@@ -1,28 +1,11 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 
-@SuppressWarnings("unused")
+import com.google.gson.annotations.SerializedName;
+
 public class CapabilitiesResponse extends BaseResponse {
     @SerializedName("securitygroupsenabled")
     @Param(description = "true if security groups support is enabled, false otherwise")
@@ -80,59 +63,59 @@ public class CapabilitiesResponse extends BaseResponse {
     @Param(description = "true if the user can recover and expunge virtualmachines, false otherwise", since = "4.6.0")
     private boolean allowUserExpungeRecoverVM;
 
-    public void setSecurityGroupsEnabled(boolean securityGroupsEnabled) {
+    public void setSecurityGroupsEnabled(final boolean securityGroupsEnabled) {
         this.securityGroupsEnabled = securityGroupsEnabled;
     }
 
-    public void setCloudStackVersion(String cloudStackVersion) {
+    public void setCloudStackVersion(final String cloudStackVersion) {
         this.cloudStackVersion = cloudStackVersion;
     }
 
-    public void setUserPublicTemplateEnabled(boolean userPublicTemplateEnabled) {
+    public void setUserPublicTemplateEnabled(final boolean userPublicTemplateEnabled) {
         this.userPublicTemplateEnabled = userPublicTemplateEnabled;
     }
 
-    public void setSupportELB(String supportELB) {
+    public void setSupportELB(final String supportELB) {
         this.supportELB = supportELB;
     }
 
-    public void setProjectInviteRequired(Boolean projectInviteRequired) {
+    public void setProjectInviteRequired(final Boolean projectInviteRequired) {
         this.projectInviteRequired = projectInviteRequired;
     }
 
-    public void setAllowUsersCreateProjects(Boolean allowUsersCreateProjects) {
+    public void setAllowUsersCreateProjects(final Boolean allowUsersCreateProjects) {
         this.allowUsersCreateProjects = allowUsersCreateProjects;
     }
 
-    public void setDiskOffMinSize(Long diskOffMinSize) {
+    public void setDiskOffMinSize(final Long diskOffMinSize) {
         this.diskOffMinSize = diskOffMinSize;
     }
 
-    public void setDiskOffMaxSize(Long diskOffMaxSize) {
+    public void setDiskOffMaxSize(final Long diskOffMaxSize) {
         this.diskOffMaxSize = diskOffMaxSize;
     }
 
-    public void setRegionSecondaryEnabled(boolean regionSecondaryEnabled) {
+    public void setRegionSecondaryEnabled(final boolean regionSecondaryEnabled) {
         this.regionSecondaryEnabled = regionSecondaryEnabled;
     }
 
-    public void setKVMSnapshotEnabled(boolean kvmSnapshotEnabled) {
+    public void setKVMSnapshotEnabled(final boolean kvmSnapshotEnabled) {
         this.kvmSnapshotEnabled = kvmSnapshotEnabled;
     }
 
-    public void setApiLimitInterval(Integer apiLimitInterval) {
+    public void setApiLimitInterval(final Integer apiLimitInterval) {
         this.apiLimitInterval = apiLimitInterval;
     }
 
-    public void setApiLimitMax(Integer apiLimitMax) {
+    public void setApiLimitMax(final Integer apiLimitMax) {
         this.apiLimitMax = apiLimitMax;
     }
 
-    public void setAllowUserViewDestroyedVM(boolean allowUserViewDestroyedVM) {
+    public void setAllowUserViewDestroyedVM(final boolean allowUserViewDestroyedVM) {
         this.allowUserViewDestroyedVM = allowUserViewDestroyedVM;
     }
 
-    public void setAllowUserExpungeRecoverVM(boolean allowUserExpungeRecoverVM) {
+    public void setAllowUserExpungeRecoverVM(final boolean allowUserExpungeRecoverVM) {
         this.allowUserExpungeRecoverVM = allowUserExpungeRecoverVM;
     }
 }

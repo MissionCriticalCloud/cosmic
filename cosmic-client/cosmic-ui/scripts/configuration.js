@@ -1,21 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
-(function(cloudStack, $) {
+(function (cloudStack, $) {
 
     var requiredNetworkOfferingExists = false;
     var networkServiceObjs = [],
@@ -26,13 +9,13 @@
         title: 'label.menu.service.offerings',
         id: 'configuration',
         sectionSelect: {
-            preFilter: function(args) {
-               if(isAdmin())
-                   return ["serviceOfferings", "systemServiceOfferings", "diskOfferings", "networkOfferings", "vpcOfferings"];
-               else if(isDomainAdmin())
-                   return [""];
-               else
-                   return null;
+            preFilter: function (args) {
+                if (isAdmin())
+                    return ["serviceOfferings", "systemServiceOfferings", "diskOfferings", "networkOfferings", "vpcOfferings"];
+                else if (isDomainAdmin())
+                    return [""];
+                else
+                    return null;
             },
             label: 'label.select.offering'
         },
@@ -60,17 +43,17 @@
                             label: 'label.add.compute.offering',
 
                             messages: {
-                                confirm: function(args) {
+                                confirm: function (args) {
                                     return 'message.add.service.offering';
                                 },
-                                notification: function(args) {
+                                notification: function (args) {
                                     return 'label.add.compute.offering';
                                 }
                             },
 
                             createForm: {
                                 title: 'label.add.compute.offering',
-                                preFilter: function(args) {
+                                preFilter: function (args) {
                                     if (isAdmin()) {
                                     } else {
                                         args.$form.find('.form-item[rel=isPublic]').hide();
@@ -99,7 +82,7 @@
                                     storageType: {
                                         label: 'label.storage.type',
                                         docID: 'helpComputeOfferingStorageType',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: 'shared',
@@ -117,7 +100,7 @@
                                     provisioningType: {
                                         label: 'label.disk.provisioningtype',
                                         docID: 'helpComputeOfferingProvisioningType',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: 'thin',
@@ -180,7 +163,7 @@
                                     qosType: {
                                         label: 'label.qos.type',
                                         docID: 'helpDiskOfferingQoSType',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: '',
@@ -198,7 +181,7 @@
                                                 data: items
                                             });
 
-                                            args.$select.change(function() {
+                                            args.$select.change(function () {
                                                 var $form = $(this).closest('form');
                                                 var $isCustomizedIops = $form.find('.form-item[rel=isCustomizedIops]');
                                                 var $minIops = $form.find('.form-item[rel=minIops]');
@@ -326,21 +309,20 @@
                                         label: 'label.storage.tags',
                                         docID: 'helpComputeOfferingStorageType',
                                         isTokenInput: true,
-                                        dataProvider: function(args) {
+                                        dataProvider: function (args) {
                                             $.ajax({
                                                 url: createURL("listStorageTags"),
                                                 dataType: "json",
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var item = json.liststoragetagsresponse.storagetag;
                                                     var tags = [];
 
-                                                    if (item != null)
-                                                    {
-                                                        tags = $.map(item, function(tag) {
+                                                    if (item != null) {
+                                                        tags = $.map(item, function (tag) {
                                                             return {
-                                                                       id: tag.name,
-                                                                       name: tag.name
-                                                                   };
+                                                                id: tag.name,
+                                                                name: tag.name
+                                                            };
                                                         });
                                                     }
 
@@ -350,7 +332,7 @@
                                                         noResultsText: _l('hint.no.storage.tags')
                                                     });
                                                 },
-                                                error: function(XMLHttpResponse) {
+                                                error: function (XMLHttpResponse) {
                                                     var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
 
                                                     args.response.error(errorMsg);
@@ -385,45 +367,45 @@
 
                                     deploymentPlanner: {
                                         label: 'label.deployment.planner',
-                                        select: function(args) {
-                                          if (isAdmin()) {
-                                            $.ajax({
-                                                url: createURL('listDeploymentPlanners'),
-                                                dataType: 'json',
-                                                success: function(json) {
-                                                    var items = [{
-                                                        id: '',
-                                                        description: ''
-                                                    }];
-                                                    var plannerObjs = json.listdeploymentplannersresponse.deploymentPlanner;
-                                                    $(plannerObjs).each(function() {
-                                                        items.push({
-                                                            id: this.name,
-                                                            description: this.name
+                                        select: function (args) {
+                                            if (isAdmin()) {
+                                                $.ajax({
+                                                    url: createURL('listDeploymentPlanners'),
+                                                    dataType: 'json',
+                                                    success: function (json) {
+                                                        var items = [{
+                                                            id: '',
+                                                            description: ''
+                                                        }];
+                                                        var plannerObjs = json.listdeploymentplannersresponse.deploymentPlanner;
+                                                        $(plannerObjs).each(function () {
+                                                            items.push({
+                                                                id: this.name,
+                                                                description: this.name
+                                                            });
                                                         });
-                                                    });
-                                                    args.response.success({
-                                                        data: items
-                                                    });
-                                                    args.$select.change(function() {
-                                                        var $form = $(this).closest('form');
-                                                        var $fields = $form.find('.field');
-                                                        if ($(this).val() == "ImplicitDedicationPlanner") {
-                                                            $form.find('[rel=plannerMode]').css('display', 'block');
-                                                        } else {
-                                                            $form.find('[rel=plannerMode]').hide();
-                                                        }
-                                                    });
-                                                }
-                                            });
-                                          }
+                                                        args.response.success({
+                                                            data: items
+                                                        });
+                                                        args.$select.change(function () {
+                                                            var $form = $(this).closest('form');
+                                                            var $fields = $form.find('.field');
+                                                            if ($(this).val() == "ImplicitDedicationPlanner") {
+                                                                $form.find('[rel=plannerMode]').css('display', 'block');
+                                                            } else {
+                                                                $form.find('[rel=plannerMode]').hide();
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            }
                                         }
                                     },
 
                                     // plannerKey:{label:'Planner Key' , docID:'helpImplicitPlannerKey'},
                                     plannerMode: {
                                         label: 'label.planner.mode',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: '',
@@ -445,7 +427,7 @@
 
                                     pciDevice: {
                                         label: 'label.gpu',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: '',
@@ -467,7 +449,7 @@
                                             vGpuMap['Group of NVIDIA Corporation GK107GL [GRID K1] GPUs'] = ['passthrough', 'GRID K100', 'GRID K120Q', 'GRID K140Q', 'GRID K160Q', 'GRID K180Q'];
                                             vGpuMap['Group of NVIDIA Corporation GK104GL [GRID K2] GPUs'] = ['passthrough', 'GRID K200', 'GRID K220Q', 'GRID K240Q', 'GRID K260Q', 'GRID K280Q'];
 
-                                            args.$select.change(function() {
+                                            args.$select.change(function () {
                                                 var gpu = $(this).val();
 
                                                 if (gpu == '') {
@@ -479,7 +461,7 @@
                                                     // enable/disable vGPU type options, depending on selected GPU
                                                     var $vGpuTypeSelect = $(this).closest('form').find('select[name=vgpuType]');
                                                     var $vGpuTypeOptions = $vGpuTypeSelect.find('option');
-                                                    $vGpuTypeOptions.each(function(index) {
+                                                    $vGpuTypeOptions.each(function (index) {
                                                         var vGpuTypeOption = $(this).val();
                                                         if (vGpuTypeOption == '' || (gpu in vGpuMap && $.inArray(vGpuTypeOption, vGpuMap[gpu]) > -1))
                                                             $(this).attr('disabled', false);
@@ -499,7 +481,7 @@
                                     vgpuType: {
                                         label: 'label.vgpu.type',
                                         isHidden: true,
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: '',
@@ -559,21 +541,21 @@
                                         label: 'label.domain',
                                         docID: 'helpComputeOfferingDomain',
                                         dependsOn: 'isPublic',
-                                        select: function(args) {
+                                        select: function (args) {
                                             $.ajax({
                                                 url: createURL("listDomains&listAll=true"),
                                                 dataType: "json",
                                                 async: false,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var items = [];
                                                     var domainObjs = json.listdomainsresponse.domain;
-                                                    $(domainObjs).each(function() {
+                                                    $(domainObjs).each(function () {
                                                         items.push({
                                                             id: this.id,
                                                             description: this.path
                                                         });
                                                     });
-                                                    items.sort(function(a, b) {
+                                                    items.sort(function (a, b) {
                                                         return a.description.localeCompare(b.description);
                                                     });
                                                     args.response.success({
@@ -587,13 +569,13 @@
                                 }
                             },
 
-                            action: function(args) {
+                            action: function (args) {
                                 var data = {
                                     issystem: false,
                                     name: args.data.name,
                                     displaytext: args.data.description,
                                     storageType: args.data.storageType,
-                                    provisioningType :args.data.provisioningType,
+                                    provisioningType: args.data.provisioningType,
                                     customized: (args.data.isCustomized == "on")
                                 };
 
@@ -724,27 +706,27 @@
                                 $.ajax({
                                     url: createURL('createServiceOffering' + array1.join("")),
                                     data: data,
-                                    success: function(json) {
+                                    success: function (json) {
                                         var item = json.createserviceofferingresponse.serviceoffering;
                                         args.response.success({
                                             data: item
                                         });
                                     },
-                                    error: function(data) {
+                                    error: function (data) {
                                         args.response.error(parseXMLHttpResponse(data));
                                     }
                                 });
                             },
 
                             notification: {
-                                poll: function(args) {
+                                poll: function (args) {
                                     args.complete();
                                 }
                             }
                         }
                     },
 
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var data = {};
                         listViewDataProvider(args, data);
 
@@ -755,14 +737,14 @@
                         $.ajax({
                             url: createURL('listServiceOfferings&isrecursive=true'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listserviceofferingsresponse.serviceoffering;
                                 args.response.success({
                                     actionFilter: serviceOfferingActionfilter,
                                     data: items
                                 });
                             },
-                            error: function(data) {
+                            error: function (data) {
                                 args.response.error(parseXMLHttpResponse(data));
                             }
                         });
@@ -773,7 +755,7 @@
                         actions: {
                             edit: {
                                 label: 'label.edit',
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.serviceOfferings[0].id,
                                         name: args.data.name,
@@ -782,13 +764,13 @@
                                     $.ajax({
                                         url: createURL('updateServiceOffering'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.updateserviceofferingresponse.serviceoffering;
                                             args.response.success({
                                                 data: item
                                             });
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
@@ -798,14 +780,14 @@
                             remove: {
                                 label: 'label.action.delete.service.offering',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.action.delete.service.offering';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.delete.service.offering';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.serviceOfferings[0].id
                                     };
@@ -813,16 +795,16 @@
                                         url: createURL('deleteServiceOffering'),
                                         data: data,
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success();
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete();
                                     }
                                 }
@@ -863,13 +845,13 @@
                                     },
                                     cpuspeed: {
                                         label: 'label.cpu.mhz',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             return cloudStack.converters.convertHz(args);
                                         }
                                     },
                                     memory: {
                                         label: 'label.memory.mb',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args == undefined)
                                                 return '';
                                             else
@@ -885,7 +867,7 @@
                                     },
                                     miniops: {
                                         label: 'label.disk.iops.min',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args > 0)
                                                 return args;
                                             else
@@ -894,7 +876,7 @@
                                     },
                                     maxiops: {
                                         label: 'label.disk.iops.max',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args > 0)
                                                 return args;
                                             else
@@ -903,7 +885,7 @@
                                     },
                                     hypervisorsnapshotreserve: {
                                         label: 'label.hypervisor.snapshot.reserve',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args > 0)
                                                 return args;
                                             else
@@ -961,7 +943,7 @@
                                     }
                                 }],
 
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     var data = {
                                         issystem: false,
                                         id: args.context.serviceOfferings[0].id
@@ -970,7 +952,7 @@
                                         url: createURL('listServiceOfferings&isrecursive=true'),
                                         data: data,
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.listserviceofferingsresponse.serviceoffering[0];
 
                                             if (item.deploymentplanner != null && item.serviceofferingdetails != null) {
@@ -1020,17 +1002,17 @@
                             label: 'label.add.system.service.offering',
 
                             messages: {
-                                confirm: function(args) {
+                                confirm: function (args) {
                                     return 'message.add.system.service.offering';
                                 },
-                                notification: function(args) {
+                                notification: function (args) {
                                     return 'label.add.system.service.offering';
                                 }
                             },
 
                             createForm: {
                                 title: 'label.add.system.service.offering',
-                                preFilter: function(args) {
+                                preFilter: function (args) {
                                     if (isAdmin()) {
                                     } else {
                                         args.$form.find('.form-item[rel=isPublic]').hide();
@@ -1055,7 +1037,7 @@
                                     systemvmtype: {
                                         label: 'label.system.vm.type',
                                         docID: 'helpSystemOfferingVMType',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: 'domainrouter',
@@ -1077,7 +1059,7 @@
                                     storageType: {
                                         label: 'label.storage.type',
                                         docID: 'helpSystemOfferingStorageType',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: 'shared',
@@ -1095,7 +1077,7 @@
                                     provisioningType: {
                                         label: 'label.disk.provisioningtype',
                                         docID: 'helpDiskOfferingProvisioningType',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: 'thin',
@@ -1209,21 +1191,21 @@
                                         label: 'label.domain',
                                         docID: 'helpSystemOfferingDomain',
                                         dependsOn: 'isPublic',
-                                        select: function(args) {
+                                        select: function (args) {
                                             $.ajax({
                                                 url: createURL("listDomains&listAll=true"),
                                                 dataType: "json",
                                                 async: false,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var items = [];
                                                     var domainObjs = json.listdomainsresponse.domain;
-                                                    $(domainObjs).each(function() {
+                                                    $(domainObjs).each(function () {
                                                         items.push({
                                                             id: this.id,
                                                             description: this.path
                                                         });
                                                     });
-                                                    items.sort(function(a, b) {
+                                                    items.sort(function (a, b) {
                                                         return a.description.localeCompare(b.description);
                                                     });
                                                     args.response.success({
@@ -1237,7 +1219,7 @@
                                 }
                             },
 
-                            action: function(args) {
+                            action: function (args) {
                                 var data = {
                                     issystem: true,
                                     name: args.data.name,
@@ -1305,27 +1287,27 @@
                                 $.ajax({
                                     url: createURL('createServiceOffering'),
                                     data: data,
-                                    success: function(json) {
+                                    success: function (json) {
                                         var item = json.createserviceofferingresponse.serviceoffering;
                                         args.response.success({
                                             data: item
                                         });
                                     },
-                                    error: function(data) {
+                                    error: function (data) {
                                         args.response.error(parseXMLHttpResponse(data));
                                     }
                                 });
                             },
 
                             notification: {
-                                poll: function(args) {
+                                poll: function (args) {
                                     args.complete();
                                 }
                             }
                         }
                     },
 
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var data = {};
                         listViewDataProvider(args, data);
 
@@ -1336,13 +1318,13 @@
                         $.ajax({
                             url: createURL('listServiceOfferings&isrecursive=true'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listserviceofferingsresponse.serviceoffering;
                                 args.response.success({
                                     data: items
                                 });
                             },
-                            error: function(data) {
+                            error: function (data) {
                                 args.response.error(parseXMLHttpResponse(data));
                             }
                         });
@@ -1353,7 +1335,7 @@
                         actions: {
                             edit: {
                                 label: 'label.edit',
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.systemServiceOfferings[0].id,
                                         name: args.data.name,
@@ -1362,13 +1344,13 @@
                                     $.ajax({
                                         url: createURL('updateServiceOffering'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.updateserviceofferingresponse.serviceoffering;
                                             args.response.success({
                                                 data: item
                                             });
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
@@ -1378,30 +1360,30 @@
                             remove: {
                                 label: 'label.action.delete.system.service.offering',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.action.delete.system.service.offering';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.delete.system.service.offering';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.systemServiceOfferings[0].id
                                     };
                                     $.ajax({
                                         url: createURL('deleteServiceOffering'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success();
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete();
                                     }
                                 }
@@ -1433,7 +1415,7 @@
                                     },
                                     systemvmtype: {
                                         label: 'label.system.vm.type',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             var text = '';
                                             switch (args) {
                                                 case 'domainrouter':
@@ -1460,13 +1442,13 @@
                                     },
                                     cpuspeed: {
                                         label: 'label.cpu.mhz',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             return cloudStack.converters.convertHz(args);
                                         }
                                     },
                                     memory: {
                                         label: 'label.memory.mb',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args == undefined)
                                                 return '';
                                             else
@@ -1511,7 +1493,7 @@
                                     }
                                 }],
 
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     var data = {
                                         issystem: true,
                                         id: args.context.systemServiceOfferings[0].id
@@ -1519,7 +1501,7 @@
                                     $.ajax({
                                         url: createURL('listServiceOfferings&isrecursive=true'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.listserviceofferingsresponse.serviceoffering[0];
                                             args.response.success({
                                                 actionFilter: systemServiceOfferingActionfilter,
@@ -1553,7 +1535,7 @@
                         },
                         disksize: {
                             label: 'label.disk.size.gb',
-                            converter: function(args) {
+                            converter: function (args) {
                                 if (args != 0)
                                     return args;
                                 else
@@ -1564,20 +1546,20 @@
 
                     reorder: cloudStack.api.actions.sort('updateDiskOffering', 'diskOfferings'),
 
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var data = {};
                         listViewDataProvider(args, data);
 
                         $.ajax({
                             url: createURL('listDiskOfferings&isrecursive=true'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listdiskofferingsresponse.diskoffering;
                                 args.response.success({
                                     data: items
                                 });
                             },
-                            error: function(data) {
+                            error: function (data) {
                                 args.response.error(parseXMLHttpResponse(data));
                             }
                         });
@@ -1588,17 +1570,17 @@
                             label: 'label.add.disk.offering',
 
                             messages: {
-                                confirm: function(args) {
+                                confirm: function (args) {
                                     return 'message.add.disk.offering';
                                 },
-                                notification: function(args) {
+                                notification: function (args) {
                                     return 'label.add.disk.offering';
                                 }
                             },
 
                             createForm: {
                                 title: 'label.add.disk.offering',
-                                preFilter: function(args) {
+                                preFilter: function (args) {
                                     if (isAdmin()) {
                                     } else {
                                         args.$form.find('.form-item[rel=isPublic]').hide();
@@ -1624,7 +1606,7 @@
                                     storageType: {
                                         label: 'label.storage.type',
                                         docID: 'helpDiskOfferingStorageType',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: 'shared',
@@ -1642,7 +1624,7 @@
                                     provisioningType: {
                                         label: 'label.disk.provisioningtype',
                                         docID: 'helpDiskOfferingProvisioningType',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: 'thin',
@@ -1680,7 +1662,7 @@
                                     qosType: {
                                         label: 'label.qos.type',
                                         docID: 'helpDiskOfferingQoSType',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: '',
@@ -1698,7 +1680,7 @@
                                                 data: items
                                             });
 
-                                            args.$select.change(function() {
+                                            args.$select.change(function () {
                                                 var $form = $(this).closest('form');
                                                 var $isCustomizedIops = $form.find('.form-item[rel=isCustomizedIops]');
                                                 var $minIops = $form.find('.form-item[rel=minIops]');
@@ -1819,7 +1801,7 @@
                                     cacheMode: {
                                         label: 'label.cache.mode',
                                         docID: 'helpDiskOfferingCacheMode',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: 'none',
@@ -1842,21 +1824,20 @@
                                         label: 'label.storage.tags',
                                         docID: 'helpDiskOfferingStorageTags',
                                         isTokenInput: true,
-                                        dataProvider: function(args) {
+                                        dataProvider: function (args) {
                                             $.ajax({
                                                 url: createURL("listStorageTags"),
                                                 dataType: "json",
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var item = json.liststoragetagsresponse.storagetag;
                                                     var tags = [];
 
-                                                    if (item != null)
-                                                    {
-                                                        tags = $.map(item, function(tag) {
+                                                    if (item != null) {
+                                                        tags = $.map(item, function (tag) {
                                                             return {
-                                                                       id: tag.name,
-                                                                       name: tag.name
-                                                                   };
+                                                                id: tag.name,
+                                                                name: tag.name
+                                                            };
                                                         });
                                                     }
 
@@ -1866,7 +1847,7 @@
                                                         noResultsText: _l('hint.no.storage.tags')
                                                     });
                                                 },
-                                                error: function(XMLHttpResponse) {
+                                                error: function (XMLHttpResponse) {
                                                     var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
 
                                                     args.response.error(errorMsg);
@@ -1885,21 +1866,21 @@
                                         label: 'label.domain',
                                         docID: 'helpDiskOfferingDomain',
                                         dependsOn: 'isPublic',
-                                        select: function(args) {
+                                        select: function (args) {
                                             $.ajax({
                                                 url: createURL("listDomains&listAll=true"),
                                                 dataType: "json",
                                                 async: false,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var items = [];
                                                     var domainObjs = json.listdomainsresponse.domain;
-                                                    $(domainObjs).each(function() {
+                                                    $(domainObjs).each(function () {
                                                         items.push({
                                                             id: this.id,
                                                             description: this.path
                                                         });
                                                     });
-                                                    items.sort(function(a, b) {
+                                                    items.sort(function (a, b) {
                                                         return a.description.localeCompare(b.description);
                                                     });
                                                     args.response.success({
@@ -1913,7 +1894,7 @@
                                 }
                             },
 
-                            action: function(args) {
+                            action: function (args) {
                                 var data = {
                                     isMirrored: false,
                                     name: args.data.name,
@@ -1997,20 +1978,20 @@
                                 $.ajax({
                                     url: createURL('createDiskOffering'),
                                     data: data,
-                                    success: function(json) {
+                                    success: function (json) {
                                         var item = json.creatediskofferingresponse.diskoffering;
                                         args.response.success({
                                             data: item
                                         });
                                     },
-                                    error: function(data) {
+                                    error: function (data) {
                                         args.response.error(parseXMLHttpResponse(data));
                                     }
                                 });
                             },
 
                             notification: {
-                                poll: function(args) {
+                                poll: function (args) {
                                     args.complete();
                                 }
                             }
@@ -2022,7 +2003,7 @@
                         actions: {
                             edit: {
                                 label: 'label.edit',
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.diskOfferings[0].id,
                                         name: args.data.name,
@@ -2031,13 +2012,13 @@
                                     $.ajax({
                                         url: createURL('updateDiskOffering'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.updatediskofferingresponse.diskoffering;
                                             args.response.success({
                                                 data: item
                                             });
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
@@ -2047,30 +2028,30 @@
                             remove: {
                                 label: 'label.action.delete.disk.offering',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.action.delete.disk.offering';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.delete.disk.offering';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.diskOfferings[0].id
                                     };
                                     $.ajax({
                                         url: createURL('deleteDiskOffering'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success();
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete();
                                     }
                                 }
@@ -2106,7 +2087,7 @@
                                     },
                                     disksize: {
                                         label: 'label.disk.size.gb',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args != 0)
                                                 return args;
                                             else
@@ -2119,7 +2100,7 @@
                                     },
                                     miniops: {
                                         label: 'label.disk.iops.min',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args > 0)
                                                 return args;
                                             else
@@ -2128,7 +2109,7 @@
                                     },
                                     maxiops: {
                                         label: 'label.disk.iops.max',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args > 0)
                                                 return args;
                                             else
@@ -2137,7 +2118,7 @@
                                     },
                                     hypervisorsnapshotreserve: {
                                         label: 'label.hypervisor.snapshot.reserve',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args > 0)
                                                 return args;
                                             else
@@ -2173,14 +2154,14 @@
                                     }
                                 }],
 
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     var data = {
                                         id: args.context.diskOfferings[0].id
                                     };
                                     $.ajax({
                                         url: createURL('listDiskOfferings&isrecursive=true'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.listdiskofferingsresponse.diskoffering[0];
                                             args.response.success({
                                                 actionFilter: diskOfferingActionfilter,
@@ -2215,17 +2196,17 @@
                         }
                     },
 
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var data = {};
                         listViewDataProvider(args, data);
 
                         $.ajax({
                             url: createURL('listNetworkOfferings'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listnetworkofferingsresponse.networkoffering;
 
-                                $(items).each(function() {
+                                $(items).each(function () {
                                     if (this.availability == "Required") {
                                         requiredNetworkOfferingExists = true;
                                         return false; //break each loop
@@ -2237,7 +2218,7 @@
                                     data: items
                                 });
                             },
-                            error: function(data) {
+                            error: function (data) {
                                 args.response.error(parseXMLHttpResponse(data));
                             }
                         });
@@ -2249,7 +2230,7 @@
 
                             createForm: {
                                 title: 'label.add.network.offering',
-                                preFilter: function(args) {
+                                preFilter: function (args) {
                                     var $availability = args.$form.find('.form-item[rel=availability]');
                                     var $lbType = args.$form.find('.form-item[rel=lbType]');
                                     var $serviceofferingid = args.$form.find('.form-item[rel=serviceofferingid]');
@@ -2263,7 +2244,7 @@
                                         url: createURL('listZones'),
                                         data: {},
                                         async: false,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var zones = json.listzonesresponse.zone;
                                             if (zones != null && zones.length > 0) {
                                                 for (var i = 0; i < zones.length; i++) {
@@ -2274,7 +2255,7 @@
                                         }
                                     });
 
-                                    args.$form.bind('change', function() { //when any field in the dialog is changed
+                                    args.$form.bind('change', function () { //when any field in the dialog is changed
                                         //check whether to show or hide availability field
                                         var $sourceNATField = args.$form.find('input[name=\"service.SourceNat.isEnabled\"]');
                                         var $guestTypeField = args.$form.find('select[name=guestIpType]');
@@ -2293,15 +2274,15 @@
                                         var $providers = $useVpcCb.closest('form').find('.dynamic-input select[name!="service.Connectivity.provider"]');
                                         var $optionsOfProviders = $providers.find('option');
                                         if ($useVpc.is(':visible') && $useVpcCb.is(':checked')) { //*** vpc ***
-                                            $optionsOfProviders.each(function(index) {
-                                                if ($(this).val() == 'InternalLbVm' || $(this).val() == 'VpcVirtualRouter'  || $(this).val() == 'NuageVsp' || $(this).val() == 'NuageVspVpc') {
+                                            $optionsOfProviders.each(function (index) {
+                                                if ($(this).val() == 'InternalLbVm' || $(this).val() == 'VpcVirtualRouter' || $(this).val() == 'NuageVsp' || $(this).val() == 'NuageVspVpc') {
                                                     $(this).attr('disabled', false);
                                                 } else {
                                                     $(this).attr('disabled', true);
                                                 }
                                             });
                                         } else { //*** non-vpc ***
-                                            $optionsOfProviders.each(function(index) {
+                                            $optionsOfProviders.each(function (index) {
                                                 if ($(this).val() == 'InternalLbVm' || $(this).val() == 'VpcVirtualRouter') {
                                                     $(this).attr('disabled', true);
                                                 } else {
@@ -2309,13 +2290,12 @@
                                                 }
                                             });
                                         }
-                                        $providers.each(function() {
+                                        $providers.each(function () {
                                             //if selected option is disabled, select the first enabled option instead
                                             if ($(this).find('option:selected:disabled').length > 0) {
                                                 $(this).val($(this).find('option:first'));
                                             }
                                         });
-
 
 
                                         if (!requiredNetworkOfferingExists &&
@@ -2380,7 +2360,7 @@
 
                                         //when service(s) has Virtual Router as provider.....
                                         var havingVirtualRouterForAtLeastOneService = false;
-                                        $(serviceCheckboxNames).each(function() {
+                                        $(serviceCheckboxNames).each(function () {
                                             var checkboxName = this;
                                             if ($("input[name='" + checkboxName + "']").is(":checked") == true) {
                                                 var providerFieldName = checkboxName.replace(".isEnabled", ".provider"); //either dropdown or input hidden field
@@ -2399,13 +2379,13 @@
 
 
                                         /*
-                                        when service(s) has VPC Virtual Router as provider:
-                    (1) conserve mode is set to unchecked and grayed out.
-                    (2) redundant router capability checkbox is set to unchecked and grayed out.
-                    (3) remove Firewall service, SecurityGroup service.
-                    */
+                                         when service(s) has VPC Virtual Router as provider:
+                                         (1) conserve mode is set to unchecked and grayed out.
+                                         (2) redundant router capability checkbox is set to unchecked and grayed out.
+                                         (3) remove Firewall service, SecurityGroup service.
+                                         */
                                         var havingVpcVirtualRouterForAtLeastOneService = false;
-                                        $(serviceCheckboxNames).each(function() {
+                                        $(serviceCheckboxNames).each(function () {
                                             var checkboxName = this;
                                             if ($("input[name='" + checkboxName + "']").is(":checked") == true) {
                                                 var providerFieldName = checkboxName.replace(".isEnabled", ".provider"); //either dropdown or input hidden field
@@ -2431,44 +2411,44 @@
 
                                         //CS-16612 show all services regardless of guestIpType(Shared/Isolated)
                                         /*
-                                        //hide/show service fields ***** (begin) *****
-                                        var serviceFieldsToHide = [];
-                                        if($guestTypeField.val() == 'Shared') { //Shared network offering
-                                          serviceFieldsToHide = [
-                                                'service.SourceNat.isEnabled',
-                                                'service.PortForwarding.isEnabled',
-                                                'service.Firewall.isEnabled',
-                                                'service.Vpn.isEnabled'
-                                            ];
-                                            if(havingVpcVirtualRouterForAtLeastOneService == true) { //add SecurityGroup to to-hide-list
-                                              serviceFieldsToHide.push('service.SecurityGroup.isEnabled');
-                                            }
-                                            else { //remove SecurityGroup from to-hide-list
-                                              var temp = $.map(serviceFieldsToHide, function(item) {
-                                                    if (item != 'service.SecurityGroup.isEnabled') {
-                                                      return item;
-                                                    }
-                                                });
-                                                serviceFieldsToHide = temp;
-                                            }
-                                        }
-                                        else { //Isolated network offering
-                                          serviceFieldsToHide = [
-                                              'service.SecurityGroup.isEnabled'
-                                            ];
-                                            if(havingVpcVirtualRouterForAtLeastOneService == true) { //add firewall to to-hide-list
-                                              serviceFieldsToHide.push('service.Firewall.isEnabled');
-                                            }
-                                            else { //remove firewall from to-hide-list
-                                              var temp = $.map(serviceFieldsToHide, function(item) {
-                                                    if (item != 'service.Firewall.isEnabled') {
-                                                      return item;
-                                                    }
-                                                });
-                                                serviceFieldsToHide = temp;
-                                            }
-                                        }
-                    */
+                                         //hide/show service fields ***** (begin) *****
+                                         var serviceFieldsToHide = [];
+                                         if($guestTypeField.val() == 'Shared') { //Shared network offering
+                                         serviceFieldsToHide = [
+                                         'service.SourceNat.isEnabled',
+                                         'service.PortForwarding.isEnabled',
+                                         'service.Firewall.isEnabled',
+                                         'service.Vpn.isEnabled'
+                                         ];
+                                         if(havingVpcVirtualRouterForAtLeastOneService == true) { //add SecurityGroup to to-hide-list
+                                         serviceFieldsToHide.push('service.SecurityGroup.isEnabled');
+                                         }
+                                         else { //remove SecurityGroup from to-hide-list
+                                         var temp = $.map(serviceFieldsToHide, function(item) {
+                                         if (item != 'service.SecurityGroup.isEnabled') {
+                                         return item;
+                                         }
+                                         });
+                                         serviceFieldsToHide = temp;
+                                         }
+                                         }
+                                         else { //Isolated network offering
+                                         serviceFieldsToHide = [
+                                         'service.SecurityGroup.isEnabled'
+                                         ];
+                                         if(havingVpcVirtualRouterForAtLeastOneService == true) { //add firewall to to-hide-list
+                                         serviceFieldsToHide.push('service.Firewall.isEnabled');
+                                         }
+                                         else { //remove firewall from to-hide-list
+                                         var temp = $.map(serviceFieldsToHide, function(item) {
+                                         if (item != 'service.Firewall.isEnabled') {
+                                         return item;
+                                         }
+                                         });
+                                         serviceFieldsToHide = temp;
+                                         }
+                                         }
+                                         */
 
 
                                         //CS-16687: NetworkACL should be removed when the guest_type is SHARED
@@ -2483,7 +2463,7 @@
                                         }
 
                                         //hide service fields that are included in serviceFieldsToHide
-                                        var $serviceCheckboxesToHide = args.$form.find('.form-item').filter(function() {
+                                        var $serviceCheckboxesToHide = args.$form.find('.form-item').filter(function () {
                                             if ($.inArray($(this).attr('rel'), serviceFieldsToHide) > -1) {
                                                 return true;
                                             }
@@ -2492,7 +2472,7 @@
                                         $serviceCheckboxesToHide.hide();
                                         $serviceCheckboxesToHide.find('input[type=checkbox]').attr('checked', false);
 
-                                        var $serviceProviderDropdownsToHide = args.$form.find('.form-item').filter(function() {
+                                        var $serviceProviderDropdownsToHide = args.$form.find('.form-item').filter(function () {
                                             if ($.inArray($(this).attr('depends-on'), serviceFieldsToHide) > -1) {
                                                 return true;
                                             }
@@ -2565,22 +2545,22 @@
                                     },
 
                                     /*
-                  trafficType: {
-                    label: 'label.traffic.type', validation: { required: true },
-                    select: function(args) {
-                      args.response.success({
-                        data: [
-                          { id: 'GUEST', description: 'Guest' }
-                        ]
-                      });
-                    }
-                  },
-                                    */
+                                     trafficType: {
+                                     label: 'label.traffic.type', validation: { required: true },
+                                     select: function(args) {
+                                     args.response.success({
+                                     data: [
+                                     { id: 'GUEST', description: 'Guest' }
+                                     ]
+                                     });
+                                     }
+                                     },
+                                     */
 
                                     guestIpType: {
                                         label: 'label.guest.type',
                                         docID: 'helpNetworkOfferingGuestType',
-                                        select: function(args) {
+                                        select: function (args) {
                                             args.response.success({
                                                 data: [{
                                                     id: 'Isolated',
@@ -2591,7 +2571,7 @@
                                                 }]
                                             });
 
-                                            args.$select.change(function() {
+                                            args.$select.change(function () {
                                                 var $form = $(this).closest("form");
 
                                                 if ($(this).val() == "Shared") {
@@ -2632,7 +2612,7 @@
                                     lbType: { //only shown when VPC is checked and LB service is checked
                                         label: 'label.load.balancer.type',
                                         isHidden: true,
-                                        select: function(args) {
+                                        select: function (args) {
                                             args.response.success({
                                                 data: [{
                                                     id: 'publicLb',
@@ -2648,16 +2628,16 @@
                                     supportedServices: {
                                         label: 'label.supported.services',
 
-                                        dynamic: function(args) {
+                                        dynamic: function (args) {
                                             $.ajax({
                                                 url: createURL('listSupportedNetworkServices'),
                                                 dataType: 'json',
                                                 async: true,
-                                                success: function(data) {
+                                                success: function (data) {
                                                     networkServiceObjs = data.listsupportednetworkservicesresponse.networkservice;
                                                     serviceFields = [];
                                                     var fields = {}, providerCanenableindividualserviceMap = {}, providerServicesMap = {}, providerDropdownsForciblyChangedTogether = {};
-                                                    $(networkServiceObjs).each(function() {
+                                                    $(networkServiceObjs).each(function () {
                                                         var serviceName = this.name;
                                                         var providerObjs = this.provider;
                                                         var serviceDisplayName;
@@ -2718,10 +2698,10 @@
                                                                 label: serviceDisplayName + ' Provider',
                                                                 isHidden: true,
                                                                 dependsOn: id.isEnabled,
-                                                                select: function(args) {
+                                                                select: function (args) {
                                                                     //Virtual Router needs to be the first choice in provider dropdown (Bug 12509)
                                                                     var items = [];
-                                                                    $(providerObjs).each(function() {
+                                                                    $(providerObjs).each(function () {
                                                                         if (this.name == "VirtualRouter")
                                                                             items.unshift({
                                                                                 id: this.name,
@@ -2749,7 +2729,7 @@
                                                                     // Disable VPC virtual router by default
                                                                     args.$select.find('option[value=VpcVirtualRouter]').attr('disabled', true);
 
-                                                                    args.$select.change(function() {
+                                                                    args.$select.change(function () {
                                                                         var $thisProviderDropdown = $(this);
                                                                         var providerName = $(this).val();
                                                                         var canenableindividualservice = providerCanenableindividualserviceMap[providerName];
@@ -2757,7 +2737,7 @@
                                                                             var serviceNames = providerServicesMap[providerName];
                                                                             if (serviceNames != null && serviceNames.length > 1) {
                                                                                 providerDropdownsForciblyChangedTogether = {}; //reset
-                                                                                $(serviceNames).each(function() {
+                                                                                $(serviceNames).each(function () {
                                                                                     var providerDropdownId = 'service' + '.' + this + '.' + 'provider';
                                                                                     providerDropdownsForciblyChangedTogether[providerDropdownId] = 1;
                                                                                     $("select[name='" + providerDropdownId + "']").val(providerName);
@@ -2790,7 +2770,7 @@
                                                         fields: fields
                                                     });
                                                 },
-                                                error: function(data) {
+                                                error: function (data) {
                                                     args.response.error(parseXMLHttpResponse(data));
                                                 }
                                             });
@@ -2802,12 +2782,12 @@
                                         label: 'label.system.offering.for.router',
                                         isHidden: true,
                                         docID: 'helpNetworkOfferingSystemOffering',
-                                        select: function(args) {
+                                        select: function (args) {
                                             $.ajax({
                                                 url: createURL('listServiceOfferings&issystem=true&systemvmtype=domainrouter'),
                                                 dataType: 'json',
                                                 async: true,
-                                                success: function(data) {
+                                                success: function (data) {
                                                     var serviceOfferings = data.listserviceofferingsresponse.serviceoffering;
 
                                                     args.response.success({
@@ -2816,7 +2796,7 @@
                                                                 id: null,
                                                                 description: 'None'
                                                             }],
-                                                            $.map(serviceOfferings, function(elem) {
+                                                            $.map(serviceOfferings, function (elem) {
                                                                 return {
                                                                     id: elem.id,
                                                                     description: elem.name
@@ -2825,7 +2805,7 @@
                                                         )
                                                     });
                                                 },
-                                                error: function(data) {
+                                                error: function (data) {
                                                     args.response.error(parseXMLHttpResponse(data));
                                                 }
                                             });
@@ -2844,7 +2824,7 @@
                                         label: 'label.supported.source.NAT.type',
                                         isHidden: true,
                                         dependsOn: 'service.SourceNat.isEnabled',
-                                        select: function(args) {
+                                        select: function (args) {
                                             args.response.success({
                                                 data: [{
                                                     id: 'peraccount',
@@ -2861,7 +2841,7 @@
                                         label: 'label.LB.isolation',
                                         docID: 'helpNetworkOfferingLBIsolation',
                                         isHidden: true,
-                                        select: function(args) {
+                                        select: function (args) {
                                             args.response.success({
                                                 data: [{
                                                     id: 'dedicated',
@@ -2876,7 +2856,7 @@
                                     "service.Lb.inlineModeDropdown": {
                                         label: 'label.mode',
                                         docID: 'helpNetworkOfferingMode',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: "false",
@@ -2922,7 +2902,7 @@
                                     availability: {
                                         label: 'label.availability',
                                         isHidden: true,
-                                        select: function(args) {
+                                        select: function (args) {
                                             args.response.success({
                                                 data: [{
                                                     id: 'Optional',
@@ -2938,11 +2918,11 @@
                                     egressdefaultpolicy: {
                                         label: 'label.default.egress.policy',
                                         isHidden: true,
-                                        select: function(args) {
+                                        select: function (args) {
                                             args.response.success({
                                                 data: [
-                                                    { id: 'ALLOW', description: 'label.allow' },
-                                                    { id: 'DENY', description: 'label.deny' }
+                                                    {id: 'ALLOW', description: 'label.allow'},
+                                                    {id: 'DENY', description: 'label.deny'}
                                                 ]
                                             });
                                         }
@@ -2950,13 +2930,13 @@
                                 }
                             },
 
-                            action: function(args) {
+                            action: function (args) {
                                 var formData = args.data;
                                 var inputData = {};
                                 var serviceProviderMap = {};
                                 var serviceCapabilityIndex = 0;
 
-                                $.each(formData, function(key, value) {
+                                $.each(formData, function (key, value) {
                                     var serviceData = key.split('.');
 
                                     if (serviceData.length > 1) {
@@ -2965,8 +2945,8 @@
                                             value == 'on') { // Services field
 
                                             serviceProviderMap[serviceData[1]] = formData[
-                                                'service.' + serviceData[1] + '.provider'
-                                            ];
+                                            'service.' + serviceData[1] + '.provider'
+                                                ];
                                         } else if ((key == 'service.SourceNat.redundantRouterCapabilityCheckbox') && ("SourceNat" in serviceProviderMap)) { //if checkbox is unchecked, it won't be included in formData in the first place. i.e. it won't fall into this section
                                             inputData['serviceCapabilityList[' + serviceCapabilityIndex + '].service'] = 'SourceNat';
                                             inputData['serviceCapabilityList[' + serviceCapabilityIndex + '].capabilitytype'] = "RedundantRouter";
@@ -3004,15 +2984,15 @@
                                             serviceCapabilityIndex++;
                                         }
                                     } else if (value != '') { // normal data (serviceData.length ==1), e.g. "name", "displayText", "networkRate", "guestIpType", "lbType" (unwanted), "availability" (unwated when value is "Optional"), "egressdefaultpolicy", "state" (unwanted), "status" (unwanted), "allocationstate" (unwanted)
-                                        if (!(key ==  "lbType"  || (key == "availability" && value == "Optional") || key == "state" || key == "status" || key == "allocationstate" || key == "useVpc" )) {
-                                        inputData[key] = value;
-                                    }
+                                        if (!(key == "lbType" || (key == "availability" && value == "Optional") || key == "state" || key == "status" || key == "allocationstate" || key == "useVpc" )) {
+                                            inputData[key] = value;
+                                        }
                                     }
                                 });
 
                                 for (var key1 in inputData) {
                                     /* When capability ElasticIp=true is passed to API, if capability associatePublicIP is not passed to API, cloudStack API will assume associatePublicIP=true.
-                                    So, UI has to explicitly pass associatePublicIP=false to API if its checkbox is unchecked. */
+                                     So, UI has to explicitly pass associatePublicIP=false to API if its checkbox is unchecked. */
                                     if (inputData[key1] == 'ElasticIp') { //ElasticIp checkbox is checked
                                         var associatePublicIPExists = false;
                                         for (var key2 in inputData) {
@@ -3035,18 +3015,18 @@
                                 //passing supportsstrechedl2subnet's value as capability
                                 for (var k in inputData) {
                                     if (k == 'supportsstrechedl2subnet' && ("Connectivity" in serviceProviderMap)) {
-                                            inputData['servicecapabilitylist[' + serviceCapabilityIndex + '].service'] = 'Connectivity';
-                                            inputData['servicecapabilitylist[' + serviceCapabilityIndex + '].capabilitytype'] = 'StretchedL2Subnet';
-                                            inputData['servicecapabilitylist[' + serviceCapabilityIndex + '].capabilityvalue'] = true;
-                                            serviceCapabilityIndex++;
-                                            break;
+                                        inputData['servicecapabilitylist[' + serviceCapabilityIndex + '].service'] = 'Connectivity';
+                                        inputData['servicecapabilitylist[' + serviceCapabilityIndex + '].capabilitytype'] = 'StretchedL2Subnet';
+                                        inputData['servicecapabilitylist[' + serviceCapabilityIndex + '].capabilityvalue'] = true;
+                                        serviceCapabilityIndex++;
+                                        break;
                                     }
                                 }
                                 //removing supportsstrechedl2subnet from parameters, it has been set as capability
                                 delete inputData['supportsstrechedl2subnet'];
 
                                 // Make supported services list
-                                inputData['supportedServices'] = $.map(serviceProviderMap, function(value, key) {
+                                inputData['supportedServices'] = $.map(serviceProviderMap, function (value, key) {
                                     return key;
                                 }).join(',');
 
@@ -3081,7 +3061,7 @@
 
                                 // Make service provider map
                                 var serviceProviderIndex = 0;
-                                $.each(serviceProviderMap, function(key, value) {
+                                $.each(serviceProviderMap, function (key, value) {
                                     inputData['serviceProviderList[' + serviceProviderIndex + '].service'] = key;
                                     inputData['serviceProviderList[' + serviceProviderIndex + '].provider'] = value;
                                     serviceProviderIndex++;
@@ -3106,7 +3086,7 @@
                                     url: createURL('createNetworkOffering'),
                                     data: inputData,
                                     type: "POST", //use POST instead of GET since the API call might be overlong and exceed size limit
-                                    success: function(data) {
+                                    success: function (data) {
                                         var item = data.createnetworkofferingresponse.networkoffering;
 
                                         if (inputData['availability'] == "Required")
@@ -3118,14 +3098,14 @@
                                         });
                                     },
 
-                                    error: function(data) {
+                                    error: function (data) {
                                         args.response.error(parseXMLHttpResponse(data));
                                     }
                                 });
                             },
 
                             notification: {
-                                poll: function(args) {
+                                poll: function (args) {
                                     args.complete({
                                         actionFilter: networkOfferingActionfilter
                                     });
@@ -3133,7 +3113,7 @@
                             },
 
                             messages: {
-                                notification: function(args) {
+                                notification: function (args) {
                                     return 'label.add.network.offering';
                                 }
                             }
@@ -3147,7 +3127,7 @@
                         actions: {
                             edit: {
                                 label: 'label.edit',
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.networkOfferings[0].id,
                                         name: args.data.name,
@@ -3158,7 +3138,7 @@
                                     $.ajax({
                                         url: createURL('updateNetworkOffering'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             //if availability is being updated from Required to Optional
                                             if (args.context.networkOfferings[0].availability == "Required" && args.data.availability == "Optional")
                                                 requiredNetworkOfferingExists = false;
@@ -3171,7 +3151,7 @@
                                                 data: item
                                             });
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
@@ -3181,29 +3161,29 @@
                             enable: {
                                 label: 'label.enable.network.offering',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.confirm.enable.network.offering';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'message.enabling.network.offering';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL("updateNetworkOffering&id=" + args.context.networkOfferings[0].id + "&state=Enabled"),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.updatenetworkofferingresponse.networkoffering;
                                             args.response.success();
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete({
                                             data: {
                                                 state: 'Enabled'
@@ -3216,29 +3196,29 @@
                             disable: {
                                 label: 'label.disable.network.offering',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.confirm.disable.network.offering';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'message.disabling.network.offering';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL("updateNetworkOffering&id=" + args.context.networkOfferings[0].id + "&state=Disabled"),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.updatenetworkofferingresponse.networkoffering;
                                             args.response.success();
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete({
                                             data: {
                                                 state: 'Disabled'
@@ -3250,33 +3230,33 @@
 
                             remove: {
                                 label: 'label.remove.network.offering',
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL('deleteNetworkOffering'),
                                         data: {
                                             id: args.context.networkOfferings[0].id
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             if (args.context.networkOfferings[0].availability == "Required")
                                                 requiredNetworkOfferingExists = false; //since only one or zero Required network offering can exist
 
                                             args.response.success();
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
                                 },
                                 messages: {
-                                    confirm: function() {
+                                    confirm: function () {
                                         return 'message.confirm.remove.network.offering';
                                     },
-                                    notification: function() {
+                                    notification: function () {
                                         return 'label.remove.network.offering';
                                     }
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete({
                                             data: {
                                                 state: 'Destroyed'
@@ -3324,7 +3304,7 @@
 
                                     egressdefaultpolicy: {
                                         label: 'label.egress.default.policy',
-                                        converter: function(str) {
+                                        converter: function (str) {
                                             return str === true ? 'Allow' : 'Deny';
                                         }
                                     },
@@ -3332,7 +3312,7 @@
                                     availability: {
                                         label: 'label.availability',
                                         isEditable: true,
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: 'Required',
@@ -3366,7 +3346,7 @@
                                     },
                                     networkrate: {
                                         label: 'label.network.rate',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             var networkRate = args;
                                             if (args == null || args == -1) {
                                                 return "Unlimited";
@@ -3394,22 +3374,22 @@
                                     }
                                 }],
 
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     $.ajax({
                                         url: createURL('listNetworkOfferings&id=' + args.context.networkOfferings[0].id),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.listnetworkofferingsresponse.networkoffering[0];
                                             args.response.success({
                                                 actionFilter: networkOfferingActionfilter,
                                                 data: $.extend(item, {
-                                                    supportedServices: $.map(item.service, function(service) {
+                                                    supportedServices: $.map(item.service, function (service) {
                                                         return service.name;
                                                     }).join(', '),
 
-                                                    serviceCapabilities: $.map(item.service, function(service) {
-                                                        return service.provider ? $.map(service.provider, function(capability) {
+                                                    serviceCapabilities: $.map(item.service, function (service) {
+                                                        return service.provider ? $.map(service.provider, function (capability) {
                                                             return service.name + ': ' + capability.name;
                                                         }).join(', ') : null;
                                                     }).join(', ')
@@ -3444,21 +3424,21 @@
                         }
                     },
 
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var data = {};
                         listViewDataProvider(args, data);
 
                         $.ajax({
                             url: createURL('listVPCOfferings'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listvpcofferingsresponse.vpcoffering;
                                 args.response.success({
                                     actionFilter: vpcOfferingActionfilter,
                                     data: items
                                 });
                             },
-                            error: function(data) {
+                            error: function (data) {
                                 args.response.error(parseXMLHttpResponse(data));
                             }
                         });
@@ -3471,7 +3451,7 @@
                             createForm: {
                                 title: 'label.add.vpc.offering',
 
-                                preFilter: function(args) {
+                                preFilter: function (args) {
                                     var hasAdvancedZones = false;
 
                                     // Check whether there are any advanced zones
@@ -3479,7 +3459,7 @@
                                         url: createURL('listZones'),
                                         data: {},
                                         async: false,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var zones = json.listzonesresponse.zone;
                                             if (zones != null && zones.length > 0) {
                                                 for (var i = 0; i < zones.length; i++) {
@@ -3490,12 +3470,12 @@
                                         }
                                     });
 
-                                    args.$form.bind('change', function() { //when any field in the dialog is changed
+                                    args.$form.bind('change', function () { //when any field in the dialog is changed
 
                                         var $providers = args.$form.find('.dynamic-input select');
                                         var $optionsOfProviders = $providers.find('option');
 
-                                        $providers.each(function() {
+                                        $providers.each(function () {
                                             //if selected option is disabled, select the first enabled option instead
                                             if ($(this).find('option:selected:disabled').length > 0) {
                                                 $(this).val($(this).find('option:first'));
@@ -3526,13 +3506,13 @@
                                     supportedServices: {
                                         label: 'label.supported.services',
 
-                                        dynamic: function(args) {
+                                        dynamic: function (args) {
                                             var networkServiceObjs = [];
                                             networkServiceObjs.push({
                                                 name: 'Dhcp',
                                                 provider: [
-                                                       {name: 'VpcVirtualRouter'},
-                                                       {name: 'NuageVsp'}]
+                                                    {name: 'VpcVirtualRouter'},
+                                                    {name: 'NuageVsp'}]
                                             });
                                             networkServiceObjs.push({
                                                 name: 'Dns',
@@ -3549,20 +3529,20 @@
                                             networkServiceObjs.push({
                                                 name: 'StaticNat',
                                                 provider: [
-                                                       {name: 'VpcVirtualRouter'},
-                                                       {name: 'NuageVsp'}]
+                                                    {name: 'VpcVirtualRouter'},
+                                                    {name: 'NuageVsp'}]
                                             });
                                             networkServiceObjs.push({
                                                 name: 'SourceNat',
                                                 provider: [
-                                                       {name: 'VpcVirtualRouter'},
-                                                       {name: 'NuageVsp'}]
+                                                    {name: 'VpcVirtualRouter'},
+                                                    {name: 'NuageVsp'}]
                                             });
                                             networkServiceObjs.push({
                                                 name: 'NetworkACL',
                                                 provider: [
-                                                       {name: 'VpcVirtualRouter'},
-                                                       {name: 'NuageVsp'}]
+                                                    {name: 'VpcVirtualRouter'},
+                                                    {name: 'NuageVsp'}]
                                             });
                                             networkServiceObjs.push({
                                                 name: 'PortForwarding',
@@ -3588,7 +3568,7 @@
 
                                             serviceFields = [];
                                             var fields = {};
-                                            $(networkServiceObjs).each(function() {
+                                            $(networkServiceObjs).each(function () {
                                                 var serviceName = this.name;
                                                 var providerObjs = this.provider;
                                                 var serviceDisplayName;
@@ -3643,13 +3623,13 @@
                                                     label: serviceDisplayName + ' Provider',
                                                     isHidden: true,
                                                     dependsOn: id.isEnabled,
-                                                    select: function(args) {
+                                                    select: function (args) {
                                                         var items = [];
-                                                        $(providerObjs).each(function() {
-                                                               items.push({
-                                                                    id: this.name,
-                                                                    description: this.name
-                                                                });
+                                                        $(providerObjs).each(function () {
+                                                            items.push({
+                                                                id: this.name,
+                                                                description: this.name
+                                                            });
                                                         });
                                                         args.response.success({
                                                             data: items
@@ -3687,12 +3667,12 @@
                                 }//end of fields
                             }, //end of createForm
 
-                            action: function(args) {
+                            action: function (args) {
                                 var formData = args.data;
                                 var inputData = {};
                                 var serviceProviderMap = {};
                                 var serviceCapabilityIndex = 0;
-                                $.each(formData, function(key, value) {
+                                $.each(formData, function (key, value) {
                                     var serviceData = key.split('.');
                                     if (serviceData.length > 1) {
                                         if (serviceData[0] == 'service' &&
@@ -3700,8 +3680,8 @@
                                             value == 'on') { // Services field
 
                                             serviceProviderMap[serviceData[1]] = formData[
-                                                'service.' + serviceData[1] + '.provider'
-                                            ];
+                                            'service.' + serviceData[1] + '.provider'
+                                                ];
                                         } else if ((key == 'service.Connectivity.regionLevelVpcCapabilityCheckbox') && ("Connectivity" in serviceProviderMap)) {
                                             inputData['serviceCapabilityList[' + serviceCapabilityIndex + '].service'] = 'Connectivity';
                                             inputData['serviceCapabilityList[' + serviceCapabilityIndex + '].capabilitytype'] = "RegionLevelVpc";
@@ -3725,14 +3705,14 @@
                                 });
 
                                 // Make supported services list
-                                inputData['supportedServices'] = $.map(serviceProviderMap, function(value, key) {
+                                inputData['supportedServices'] = $.map(serviceProviderMap, function (value, key) {
                                     return key;
                                 }).join(',');
 
 
                                 // Make service provider map
                                 var serviceProviderIndex = 0;
-                                $.each(serviceProviderMap, function(key, value) {
+                                $.each(serviceProviderMap, function (key, value) {
                                     inputData['serviceProviderList[' + serviceProviderIndex + '].service'] = key;
                                     inputData['serviceProviderList[' + serviceProviderIndex + '].provider'] = value;
                                     serviceProviderIndex++;
@@ -3743,7 +3723,7 @@
                                     data: inputData,
                                     dataType: 'json',
                                     async: true,
-                                    success: function(data) {
+                                    success: function (data) {
                                         var item = data.createvpcofferingresponse;
 
                                         args.response.success({
@@ -3752,14 +3732,14 @@
                                         });
                                     },
 
-                                    error: function(data) {
+                                    error: function (data) {
                                         args.response.error(parseXMLHttpResponse(data));
                                     }
                                 });
                             },
 
                             notification: {
-                                poll: function(args) {
+                                poll: function (args) {
                                     args.complete({
                                         actionFilter: vpcOfferingActionfilter
                                     });
@@ -3767,7 +3747,7 @@
                             },
 
                             messages: {
-                                notification: function(args) {
+                                notification: function (args) {
                                     return 'message.added.vpc.offering';
                                 }
                             }
@@ -3781,7 +3761,7 @@
                         actions: {
                             edit: {
                                 label: 'label.edit',
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.vpcOfferings[0].id,
                                         name: args.data.name,
@@ -3792,13 +3772,13 @@
                                     $.ajax({
                                         url: createURL('updateVPCOffering'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.updatevpcofferingresponse.vpcoffering;
                                             args.response.success({
                                                 data: item
                                             });
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
@@ -3808,29 +3788,29 @@
                             enable: {
                                 label: 'label.enable.vpc.offering',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.confirm.enable.vpc.offering';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'message.enabling.vpc.offering';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL("updateVPCOffering&id=" + args.context.vpcOfferings[0].id + "&state=Enabled"),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.updatevpcofferingresponse.vpcoffering;
                                             args.response.success();
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete({
                                             data: {
                                                 state: 'Enabled'
@@ -3843,29 +3823,29 @@
                             disable: {
                                 label: 'label.disable.vpc.offering',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.confirm.disable.vpc.offering';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'message.disabling.vpc.offering';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL("updateVPCOffering&id=" + args.context.vpcOfferings[0].id + "&state=Disabled"),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.updatevpcofferingresponse.vpcoffering;
                                             args.response.success();
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete({
                                             data: {
                                                 state: 'Disabled'
@@ -3877,30 +3857,30 @@
 
                             remove: {
                                 label: 'label.remove.vpc.offering',
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL('deleteVPCOffering'),
                                         data: {
                                             id: args.context.vpcOfferings[0].id
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success();
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
                                 },
                                 messages: {
-                                    confirm: function() {
+                                    confirm: function () {
                                         return 'message.confirm.remove.vpc.offering';
                                     },
-                                    notification: function() {
+                                    notification: function () {
                                         return 'label.remove.vpc.offering';
                                     }
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete({
                                             data: {
                                                 state: 'Destroyed'
@@ -3966,22 +3946,22 @@
 
                                 }],
 
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     $.ajax({
                                         url: createURL('listVPCOfferings&id=' + args.context.vpcOfferings[0].id),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.listvpcofferingsresponse.vpcoffering[0];
                                             args.response.success({
                                                 actionFilter: vpcOfferingActionfilter,
                                                 data: $.extend(item, {
-                                                    supportedServices: $.map(item.service, function(service) {
+                                                    supportedServices: $.map(item.service, function (service) {
                                                         return service.name;
                                                     }).join(', '),
 
-                                                    serviceCapabilities: $.map(item.service, function(service) {
-                                                        return service.provider ? $.map(service.provider, function(capability) {
+                                                    serviceCapabilities: $.map(item.service, function (service) {
+                                                        return service.provider ? $.map(service.provider, function (capability) {
                                                             return service.name + ': ' + capability.name;
                                                         }).join(', ') : null;
                                                     }).join(', ')
@@ -3996,10 +3976,10 @@
                 }
             }
         }
-}
+    }
 
 
-    var serviceOfferingActionfilter = function(args) {
+    var serviceOfferingActionfilter = function (args) {
         var jsonObj = args.context.item;
         var allowedActions = [];
         allowedActions.push("edit");
@@ -4007,7 +3987,7 @@
         return allowedActions;
     };
 
-    var systemServiceOfferingActionfilter = function(args) {
+    var systemServiceOfferingActionfilter = function (args) {
         var jsonObj = args.context.item;
         var allowedActions = [];
         allowedActions.push("edit");
@@ -4015,7 +3995,7 @@
         return allowedActions;
     };
 
-    var diskOfferingActionfilter = function(args) {
+    var diskOfferingActionfilter = function (args) {
         var jsonObj = args.context.item;
         var allowedActions = [];
         allowedActions.push("edit");
@@ -4023,7 +4003,7 @@
         return allowedActions;
     };
 
-    var networkOfferingActionfilter = function(args) {
+    var networkOfferingActionfilter = function (args) {
         var jsonObj = args.context.item;
 
         if (jsonObj.state == 'Destroyed')
@@ -4043,7 +4023,7 @@
         return allowedActions;
     };
 
-    var vpcOfferingActionfilter = function(args) {
+    var vpcOfferingActionfilter = function (args) {
         var jsonObj = args.context.item;
 
         if (jsonObj.state == 'Destroyed')

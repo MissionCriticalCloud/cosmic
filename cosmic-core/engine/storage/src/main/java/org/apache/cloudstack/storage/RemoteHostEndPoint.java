@@ -1,28 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.storage;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
@@ -45,49 +21,117 @@ import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.dao.SecondaryStorageVmDao;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
 import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+
+import javax.inject.Inject;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RemoteHostEndPoint implements EndPoint {
     private static final Logger s_logger = LoggerFactory.getLogger(RemoteHostEndPoint.class);
-    private long hostId;
-    private String hostAddress;
-    private String publicAddress;
-    @Inject
-    AgentManager agentMgr;
     @Inject
     protected HypervisorGuruManager _hvGuruMgr;
     @Inject
     protected SecondaryStorageVmDao vmDao;
     @Inject
     protected HostDao _hostDao;
-    private ScheduledExecutorService executor;
+    @Inject
+    AgentManager agentMgr;
+    private long hostId;
+    private String hostAddress;
+    private String publicAddress;
+    private final ScheduledExecutorService executor;
 
     public RemoteHostEndPoint() {
         executor = Executors.newScheduledThreadPool(10, new NamedThreadFactory("RemoteHostEndPoint"));
     }
 
-    private void configure(Host host) {
+    public static RemoteHostEndPoint getHypervisorHostEndPoint(final Host host) {
+        final RemoteHostEndPoint ep = ComponentContext.inject(RemoteHostEndPoint.class);
+        ep.configure(host);
+        return ep;
+    }
+
+    private void configure(final Host host) {
         hostId = host.getId();
         hostAddress = host.getPrivateIpAddress();
         publicAddress = host.getPublicIpAddress();
         if (Host.Type.SecondaryStorageVM == host.getType()) {
-            String vmName = host.getName();
-            SecondaryStorageVmVO ssvm = vmDao.findByInstanceName(vmName);
+            final String vmName = host.getName();
+            final SecondaryStorageVmVO ssvm = vmDao.findByInstanceName(vmName);
             if (ssvm != null) {
                 publicAddress = ssvm.getPublicIpAddress();
             }
         }
     }
 
-    public static RemoteHostEndPoint getHypervisorHostEndPoint(Host host) {
-        RemoteHostEndPoint ep = ComponentContext.inject(RemoteHostEndPoint.class);
-        ep.configure(host);
-        return ep;
+    private class CmdRunner extends ManagedContextRunnable implements Listener {
+        final AsyncCompletionCallback<Answer> callback;
+        Answer answer;
+
+        public CmdRunner(final AsyncCompletionCallback<Answer> callback) {
+            this.callback = callback;
+        }
+
+        @Override
+        public boolean processAnswers(final long agentId, final long seq, final Answer[] answers) {
+            answer = answers[0];
+            executor.schedule(this, 10, TimeUnit.SECONDS);
+            return true;
+        }
+
+        @Override
+        public boolean processCommands(final long agentId, final long seq, final Command[] commands) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public AgentControlAnswer processControlCommand(final long agentId, final AgentControlCommand cmd) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void processConnect(final Host host, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public boolean processDisconnect(final long agentId, final Status state) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isRecurring() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public int getTimeout() {
+            // TODO Auto-generated method stub
+            return -1;
+        }
+
+        @Override
+        public boolean processTimeout(final long agentId, final long seq) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        protected void runInContext() {
+            callback.complete(answer);
+        }
     }
 
     @Override
@@ -106,100 +150,37 @@ public class RemoteHostEndPoint implements EndPoint {
     }
 
     // used when HypervisorGuruManager choose a different host to send command
-    private void setId(long id) {
-        HostVO host = _hostDao.findById(id);
+    private void setId(final long id) {
+        final HostVO host = _hostDao.findById(id);
         if (host != null) {
             configure(host);
         }
     }
 
     @Override
-    public Answer sendMessage(Command cmd) {
+    public Answer sendMessage(final Command cmd) {
         String errMsg = null;
         try {
-            long newHostId = _hvGuruMgr.getGuruProcessedCommandTargetHost(hostId, cmd);
+            final long newHostId = _hvGuruMgr.getGuruProcessedCommandTargetHost(hostId, cmd);
             if (newHostId != hostId) {
                 // update endpoint with new host if changed
                 setId(newHostId);
             }
             return agentMgr.send(newHostId, cmd);
-        } catch (AgentUnavailableException e) {
+        } catch (final AgentUnavailableException e) {
             errMsg = e.toString();
             s_logger.debug("Failed to send command, due to Agent:" + getId() + ", " + e.toString());
-        } catch (OperationTimedoutException e) {
+        } catch (final OperationTimedoutException e) {
             errMsg = e.toString();
             s_logger.debug("Failed to send command, due to Agent:" + getId() + ", " + e.toString());
         }
         throw new CloudRuntimeException("Failed to send command, due to Agent:" + getId() + ", " + errMsg);
     }
 
-    private class CmdRunner extends ManagedContextRunnable implements Listener {
-        final AsyncCompletionCallback<Answer> callback;
-        Answer answer;
-
-        public CmdRunner(AsyncCompletionCallback<Answer> callback) {
-            this.callback = callback;
-        }
-
-        @Override
-        public boolean processAnswers(long agentId, long seq, Answer[] answers) {
-            answer = answers[0];
-            executor.schedule(this, 10, TimeUnit.SECONDS);
-            return true;
-        }
-
-        @Override
-        public boolean processCommands(long agentId, long seq, Command[] commands) {
-            // TODO Auto-generated method stub
-            return false;
-        }
-
-        @Override
-        public AgentControlAnswer processControlCommand(long agentId, AgentControlCommand cmd) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public void processConnect(Host host, StartupCommand cmd, boolean forRebalance) throws ConnectionException {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public boolean processDisconnect(long agentId, Status state) {
-            // TODO Auto-generated method stub
-            return false;
-        }
-
-        @Override
-        public boolean isRecurring() {
-            // TODO Auto-generated method stub
-            return false;
-        }
-
-        @Override
-        public int getTimeout() {
-            // TODO Auto-generated method stub
-            return -1;
-        }
-
-        @Override
-        public boolean processTimeout(long agentId, long seq) {
-            // TODO Auto-generated method stub
-            return false;
-        }
-
-        @Override
-        protected void runInContext() {
-            callback.complete(answer);
-        }
-    }
-
     @Override
-    public void sendMessageAsync(Command cmd, AsyncCompletionCallback<Answer> callback) {
+    public void sendMessageAsync(final Command cmd, final AsyncCompletionCallback<Answer> callback) {
         try {
-            long newHostId = _hvGuruMgr.getGuruProcessedCommandTargetHost(hostId, cmd);
+            final long newHostId = _hvGuruMgr.getGuruProcessedCommandTargetHost(hostId, cmd);
             if (newHostId != hostId) {
                 // update endpoint with new host if changed
                 setId(newHostId);
@@ -208,7 +189,7 @@ public class RemoteHostEndPoint implements EndPoint {
                 s_logger.debug("Sending command " + cmd.toString() + " to host: " + newHostId);
             }
             agentMgr.send(newHostId, new Commands(cmd), new CmdRunner(callback));
-        } catch (AgentUnavailableException e) {
+        } catch (final AgentUnavailableException e) {
             throw new CloudRuntimeException("Unable to send message", e);
         }
     }

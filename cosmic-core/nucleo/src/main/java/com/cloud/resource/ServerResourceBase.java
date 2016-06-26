@@ -1,24 +1,17 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.resource;
 
+import com.cloud.agent.IAgentControl;
+import com.cloud.agent.api.Answer;
+import com.cloud.agent.api.Command;
+import com.cloud.agent.api.StartupCommand;
+import com.cloud.utils.net.NetUtils;
+import com.cloud.utils.script.Script;
+
+import javax.naming.ConfigurationException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.NetworkInterface;
@@ -30,54 +23,39 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.ConfigurationException;
-
-import com.cloud.agent.IAgentControl;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.utils.net.NetUtils;
-import com.cloud.utils.script.Script;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class ServerResourceBase implements ServerResource {
     private static final Logger s_logger = LoggerFactory.getLogger(ServerResourceBase.class);
     protected String _name;
-    private ArrayList<String> _warnings = new ArrayList<String>();
-    private ArrayList<String> _errors = new ArrayList<String>();
     protected NetworkInterface _publicNic;
     protected NetworkInterface _privateNic;
     protected NetworkInterface _storageNic;
     protected NetworkInterface _storageNic2;
     protected IAgentControl _agentControl;
+    private final ArrayList<String> _warnings = new ArrayList<>();
+    private final ArrayList<String> _errors = new ArrayList<>();
 
     @Override
     public String getName() {
         return _name;
     }
 
-    protected String findScript(String script) {
-        return Script.findScript(getDefaultScriptsDir(), script);
-    }
-
-    protected abstract String getDefaultScriptsDir();
-
     @Override
-    public boolean configure(final String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         _name = name;
 
-        String publicNic = (String)params.get("public.network.device");
+        String publicNic = (String) params.get("public.network.device");
         if (publicNic == null) {
             publicNic = "xenbr1";
         }
-        String privateNic = (String)params.get("private.network.device");
+        String privateNic = (String) params.get("private.network.device");
         if (privateNic == null) {
             privateNic = "xenbr0";
         }
-        final String storageNic = (String)params.get("storage.network.device");
-        final String storageNic2 = (String)params.get("storage.network.device.2");
+        final String storageNic = (String) params.get("storage.network.device");
+        final String storageNic2 = (String) params.get("storage.network.device.2");
 
         _privateNic = getNetworkInterface(privateNic);
         _publicNic = getNetworkInterface(publicNic);
@@ -102,9 +80,9 @@ public abstract class ServerResourceBase implements ServerResource {
                 final String nicName = nic.getName();
                 //  try {
                 if (//!nic.isLoopback() &&
-                        //nic.isUp() &&
+                    //nic.isUp() &&
                         !nic.isVirtual() && !nicName.startsWith("vnif") && !nicName.startsWith("vnbr") && !nicName.startsWith("peth") && !nicName.startsWith("vif") &&
-                        !nicName.startsWith("virbr") && !nicName.contains(":")) {
+                                !nicName.startsWith("virbr") && !nicName.contains(":")) {
                     final String[] info = NetUtils.getNicParams(nicName);
                     if (info != null && info[0] != null) {
                         _privateNic = nic;
@@ -122,7 +100,7 @@ public abstract class ServerResourceBase implements ServerResource {
                 throw new ConfigurationException("Private NIC is not configured");
             }
         }
-        String infos[] = NetUtils.getNetworkParams(_privateNic);
+        final String[] infos = NetUtils.getNetworkParams(_privateNic);
         if (infos == null) {
             s_logger.warn("Incorrect details for private Nic during initialization of ServerResourceBase");
             return false;
@@ -145,7 +123,7 @@ public abstract class ServerResourceBase implements ServerResource {
 
         nicName = nicName.trim();
 
-        NetworkInterface nic;
+        final NetworkInterface nic;
         try {
             nic = NetworkInterface.getByName(nicName);
             if (nic == null) {
@@ -159,6 +137,22 @@ public abstract class ServerResourceBase implements ServerResource {
             return null;
         }
     }
+
+    @Override
+    public boolean start() {
+        return true;
+    }
+
+    @Override
+    public boolean stop() {
+        return true;
+    }
+
+    protected String findScript(final String script) {
+        return Script.findScript(getDefaultScriptsDir(), script);
+    }
+
+    protected abstract String getDefaultScriptsDir();
 
     protected void fillNetworkInformation(final StartupCommand cmd) {
         String[] info = null;
@@ -226,8 +220,12 @@ public abstract class ServerResourceBase implements ServerResource {
     }
 
     @Override
-    public void setAgentControl(IAgentControl agentControl) {
+    public void setAgentControl(final IAgentControl agentControl) {
         _agentControl = agentControl;
+    }
+
+    protected void recordWarning(final String msg) {
+        recordWarning(msg, null);
     }
 
     protected void recordWarning(final String msg, final Throwable th) {
@@ -237,13 +235,19 @@ public abstract class ServerResourceBase implements ServerResource {
         }
     }
 
-    protected void recordWarning(final String msg) {
-        recordWarning(msg, null);
+    protected String getLogStr(final String msg, final Throwable th) {
+        final StringWriter writer = new StringWriter();
+        writer.append(new Date().toString()).append(": ").append(msg);
+        if (th != null) {
+            writer.append("\n  Exception: ");
+            th.printStackTrace(new PrintWriter(writer));
+        }
+        return writer.toString();
     }
 
     protected List<String> getWarnings() {
         synchronized (_warnings) {
-            final List<String> results = new LinkedList<String>(_warnings);
+            final List<String> results = new LinkedList<>(_warnings);
             _warnings.clear();
             return results;
         }
@@ -251,10 +255,14 @@ public abstract class ServerResourceBase implements ServerResource {
 
     protected List<String> getErrors() {
         synchronized (_errors) {
-            final List<String> result = new LinkedList<String>(_errors);
+            final List<String> result = new LinkedList<>(_errors);
             _errors.clear();
             return result;
         }
+    }
+
+    protected void recordError(final String msg) {
+        recordError(msg, null);
     }
 
     protected void recordError(final String msg, final Throwable th) {
@@ -262,10 +270,6 @@ public abstract class ServerResourceBase implements ServerResource {
         synchronized (_errors) {
             _errors.add(str);
         }
-    }
-
-    protected void recordError(final String msg) {
-        recordError(msg, null);
     }
 
     protected Answer createErrorAnswer(final Command cmd, final String msg, final Throwable th) {
@@ -286,25 +290,5 @@ public abstract class ServerResourceBase implements ServerResource {
         writer.append("===>Stack<===");
         th.printStackTrace(new PrintWriter(writer));
         return writer.toString();
-    }
-
-    protected String getLogStr(final String msg, final Throwable th) {
-        final StringWriter writer = new StringWriter();
-        writer.append(new Date().toString()).append(": ").append(msg);
-        if (th != null) {
-            writer.append("\n  Exception: ");
-            th.printStackTrace(new PrintWriter(writer));
-        }
-        return writer.toString();
-    }
-
-    @Override
-    public boolean start() {
-        return true;
-    }
-
-    @Override
-    public boolean stop() {
-        return true;
     }
 }

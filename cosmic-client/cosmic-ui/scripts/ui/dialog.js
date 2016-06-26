@@ -1,28 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function($, cloudStack, _l) {
+(function ($, cloudStack, _l) {
     cloudStack.dialog = {
         /**
          * Error message form
          *
          * Returns callback, that can be plugged into a standard data provider response
          */
-        error: function(callback) {
-            return function(args) {
+        error: function (callback) {
+            return function (args) {
                 var message = args.message ? args.message : args;
                 if (message) cloudStack.dialog.notice({
                     message: message
@@ -35,15 +19,15 @@
         /**
          * Dialog with form
          */
-        createForm: function(args) {
+        createForm: function (args) {
             var cancel = args.cancel;
             var $formContainer = $('<div>').addClass('form-container');
             var $form = $('<form>').appendTo($formContainer)
-                    .submit(function() {
-                        $(this).closest('.ui-dialog').find('button.ok').click();
+                .submit(function () {
+                    $(this).closest('.ui-dialog').find('button.ok').click();
 
-                        return false;
-                    });
+                    return false;
+                });
             var createLabel = _l(args.form.createLabel);
 
             // Description text
@@ -66,7 +50,7 @@
                 .appendTo($form);
 
             // Render fields and events
-            var fields = $.map(args.form.fields, function(value, key) {
+            var fields = $.map(args.form.fields, function (value, key) {
                 return key;
             });
 
@@ -75,7 +59,7 @@
                 fields: args.form.fields
             });
 
-            var ret = function() {
+            var ret = function () {
                 $('.overlay').remove();
 
                 return $formContainer.dialog({
@@ -84,7 +68,7 @@
                     draggable: false,
                     width: 400,
                     title: _l(args.form.title),
-                    open: function() {
+                    open: function () {
                         if (args.form.preFilter) {
                             args.form.preFilter({
                                 $form: $form,
@@ -93,13 +77,13 @@
                         }
 
                         $(window).trigger('cloudStack.createForm.open', {
-                          $form: $form
+                            $form: $form
                         });
                     },
                     buttons: [{
                         text: createLabel ? createLabel : _l('label.ok'),
                         'class': 'ok',
-                        click: function() {
+                        click: function () {
                             if (!complete($formContainer)) {
                                 return false;
                             }
@@ -116,7 +100,7 @@
                     }, {
                         text: _l('label.cancel'),
                         'class': 'cancel',
-                        click: function() {
+                        click: function () {
                             $('div.overlay').remove();
                             $('.tooltip-box').remove();
                             $formContainer.remove();
@@ -132,7 +116,7 @@
                 }).closest('.ui-dialog').overlay();
             };
 
-            var isLastAsync = function(idx) {
+            var isLastAsync = function (idx) {
                 for (var i = idx + 1; i < $(fields).length; i++) {
                     var f = args.form.fields[$(fields).get(i)];
                     if (f.select || f.dynamic) {
@@ -145,15 +129,15 @@
             var isAsync = false;
             var isNoDialog = args.noDialog ? args.noDialog : false;
 
-            $(fields).each(function(idx, element) {
+            $(fields).each(function (idx, element) {
                 var key = this;
                 var field = args.form.fields[key];
 
                 var $formItem = $('<div>')
-                        .addClass('form-item')
-                        .attr({
-                            rel: key
-                        });
+                    .addClass('form-item')
+                    .attr({
+                        rel: key
+                    });
 
                 if (field.isHidden != null) {
                     if (typeof(field.isHidden) == 'boolean' && field.isHidden == true)
@@ -187,10 +171,10 @@
                 // Label field
 
                 var $name = $('<div>').addClass('name')
-                        .appendTo($formItem)
-                        .append(
-                            $('<label>').html(_l(field.label) + ':')
-                        );
+                    .appendTo($formItem)
+                    .append(
+                        $('<label>').html(_l(field.label) + ':')
+                    );
 
                 // red asterisk
                 var $asterisk = $('<span>').addClass('field-required').html('*');
@@ -210,17 +194,17 @@
 
                 // Input area
                 var $value = $('<div>').addClass('value')
-                        .appendTo($formItem);
+                    .appendTo($formItem);
                 var $input, $dependsOn, selectFn, selectArgs;
                 var dependsOn = field.dependsOn;
 
                 // Depends on fields
                 if (field.dependsOn) {
                     $formItem.attr('depends-on', dependsOn);
-                    $dependsOn = $form.find('input, select').filter(function() {
+                    $dependsOn = $form.find('input, select').filter(function () {
                         return $.isArray(dependsOn) ?
-                            $.inArray($(this).attr('name'), dependsOn) > -1 :
-                            $(this).attr('name') === dependsOn;
+                        $.inArray($(this).attr('name'), dependsOn) > -1 :
+                        $(this).attr('name') === dependsOn;
                     });
 
                     if ($dependsOn.is('[type=checkbox]')) {
@@ -232,7 +216,7 @@
                         }
 
                         // Checkbox
-                        $dependsOn.bind('click', function(event) {
+                        $dependsOn.bind('click', function (event) {
                             var $target = $(this);
                             var $dependent = $target.closest('form').find('[depends-on=\'' + dependsOn + '\']');
 
@@ -242,13 +226,13 @@
                                 $dependent.css('display', 'inline-block'); //show dependent dropdown field
                                 $dependent.change(); //trigger event handler for default option in dependent dropdown field (CLOUDSTACK-7826)
 
-                                $dependent.each(function() {
+                                $dependent.each(function () {
                                     if ($(this).data('dialog-select-fn')) {
                                         $(this).data('dialog-select-fn')();
                                     }
                                 });
                             } else if (($target.is(':unchecked') && !isReverse) ||
-                                       ($target.is(':checked') && isReverse)) {
+                                ($target.is(':checked') && isReverse)) {
                                 $dependent.hide();
                             }
 
@@ -280,31 +264,31 @@
                     selectArgs = {
                         context: args.context,
                         response: {
-                            success: function(args) {
+                            success: function (args) {
                                 if (args.data == undefined || args.data.length == 0) {
                                     var $option = $('<option>')
-                                    .appendTo($input)
-                                    .html("");
+                                        .appendTo($input)
+                                        .html("");
                                 } else {
-                                $(args.data).each(function() {
-                                    var id;
-                                    if (field.valueField)
-                                        id = this[field.valueField];
-                                    else
-                                        id = this.id !== undefined ? this.id : this.name;
+                                    $(args.data).each(function () {
+                                        var id;
+                                        if (field.valueField)
+                                            id = this[field.valueField];
+                                        else
+                                            id = this.id !== undefined ? this.id : this.name;
 
-                                    var desc;
-                                    if (args.descriptionField)
-                                        desc = this[args.descriptionField];
-                                    else
-                                        desc = _l(this.description);
+                                        var desc;
+                                        if (args.descriptionField)
+                                            desc = this[args.descriptionField];
+                                        else
+                                            desc = _l(this.description);
 
-                                    var $option = $('<option>')
+                                        var $option = $('<option>')
                                             .appendTo($input)
                                             .val(_s(id))
                                             .data('json-obj', this)
                                             .html(_s(desc));
-                                });
+                                    });
                                 }
 
                                 if (field.defaultValue) {
@@ -325,7 +309,7 @@
                         .attr({
                             name: key
                         })
-                        .data('dialog-select-fn', function(args) {
+                        .data('dialog-select-fn', function (args) {
                             selectFn(args ? $.extend(true, {}, selectArgs, args) : selectArgs);
                         })
                         .appendTo($value);
@@ -338,24 +322,26 @@
                     });
 
                     if (dependsOn) {
-                        $dependsOn = $input.closest('form').find('input, select').filter(function() {
+                        $dependsOn = $input.closest('form').find('input, select').filter(function () {
                             return $.isArray(dependsOn) ?
-                                $.inArray($(this).attr('name'), dependsOn) > -1 :
-                                $(this).attr('name') === dependsOn;
+                            $.inArray($(this).attr('name'), dependsOn) > -1 :
+                            $(this).attr('name') === dependsOn;
                         });
 
                         // Reload selects linked to in dependsOn
-                        $dependsOn.each(function() {
+                        $dependsOn.each(function () {
                             var $targetDependsOn = $(this);
 
-                            $targetDependsOn.bind('change', function(event) {
+                            $targetDependsOn.bind('change', function (event) {
                                 var formData = cloudStack.serializeForm($form);
                                 var dependsOnLoaded;
 
                                 // Make sure all data is loaded to pass to select fn
                                 dependsOnLoaded = $.inArray(
-                                    true, $dependsOn.map(function(index, item) { return $(item).find('option').size() ? true : false; })
-                                ) > -1;
+                                        true, $dependsOn.map(function (index, item) {
+                                            return $(item).find('option').size() ? true : false;
+                                        })
+                                    ) > -1;
 
                                 if (!dependsOnLoaded) {
                                     return false;
@@ -388,7 +374,7 @@
                         $input = $('<div>')
                             .addClass('multi-array').addClass(key).appendTo($value);
 
-                        $.each(field.multiArray, function(itemKey, itemValue) {
+                        $.each(field.multiArray, function (itemKey, itemValue) {
                             $input.append(
                                 $('<div>').addClass('item')
                                     .append(
@@ -420,7 +406,7 @@
                             $input.attr('checked', strOrFunc(field.isChecked, args));
                         } else {
                             // This is mainly for IE compatibility
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 $input.attr('checked', false);
                             }, 100);
                         }
@@ -428,7 +414,7 @@
 
                     // Setup on click event
                     if (field.onChange) {
-                        $input.click(function() {
+                        $input.click(function () {
                             field.onChange({
                                 $checkbox: $input
                             });
@@ -443,7 +429,7 @@
                     field.dynamic({
                         context: args.context,
                         response: {
-                            success: function(args) {
+                            success: function (args) {
                                 var form = cloudStack.dialog.createForm({
                                     noDialog: true,
                                     form: {
@@ -481,7 +467,7 @@
                     }).appendTo($value);
 
                     // Add events
-                    $input.change(function(event) {
+                    $input.change(function (event) {
                         $form.data('files', event.target.files);
                     });
                 } else if (field.isTokenInput) { // jquery.tokeninput.js
@@ -490,14 +476,14 @@
                     selectArgs = {
                         context: args.context,
                         response: {
-                            success: function(args) {
+                            success: function (args) {
                                 $input.tokenInput(unique_tags(args.data),
-                                {
-                                    theme: "facebook",
-                                    preventDuplicates: true,
-                                    hintText: args.hintText,
-                                    noResultsText: args.noResultsText
-                                });
+                                    {
+                                        theme: "facebook",
+                                        preventDuplicates: true,
+                                        hintText: args.hintText,
+                                        noResultsText: args.noResultsText
+                                    });
                             }
                         }
                     };
@@ -527,9 +513,9 @@
                     }
                     $input.addClass("disallowSpecialCharacters");
                     $input.datepicker({
-			dateFormat: 'yy-mm-dd',
-			maxDate: field.maxDate,
-			minDate: field.minDate
+                        dateFormat: 'yy-mm-dd',
+                        maxDate: field.maxDate,
+                        minDate: field.minDate
                     });
 
                 } else if (field.range) { //2 text fields on the same line (e.g. port range: startPort - endPort)
@@ -560,7 +546,7 @@
                         .css('width', 'auto');
                     var unitSelect = $('<select>')
                         .attr({
-                            name: key+'_unit'
+                            name: key + '_unit'
                         })
                         .data('key', key)
                         .css('width', 'auto');
@@ -570,43 +556,43 @@
                     textbox.appendTo($value);
                     unitSelect.appendTo($value);
 
-                    $.each(field.units, function() {
+                    $.each(field.units, function () {
                         var id = this.id;
                         var text = this.text;
                         var toBase = this.toBase;
                         var fromBase = this.fromBase;
 
                         var option = $('<option>')
-                                .appendTo(unitSelect)
-                                .val(_s(id))
-                                .html(_s(text))
-                                .data('toBase', toBase)
-                                .data('fromBase', fromBase);
+                            .appendTo(unitSelect)
+                            .val(_s(id))
+                            .html(_s(text))
+                            .data('toBase', toBase)
+                            .data('fromBase', fromBase);
                     });
 
-                    unitSelect.focus(function() {
+                    unitSelect.focus(function () {
                         this.oldUnit = this.value;
                     });
 
-                    unitSelect.change(function() {
+                    unitSelect.change(function () {
                         if ($(this).parent().length == 0)
                             return;
 
                         var oldUnit = this.oldUnit;
                         var newUnit = this.value;
                         var key = $(this).data('key');
-                        var value = $(this).closest('form').find('input[name='+key+']').attr('value');
+                        var value = $(this).closest('form').find('input[name=' + key + ']').attr('value');
 
                         if (!value || value.length === 0 || !oldUnit || oldUnit == newUnit)
                             return;
 
-                        var toBase = $(this).closest('form').find('option[value='+oldUnit+']').data('toBase');
-                        var fromBase = $(this).closest('form').find('option[value='+newUnit+']').data('fromBase');
+                        var toBase = $(this).closest('form').find('option[value=' + oldUnit + ']').data('toBase');
+                        var fromBase = $(this).closest('form').find('option[value=' + newUnit + ']').data('fromBase');
 
                         var baseValue = toBase(value);
                         var newValue = fromBase(baseValue);
 
-                        $(this).closest('form').find('input[name='+key+']').attr('value', newValue);
+                        $(this).closest('form').find('input[name=' + key + ']').attr('value', newValue);
 
                         this.oldUnit = newUnit;
                     })
@@ -657,14 +643,15 @@
             });
 
 
-            var getFormValues = function() {
+            var getFormValues = function () {
                 var formValues = {};
-                $.each(args.form.fields, function(key) {});
+                $.each(args.form.fields, function (key) {
+                });
             };
 
             // Setup form validation
             $formContainer.find('form').validate();
-            $formContainer.find('input, select').each(function() {
+            $formContainer.find('input, select').each(function () {
                 if ($(this).data('validation-rules')) {
                     $(this).rules('add', $(this).data('validation-rules'));
                 } else {
@@ -674,7 +661,7 @@
             $form.find('select').trigger('change');
 
 
-            var complete = function($formContainer) {
+            var complete = function ($formContainer) {
                 var $form = $formContainer.find('form');
                 var data = cloudStack.serializeForm($form);
 
@@ -685,21 +672,21 @@
                     }
                 }
 
-                var uploadFiles = function() {
+                var uploadFiles = function () {
                     $form.prepend($('<div>').addClass('loading-overlay'));
                     args.form.fileUpload.getURL({
                         $form: $form,
                         formData: data,
                         context: args.context,
                         response: {
-                            success: function(successArgs) {
+                            success: function (successArgs) {
                                 var $file = $form.find('input[type=file]');
                                 var postUploadArgs = {
                                     $form: $form,
                                     data: data,
                                     context: args.context,
                                     response: {
-                                        success: function() {
+                                        success: function () {
                                             args.after({
                                                 data: data,
                                                 ref: args.ref, // For backwards compatibility; use context
@@ -717,38 +704,38 @@
 
                                             $('.hovered-elem').hide();
                                         },
-                                        error: function(msg) {
+                                        error: function (msg) {
                                             $('div.overlay').remove();
                                             $form.find('.loading-overlay').remove();
                                             $('div.loading-overlay').remove();
 
-                                            cloudStack.dialog.error({ message: msg });
+                                            cloudStack.dialog.error({message: msg});
                                         }
                                     }
                                 };
                                 var postUploadArgsWithStatus = $.extend(true, {}, postUploadArgs);
 
-                                if(successArgs.ajaxPost) {
+                                if (successArgs.ajaxPost) {
                                     var request = new FormData();
                                     request.append('file', $file.prop("files")[0]);
                                     $.ajax({
-                                            type: 'POST',
-                                            url: successArgs.url,
-                                            data: request,
-                                            dataType : 'html',
-                                            processData: false,
-                                            contentType: false,
-                                            headers: successArgs.data,
-                                            success: function(r) {
-                                                postUploadArgsWithStatus.error = false;
-                                                args.form.fileUpload.postUpload(postUploadArgsWithStatus);
-                                            },
-                                            error: function(r) {
-                                                postUploadArgsWithStatus.error = true;
-                                                postUploadArgsWithStatus.errorMsg = r.responseText;
-                                                args.form.fileUpload.postUpload(postUploadArgsWithStatus);
-                                            }
-                                        });
+                                        type: 'POST',
+                                        url: successArgs.url,
+                                        data: request,
+                                        dataType: 'html',
+                                        processData: false,
+                                        contentType: false,
+                                        headers: successArgs.data,
+                                        success: function (r) {
+                                            postUploadArgsWithStatus.error = false;
+                                            args.form.fileUpload.postUpload(postUploadArgsWithStatus);
+                                        },
+                                        error: function (r) {
+                                            postUploadArgsWithStatus.error = true;
+                                            postUploadArgsWithStatus.errorMsg = r.responseText;
+                                            args.form.fileUpload.postUpload(postUploadArgsWithStatus);
+                                        }
+                                    });
                                 } else {
                                     //
                                     // Move file field into iframe; keep visible for consistency
@@ -762,7 +749,7 @@
                                     var $field = $file.closest('.form-item .value');
 
                                     // Add additional passed data
-                                    $.map(successArgs.data, function(v, k) {
+                                    $.map(successArgs.data, function (v, k) {
                                         var $hidden = $('<input>').attr({
                                             type: 'hidden',
                                             name: k,
@@ -776,13 +763,13 @@
                                     console.log("The following object is a hidden HTML form that will submit local file with hidden field signature/expires/metadata:");
                                     console.log($frameForm);
 
-                                    $uploadFrame.css({ width: $field.outerWidth(), height: $field.height() }).show();
+                                    $uploadFrame.css({width: $field.outerWidth(), height: $field.height()}).show();
                                     $frameForm.append($file);
                                     $field.append($uploadFrame);
                                     $uploadFrame.contents().find('html body').append($frameForm);
-                                    $frameForm.submit(function() {
+                                    $frameForm.submit(function () {
                                         console.log("callback() in $frameForm.submit(callback(){}) is triggered");
-                                        $uploadFrame.load(function() {
+                                        $uploadFrame.load(function () {
                                             console.log("callback() in $uploadFrame.load(callback(){}) is triggered");
                                             args.form.fileUpload.postUpload(postUploadArgs);
                                         });
@@ -791,8 +778,8 @@
                                     $frameForm.submit();
                                 }
                             },
-                            error: function(msg) {
-                                cloudStack.dialog.error({ message: msg });
+                            error: function (msg) {
+                                cloudStack.dialog.error({message: msg});
                             }
                         }
                     });
@@ -825,7 +812,7 @@
         },
 
         // Dialog with list view selector
-        listView: function(args) {
+        listView: function (args) {
             var listView = args.listView;
             var after = args.after;
             var context = args.context;
@@ -836,7 +823,7 @@
                     label: _l('label.select.instance'),
                     type: listView.type,
                     action: {
-                        uiCustom: function(args) {
+                        uiCustom: function (args) {
                             var $item = args.$item;
                             var $input = $item.find('td.actions input:visible');
 
@@ -871,10 +858,10 @@
                 buttons: [{
                     text: _l('label.apply'),
                     'class': 'ok',
-                    click: function() {
+                    click: function () {
                         if (!$listView.find(
-                            'input[type=radio]:checked, input[type=checkbox]:checked'
-                        ).size()) {
+                                'input[type=radio]:checked, input[type=checkbox]:checked'
+                            ).size()) {
                             cloudStack.dialog.notice({
                                 message: _l('message.select.instance')
                             });
@@ -884,7 +871,7 @@
 
                         after({
                             context: $.extend(true, {}, context, {
-                                instances: $listView.find('tr.multi-edit-selected').map(function(index, row) {
+                                instances: $listView.find('tr.multi-edit-selected').map(function (index, row) {
                                     var $row = $(row);
 
                                     return $row.data('json-obj');
@@ -899,11 +886,11 @@
                 }, {
                     text: _l('label.cancel'),
                     'class': 'cancel',
-                    click: function() {
-                        $listView.fadeOut(function() {
+                    click: function () {
+                        $listView.fadeOut(function () {
                             $listView.remove();
                         });
-                        $('div.overlay').fadeOut(function() {
+                        $('div.overlay').fadeOut(function () {
                             $('div.overlay').remove();
                         });
                     }
@@ -917,7 +904,7 @@
         createFormField: {
             validation: {
                 required: {
-                    add: function($formField) {
+                    add: function ($formField) {
                         var $input = $formField.find('input, select');
                         var validationRules = $input.data('validation-rules');
 
@@ -933,7 +920,7 @@
                             });
                         }
                     },
-                    remove: function($formField) {
+                    remove: function ($formField) {
                         var $input = $formField.find('input, select');
                         var validationRules = $input.data('validation-rules');
 
@@ -953,20 +940,20 @@
         /**
          * Confirmation dialog
          */
-        confirm: function(args) {
+        confirm: function (args) {
             return $(
                 $('<span>').addClass('message').html(
                     _l(args.message)
                 )
             ).dialog({
                 title: args.isWarning ? _l('label.warning') : _l('label.confirmation'),
-                dialogClass: args.isWarning ? 'confirm warning': 'confirm',
+                dialogClass: args.isWarning ? 'confirm warning' : 'confirm',
                 closeOnEscape: false,
                 zIndex: 5000,
                 buttons: [{
                     text: _l('label.no'),
                     'class': 'cancel',
-                    click: function() {
+                    click: function () {
                         $(this).dialog('destroy');
                         $('div.overlay').remove();
                         if (args.cancelAction) {
@@ -977,7 +964,7 @@
                 }, {
                     text: _l('label.yes'),
                     'class': 'ok',
-                    click: function() {
+                    click: function () {
                         args.action();
                         $(this).dialog('destroy');
                         $('div.overlay').remove();
@@ -990,7 +977,7 @@
         /**
          * Notice dialog
          */
-        notice: function(args) {
+        notice: function (args) {
             if (args.message) {
                 return $(
                     $('<span>').addClass('message').html(
@@ -1004,7 +991,7 @@
                     buttons: [{
                         text: _l('label.close'),
                         'class': 'close',
-                        click: function() {
+                        click: function () {
                             $(this).dialog('destroy');
                             if (args.clickAction) args.clickAction();
                             $('.hovered-elem').hide();

@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.storage.image;
 
 import com.cloud.agent.api.Answer;
@@ -28,9 +10,13 @@ import com.cloud.dc.dao.ClusterDao;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.storage.*;
+import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.Storage.TemplateType;
+import com.cloud.storage.StoragePool;
+import com.cloud.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.storage.VMTemplateVO;
+import com.cloud.storage.VMTemplateZoneVO;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VMTemplatePoolDao;
 import com.cloud.storage.dao.VMTemplateZoneDao;
@@ -46,9 +32,24 @@ import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.utils.fsm.StateMachine2;
-import org.apache.cloudstack.engine.subsystem.api.storage.*;
+import org.apache.cloudstack.engine.subsystem.api.storage.CopyCommandResult;
+import org.apache.cloudstack.engine.subsystem.api.storage.CreateCmdResult;
+import org.apache.cloudstack.engine.subsystem.api.storage.DataMotionService;
+import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
+import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
+import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
+import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
+import org.apache.cloudstack.engine.subsystem.api.storage.EndPointSelector;
+import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
+import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotInfo;
+import org.apache.cloudstack.engine.subsystem.api.storage.StorageCacheManager;
+import org.apache.cloudstack.engine.subsystem.api.storage.TemplateDataFactory;
+import org.apache.cloudstack.engine.subsystem.api.storage.TemplateInfo;
+import org.apache.cloudstack.engine.subsystem.api.storage.TemplateService;
+import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
+import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
 import org.apache.cloudstack.framework.async.AsyncCallFuture;
 import org.apache.cloudstack.framework.async.AsyncCallbackDispatcher;
 import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
@@ -63,12 +64,18 @@ import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreEntity;
 import org.apache.cloudstack.storage.image.store.TemplateObject;
 import org.apache.cloudstack.storage.to.TemplateObjectTO;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import javax.inject.Inject;
-import java.util.*;
 
 @Component
 public class TemplateServiceImpl implements TemplateService {
@@ -128,7 +135,6 @@ public class TemplateServiceImpl implements TemplateService {
         public AsyncCallFuture<TemplateApiResult> getFuture() {
             return future;
         }
-
     }
 
     @Override
@@ -264,10 +270,12 @@ public class TemplateServiceImpl implements TemplateService {
                     List<VMTemplateVO> allTemplates = null;
                     if (zoneId == null) {
                         // region wide store
-                        allTemplates = _templateDao.listByState(VirtualMachineTemplate.State.Active, VirtualMachineTemplate.State.NotUploaded, VirtualMachineTemplate.State.UploadInProgress);
+                        allTemplates = _templateDao.listByState(VirtualMachineTemplate.State.Active, VirtualMachineTemplate.State.NotUploaded, VirtualMachineTemplate.State
+                                .UploadInProgress);
                     } else {
                         // zone wide store
-                        allTemplates = _templateDao.listInZoneByState(zoneId, VirtualMachineTemplate.State.Active, VirtualMachineTemplate.State.NotUploaded, VirtualMachineTemplate.State.UploadInProgress);
+                        allTemplates = _templateDao.listInZoneByState(zoneId, VirtualMachineTemplate.State.Active, VirtualMachineTemplate.State.NotUploaded,
+                                VirtualMachineTemplate.State.UploadInProgress);
                     }
                     final List<VMTemplateVO> rtngTmplts = _templateDao.listAllSystemVMTemplates();
                     final List<VMTemplateVO> defaultBuiltin = _templateDao.listDefaultBuiltinTemplates();
@@ -290,7 +298,8 @@ public class TemplateServiceImpl implements TemplateService {
 
                     toBeDownloaded.addAll(allTemplates);
 
-                    final StateMachine2<VirtualMachineTemplate.State, VirtualMachineTemplate.Event, VirtualMachineTemplate> stateMachine = VirtualMachineTemplate.State.getStateMachine();
+                    final StateMachine2<VirtualMachineTemplate.State, VirtualMachineTemplate.Event, VirtualMachineTemplate> stateMachine = VirtualMachineTemplate.State
+                            .getStateMachine();
                     for (final VMTemplateVO tmplt : allTemplates) {
                         final String uniqueName = tmplt.getUniqueName();
                         TemplateDataStoreVO tmpltStore = _vmTemplateStoreDao.findByStoreTemplate(storeId, tmplt.getId());
@@ -309,7 +318,8 @@ public class TemplateServiceImpl implements TemplateService {
                                     s_logger.info(msg);
                                     _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_UPLOAD_FAILED, zoneId, null, msg, msg);
                                     if (tmplt.getState() == VirtualMachineTemplate.State.NotUploaded || tmplt.getState() == VirtualMachineTemplate.State.UploadInProgress) {
-                                        s_logger.info("Template Sync found " + uniqueName + " on image store " + storeId + " uploaded using SSVM as corrupted, marking it as failed");
+                                        s_logger.info("Template Sync found " + uniqueName + " on image store " + storeId + " uploaded using SSVM as corrupted, marking it as " +
+                                                "failed");
                                         tmpltStore.setState(State.Failed);
                                         try {
                                             stateMachine.transitTo(tmplt, VirtualMachineTemplate.Event.OperationFailed, null, _templateDao);
@@ -317,7 +327,8 @@ public class TemplateServiceImpl implements TemplateService {
                                             s_logger.error("Unexpected state transition exception for template " + tmplt.getName() + ". Details: " + e.getMessage());
                                         }
                                     } else if (tmplt.getUrl() == null) {
-                                        msg = "Private template (" + tmplt + ") with install path " + tmpltInfo.getInstallPath() + " is corrupted, please check in image store: " + tmpltStore.getDataStoreId();
+                                        msg = "Private template (" + tmplt + ") with install path " + tmpltInfo.getInstallPath() + " is corrupted, please check in image store: "
+                                                + tmpltStore.getDataStoreId();
                                         s_logger.warn(msg);
                                     } else {
                                         s_logger.info("Removing template_store_ref entry for corrupted template " + tmplt.getName());
@@ -364,7 +375,8 @@ public class TemplateServiceImpl implements TemplateService {
                                 }
                                 _vmTemplateStoreDao.update(tmpltStore.getId(), tmpltStore);
                             } else {
-                                tmpltStore = new TemplateDataStoreVO(storeId, tmplt.getId(), new Date(), 100, Status.DOWNLOADED, null, null, null, tmpltInfo.getInstallPath(), tmplt.getUrl());
+                                tmpltStore = new TemplateDataStoreVO(storeId, tmplt.getId(), new Date(), 100, Status.DOWNLOADED, null, null, null, tmpltInfo.getInstallPath(),
+                                        tmplt.getUrl());
                                 tmpltStore.setSize(tmpltInfo.getSize());
                                 tmpltStore.setPhysicalSize(tmpltInfo.getPhysicalSize());
                                 tmpltStore.setDataStoreRole(store.getRole());
@@ -470,12 +482,10 @@ public class TemplateServiceImpl implements TemplateService {
                             }
                             if (answer == null || !answer.getResult()) {
                                 s_logger.info("Failed to deleted template at store: " + store.getName());
-
                             } else {
                                 final String description = "Deleted template " + tInfo.getTemplateName() + " on secondary storage " + storeId;
                                 s_logger.info(description);
                             }
-
                         }
                     }
                 } finally {
@@ -487,7 +497,6 @@ public class TemplateServiceImpl implements TemplateService {
         } finally {
             syncLock.releaseRef();
         }
-
     }
 
     // persist entry in template_zone_ref table. zoneId can be empty for

@@ -1,25 +1,10 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-import CsHelper
 import logging
+from cs.CsFile import CsFile
 from netaddr import *
+
+import CsHelper
 from CsGuestNetwork import CsGuestNetwork
 from cs.CsDatabag import CsDataBag
-from cs.CsFile import CsFile
 
 LEASES = "/var/lib/misc/dnsmasq.leases"
 DHCP_HOSTS = "/etc/dhcphosts.txt"
@@ -30,7 +15,7 @@ class CsDhcp(CsDataBag):
     """ Manage dhcp entries """
 
     def process(self):
-        self.hosts = {}
+        self.hosts = { }
         self.changed = []
         self.devinfo = CsHelper.get_device_info()
         self.preseed()
@@ -44,7 +29,7 @@ class CsDhcp(CsDataBag):
                 continue
             self.add(self.dbag[item])
         self.write_hosts()
-        
+
         if self.cloud.is_changed():
             self.delete_leases()
 
@@ -106,7 +91,7 @@ class CsDhcp(CsDataBag):
 
     def preseed(self):
         self.add_host("127.0.0.1", "localhost")
-        self.add_host("::1",     "localhost ip6-localhost ip6-loopback")
+        self.add_host("::1", "localhost ip6-localhost ip6-loopback")
         self.add_host("ff02::1", "ip6-allnodes")
         self.add_host("ff02::2", "ip6-allrouters")
         if self.config.is_vpc():

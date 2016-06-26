@@ -1,24 +1,9 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.storage.volume.db;
 
-import java.util.Date;
+import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.utils.db.GenericDaoBase;
+import com.cloud.utils.fsm.StateObject;
+import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,23 +15,16 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
-import com.cloud.utils.db.GenericDaoBase;
-import com.cloud.utils.fsm.StateObject;
-
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
+import java.util.Date;
 
 @Entity
 @Table(name = "template_spool_ref")
 public class TemplatePrimaryDataStoreVO implements StateObject<ObjectInDataStoreStateMachine.State> {
+    @Column(name = "update_count", updatable = true, nullable = false)
+    protected long updatedCount;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
-
-    @Column(name = "pool_id")
-    private long poolId;
-
     @Column(name = "template_id")
     long templateId;
 
@@ -85,83 +63,10 @@ public class TemplatePrimaryDataStoreVO implements StateObject<ObjectInDataStore
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     ObjectInDataStoreStateMachine.State state;
+    @Column(name = "pool_id")
+    private long poolId;
 
-    @Column(name = "update_count", updatable = true, nullable = false)
-    protected long updatedCount;
-
-    public long getUpdatedCount() {
-        return this.updatedCount;
-    }
-
-    public void incrUpdatedCount() {
-        this.updatedCount++;
-    }
-
-    public void decrUpdatedCount() {
-        this.updatedCount--;
-    }
-
-    public String getInstallPath() {
-        return installPath;
-    }
-
-    public long getTemplateSize() {
-        return templateSize;
-    }
-
-    public long getPoolId() {
-        return poolId;
-    }
-
-    public void setpoolId(long poolId) {
-        this.poolId = poolId;
-    }
-
-    public long getTemplateId() {
-        return templateId;
-    }
-
-    public void setTemplateId(long templateId) {
-        this.templateId = templateId;
-    }
-
-    public int getDownloadPercent() {
-        return downloadPercent;
-    }
-
-    public void setDownloadPercent(int downloadPercent) {
-        this.downloadPercent = downloadPercent;
-    }
-
-    public void setDownloadState(Status downloadState) {
-        this.downloadState = downloadState;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public Date getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(Date date) {
-        lastUpdated = date;
-    }
-
-    public void setInstallPath(String installPath) {
-        this.installPath = installPath;
-    }
-
-    public Status getDownloadState() {
-        return downloadState;
-    }
-
-    public TemplatePrimaryDataStoreVO(long poolId, long templateId) {
+    public TemplatePrimaryDataStoreVO(final long poolId, final long templateId) {
         super();
         this.poolId = poolId;
         this.templateId = templateId;
@@ -170,8 +75,9 @@ public class TemplatePrimaryDataStoreVO implements StateObject<ObjectInDataStore
         this.markedForGC = false;
     }
 
-    public TemplatePrimaryDataStoreVO(long poolId, long templateId, Date lastUpdated, int downloadPercent, Status downloadState, String localDownloadPath,
-            String errorString, String jobId, String installPath, long templateSize) {
+    public TemplatePrimaryDataStoreVO(final long poolId, final long templateId, final Date lastUpdated, final int downloadPercent, final Status downloadState, final String
+            localDownloadPath,
+                                      final String errorString, final String jobId, final String installPath, final long templateSize) {
         super();
         this.poolId = poolId;
         this.templateId = templateId;
@@ -189,74 +95,145 @@ public class TemplatePrimaryDataStoreVO implements StateObject<ObjectInDataStore
 
     }
 
-    public void setLocalDownloadPath(String localPath) {
-        this.localDownloadPath = localPath;
+    public long getUpdatedCount() {
+        return this.updatedCount;
+    }
+
+    public void incrUpdatedCount() {
+        this.updatedCount++;
+    }
+
+    public void decrUpdatedCount() {
+        this.updatedCount--;
+    }
+
+    public String getInstallPath() {
+        return installPath;
+    }
+
+    public void setInstallPath(final String installPath) {
+        this.installPath = installPath;
+    }
+
+    public long getTemplateSize() {
+        return templateSize;
+    }
+
+    public void setTemplateSize(final long templateSize) {
+        this.templateSize = templateSize;
+    }
+
+    public void setpoolId(final long poolId) {
+        this.poolId = poolId;
+    }
+
+    public int getDownloadPercent() {
+        return downloadPercent;
+    }
+
+    public void setDownloadPercent(final int downloadPercent) {
+        this.downloadPercent = downloadPercent;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(final Date date) {
+        lastUpdated = date;
+    }
+
+    public Status getDownloadState() {
+        return downloadState;
+    }
+
+    public void setDownloadState(final Status downloadState) {
+        this.downloadState = downloadState;
     }
 
     public String getLocalDownloadPath() {
         return localDownloadPath;
     }
 
-    public void setErrorString(String errorString) {
-        this.errorString = errorString;
+    public void setLocalDownloadPath(final String localPath) {
+        this.localDownloadPath = localPath;
     }
 
     public String getErrorString() {
         return errorString;
     }
 
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
+    public void setErrorString(final String errorString) {
+        this.errorString = errorString;
     }
 
     public String getJobId() {
         return jobId;
     }
 
-    public void setTemplateSize(long templateSize) {
-        this.templateSize = templateSize;
+    public void setJobId(final String jobId) {
+        this.jobId = jobId;
     }
 
     public boolean getMarkedForGC() {
         return markedForGC;
     }
 
-    public void setMarkedForGC(boolean markedForGC) {
+    public void setMarkedForGC(final boolean markedForGC) {
         this.markedForGC = markedForGC;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public int hashCode() {
+        final Long tid = new Long(templateId);
+        final Long hid = new Long(poolId);
+        return tid.hashCode() + hid.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
         if (obj instanceof TemplatePrimaryDataStoreVO) {
-            TemplatePrimaryDataStoreVO other = (TemplatePrimaryDataStoreVO)obj;
+            final TemplatePrimaryDataStoreVO other = (TemplatePrimaryDataStoreVO) obj;
             return (this.templateId == other.getTemplateId() && this.poolId == other.getPoolId());
         }
         return false;
     }
 
-    @Override
-    public int hashCode() {
-        Long tid = new Long(templateId);
-        Long hid = new Long(poolId);
-        return tid.hashCode() + hid.hashCode();
+    public long getPoolId() {
+        return poolId;
+    }
+
+    public long getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(final long templateId) {
+        this.templateId = templateId;
     }
 
     @Override
     public String toString() {
         return new StringBuilder("TmplPool[").append(id)
-            .append("-")
-            .append(templateId)
-            .append("-")
-            .append("poolId")
-            .append("-")
-            .append(installPath)
-            .append("]")
-            .toString();
+                                             .append("-")
+                                             .append(templateId)
+                                             .append("-")
+                                             .append("poolId")
+                                             .append("-")
+                                             .append(installPath)
+                                             .append("]")
+                                             .toString();
     }
 
     @Override
     public ObjectInDataStoreStateMachine.State getState() {
         return this.state;
     }
-
 }

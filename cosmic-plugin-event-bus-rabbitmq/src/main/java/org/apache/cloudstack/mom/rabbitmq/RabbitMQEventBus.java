@@ -1,5 +1,16 @@
 package org.apache.cloudstack.mom.rabbitmq;
 
+import com.cloud.utils.Ternary;
+import com.cloud.utils.component.ManagerBase;
+import com.cloud.utils.exception.CloudRuntimeException;
+import org.apache.cloudstack.framework.events.Event;
+import org.apache.cloudstack.framework.events.EventBus;
+import org.apache.cloudstack.framework.events.EventBusException;
+import org.apache.cloudstack.framework.events.EventSubscriber;
+import org.apache.cloudstack.framework.events.EventTopic;
+import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+
+import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.security.KeyManagementException;
@@ -11,11 +22,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
-import javax.naming.ConfigurationException;
-
-import com.cloud.utils.Ternary;
-import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.BlockedListener;
@@ -27,25 +33,20 @@ import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.MessageProperties;
 import com.rabbitmq.client.ShutdownListener;
 import com.rabbitmq.client.ShutdownSignalException;
-
-import org.apache.cloudstack.framework.events.Event;
-import org.apache.cloudstack.framework.events.EventBus;
-import org.apache.cloudstack.framework.events.EventBusException;
-import org.apache.cloudstack.framework.events.EventSubscriber;
-import org.apache.cloudstack.framework.events.EventTopic;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RabbitMQEventBus extends ManagerBase implements EventBus {
 
     private static final Logger s_logger = LoggerFactory.getLogger(RabbitMQEventBus.class);
+    private static final String secureProtocol = "TLSv1";
+    // AMQP server should consider messages acknowledged once delivered if _autoAck is true
+    private static final boolean s_autoAck = true;
     // details of AMQP server
     private static String amqpHost;
     private static Integer port;
     private static String username;
     private static String password;
-    private static final String secureProtocol = "TLSv1";
     private static String virtualHost;
     private static String useSsl;
     // AMQP exchange name where all CloudStack events will be published
@@ -55,8 +56,6 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
     private static ConcurrentHashMap<String, Ternary<String, Channel, EventSubscriber>> s_subscribers;
     // connection to AMQP server,
     private static Connection s_connection = null;
-    // AMQP server should consider messages acknowledged once delivered if _autoAck is true
-    private static final boolean s_autoAck = true;
     private static DisconnectHandler disconnectHandler;
     private static BlockedConnectionHandler blockedConnectionHandler;
     private ExecutorService executorService;
@@ -145,7 +144,6 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
             final Ternary<String, Channel, EventSubscriber> queueDetails = s_subscribers.get(queueName);
             queueDetails.second(channel);
             s_subscribers.put(queueName, queueDetails);
-
         } catch (final AlreadyClosedException | ConnectException | NoSuchAlgorithmException | KeyManagementException | TimeoutException e) {
             s_logger.warn("Connection to AMQP service is lost. Subscription:" + queueName + " will be active after reconnection", e);
         } catch (final IOException e) {
@@ -153,24 +151,6 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
         }
 
         return queueId;
-    }
-
-    private void handleDelivery(final String queueName, final Envelope envelope, final byte[] body) {
-        final Ternary<String, Channel, EventSubscriber> queueDetails = s_subscribers.get(queueName);
-        if (queueDetails != null) {
-            final EventSubscriber subscriber = queueDetails.third();
-            final String routingKey = envelope.getRoutingKey();
-            final String eventSource = getEventSourceFromRoutingKey(routingKey);
-            final String eventCategory = getEventCategoryFromRoutingKey(routingKey);
-            final String eventType = getEventTypeFromRoutingKey(routingKey);
-            final String resourceType = getResourceTypeFromRoutingKey(routingKey);
-            final String resourceUUID = getResourceUUIDFromRoutingKey(routingKey);
-            final Event event = new Event(eventSource, eventCategory, eventType, resourceType, resourceUUID);
-            event.setDescription(new String(body));
-
-            // deliver the event to call back object provided by subscriber
-            subscriber.onEvent(event);
-        }
     }
 
     @Override
@@ -201,12 +181,61 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
         return buildKey(eventSource, eventCategory, eventType, resourceType, resourceUuid);
     }
 
-    private String makeKeyValue(final String value) {
-        return replaceNullWithWildcard(value).replace(".", "-");
+    private void handleDelivery(final String queueName, final Envelope envelope, final byte[] body) {
+        final Ternary<String, Channel, EventSubscriber> queueDetails = s_subscribers.get(queueName);
+        if (queueDetails != null) {
+            final EventSubscriber subscriber = queueDetails.third();
+            final String routingKey = envelope.getRoutingKey();
+            final String eventSource = getEventSourceFromRoutingKey(routingKey);
+            final String eventCategory = getEventCategoryFromRoutingKey(routingKey);
+            final String eventType = getEventTypeFromRoutingKey(routingKey);
+            final String resourceType = getResourceTypeFromRoutingKey(routingKey);
+            final String resourceUUID = getResourceUUIDFromRoutingKey(routingKey);
+            final Event event = new Event(eventSource, eventCategory, eventType, resourceType, resourceUUID);
+            event.setDescription(new String(body));
+
+            // deliver the event to call back object provided by subscriber
+            subscriber.onEvent(event);
+        }
     }
 
-    private String buildKey(final String eventSource, final String eventCategory, final String eventType, final String resourceType, final String resourceUuid) {
-        return eventSource + "." + eventCategory + "." + eventType + "." + resourceType + "." + resourceUuid;
+    private String getEventSourceFromRoutingKey(final String routingKey) {
+        final String[] keyParts = routingKey.split("\\.");
+        return keyParts[0];
+    }
+
+    private String getEventCategoryFromRoutingKey(final String routingKey) {
+        final String[] keyParts = routingKey.split("\\.");
+        return keyParts[1];
+    }
+
+    private String getEventTypeFromRoutingKey(final String routingKey) {
+        final String[] keyParts = routingKey.split("\\.");
+        return keyParts[2];
+    }
+
+    private String getResourceTypeFromRoutingKey(final String routingKey) {
+        final String[] keyParts = routingKey.split("\\.");
+        return keyParts[3];
+    }
+
+    private String getResourceUUIDFromRoutingKey(final String routingKey) {
+        final String[] keyParts = routingKey.split("\\.");
+        return keyParts[4];
+    }
+
+    /**
+     * creates a routing key from the event details.
+     * created routing key will be used while publishing the message to exchange on AMQP server
+     */
+    private String createRoutingKey(final Event event) {
+        final String eventSource = makeKeyValue(event.getEventSource());
+        final String eventCategory = makeKeyValue(event.getEventCategory());
+        final String eventType = makeKeyValue(event.getEventType());
+        final String resourceType = makeKeyValue(event.getResourceType());
+        final String resourceUuid = makeKeyValue(event.getResourceUUID());
+
+        return buildKey(eventSource, eventCategory, eventType, resourceType, resourceUuid);
     }
 
     private synchronized Connection getConnection() throws IOException, TimeoutException, NoSuchAlgorithmException, KeyManagementException {
@@ -240,37 +269,33 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
         }
     }
 
-    private String getEventSourceFromRoutingKey(final String routingKey) {
-        final String[] keyParts = routingKey.split("\\.");
-        return keyParts[0];
-    }
-
-    private String getEventCategoryFromRoutingKey(final String routingKey) {
-        final String[] keyParts = routingKey.split("\\.");
-        return keyParts[1];
-    }
-
-    private String getEventTypeFromRoutingKey(final String routingKey) {
-        final String[] keyParts = routingKey.split("\\.");
-        return keyParts[2];
-    }
-
-    private String getResourceTypeFromRoutingKey(final String routingKey) {
-        final String[] keyParts = routingKey.split("\\.");
-        return keyParts[3];
-    }
-
-    private String getResourceUUIDFromRoutingKey(final String routingKey) {
-        final String[] keyParts = routingKey.split("\\.");
-        return keyParts[4];
-    }
-
-    private String replaceNullWithWildcard(final String key) {
-        if (key == null || key.isEmpty()) {
-            return "*";
-        } else {
-            return key;
+    private void publishEventToExchange(final Channel channel, final String exchangeName, final String routingKey, final String eventDescription) throws IOException {
+        final byte[] messageBodyBytes = eventDescription.getBytes();
+        try {
+            channel.basicPublish(exchangeName, routingKey, MessageProperties.PERSISTENT_TEXT_PLAIN, messageBodyBytes);
+        } catch (final IOException e) {
+            s_logger.warn("Failed to publish event " + routingKey + " on exchange " + exchangeName + "  of message broker due to " + e.getMessage(), e);
+            throw e;
         }
+    }
+
+    private synchronized void closeConnection() {
+        try {
+            if (s_connection != null) {
+                s_connection.close();
+            }
+        } catch (final Exception e) {
+            s_logger.warn("Failed to close connection to AMQP server due to " + e.getMessage());
+        }
+        s_connection = null;
+    }
+
+    private String makeKeyValue(final String value) {
+        return replaceNullWithWildcard(value).replace(".", "-");
+    }
+
+    private String buildKey(final String eventSource, final String eventCategory, final String eventType, final String resourceType, final String resourceUuid) {
+        return eventSource + "." + eventCategory + "." + eventType + "." + resourceType + "." + resourceUuid;
     }
 
     private synchronized Connection createConnection() throws KeyManagementException, NoSuchAlgorithmException, IOException, TimeoutException {
@@ -296,44 +321,18 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
         return s_connection;
     }
 
-    /**
-     * creates a routing key from the event details.
-     * created routing key will be used while publishing the message to exchange on AMQP server
-     */
-    private String createRoutingKey(final Event event) {
-        final String eventSource = makeKeyValue(event.getEventSource());
-        final String eventCategory = makeKeyValue(event.getEventCategory());
-        final String eventType = makeKeyValue(event.getEventType());
-        final String resourceType = makeKeyValue(event.getResourceType());
-        final String resourceUuid = makeKeyValue(event.getResourceUUID());
-
-        return buildKey(eventSource, eventCategory, eventType, resourceType, resourceUuid);
-    }
-
-    private void publishEventToExchange(final Channel channel, final String exchangeName, final String routingKey, final String eventDescription) throws IOException {
-        final byte[] messageBodyBytes = eventDescription.getBytes();
-        try {
-            channel.basicPublish(exchangeName, routingKey, MessageProperties.PERSISTENT_TEXT_PLAIN, messageBodyBytes);
-        } catch (final IOException e) {
-            s_logger.warn("Failed to publish event " + routingKey + " on exchange " + exchangeName + "  of message broker due to " + e.getMessage(), e);
-            throw e;
+    private String replaceNullWithWildcard(final String key) {
+        if (key == null || key.isEmpty()) {
+            return "*";
+        } else {
+            return key;
         }
-    }
-
-    private synchronized void closeConnection() {
-        try {
-            if (s_connection != null) {
-                s_connection.close();
-            }
-        } catch (final Exception e) {
-            s_logger.warn("Failed to close connection to AMQP server due to " + e.getMessage());
-        }
-        s_connection = null;
     }
 
     private synchronized void abortConnection() {
-        if (s_connection == null)
+        if (s_connection == null) {
             return;
+        }
 
         try {
             s_connection.abort();
@@ -381,7 +380,6 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
             if (retryInterval == null) {
                 retryInterval = 10000;// default to 10s to try out reconnect
             }
-
         } catch (final NumberFormatException e) {
             throw new ConfigurationException("Invalid port number/retry interval");
         }
@@ -500,7 +498,8 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
                         // register a callback handler to receive the events that a subscriber subscribed to
                         channel.basicConsume(subscriberId, s_autoAck, subscriberId, new DefaultConsumer(channel) {
                             @Override
-                            public void handleDelivery(final String queueName, final Envelope envelope, final AMQP.BasicProperties properties, final byte[] body) throws IOException {
+                            public void handleDelivery(final String queueName, final Envelope envelope, final AMQP.BasicProperties properties, final byte[] body) throws
+                                    IOException {
                                 RabbitMQEventBus.this.handleDelivery(queueName, envelope, body);
                             }
                         });

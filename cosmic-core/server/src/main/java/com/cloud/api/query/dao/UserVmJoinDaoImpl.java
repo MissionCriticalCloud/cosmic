@@ -1,31 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.query.dao;
-
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
 
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
@@ -47,7 +20,6 @@ import com.cloud.vm.VmDetailConstants;
 import com.cloud.vm.VmStats;
 import com.cloud.vm.dao.NicSecondaryIpVO;
 import com.cloud.vm.dao.UserVmDetailsDao;
-
 import org.apache.cloudstack.affinity.AffinityGroupResponse;
 import org.apache.cloudstack.api.ApiConstants.VMDetails;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
@@ -56,6 +28,17 @@ import org.apache.cloudstack.api.response.NicSecondaryIpResponse;
 import org.apache.cloudstack.api.response.SecurityGroupResponse;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -63,18 +46,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implements UserVmJoinDao {
     public static final Logger s_logger = LoggerFactory.getLogger(UserVmJoinDaoImpl.class);
-
-    @Inject
-    private ConfigurationDao  _configDao;
+    private final SearchBuilder<UserVmJoinVO> VmDetailSearch;
+    private final SearchBuilder<UserVmJoinVO> activeVmByIsoSearch;
     @Inject
     public AccountManager _accountMgr;
+    @Inject
+    private ConfigurationDao _configDao;
     @Inject
     private UserVmDetailsDao _userVmDetailsDao;
     @Inject
     private UserDao _userDao;
-
-    private final SearchBuilder<UserVmJoinVO> VmDetailSearch;
-    private final SearchBuilder<UserVmJoinVO> activeVmByIsoSearch;
 
     protected UserVmJoinDaoImpl() {
 
@@ -91,18 +72,8 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
     }
 
     @Override
-    public List<UserVmJoinVO> listActiveByIsoId(Long isoId) {
-        SearchCriteria<UserVmJoinVO> sc = activeVmByIsoSearch.create();
-        sc.setParameters("isoId", isoId);
-        State[] states = new State[2];
-        states[0] = State.Error;
-        states[1] = State.Expunging;
-        return listBy(sc);
-    }
-
-    @Override
-    public UserVmResponse newUserVmResponse(ResponseView view, String objectName, UserVmJoinVO userVm, EnumSet<VMDetails> details, Account caller) {
-        UserVmResponse userVmResponse = new UserVmResponse();
+    public UserVmResponse newUserVmResponse(final ResponseView view, final String objectName, final UserVmJoinVO userVm, final EnumSet<VMDetails> details, final Account caller) {
+        final UserVmResponse userVmResponse = new UserVmResponse();
 
         if (userVm.getHypervisorType() != null) {
             userVmResponse.setHypervisor(userVm.getHypervisorType().toString());
@@ -111,7 +82,7 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
         userVmResponse.setName(userVm.getName());
 
         if (userVm.getDisplayName() != null) {
-        userVmResponse.setDisplayName(userVm.getDisplayName());
+            userVmResponse.setDisplayName(userVm.getDisplayName());
         } else {
             userVmResponse.setDisplayName(userVm.getName());
         }
@@ -123,7 +94,7 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
             userVmResponse.setAccountName(userVm.getAccountName());
         }
 
-        User user = _userDao.getUser(userVm.getUserId());
+        final User user = _userDao.getUser(userVm.getUserId());
         if (user != null) {
             userVmResponse.setUserId(user.getUuid());
             userVmResponse.setUserName(user.getUsername());
@@ -173,7 +144,7 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
             userVmResponse.setCpuNumber(userVm.getCpu());
             userVmResponse.setCpuSpeed(userVm.getSpeed());
             userVmResponse.setMemory(userVm.getRamSize());
-            ServiceOfferingDetailsVO serviceOfferingDetail = ApiDBUtils.findServiceOfferingDetail(userVm.getServiceOfferingId(), GPU.Keys.vgpuType.toString());
+            final ServiceOfferingDetailsVO serviceOfferingDetail = ApiDBUtils.findServiceOfferingDetail(userVm.getServiceOfferingId(), GPU.Keys.vgpuType.toString());
             if (serviceOfferingDetail != null) {
                 userVmResponse.setVgpu(serviceOfferingDetail.getValue());
             }
@@ -199,30 +170,31 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
 
         if (details.contains(VMDetails.all) || details.contains(VMDetails.stats)) {
             // stats calculation
-            VmStats vmStats = ApiDBUtils.getVmStatistics(userVm.getId());
+            final VmStats vmStats = ApiDBUtils.getVmStatistics(userVm.getId());
             if (vmStats != null) {
                 userVmResponse.setCpuUsed(new DecimalFormat("#.##").format(vmStats.getCPUUtilization()) + "%");
 
-                userVmResponse.setNetworkKbsRead((long)vmStats.getNetworkReadKBs());
+                userVmResponse.setNetworkKbsRead((long) vmStats.getNetworkReadKBs());
 
-                userVmResponse.setNetworkKbsWrite((long)vmStats.getNetworkWriteKBs());
+                userVmResponse.setNetworkKbsWrite((long) vmStats.getNetworkWriteKBs());
 
-                if ((userVm.getHypervisorType() != null) && (userVm.getHypervisorType().equals(HypervisorType.KVM) || userVm.getHypervisorType().equals(HypervisorType.XenServer))) { // support KVM and XenServer only util 2013.06.25
-                    userVmResponse.setDiskKbsRead((long)vmStats.getDiskReadKBs());
+                if ((userVm.getHypervisorType() != null) && (userVm.getHypervisorType().equals(HypervisorType.KVM) || userVm.getHypervisorType().equals(HypervisorType.XenServer)
+                )) { // support KVM and XenServer only util 2013.06.25
+                    userVmResponse.setDiskKbsRead((long) vmStats.getDiskReadKBs());
 
-                    userVmResponse.setDiskKbsWrite((long)vmStats.getDiskWriteKBs());
+                    userVmResponse.setDiskKbsWrite((long) vmStats.getDiskWriteKBs());
 
-                    userVmResponse.setDiskIORead((long)vmStats.getDiskReadIOs());
+                    userVmResponse.setDiskIORead((long) vmStats.getDiskReadIOs());
 
-                    userVmResponse.setDiskIOWrite((long)vmStats.getDiskWriteIOs());
+                    userVmResponse.setDiskIOWrite((long) vmStats.getDiskWriteIOs());
                 }
             }
         }
 
         if (details.contains(VMDetails.all) || details.contains(VMDetails.secgrp)) {
-            Long securityGroupId = userVm.getSecurityGroupId();
+            final Long securityGroupId = userVm.getSecurityGroupId();
             if (securityGroupId != null && securityGroupId.longValue() != 0) {
-                SecurityGroupResponse resp = new SecurityGroupResponse();
+                final SecurityGroupResponse resp = new SecurityGroupResponse();
                 resp.setId(userVm.getSecurityGroupUuid());
                 resp.setName(userVm.getSecurityGroupName());
                 resp.setDescription(userVm.getSecurityGroupDescription());
@@ -238,9 +210,9 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
         }
 
         if (details.contains(VMDetails.all) || details.contains(VMDetails.nics)) {
-            long nic_id = userVm.getNicId();
+            final long nic_id = userVm.getNicId();
             if (nic_id > 0) {
-                NicResponse nicResponse = new NicResponse();
+                final NicResponse nicResponse = new NicResponse();
                 nicResponse.setId(userVm.getNicUuid());
                 nicResponse.setIpaddress(userVm.getIpAddress());
                 nicResponse.setGateway(userVm.getGateway());
@@ -264,11 +236,11 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
                     nicResponse.setType(userVm.getGuestType().toString());
                 }
                 nicResponse.setIsDefault(userVm.isDefaultNic());
-                List<NicSecondaryIpVO> secondaryIps = ApiDBUtils.findNicSecondaryIps(userVm.getNicId());
+                final List<NicSecondaryIpVO> secondaryIps = ApiDBUtils.findNicSecondaryIps(userVm.getNicId());
                 if (secondaryIps != null) {
-                    List<NicSecondaryIpResponse> ipList = new ArrayList<NicSecondaryIpResponse>();
-                    for (NicSecondaryIpVO ip : secondaryIps) {
-                        NicSecondaryIpResponse ipRes = new NicSecondaryIpResponse();
+                    final List<NicSecondaryIpResponse> ipList = new ArrayList<>();
+                    for (final NicSecondaryIpVO ip : secondaryIps) {
+                        final NicSecondaryIpResponse ipRes = new NicSecondaryIpResponse();
                         ipRes.setId(ip.getUuid());
                         ipRes.setIpAddr(ip.getIp4Address());
                         ipList.add(ipRes);
@@ -281,18 +253,18 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
         }
 
         // update tag information
-        long tag_id = userVm.getTagId();
+        final long tag_id = userVm.getTagId();
         if (tag_id > 0 && !userVmResponse.containTag(tag_id)) {
-            ResourceTagJoinVO vtag = ApiDBUtils.findResourceTagViewById(tag_id);
+            final ResourceTagJoinVO vtag = ApiDBUtils.findResourceTagViewById(tag_id);
             if (vtag != null) {
                 userVmResponse.addTag(ApiDBUtils.newResourceTagResponse(vtag, false));
             }
         }
 
         if (details.contains(VMDetails.all) || details.contains(VMDetails.affgrp)) {
-            Long affinityGroupId = userVm.getAffinityGroupId();
+            final Long affinityGroupId = userVm.getAffinityGroupId();
             if (affinityGroupId != null && affinityGroupId.longValue() != 0) {
-                AffinityGroupResponse resp = new AffinityGroupResponse();
+                final AffinityGroupResponse resp = new AffinityGroupResponse();
                 resp.setId(userVm.getAffinityGroupUuid());
                 resp.setName(userVm.getAffinityGroupName());
                 resp.setDescription(userVm.getAffinityGroupDescription());
@@ -304,9 +276,9 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
 
         // set resource details map
         // only hypervisortoolsversion can be returned to the end user
-        UserVmDetailVO hypervisorToolsVersion = _userVmDetailsDao.findDetail(userVm.getId(), VmDetailConstants.HYPERVISOR_TOOLS_VERSION);
+        final UserVmDetailVO hypervisorToolsVersion = _userVmDetailsDao.findDetail(userVm.getId(), VmDetailConstants.HYPERVISOR_TOOLS_VERSION);
         if (hypervisorToolsVersion != null) {
-            Map<String, String> resourceDetails = new HashMap<String, String>();
+            final Map<String, String> resourceDetails = new HashMap<>();
             resourceDetails.put(hypervisorToolsVersion.getName(), hypervisorToolsVersion.getValue());
             userVmResponse.setDetails(resourceDetails);
         }
@@ -322,10 +294,10 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
     }
 
     @Override
-    public UserVmResponse setUserVmResponse(ResponseView view, UserVmResponse userVmData, UserVmJoinVO uvo) {
-        Long securityGroupId = uvo.getSecurityGroupId();
+    public UserVmResponse setUserVmResponse(final ResponseView view, final UserVmResponse userVmData, final UserVmJoinVO uvo) {
+        final Long securityGroupId = uvo.getSecurityGroupId();
         if (securityGroupId != null && securityGroupId.longValue() != 0) {
-            SecurityGroupResponse resp = new SecurityGroupResponse();
+            final SecurityGroupResponse resp = new SecurityGroupResponse();
             resp.setId(uvo.getSecurityGroupUuid());
             resp.setName(uvo.getSecurityGroupName());
             resp.setDescription(uvo.getSecurityGroupDescription());
@@ -339,9 +311,9 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
             userVmData.addSecurityGroup(resp);
         }
 
-        long nic_id = uvo.getNicId();
+        final long nic_id = uvo.getNicId();
         if (nic_id > 0) {
-            NicResponse nicResponse = new NicResponse();
+            final NicResponse nicResponse = new NicResponse();
             nicResponse.setId(uvo.getNicUuid());
             nicResponse.setIpaddress(uvo.getIpAddress());
             nicResponse.setGateway(uvo.getGateway());
@@ -365,11 +337,11 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
                 nicResponse.setType(uvo.getGuestType().toString());
             }
             nicResponse.setIsDefault(uvo.isDefaultNic());
-            List<NicSecondaryIpVO> secondaryIps = ApiDBUtils.findNicSecondaryIps(uvo.getNicId());
+            final List<NicSecondaryIpVO> secondaryIps = ApiDBUtils.findNicSecondaryIps(uvo.getNicId());
             if (secondaryIps != null) {
-                List<NicSecondaryIpResponse> ipList = new ArrayList<NicSecondaryIpResponse>();
-                for (NicSecondaryIpVO ip : secondaryIps) {
-                    NicSecondaryIpResponse ipRes = new NicSecondaryIpResponse();
+                final List<NicSecondaryIpResponse> ipList = new ArrayList<>();
+                for (final NicSecondaryIpVO ip : secondaryIps) {
+                    final NicSecondaryIpResponse ipRes = new NicSecondaryIpResponse();
                     ipRes.setId(ip.getUuid());
                     ipRes.setIpAddr(ip.getIp4Address());
                     ipList.add(ipRes);
@@ -381,17 +353,17 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
             userVmData.addNic(nicResponse);
         }
 
-        long tag_id = uvo.getTagId();
+        final long tag_id = uvo.getTagId();
         if (tag_id > 0 && !userVmData.containTag(tag_id)) {
-            ResourceTagJoinVO vtag = ApiDBUtils.findResourceTagViewById(tag_id);
+            final ResourceTagJoinVO vtag = ApiDBUtils.findResourceTagViewById(tag_id);
             if (vtag != null) {
                 userVmData.addTag(ApiDBUtils.newResourceTagResponse(vtag, false));
             }
         }
 
-        Long affinityGroupId = uvo.getAffinityGroupId();
+        final Long affinityGroupId = uvo.getAffinityGroupId();
         if (affinityGroupId != null && affinityGroupId.longValue() != 0) {
-            AffinityGroupResponse resp = new AffinityGroupResponse();
+            final AffinityGroupResponse resp = new AffinityGroupResponse();
             resp.setId(uvo.getAffinityGroupUuid());
             resp.setName(uvo.getAffinityGroupName());
             resp.setDescription(uvo.getAffinityGroupDescription());
@@ -404,26 +376,48 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
     }
 
     @Override
-    public List<UserVmJoinVO> searchByIds(Long... vmIds) {
+    public List<UserVmJoinVO> newUserVmView(final UserVm... userVms) {
+
+        final Hashtable<Long, UserVm> userVmDataHash = new Hashtable<>();
+        for (final UserVm vm : userVms) {
+            if (!userVmDataHash.containsKey(vm.getId())) {
+                userVmDataHash.put(vm.getId(), vm);
+            }
+        }
+
+        final Set<Long> vmIdSet = userVmDataHash.keySet();
+        final List<UserVmJoinVO> uvms = searchByIds(vmIdSet.toArray(new Long[vmIdSet.size()]));
+        // populate transit password field from UserVm
+        if (uvms != null) {
+            for (final UserVmJoinVO uvm : uvms) {
+                final UserVm v = userVmDataHash.get(uvm.getId());
+                uvm.setPassword(v.getPassword());
+            }
+        }
+        return uvms;
+    }
+
+    @Override
+    public List<UserVmJoinVO> searchByIds(final Long... vmIds) {
         // set detail batch query size
         int DETAILS_BATCH_SIZE = 2000;
-        String batchCfg = _configDao.getValue("detail.batch.query.size");
+        final String batchCfg = _configDao.getValue("detail.batch.query.size");
         if (batchCfg != null) {
             DETAILS_BATCH_SIZE = Integer.parseInt(batchCfg);
         }
         // query details by batches
-        List<UserVmJoinVO> uvList = new ArrayList<UserVmJoinVO>();
+        final List<UserVmJoinVO> uvList = new ArrayList<>();
         // query details by batches
         int curr_index = 0;
         if (vmIds.length > DETAILS_BATCH_SIZE) {
             while ((curr_index + DETAILS_BATCH_SIZE) <= vmIds.length) {
-                Long[] ids = new Long[DETAILS_BATCH_SIZE];
+                final Long[] ids = new Long[DETAILS_BATCH_SIZE];
                 for (int k = 0, j = curr_index; j < curr_index + DETAILS_BATCH_SIZE; j++, k++) {
                     ids[k] = vmIds[j];
                 }
-                SearchCriteria<UserVmJoinVO> sc = VmDetailSearch.create();
+                final SearchCriteria<UserVmJoinVO> sc = VmDetailSearch.create();
                 sc.setParameters("idIN", ids);
-                List<UserVmJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
+                final List<UserVmJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
                 if (vms != null) {
                     uvList.addAll(vms);
                 }
@@ -431,15 +425,15 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
             }
         }
         if (curr_index < vmIds.length) {
-            int batch_size = (vmIds.length - curr_index);
+            final int batch_size = (vmIds.length - curr_index);
             // set the ids value
-            Long[] ids = new Long[batch_size];
+            final Long[] ids = new Long[batch_size];
             for (int k = 0, j = curr_index; j < curr_index + batch_size; j++, k++) {
                 ids[k] = vmIds[j];
             }
-            SearchCriteria<UserVmJoinVO> sc = VmDetailSearch.create();
+            final SearchCriteria<UserVmJoinVO> sc = VmDetailSearch.create();
             sc.setParameters("idIN", ids);
-            List<UserVmJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
+            final List<UserVmJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
             if (vms != null) {
                 uvList.addAll(vms);
             }
@@ -448,25 +442,12 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
     }
 
     @Override
-    public List<UserVmJoinVO> newUserVmView(UserVm... userVms) {
-
-        Hashtable<Long, UserVm> userVmDataHash = new Hashtable<Long, UserVm>();
-        for (UserVm vm : userVms) {
-            if (!userVmDataHash.containsKey(vm.getId())) {
-                userVmDataHash.put(vm.getId(), vm);
-            }
-        }
-
-        Set<Long> vmIdSet = userVmDataHash.keySet();
-        List<UserVmJoinVO> uvms = searchByIds(vmIdSet.toArray(new Long[vmIdSet.size()]));
-        // populate transit password field from UserVm
-        if (uvms != null) {
-            for (UserVmJoinVO uvm : uvms) {
-                UserVm v = userVmDataHash.get(uvm.getId());
-                uvm.setPassword(v.getPassword());
-            }
-        }
-        return uvms;
+    public List<UserVmJoinVO> listActiveByIsoId(final Long isoId) {
+        final SearchCriteria<UserVmJoinVO> sc = activeVmByIsoSearch.create();
+        sc.setParameters("isoId", isoId);
+        final State[] states = new State[2];
+        states[0] = State.Error;
+        states[1] = State.Expunging;
+        return listBy(sc);
     }
-
 }

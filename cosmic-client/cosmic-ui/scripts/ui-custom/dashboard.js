@@ -1,52 +1,36 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function($, cloudStack) {
-    cloudStack.uiCustom.dashboard = function() {
+(function ($, cloudStack) {
+    cloudStack.uiCustom.dashboard = function () {
         /**
          * Retrieve chart data
          */
-        var getData = function() {
+        var getData = function () {
             // Populate data
             $dashboard.find('[data-item]').hide();
             cloudStack.sections.dashboard[dashboardType].dataProvider({
                 response: {
-                    success: function(args) {
+                    success: function (args) {
                         var $browser = $dashboard.closest('#browser .container');
                         var data = args.data;
 
                         // Iterate over data; populate corresponding DOM elements
-                        $.each(data, function(key, value) {
+                        $.each(data, function (key, value) {
                             var $elem = $dashboard.find('[data-item=' + key + ']');
 
                             // This assumes an array of data
                             if ($elem.is('ul')) {
                                 $elem.show();
                                 var $liTmpl = $elem.find('li').remove();
-                                $(value).each(function() {
+                                $(value).each(function () {
                                     var item = this;
                                     var $li = $liTmpl.clone().appendTo($elem).hide();
 
                                     if ($li.is('.zone-stats li')) {
-                                        $li.click(function() {
+                                        $li.click(function () {
                                             $browser.cloudBrowser('addPanel', {
                                                 title: _l('label.zone.details'),
                                                 parent: $dashboard.closest('.panel'),
                                                 maximizeIfSelected: true,
-                                                complete: function($newPanel) {
+                                                complete: function ($newPanel) {
                                                     $newPanel.detailView($.extend(true, {},
                                                         cloudStack.sections.dashboard.admin.zoneDetailView, {
                                                             $browser: $browser,
@@ -62,18 +46,18 @@
                                         });
                                     }
 
-                                    $.each(item, function(arrayKey, arrayValue) {
+                                    $.each(item, function (arrayKey, arrayValue) {
                                         if (!arrayValue) arrayValue = '';
 
                                         var $arrayElem = $li.find('[data-list-item=' + arrayKey + ']');
 
-                                        $arrayElem.each(function() {
+                                        $arrayElem.each(function () {
                                             var $arrayElem = $(this);
 
                                             if ($arrayElem.hasClass('pie-chart')) {
                                                 // Generate pie chart
                                                 // -- values above 80 have a red color
-                                                setTimeout(function() {
+                                                setTimeout(function () {
                                                     pieChart($arrayElem, [{
                                                         data: [
                                                             [1, 100 - arrayValue]
@@ -88,7 +72,7 @@
                                                 });
                                             } else {
                                                 if ($li.attr('concat-value')) {
-                                                    var val = $(_l(arrayValue).toString().split(', ')).map(function() {
+                                                    var val = $(_l(arrayValue).toString().split(', ')).map(function () {
                                                         var val = _s(this.toString());
                                                         var concatValue = parseInt($li.attr('concat-value'));
 
@@ -113,7 +97,7 @@
                                     $li.fadeIn();
                                 });
                             } else {
-                                $elem.each(function() {
+                                $elem.each(function () {
                                     var $item = $(this);
                                     if ($item.hasClass('chart-line')) {
                                         $item.show().animate({
@@ -133,7 +117,7 @@
         /**
          * Render circular pie chart, without labels
          */
-        var pieChart = function($container, data) {
+        var pieChart = function ($container, data) {
             $container.css({
                 width: 70,
                 height: 66
@@ -171,7 +155,7 @@
         $dashboard.find('.dashboard-container.head .top .title span').html(_l('label.system.capacity'));
 
         // View all action
-        $dashboard.find('.view-all').click(function() {
+        $dashboard.find('.view-all').click(function () {
             var $browser = $('#browser .container');
 
             if ($(this).hasClass('network')) $('#navigation li.network').click();
@@ -179,7 +163,7 @@
                 $browser.cloudBrowser('addPanel', {
                     title: $dashboard.hasClass('admin') ? 'Alerts' : 'Events',
                     maximizeIfSelected: true,
-                    complete: function($newPanel) {
+                    complete: function ($newPanel) {
                         $newPanel.listView({
                             $browser: $browser,
                             context: cloudStack.context,
@@ -187,11 +171,12 @@
                         });
                     }
                 });
-            };
+            }
+            ;
         });
 
         //Fetch Latest action
-        $dashboard.find('.fetch-latest').click(function() {
+        $dashboard.find('.fetch-latest').click(function () {
             window.fetchLatestflag = 1;
             var $browser = $('#browser .container');
 

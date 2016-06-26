@@ -1,33 +1,16 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.List;
 
 import com.cloud.network.PhysicalNetworkServiceProvider;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
 
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
+
 @EntityReference(value = PhysicalNetworkServiceProvider.class)
-@SuppressWarnings("unused")
 public class ProviderResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.NAME)
@@ -58,15 +41,15 @@ public class ProviderResponse extends BaseResponse {
     @Param(description = "true if individual services can be enabled/disabled")
     private Boolean canEnableIndividualServices;
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setPhysicalNetworkId(String physicalNetworkId) {
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public void setPhysicalNetworkId(final String physicalNetworkId) {
         this.physicalNetworkId = physicalNetworkId;
     }
 
@@ -74,43 +57,43 @@ public class ProviderResponse extends BaseResponse {
         return physicalNetworkId;
     }
 
-    public void setDestinationPhysicalNetworkId(String destPhysicalNetworkId) {
-        this.destinationPhysicalNetworkId = destPhysicalNetworkId;
-    }
-
     public String getDestinationPhysicalNetworkId() {
         return destinationPhysicalNetworkId;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public void setDestinationPhysicalNetworkId(final String destPhysicalNetworkId) {
+        this.destinationPhysicalNetworkId = destPhysicalNetworkId;
     }
 
     public String getState() {
         return this.state;
     }
 
-    public void setId(String uuid) {
-        this.id = uuid;
+    public void setState(final String state) {
+        this.state = state;
     }
 
     public String getId() {
         return this.id;
     }
 
-    public void setServices(List<String> services) {
-        this.services = services;
+    public void setId(final String uuid) {
+        this.id = uuid;
     }
 
     public List<String> getServices() {
         return services;
     }
 
+    public void setServices(final List<String> services) {
+        this.services = services;
+    }
+
     public Boolean getCanEnableIndividualServices() {
         return canEnableIndividualServices;
     }
 
-    public void setCanEnableIndividualServices(Boolean canEnableIndividualServices) {
+    public void setCanEnableIndividualServices(final Boolean canEnableIndividualServices) {
         this.canEnableIndividualServices = canEnableIndividualServices;
     }
 }

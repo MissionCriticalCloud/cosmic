@@ -1,45 +1,29 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ BVT tests for SSVM
 """
 # Import Local Modules
-from marvin.cloudstackTestCase import cloudstackTestCase
+import telnetlib
 from marvin.cloudstackAPI import (stopSystemVm,
                                   rebootSystemVm,
                                   destroySystemVm)
-from marvin.lib.utils import (cleanup_resources,
-                              get_process_status,
-                              get_host_credentials)
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (PhysicalNetwork)
 from marvin.lib.common import (get_zone,
                                list_hosts,
                                list_ssvms,
                                list_zones,
                                list_vlan_ipranges)
+from marvin.lib.utils import (cleanup_resources,
+                              get_process_status,
+                              get_host_credentials)
 from nose.plugins.attrib import attr
-import telnetlib
 
 # Import System modules
 import time
+
 _multiprocess_shared_ = True
 
 
 class TestSSVMs(cloudstackTestCase):
-
     def setUp(self):
         self.apiclient = self.testClient.getApiClient()
         self.hypervisor = self.testClient.getHypervisorInfo()
@@ -464,7 +448,7 @@ class TestSSVMs(cloudstackTestCase):
             1,
             "Check cloud service is running or not"
         )
-        
+
         linklocal_ip = None
         # Check status of cloud service
         if self.hypervisor.lower() in ('vmware'):
@@ -504,7 +488,7 @@ class TestSSVMs(cloudstackTestCase):
             res,
             "The cached Link Local should be the same as the current Link Local IP, but they are different! Current ==> %s; Cached ==> %s " % (linklocal_ip, res)
         )
-        
+
         return
 
     @attr(
@@ -986,7 +970,7 @@ class TestSSVMs(cloudstackTestCase):
         )
 
         # Private IP Address of System VMs are allowed to change after reboot - CLOUDSTACK-7745
-        
+
         # Wait for the agent to be up
         self.waitForSystemVMAgent(cpvm_response.name)
 

@@ -1,29 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package org.apache.cloudstack.framework.jobs.dao;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
 
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.db.DB;
@@ -35,8 +10,16 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
-
 import org.apache.cloudstack.framework.jobs.impl.SyncQueueItemVO;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,52 +45,53 @@ public class SyncQueueItemDaoImpl extends GenericDaoBase<SyncQueueItemVO, Long> 
     }
 
     @Override
-    public SyncQueueItemVO getNextQueueItem(long queueId) {
+    public SyncQueueItemVO getNextQueueItem(final long queueId) {
 
-        SearchBuilder<SyncQueueItemVO> sb = createSearchBuilder();
+        final SearchBuilder<SyncQueueItemVO> sb = createSearchBuilder();
         sb.and("queueId", sb.entity().getQueueId(), SearchCriteria.Op.EQ);
         sb.and("lastProcessNumber", sb.entity().getLastProcessNumber(), SearchCriteria.Op.NULL);
         sb.done();
 
-        SearchCriteria<SyncQueueItemVO> sc = sb.create();
+        final SearchCriteria<SyncQueueItemVO> sc = sb.create();
         sc.setParameters("queueId", queueId);
 
-        Filter filter = new Filter(SyncQueueItemVO.class, "created", true, 0L, 1L);
-        List<SyncQueueItemVO> l = listBy(sc, filter);
-        if(l != null && l.size() > 0)
+        final Filter filter = new Filter(SyncQueueItemVO.class, "created", true, 0L, 1L);
+        final List<SyncQueueItemVO> l = listBy(sc, filter);
+        if (l != null && l.size() > 0) {
             return l.get(0);
+        }
 
         return null;
     }
 
     @Override
-    public int getActiveQueueItemCount(long queueId) {
-        SearchCriteria<Integer> sc = queueActiveItemSearch.create();
+    public int getActiveQueueItemCount(final long queueId) {
+        final SearchCriteria<Integer> sc = queueActiveItemSearch.create();
         sc.setParameters("queueId", queueId);
 
-        List<Integer> count = customSearch(sc, null);
+        final List<Integer> count = customSearch(sc, null);
         return count.get(0);
     }
 
     @Override
-    public List<SyncQueueItemVO> getNextQueueItems(int maxItems) {
-        List<SyncQueueItemVO> l = new ArrayList<SyncQueueItemVO>();
+    public List<SyncQueueItemVO> getNextQueueItems(final int maxItems) {
+        final List<SyncQueueItemVO> l = new ArrayList<>();
 
-        String sql = "SELECT i.id, i.queue_id, i.content_type, i.content_id, i.created " +
+        final String sql = "SELECT i.id, i.queue_id, i.content_type, i.content_id, i.created " +
                 " FROM sync_queue AS q JOIN sync_queue_item AS i ON q.id = i.queue_id " +
-                     " WHERE i.queue_proc_number IS NULL " +
+                " WHERE i.queue_proc_number IS NULL " +
                 " GROUP BY q.id " +
                 " ORDER BY i.id " +
                 " LIMIT 0, ?";
 
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         try {
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setInt(1, maxItems);
-            ResultSet rs = pstmt.executeQuery();
-            while(rs.next()) {
-                SyncQueueItemVO item = new SyncQueueItemVO();
+            final ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                final SyncQueueItemVO item = new SyncQueueItemVO();
                 item.setId(rs.getLong(1));
                 item.setQueueId(rs.getLong(2));
                 item.setContentType(rs.getString(3));
@@ -115,36 +99,37 @@ public class SyncQueueItemDaoImpl extends GenericDaoBase<SyncQueueItemVO, Long> 
                 item.setCreated(DateUtil.parseDateString(TimeZone.getTimeZone("GMT"), rs.getString(5)));
                 l.add(item);
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             s_logger.error("Unexpected sql exception, ", e);
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             s_logger.error("Unexpected exception, ", e);
         }
         return l;
     }
 
     @Override
-    public List<SyncQueueItemVO> getActiveQueueItems(Long msid, boolean exclusive) {
-        SearchBuilder<SyncQueueItemVO> sb = createSearchBuilder();
+    public List<SyncQueueItemVO> getActiveQueueItems(final Long msid, final boolean exclusive) {
+        final SearchBuilder<SyncQueueItemVO> sb = createSearchBuilder();
         sb.and("lastProcessMsid", sb.entity().getLastProcessMsid(),
                 SearchCriteria.Op.EQ);
         sb.done();
 
-        SearchCriteria<SyncQueueItemVO> sc = sb.create();
+        final SearchCriteria<SyncQueueItemVO> sc = sb.create();
         sc.setParameters("lastProcessMsid", msid);
 
-        Filter filter = new Filter(SyncQueueItemVO.class, "created", true, null, null);
+        final Filter filter = new Filter(SyncQueueItemVO.class, "created", true, null, null);
 
-        if (exclusive)
+        if (exclusive) {
             return lockRows(sc, filter, true);
+        }
         return listBy(sc, filter);
     }
 
     @Override
-    public List<SyncQueueItemVO> getBlockedQueueItems(long thresholdMs, boolean exclusive) {
-        Date cutTime = DateUtil.currentGMTTime();
+    public List<SyncQueueItemVO> getBlockedQueueItems(final long thresholdMs, final boolean exclusive) {
+        final Date cutTime = DateUtil.currentGMTTime();
 
-        SearchBuilder<SyncQueueItemVO> sbItem = createSearchBuilder();
+        final SearchBuilder<SyncQueueItemVO> sbItem = createSearchBuilder();
         sbItem.and("lastProcessMsid", sbItem.entity().getLastProcessMsid(), SearchCriteria.Op.NNULL);
         sbItem.and("lastProcessNumber", sbItem.entity().getLastProcessNumber(), SearchCriteria.Op.NNULL);
         sbItem.and("lastProcessTime", sbItem.entity().getLastProcessTime(), SearchCriteria.Op.NNULL);
@@ -152,20 +137,21 @@ public class SyncQueueItemDaoImpl extends GenericDaoBase<SyncQueueItemVO, Long> 
 
         sbItem.done();
 
-        SearchCriteria<SyncQueueItemVO> sc = sbItem.create();
+        final SearchCriteria<SyncQueueItemVO> sc = sbItem.create();
         sc.setParameters("lastProcessTime2", new Date(cutTime.getTime() - thresholdMs));
 
-        if(exclusive)
+        if (exclusive) {
             return lockRows(sc, null, true);
+        }
         return listBy(sc, null);
     }
 
     @Override
-    public Long getQueueItemIdByContentIdAndType(long contentId, String contentType) {
-        SearchCriteria<Long> sc = queueIdSearch.create();
+    public Long getQueueItemIdByContentIdAndType(final long contentId, final String contentType) {
+        final SearchCriteria<Long> sc = queueIdSearch.create();
         sc.setParameters("contentId", contentId);
         sc.setParameters("contentType", contentType);
-        List<Long> id = customSearch(sc, null);
+        final List<Long> id = customSearch(sc, null);
 
         return id.size() == 0 ? null : id.get(0);
     }

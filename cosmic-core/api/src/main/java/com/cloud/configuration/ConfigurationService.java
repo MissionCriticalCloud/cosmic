@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.configuration;
-
-import java.util.List;
 
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.Pod;
@@ -33,7 +15,6 @@ import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.command.admin.config.UpdateCfgCmd;
 import org.apache.cloudstack.api.command.admin.network.CreateNetworkOfferingCmd;
 import org.apache.cloudstack.api.command.admin.network.DeleteNetworkOfferingCmd;
@@ -61,13 +42,14 @@ import org.apache.cloudstack.config.Configuration;
 import org.apache.cloudstack.region.PortableIp;
 import org.apache.cloudstack.region.PortableIpRange;
 
+import java.util.List;
+
 public interface ConfigurationService {
 
     /**
      * Updates a configuration entry with a new value
      *
-     * @param cmd
-     *            - the command wrapping name and value parameters
+     * @param cmd - the command wrapping name and value parameters
      * @return updated configuration object if successful
      */
     Configuration updateConfiguration(UpdateCfgCmd cmd) throws InvalidParameterValueException;
@@ -75,8 +57,7 @@ public interface ConfigurationService {
     /**
      * Create a service offering through the API
      *
-     * @param cmd
-     *            the command object that specifies the name, number of cpu cores, amount of RAM, etc. for the service
+     * @param cmd the command object that specifies the name, number of cpu cores, amount of RAM, etc. for the service
      *            offering
      * @return the newly created service offering if successful, null otherwise
      */
@@ -107,8 +88,7 @@ public interface ConfigurationService {
     /**
      * Updates a disk offering
      *
-     * @param cmd
-     *            - the command specifying diskOfferingId, name, description, tags
+     * @param cmd - the command specifying diskOfferingId, name, description, tags
      * @return updated disk offering
      * @throws
      */
@@ -117,8 +97,7 @@ public interface ConfigurationService {
     /**
      * Deletes a disk offering
      *
-     * @param cmd
-     *            - the command specifying disk offering id
+     * @param cmd - the command specifying disk offering id
      * @return true or false
      * @throws
      */
@@ -140,20 +119,13 @@ public interface ConfigurationService {
     /**
      * Creates a new pod based on the parameters specified in the command object
      *
-     * @param zoneId
-     *            TODO
-     * @param name
-     *            TODO
-     * @param startIp
-     *            TODO
-     * @param endIp
-     *            TODO
-     * @param gateway
-     *            TODO
-     * @param netmask
-     *            TODO
-     * @param allocationState
-     *            TODO
+     * @param zoneId          TODO
+     * @param name            TODO
+     * @param startIp         TODO
+     * @param endIp           TODO
+     * @param gateway         TODO
+     * @param netmask         TODO
+     * @param allocationState TODO
      * @return the new pod if successful, null otherwise
      * @throws
      * @throws
@@ -163,16 +135,14 @@ public interface ConfigurationService {
     /**
      * Edits a pod in the database. Will not allow you to edit pods that are being used anywhere in the system.
      *
-     * @param UpdatePodCmd
-     *            api command
+     * @param UpdatePodCmd api command
      */
     Pod editPod(UpdatePodCmd cmd);
 
     /**
      * Deletes a pod from the database. Will not allow you to delete pods that are being used anywhere in the system.
      *
-     * @param cmd
-     *            - the command containing podId
+     * @param cmd - the command containing podId
      * @return true or false
      * @throws ,
      */
@@ -210,10 +180,9 @@ public interface ConfigurationService {
      * virtual public network (2) pod-wide direct attached VLANs (3) account-specific direct attached VLANs
      *
      * @param userId
-     * @param vlanType
-     *            - either "DomR" (VLAN for a virtual public network) or "DirectAttached" (VLAN for IPs that will be
-     *            directly
-     *            attached to UserVMs)
+     * @param vlanType  - either "DomR" (VLAN for a virtual public network) or "DirectAttached" (VLAN for IPs that will be
+     *                  directly
+     *                  attached to UserVMs)
      * @param zoneId
      * @param accountId
      * @param podId
@@ -222,12 +191,12 @@ public interface ConfigurationService {
      * @param gateway
      * @param startIP
      * @param endIP
+     * @return The new Vlan object
      * @throws ResourceAllocationException TODO
      * @throws
-     * @return The new Vlan object
      */
     Vlan createVlanAndPublicIpRange(CreateVlanIpRangeCmd cmd) throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException,
-        ResourceAllocationException;
+            ResourceAllocationException;
 
     /**
      * Marks the the account with the default zone-id.

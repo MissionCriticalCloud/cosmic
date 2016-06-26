@@ -1,48 +1,27 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.agent.api.to;
-
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.template.VirtualMachineTemplate.BootloaderType;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.Type;
 
+import java.util.List;
+import java.util.Map;
+
 public class VirtualMachineTO {
-    private long id;
-    private String name;
-    private BootloaderType bootloader;
     Type type;
     int cpus;
-
     /**
-        'speed' is still here since 4.0.X/4.1.X management servers do not support
-         the overcommit feature yet.
-
-         The overcommit feature sends minSpeed and maxSpeed
-
-         So this is here for backwards compatibility with 4.0.X/4.1.X management servers
-         and newer agents.
-    */
+     * 'speed' is still here since 4.0.X/4.1.X management servers do not support
+     * the overcommit feature yet.
+     * <p>
+     * The overcommit feature sends minSpeed and maxSpeed
+     * <p>
+     * So this is here for backwards compatibility with 4.0.X/4.1.X management servers
+     * and newer agents.
+     */
     Integer speed;
     Integer minSpeed;
     Integer maxSpeed;
-
     long minRam;
     long maxRam;
     String hostName;
@@ -58,20 +37,21 @@ public class VirtualMachineTO {
     String vncAddr;
     Map<String, String> params;
     String uuid;
-
     DiskTO[] disks;
     NicTO[] nics;
     GPUDeviceTO gpuDevice;
     Integer vcpuMaxLimit;
     List<String[]> vmData = null;
-
     String configDriveLabel = null;
     String configDriveIsoRootFolder = null;
     String configDriveIsoFile = null;
+    private long id;
+    private String name;
+    private BootloaderType bootloader;
 
-
-    public VirtualMachineTO(long id, String instanceName, VirtualMachine.Type type, int cpus, Integer speed, long minRam, long maxRam, BootloaderType bootloader,
-            String os, boolean enableHA, boolean limitCpuUse, String vncPassword) {
+    public VirtualMachineTO(final long id, final String instanceName, final VirtualMachine.Type type, final int cpus, final Integer speed, final long minRam, final long maxRam,
+                            final BootloaderType bootloader,
+                            final String os, final boolean enableHA, final boolean limitCpuUse, final String vncPassword) {
         this.id = id;
         name = instanceName;
         this.type = type;
@@ -86,8 +66,9 @@ public class VirtualMachineTO {
         this.vncPassword = vncPassword;
     }
 
-    public VirtualMachineTO(long id, String instanceName, VirtualMachine.Type type, int cpus, Integer minSpeed, Integer maxSpeed, long minRam, long maxRam,
-            BootloaderType bootloader, String os, boolean enableHA, boolean limitCpuUse, String vncPassword) {
+    public VirtualMachineTO(final long id, final String instanceName, final VirtualMachine.Type type, final int cpus, final Integer minSpeed, final Integer maxSpeed, final long
+            minRam, final long maxRam,
+                            final BootloaderType bootloader, final String os, final boolean enableHA, final boolean limitCpuUse, final String vncPassword) {
         this.id = id;
         name = instanceName;
         this.type = type;
@@ -110,7 +91,7 @@ public class VirtualMachineTO {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
@@ -118,7 +99,7 @@ public class VirtualMachineTO {
         return enableDynamicallyScaleVm;
     }
 
-    public void setEnableDynamicallyScaleVm(boolean enableDynamicallyScaleVm) {
+    public void setEnableDynamicallyScaleVm(final boolean enableDynamicallyScaleVm) {
         this.enableDynamicallyScaleVm = enableDynamicallyScaleVm;
     }
 
@@ -126,7 +107,7 @@ public class VirtualMachineTO {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -138,7 +119,7 @@ public class VirtualMachineTO {
         return bootloader;
     }
 
-    public void setBootloader(BootloaderType bootloader) {
+    public void setBootloader(final BootloaderType bootloader) {
         this.bootloader = bootloader;
     }
 
@@ -146,7 +127,7 @@ public class VirtualMachineTO {
         return cpus;
     }
 
-    public void setCpus(int cpus) {
+    public void setCpus(final int cpus) {
         this.cpus = cpus;
     }
 
@@ -170,7 +151,7 @@ public class VirtualMachineTO {
         return minRam;
     }
 
-    public void setRam(long minRam, long maxRam) {
+    public void setRam(final long minRam, final long maxRam) {
         this.minRam = minRam;
         this.maxRam = maxRam;
     }
@@ -183,7 +164,7 @@ public class VirtualMachineTO {
         return hostName;
     }
 
-    public void setHostName(String hostName) {
+    public void setHostName(final String hostName) {
         this.hostName = hostName;
     }
 
@@ -191,7 +172,7 @@ public class VirtualMachineTO {
         return arch;
     }
 
-    public void setArch(String arch) {
+    public void setArch(final String arch) {
         this.arch = arch;
     }
 
@@ -199,7 +180,7 @@ public class VirtualMachineTO {
         return os;
     }
 
-    public void setOs(String os) {
+    public void setOs(final String os) {
         this.os = os;
     }
 
@@ -207,13 +188,13 @@ public class VirtualMachineTO {
         return bootArgs;
     }
 
-    public void setBootArgs(String bootArgs) {
+    public void setBootArgs(final String bootArgs) {
         this.bootArgs = bootArgs;
     }
 
-    public void setBootArgs(Map<String, String> bootParams) {
-        StringBuilder buf = new StringBuilder();
-        for (Map.Entry<String, String> entry : bootParams.entrySet()) {
+    public void setBootArgs(final Map<String, String> bootParams) {
+        final StringBuilder buf = new StringBuilder();
+        for (final Map.Entry<String, String> entry : bootParams.entrySet()) {
             buf.append(" ").append(entry.getKey()).append("=").append(entry.getValue());
         }
         bootArgs = buf.toString();
@@ -223,7 +204,7 @@ public class VirtualMachineTO {
         return bootupScripts;
     }
 
-    public void setBootupScripts(String[] bootupScripts) {
+    public void setBootupScripts(final String[] bootupScripts) {
         this.bootupScripts = bootupScripts;
     }
 
@@ -231,7 +212,7 @@ public class VirtualMachineTO {
         return disks;
     }
 
-    public void setDisks(DiskTO[] disks) {
+    public void setDisks(final DiskTO[] disks) {
         this.disks = disks;
     }
 
@@ -239,7 +220,7 @@ public class VirtualMachineTO {
         return nics;
     }
 
-    public void setNics(NicTO[] nics) {
+    public void setNics(final NicTO[] nics) {
         this.nics = nics;
     }
 
@@ -247,7 +228,7 @@ public class VirtualMachineTO {
         return vncPassword;
     }
 
-    public void setVncPassword(String vncPassword) {
+    public void setVncPassword(final String vncPassword) {
         this.vncPassword = vncPassword;
     }
 
@@ -255,7 +236,7 @@ public class VirtualMachineTO {
         return vncAddr;
     }
 
-    public void setVncAddr(String vncAddr) {
+    public void setVncAddr(final String vncAddr) {
         this.vncAddr = vncAddr;
     }
 
@@ -263,7 +244,7 @@ public class VirtualMachineTO {
         return params;
     }
 
-    public void setDetails(Map<String, String> params) {
+    public void setDetails(final Map<String, String> params) {
         this.params = params;
     }
 
@@ -271,7 +252,7 @@ public class VirtualMachineTO {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(final String uuid) {
         this.uuid = uuid;
     }
 
@@ -279,7 +260,7 @@ public class VirtualMachineTO {
         return gpuDevice;
     }
 
-    public void setGpuDevice(GPUDeviceTO gpuDevice) {
+    public void setGpuDevice(final GPUDeviceTO gpuDevice) {
         this.gpuDevice = gpuDevice;
     }
 
@@ -287,7 +268,7 @@ public class VirtualMachineTO {
         return platformEmulator;
     }
 
-    public void setPlatformEmulator(String platformEmulator) {
+    public void setPlatformEmulator(final String platformEmulator) {
         this.platformEmulator = platformEmulator;
     }
 
@@ -295,7 +276,7 @@ public class VirtualMachineTO {
         return vcpuMaxLimit;
     }
 
-    public void setVcpuMaxLimit(Integer vcpuMaxLimit) {
+    public void setVcpuMaxLimit(final Integer vcpuMaxLimit) {
         this.vcpuMaxLimit = vcpuMaxLimit;
     }
 
@@ -303,7 +284,7 @@ public class VirtualMachineTO {
         return vmData;
     }
 
-    public void setVmData(List<String[]> vmData) {
+    public void setVmData(final List<String[]> vmData) {
         this.vmData = vmData;
     }
 
@@ -311,7 +292,7 @@ public class VirtualMachineTO {
         return configDriveLabel;
     }
 
-    public void setConfigDriveLabel(String configDriveLabel) {
+    public void setConfigDriveLabel(final String configDriveLabel) {
         this.configDriveLabel = configDriveLabel;
     }
 
@@ -319,7 +300,7 @@ public class VirtualMachineTO {
         return configDriveIsoRootFolder;
     }
 
-    public void setConfigDriveIsoRootFolder(String configDriveIsoRootFolder) {
+    public void setConfigDriveIsoRootFolder(final String configDriveIsoRootFolder) {
         this.configDriveIsoRootFolder = configDriveIsoRootFolder;
     }
 
@@ -327,8 +308,7 @@ public class VirtualMachineTO {
         return configDriveIsoFile;
     }
 
-    public void setConfigDriveIsoFile(String configDriveIsoFile) {
+    public void setConfigDriveIsoFile(final String configDriveIsoFile) {
         this.configDriveIsoFile = configDriveIsoFile;
     }
-
 }

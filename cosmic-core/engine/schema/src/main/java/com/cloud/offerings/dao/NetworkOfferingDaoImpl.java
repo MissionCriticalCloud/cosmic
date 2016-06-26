@@ -1,26 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.offerings.dao;
-
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.persistence.EntityExistsException;
 
 import com.cloud.network.Network;
 import com.cloud.network.Networks.TrafficType;
@@ -36,6 +14,11 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
+
+import javax.inject.Inject;
+import javax.persistence.EntityExistsException;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -85,17 +68,29 @@ public class NetworkOfferingDaoImpl extends GenericDaoBase<NetworkOfferingVO, Lo
     }
 
     @Override
-    public NetworkOfferingVO findByUniqueName(String uniqueName) {
-        SearchCriteria<NetworkOfferingVO> sc = NameSearch.create();
+    @DB
+    public boolean remove(final Long networkOfferingId) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        txn.start();
+        final NetworkOfferingVO offering = findById(networkOfferingId);
+        offering.setUniqueName(null);
+        update(networkOfferingId, offering);
+        final boolean result = super.remove(networkOfferingId);
+        txn.commit();
+        return result;
+    }
+
+    @Override
+    public NetworkOfferingVO findByUniqueName(final String uniqueName) {
+        final SearchCriteria<NetworkOfferingVO> sc = NameSearch.create();
 
         sc.setParameters("uniqueName", uniqueName);
 
         return findOneBy(sc);
-
     }
 
     @Override
-    public NetworkOfferingVO persistDefaultNetworkOffering(NetworkOfferingVO offering) {
+    public NetworkOfferingVO persistDefaultNetworkOffering(final NetworkOfferingVO offering) {
         assert offering.getUniqueName() != null : "how are you going to find this later if you don't set it?";
         NetworkOfferingVO vo = findByUniqueName(offering.getUniqueName());
         if (vo != null) {
@@ -104,7 +99,7 @@ public class NetworkOfferingDaoImpl extends GenericDaoBase<NetworkOfferingVO, Lo
         try {
             vo = persist(offering);
             return vo;
-        } catch (EntityExistsException e) {
+        } catch (final EntityExistsException e) {
             // Assume it's conflict on unique name from two different management servers.
             return findByUniqueName(offering.getName());
         }
@@ -112,35 +107,22 @@ public class NetworkOfferingDaoImpl extends GenericDaoBase<NetworkOfferingVO, Lo
 
     @Override
     public List<NetworkOfferingVO> listSystemNetworkOfferings() {
-        SearchCriteria<NetworkOfferingVO> sc = SystemOfferingSearch.create();
+        final SearchCriteria<NetworkOfferingVO> sc = SystemOfferingSearch.create();
         sc.setParameters("system", true);
         return this.listIncludingRemovedBy(sc, null);
     }
 
     @Override
-    public List<NetworkOfferingVO> listByAvailability(Availability availability, boolean isSystem) {
-        SearchCriteria<NetworkOfferingVO> sc = AvailabilitySearch.create();
+    public List<NetworkOfferingVO> listByAvailability(final Availability availability, final boolean isSystem) {
+        final SearchCriteria<NetworkOfferingVO> sc = AvailabilitySearch.create();
         sc.setParameters("availability", availability);
         sc.setParameters("isSystem", isSystem);
         return listBy(sc, null);
     }
 
     @Override
-    @DB
-    public boolean remove(Long networkOfferingId) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        NetworkOfferingVO offering = findById(networkOfferingId);
-        offering.setUniqueName(null);
-        update(networkOfferingId, offering);
-        boolean result = super.remove(networkOfferingId);
-        txn.commit();
-        return result;
-    }
-
-    @Override
-    public List<Long> getOfferingIdsToUpgradeFrom(NetworkOffering originalOffering) {
-        SearchCriteria<Long> sc = UpgradeSearch.create();
+    public List<Long> getOfferingIdsToUpgradeFrom(final NetworkOffering originalOffering) {
+        final SearchCriteria<Long> sc = UpgradeSearch.create();
         // exclude original offering
         sc.addAnd("id", SearchCriteria.Op.NEQ, originalOffering.getId());
 
@@ -162,8 +144,8 @@ public class NetworkOfferingDaoImpl extends GenericDaoBase<NetworkOfferingVO, Lo
     }
 
     @Override
-    public List<NetworkOfferingVO> listByTrafficTypeGuestTypeAndState(NetworkOffering.State state, TrafficType trafficType, Network.GuestType type) {
-        SearchCriteria<NetworkOfferingVO> sc = AllFieldsSearch.create();
+    public List<NetworkOfferingVO> listByTrafficTypeGuestTypeAndState(final NetworkOffering.State state, final TrafficType trafficType, final Network.GuestType type) {
+        final SearchCriteria<NetworkOfferingVO> sc = AllFieldsSearch.create();
         sc.setParameters("trafficType", trafficType);
         sc.setParameters("guestType", type);
         sc.setParameters("state", state);
@@ -172,15 +154,15 @@ public class NetworkOfferingDaoImpl extends GenericDaoBase<NetworkOfferingVO, Lo
 
     @Override
     @DB
-    public NetworkOfferingVO persist(NetworkOfferingVO off, Map<Detail, String> details) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public NetworkOfferingVO persist(final NetworkOfferingVO off, final Map<Detail, String> details) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
         //1) persist the offering
-        NetworkOfferingVO vo = super.persist(off);
+        final NetworkOfferingVO vo = super.persist(off);
 
         //2) persist the details
         if (details != null && !details.isEmpty()) {
-            for (NetworkOffering.Detail detail : details.keySet()) {
+            for (final NetworkOffering.Detail detail : details.keySet()) {
                 _detailsDao.persist(new NetworkOfferingDetailsVO(off.getId(), detail, details.get(detail)));
             }
         }
@@ -188,5 +170,4 @@ public class NetworkOfferingDaoImpl extends GenericDaoBase<NetworkOfferingVO, Lo
         txn.commit();
         return vo;
     }
-
 }

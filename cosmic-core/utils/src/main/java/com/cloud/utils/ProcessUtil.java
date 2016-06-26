@@ -1,33 +1,17 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
-
-import javax.naming.ConfigurationException;
-
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
+
+import javax.naming.ConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -37,7 +21,7 @@ public class ProcessUtil {
     private static final Logger s_logger = LoggerFactory.getLogger(ProcessUtil.class.getName());
 
     // paths cannot be hardcoded
-    public static void pidCheck(String pidDir, String run) throws ConfigurationException {
+    public static void pidCheck(final String pidDir, final String run) throws ConfigurationException {
 
         String dir = pidDir == null ? "/var/run" : pidDir;
 
@@ -52,7 +36,7 @@ public class ProcessUtil {
                     dir = pidDir == null ? "/var/run" : pidDir;
                 }
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             s_logger.debug("environment.properties could not be opened");
         }
 
@@ -101,10 +85,10 @@ public class ProcessUtil {
     }
 
     public static String dumpStack() {
-        StringBuilder sb = new StringBuilder();
-        StackTraceElement[] elems = Thread.currentThread().getStackTrace();
+        final StringBuilder sb = new StringBuilder();
+        final StackTraceElement[] elems = Thread.currentThread().getStackTrace();
         if (elems != null && elems.length > 0) {
-            for (StackTraceElement elem : elems) {
+            for (final StackTraceElement elem : elems) {
                 sb.append("\tat ").append(elem.getMethodName()).append("(").append(elem.getFileName()).append(":").append(elem.getLineNumber()).append(")\n");
             }
         }

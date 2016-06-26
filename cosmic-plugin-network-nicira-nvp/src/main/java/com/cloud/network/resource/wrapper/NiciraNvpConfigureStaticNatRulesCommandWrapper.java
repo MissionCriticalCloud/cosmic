@@ -1,23 +1,10 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.network.resource.wrapper;
+
+import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.ConfigureStaticNatRulesOnLogicalRouterAnswer;
@@ -30,12 +17,11 @@ import com.cloud.network.resource.NiciraNvpResource;
 import com.cloud.network.utils.CommandRetryUtility;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = ConfigureStaticNatRulesOnLogicalRouterCommand.class)
 public final class NiciraNvpConfigureStaticNatRulesCommandWrapper extends CommandWrapper<ConfigureStaticNatRulesOnLogicalRouterCommand, Answer, NiciraNvpResource> {
@@ -101,7 +87,6 @@ public final class NiciraNvpConfigureStaticNatRulesCommandWrapper extends Comman
                         niciraNvpApi.deleteLogicalRouterNatRule(command.getLogicalRouterUuid(), rulepair[0].getUuid());
                         throw ex; // Rethrow original exception
                     }
-
                 }
             }
             return new ConfigureStaticNatRulesOnLogicalRouterAnswer(command, true, command.getRules().size() + " StaticNat rules applied");

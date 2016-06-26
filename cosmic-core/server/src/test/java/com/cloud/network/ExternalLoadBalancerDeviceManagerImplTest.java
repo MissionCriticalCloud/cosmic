@@ -1,30 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.network;
-
-import java.lang.reflect.Field;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-
-import javax.inject.Inject;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Command;
@@ -61,9 +35,17 @@ import com.cloud.user.dao.UserStatisticsDao;
 import com.cloud.utils.net.Ip;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import java.lang.reflect.Field;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,6 +57,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ExternalLoadBalancerDeviceManagerImplTest {
 
+    @Mock
+    protected HostPodDao _podDao = null;
     @Mock
     NetworkExternalLoadBalancerDao _networkExternalLBDao;
     @Mock
@@ -132,8 +116,6 @@ public class ExternalLoadBalancerDeviceManagerImplTest {
     @Mock
     ExternalFirewallDeviceDao _externalFirewallDeviceDao;
     @Mock
-    protected HostPodDao _podDao = null;
-    @Mock
     IpAddressManager _ipAddrMgr;
 
     @Mock
@@ -149,7 +131,7 @@ public class ExternalLoadBalancerDeviceManagerImplTest {
             IllegalAccessException, NoSuchFieldException, SecurityException {
         externalLoadBalancerDeviceManager = new ExternalLoadBalancerDeviceManagerImpl() {
         };
-        for (Field fieldToInject : ExternalLoadBalancerDeviceManagerImpl.class
+        for (final Field fieldToInject : ExternalLoadBalancerDeviceManagerImpl.class
                 .getDeclaredFields()) {
             if (fieldToInject.isAnnotationPresent(Inject.class)) {
                 fieldToInject.setAccessible(true);
@@ -165,16 +147,36 @@ public class ExternalLoadBalancerDeviceManagerImplTest {
             URISyntaxException {
         setupLBHealthChecksMocks();
 
-        HealthCheckLBConfigAnswer answer = Mockito
+        final HealthCheckLBConfigAnswer answer = Mockito
                 .mock(HealthCheckLBConfigAnswer.class);
         Mockito.when(answer.getLoadBalancers()).thenReturn(
-                Collections.<LoadBalancerTO> emptyList());
+                Collections.<LoadBalancerTO>emptyList());
         Mockito.when(
                 _agentMgr.easySend(Mockito.anyLong(),
                         Mockito.any(Command.class))).thenReturn(answer);
 
         Assert.assertNotNull(externalLoadBalancerDeviceManager
                 .getLBHealthChecks(network, Arrays.asList(rule)));
+    }
+
+    private void setupLBHealthChecksMocks() throws URISyntaxException {
+        Mockito.when(network.getId()).thenReturn(42l);
+        Mockito.when(network.getBroadcastUri()).thenReturn(new URI("vlan://1"));
+        final NetworkExternalLoadBalancerVO externalLb = Mockito
+                .mock(NetworkExternalLoadBalancerVO.class);
+        Mockito.when(externalLb.getExternalLBDeviceId()).thenReturn(66l);
+        Mockito.when(_networkExternalLBDao.findByNetworkId(42)).thenReturn(
+                externalLb);
+        final ExternalLoadBalancerDeviceVO lbDevice = Mockito
+                .mock(ExternalLoadBalancerDeviceVO.class);
+        Mockito.when(_externalLoadBalancerDeviceDao.findById(66l)).thenReturn(
+                lbDevice);
+        Mockito.when(rule.getAlgorithm()).thenReturn("TEST");
+        Mockito.when(rule.getProtocol()).thenReturn("TEST");
+        Mockito.when(rule.getSourceIp()).thenReturn(new Ip(1l));
+        Mockito.when(lbDevice.getHostId()).thenReturn(99l);
+        final HostVO hostVo = Mockito.mock(HostVO.class);
+        Mockito.when(_hostDao.findById(Mockito.anyLong())).thenReturn(hostVo);
     }
 
     @Test
@@ -190,33 +192,12 @@ public class ExternalLoadBalancerDeviceManagerImplTest {
                 .getLBHealthChecks(network, Arrays.asList(rule)));
     }
 
-    private void setupLBHealthChecksMocks() throws URISyntaxException {
-        Mockito.when(network.getId()).thenReturn(42l);
-        Mockito.when(network.getBroadcastUri()).thenReturn(new URI("vlan://1"));
-        NetworkExternalLoadBalancerVO externalLb = Mockito
-                .mock(NetworkExternalLoadBalancerVO.class);
-        Mockito.when(externalLb.getExternalLBDeviceId()).thenReturn(66l);
-        Mockito.when(_networkExternalLBDao.findByNetworkId(42)).thenReturn(
-                externalLb);
-        ExternalLoadBalancerDeviceVO lbDevice = Mockito
-                .mock(ExternalLoadBalancerDeviceVO.class);
-        Mockito.when(_externalLoadBalancerDeviceDao.findById(66l)).thenReturn(
-                lbDevice);
-        Mockito.when(rule.getAlgorithm()).thenReturn("TEST");
-        Mockito.when(rule.getProtocol()).thenReturn("TEST");
-        Mockito.when(rule.getSourceIp()).thenReturn(new Ip(1l));
-        Mockito.when(lbDevice.getHostId()).thenReturn(99l);
-        HostVO hostVo = Mockito.mock(HostVO.class);
-        Mockito.when(_hostDao.findById(Mockito.anyLong())).thenReturn(hostVo);
-    }
-
-
     @Test
-    public void testUsageTask()  {
-        ExternalDeviceUsageManagerImpl.ExternalDeviceNetworkUsageTask usageTask = Mockito
+    public void testUsageTask() {
+        final ExternalDeviceUsageManagerImpl.ExternalDeviceNetworkUsageTask usageTask = Mockito
                 .mock(ExternalDeviceUsageManagerImpl.ExternalDeviceNetworkUsageTask.class);
-        Mockito.when(_hostDao.listByType(Host.Type.ExternalFirewall)).thenReturn(new ArrayList<HostVO>());
-        Mockito.when(_hostDao.listByType(Host.Type.ExternalLoadBalancer)).thenReturn(new ArrayList<HostVO>());
+        Mockito.when(_hostDao.listByType(Host.Type.ExternalFirewall)).thenReturn(new ArrayList<>());
+        Mockito.when(_hostDao.listByType(Host.Type.ExternalLoadBalancer)).thenReturn(new ArrayList<>());
         usageTask.runInContext();
         Mockito.verify(usageTask, Mockito.times(0)).runExternalDeviceNetworkUsageTask();
     }

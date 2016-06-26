@@ -1,28 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.storage;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
@@ -43,8 +19,15 @@ import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -69,7 +52,7 @@ public class OCFS2ManagerImpl extends ManagerBase implements OCFS2Manager, Resou
     PrimaryDataStoreDao _poolDao;
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         return true;
     }
 
@@ -85,25 +68,19 @@ public class OCFS2ManagerImpl extends ManagerBase implements OCFS2Manager, Resou
         return true;
     }
 
-    private List<Ternary<Integer, String, String>> marshalNodes(List<HostVO> hosts) {
-        Integer i = 0;
-        List<Ternary<Integer, String, String>> lst = new ArrayList<Ternary<Integer, String, String>>();
-        for (HostVO h : hosts) {
-            /**
-             * Don't show "node" in node name otherwise OVM's utils/config_o2cb.sh will be going crazy
-             */
-            String nodeName = "ovm_" + h.getPrivateIpAddress().replace(".", "_");
-            Ternary<Integer, String, String> node = new Ternary<Integer, String, String>(i, h.getPrivateIpAddress(), nodeName);
-            lst.add(node);
-            i++;
+    @Override
+    public boolean prepareNodes(final List<HostVO> hosts, final StoragePool pool) {
+        if (pool.getPoolType() != StoragePoolType.OCFS2) {
+            throw new CloudRuntimeException("None OCFS2 storage pool is getting into OCFS2 manager!");
         }
-        return lst;
+
+        return prepareNodes(getClusterName(pool.getClusterId()), hosts);
     }
 
-    private boolean prepareNodes(String clusterName, List<HostVO> hosts) {
-        PrepareOCFS2NodesCommand cmd = new PrepareOCFS2NodesCommand(clusterName, marshalNodes(hosts));
-        for (HostVO h : hosts) {
-            Answer ans = _agentMgr.easySend(h.getId(), cmd);
+    private boolean prepareNodes(final String clusterName, final List<HostVO> hosts) {
+        final PrepareOCFS2NodesCommand cmd = new PrepareOCFS2NodesCommand(clusterName, marshalNodes(hosts));
+        for (final HostVO h : hosts) {
+            final Answer ans = _agentMgr.easySend(h.getId(), cmd);
             if (ans == null) {
                 s_logger.debug("Host " + h.getId() + " is not in UP state, skip preparing OCFS2 node on it");
                 continue;
@@ -117,38 +94,44 @@ public class OCFS2ManagerImpl extends ManagerBase implements OCFS2Manager, Resou
         return true;
     }
 
-    private String getClusterName(Long clusterId) {
-        ClusterVO cluster = _clusterDao.findById(clusterId);
+    private String getClusterName(final Long clusterId) {
+        final ClusterVO cluster = _clusterDao.findById(clusterId);
         if (cluster == null) {
             throw new CloudRuntimeException("Cannot get cluster for id " + clusterId);
         }
 
-        String clusterName = "OvmCluster" + cluster.getId();
+        final String clusterName = "OvmCluster" + cluster.getId();
         return clusterName;
     }
 
-    @Override
-    public boolean prepareNodes(List<HostVO> hosts, StoragePool pool) {
-        if (pool.getPoolType() != StoragePoolType.OCFS2) {
-            throw new CloudRuntimeException("None OCFS2 storage pool is getting into OCFS2 manager!");
+    private List<Ternary<Integer, String, String>> marshalNodes(final List<HostVO> hosts) {
+        Integer i = 0;
+        final List<Ternary<Integer, String, String>> lst = new ArrayList<>();
+        for (final HostVO h : hosts) {
+            /**
+             * Don't show "node" in node name otherwise OVM's utils/config_o2cb.sh will be going crazy
+             */
+            final String nodeName = "ovm_" + h.getPrivateIpAddress().replace(".", "_");
+            final Ternary<Integer, String, String> node = new Ternary<>(i, h.getPrivateIpAddress(), nodeName);
+            lst.add(node);
+            i++;
         }
-
-        return prepareNodes(getClusterName(pool.getClusterId()), hosts);
+        return lst;
     }
 
     @Override
-    public boolean prepareNodes(Long clusterId) {
-        ClusterVO cluster = _clusterDao.findById(clusterId);
+    public boolean prepareNodes(final Long clusterId) {
+        final ClusterVO cluster = _clusterDao.findById(clusterId);
         if (cluster == null) {
             throw new CloudRuntimeException("Cannot find cluster for ID " + clusterId);
         }
 
-        QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
+        final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
         sc.and(sc.entity().getClusterId(), Op.EQ, clusterId);
         sc.and(sc.entity().getPodId(), Op.EQ, cluster.getPodId());
         sc.and(sc.entity().getDataCenterId(), Op.EQ, cluster.getDataCenterId());
         sc.and(sc.entity().getType(), Op.EQ, Host.Type.Routing);
-        List<HostVO> hosts = sc.list();
+        final List<HostVO> hosts = sc.list();
         if (hosts.isEmpty()) {
             s_logger.debug("There is no host in cluster " + clusterId + ", no need to prepare OCFS2 nodes");
             return true;
@@ -158,48 +141,49 @@ public class OCFS2ManagerImpl extends ManagerBase implements OCFS2Manager, Resou
     }
 
     @Override
-    public void processDiscoverEventBefore(Long dcid, Long podId, Long clusterId, URI uri, String username, String password, List<String> hostTags) {
+    public void processDiscoverEventBefore(final Long dcid, final Long podId, final Long clusterId, final URI uri, final String username, final String password, final
+    List<String> hostTags) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void processDiscoverEventAfter(Map<? extends ServerResource, Map<String, String>> resources) {
+    public void processDiscoverEventAfter(final Map<? extends ServerResource, Map<String, String>> resources) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void processDeleteHostEventBefore(Host host) {
+    public void processDeleteHostEventBefore(final Host host) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void processDeletHostEventAfter(Host host) {
+    public void processDeletHostEventAfter(final Host host) {
         // TODO Auto-generated method stub
     }
 
     @Override
-    public void processCancelMaintenaceEventBefore(Long hostId) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void processCancelMaintenaceEventAfter(Long hostId) {
+    public void processCancelMaintenaceEventBefore(final Long hostId) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void processPrepareMaintenaceEventBefore(Long hostId) {
+    public void processCancelMaintenaceEventAfter(final Long hostId) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void processPrepareMaintenaceEventAfter(Long hostId) {
+    public void processPrepareMaintenaceEventBefore(final Long hostId) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void processPrepareMaintenaceEventAfter(final Long hostId) {
         // TODO Auto-generated method stub
 
     }

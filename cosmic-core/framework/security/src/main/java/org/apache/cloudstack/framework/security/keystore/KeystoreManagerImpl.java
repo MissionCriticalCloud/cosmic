@@ -1,21 +1,11 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.framework.security.keystore;
 
+import com.cloud.utils.Ternary;
+import com.cloud.utils.component.ManagerBase;
+import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.security.CertificateHelper;
+
+import javax.inject.Inject;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -27,13 +17,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-
-import com.cloud.utils.Ternary;
-import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.security.CertificateHelper;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -48,95 +31,99 @@ public class KeystoreManagerImpl extends ManagerBase implements KeystoreManager 
     private KeystoreDao _ksDao;
 
     @Override
-    public boolean validateCertificate(String certificate, String key, String domainSuffix) {
+    public boolean validateCertificate(final String certificate, final String key, final String domainSuffix) {
         if (certificate == null || certificate.isEmpty() || key == null || key.isEmpty() || domainSuffix == null || domainSuffix.isEmpty()) {
             s_logger.error("Invalid parameter found in (certificate, key, domainSuffix) tuple for domain: " + domainSuffix);
             return false;
         }
 
         try {
-            String ksPassword = "passwordForValidation";
-            byte[] ksBits = CertificateHelper.buildAndSaveKeystore(domainSuffix, certificate, getKeyContent(key), ksPassword);
-            KeyStore ks = CertificateHelper.loadKeystore(ksBits, ksPassword);
-            if (ks != null)
+            final String ksPassword = "passwordForValidation";
+            final byte[] ksBits = CertificateHelper.buildAndSaveKeystore(domainSuffix, certificate, getKeyContent(key), ksPassword);
+            final KeyStore ks = CertificateHelper.loadKeystore(ksBits, ksPassword);
+            if (ks != null) {
                 return true;
+            }
 
             s_logger.error("Unabled to construct keystore for domain: " + domainSuffix);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             s_logger.error("Certificate validation failed due to exception for domain: " + domainSuffix, e);
         }
         return false;
     }
 
     @Override
-    public void saveCertificate(String name, String certificate, String key, String domainSuffix) {
+    public void saveCertificate(final String name, final String certificate, final String key, final String domainSuffix) {
         if (name == null || name.isEmpty() || certificate == null || certificate.isEmpty() || key == null || key.isEmpty() || domainSuffix == null ||
-            domainSuffix.isEmpty())
+                domainSuffix.isEmpty()) {
             throw new CloudRuntimeException("invalid parameter in saveCerticate");
+        }
 
         _ksDao.save(name, certificate, key, domainSuffix);
     }
 
     @Override
-    public void saveCertificate(String name, String certificate, Integer index, String domainSuffix) {
-        if (name == null || name.isEmpty() || certificate == null || certificate.isEmpty() || index == null || domainSuffix == null || domainSuffix.isEmpty())
-            throw new CloudRuntimeException("invalid parameter in saveCerticate");
-
-        _ksDao.save(name, certificate, index, domainSuffix);
-    }
-
-    @Override
-    public byte[] getKeystoreBits(String name, String aliasForCertificateInStore, String storePassword) {
+    public byte[] getKeystoreBits(final String name, final String aliasForCertificateInStore, final String storePassword) {
         assert (name != null);
         assert (aliasForCertificateInStore != null);
         assert (storePassword != null);
 
-        KeystoreVO ksVo = _ksDao.findByName(name);
-        if (ksVo == null)
+        final KeystoreVO ksVo = _ksDao.findByName(name);
+        if (ksVo == null) {
             throw new CloudRuntimeException("Unable to find keystore " + name);
+        }
 
-        List<Ternary<String, String, String>> certs = new ArrayList<Ternary<String, String, String>>();
-        List<KeystoreVO> certChains = _ksDao.findCertChain();
+        final List<Ternary<String, String, String>> certs = new ArrayList<>();
+        final List<KeystoreVO> certChains = _ksDao.findCertChain();
 
-        for (KeystoreVO ks : certChains) {
-            Ternary<String, String, String> cert = new Ternary<String, String, String>(ks.getName(), ks.getCertificate(), null);
+        for (final KeystoreVO ks : certChains) {
+            final Ternary<String, String, String> cert = new Ternary<>(ks.getName(), ks.getCertificate(), null);
             certs.add(cert);
         }
 
-        Ternary<String, String, String> cert = new Ternary<String, String, String>(ksVo.getName(), ksVo.getCertificate(), getKeyContent(ksVo.getKey()));
+        final Ternary<String, String, String> cert = new Ternary<>(ksVo.getName(), ksVo.getCertificate(), getKeyContent(ksVo.getKey()));
         certs.add(cert);
 
         try {
             return CertificateHelper.buildAndSaveKeystore(certs, storePassword);
-        } catch (KeyStoreException e) {
+        } catch (final KeyStoreException e) {
             s_logger.warn("Unable to build keystore for " + name + " due to KeyStoreException");
-        } catch (CertificateException e) {
+        } catch (final CertificateException e) {
             s_logger.warn("Unable to build keystore for " + name + " due to CertificateException");
-        } catch (NoSuchAlgorithmException e) {
+        } catch (final NoSuchAlgorithmException e) {
             s_logger.warn("Unable to build keystore for " + name + " due to NoSuchAlgorithmException");
-        } catch (InvalidKeySpecException e) {
+        } catch (final InvalidKeySpecException e) {
             s_logger.warn("Unable to build keystore for " + name + " due to InvalidKeySpecException");
-        } catch (IOException e) {
+        } catch (final IOException e) {
             s_logger.warn("Unable to build keystore for " + name + " due to IOException");
         }
         return null;
     }
 
     @Override
-    public Certificates getCertificates(String name) {
-        KeystoreVO ksVo = _ksDao.findByName(name);
+    public void saveCertificate(final String name, final String certificate, final Integer index, final String domainSuffix) {
+        if (name == null || name.isEmpty() || certificate == null || certificate.isEmpty() || index == null || domainSuffix == null || domainSuffix.isEmpty()) {
+            throw new CloudRuntimeException("invalid parameter in saveCerticate");
+        }
+
+        _ksDao.save(name, certificate, index, domainSuffix);
+    }
+
+    @Override
+    public Certificates getCertificates(final String name) {
+        final KeystoreVO ksVo = _ksDao.findByName(name);
         if (ksVo == null) {
             return null;
         }
-        String prvKey = ksVo.getKey();
-        String prvCert = ksVo.getCertificate();
-        String domainSuffix = ksVo.getDomainSuffix();
+        final String prvKey = ksVo.getKey();
+        final String prvCert = ksVo.getCertificate();
+        final String domainSuffix = ksVo.getDomainSuffix();
         String certChain = null;
         String rootCert = null;
-        List<KeystoreVO> certchains = _ksDao.findCertChain(domainSuffix);
+        final List<KeystoreVO> certchains = _ksDao.findCertChain(domainSuffix);
         if (certchains.size() > 0) {
-            ArrayList<String> chains = new ArrayList<String>();
-            for (KeystoreVO cert : certchains) {
+            final ArrayList<String> chains = new ArrayList<>();
+            for (final KeystoreVO cert : certchains) {
                 if (chains.size() == 0) {// For the first time it will be length 0
                     rootCert = cert.getCertificate();
                 }
@@ -145,15 +132,16 @@ public class KeystoreManagerImpl extends ManagerBase implements KeystoreManager 
             Collections.reverse(chains);
             certChain = StringUtils.join(chains, "\n");
         }
-        Certificates certs = new Certificates(prvKey, prvCert, certChain, rootCert);
+        final Certificates certs = new Certificates(prvKey, prvCert, certChain, rootCert);
         return certs;
     }
 
-    private static String getKeyContent(String key) {
-        Pattern regex = Pattern.compile("(^[\\-]+[^\\-]+[\\-]+[\\n]?)([^\\-]+)([\\-]+[^\\-]+[\\-]+$)");
-        Matcher m = regex.matcher(key);
-        if (m.find())
+    private static String getKeyContent(final String key) {
+        final Pattern regex = Pattern.compile("(^[\\-]+[^\\-]+[\\-]+[\\n]?)([^\\-]+)([\\-]+[^\\-]+[\\-]+$)");
+        final Matcher m = regex.matcher(key);
+        if (m.find()) {
             return m.group(2);
+        }
 
         return key;
     }

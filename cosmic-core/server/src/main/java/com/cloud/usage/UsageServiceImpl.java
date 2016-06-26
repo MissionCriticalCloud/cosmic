@@ -1,30 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.usage;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.configuration.Config;
 import com.cloud.domain.DomainVO;
@@ -65,7 +39,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.api.command.admin.usage.GenerateUsageRecordsCmd;
 import org.apache.cloudstack.api.command.admin.usage.GetUsageRecordsCmd;
 import org.apache.cloudstack.api.command.admin.usage.RemoveRawUsageRecordsCmd;
@@ -75,6 +48,16 @@ import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.usage.Usage;
 import org.apache.cloudstack.usage.UsageService;
 import org.apache.cloudstack.usage.UsageTypes;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -125,23 +108,23 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
     }
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         super.configure(name, params);
         String timeZoneStr = _configDao.getValue(Config.UsageAggregationTimezone.toString());
         if (timeZoneStr == null) {
-           timeZoneStr = "GMT";
+            timeZoneStr = "GMT";
         }
         _usageTimezone = TimeZone.getTimeZone(timeZoneStr);
         return true;
     }
 
     @Override
-    public boolean generateUsageRecords(GenerateUsageRecordsCmd cmd) {
-        TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
+    public boolean generateUsageRecords(final GenerateUsageRecordsCmd cmd) {
+        final TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
         try {
-            UsageJobVO immediateJob = _usageJobDao.getNextImmediateJob();
+            final UsageJobVO immediateJob = _usageJobDao.getNextImmediateJob();
             if (immediateJob == null) {
-                UsageJobVO job = _usageJobDao.getLastJob();
+                final UsageJobVO job = _usageJobDao.getLastJob();
 
                 String host = null;
                 int pid = 0;
@@ -155,28 +138,28 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
             txn.close();
 
             // switch back to VMOPS_DB
-            TransactionLegacy swap = TransactionLegacy.open(TransactionLegacy.CLOUD_DB);
+            final TransactionLegacy swap = TransactionLegacy.open(TransactionLegacy.CLOUD_DB);
             swap.close();
         }
         return true;
     }
 
     @Override
-    public Pair<List<? extends Usage>, Integer> getUsageRecords(GetUsageRecordsCmd cmd) {
+    public Pair<List<? extends Usage>, Integer> getUsageRecords(final GetUsageRecordsCmd cmd) {
         Long accountId = cmd.getAccountId();
-        Long domainId = cmd.getDomainId();
-        String accountName = cmd.getAccountName();
+        final Long domainId = cmd.getDomainId();
+        final String accountName = cmd.getAccountName();
         Account userAccount = null;
-        Account caller = CallContext.current().getCallingAccount();
-        Long usageType = cmd.getUsageType();
-        Long projectId = cmd.getProjectId();
-        String usageId = cmd.getUsageId();
+        final Account caller = CallContext.current().getCallingAccount();
+        final Long usageType = cmd.getUsageType();
+        final Long projectId = cmd.getProjectId();
+        final String usageId = cmd.getUsageId();
 
         if (projectId != null) {
             if (accountId != null) {
                 throw new InvalidParameterValueException("Projectid and accountId can't be specified together");
             }
-            Project project = _projectMgr.getProject(projectId);
+            final Project project = _projectMgr.getProject(projectId);
             if (project == null) {
                 throw new InvalidParameterValueException("Unable to find project by id " + projectId);
             }
@@ -186,8 +169,8 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
         //if accountId is not specified, use accountName and domainId
         if ((accountId == null) && (accountName != null) && (domainId != null)) {
             if (_domainDao.isChildDomain(caller.getDomainId(), domainId)) {
-                Filter filter = new Filter(AccountVO.class, "id", Boolean.FALSE, null, null);
-                List<AccountVO> accounts = _accountDao.listAccounts(accountName, domainId, filter);
+                final Filter filter = new Filter(AccountVO.class, "id", Boolean.FALSE, null, null);
+                final List<AccountVO> accounts = _accountDao.listAccounts(accountName, domainId, filter);
                 if (accounts.size() > 0) {
                     userAccount = accounts.get(0);
                 }
@@ -217,35 +200,36 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
             s_logger.debug("Account details not available. Using userContext accountId: " + accountId);
         }
 
-        Date startDate = cmd.getStartDate();
-        Date endDate = cmd.getEndDate();
+        final Date startDate = cmd.getStartDate();
+        final Date endDate = cmd.getEndDate();
         if (startDate.after(endDate)) {
             throw new InvalidParameterValueException("Incorrect Date Range. Start date: " + startDate + " is after end date:" + endDate);
         }
-        TimeZone usageTZ = getUsageTimezone();
-        Date adjustedStartDate = computeAdjustedTime(startDate, usageTZ);
-        Date adjustedEndDate = computeAdjustedTime(endDate, usageTZ);
+        final TimeZone usageTZ = getUsageTimezone();
+        final Date adjustedStartDate = computeAdjustedTime(startDate, usageTZ);
+        final Date adjustedEndDate = computeAdjustedTime(endDate, usageTZ);
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("getting usage records for account: " + accountId + ", domainId: " + domainId + ", between " + adjustedStartDate + " and " + adjustedEndDate +
-                ", using pageSize: " + cmd.getPageSizeVal() + " and startIndex: " + cmd.getStartIndex());
+                    ", using pageSize: " + cmd.getPageSizeVal() + " and startIndex: " + cmd.getStartIndex());
         }
 
-        Filter usageFilter = new Filter(UsageVO.class, "id", true, cmd.getStartIndex(), cmd.getPageSizeVal());
+        final Filter usageFilter = new Filter(UsageVO.class, "id", true, cmd.getStartIndex(), cmd.getPageSizeVal());
 
-        SearchCriteria<UsageVO> sc = _usageDao.createSearchCriteria();
+        final SearchCriteria<UsageVO> sc = _usageDao.createSearchCriteria();
 
         if (accountId != -1 && accountId != Account.ACCOUNT_ID_SYSTEM && !isAdmin && !isDomainAdmin) {
             sc.addAnd("accountId", SearchCriteria.Op.EQ, accountId);
         }
 
         if (isDomainAdmin) {
-            SearchCriteria<DomainVO> sdc = _domainDao.createSearchCriteria();
+            final SearchCriteria<DomainVO> sdc = _domainDao.createSearchCriteria();
             sdc.addOr("path", SearchCriteria.Op.LIKE, _domainDao.findById(caller.getDomainId()).getPath() + "%");
-            List<DomainVO> domains = _domainDao.search(sdc, null);
-            List<Long> domainIds = new ArrayList<Long>();
-            for (DomainVO domain : domains)
+            final List<DomainVO> domains = _domainDao.search(sdc, null);
+            final List<Long> domainIds = new ArrayList<>();
+            for (final DomainVO domain : domains) {
                 domainIds.add(domain.getId());
+            }
             sc.addAnd("domainId", SearchCriteria.Op.IN, domainIds.toArray());
         }
 
@@ -270,39 +254,39 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
                 case UsageTypes.RUNNING_VM:
                 case UsageTypes.ALLOCATED_VM:
                 case UsageTypes.VM_SNAPSHOT:
-                    VMInstanceVO vm = _vmDao.findByUuidIncludingRemoved(usageId);
+                    final VMInstanceVO vm = _vmDao.findByUuidIncludingRemoved(usageId);
                     if (vm != null) {
                         usageDbId = vm.getId();
                     }
 
                     if (vm == null && (usageType == UsageTypes.NETWORK_BYTES_RECEIVED || usageType == UsageTypes.NETWORK_BYTES_SENT)) {
-                        HostVO host = _hostDao.findByUuidIncludingRemoved(usageId);
+                        final HostVO host = _hostDao.findByUuidIncludingRemoved(usageId);
                         if (host != null) {
                             usageDbId = host.getId();
                         }
                     }
                     break;
                 case UsageTypes.SNAPSHOT:
-                    SnapshotVO snap = _snapshotDao.findByUuidIncludingRemoved(usageId);
+                    final SnapshotVO snap = _snapshotDao.findByUuidIncludingRemoved(usageId);
                     if (snap != null) {
                         usageDbId = snap.getId();
                     }
                     break;
                 case UsageTypes.TEMPLATE:
                 case UsageTypes.ISO:
-                    VMTemplateVO tmpl = _vmTemplateDao.findByUuidIncludingRemoved(usageId);
+                    final VMTemplateVO tmpl = _vmTemplateDao.findByUuidIncludingRemoved(usageId);
                     if (tmpl != null) {
                         usageDbId = tmpl.getId();
                     }
                     break;
                 case UsageTypes.LOAD_BALANCER_POLICY:
-                    LoadBalancerVO lb = _lbDao.findByUuidIncludingRemoved(usageId);
+                    final LoadBalancerVO lb = _lbDao.findByUuidIncludingRemoved(usageId);
                     if (lb != null) {
                         usageDbId = lb.getId();
                     }
                     break;
                 case UsageTypes.PORT_FORWARDING_RULE:
-                    PortForwardingRuleVO pf = _pfDao.findByUuidIncludingRemoved(usageId);
+                    final PortForwardingRuleVO pf = _pfDao.findByUuidIncludingRemoved(usageId);
                     if (pf != null) {
                         usageDbId = pf.getId();
                     }
@@ -312,25 +296,25 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
                 case UsageTypes.VM_DISK_IO_WRITE:
                 case UsageTypes.VM_DISK_BYTES_READ:
                 case UsageTypes.VM_DISK_BYTES_WRITE:
-                    VolumeVO volume = _volumeDao.findByUuidIncludingRemoved(usageId);
+                    final VolumeVO volume = _volumeDao.findByUuidIncludingRemoved(usageId);
                     if (volume != null) {
                         usageDbId = volume.getId();
                     }
                     break;
                 case UsageTypes.VPN_USERS:
-                    VpnUserVO vpnUser = _vpnUserDao.findByUuidIncludingRemoved(usageId);
+                    final VpnUserVO vpnUser = _vpnUserDao.findByUuidIncludingRemoved(usageId);
                     if (vpnUser != null) {
                         usageDbId = vpnUser.getId();
                     }
                     break;
                 case UsageTypes.SECURITY_GROUP:
-                    SecurityGroupVO sg = _sgDao.findByUuidIncludingRemoved(usageId);
+                    final SecurityGroupVO sg = _sgDao.findByUuidIncludingRemoved(usageId);
                     if (sg != null) {
                         usageDbId = sg.getId();
                     }
                     break;
                 case UsageTypes.IP_ADDRESS:
-                    IPAddressVO ip = _ipDao.findByUuidIncludingRemoved(usageId);
+                    final IPAddressVO ip = _ipDao.findByUuidIncludingRemoved(usageId);
                     if (ip != null) {
                         usageDbId = ip.getId();
                     }
@@ -343,7 +327,7 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
                 sc.addAnd("usageId", SearchCriteria.Op.EQ, usageDbId);
             } else {
                 // return an empty list if usageId was not found
-                return new Pair<List<? extends Usage>, Integer>(new ArrayList<Usage>(), new Integer(0));
+                return new Pair<>(new ArrayList<>(), new Integer(0));
             }
         }
 
@@ -351,22 +335,22 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
             sc.addAnd("startDate", SearchCriteria.Op.BETWEEN, adjustedStartDate, adjustedEndDate);
             sc.addAnd("endDate", SearchCriteria.Op.BETWEEN, adjustedStartDate, adjustedEndDate);
         } else {
-            return new Pair<List<? extends Usage>, Integer>(new ArrayList<Usage>(), new Integer(0)); // return an empty list if we fail to validate the dates
+            return new Pair<>(new ArrayList<>(), new Integer(0)); // return an empty list if we fail to validate the dates
         }
 
         Pair<List<UsageVO>, Integer> usageRecords = null;
-        TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
+        final TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
         try {
             usageRecords = _usageDao.searchAndCountAllRecords(sc, usageFilter);
         } finally {
             txn.close();
 
             // switch back to VMOPS_DB
-            TransactionLegacy swap = TransactionLegacy.open(TransactionLegacy.CLOUD_DB);
+            final TransactionLegacy swap = TransactionLegacy.open(TransactionLegacy.CLOUD_DB);
             swap.close();
         }
 
-        return new Pair<List<? extends Usage>, Integer>(usageRecords.first(), usageRecords.second());
+        return new Pair<>(usageRecords.first(), usageRecords.second());
     }
 
     @Override
@@ -375,26 +359,26 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
     }
 
     @Override
-    public boolean removeRawUsageRecords(RemoveRawUsageRecordsCmd cmd) throws InvalidParameterValueException {
-        Integer interval = cmd.getInterval();
-        if (interval != null && interval > 0 ) {
-            String jobExecTime = _configDao.getValue(Config.UsageStatsJobExecTime.toString());
-            if (jobExecTime != null ) {
-                String[] segments = jobExecTime.split(":");
+    public boolean removeRawUsageRecords(final RemoveRawUsageRecordsCmd cmd) throws InvalidParameterValueException {
+        final Integer interval = cmd.getInterval();
+        if (interval != null && interval > 0) {
+            final String jobExecTime = _configDao.getValue(Config.UsageStatsJobExecTime.toString());
+            if (jobExecTime != null) {
+                final String[] segments = jobExecTime.split(":");
                 if (segments.length == 2) {
                     String timeZoneStr = _configDao.getValue(Config.UsageExecutionTimezone.toString());
                     if (timeZoneStr == null) {
                         timeZoneStr = "GMT";
                     }
-                    TimeZone tz = TimeZone.getTimeZone(timeZoneStr);
-                    Calendar cal = Calendar.getInstance(tz);
+                    final TimeZone tz = TimeZone.getTimeZone(timeZoneStr);
+                    final Calendar cal = Calendar.getInstance(tz);
                     cal.setTime(new Date());
-                    long curTS = cal.getTimeInMillis();
+                    final long curTS = cal.getTimeInMillis();
                     cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(segments[0]));
                     cal.set(Calendar.MINUTE, Integer.parseInt(segments[1]));
                     cal.set(Calendar.SECOND, 0);
                     cal.set(Calendar.MILLISECOND, 0);
-                    long execTS = cal.getTimeInMillis();
+                    final long execTS = cal.getTimeInMillis();
                     s_logger.debug("Trying to remove old raw cloud_usage records older than " + interval + " day(s), current time=" + curTS + " next job execution time=" + execTS);
                     // Let's avoid cleanup when job runs and around a 15 min interval
                     if (Math.abs(curTS - execTS) < 15 * 60 * 1000) {
@@ -409,19 +393,24 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
         return true;
     }
 
-    private Date computeAdjustedTime(Date initialDate, TimeZone targetTZ) {
-        Calendar cal = Calendar.getInstance();
+    @Override
+    public List<UsageTypeResponse> listUsageTypes() {
+        return UsageTypes.listUsageTypes();
+    }
+
+    private Date computeAdjustedTime(final Date initialDate, final TimeZone targetTZ) {
+        final Calendar cal = Calendar.getInstance();
         cal.setTime(initialDate);
-        TimeZone localTZ = cal.getTimeZone();
+        final TimeZone localTZ = cal.getTimeZone();
         int timezoneOffset = cal.get(Calendar.ZONE_OFFSET);
         if (localTZ.inDaylightTime(initialDate)) {
             timezoneOffset += (60 * 60 * 1000);
         }
         cal.add(Calendar.MILLISECOND, timezoneOffset);
 
-        Date newTime = cal.getTime();
+        final Date newTime = cal.getTime();
 
-        Calendar calTS = Calendar.getInstance(targetTZ);
+        final Calendar calTS = Calendar.getInstance(targetTZ);
         calTS.setTime(newTime);
         timezoneOffset = calTS.get(Calendar.ZONE_OFFSET);
         if (targetTZ.inDaylightTime(initialDate)) {
@@ -432,10 +421,4 @@ public class UsageServiceImpl extends ManagerBase implements UsageService, Manag
 
         return calTS.getTime();
     }
-
-    @Override
-    public List<UsageTypeResponse> listUsageTypes() {
-        return UsageTypes.listUsageTypes();
-    }
-
 }

@@ -1,28 +1,11 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.usage;
-
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.Date;
 
 @Entity
 @Table(name = "usage_vm_instance")
@@ -72,8 +55,9 @@ public class UsageVMInstanceVO {
     protected UsageVMInstanceVO() {
     }
 
-    public UsageVMInstanceVO(int usageType, long zoneId, long accountId, long vmInstanceId, String vmName, long serviceOfferingId, long templateId,
-            String hypervisorType, Date startDate, Date endDate) {
+    public UsageVMInstanceVO(final int usageType, final long zoneId, final long accountId, final long vmInstanceId, final String vmName, final long serviceOfferingId, final long
+            templateId,
+                             final String hypervisorType, final Date startDate, final Date endDate) {
         this.usageType = usageType;
         this.zoneId = zoneId;
         this.accountId = accountId;
@@ -86,8 +70,9 @@ public class UsageVMInstanceVO {
         this.endDate = endDate;
     }
 
-    public UsageVMInstanceVO(int usageType, long zoneId, long accountId, long vmInstanceId, String vmName, long serviceOfferingId, long templateId,
-            Long cpuSpeed, Long cpuCores, Long memory, String hypervisorType, Date startDate, Date endDate) {
+    public UsageVMInstanceVO(final int usageType, final long zoneId, final long accountId, final long vmInstanceId, final String vmName, final long serviceOfferingId, final long
+            templateId,
+                             final Long cpuSpeed, final Long cpuCores, final Long memory, final String hypervisorType, final Date startDate, final Date endDate) {
         this.usageType = usageType;
         this.zoneId = zoneId;
         this.accountId = accountId;
@@ -131,7 +116,7 @@ public class UsageVMInstanceVO {
         return templateId;
     }
 
-    public void setServiceOfferingId(long serviceOfferingId) {
+    public void setServiceOfferingId(final long serviceOfferingId) {
         this.serviceOfferingId = serviceOfferingId;
     }
 
@@ -143,7 +128,7 @@ public class UsageVMInstanceVO {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(final Date startDate) {
         this.startDate = startDate;
     }
 
@@ -151,7 +136,7 @@ public class UsageVMInstanceVO {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(final Date endDate) {
         this.endDate = endDate;
     }
 
@@ -159,7 +144,7 @@ public class UsageVMInstanceVO {
         return memory;
     }
 
-    public void setMemory(Long memory) {
+    public void setMemory(final Long memory) {
         this.memory = memory;
     }
 
@@ -167,7 +152,7 @@ public class UsageVMInstanceVO {
         return cpuCores;
     }
 
-    public void setCpuCores(Long cpuCores) {
+    public void setCpuCores(final Long cpuCores) {
         this.cpuCores = cpuCores;
     }
 
@@ -175,7 +160,7 @@ public class UsageVMInstanceVO {
         return cpuSpeed;
     }
 
-    public void setCpuSpeed(Long cpuSpeed) {
+    public void setCpuSpeed(final Long cpuSpeed) {
         this.cpuSpeed = cpuSpeed;
     }
 }

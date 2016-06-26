@@ -1,22 +1,7 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.hypervisor;
 
-import java.util.UUID;
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.utils.NumbersUtil;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,9 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.utils.NumbersUtil;
+import java.util.UUID;
 
 @Entity
 @Table(name = "hypervisor_capabilities")
@@ -70,21 +53,14 @@ public class HypervisorCapabilitiesVO implements HypervisorCapabilities {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public HypervisorCapabilitiesVO(HypervisorType hypervisorType, String hypervisorVersion, Long maxGuestsLimit, boolean securityGroupEnabled,
-            boolean storageMotionSupported) {
+    public HypervisorCapabilitiesVO(final HypervisorType hypervisorType, final String hypervisorVersion, final Long maxGuestsLimit, final boolean securityGroupEnabled,
+                                    final boolean storageMotionSupported) {
         this.hypervisorType = hypervisorType;
         this.hypervisorVersion = hypervisorVersion;
         this.maxGuestsLimit = maxGuestsLimit;
         this.securityGroupEnabled = securityGroupEnabled;
         this.storageMotionSupported = storageMotionSupported;
         this.uuid = UUID.randomUUID().toString();
-    }
-
-    /**
-     * @param hypervisorType the hypervisorType to set
-     */
-    public void setHypervisorType(HypervisorType hypervisorType) {
-        this.hypervisorType = hypervisorType;
     }
 
     /**
@@ -96,10 +72,10 @@ public class HypervisorCapabilitiesVO implements HypervisorCapabilities {
     }
 
     /**
-     * @param hypervisorVersion the hypervisorVersion to set
+     * @param hypervisorType the hypervisorType to set
      */
-    public void setHypervisorVersion(String hypervisorVersion) {
-        this.hypervisorVersion = hypervisorVersion;
+    public void setHypervisorType(final HypervisorType hypervisorType) {
+        this.hypervisorType = hypervisorType;
     }
 
     /**
@@ -110,8 +86,11 @@ public class HypervisorCapabilitiesVO implements HypervisorCapabilities {
         return hypervisorVersion;
     }
 
-    public void setSecurityGroupEnabled(Boolean securityGroupEnabled) {
-        this.securityGroupEnabled = securityGroupEnabled;
+    /**
+     * @param hypervisorVersion the hypervisorVersion to set
+     */
+    public void setHypervisorVersion(final String hypervisorVersion) {
+        this.hypervisorVersion = hypervisorVersion;
     }
 
     /**
@@ -122,11 +101,8 @@ public class HypervisorCapabilitiesVO implements HypervisorCapabilities {
         return securityGroupEnabled;
     }
 
-    /**
-     * @param maxGuests the maxGuests to set
-     */
-    public void setMaxGuestsLimit(Long maxGuestsLimit) {
-        this.maxGuestsLimit = maxGuestsLimit;
+    public void setSecurityGroupEnabled(final Boolean securityGroupEnabled) {
+        this.securityGroupEnabled = securityGroupEnabled;
     }
 
     /**
@@ -138,10 +114,24 @@ public class HypervisorCapabilitiesVO implements HypervisorCapabilities {
     }
 
     /**
-     * @param storageMotionSupported
+     * @param maxGuests the maxGuests to set
      */
-    public void setStorageMotionSupported(boolean storageMotionSupported) {
-        this.storageMotionSupported = storageMotionSupported;
+    public void setMaxGuestsLimit(final Long maxGuestsLimit) {
+        this.maxGuestsLimit = maxGuestsLimit;
+    }
+
+    @Override
+    public Integer getMaxDataVolumesLimit() {
+        return maxDataVolumesLimit;
+    }
+
+    public void setMaxDataVolumesLimit(final Integer maxDataVolumesLimit) {
+        this.maxDataVolumesLimit = maxDataVolumesLimit;
+    }
+
+    @Override
+    public Integer getMaxHostsPerCluster() {
+        return maxHostsPerCluster;
     }
 
     /**
@@ -152,9 +142,15 @@ public class HypervisorCapabilitiesVO implements HypervisorCapabilities {
         return storageMotionSupported;
     }
 
-    @Override
-    public long getId() {
-        return id;
+    /**
+     * @param storageMotionSupported
+     */
+    public void setStorageMotionSupported(final boolean storageMotionSupported) {
+        this.storageMotionSupported = storageMotionSupported;
+    }
+
+    public void setMaxHostsPerCluster(final Integer maxHostsPerCluster) {
+        this.maxHostsPerCluster = maxHostsPerCluster;
     }
 
     @Override
@@ -163,47 +159,33 @@ public class HypervisorCapabilitiesVO implements HypervisorCapabilities {
     }
 
     @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof HypervisorCapabilitiesVO) {
+            return ((HypervisorCapabilitiesVO) obj).getId() == this.getId();
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    @Override
     public String getUuid() {
         return this.uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(final String uuid) {
         this.uuid = uuid;
-    }
-
-    @Override
-    public Integer getMaxDataVolumesLimit() {
-        return maxDataVolumesLimit;
-    }
-
-    public void setMaxDataVolumesLimit(Integer maxDataVolumesLimit) {
-        this.maxDataVolumesLimit = maxDataVolumesLimit;
-    }
-
-    @Override
-    public Integer getMaxHostsPerCluster() {
-        return maxHostsPerCluster;
-    }
-
-    public void setMaxHostsPerCluster(Integer maxHostsPerCluster) {
-        this.maxHostsPerCluster = maxHostsPerCluster;
     }
 
     public Boolean getVmSnapshotEnabled() {
         return vmSnapshotEnabled;
     }
 
-    public void setVmSnapshotEnabled(Boolean vmSnapshotEnabled) {
+    public void setVmSnapshotEnabled(final Boolean vmSnapshotEnabled) {
         this.vmSnapshotEnabled = vmSnapshotEnabled;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof HypervisorCapabilitiesVO) {
-            return ((HypervisorCapabilitiesVO)obj).getId() == this.getId();
-        } else {
-            return false;
-        }
-    }
-
 }

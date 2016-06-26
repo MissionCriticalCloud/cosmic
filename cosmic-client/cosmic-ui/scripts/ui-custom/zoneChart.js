@@ -1,42 +1,26 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function($, cloudStack) {
+(function ($, cloudStack) {
     /**
      * Zone details chart
      */
-    cloudStack.uiCustom.systemChart = function(chartID, chartFunc) {
+    cloudStack.uiCustom.systemChart = function (chartID, chartFunc) {
         /**
          * Make view all button
          */
-        var viewAllButton = function(args) {
+        var viewAllButton = function (args) {
             var $viewAll = $('<div>').addClass('button view-all');
             var $label = $('<span>').addClass('view-all-label').html(args.label ? args.label : _l('label.view.all'));
             var $browser = args.$browser;
             var action = args.action;
             // Launch a list view
             //var $multiple-click=$viewAll.data('multiple-click',false);
-            $viewAll.click(function() {
+            $viewAll.click(function () {
                 if ($viewAll.data('multiple-click')) return false;
                 //@pranav-handling the multiple clicks by using a flag variable
                 $viewAll.data('multiple-click', true);
                 $browser.cloudBrowser('addPanel', {
                     title: args.title,
                     maximizeIfSelected: true,
-                    complete: function($newPanel) {
+                    complete: function ($newPanel) {
                         $viewAll.data('multiple-click', false);
                         action({
                             $panel: $newPanel
@@ -57,8 +41,8 @@
             /**
              * Makes a list view from given zone sub-section
              */
-            listView: function(targetID, context) {
-                return function(args) {
+            listView: function (targetID, context) {
+                return function (args) {
                     var $elem = args.$panel;
                     var listView = cloudStack.sections.system.subsections[targetID];
 
@@ -68,8 +52,8 @@
                 };
             },
 
-            providerListView: function(context) {
-                return function(args) {
+            providerListView: function (context) {
+                return function (args) {
                     var $elem = args.$panel;
                     var listViewArgs = cloudStack.sections.system.naas.providerListView;
 
@@ -83,8 +67,8 @@
             /**
              * Makes details for a given traffic type
              */
-            trafficTypeDetails: function(targetID, context) {
-                return function(args) {
+            trafficTypeDetails: function (targetID, context) {
+                return function (args) {
                     var $elem = args.$panel;
                     var detailViewArgs = cloudStack.sections.system.naas.mainNetworks[targetID].detailView;
 
@@ -103,7 +87,7 @@
             /**
              * Compute tab
              */
-            compute: function(args) {
+            compute: function (args) {
                 var $chart = $('<div>');
                 var $browser = $('#browser .container');
                 var context = args.context;
@@ -154,7 +138,7 @@
                 var $computeResources = $('<ul>').addClass('resources');
 
                 // Make resource items
-                $.each(computeResources, function(id, resource) {
+                $.each(computeResources, function (id, resource) {
                     var $li = $('<li>');
                     var $label = $('<span>').addClass('label');
 
@@ -179,7 +163,7 @@
                 return $chart;
             },
 
-            network: function(args) {
+            network: function (args) {
                 var $chart = $('<div>');
                 var $browser = $('#browser .container');
                 var $loading = $('<div>').addClass('loading-overlay');
@@ -189,7 +173,7 @@
 
                 $loading.appendTo($chart);
 
-                var renderChart = function(args) {
+                var renderChart = function (args) {
                     var $targetChart = args.$chart ? args.$chart : $chart;
                     var targetContext = $.extend(true, {}, context, {
                         physicalNetworks: [args.data]
@@ -199,7 +183,7 @@
                     trafficTypeDataProvider({
                         context: targetContext,
                         response: {
-                            success: function(args) {
+                            success: function (args) {
                                 var $networkChart = $('<div>').addClass('system-network-chart');
                                 var $trafficTypes = $('<ul>').addClass('resources traffic-types');
 
@@ -244,12 +228,12 @@
                                     }
                                 };
 
-                                var validTrafficTypes = $.map(args.data, function(trafficType) {
+                                var validTrafficTypes = $.map(args.data, function (trafficType) {
                                     return trafficType.name.toLowerCase();
                                 });
 
                                 // Make traffic type elems
-                                $.each(trafficTypes, function(id, trafficType) {
+                                $.each(trafficTypes, function (id, trafficType) {
                                     if ($.inArray(id, validTrafficTypes) == -1) { //if it is not a valid traffic type
                                         if (trafficType.dependsOn != null && trafficType.dependsOn.length > 0) { //if it has dependsOn
                                             if ($.inArray(trafficType.dependsOn, validTrafficTypes) == -1) { //if its dependsOn is not a valid traffic type, either
@@ -297,13 +281,13 @@
                 networkDataProvider({
                     context: context,
                     response: {
-                        success: function(args) {
+                        success: function (args) {
                             var data = args.data;
                             var actionFilter = args.actionFilter;
 
                             $chart.listView({
                                 listView: $.extend(true, {}, cloudStack.sections.system.naas.networks.listView, {
-                                    dataProvider: function(args) {
+                                    dataProvider: function (args) {
                                         args.response.success({
                                             actionFilter: actionFilter,
                                             data: data
@@ -314,7 +298,7 @@
                                         tabs: {
                                             network: {
                                                 title: 'label.network',
-                                                custom: function(args) {
+                                                custom: function (args) {
                                                     var $chart = $('<div>').addClass('system-chart network');
 
                                                     renderChart({
@@ -337,7 +321,7 @@
                 return $chart;
             },
 
-            resources: function(args) {
+            resources: function (args) {
                 var $chart = $('<div>').addClass('dashboard admin');
                 var $chartItems = $('<ul>');
                 var $stats = $('<div>').addClass('stats');
@@ -390,9 +374,9 @@
                 cloudStack.sections.system.zoneDashboard({
                     context: args.context,
                     response: {
-                        success: function(args) {
+                        success: function (args) {
                             $loading.remove();
-                            $.each(chartItems, function(id, chartItem) {
+                            $.each(chartItems, function (id, chartItem) {
                                 var data = args.data[id] ? args.data[id] : {
                                     used: 0,
                                     total: 0,
@@ -438,7 +422,7 @@
             }
         };
 
-        return function(args) {
+        return function (args) {
             // Fix zone context naming
             args.context.zones = args.context.physicalResources;
 

@@ -1,23 +1,7 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function($, cloudStack) {
+(function ($, cloudStack) {
 
-    cloudStack.uiCustom.metricsView = function(args) {
-        return function(ctxArgs) {
+    cloudStack.uiCustom.metricsView = function (args) {
+        return function (ctxArgs) {
 
             var metricsListView = cloudStack.sections.metrics.listView;
             var metricsLabel = _l('label.metrics');
@@ -100,7 +84,7 @@
                     addRow: true,
                     action: {
                         custom: function (args) {
-                            return function() {
+                            return function () {
                             };
                         }
                     }
@@ -120,17 +104,17 @@
                     },
                     zoneid: {
                         label: 'label.zone',
-                        select: function(args) {
+                        select: function (args) {
                             $.ajax({
                                 url: createURL('listZones'),
                                 data: {
                                     listAll: true
                                 },
-                                success: function(json) {
+                                success: function (json) {
                                     var zones = json.listzonesresponse.zone ? json.listzonesresponse.zone : [];
 
                                     args.response.success({
-                                        data: $.map(zones, function(zone) {
+                                        data: $.map(zones, function (zone) {
                                             return {
                                                 id: zone.id,
                                                 description: zone.name
@@ -146,63 +130,63 @@
 
             var $browser = $('#browser .container');
             return $browser.cloudBrowser('addPanel', {
-                  title: metricsLabel,
-                  maximizeIfSelected: true,
-                  complete: function($newPanel) {
-                      $newPanel.listView({
-                          $browser: $browser,
-                          context: context,
-                          listView: metricsListView
-                      });
-                      // Make metrics tables horizontally scrollable
-                      $newPanel.find('.list-view').css({'overflow-x': 'visible'});
-                      // Refresh metrics when refresh button is clicked
-                      $newPanel.find('.refreshMetrics').click(function() {
-                          var sortedTh = $newPanel.find('table thead tr:last th.sorted');
-                          var thIndex = sortedTh.index();
-                          var thClassName = null;
-                          var wasSorted = false;
-                          var sortClassName = 'asc';
-                          if (sortedTh && sortedTh.hasClass('sorted')) {
-                              wasSorted = true;
-                              var classes = sortedTh.attr('class').split(/\s+/);
-                              thClassName = classes[0];
-                              if (classes.indexOf('desc') > -1) {
-                                  sortClassName = 'desc';
-                              }
-                          }
-                          $browser.cloudBrowser('removeLastPanel', {});
-                          var refreshedPanel = cloudStack.uiCustom.metricsView(args)(ctxArgs);
-                          if (wasSorted && thClassName) {
-                              refreshedPanel.find('th.' + thClassName).filter(function() {
-                                  return $(this).index() == thIndex;
-                              }).addClass('sorted').addClass(sortClassName);
-                          }
-                      });
+                title: metricsLabel,
+                maximizeIfSelected: true,
+                complete: function ($newPanel) {
+                    $newPanel.listView({
+                        $browser: $browser,
+                        context: context,
+                        listView: metricsListView
+                    });
+                    // Make metrics tables horizontally scrollable
+                    $newPanel.find('.list-view').css({'overflow-x': 'visible'});
+                    // Refresh metrics when refresh button is clicked
+                    $newPanel.find('.refreshMetrics').click(function () {
+                        var sortedTh = $newPanel.find('table thead tr:last th.sorted');
+                        var thIndex = sortedTh.index();
+                        var thClassName = null;
+                        var wasSorted = false;
+                        var sortClassName = 'asc';
+                        if (sortedTh && sortedTh.hasClass('sorted')) {
+                            wasSorted = true;
+                            var classes = sortedTh.attr('class').split(/\s+/);
+                            thClassName = classes[0];
+                            if (classes.indexOf('desc') > -1) {
+                                sortClassName = 'desc';
+                            }
+                        }
+                        $browser.cloudBrowser('removeLastPanel', {});
+                        var refreshedPanel = cloudStack.uiCustom.metricsView(args)(ctxArgs);
+                        if (wasSorted && thClassName) {
+                            refreshedPanel.find('th.' + thClassName).filter(function () {
+                                return $(this).index() == thIndex;
+                            }).addClass('sorted').addClass(sortClassName);
+                        }
+                    });
 
-                      var browseBy = metricsListView.browseBy;
-                      if (browseBy) {
-                          $newPanel.bind('click', function(event) {
-                              event.stopPropagation();
-                              var $target = $(event.target);
-                              var id = $target.closest('tr').data('list-view-item-id');
-                              var jsonObj = $target.closest('tr').data('jsonObj');
-                              if (browseBy.filterKey && jsonObj) {
-                                  if (jsonObj.hasOwnProperty(browseBy.filterKey)) {
-                                      id = jsonObj[browseBy.filterKey];
-                                  } else {
-                                      return; // return if provided key is missing
-                                  }
-                              }
-                              if (id && ($target.hasClass('first') || $target.parent().hasClass('first')) && ($target.is('td') || $target.parent().is('td'))) {
-                                  context.id = id;
-                                  context.filterBy = browseBy.filterBy;
-                                  ctxArgs.context = context;
-                                  cloudStack.uiCustom.metricsView({resource: browseBy.resource})(ctxArgs);
-                              }
-                          });
-                      }
-                  }
+                    var browseBy = metricsListView.browseBy;
+                    if (browseBy) {
+                        $newPanel.bind('click', function (event) {
+                            event.stopPropagation();
+                            var $target = $(event.target);
+                            var id = $target.closest('tr').data('list-view-item-id');
+                            var jsonObj = $target.closest('tr').data('jsonObj');
+                            if (browseBy.filterKey && jsonObj) {
+                                if (jsonObj.hasOwnProperty(browseBy.filterKey)) {
+                                    id = jsonObj[browseBy.filterKey];
+                                } else {
+                                    return; // return if provided key is missing
+                                }
+                            }
+                            if (id && ($target.hasClass('first') || $target.parent().hasClass('first')) && ($target.is('td') || $target.parent().is('td'))) {
+                                context.id = id;
+                                context.filterBy = browseBy.filterBy;
+                                ctxArgs.context = context;
+                                cloudStack.uiCustom.metricsView({resource: browseBy.resource})(ctxArgs);
+                            }
+                        });
+                    }
+                }
             });
         };
     };

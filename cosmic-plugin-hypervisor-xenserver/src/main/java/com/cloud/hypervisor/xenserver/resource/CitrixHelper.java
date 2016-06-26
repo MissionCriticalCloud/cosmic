@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.hypervisor.xenserver.resource;
 
 import java.util.HashMap;
@@ -22,28 +6,9 @@ import com.xensource.xenapi.Host;
 
 /**
  * Reduce bloat inside CitrixResourceBase
- *
  */
 public class CitrixHelper {
-    private static final HashMap<String, MemoryValues> XenServerGuestOsMemoryMap = new HashMap<String, MemoryValues>(70);
-
-    public static class MemoryValues {
-        long max;
-        long min;
-
-        public MemoryValues(final long min, final long max) {
-            this.min = min * 1024 * 1024;
-            this.max = max * 1024 * 1024;
-        }
-
-        public long getMax() {
-            return max;
-        }
-
-        public long getMin() {
-            return min;
-        }
-    }
+    private static final HashMap<String, MemoryValues> XenServerGuestOsMemoryMap = new HashMap<>(70);
 
     static {
         XenServerGuestOsMemoryMap.put("CentOS 4.5 (32-bit)", new MemoryValues(256l, 16 * 1024l));
@@ -237,7 +202,7 @@ public class CitrixHelper {
         return prodVersion;
     }
 
-    public static String getPVbootloaderArgs(String guestOS) {
+    public static String getPVbootloaderArgs(final String guestOS) {
         if (guestOS.startsWith("SUSE Linux Enterprise Server")) {
             if (guestOS.contains("64-bit")) {
                 return "--kernel /boot/vmlinuz-xen --ramdisk /boot/initrd-xen";
@@ -246,5 +211,23 @@ public class CitrixHelper {
             }
         }
         return "";
+    }
+
+    public static class MemoryValues {
+        long max;
+        long min;
+
+        public MemoryValues(final long min, final long max) {
+            this.min = min * 1024 * 1024;
+            this.max = max * 1024 * 1024;
+        }
+
+        public long getMax() {
+            return max;
+        }
+
+        public long getMin() {
+            return min;
+        }
     }
 }

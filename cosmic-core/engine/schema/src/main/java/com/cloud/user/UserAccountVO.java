@@ -1,22 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.user;
 
-import java.util.Date;
+import com.cloud.utils.db.Encrypt;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,67 +14,47 @@ import javax.persistence.Id;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.Encrypt;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "user")
 @SecondaryTable(name = "account", pkJoinColumns = {@PrimaryKeyJoinColumn(name = "account_id", referencedColumnName = "id")})
 public class UserAccountVO implements UserAccount, InternalIdentity {
+    @Column(name = "is_registered")
+    boolean registered;
+    @Column(name = "incorrect_login_attempts")
+    int loginAttempts;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id = null;
-
     @Column(name = "username")
     private String username = null;
-
     @Column(name = "password")
     private String password = null;
-
     @Column(name = "firstname")
     private String firstname = null;
-
     @Column(name = "lastname")
     private String lastname = null;
-
     @Column(name = "account_id")
     private long accountId;
-
     @Column(name = "email")
     private String email = null;
-
     @Column(name = "state")
     private String state;
-
     @Column(name = "api_key")
     private String apiKey = null;
-
     @Encrypt
     @Column(name = "secret_key")
     private String secretKey = null;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
-
     @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
-
     @Column(name = "timezone")
     private String timezone;
-
     @Column(name = "registration_token")
     private String registrationToken = null;
-
-    @Column(name = "is_registered")
-    boolean registered;
-
-    @Column(name = "incorrect_login_attempts")
-    int loginAttempts;
-
     @Column(name = "account_name", table = "account", insertable = false, updatable = false)
     private String accountName = null;
 
@@ -116,7 +82,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -125,7 +91,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(final String username) {
         this.username = username;
     }
 
@@ -134,7 +100,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return password;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(final String password) {
         this.password = password;
     }
 
@@ -143,7 +109,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return firstname;
     }
 
-    public void setFirstname(String firstname) {
+    public void setFirstname(final String firstname) {
         this.firstname = firstname;
     }
 
@@ -152,7 +118,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return lastname;
     }
 
-    public void setLastname(String lastname) {
+    public void setLastname(final String lastname) {
         this.lastname = lastname;
     }
 
@@ -161,7 +127,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return accountId;
     }
 
-    public void setAccountId(long accountId) {
+    public void setAccountId(final long accountId) {
         this.accountId = accountId;
     }
 
@@ -170,7 +136,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
 
@@ -179,7 +145,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
@@ -188,7 +154,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return apiKey;
     }
 
-    public void setApiKey(String apiKey) {
+    public void setApiKey(final String apiKey) {
         this.apiKey = apiKey;
     }
 
@@ -197,7 +163,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return secretKey;
     }
 
-    public void setSecretKey(String secretKey) {
+    public void setSecretKey(final String secretKey) {
         this.secretKey = secretKey;
     }
 
@@ -206,16 +172,16 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return created;
     }
 
-//    public void setCreated(Date created) {
-//        this.created = created;
-//    }
+    //    public void setCreated(Date created) {
+    //        this.created = created;
+    //    }
 
     @Override
     public Date getRemoved() {
         return removed;
     }
 
-    public void setRemoved(Date removed) {
+    public void setRemoved(final Date removed) {
         this.removed = removed;
     }
 
@@ -224,7 +190,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return accountName;
     }
 
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
@@ -233,7 +199,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return type;
     }
 
-    public void setType(short type) {
+    public void setType(final short type) {
         this.type = type;
     }
 
@@ -242,7 +208,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return domainId;
     }
 
-    public void setDomainId(Long domainId) {
+    public void setDomainId(final Long domainId) {
         this.domainId = domainId;
     }
 
@@ -251,7 +217,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return accountState;
     }
 
-    public void setAccountState(String accountState) {
+    public void setAccountState(final String accountState) {
         this.accountState = accountState;
     }
 
@@ -260,7 +226,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return timezone;
     }
 
-    public void setTimezone(String timezone) {
+    public void setTimezone(final String timezone) {
         this.timezone = timezone;
     }
 
@@ -269,7 +235,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return registrationToken;
     }
 
-    public void setRegistrationToken(String registrationToken) {
+    public void setRegistrationToken(final String registrationToken) {
         this.registrationToken = registrationToken;
     }
 
@@ -278,12 +244,8 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return registered;
     }
 
-    public void setRegistered(boolean registered) {
+    public void setRegistered(final boolean registered) {
         this.registered = registered;
-    }
-
-    public void setLoginAttempts(int loginAttempts) {
-        this.loginAttempts = loginAttempts;
     }
 
     @Override
@@ -291,12 +253,16 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return loginAttempts;
     }
 
+    public void setLoginAttempts(final int loginAttempts) {
+        this.loginAttempts = loginAttempts;
+    }
+
     @Override
     public User.Source getSource() {
         return source;
     }
 
-    public void setSource(User.Source source) {
+    public void setSource(final User.Source source) {
         this.source = source;
     }
 
@@ -304,7 +270,7 @@ public class UserAccountVO implements UserAccount, InternalIdentity {
         return externalEntity;
     }
 
-    public void setExternalEntity(String externalEntity) {
+    public void setExternalEntity(final String externalEntity) {
         this.externalEntity = externalEntity;
     }
 }

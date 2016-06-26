@@ -1,29 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.deploy;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.configuration.Config;
 import com.cloud.exception.InsufficientServerCapacityException;
@@ -37,6 +12,14 @@ import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachineProfile;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,30 +38,23 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
     private int capacityReleaseInterval;
 
     @Override
-    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        super.configure(name, params);
-        capacityReleaseInterval = NumbersUtil.parseInt(configDao.getValue(Config.CapacitySkipcountingHours.key()), 3600);
-        return true;
-    }
-
-    @Override
-    public List<Long> orderClusters(VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoid) throws InsufficientServerCapacityException {
+    public List<Long> orderClusters(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid) throws InsufficientServerCapacityException {
         List<Long> clusterList = super.orderClusters(vmProfile, plan, avoid);
-        Set<Long> hostsToAvoid = avoid.getHostsToAvoid();
-        Account account = vmProfile.getOwner();
+        final Set<Long> hostsToAvoid = avoid.getHostsToAvoid();
+        final Account account = vmProfile.getOwner();
 
         if (clusterList == null || clusterList.isEmpty()) {
             return clusterList;
         }
 
         // Check if strict or preferred mode should be used.
-        boolean preferred = isServiceOfferingUsingPlannerInPreferredMode(vmProfile.getServiceOfferingId());
+        final boolean preferred = isServiceOfferingUsingPlannerInPreferredMode(vmProfile.getServiceOfferingId());
 
         // Get the list of all the hosts in the given clusters
-        List<Long> allHosts = new ArrayList<Long>();
-        for (Long cluster : clusterList) {
-            List<HostVO> hostsInCluster = resourceMgr.listAllHostsInCluster(cluster);
-            for (HostVO hostVO : hostsInCluster) {
+        final List<Long> allHosts = new ArrayList<>();
+        for (final Long cluster : clusterList) {
+            final List<HostVO> hostsInCluster = resourceMgr.listAllHostsInCluster(cluster);
+            for (final HostVO hostVO : hostsInCluster) {
                 allHosts.add(hostVO.getId());
             }
         }
@@ -90,12 +66,12 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
         // 3. Hosts running vms created by implicit planner and in strict mode of other accounts.
         // 4. Hosts running vms from other account or from this account but created by a service offering which uses
         //    any planner besides implicit.
-        Set<Long> emptyHosts = new HashSet<Long>();
-        Set<Long> hostRunningVmsOfAccount = new HashSet<Long>();
-        Set<Long> hostRunningStrictImplicitVmsOfOtherAccounts = new HashSet<Long>();
-        Set<Long> allOtherHosts = new HashSet<Long>();
-        for (Long host : allHosts) {
-            List<VMInstanceVO> vms = getVmsOnHost(host);
+        final Set<Long> emptyHosts = new HashSet<>();
+        final Set<Long> hostRunningVmsOfAccount = new HashSet<>();
+        final Set<Long> hostRunningStrictImplicitVmsOfOtherAccounts = new HashSet<>();
+        final Set<Long> allOtherHosts = new HashSet<>();
+        for (final Long host : allHosts) {
+            final List<VMInstanceVO> vms = getVmsOnHost(host);
             if (vms == null || vms.isEmpty()) {
                 emptyHosts.add(host);
             } else if (checkHostSuitabilityForImplicitDedication(account.getAccountId(), vms)) {
@@ -135,13 +111,25 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
         return clusterList;
     }
 
-    private List<VMInstanceVO> getVmsOnHost(long hostId) {
-        List<VMInstanceVO> vms = vmInstanceDao.listUpByHostId(hostId);
-        List<VMInstanceVO> vmsByLastHostId = vmInstanceDao.listByLastHostId(hostId);
+    private boolean isServiceOfferingUsingPlannerInPreferredMode(final long serviceOfferingId) {
+        boolean preferred = false;
+        final Map<String, String> details = serviceOfferingDetailsDao.listDetailsKeyPairs(serviceOfferingId);
+        if (details != null && !details.isEmpty()) {
+            final String preferredAttribute = details.get("ImplicitDedicationMode");
+            if (preferredAttribute != null && preferredAttribute.equals("Preferred")) {
+                preferred = true;
+            }
+        }
+        return preferred;
+    }
+
+    private List<VMInstanceVO> getVmsOnHost(final long hostId) {
+        final List<VMInstanceVO> vms = vmInstanceDao.listUpByHostId(hostId);
+        final List<VMInstanceVO> vmsByLastHostId = vmInstanceDao.listByLastHostId(hostId);
         if (vmsByLastHostId.size() > 0) {
             // check if any VMs are within skip.counting.hours, if yes we have to consider the host.
-            for (VMInstanceVO stoppedVM : vmsByLastHostId) {
-                long secondsSinceLastUpdate = (DateUtil.currentGMTTime().getTime() - stoppedVM.getUpdateTime().getTime()) / 1000;
+            for (final VMInstanceVO stoppedVM : vmsByLastHostId) {
+                final long secondsSinceLastUpdate = (DateUtil.currentGMTTime().getTime() - stoppedVM.getUpdateTime().getTime()) / 1000;
                 if (secondsSinceLastUpdate < capacityReleaseInterval) {
                     vms.add(stoppedVM);
                 }
@@ -151,12 +139,13 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
         return vms;
     }
 
-    private boolean checkHostSuitabilityForImplicitDedication(Long accountId, List<VMInstanceVO> allVmsOnHost) {
+    private boolean checkHostSuitabilityForImplicitDedication(final Long accountId, final List<VMInstanceVO> allVmsOnHost) {
         boolean suitable = true;
-        if (allVmsOnHost.isEmpty())
+        if (allVmsOnHost.isEmpty()) {
             return false;
+        }
 
-        for (VMInstanceVO vm : allVmsOnHost) {
+        for (final VMInstanceVO vm : allVmsOnHost) {
             if (vm.getAccountId() != accountId) {
                 s_logger.info("Host " + vm.getHostId() + " found to be unsuitable for implicit dedication as it is " + "running instances of another account");
                 suitable = false;
@@ -164,7 +153,7 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
             } else {
                 if (!isImplicitPlannerUsedByOffering(vm.getServiceOfferingId())) {
                     s_logger.info("Host " + vm.getHostId() + " found to be unsuitable for implicit dedication as it " +
-                        "is running instances of this account which haven't been created using implicit dedication.");
+                            "is running instances of this account which haven't been created using implicit dedication.");
                     suitable = false;
                     break;
                 }
@@ -173,11 +162,12 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
         return suitable;
     }
 
-    private boolean checkIfAllVmsCreatedInStrictMode(Long accountId, List<VMInstanceVO> allVmsOnHost) {
+    private boolean checkIfAllVmsCreatedInStrictMode(final Long accountId, final List<VMInstanceVO> allVmsOnHost) {
         boolean createdByImplicitStrict = true;
-        if (allVmsOnHost.isEmpty())
+        if (allVmsOnHost.isEmpty()) {
             return false;
-        for (VMInstanceVO vm : allVmsOnHost) {
+        }
+        for (final VMInstanceVO vm : allVmsOnHost) {
             if (!isImplicitPlannerUsedByOffering(vm.getServiceOfferingId())) {
                 s_logger.info("Host " + vm.getHostId() + " found to be running a vm created by a planner other" + " than implicit.");
                 createdByImplicitStrict = false;
@@ -191,9 +181,26 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
         return createdByImplicitStrict;
     }
 
-    private boolean isImplicitPlannerUsedByOffering(long offeringId) {
+    private List<Long> getUpdatedClusterList(final List<Long> clusterList, final Set<Long> hostsSet) {
+        final List<Long> updatedClusterList = new ArrayList<>();
+        for (final Long cluster : clusterList) {
+            final List<HostVO> hosts = resourceMgr.listAllHostsInCluster(cluster);
+            final Set<Long> hostsInClusterSet = new HashSet<>();
+            for (final HostVO host : hosts) {
+                hostsInClusterSet.add(host.getId());
+            }
+
+            if (!hostsSet.containsAll(hostsInClusterSet)) {
+                updatedClusterList.add(cluster);
+            }
+        }
+
+        return updatedClusterList;
+    }
+
+    private boolean isImplicitPlannerUsedByOffering(final long offeringId) {
         boolean implicitPlannerUsed = false;
-        ServiceOfferingVO offering = serviceOfferingDao.findByIdIncludingRemoved(offeringId);
+        final ServiceOfferingVO offering = serviceOfferingDao.findByIdIncludingRemoved(offeringId);
         if (offering == null) {
             s_logger.error("Couldn't retrieve the offering by the given id : " + offeringId);
         } else {
@@ -210,39 +217,11 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
         return implicitPlannerUsed;
     }
 
-    private boolean isServiceOfferingUsingPlannerInPreferredMode(long serviceOfferingId) {
-        boolean preferred = false;
-        Map<String, String> details = serviceOfferingDetailsDao.listDetailsKeyPairs(serviceOfferingId);
-        if (details != null && !details.isEmpty()) {
-            String preferredAttribute = details.get("ImplicitDedicationMode");
-            if (preferredAttribute != null && preferredAttribute.equals("Preferred")) {
-                preferred = true;
-            }
-        }
-        return preferred;
-    }
-
-    private List<Long> getUpdatedClusterList(List<Long> clusterList, Set<Long> hostsSet) {
-        List<Long> updatedClusterList = new ArrayList<Long>();
-        for (Long cluster : clusterList) {
-            List<HostVO> hosts = resourceMgr.listAllHostsInCluster(cluster);
-            Set<Long> hostsInClusterSet = new HashSet<Long>();
-            for (HostVO host : hosts) {
-                hostsInClusterSet.add(host.getId());
-            }
-
-            if (!hostsSet.containsAll(hostsInClusterSet)) {
-                updatedClusterList.add(cluster);
-            }
-        }
-
-        return updatedClusterList;
-    }
-
     @Override
-    public PlannerResourceUsage getResourceUsage(VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoid) throws InsufficientServerCapacityException {
+    public PlannerResourceUsage getResourceUsage(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid) throws
+            InsufficientServerCapacityException {
         // Check if strict or preferred mode should be used.
-        boolean preferred = isServiceOfferingUsingPlannerInPreferredMode(vmProfile.getServiceOfferingId());
+        final boolean preferred = isServiceOfferingUsingPlannerInPreferredMode(vmProfile.getServiceOfferingId());
 
         // If service offering in strict mode return resource usage as Dedicated
         if (!preferred) {
@@ -251,15 +230,15 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
             // service offering is in implicit mode.
             // find is it possible to deploy in dedicated mode,
             // if its possible return dedicated else return shared.
-            List<Long> clusterList = super.orderClusters(vmProfile, plan, avoid);
-            Set<Long> hostsToAvoid = avoid.getHostsToAvoid();
-            Account account = vmProfile.getOwner();
+            final List<Long> clusterList = super.orderClusters(vmProfile, plan, avoid);
+            final Set<Long> hostsToAvoid = avoid.getHostsToAvoid();
+            final Account account = vmProfile.getOwner();
 
             // Get the list of all the hosts in the given clusters
-            List<Long> allHosts = new ArrayList<Long>();
-            for (Long cluster : clusterList) {
-                List<HostVO> hostsInCluster = resourceMgr.listAllHostsInCluster(cluster);
-                for (HostVO hostVO : hostsInCluster) {
+            final List<Long> allHosts = new ArrayList<>();
+            for (final Long cluster : clusterList) {
+                final List<HostVO> hostsInCluster = resourceMgr.listAllHostsInCluster(cluster);
+                for (final HostVO hostVO : hostsInCluster) {
 
                     allHosts.add(hostVO.getId());
                 }
@@ -275,12 +254,12 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
             // 4. Hosts running vms from other account or from this account but
             // created by a service offering which uses
             // any planner besides implicit.
-            Set<Long> emptyHosts = new HashSet<Long>();
-            Set<Long> hostRunningVmsOfAccount = new HashSet<Long>();
-            Set<Long> hostRunningStrictImplicitVmsOfOtherAccounts = new HashSet<Long>();
-            Set<Long> allOtherHosts = new HashSet<Long>();
-            for (Long host : allHosts) {
-                List<VMInstanceVO> vms = getVmsOnHost(host);
+            final Set<Long> emptyHosts = new HashSet<>();
+            final Set<Long> hostRunningVmsOfAccount = new HashSet<>();
+            final Set<Long> hostRunningStrictImplicitVmsOfOtherAccounts = new HashSet<>();
+            final Set<Long> allOtherHosts = new HashSet<>();
+            for (final Long host : allHosts) {
+                final List<VMInstanceVO> vms = getVmsOnHost(host);
                 // emptyHost should contain only Hosts which are not having any VM's (user/system) on it.
                 if (vms == null || vms.isEmpty()) {
                     emptyHosts.add(host);
@@ -314,5 +293,12 @@ public class ImplicitDedicationPlanner extends FirstFitPlanner implements Deploy
             }
             return PlannerResourceUsage.Shared;
         }
+    }
+
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+        super.configure(name, params);
+        capacityReleaseInterval = NumbersUtil.parseInt(configDao.getValue(Config.CapacitySkipcountingHours.key()), 3600);
+        return true;
     }
 }

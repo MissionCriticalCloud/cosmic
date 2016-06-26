@@ -1,26 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package org.apache.cloudstack.api.command.user.autoscale;
 
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.network.as.Condition;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -32,6 +14,7 @@ import org.apache.cloudstack.api.response.ConditionResponse;
 import org.apache.cloudstack.api.response.CounterResponse;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,8 +62,8 @@ public class CreateConditionCmd extends BaseAsyncCreateCmd {
 
     @Override
     public void execute() {
-        Condition condition = _entityMgr.findById(Condition.class, getEntityId());
-        ConditionResponse response = _responseGenerator.createConditionResponse(condition);
+        final Condition condition = _entityMgr.findById(Condition.class, getEntityId());
+        final ConditionResponse response = _responseGenerator.createConditionResponse(condition);
         response.setResponseName(getCommandName());
         setResponseObject(response);
     }
@@ -92,6 +75,16 @@ public class CreateConditionCmd extends BaseAsyncCreateCmd {
     @Override
     public String getCommandName() {
         return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final Long accountId = _accountService.finalyzeAccountId(accountName, domainId, null, true);
+        if (accountId == null) {
+            return CallContext.current().getCallingAccount().getId();
+        }
+
+        return accountId;
     }
 
     public Long getCounterId() {
@@ -122,8 +115,8 @@ public class CreateConditionCmd extends BaseAsyncCreateCmd {
     }
 
     @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.Condition;
+    public String getEventType() {
+        return EventTypes.EVENT_CONDITION_CREATE;
     }
 
     @Override
@@ -132,18 +125,7 @@ public class CreateConditionCmd extends BaseAsyncCreateCmd {
     }
 
     @Override
-    public String getEventType() {
-        return EventTypes.EVENT_CONDITION_CREATE;
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.Condition;
     }
-
-    @Override
-    public long getEntityOwnerId() {
-        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, null, true);
-        if (accountId == null) {
-            return CallContext.current().getCallingAccount().getId();
-        }
-
-        return accountId;
-    }
-
 }

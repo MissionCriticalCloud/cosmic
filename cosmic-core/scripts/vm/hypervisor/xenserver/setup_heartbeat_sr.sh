@@ -1,23 +1,7 @@
-#!/bin/bash
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+#! /bin/bash
 
 #set -x
- 
+
 usage() {
   echo "Usage: $(basename $0) [uuid of this host] [uuid of the sr to place the heartbeat]"
 
@@ -40,7 +24,7 @@ if [ `xe host-list | grep $1 | wc -l` -ne 1 ]; then
   exit 0
 fi
 
-if [ `xe sr-list uuid=$2 | wc -l`  -eq 0 ]; then 
+if [ `xe sr-list uuid=$2 | wc -l`  -eq 0 ]; then
   echo "#4# Unable to find SR with uuid: $2"
   exit 0
 fi
@@ -60,7 +44,7 @@ if [ "$srtype" == "nfs" ];then
     date=`date +%s`
     echo "$date" > $filename
   fi
-else 
+else
   dir=/dev/VG_XenStorage-$2
   link=$dir/hb-$1
   lv=`lvscan | grep $link`
@@ -71,7 +55,7 @@ else
         dmsetup remove -f $devmapper
       fi
       rm $link -f
-    fi 
+    fi
     lvcreate VG_XenStorage-$2 -n hb-$1 --size 4M
     if [ $? -ne 0 ]; then
       echo "#6# Unable to create heartbeat volume hb-$1"

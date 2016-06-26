@@ -1,23 +1,10 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.user;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.user.Account.State;
+import com.cloud.utils.db.Encrypt;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.Identity;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,76 +14,53 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.user.Account.State;
-import com.cloud.utils.db.Encrypt;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * A bean representing a user
- *
  */
 @Entity
 @Table(name = "user")
 public class UserVO implements User, Identity, InternalIdentity {
+    @Column(name = "is_registered")
+    boolean registered;
+    @Column(name = "default")
+    boolean isDefault;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-
     @Column(name = "username")
     private String username = null;
-
     @Column(name = "password")
     private String password = null;
-
     @Column(name = "firstname")
     private String firstname = null;
-
     @Column(name = "lastname")
     private String lastname = null;
-
     @Column(name = "account_id")
     private long accountId;
-
     @Column(name = "email")
     private String email = null;
-
     @Column(name = "state")
     @Enumerated(value = EnumType.STRING)
     private State state;
-
     @Column(name = "api_key")
     private String apiKey = null;
-
     @Encrypt
     @Column(name = "secret_key")
     private String secretKey = null;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
-
     @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
-
     @Column(name = "timezone")
     private String timezone;
-
     @Column(name = "registration_token")
     private String registrationToken = null;
-
-    @Column(name = "is_registered")
-    boolean registered;
-
     @Column(name = "uuid")
     private String uuid;
-
-    @Column(name = "default")
-    boolean isDefault;
-
     @Column(name = "source")
     @Enumerated(value = EnumType.STRING)
     private Source source;
@@ -108,12 +72,13 @@ public class UserVO implements User, Identity, InternalIdentity {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public UserVO(long id) {
+    public UserVO(final long id) {
         this.id = id;
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public UserVO(long accountId, String username, String password, String firstName, String lastName, String email, String timezone, String uuid, Source source) {
+    public UserVO(final long accountId, final String username, final String password, final String firstName, final String lastName, final String email, final String timezone,
+                  final String uuid, final Source source) {
         this.accountId = accountId;
         this.username = username;
         this.password = password;
@@ -132,6 +97,11 @@ public class UserVO implements User, Identity, InternalIdentity {
     }
 
     @Override
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    @Override
     public Date getCreated() {
         return created;
     }
@@ -147,7 +117,7 @@ public class UserVO implements User, Identity, InternalIdentity {
     }
 
     @Override
-    public void setUsername(String username) {
+    public void setUsername(final String username) {
         this.username = username;
     }
 
@@ -157,7 +127,7 @@ public class UserVO implements User, Identity, InternalIdentity {
     }
 
     @Override
-    public void setPassword(String password) {
+    public void setPassword(final String password) {
         this.password = password;
     }
 
@@ -167,7 +137,7 @@ public class UserVO implements User, Identity, InternalIdentity {
     }
 
     @Override
-    public void setFirstname(String firstname) {
+    public void setFirstname(final String firstname) {
         this.firstname = firstname;
     }
 
@@ -177,8 +147,12 @@ public class UserVO implements User, Identity, InternalIdentity {
     }
 
     @Override
-    public void setLastname(String lastname) {
+    public void setLastname(final String lastname) {
         this.lastname = lastname;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 
     @Override
@@ -187,7 +161,7 @@ public class UserVO implements User, Identity, InternalIdentity {
     }
 
     @Override
-    public void setAccountId(long accountId) {
+    public void setAccountId(final long accountId) {
         this.accountId = accountId;
     }
 
@@ -197,7 +171,7 @@ public class UserVO implements User, Identity, InternalIdentity {
     }
 
     @Override
-    public void setEmail(String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
 
@@ -207,7 +181,7 @@ public class UserVO implements User, Identity, InternalIdentity {
     }
 
     @Override
-    public void setState(State state) {
+    public void setState(final State state) {
         this.state = state;
     }
 
@@ -217,7 +191,7 @@ public class UserVO implements User, Identity, InternalIdentity {
     }
 
     @Override
-    public void setApiKey(String apiKey) {
+    public void setApiKey(final String apiKey) {
         this.apiKey = apiKey;
     }
 
@@ -227,7 +201,7 @@ public class UserVO implements User, Identity, InternalIdentity {
     }
 
     @Override
-    public void setSecretKey(String secretKey) {
+    public void setSecretKey(final String secretKey) {
         this.secretKey = secretKey;
     }
 
@@ -237,7 +211,7 @@ public class UserVO implements User, Identity, InternalIdentity {
     }
 
     @Override
-    public void setTimezone(String timezone) {
+    public void setTimezone(final String timezone) {
         this.timezone = timezone;
     }
 
@@ -246,7 +220,7 @@ public class UserVO implements User, Identity, InternalIdentity {
         return registrationToken;
     }
 
-    public void setRegistrationToken(String registrationToken) {
+    public void setRegistrationToken(final String registrationToken) {
         this.registrationToken = registrationToken;
     }
 
@@ -255,22 +229,8 @@ public class UserVO implements User, Identity, InternalIdentity {
         return registered;
     }
 
-    public void setRegistered(boolean registered) {
+    public void setRegistered(final boolean registered) {
         this.registered = registered;
-    }
-
-    @Override
-    public String toString() {
-        return new StringBuilder("User[").append(id).append("-").append(username).append("]").toString();
-    }
-
-    @Override
-    public String getUuid() {
-        return this.uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 
     @Override
@@ -282,7 +242,7 @@ public class UserVO implements User, Identity, InternalIdentity {
         return source;
     }
 
-    public void setSource(Source source) {
+    public void setSource(final Source source) {
         this.source = source;
     }
 
@@ -290,7 +250,12 @@ public class UserVO implements User, Identity, InternalIdentity {
         return externalEntity;
     }
 
-    public void setExternalEntity(String externalEntity) {
+    public void setExternalEntity(final String externalEntity) {
         this.externalEntity = externalEntity;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("User[").append(id).append("-").append(username).append("]").toString();
     }
 }

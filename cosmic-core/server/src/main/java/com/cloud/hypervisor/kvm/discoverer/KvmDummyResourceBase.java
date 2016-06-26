@@ -1,25 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.hypervisor.kvm.discoverer;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
@@ -30,6 +9,10 @@ import com.cloud.host.Host.Type;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.ServerResourceBase;
+
+import javax.naming.ConfigurationException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class KvmDummyResourceBase extends ServerResourceBase implements ServerResource {
     private String _zoneId;
@@ -46,8 +29,8 @@ public class KvmDummyResourceBase extends ServerResourceBase implements ServerRe
 
     @Override
     public StartupCommand[] initialize() {
-        StartupRoutingCommand cmd =
-            new StartupRoutingCommand(0, 0, 0, 0, null, Hypervisor.HypervisorType.KVM, new HashMap<String, String>());
+        final StartupRoutingCommand cmd =
+                new StartupRoutingCommand(0, 0, 0, 0, null, Hypervisor.HypervisorType.KVM, new HashMap<>());
         cmd.setDataCenter(_zoneId);
         cmd.setPod(_podId);
         cmd.setCluster(_clusterId);
@@ -56,19 +39,29 @@ public class KvmDummyResourceBase extends ServerResourceBase implements ServerRe
         cmd.setPrivateIpAddress(_agentIp);
         cmd.setStorageIpAddress(_agentIp);
         cmd.setVersion(KvmDummyResourceBase.class.getPackage().getImplementationVersion());
-        return new StartupCommand[] {cmd};
+        return new StartupCommand[]{cmd};
     }
 
     @Override
-    public PingCommand getCurrentStatus(long id) {
+    public PingCommand getCurrentStatus(final long id) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Answer executeRequest(Command cmd) {
+    public Answer executeRequest(final Command cmd) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+        _zoneId = (String) params.get("zone");
+        _podId = (String) params.get("pod");
+        _clusterId = (String) params.get("cluster");
+        _guid = (String) params.get("guid");
+        _agentIp = (String) params.get("agentIp");
+        return true;
     }
 
     @Override
@@ -78,23 +71,7 @@ public class KvmDummyResourceBase extends ServerResourceBase implements ServerRe
     }
 
     @Override
-    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _zoneId = (String)params.get("zone");
-        _podId = (String)params.get("pod");
-        _clusterId = (String)params.get("cluster");
-        _guid = (String)params.get("guid");
-        _agentIp = (String)params.get("agentIp");
-        return true;
-    }
-
-    @Override
-    public void setName(String name) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setConfigParams(Map<String, Object> params) {
+    public void setName(final String name) {
         // TODO Auto-generated method stub
 
     }
@@ -106,13 +83,19 @@ public class KvmDummyResourceBase extends ServerResourceBase implements ServerRe
     }
 
     @Override
+    public void setConfigParams(final Map<String, Object> params) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
     public int getRunLevel() {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    public void setRunLevel(int level) {
+    public void setRunLevel(final int level) {
         // TODO Auto-generated method stub
 
     }

@@ -1,31 +1,16 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.hypervisor.xenserver;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.TimeoutException;
 
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;
 import com.cloud.utils.Pair;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VirtualMachine;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.TimeoutException;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Event;
 import com.xensource.xenapi.EventBatch;
@@ -35,30 +20,27 @@ import com.xensource.xenapi.Task;
 import com.xensource.xenapi.Types;
 import com.xensource.xenapi.Types.XenAPIException;
 import com.xensource.xenapi.VM;
-
 import org.apache.xmlrpc.XmlRpcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * XenServerResourceNewBase is an abstract base class that encapsulates how
  * CloudStack should interact with XenServer after a special XenServer
  * 6.2 hotfix.  From here on, every Resource for future versions of
  * XenServer should use this as the base class.  This base class lessens
  * the amount of load CloudStack places on Xapi because it doesn't use
  * polling as a means to collect data and figure out task completion.
- *
+ * <p>
  * This base class differs from CitrixResourceBase in the following ways:
- *   - VM states are detected using Event.from instead of polling.  This
- *     increases the number of threads CloudStack uses but the threads
- *     are mostly idle just waiting for events from XenServer.
- *   - stats are collected through the http interface rather than Xapi plugin.
- *     This change may be promoted to CitrixResourceBase as it's also possible
- *     in previous versions of XenServer.
- *   - Asynchronous task completion is done throught Event.from rather than
- *     polling.
- *
+ * - VM states are detected using Event.from instead of polling.  This
+ * increases the number of threads CloudStack uses but the threads
+ * are mostly idle just waiting for events from XenServer.
+ * - stats are collected through the http interface rather than Xapi plugin.
+ * This change may be promoted to CitrixResourceBase as it's also possible
+ * in previous versions of XenServer.
+ * - Asynchronous task completion is done throught Event.from rather than
+ * polling.
  */
 public class XenServerResourceNewBase extends XenServer620SP1Resource {
     private static final Logger s_logger = LoggerFactory.getLogger(XenServerResourceNewBase.class);
@@ -69,7 +51,7 @@ public class XenServerResourceNewBase extends XenServer620SP1Resource {
         final StartupCommand[] cmds = super.initialize();
 
         final Connection conn = getConnection();
-        Pool pool;
+        final Pool pool;
         try {
             pool = Pool.getByUuid(conn, _host.getPool());
             final Pool.Record poolr = pool.getRecord(conn);
@@ -100,14 +82,13 @@ public class XenServerResourceNewBase extends XenServer620SP1Resource {
             s_logger.trace("Task " + task.getNameLabel(c) + " (" + task.getType(c) + ") sent to " + c.getSessionReference() + " is pending completion with a " + timeout +
                     "ms timeout");
         }
-        final Set<String> classes = new HashSet<String>();
+        final Set<String> classes = new HashSet<>();
         classes.add("Task/" + task.toWireString());
         String token = "";
         final Double t = new Double(timeout / 1000);
         while (true) {
             final EventBatch map = Event.from(c, classes, token, t);
             token = map.token;
-            @SuppressWarnings("unchecked")
             final
             Set<Event.Record> events = map.events;
             if (events.size() == 0) {
@@ -124,7 +105,7 @@ public class XenServerResourceNewBase extends XenServer620SP1Resource {
                     continue;
                 }
 
-                final Task.Record taskRecord = (Task.Record)rec.snapshot;
+                final Task.Record taskRecord = (Task.Record) rec.snapshot;
 
                 if (taskRecord.status != Types.TaskStatusType.PENDING) {
                     if (s_logger.isDebugEnabled()) {
@@ -133,9 +114,8 @@ public class XenServerResourceNewBase extends XenServer620SP1Resource {
                     return;
                 } else {
                     if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Task: ref:" + task.toWireString() + ", UUID:" + taskRecord.uuid +  " progress: " + taskRecord.progress);
+                        s_logger.debug("Task: ref:" + task.toWireString() + ", UUID:" + taskRecord.uuid + " progress: " + taskRecord.progress);
                     }
-
                 }
             }
             if (System.currentTimeMillis() - beginTime > timeout) {
@@ -147,18 +127,35 @@ public class XenServerResourceNewBase extends XenServer620SP1Resource {
         }
     }
 
-
     protected class VmEventListener extends Thread {
         boolean _stop = false;
-        HashMap<String, Pair<String, VirtualMachine.State>> _changes = new HashMap<String, Pair<String, VirtualMachine.State>>();
+        HashMap<String, Pair<String, VirtualMachine.State>> _changes = new HashMap<>();
         boolean _isMaster;
         Set<String> _classes;
         String _token = "";
 
         public VmEventListener(final boolean isMaster) {
             _isMaster = isMaster;
-            _classes = new HashSet<String>();
+            _classes = new HashSet<>();
             _classes.add("VM");
+        }
+
+        @Override
+        public void start() {
+            if (_isMaster) {
+                // Throw away the initial set of events because they're history
+                final Connection conn = getConnection();
+                final EventBatch results;
+                try {
+                    results = Event.from(conn, _classes, _token, new Double(30));
+                } catch (final Exception e) {
+                    s_logger.error("Retrying the waiting on VM events due to: ", e);
+                    throw new CloudRuntimeException("Unable to start a listener thread to listen to VM events", e);
+                }
+                _token = results.token;
+                s_logger.debug("Starting the event listener thread for " + _host.getUuid());
+                super.start();
+            }
         }
 
         @Override
@@ -167,7 +164,7 @@ public class XenServerResourceNewBase extends XenServer620SP1Resource {
             while (!_stop) {
                 try {
                     final Connection conn = getConnection();
-                    EventBatch results;
+                    final EventBatch results;
                     try {
                         results = Event.from(conn, _classes, _token, new Double(30));
                     } catch (final Exception e) {
@@ -176,7 +173,6 @@ public class XenServerResourceNewBase extends XenServer620SP1Resource {
                     }
 
                     _token = results.token;
-                    @SuppressWarnings("unchecked")
                     final
                     Set<Event.Record> events = results.events;
                     for (final Event.Record event : events) {
@@ -187,7 +183,7 @@ public class XenServerResourceNewBase extends XenServer620SP1Resource {
                                 }
                                 continue;
                             }
-                            final VM.Record vm = (VM.Record)event.snapshot;
+                            final VM.Record vm = (VM.Record) event.snapshot;
 
                             String hostUuid = null;
                             if (vm.residentOn != null && !vm.residentOn.toWireString().contains("OpaqueRef:NULL")) {
@@ -208,24 +204,6 @@ public class XenServerResourceNewBase extends XenServer620SP1Resource {
 
         }
 
-        @Override
-        public void start() {
-            if (_isMaster) {
-                // Throw away the initial set of events because they're history
-                final Connection conn = getConnection();
-                EventBatch results;
-                try {
-                    results = Event.from(conn, _classes, _token, new Double(30));
-                } catch (final Exception e) {
-                    s_logger.error("Retrying the waiting on VM events due to: ", e);
-                    throw new CloudRuntimeException("Unable to start a listener thread to listen to VM events", e);
-                }
-                _token = results.token;
-                s_logger.debug("Starting the event listener thread for " + _host.getUuid());
-                super.start();
-            }
-        }
-
         public boolean isListening() {
             return _isMaster;
         }
@@ -236,7 +214,7 @@ public class XenServerResourceNewBase extends XenServer620SP1Resource {
                     return null;
                 }
                 final HashMap<String, Pair<String, VirtualMachine.State>> diff = _changes;
-                _changes = new HashMap<String, Pair<String, VirtualMachine.State>>();
+                _changes = new HashMap<>();
                 return diff;
             }
         }
@@ -246,5 +224,4 @@ public class XenServerResourceNewBase extends XenServer620SP1Resource {
             interrupt();
         }
     }
-
 }

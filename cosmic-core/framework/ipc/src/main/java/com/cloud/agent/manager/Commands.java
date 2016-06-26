@@ -1,48 +1,41 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.agent.manager;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.Command.OnError;
 import com.cloud.utils.exception.CloudRuntimeException;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 public class Commands implements Iterable<Command> {
+    private final ArrayList<String> _ids = new ArrayList<>();
+    private final ArrayList<Command> _cmds = new ArrayList<>();
     OnError _handler;
-    private final ArrayList<String> _ids = new ArrayList<String>();
-    private final ArrayList<Command> _cmds = new ArrayList<Command>();
     private Answer[] _answers;
 
-    public Commands(OnError handler) {
-        _handler = handler;
-    }
-
-    public Commands(Command cmd) {
+    public Commands(final Command cmd) {
         this(OnError.Stop);
         addCommand(cmd);
     }
 
-    public void addCommands(List<Command> cmds) {
+    public Commands(final OnError handler) {
+        _handler = handler;
+    }
+
+    public void addCommand(final Command cmd) {
+        addCommand(null, cmd);
+    }
+
+    public void addCommand(final String id, final Command cmd) {
+        _ids.add(id);
+        _cmds.add(cmd);
+    }
+
+    public void addCommands(final List<Command> cmds) {
         int i = 0;
-        for (Command cmd : cmds) {
+        for (final Command cmd : cmds) {
             addCommand(Integer.toString(i++), cmd);
         }
     }
@@ -51,39 +44,29 @@ public class Commands implements Iterable<Command> {
         return _cmds.size();
     }
 
-    public void addCommand(String id, Command cmd) {
-        _ids.add(id);
-        _cmds.add(cmd);
-    }
-
-    public void addCommand(Command cmd) {
-        addCommand(null, cmd);
-    }
-
-    public void addCommand(int index, Command cmd) {
+    public void addCommand(final int index, final Command cmd) {
         _cmds.add(index, cmd);
     }
 
-    public Answer getAnswer(String id) {
-        int i = _ids.indexOf(id);
+    public Answer getAnswer(final String id) {
+        final int i = _ids.indexOf(id);
         return i == -1 ? null : _answers[i];
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Answer> T getAnswer(Class<T> clazz) {
+    public <T extends Answer> T getAnswer(final Class<T> clazz) {
         assert (clazz != Answer.class) : "How do you expect to get a unique answer in this case?  huh?  How? How? How?....one more time....How?";
-        for (Answer answer : _answers) {
+        for (final Answer answer : _answers) {
             if (answer.getClass() == clazz) {
-                return (T)answer;
+                return (T) answer;
             }
         }
         throw new CloudRuntimeException("Unable to get answer that is of " + clazz);
     }
 
-    public <T extends Command> Answer getAnswerFor(Class<T> clazz) {
+    public <T extends Command> Answer getAnswerFor(final Class<T> clazz) {
         assert (clazz != Command.class) : "You passed in a generic Command.  Seriously, you think you did that?";
         int i = 0;
-        for (Command cmd : _cmds) {
+        for (final Command cmd : _cmds) {
             if (cmd.getClass() == clazz) {
                 break;
             }
@@ -99,10 +82,6 @@ public class Commands implements Iterable<Command> {
         return _cmds.toArray(new Command[_cmds.size()]);
     }
 
-    public void setAnswers(Answer[] answers) {
-        _answers = answers;
-    }
-
     public OnError getErrorHandling() {
         return _handler;
     }
@@ -115,11 +94,14 @@ public class Commands implements Iterable<Command> {
         return _answers;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Command> T getCommand(Class<T> clazz) {
-        for (Command cmd : _cmds) {
+    public void setAnswers(final Answer[] answers) {
+        _answers = answers;
+    }
+
+    public <T extends Command> T getCommand(final Class<T> clazz) {
+        for (final Command cmd : _cmds) {
             if (cmd.getClass() == clazz) {
-                return (T)cmd;
+                return (T) cmd;
             }
         }
         return null;
@@ -135,7 +117,7 @@ public class Commands implements Iterable<Command> {
         if (_handler == OnError.Continue) {
             return true;
         }
-        for (Answer answer : _answers) {
+        for (final Answer answer : _answers) {
             if (_handler == OnError.Continue && answer.getResult()) {
                 return true;
             } else if (_handler != OnError.Continue && !answer.getResult()) {

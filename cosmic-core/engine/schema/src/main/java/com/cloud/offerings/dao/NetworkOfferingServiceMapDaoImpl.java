@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.offerings.dao;
-
-import java.util.List;
 
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
@@ -27,6 +9,8 @@ import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -73,23 +57,23 @@ public class NetworkOfferingServiceMapDaoImpl extends GenericDaoBase<NetworkOffe
     }
 
     @Override
-    public boolean areServicesSupportedByNetworkOffering(long networkOfferingId, Service... services) {
-        SearchCriteria<NetworkOfferingServiceMapVO> sc = MultipleServicesSearch.create();
+    public boolean areServicesSupportedByNetworkOffering(final long networkOfferingId, final Service... services) {
+        final SearchCriteria<NetworkOfferingServiceMapVO> sc = MultipleServicesSearch.create();
         sc.setParameters("networkOfferingId", networkOfferingId);
 
         if (services != null) {
-            String[] servicesStr = new String[services.length];
+            final String[] servicesStr = new String[services.length];
 
             int i = 0;
-            for (Service service : services) {
+            for (final Service service : services) {
                 servicesStr[i] = service.getName();
                 i++;
             }
 
-            sc.setParameters("service", (Object[])servicesStr);
+            sc.setParameters("service", (Object[]) servicesStr);
         }
 
-        List<NetworkOfferingServiceMapVO> offeringServices = listBy(sc);
+        final List<NetworkOfferingServiceMapVO> offeringServices = listBy(sc);
 
         if (services != null) {
             if (offeringServices.size() == services.length) {
@@ -103,23 +87,22 @@ public class NetworkOfferingServiceMapDaoImpl extends GenericDaoBase<NetworkOffe
     }
 
     @Override
-    public List<NetworkOfferingServiceMapVO> listByNetworkOfferingId(long networkOfferingId) {
-        SearchCriteria<NetworkOfferingServiceMapVO> sc = AllFieldsSearch.create();
+    public List<NetworkOfferingServiceMapVO> listByNetworkOfferingId(final long networkOfferingId) {
+        final SearchCriteria<NetworkOfferingServiceMapVO> sc = AllFieldsSearch.create();
         sc.setParameters("networkOfferingId", networkOfferingId);
         return listBy(sc);
     }
 
     @Override
-    public void deleteByOfferingId(long networkOfferingId) {
-        SearchCriteria<NetworkOfferingServiceMapVO> sc = AllFieldsSearch.create();
+    public void deleteByOfferingId(final long networkOfferingId) {
+        final SearchCriteria<NetworkOfferingServiceMapVO> sc = AllFieldsSearch.create();
         sc.setParameters("networkOfferingId", networkOfferingId);
         remove(sc);
     }
 
     @Override
-    public List<String> listProvidersForServiceForNetworkOffering(long networkOfferingId, Service service) {
-        SearchCriteria<String> sc = ProvidersSearch.create();
-        ;
+    public List<String> listProvidersForServiceForNetworkOffering(final long networkOfferingId, final Service service) {
+        final SearchCriteria<String> sc = ProvidersSearch.create();
 
         sc.setParameters("networkOfferingId", networkOfferingId);
         sc.setParameters("service", service.getName());
@@ -128,9 +111,8 @@ public class NetworkOfferingServiceMapDaoImpl extends GenericDaoBase<NetworkOffe
     }
 
     @Override
-    public boolean isProviderForNetworkOffering(long networkOfferingId, Provider provider) {
-        SearchCriteria<NetworkOfferingServiceMapVO> sc = AllFieldsSearch.create();
-        ;
+    public boolean isProviderForNetworkOffering(final long networkOfferingId, final Provider provider) {
+        final SearchCriteria<NetworkOfferingServiceMapVO> sc = AllFieldsSearch.create();
 
         sc.setParameters("networkOfferingId", networkOfferingId);
         sc.setParameters("provider", provider.getName());
@@ -142,28 +124,27 @@ public class NetworkOfferingServiceMapDaoImpl extends GenericDaoBase<NetworkOffe
     }
 
     @Override
-    public List<String> listServicesForNetworkOffering(long networkOfferingId) {
-        SearchCriteria<String> sc = ServicesSearch.create();
-        ;
+    public List<String> listServicesForNetworkOffering(final long networkOfferingId) {
+        final SearchCriteria<String> sc = ServicesSearch.create();
         sc.setParameters("networkOfferingId", networkOfferingId);
         return customSearch(sc, null);
     }
 
     @Override
-    public NetworkOfferingServiceMapVO persist(NetworkOfferingServiceMapVO entity) {
-        SearchCriteria<NetworkOfferingServiceMapVO> sc = AllFieldsSearch.create();
-        sc.setParameters("networkOfferingId", entity.getNetworkOfferingId());
-        sc.setParameters("service", entity.getService());
-        sc.setParameters("provider", entity.getProvider());
-        NetworkOfferingServiceMapVO mappingInDb = findOneBy(sc);
-        return mappingInDb != null ? mappingInDb : super.persist(entity);
+    public List<String> getDistinctProviders(final long offId) {
+        final SearchCriteria<String> sc = DistinctProvidersSearch.create();
+        sc.setParameters("offId", offId);
+        final List<String> results = customSearch(sc, null);
+        return results;
     }
 
     @Override
-    public List<String> getDistinctProviders(long offId) {
-        SearchCriteria<String> sc = DistinctProvidersSearch.create();
-        sc.setParameters("offId", offId);
-        List<String> results = customSearch(sc, null);
-        return results;
+    public NetworkOfferingServiceMapVO persist(final NetworkOfferingServiceMapVO entity) {
+        final SearchCriteria<NetworkOfferingServiceMapVO> sc = AllFieldsSearch.create();
+        sc.setParameters("networkOfferingId", entity.getNetworkOfferingId());
+        sc.setParameters("service", entity.getService());
+        sc.setParameters("provider", entity.getProvider());
+        final NetworkOfferingServiceMapVO mappingInDb = findOneBy(sc);
+        return mappingInDb != null ? mappingInDb : super.persist(entity);
     }
 }

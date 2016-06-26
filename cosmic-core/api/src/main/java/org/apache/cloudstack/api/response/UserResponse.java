@@ -1,30 +1,14 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.Date;
 
 import com.cloud.serializer.Param;
 import com.cloud.user.User;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.Date;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = User.class)
 public class UserResponse extends BaseResponse {
@@ -105,7 +89,7 @@ public class UserResponse extends BaseResponse {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -113,7 +97,7 @@ public class UserResponse extends BaseResponse {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(final String username) {
         this.username = username;
     }
 
@@ -121,7 +105,7 @@ public class UserResponse extends BaseResponse {
         return firstname;
     }
 
-    public void setFirstname(String firstname) {
+    public void setFirstname(final String firstname) {
         this.firstname = firstname;
     }
 
@@ -129,7 +113,7 @@ public class UserResponse extends BaseResponse {
         return lastname;
     }
 
-    public void setLastname(String lastname) {
+    public void setLastname(final String lastname) {
         this.lastname = lastname;
     }
 
@@ -137,7 +121,7 @@ public class UserResponse extends BaseResponse {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
 
@@ -145,7 +129,7 @@ public class UserResponse extends BaseResponse {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 
@@ -153,7 +137,7 @@ public class UserResponse extends BaseResponse {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
@@ -161,7 +145,7 @@ public class UserResponse extends BaseResponse {
         return accountName;
     }
 
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
@@ -169,7 +153,7 @@ public class UserResponse extends BaseResponse {
         return accountType;
     }
 
-    public void setAccountType(Short accountType) {
+    public void setAccountType(final Short accountType) {
         this.accountType = accountType;
     }
 
@@ -177,7 +161,7 @@ public class UserResponse extends BaseResponse {
         return domainId;
     }
 
-    public void setDomainId(String domainId) {
+    public void setDomainId(final String domainId) {
         this.domainId = domainId;
     }
 
@@ -185,7 +169,7 @@ public class UserResponse extends BaseResponse {
         return domainName;
     }
 
-    public void setDomainName(String domainName) {
+    public void setDomainName(final String domainName) {
         this.domainName = domainName;
     }
 
@@ -193,7 +177,7 @@ public class UserResponse extends BaseResponse {
         return timezone;
     }
 
-    public void setTimezone(String timezone) {
+    public void setTimezone(final String timezone) {
         this.timezone = timezone;
     }
 
@@ -201,7 +185,7 @@ public class UserResponse extends BaseResponse {
         return apiKey;
     }
 
-    public void setApiKey(String apiKey) {
+    public void setApiKey(final String apiKey) {
         this.apiKey = apiKey;
     }
 
@@ -209,7 +193,7 @@ public class UserResponse extends BaseResponse {
         return secretKey;
     }
 
-    public void setSecretKey(String secretKey) {
+    public void setSecretKey(final String secretKey) {
         this.secretKey = secretKey;
     }
 
@@ -217,7 +201,7 @@ public class UserResponse extends BaseResponse {
         return accountId;
     }
 
-    public void setAccountId(String accountId) {
+    public void setAccountId(final String accountId) {
         this.accountId = accountId;
     }
 
@@ -225,11 +209,11 @@ public class UserResponse extends BaseResponse {
         return this.isCallerChildDomain;
     }
 
-    public void setIsCallerChildDomain(boolean isCallerChildDomain) {
+    public void setIsCallerChildDomain(final boolean isCallerChildDomain) {
         this.isCallerChildDomain = isCallerChildDomain;
     }
 
-    public void setIsDefault(Boolean isDefault) {
+    public void setIsDefault(final Boolean isDefault) {
         this.isDefault = isDefault;
     }
 }

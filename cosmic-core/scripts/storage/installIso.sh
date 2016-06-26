@@ -1,20 +1,4 @@
-#!/usr/bin/env bash
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+#! /usr/bin/env bash
 
 
 # $Id: installIso.sh 9132 2010-06-04 20:17:43Z manuel $ $HeadURL: svn://svn.lab.vmops.com/repos/vmdev/java/scripts/storage/installIso.sh $
@@ -29,7 +13,7 @@ usage() {
 
 verify_cksum() {
   echo  "$1  $2" | md5sum  -c --status
-  if [ $? -gt 0 ] 
+  if [ $? -gt 0 ]
   then
     printf "Checksum failed, not proceeding with install\n"
     exit 3
@@ -44,7 +28,7 @@ install_file() {
 
   mv $isofile /$isofs/$tmpltname
 
-  if [ $? -gt 0 ] 
+  if [ $? -gt 0 ]
   then
     printf "Move operation failed, iso $isofile not installed\n"
     exit 4
@@ -55,7 +39,7 @@ install_file() {
   isofs=$isofs/$file
   mp=${isofs%/iso/*}
   mp=/$mp/iso
-  path=${isofs:${#mp}}  
+  path=${isofs:${#mp}}
   pushd $mp
   ln -s $path $file
   popd
@@ -108,10 +92,10 @@ then
   isofs=${isofs:1}
 fi
 
-if [ ! -d /$isofs ] 
+if [ ! -d /$isofs ]
 then
   mkdir -p /$isofs
-  if [ $? -gt 0 ] 
+  if [ $? -gt 0 ]
   then
     printf "Failed to create iso fs $isofs\n" >&2
     exit 1

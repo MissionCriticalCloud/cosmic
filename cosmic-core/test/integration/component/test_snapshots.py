@@ -1,33 +1,17 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ P1 tests for Snapshots
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
+import time
+from marvin.cloudstackAPI import detachVolume
 from marvin.cloudstackTestCase import cloudstackTestCase
-
 from marvin.lib.base import (
     Snapshot,
-     Template,
-     VirtualMachine,
-     Account,
-     ServiceOffering,
-     DiskOffering,
-     Volume
+    Template,
+    VirtualMachine,
+    Account,
+    ServiceOffering,
+    DiskOffering,
+    Volume
 )
 from marvin.lib.common import (
     get_domain,
@@ -46,12 +30,10 @@ from marvin.lib.utils import (
     format_volume_to_ext3,
     random_gen
 )
-from marvin.cloudstackAPI import detachVolume
-import time
+from nose.plugins.attrib import attr
 
 
 class Services:
-
     """Test Snapshots Services
     """
 
@@ -70,8 +52,8 @@ class Services:
                 "name": "Tiny Instance",
                 "displaytext": "Tiny Instance",
                 "cpunumber": 1,
-                "cpuspeed": 200,    # in MHz
-                                    "memory": 256,      # In MBs
+                "cpuspeed": 200,  # in MHz
+                "memory": 256,  # In MBs
             },
             "disk_offering": {
                 "displaytext": "Small Disk",
@@ -79,29 +61,29 @@ class Services:
                 "disksize": 1
             },
             "server_with_disk":
-            {
-                "displayname": "Test VM -With Disk",
-                "username": "root",
-                "password": "password",
-                "ssh_port": 22,
-                "hypervisor": 'XenServer',
-                "privateport": 22,
-                "publicport": 22,
-                "protocol": 'TCP',
-            },
+                {
+                    "displayname": "Test VM -With Disk",
+                    "username": "root",
+                    "password": "password",
+                    "ssh_port": 22,
+                    "hypervisor": 'XenServer',
+                    "privateport": 22,
+                    "publicport": 22,
+                    "protocol": 'TCP',
+                },
 
             "server_without_disk":
-            {
-                "displayname": "Test VM-No Disk",
-                "username": "root",
-                "password": "password",
-                "ssh_port": 22,
-                "hypervisor": 'XenServer',
-                "privateport": 22,
-                # For NAT rule creation
-                "publicport": 22,
-                "protocol": 'TCP',
-            },
+                {
+                    "displayname": "Test VM-No Disk",
+                    "username": "root",
+                    "password": "password",
+                    "ssh_port": 22,
+                    "hypervisor": 'XenServer',
+                    "privateport": 22,
+                    # For NAT rule creation
+                    "publicport": 22,
+                    "protocol": 'TCP',
+                },
             "server": {
                 "displayname": "TestVM",
                 "username": "root",
@@ -129,19 +111,19 @@ class Services:
             },
             "volume": {
                 "diskname": "APP Data Volume",
-                "size": 1,   # in GBs
-                "xenserver": {"rootdiskdevice": "/dev/xvda",
-                              "datadiskdevice_1": '/dev/xvdb',
-                              "datadiskdevice_2": '/dev/xvdc',   # Data Disk
-                              },
-                "kvm": {"rootdiskdevice": "/dev/vda",
-                        "datadiskdevice_1": "/dev/vdb",
-                        "datadiskdevice_2": "/dev/vdc"
-                        },
-                "vmware": {"rootdiskdevice": "/dev/hda",
-                           "datadiskdevice_1": "/dev/hdb",
-                           "datadiskdevice_2": "/dev/hdc"
-                           }
+                "size": 1,  # in GBs
+                "xenserver": { "rootdiskdevice": "/dev/xvda",
+                               "datadiskdevice_1": '/dev/xvdb',
+                               "datadiskdevice_2": '/dev/xvdc',  # Data Disk
+                               },
+                "kvm": { "rootdiskdevice": "/dev/vda",
+                         "datadiskdevice_1": "/dev/vdb",
+                         "datadiskdevice_2": "/dev/vdc"
+                         },
+                "vmware": { "rootdiskdevice": "/dev/hda",
+                            "datadiskdevice_1": "/dev/hdb",
+                            "datadiskdevice_2": "/dev/hdc"
+                            }
             },
             "paths": {
                 "mount_dir": "/mnt/tmp",
@@ -158,7 +140,6 @@ class Services:
 
 
 class TestSnapshots(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestSnapshots, cls).getClsTestClient()
@@ -220,8 +201,7 @@ class TestSnapshots(cloudstackTestCase):
 
         if self.unsupportedHypervisor:
             self.skipTest("Skipping test because unsupported hypervisor: %s" %
-                    self.hypervisor)
-
+                          self.hypervisor)
 
         # Create VMs, NAT Rules etc
         self.account = Account.create(
@@ -367,30 +347,30 @@ class TestSnapshots(cloudstackTestCase):
             self.services["paths"]["mount_dir"],
             "mount -t ext3 %s1 %s" %
             (self.services["volume"][
-                self.hypervisor]["datadiskdevice_2"],
-                self.services["paths"]["mount_dir"]),
+                 self.hypervisor]["datadiskdevice_2"],
+             self.services["paths"]["mount_dir"]),
             "mkdir -p %s/%s/{%s,%s} " %
             (self.services["paths"]["mount_dir"],
-                self.services["paths"]["sub_dir"],
-                self.services["paths"]["sub_lvl_dir1"],
-                self.services["paths"]["sub_lvl_dir2"]),
+             self.services["paths"]["sub_dir"],
+             self.services["paths"]["sub_lvl_dir1"],
+             self.services["paths"]["sub_lvl_dir2"]),
             "echo %s > %s/%s/%s/%s" %
             (random_data_0,
-                self.services["paths"]["mount_dir"],
-                self.services["paths"]["sub_dir"],
-                self.services["paths"]["sub_lvl_dir1"],
-                self.services["paths"]["random_data"]),
+             self.services["paths"]["mount_dir"],
+             self.services["paths"]["sub_dir"],
+             self.services["paths"]["sub_lvl_dir1"],
+             self.services["paths"]["random_data"]),
             "echo %s > %s/%s/%s/%s" %
             (random_data_1,
-                self.services["paths"]["mount_dir"],
-                self.services["paths"]["sub_dir"],
-                self.services["paths"]["sub_lvl_dir2"],
-                self.services["paths"]["random_data"]),
+             self.services["paths"]["mount_dir"],
+             self.services["paths"]["sub_dir"],
+             self.services["paths"]["sub_lvl_dir2"],
+             self.services["paths"]["random_data"]),
             "cat %s/%s/%s/%s" %
             (self.services["paths"]["mount_dir"],
-                self.services["paths"]["sub_dir"],
-                self.services["paths"]["sub_lvl_dir1"],
-                self.services["paths"]["random_data"])]
+             self.services["paths"]["sub_dir"],
+             self.services["paths"]["sub_lvl_dir1"],
+             self.services["paths"]["random_data"])]
         for c in cmds:
             self.debug("Command: %s" % c)
             result = ssh_client.execute(c)
@@ -505,8 +485,8 @@ class TestSnapshots(cloudstackTestCase):
                 self.services["paths"]["mount_dir"],
                 "mount -t ext3 %s1 %s" %
                 (self.services["volume"][
-                    self.hypervisor]["datadiskdevice_1"],
-                    self.services["paths"]["mount_dir"]),
+                     self.hypervisor]["datadiskdevice_1"],
+                 self.services["paths"]["mount_dir"]),
             ]
 
             for c in cmds:
@@ -668,24 +648,24 @@ class TestSnapshots(cloudstackTestCase):
                 self.services["paths"]["mount_dir"],
                 "mount %s1 %s" %
                 (self.services["volume"][
-                    self.hypervisor]["datadiskdevice_1"],
-                    self.services["paths"]["mount_dir"]),
+                     self.hypervisor]["datadiskdevice_1"],
+                 self.services["paths"]["mount_dir"]),
                 "pushd %s" %
                 self.services["paths"]["mount_dir"],
                 "mkdir -p %s/{%s,%s} " %
                 (self.services["paths"]["sub_dir"],
-                    self.services["paths"]["sub_lvl_dir1"],
-                    self.services["paths"]["sub_lvl_dir2"]),
+                 self.services["paths"]["sub_lvl_dir1"],
+                 self.services["paths"]["sub_lvl_dir2"]),
                 "echo %s > %s/%s/%s" %
                 (random_data_0,
-                    self.services["paths"]["sub_dir"],
-                    self.services["paths"]["sub_lvl_dir1"],
-                    self.services["paths"]["random_data"]),
+                 self.services["paths"]["sub_dir"],
+                 self.services["paths"]["sub_lvl_dir1"],
+                 self.services["paths"]["random_data"]),
                 "echo %s > %s/%s/%s" %
                 (random_data_1,
-                    self.services["paths"]["sub_dir"],
-                    self.services["paths"]["sub_lvl_dir2"],
-                    self.services["paths"]["random_data"]),
+                 self.services["paths"]["sub_dir"],
+                 self.services["paths"]["sub_lvl_dir2"],
+                 self.services["paths"]["random_data"]),
                 "sync",
                 "umount %s" %
                 (self.services["paths"]["mount_dir"]),
@@ -948,7 +928,6 @@ class TestSnapshots(cloudstackTestCase):
 
 
 class TestCreateVMSnapshotTemplate(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(
@@ -1165,7 +1144,6 @@ class TestCreateVMSnapshotTemplate(cloudstackTestCase):
 
 
 class TestSnapshotEvents(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestSnapshotEvents, cls).getClsTestClient()

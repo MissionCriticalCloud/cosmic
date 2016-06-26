@@ -1,29 +1,10 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ BVT tests for Service offerings"""
 
 # Import Local Modules
-from marvin.codes import FAILED
-from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.cloudstackAPI import (changeServiceForVirtualMachine,
                                   updateServiceOffering)
-from marvin.lib.utils import (isAlmostEqual,
-                              cleanup_resources,
-                              random_gen)
+from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import FAILED
 from marvin.lib.base import (ServiceOffering,
                              Account,
                              VirtualMachine)
@@ -32,14 +13,15 @@ from marvin.lib.common import (list_service_offering,
                                get_domain,
                                get_zone,
                                get_template)
+from marvin.lib.utils import (isAlmostEqual,
+                              cleanup_resources,
+                              random_gen)
 from nose.plugins.attrib import attr
-
 
 _multiprocess_shared_ = True
 
 
 class TestCreateServiceOffering(cloudstackTestCase):
-
     def setUp(self):
         self.apiclient = self.testClient.getApiClient()
         self.dbclient = self.testClient.getDbConnection()
@@ -128,7 +110,6 @@ class TestCreateServiceOffering(cloudstackTestCase):
 
 
 class TestServiceOfferings(cloudstackTestCase):
-
     def setUp(self):
         self.apiclient = self.testClient.getApiClient()
         self.dbclient = self.testClient.getDbConnection()
@@ -175,7 +156,6 @@ class TestServiceOfferings(cloudstackTestCase):
         # Set Zones and disk offerings
         cls.services["small"]["zoneid"] = cls.zone.id
         cls.services["small"]["template"] = template.id
-
 
         # Create VMs, NAT Rules etc
         cls.account = Account.create(

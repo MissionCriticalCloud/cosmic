@@ -1,27 +1,7 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.systemvm;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -33,6 +13,10 @@ import org.apache.cloudstack.api.response.PodResponse;
 import org.apache.cloudstack.api.response.StoragePoolResponse;
 import org.apache.cloudstack.api.response.SystemVmResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,18 +47,18 @@ public class ListSystemVMsCmd extends BaseListCmd {
     private String state;
 
     @Parameter(name = ApiConstants.SYSTEM_VM_TYPE,
-               type = CommandType.STRING,
-               description = "the system VM type. Possible types are \"consoleproxy\" and \"secondarystoragevm\".")
+            type = CommandType.STRING,
+            description = "the system VM type. Possible types are \"consoleproxy\" and \"secondarystoragevm\".")
     private String systemVmType;
 
     @Parameter(name = ApiConstants.ZONE_ID, type = CommandType.UUID, entityType = ZoneResponse.class, description = "the Zone ID of the system VM")
     private Long zoneId;
 
     @Parameter(name = ApiConstants.STORAGE_ID,
-               type = CommandType.UUID,
-               entityType = StoragePoolResponse.class,
-               description = "the storage ID where vm's volumes belong to",
-               since = "3.0.1")
+            type = CommandType.UUID,
+            entityType = StoragePoolResponse.class,
+            description = "the storage ID where vm's volumes belong to",
+            since = "3.0.1")
     private Long storageId;
 
     /////////////////////////////////////////////////////
@@ -118,22 +102,17 @@ public class ListSystemVMsCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public ApiCommandJobType getInstanceType() {
         return ApiCommandJobType.SystemVm;
     }
 
     @Override
     public void execute() {
-        Pair<List<? extends VirtualMachine>, Integer> systemVMs = _mgr.searchForSystemVm(this);
-        ListResponse<SystemVmResponse> response = new ListResponse<SystemVmResponse>();
-        List<SystemVmResponse> vmResponses = new ArrayList<SystemVmResponse>();
-        for (VirtualMachine systemVM : systemVMs.first()) {
-            SystemVmResponse vmResponse = _responseGenerator.createSystemVmResponse(systemVM);
+        final Pair<List<? extends VirtualMachine>, Integer> systemVMs = _mgr.searchForSystemVm(this);
+        final ListResponse<SystemVmResponse> response = new ListResponse<>();
+        final List<SystemVmResponse> vmResponses = new ArrayList<>();
+        for (final VirtualMachine systemVM : systemVMs.first()) {
+            final SystemVmResponse vmResponse = _responseGenerator.createSystemVmResponse(systemVM);
             vmResponse.setObjectName("systemvm");
             vmResponses.add(vmResponse);
         }
@@ -141,5 +120,10 @@ public class ListSystemVMsCmd extends BaseListCmd {
         response.setResponses(vmResponses, systemVMs.second());
         response.setResponseName(getCommandName());
         setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

@@ -1,28 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.user;
-
-import java.lang.reflect.Field;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import javax.inject.Inject;
 
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.dao.ResourceCountDao;
@@ -70,9 +46,7 @@ import com.cloud.vm.dao.InstanceGroupDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotManager;
-import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
@@ -82,6 +56,14 @@ import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationSe
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
 import org.apache.cloudstack.region.gslb.GlobalLoadBalancerRuleDao;
+
+import javax.inject.Inject;
+import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -94,6 +76,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AccountManagerImplTest {
+    @Mock
+    protected SnapshotDao _snapshotDao;
+    @Mock
+    protected VMTemplateDao _vmTemplateDao;
     @Mock
     AccountDao _accountDao;
     @Mock
@@ -118,10 +104,6 @@ public class AccountManagerImplTest {
     SecurityGroupDao _securityGroupDao;
     @Mock
     VMInstanceDao _vmDao;
-    @Mock
-    protected SnapshotDao _snapshotDao;
-    @Mock
-    protected VMTemplateDao _vmTemplateDao;
     @Mock
     SecurityGroupManager _networkGroupMgr;
     @Mock
@@ -207,14 +189,14 @@ public class AccountManagerImplTest {
     public void setup() throws NoSuchFieldException, SecurityException,
             IllegalArgumentException, IllegalAccessException {
         accountManager = new AccountManagerImpl();
-        for (Field field : AccountManagerImpl.class.getDeclaredFields()) {
+        for (final Field field : AccountManagerImpl.class.getDeclaredFields()) {
             if (field.getAnnotation(Inject.class) != null) {
                 field.setAccessible(true);
                 try {
-                    Field mockField = this.getClass().getDeclaredField(
+                    final Field mockField = this.getClass().getDeclaredField(
                             field.getName());
                     field.set(accountManager, mockField.get(this));
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     // ignore missing fields
                 }
             }
@@ -239,7 +221,7 @@ public class AccountManagerImplTest {
     @Test
     public void disableAccountDisabled() throws ConcurrentOperationException,
             ResourceUnavailableException {
-        AccountVO disabledAccount = new AccountVO();
+        final AccountVO disabledAccount = new AccountVO();
         disabledAccount.setState(State.disabled);
         Mockito.when(_accountDao.findById(42l)).thenReturn(disabledAccount);
         Assert.assertTrue(accountManager.disableAccount(42));
@@ -248,7 +230,7 @@ public class AccountManagerImplTest {
     @Test
     public void disableAccount() throws ConcurrentOperationException,
             ResourceUnavailableException {
-        AccountVO account = new AccountVO();
+        final AccountVO account = new AccountVO();
         account.setState(State.enabled);
         Mockito.when(_accountDao.findById(42l)).thenReturn(account);
         Mockito.when(_accountDao.createForUpdate()).thenReturn(new AccountVO());
@@ -264,24 +246,24 @@ public class AccountManagerImplTest {
 
     @Test
     public void deleteUserAccount() {
-        AccountVO account = new AccountVO();
+        final AccountVO account = new AccountVO();
         account.setId(42l);
-        DomainVO domain = new DomainVO();
+        final DomainVO domain = new DomainVO();
         Mockito.when(_accountDao.findById(42l)).thenReturn(account);
         Mockito.when(
                 securityChecker.checkAccess(Mockito.any(Account.class),
-                    Mockito.any(ControlledEntity.class), Mockito.any(AccessType.class),
-                    Mockito.anyString()))
-                .thenReturn(true);
+                        Mockito.any(ControlledEntity.class), Mockito.any(AccessType.class),
+                        Mockito.anyString()))
+               .thenReturn(true);
         Mockito.when(_accountDao.remove(42l)).thenReturn(true);
         Mockito.when(_configMgr.releaseAccountSpecificVirtualRanges(42l))
-                .thenReturn(true);
+               .thenReturn(true);
         Mockito.when(_domainMgr.getDomain(Mockito.anyLong())).thenReturn(domain);
         Mockito.when(
                 securityChecker.checkAccess(Mockito.any(Account.class),
                         Mockito.any(Domain.class)))
-                .thenReturn(true);
-        Mockito.when(_vmSnapshotDao.listByAccountId(Mockito.anyLong())).thenReturn(new ArrayList<VMSnapshotVO>());
+               .thenReturn(true);
+        Mockito.when(_vmSnapshotDao.listByAccountId(Mockito.anyLong())).thenReturn(new ArrayList<>());
 
         Assert.assertTrue(accountManager.deleteUserAccount(42));
         // assert that this was a clean delete
@@ -291,18 +273,18 @@ public class AccountManagerImplTest {
 
     @Test
     public void deleteUserAccountCleanup() {
-        AccountVO account = new AccountVO();
+        final AccountVO account = new AccountVO();
         account.setId(42l);
-        DomainVO domain = new DomainVO();
+        final DomainVO domain = new DomainVO();
         Mockito.when(_accountDao.findById(42l)).thenReturn(account);
         Mockito.when(
                 securityChecker.checkAccess(Mockito.any(Account.class),
                         Mockito.any(ControlledEntity.class), Mockito.any(AccessType.class),
                         Mockito.anyString()))
-                .thenReturn(true);
+               .thenReturn(true);
         Mockito.when(_accountDao.remove(42l)).thenReturn(true);
         Mockito.when(_configMgr.releaseAccountSpecificVirtualRanges(42l))
-                .thenReturn(true);
+               .thenReturn(true);
         Mockito.when(_userVmDao.listByAccountId(42l)).thenReturn(
                 Arrays.asList(Mockito.mock(UserVmVO.class)));
         Mockito.when(
@@ -312,7 +294,7 @@ public class AccountManagerImplTest {
         Mockito.when(
                 securityChecker.checkAccess(Mockito.any(Account.class),
                         Mockito.any(Domain.class)))
-                .thenReturn(true);
+               .thenReturn(true);
 
         Assert.assertTrue(accountManager.deleteUserAccount(42));
         // assert that this was NOT a clean delete
@@ -320,14 +302,13 @@ public class AccountManagerImplTest {
                 Mockito.eq(42l));
     }
 
-
     @Test
     public void testAuthenticateUser() throws UnknownHostException {
-        Pair<Boolean, UserAuthenticator.ActionOnFailedAuthentication> successAuthenticationPair = new Pair<>(true, null);
-        Pair<Boolean, UserAuthenticator.ActionOnFailedAuthentication> failureAuthenticationPair = new Pair<>(false,
-                                                                                                             UserAuthenticator.ActionOnFailedAuthentication.INCREMENT_INCORRECT_LOGIN_ATTEMPT_COUNT);
+        final Pair<Boolean, UserAuthenticator.ActionOnFailedAuthentication> successAuthenticationPair = new Pair<>(true, null);
+        final Pair<Boolean, UserAuthenticator.ActionOnFailedAuthentication> failureAuthenticationPair = new Pair<>(false,
+                UserAuthenticator.ActionOnFailedAuthentication.INCREMENT_INCORRECT_LOGIN_ATTEMPT_COUNT);
 
-        UserAccountVO userAccountVO = new UserAccountVO();
+        final UserAccountVO userAccountVO = new UserAccountVO();
         userAccountVO.setSource(User.Source.UNKNOWN);
         userAccountVO.setState(Account.State.disabled.toString());
         Mockito.when(_userAccountDao.getUserAccount("test", 1L)).thenReturn(userAccountVO);
@@ -351,6 +332,5 @@ public class AccountManagerImplTest {
         Mockito.verify(userAuthenticator, Mockito.times(1)).authenticate("test", "fail", 1L, null);
         Mockito.verify(userAuthenticator, Mockito.never()).authenticate("test", null, 1L, null);
         Mockito.verify(userAuthenticator, Mockito.never()).authenticate("test", "", 1L, null);
-
     }
 }

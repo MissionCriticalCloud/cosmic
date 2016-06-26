@@ -1,20 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.gpu;
+
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,48 +9,47 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.apache.cloudstack.api.InternalIdentity;
-
 @Entity
-@Table(name="vgpu_types")
+@Table(name = "vgpu_types")
 public class VGPUTypesVO implements InternalIdentity {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name="id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private long id;
 
-    @Column(name="gpu_group_id")
+    @Column(name = "gpu_group_id")
     private long gpuGroupId;
 
-    @Column(name="vgpu_type")
+    @Column(name = "vgpu_type")
     private String vgpuType;
 
-    @Column(name="video_ram")
+    @Column(name = "video_ram")
     private long videoRam;
 
-    @Column(name="max_heads")
+    @Column(name = "max_heads")
     private long maxHeads;
 
-    @Column(name="max_resolution_x")
+    @Column(name = "max_resolution_x")
     private long maxResolutionX;
 
-    @Column(name="max_resolution_y")
+    @Column(name = "max_resolution_y")
     private long maxResolutionY;
 
-    @Column(name="max_vgpu_per_pgpu")
+    @Column(name = "max_vgpu_per_pgpu")
     private long maxVgpuPerPgpu;
 
-    @Column(name="remaining_capacity")
+    @Column(name = "remaining_capacity")
     private long remainingCapacity;
 
-    @Column(name="max_capacity")
+    @Column(name = "max_capacity")
     private long maxCapacity;
 
     protected VGPUTypesVO() {
     }
 
-    public VGPUTypesVO(long gpuGroupId, String vgpuType, long videoRam, long maxHeads, long maxResolutionX, long maxResolutionY, long maxVgpuPerPgpu,
-            long remainingCapacity, long maxCapacity) {
+    public VGPUTypesVO(final long gpuGroupId, final String vgpuType, final long videoRam, final long maxHeads, final long maxResolutionX, final long maxResolutionY, final long
+            maxVgpuPerPgpu,
+                       final long remainingCapacity, final long maxCapacity) {
         this.gpuGroupId = gpuGroupId;
         this.vgpuType = vgpuType;
         this.videoRam = videoRam;
@@ -80,7 +65,7 @@ public class VGPUTypesVO implements InternalIdentity {
         return gpuGroupId;
     }
 
-    public void setGpuGroupId(long gpuGroupId) {
+    public void setGpuGroupId(final long gpuGroupId) {
         this.gpuGroupId = gpuGroupId;
     }
 
@@ -88,7 +73,7 @@ public class VGPUTypesVO implements InternalIdentity {
         return vgpuType;
     }
 
-    public void setVgpuType(String vgpuType) {
+    public void setVgpuType(final String vgpuType) {
         this.vgpuType = vgpuType;
     }
 
@@ -96,7 +81,7 @@ public class VGPUTypesVO implements InternalIdentity {
         return videoRam;
     }
 
-    public void setVideoRam(long videoRam) {
+    public void setVideoRam(final long videoRam) {
         this.videoRam = videoRam;
     }
 
@@ -104,7 +89,7 @@ public class VGPUTypesVO implements InternalIdentity {
         return maxHeads;
     }
 
-    public void setMaxHeads(long maxHeads) {
+    public void setMaxHeads(final long maxHeads) {
         this.maxHeads = maxHeads;
     }
 
@@ -112,7 +97,7 @@ public class VGPUTypesVO implements InternalIdentity {
         return maxResolutionX;
     }
 
-    public void setMaxResolutionX(long maxResolutionX) {
+    public void setMaxResolutionX(final long maxResolutionX) {
         this.maxResolutionX = maxResolutionX;
     }
 
@@ -120,7 +105,7 @@ public class VGPUTypesVO implements InternalIdentity {
         return maxResolutionY;
     }
 
-    public void setMaxResolutionY(long maxResolutionY) {
+    public void setMaxResolutionY(final long maxResolutionY) {
         this.maxResolutionY = maxResolutionY;
     }
 
@@ -128,7 +113,7 @@ public class VGPUTypesVO implements InternalIdentity {
         return maxVgpuPerPgpu;
     }
 
-    public void setMaxVgpuPerPgpu(long maxVgpuPerPgpu) {
+    public void setMaxVgpuPerPgpu(final long maxVgpuPerPgpu) {
         this.maxVgpuPerPgpu = maxVgpuPerPgpu;
     }
 
@@ -136,7 +121,7 @@ public class VGPUTypesVO implements InternalIdentity {
         return remainingCapacity;
     }
 
-    public void setRemainingCapacity(long remainingCapacity) {
+    public void setRemainingCapacity(final long remainingCapacity) {
         this.remainingCapacity = remainingCapacity;
     }
 
@@ -144,7 +129,7 @@ public class VGPUTypesVO implements InternalIdentity {
         return maxCapacity;
     }
 
-    public void setMaxCapacity(long maxCapacity) {
+    public void setMaxCapacity(final long maxCapacity) {
         this.maxCapacity = maxCapacity;
     }
 

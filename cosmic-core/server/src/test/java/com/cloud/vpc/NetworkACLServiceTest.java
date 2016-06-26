@@ -1,36 +1,40 @@
-// Licensed to the Apache Software Foundation (ASF) under one or more
-// contributor license agreements.  See the NOTICE file distributed with
-// this work for additional information regarding copyright ownership.
-// The ASF licenses this file to You under the Apache License, Version 2.0
-// (the "License"); you may not use this file except in compliance with
-// the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package com.cloud.vpc;
 
 import com.cloud.dao.EntityManager;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.NetworkDao;
-import com.cloud.network.vpc.*;
+import com.cloud.network.vpc.NetworkACLItem;
+import com.cloud.network.vpc.NetworkACLItemDao;
+import com.cloud.network.vpc.NetworkACLItemVO;
+import com.cloud.network.vpc.NetworkACLManager;
+import com.cloud.network.vpc.NetworkACLService;
+import com.cloud.network.vpc.NetworkACLServiceImpl;
+import com.cloud.network.vpc.NetworkACLVO;
+import com.cloud.network.vpc.Vpc;
+import com.cloud.network.vpc.VpcManager;
+import com.cloud.network.vpc.VpcService;
+import com.cloud.network.vpc.VpcVO;
 import com.cloud.network.vpc.dao.NetworkACLDao;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.network.vpc.dao.VpcGatewayDao;
 import com.cloud.tags.dao.ResourceTagDao;
-import com.cloud.user.*;
+import com.cloud.user.Account;
+import com.cloud.user.AccountManager;
+import com.cloud.user.AccountVO;
+import com.cloud.user.User;
+import com.cloud.user.UserVO;
 import com.cloud.utils.component.ComponentContext;
-import junit.framework.TestCase;
 import org.apache.cloudstack.api.command.user.network.CreateNetworkACLCmd;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.test.utils.SpringUtils;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.UUID;
+
+import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,16 +54,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.UUID;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
 public class NetworkACLServiceTest extends TestCase {
+    private static final Logger s_logger = LoggerFactory.getLogger(NetworkACLServiceTest.class);
     @Inject
     NetworkACLService _aclService;
-
     @Inject
     AccountManager _accountMgr;
     @Inject
@@ -76,12 +76,9 @@ public class NetworkACLServiceTest extends TestCase {
     VpcDao _vpcDao;
     @Inject
     VpcService _vpcSrv;
-
     private CreateNetworkACLCmd createACLItemCmd;
     private NetworkACLVO acl;
     private NetworkACLItemVO aclItem;
-
-    private static final Logger s_logger = LoggerFactory.getLogger(NetworkACLServiceTest.class);
 
     @Override
     @Before
@@ -94,11 +91,6 @@ public class NetworkACLServiceTest extends TestCase {
 
         createACLItemCmd = new CreateNetworkACLCmd() {
             @Override
-            public Long getACLId() {
-                return 3L;
-            }
-
-            @Override
             public Integer getNumber() {
                 return 1;
             }
@@ -106,6 +98,11 @@ public class NetworkACLServiceTest extends TestCase {
             @Override
             public String getProtocol() {
                 return "TCP";
+            }
+
+            @Override
+            public Long getACLId() {
+                return 3L;
             }
         };
 
@@ -119,7 +116,6 @@ public class NetworkACLServiceTest extends TestCase {
             public long getId() {
                 return 1L;
             }
-
         };
 
         aclItem = new NetworkACLItemVO() {
@@ -258,5 +254,4 @@ public class NetworkACLServiceTest extends TestCase {
             }
         }
     }
-
 }

@@ -1,38 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package groovy.org.apache.cloudstack.ldap
 
-import com.cloud.exception.InvalidParameterValueException
+import com.cloud.user.AccountService
 import org.apache.cloudstack.api.ServerApiException
-import org.apache.cloudstack.api.command.LdapAddConfigurationCmd
-import org.apache.cloudstack.api.response.LdapConfigurationResponse
-
-import org.apache.cloudstack.ldap.LdapUser;
-import org.apache.cloudstack.ldap.LdapManager;
-
-import org.apache.cloudstack.api.command.LdapCreateAccountCmd;
-import org.apache.cloudstack.context.CallContext;
-
-import com.cloud.user.AccountService;
-import com.cloud.user.UserAccount;
-import com.cloud.user.UserAccountVO
-import org.apache.cloudstack.ldap.NoLdapUserMatchingQueryException;
-
-import javax.naming.NamingException
+import org.apache.cloudstack.api.command.LdapCreateAccountCmd
+import org.apache.cloudstack.context.CallContext
+import org.apache.cloudstack.ldap.LdapManager
+import org.apache.cloudstack.ldap.LdapUser
+import org.apache.cloudstack.ldap.NoLdapUserMatchingQueryException
 
 class LdapCreateAccountCmdSpec extends spock.lang.Specification {
 

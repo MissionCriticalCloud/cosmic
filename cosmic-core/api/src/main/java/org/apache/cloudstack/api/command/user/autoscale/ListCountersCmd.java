@@ -1,34 +1,17 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package org.apache.cloudstack.api.command.user.autoscale;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.network.as.Counter;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.CounterResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,10 +42,10 @@ public class ListCountersCmd extends BaseListCmd {
     public void execute() {
         List<? extends Counter> counters = null;
         counters = _autoScaleService.listCounters(this);
-        ListResponse<CounterResponse> response = new ListResponse<CounterResponse>();
-        List<CounterResponse> ctrResponses = new ArrayList<CounterResponse>();
-        for (Counter ctr : counters) {
-            CounterResponse ctrResponse = _responseGenerator.createCounterResponse(ctr);
+        final ListResponse<CounterResponse> response = new ListResponse<>();
+        final List<CounterResponse> ctrResponses = new ArrayList<>();
+        for (final Counter ctr : counters) {
+            final CounterResponse ctrResponse = _responseGenerator.createCounterResponse(ctr);
             ctrResponses.add(ctrResponse);
         }
 

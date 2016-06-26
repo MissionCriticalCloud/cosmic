@@ -1,27 +1,11 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function($, cloudStack) {
+(function ($, cloudStack) {
     // General utils
-    cloudStack.serializeForm = function($form, options) {
+    cloudStack.serializeForm = function ($form, options) {
         if (!options) options = {};
 
         var data = {};
 
-        $($form.serializeArray()).each(function() {
+        $($form.serializeArray()).each(function () {
             var dataItem = data[this.name];
             var value = _s(this.value.toString());
 
@@ -42,10 +26,10 @@
     };
 
     // Even/odd row handling
-    cloudStack.evenOdd = function($container, itemSelector, args) {
+    cloudStack.evenOdd = function ($container, itemSelector, args) {
         var even = false;
 
-        $container.find(itemSelector).each(function() {
+        $container.find(itemSelector).each(function () {
             var $elem = $(this);
 
             if (even) {
@@ -64,7 +48,7 @@
      * Takes string and runs through localization function -- if no code
      * exists or function isn't present, return string as-is
      */
-    cloudStack.localize = window._l = function(str) {
+    cloudStack.localize = window._l = function (str) {
         var localized = cloudStack.localizationFn ?
             cloudStack.localizationFn(str) : null;
 
@@ -76,7 +60,7 @@
      *
      * Strip unwanted characters from user-based input
      */
-    cloudStack.sanitize = window._s = function(value) {
+    cloudStack.sanitize = window._s = function (value) {
         if (typeof(value) == "number") {
             //alert("number does not need to be sanitized. Only string needs to be sanitized.");
             return value;
@@ -100,7 +84,7 @@
     /**
      * Reverse sanitization (HTML Decoding)
      */
-    cloudStack.sanitizeReverse = function(value) {
+    cloudStack.sanitizeReverse = function (value) {
         var reversedValue = value
             .replace(/&amp;/g, "&")
             .replace(/&lt;/g, "<")
@@ -113,7 +97,7 @@
      * If the str.length is > maxLen,
      * then concatenate and add '...' to the end of the string
      */
-    cloudStack.concat = function(str, maxLen) {
+    cloudStack.concat = function (str, maxLen) {
         if (str.length > maxLen) {
             return str.substr(0, maxLen) + '...';
         } else {
@@ -124,7 +108,7 @@
     /**
      * Localize validator messages
      */
-    cloudStack.localizeValidatorMessages = function() {
+    cloudStack.localizeValidatorMessages = function () {
         $.extend($.validator.messages, {
             required: _l('message.validate.fieldrequired'),
             remote: _l('message.validate.fixfield'),

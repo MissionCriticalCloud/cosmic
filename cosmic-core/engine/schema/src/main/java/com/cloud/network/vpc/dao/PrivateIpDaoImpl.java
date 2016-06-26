@@ -1,23 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.vpc.dao;
-
-import java.util.Date;
-import java.util.List;
 
 import com.cloud.network.vpc.PrivateIpVO;
 import com.cloud.utils.db.DB;
@@ -28,6 +9,9 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,18 +50,18 @@ public class PrivateIpDaoImpl extends GenericDaoBase<PrivateIpVO, Long> implemen
     }
 
     @Override
-    public PrivateIpVO allocateIpAddress(long dcId, long networkId, String requestedIp) {
-        SearchCriteria<PrivateIpVO> sc = AllFieldsSearch.create();
+    public PrivateIpVO allocateIpAddress(final long dcId, final long networkId, final String requestedIp) {
+        final SearchCriteria<PrivateIpVO> sc = AllFieldsSearch.create();
         sc.setParameters("networkId", networkId);
-        sc.setParameters("taken", (Date)null);
+        sc.setParameters("taken", (Date) null);
 
         if (requestedIp != null) {
             sc.setParameters("ipAddress", requestedIp);
         }
 
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
-        PrivateIpVO vo = lockOneRandomRow(sc, true);
+        final PrivateIpVO vo = lockOneRandomRow(sc, true);
         if (vo == null) {
             txn.rollback();
             return null;
@@ -89,72 +73,72 @@ public class PrivateIpDaoImpl extends GenericDaoBase<PrivateIpVO, Long> implemen
     }
 
     @Override
-    public void releaseIpAddress(String ipAddress, long networkId) {
+    public void releaseIpAddress(final String ipAddress, final long networkId) {
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Releasing private ip address: " + ipAddress + " network id " + networkId);
         }
-        SearchCriteria<PrivateIpVO> sc = AllFieldsSearch.create();
+        final SearchCriteria<PrivateIpVO> sc = AllFieldsSearch.create();
         sc.setParameters("ip", ipAddress);
         sc.setParameters("networkId", networkId);
 
-        PrivateIpVO vo = createForUpdate();
+        final PrivateIpVO vo = createForUpdate();
 
         vo.setTakenAt(null);
         update(vo, sc);
     }
 
     @Override
-    public PrivateIpVO findByIpAndSourceNetworkId(long networkId, String ip4Address) {
-        SearchCriteria<PrivateIpVO> sc = AllFieldsSearch.create();
+    public PrivateIpVO findByIpAndSourceNetworkId(final long networkId, final String ip4Address) {
+        final SearchCriteria<PrivateIpVO> sc = AllFieldsSearch.create();
         sc.setParameters("ip", ip4Address);
         sc.setParameters("networkId", networkId);
         return findOneBy(sc);
     }
 
     @Override
-    public PrivateIpVO findByIpAndSourceNetworkIdAndVpcId(long networkId, String ip4Address, long vpcId) {
-        SearchCriteria<PrivateIpVO> sc = AllFieldsSearch.create();
-        sc.setParameters("ip", ip4Address);
-        sc.setParameters("networkId", networkId);
-        sc.setParameters("vpcId", vpcId);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public PrivateIpVO findByIpAndVpcId(long vpcId, String ip4Address) {
-        SearchCriteria<PrivateIpVO> sc = AllFieldsSearch.create();
-        sc.setParameters("ip", ip4Address);
-        sc.setParameters("vpcId", vpcId);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public List<PrivateIpVO> listByNetworkId(long networkId) {
-        SearchCriteria<PrivateIpVO> sc = AllFieldsSearch.create();
+    public List<PrivateIpVO> listByNetworkId(final long networkId) {
+        final SearchCriteria<PrivateIpVO> sc = AllFieldsSearch.create();
         sc.setParameters("networkId", networkId);
         return listBy(sc);
     }
 
     @Override
-    public int countAllocatedByNetworkId(long ntwkId) {
-        SearchCriteria<Integer> sc = CountAllocatedByNetworkId.create();
+    public int countAllocatedByNetworkId(final long ntwkId) {
+        final SearchCriteria<Integer> sc = CountAllocatedByNetworkId.create();
         sc.setParameters("networkId", ntwkId);
-        List<Integer> results = customSearch(sc, null);
+        final List<Integer> results = customSearch(sc, null);
         return results.get(0);
     }
 
     @Override
-    public void deleteByNetworkId(long networkId) {
-        SearchCriteria<PrivateIpVO> sc = AllFieldsSearch.create();
+    public void deleteByNetworkId(final long networkId) {
+        final SearchCriteria<PrivateIpVO> sc = AllFieldsSearch.create();
         sc.setParameters("networkId", networkId);
         remove(sc);
     }
 
     @Override
-    public int countByNetworkId(long ntwkId) {
-        SearchCriteria<Integer> sc = CountByNetworkId.create();
+    public int countByNetworkId(final long ntwkId) {
+        final SearchCriteria<Integer> sc = CountByNetworkId.create();
         sc.setParameters("networkId", ntwkId);
-        List<Integer> results = customSearch(sc, null);
+        final List<Integer> results = customSearch(sc, null);
         return results.get(0);
+    }
+
+    @Override
+    public PrivateIpVO findByIpAndVpcId(final long vpcId, final String ip4Address) {
+        final SearchCriteria<PrivateIpVO> sc = AllFieldsSearch.create();
+        sc.setParameters("ip", ip4Address);
+        sc.setParameters("vpcId", vpcId);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public PrivateIpVO findByIpAndSourceNetworkIdAndVpcId(final long networkId, final String ip4Address, final long vpcId) {
+        final SearchCriteria<PrivateIpVO> sc = AllFieldsSearch.create();
+        sc.setParameters("ip", ip4Address);
+        sc.setParameters("networkId", networkId);
+        sc.setParameters("vpcId", vpcId);
+        return findOneBy(sc);
     }
 }

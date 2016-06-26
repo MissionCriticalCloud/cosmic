@@ -1,27 +1,11 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function(cloudStack) {
+(function (cloudStack) {
     cloudStack.sections.domains = {
         title: 'label.menu.domains',
         id: 'domains',
 
         // Domain tree
         treeView: {
-        overflowScroll: true,
+            overflowScroll: true,
             // Details
             detailView: {
                 name: 'label.domain.details',
@@ -35,7 +19,7 @@
                     'delete': {
                         label: 'label.action.delete.domain',
                         messages: {
-                            notification: function(args) {
+                            notification: function (args) {
                                 return 'label.action.delete.domain';
                             }
                         },
@@ -44,7 +28,7 @@
                             title: 'label.action.delete.domain',
                             desc: 'message.action.delete.domain',
                             createLabel: 'label.delete',
-                            preFilter: function(args) {
+                            preFilter: function (args) {
                                 if (isAdmin()) {
                                     args.$form.find('.form-item[rel=isForced]').css('display', 'inline-block');
                                 }
@@ -58,7 +42,7 @@
                             }
                         },
 
-                        action: function(args) {
+                        action: function (args) {
                             var array1 = [];
                             if (args.$form.find('.form-item[rel=isForced]').css("display") != "none") //uncomment after Brian fix it to include $form in args
                                 array1.push("&cleanup=" + (args.data.isForced == "on"));
@@ -67,7 +51,7 @@
                                 url: createURL("deleteDomain&id=" + args.context.domains[0].id + array1.join("")),
                                 dataType: "json",
                                 async: false,
-                                success: function(json) {
+                                success: function (json) {
                                     var jid = json.deletedomainresponse.jobid;
                                     args.response.success({
                                         _custom: {
@@ -92,11 +76,11 @@
                     edit: {
                         label: 'label.action.edit.domain',
                         messages: {
-                            notification: function(args) {
+                            notification: function (args) {
                                 return 'label.action.edit.domain';
                             }
                         },
-                        action: function(args) {
+                        action: function (args) {
                             var domainObj;
 
                             var data = {
@@ -115,12 +99,12 @@
                                 });
                             }
 
-                            if('name' in data || 'networkdomain' in data)  {
+                            if ('name' in data || 'networkdomain' in data) {
                                 $.ajax({
                                     url: createURL("updateDomain"),
                                     async: false,
                                     data: data,
-                                    success: function(json) {
+                                    success: function (json) {
                                         domainObj = json.updatedomainresponse.domain;
                                     }
                                 });
@@ -131,7 +115,7 @@
                                     url: createURL("updateResourceLimit&domainid=" + args.context.domains[0].id + "&resourceType=0&max=" + args.data.vmLimit),
                                     dataType: "json",
                                     async: false,
-                                    success: function(json) {
+                                    success: function (json) {
                                         domainObj["vmLimit"] = args.data.vmLimit;
                                     }
                                 });
@@ -142,7 +126,7 @@
                                     url: createURL("updateResourceLimit&domainid=" + args.context.domains[0].id + "&resourceType=1&max=" + args.data.ipLimit),
                                     dataType: "json",
                                     async: false,
-                                    success: function(json) {
+                                    success: function (json) {
                                         domainObj["ipLimit"] = args.data.ipLimit;
                                     }
                                 });
@@ -153,7 +137,7 @@
                                     url: createURL("updateResourceLimit&domainid=" + args.context.domains[0].id + "&resourceType=2&max=" + args.data.volumeLimit),
                                     dataType: "json",
                                     async: false,
-                                    success: function(json) {
+                                    success: function (json) {
                                         domainObj["volumeLimit"] = args.data.volumeLimit;
                                     }
                                 });
@@ -164,7 +148,7 @@
                                     url: createURL("updateResourceLimit&domainid=" + args.context.domains[0].id + "&resourceType=3&max=" + args.data.snapshotLimit),
                                     dataType: "json",
                                     async: false,
-                                    success: function(json) {
+                                    success: function (json) {
                                         domainObj["snapshotLimit"] = args.data.snapshotLimit;
                                     }
                                 });
@@ -175,7 +159,7 @@
                                     url: createURL("updateResourceLimit&domainid=" + args.context.domains[0].id + "&resourceType=4&max=" + args.data.templateLimit),
                                     dataType: "json",
                                     async: false,
-                                    success: function(json) {
+                                    success: function (json) {
                                         domainObj["templateLimit"] = args.data.templateLimit;
                                     }
                                 });
@@ -186,7 +170,7 @@
                                     url: createURL("updateResourceLimit&domainid=" + args.context.domains[0].id + "&resourceType=7&max=" + args.data.vpcLimit),
                                     dataType: "json",
                                     async: false,
-                                    success: function(json) {
+                                    success: function (json) {
                                         domainObj["vpcLimit"] = args.data.vpcLimit;
                                     }
                                 });
@@ -197,7 +181,7 @@
                                     url: createURL("updateResourceLimit&domainid=" + args.context.domains[0].id + "&resourceType=8&max=" + args.data.cpuLimit),
                                     dataType: "json",
                                     async: false,
-                                    success: function(json) {
+                                    success: function (json) {
                                         domainObj["cpuLimit"] = args.data.cpuLimit;
                                     }
                                 });
@@ -208,7 +192,7 @@
                                     url: createURL("updateResourceLimit&domainid=" + args.context.domains[0].id + "&resourceType=9&max=" + args.data.memoryLimit),
                                     dataType: "json",
                                     async: false,
-                                    success: function(json) {
+                                    success: function (json) {
                                         domainObj["memoryLimit"] = args.data.memoryLimit;
                                     }
                                 });
@@ -219,7 +203,7 @@
                                     url: createURL("updateResourceLimit&domainid=" + args.context.domains[0].id + "&resourceType=6&max=" + args.data.networkLimit),
                                     dataType: "json",
                                     async: false,
-                                    success: function(json) {
+                                    success: function (json) {
                                         domainObj["networkLimit"] = args.data.networkLimit;
                                     }
                                 });
@@ -230,7 +214,7 @@
                                     url: createURL("updateResourceLimit&domainid=" + args.context.domains[0].id + "&resourceType=10&max=" + args.data.primaryStorageLimit),
                                     dataType: "json",
                                     async: false,
-                                    success: function(json) {
+                                    success: function (json) {
                                         domainObj["primaryStorageLimit"] = args.data.primaryStorageLimit;
                                     }
                                 });
@@ -241,7 +225,7 @@
                                     url: createURL("updateResourceLimit&domainid=" + args.context.domains[0].id + "&resourceType=11&max=" + args.data.secondaryStorageLimit),
                                     dataType: "json",
                                     async: false,
-                                    success: function(json) {
+                                    success: function (json) {
                                         domainObj["secondaryStorageLimit"] = args.data.secondaryStorageLimit;
                                     }
                                 });
@@ -257,7 +241,7 @@
                     create: {
                         label: 'label.add.domain',
 
-                        action: function(args) {
+                        action: function (args) {
                             var data = {
                                 parentdomainid: args.context.domains[0].id,
                                 name: args.data.name
@@ -272,13 +256,13 @@
                             $.ajax({
                                 url: createURL('createDomain'),
                                 data: data,
-                                success: function(json) {
+                                success: function (json) {
                                     var item = json.createdomainresponse.domain;
                                     args.response.success({
                                         data: item
                                     });
                                 },
-                                error: function(XMLHttpResponse) {
+                                error: function (XMLHttpResponse) {
                                     var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
                                     args.response.error(errorMsg);
                                 }
@@ -286,7 +270,7 @@
                         },
 
                         messages: {
-                            notification: function(args) {
+                            notification: function (args) {
                                 return 'label.add.domain';
                             }
                         },
@@ -314,131 +298,131 @@
                     },
 
                     linktoldap: {
-                            label: 'label.link.domain.to.ldap',
+                        label: 'label.link.domain.to.ldap',
 
-                            action: function(args) {
-                                var data = {
-                                    domainid: args.context.domains[0].id,
-                                    type: args.data.type,
-                                    name: args.data.name,
-                                    accounttype: args.data.accounttype
-                                };
+                        action: function (args) {
+                            var data = {
+                                domainid: args.context.domains[0].id,
+                                type: args.data.type,
+                                name: args.data.name,
+                                accounttype: args.data.accounttype
+                            };
 
-                                if (args.data.admin != null && args.data.admin.length > 0) {
-                                    $.extend(data, {
-                                        admin: args.data.admin
-                                    });
-                                }
-
-                                $.ajax({
-                                    url: createURL('linkDomainToLdap'),
-                                    data: data,
-                                    success: function(json) {
-                                        var item = json.linkdomaintoldapresponse.LinkDomainToLdap.domainid;
-                                        args.response.success({
-                                            data: item
-                                        });
-                                    },
-                                    error: function(XMLHttpResponse) {
-                                        var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
-                                        args.response.error(errorMsg);
-                                    }
+                            if (args.data.admin != null && args.data.admin.length > 0) {
+                                $.extend(data, {
+                                    admin: args.data.admin
                                 });
-                            },
+                            }
 
-                            messages: {
-                                notification: function(args) {
-                                    return 'label.link.domain.to.ldap';
+                            $.ajax({
+                                url: createURL('linkDomainToLdap'),
+                                data: data,
+                                success: function (json) {
+                                    var item = json.linkdomaintoldapresponse.LinkDomainToLdap.domainid;
+                                    args.response.success({
+                                        data: item
+                                    });
+                                },
+                                error: function (XMLHttpResponse) {
+                                    var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
+                                    args.response.error(errorMsg);
                                 }
-                            },
+                            });
+                        },
 
-                            createForm: {
-                                title: 'label.link.domain.to.ldap',
-                                desc: 'message.link.domain.to.ldap',
-                                fields: {
-                                    type: {
-                                        label: 'label.ldap.link.type',
-                                        docID: 'helpLdapGroupType',
-                                        validation: {
-                                            required: true
-                                        },
-                                        select: function(args) {
-                                             var items = [];
-                                             items.push({
-                                                 id: "GROUP",
-                                                 description: "GROUP"
-                                             }); //regular-user
-                                             items.push({
-                                                 id: "OU",
-                                                 description: "OU"
-                                             }); //root-admin
-                                             args.response.success({
-                                                 data: items
-                                             });
-                                        }
+                        messages: {
+                            notification: function (args) {
+                                return 'label.link.domain.to.ldap';
+                            }
+                        },
+
+                        createForm: {
+                            title: 'label.link.domain.to.ldap',
+                            desc: 'message.link.domain.to.ldap',
+                            fields: {
+                                type: {
+                                    label: 'label.ldap.link.type',
+                                    docID: 'helpLdapGroupType',
+                                    validation: {
+                                        required: true
                                     },
-                                    name: {
-                                        label: 'label.name',
-                                        docID: 'helpLdapGroupName',
-                                        validation: {
-                                            required: true
-                                        }
+                                    select: function (args) {
+                                        var items = [];
+                                        items.push({
+                                            id: "GROUP",
+                                            description: "GROUP"
+                                        }); //regular-user
+                                        items.push({
+                                            id: "OU",
+                                            description: "OU"
+                                        }); //root-admin
+                                        args.response.success({
+                                            data: items
+                                        });
+                                    }
+                                },
+                                name: {
+                                    label: 'label.name',
+                                    docID: 'helpLdapGroupName',
+                                    validation: {
+                                        required: true
+                                    }
+                                },
+                                accounttype: {
+                                    label: 'label.account.type',
+                                    docID: 'helpAccountType',
+                                    validation: {
+                                        required: true
                                     },
-                                    accounttype: {
-                                        label: 'label.account.type',
-                                        docID: 'helpAccountType',
-                                        validation: {
-                                            required: true
-                                        },
-                                        select: function(args) {
-                                             var items = [];
-                                             items.push({
-                                                 id: 0,
-                                                 description: "Normal User"
-                                             }); //regular-user
-                                             items.push({
-                                                 id: 2,
-                                                 description: "Domain Admin"
-                                             }); //root-admin
-                                             args.response.success({
-                                                 data: items
-                                             });
-                                        }
-                                    },
-                                    admin: {
-                                        label: 'label.domain.admin',
-                                        docID: 'helpLdapLinkDomainAdmin',
-                                        validation: {
-                                            required: false
-                                        }
+                                    select: function (args) {
+                                        var items = [];
+                                        items.push({
+                                            id: 0,
+                                            description: "Normal User"
+                                        }); //regular-user
+                                        items.push({
+                                            id: 2,
+                                            description: "Domain Admin"
+                                        }); //root-admin
+                                        args.response.success({
+                                            data: items
+                                        });
+                                    }
+                                },
+                                admin: {
+                                    label: 'label.domain.admin',
+                                    docID: 'helpLdapLinkDomainAdmin',
+                                    validation: {
+                                        required: false
                                     }
                                 }
                             }
+                        }
                     },
 
                     updateResourceCount: {
                         label: 'label.action.update.resource.count',
                         messages: {
-                            confirm: function(args) {
+                            confirm: function (args) {
                                 return 'message.update.resource.count';
                             },
-                            notification: function(args) {
+                            notification: function (args) {
                                 return 'label.action.update.resource.count';
                             }
                         },
-                        action: function(args) {
+                        action: function (args) {
                             $.ajax({
                                 url: createURL("updateResourceCount&domainid=" + args.context.domains[0].id),
                                 dataType: "json",
                                 async: true,
-                                success: function(json) {
+                                success: function (json) {
                                     //var resourcecounts= json.updateresourcecountresponse.resourcecount;   //do nothing
                                     args.response.success();
                                 }
                             });
                         },
                         notification: {
-                            poll: function(args) {
+                            poll: function (args) {
                                 args.complete();
                             }
                         }
@@ -450,7 +434,7 @@
                         fields: [{
                             name: {
                                 label: 'label.name',
-                                isEditable: function(args) {
+                                isEditable: function (args) {
                                     if (isAdmin() && args.domains[0].level != 0) //ROOT domain (whose level is 0) is not allowed to change domain name
                                         return true;
                                     else
@@ -468,7 +452,7 @@
 
                             networkdomain: {
                                 label: 'label.network.domain',
-                                isEditable: function(args) {
+                                isEditable: function (args) {
                                     if (isAdmin())
                                         return true;
                                     else
@@ -477,7 +461,7 @@
                             },
                             vmLimit: {
                                 label: 'label.instance.limits',
-                                isEditable: function(args) {
+                                isEditable: function (args) {
                                     if (args.domains[0].id == g_domainid) //disallow to update the field on the domain you log in as
                                         return false;
                                     else
@@ -486,7 +470,7 @@
                             },
                             ipLimit: {
                                 label: 'label.ip.limits',
-                                isEditable: function(args) {
+                                isEditable: function (args) {
                                     if (args.domains[0].id == g_domainid) //disallow to update the field on the domain you log in as
                                         return false;
                                     else
@@ -495,7 +479,7 @@
                             },
                             volumeLimit: {
                                 label: 'label.volume.limits',
-                                isEditable: function(args) {
+                                isEditable: function (args) {
                                     if (args.domains[0].id == g_domainid) //disallow to update the field on the domain you log in as
                                         return false;
                                     else
@@ -504,7 +488,7 @@
                             },
                             snapshotLimit: {
                                 label: 'label.snapshot.limits',
-                                isEditable: function(args) {
+                                isEditable: function (args) {
                                     if (args.domains[0].id == g_domainid) //disallow to update the field on the domain you log in as
                                         return false;
                                     else
@@ -513,7 +497,7 @@
                             },
                             templateLimit: {
                                 label: 'label.template.limits',
-                                isEditable: function(args) {
+                                isEditable: function (args) {
                                     if (args.domains[0].id == g_domainid) //disallow to update the field on the domain you log in as
                                         return false;
                                     else
@@ -522,7 +506,7 @@
                             },
                             vpcLimit: {
                                 label: 'label.VPC.limits',
-                                isEditable: function(args) {
+                                isEditable: function (args) {
                                     if (args.domains[0].id == g_domainid) //disallow to update the field on the domain you log in as
                                         return false;
                                     else
@@ -531,7 +515,7 @@
                             },
                             cpuLimit: {
                                 label: 'label.cpu.limits',
-                                isEditable: function(args) {
+                                isEditable: function (args) {
                                     if (args.domains[0].id == g_domainid) //disallow to update the field on the domain you log in as
                                         return false;
                                     else
@@ -540,7 +524,7 @@
                             },
                             memoryLimit: {
                                 label: 'label.memory.limits',
-                                isEditable: function(args) {
+                                isEditable: function (args) {
                                     if (args.domains[0].id == g_domainid) //disallow to update the field on the domain you log in as
                                         return false;
                                     else
@@ -549,7 +533,7 @@
                             },
                             networkLimit: {
                                 label: 'label.network.limits',
-                                isEditable: function(args) {
+                                isEditable: function (args) {
                                     if (args.domains[0].id == g_domainid) //disallow to update the field on the domain you log in as
                                         return false;
                                     else
@@ -558,7 +542,7 @@
                             },
                             primaryStorageLimit: {
                                 label: 'label.primary.storage.limits',
-                                isEditable: function(args) {
+                                isEditable: function (args) {
                                     if (args.domains[0].id == g_domainid) //disallow to update the field on the domain you log in as
                                         return false;
                                     else
@@ -567,7 +551,7 @@
                             },
                             secondaryStorageLimit: {
                                 label: 'label.secondary.storage.limits',
-                                isEditable: function(args) {
+                                isEditable: function (args) {
                                     if (args.domains[0].id == g_domainid) //disallow to update the field on the domain you log in as
                                         return false;
                                     else
@@ -584,7 +568,7 @@
                                 label: 'label.volumes'
                             }
                         }],
-                        dataProvider: function(args) {
+                        dataProvider: function (args) {
                             var domainObj = args.context.domains[0];
                             var totalVMs = 0;
                             var totalVolumes = 0;
@@ -593,7 +577,7 @@
                                 url: createURL("listAccounts&domainid=" + domainObj.id),
                                 async: false,
                                 data: {},
-                                success: function(json) {
+                                success: function (json) {
                                     var items = json.listaccountsresponse.account;
                                     if (items != null) {
                                         domainObj["accountTotal"] = items.length;
@@ -611,7 +595,7 @@
                                 url: createURL("listProjects&domainid=" + domainObj.id),
                                 async: false,
                                 data: {},
-                                success: function(json) {
+                                success: function (json) {
                                     var items = json.listprojectsresponse.project;
                                     if (items != null) {
                                         for (var i = 0; i < items.length; i++) {
@@ -626,40 +610,40 @@
                             domainObj["volumeTotal"] = totalVolumes;
 
                             /* $.ajax({
-                url: createURL("listVirtualMachines&details=min&domainid=" + domainObj.id),
-                async: false,
-                dataType: "json",
-                success: function(json) {
-                  var items = json.listvirtualmachinesresponse.virtualmachine;
-                  var total;
-                  if (items != null)
-                    total = items.length;
-                  else
-                    total = 0;
-                  domainObj["vmTotal"] = total;
-                }
-              });
+                             url: createURL("listVirtualMachines&details=min&domainid=" + domainObj.id),
+                             async: false,
+                             dataType: "json",
+                             success: function(json) {
+                             var items = json.listvirtualmachinesresponse.virtualmachine;
+                             var total;
+                             if (items != null)
+                             total = items.length;
+                             else
+                             total = 0;
+                             domainObj["vmTotal"] = total;
+                             }
+                             });
 
-              $.ajax({
-                url: createURL("listVolumes&domainid=" + domainObj.id),
-                async: false,
-                dataType: "json",
-                success: function(json) {
-                  var items = json.listvolumesresponse.volume;
-                  var total;
-                  if (items != null)
-                    total = items.length;
-                  else
-                    total = 0;
-                  domainObj["volumeTotal"] = total;
-                }
-              });*/
+                             $.ajax({
+                             url: createURL("listVolumes&domainid=" + domainObj.id),
+                             async: false,
+                             dataType: "json",
+                             success: function(json) {
+                             var items = json.listvolumesresponse.volume;
+                             var total;
+                             if (items != null)
+                             total = items.length;
+                             else
+                             total = 0;
+                             domainObj["volumeTotal"] = total;
+                             }
+                             });*/
 
                             $.ajax({
                                 url: createURL("listResourceLimits&domainid=" + domainObj.id),
                                 async: false,
                                 dataType: "json",
-                                success: function(json) {
+                                success: function (json) {
                                     var limits = json.listresourcelimitsresponse.resourcelimit;
                                     if (limits != null) {
                                         for (var i = 0; i < limits.length; i++) {
@@ -713,17 +697,17 @@
                 }
             },
             labelField: 'name',
-            dataProvider: function(args) {
+            dataProvider: function (args) {
                 var parentDomain = args.context.parentDomain;
                 if (parentDomain == null) { //draw root node
                     $.ajax({
                         url: createURL("listDomains&id=" + g_domainid + '&listAll=true'),
                         dataType: "json",
                         async: false,
-                        success: function(json) {
+                        success: function (json) {
                             var domainObjs = json.listdomainsresponse.domain;
                             if (domainObjs != null && domainObjs.length > 0) {
-                                domainObjs.sort(function(a, b) {
+                                domainObjs.sort(function (a, b) {
                                     return a.name.localeCompare(b.name);
                                 });
                             }
@@ -738,10 +722,10 @@
                         url: createURL("listDomainChildren&id=" + parentDomain.id),
                         dataType: "json",
                         async: false,
-                        success: function(json) {
+                        success: function (json) {
                             var domainObjs = json.listdomainchildrenresponse.domain;
                             if (domainObjs != null && domainObjs.length > 0) {
-                                domainObjs.sort(function(a, b) {
+                                domainObjs.sort(function (a, b) {
                                     return a.name.localeCompare(b.name);
                                 });
                             }
@@ -756,7 +740,7 @@
         }
     };
 
-    var domainActionfilter = function(args) {
+    var domainActionfilter = function (args) {
         var jsonObj = args.context.item;
         var allowedActions = [];
         if (isAdmin()) {
@@ -765,7 +749,7 @@
             if (jsonObj.level != 0) { //ROOT domain (whose level is 0) is not allowed to delete
                 allowedActions.push("delete");
             }
-            if(isLdapEnabled()) {
+            if (isLdapEnabled()) {
                 allowedActions.push("linktoldap")
             }
         } else if (isDomainAdmin()) {

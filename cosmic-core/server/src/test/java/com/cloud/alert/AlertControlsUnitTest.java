@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// the License.  You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.alert;
 
 import static org.mockito.Matchers.any;
@@ -23,13 +7,14 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
-import java.util.Date;
-
 import com.cloud.alert.dao.AlertDao;
 import com.cloud.server.ManagementServerImpl;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 
+import java.util.Date;
+
+import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,8 +23,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import junit.framework.TestCase;
 
 public class AlertControlsUnitTest extends TestCase {
     private static final Logger s_logger = LoggerFactory.getLogger(AlertControlsUnitTest.class);
@@ -53,7 +36,6 @@ public class AlertControlsUnitTest extends TestCase {
 
     @Override
     @Before
-    @SuppressWarnings("unchecked")
     protected void setUp() {
         MockitoAnnotations.initMocks(this);
         _mgmtServer._alertDao = _alertDao;
@@ -78,13 +60,13 @@ public class AlertControlsUnitTest extends TestCase {
 
     protected void archiveAlerts() {
         // archive alerts
-        String msg = "Archive Alerts: TEST FAILED";
+        final String msg = "Archive Alerts: TEST FAILED";
         assertNotNull(msg, _mgmtServer._alertDao.archiveAlert(null, "system alert", null, null, 2L));
     }
 
     protected void deleteAlerts() {
         // delete alerts
-        String msg = "Delete Alerts: TEST FAILED";
+        final String msg = "Delete Alerts: TEST FAILED";
         assertNotNull(msg, _mgmtServer._alertDao.deleteAlert(null, "system alert", null, null, 2L));
     }
 }

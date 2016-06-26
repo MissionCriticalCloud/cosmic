@@ -1,24 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.query.dao;
-
-import java.util.List;
-
-import javax.inject.Inject;
 
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.ViewResponseHelper;
@@ -30,11 +10,14 @@ import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.response.AccountResponse;
 import org.apache.cloudstack.api.response.ResourceLimitAndCountResponse;
 import org.apache.cloudstack.api.response.UserResponse;
+
+import javax.inject.Inject;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -57,8 +40,8 @@ public class AccountJoinDaoImpl extends GenericDaoBase<AccountJoinVO, Long> impl
     }
 
     @Override
-    public AccountResponse newAccountResponse(ResponseView view, AccountJoinVO account) {
-        AccountResponse accountResponse = new AccountResponse();
+    public AccountResponse newAccountResponse(final ResponseView view, final AccountJoinVO account) {
+        final AccountResponse accountResponse = new AccountResponse();
         accountResponse.setId(account.getUuid());
         accountResponse.setName(account.getAccountName());
         accountResponse.setAccountType(account.getType());
@@ -73,14 +56,14 @@ public class AccountJoinDaoImpl extends GenericDaoBase<AccountJoinVO, Long> impl
         accountResponse.setBytesReceived(account.getBytesReceived());
         accountResponse.setBytesSent(account.getBytesSent());
 
-        boolean fullView = (view == ResponseView.Full && _acctMgr.isRootAdmin(account.getId()));
+        final boolean fullView = (view == ResponseView.Full && _acctMgr.isRootAdmin(account.getId()));
         setResourceLimits(account, fullView, accountResponse);
 
         //get resource limits for projects
-        long projectLimit = ApiDBUtils.findCorrectResourceLimit(account.getProjectLimit(), account.getId(), ResourceType.project);
-        String projectLimitDisplay = (fullView || projectLimit == -1) ? "Unlimited" : String.valueOf(projectLimit);
-        long projectTotal = (account.getProjectTotal() == null) ? 0 : account.getProjectTotal();
-        String projectAvail = (fullView || projectLimit == -1) ? "Unlimited" : String.valueOf(projectLimit - projectTotal);
+        final long projectLimit = ApiDBUtils.findCorrectResourceLimit(account.getProjectLimit(), account.getId(), ResourceType.project);
+        final String projectLimitDisplay = (fullView || projectLimit == -1) ? "Unlimited" : String.valueOf(projectLimit);
+        final long projectTotal = (account.getProjectTotal() == null) ? 0 : account.getProjectTotal();
+        final String projectAvail = (fullView || projectLimit == -1) ? "Unlimited" : String.valueOf(projectLimit - projectTotal);
         accountResponse.setProjectLimit(projectLimitDisplay);
         accountResponse.setProjectTotal(projectTotal);
         accountResponse.setProjectAvailable(projectAvail);
@@ -92,8 +75,8 @@ public class AccountJoinDaoImpl extends GenericDaoBase<AccountJoinVO, Long> impl
         }
 
         // adding all the users for an account as part of the response obj
-        List<UserAccountJoinVO> usersForAccount = ApiDBUtils.findUserViewByAccountId(account.getId());
-        List<UserResponse> userResponses = ViewResponseHelper.createUserResponse(usersForAccount.toArray(new UserAccountJoinVO[usersForAccount.size()]));
+        final List<UserAccountJoinVO> usersForAccount = ApiDBUtils.findUserViewByAccountId(account.getId());
+        final List<UserResponse> userResponses = ViewResponseHelper.createUserResponse(usersForAccount.toArray(new UserAccountJoinVO[usersForAccount.size()]));
         accountResponse.setUsers(userResponses);
 
         // set details
@@ -104,56 +87,65 @@ public class AccountJoinDaoImpl extends GenericDaoBase<AccountJoinVO, Long> impl
     }
 
     @Override
-    public void setResourceLimits(AccountJoinVO account, boolean fullView, ResourceLimitAndCountResponse response) {
+    public AccountJoinVO newAccountView(final Account acct) {
+        final SearchCriteria<AccountJoinVO> sc = acctIdSearch.create();
+        sc.setParameters("id", acct.getId());
+        final List<AccountJoinVO> accounts = searchIncludingRemoved(sc, null, null, false);
+        assert accounts != null && accounts.size() == 1 : "No account found for account id " + acct.getId();
+        return accounts.get(0);
+    }
+
+    @Override
+    public void setResourceLimits(final AccountJoinVO account, final boolean fullView, final ResourceLimitAndCountResponse response) {
         // Get resource limits and counts
-        long vmLimit = ApiDBUtils.findCorrectResourceLimit(account.getVmLimit(), account.getId(), ResourceType.user_vm);
-        String vmLimitDisplay = (fullView || vmLimit == -1) ? "Unlimited" : String.valueOf(vmLimit);
-        long vmTotal = (account.getVmTotal() == null) ? 0 : account.getVmTotal();
-        String vmAvail = (fullView || vmLimit == -1) ? "Unlimited" : String.valueOf(vmLimit - vmTotal);
+        final long vmLimit = ApiDBUtils.findCorrectResourceLimit(account.getVmLimit(), account.getId(), ResourceType.user_vm);
+        final String vmLimitDisplay = (fullView || vmLimit == -1) ? "Unlimited" : String.valueOf(vmLimit);
+        final long vmTotal = (account.getVmTotal() == null) ? 0 : account.getVmTotal();
+        final String vmAvail = (fullView || vmLimit == -1) ? "Unlimited" : String.valueOf(vmLimit - vmTotal);
         response.setVmLimit(vmLimitDisplay);
         response.setVmTotal(vmTotal);
         response.setVmAvailable(vmAvail);
 
-        long ipLimit = ApiDBUtils.findCorrectResourceLimit(account.getIpLimit(), account.getId(), ResourceType.public_ip);
-        String ipLimitDisplay = (fullView || ipLimit == -1) ? "Unlimited" : String.valueOf(ipLimit);
-        long ipTotal = (account.getIpTotal() == null) ? 0 : account.getIpTotal();
+        final long ipLimit = ApiDBUtils.findCorrectResourceLimit(account.getIpLimit(), account.getId(), ResourceType.public_ip);
+        final String ipLimitDisplay = (fullView || ipLimit == -1) ? "Unlimited" : String.valueOf(ipLimit);
+        final long ipTotal = (account.getIpTotal() == null) ? 0 : account.getIpTotal();
 
         Long ips = ipLimit - ipTotal;
         // check how many free ips are left, and if it's less than max allowed number of ips from account - use this
         // value
-        Long ipsLeft = account.getIpFree();
+        final Long ipsLeft = account.getIpFree();
         boolean unlimited = true;
         if (ips.longValue() > ipsLeft.longValue()) {
             ips = ipsLeft;
             unlimited = false;
         }
 
-        String ipAvail = ((fullView || ipLimit == -1) && unlimited) ? "Unlimited" : String.valueOf(ips);
+        final String ipAvail = ((fullView || ipLimit == -1) && unlimited) ? "Unlimited" : String.valueOf(ips);
 
         response.setIpLimit(ipLimitDisplay);
         response.setIpTotal(ipTotal);
         response.setIpAvailable(ipAvail);
 
-        long volumeLimit = ApiDBUtils.findCorrectResourceLimit(account.getVolumeLimit(), account.getId(), ResourceType.volume);
-        String volumeLimitDisplay = (fullView || volumeLimit == -1) ? "Unlimited" : String.valueOf(volumeLimit);
-        long volumeTotal = (account.getVolumeTotal() == null) ? 0 : account.getVolumeTotal();
-        String volumeAvail = (fullView || volumeLimit == -1) ? "Unlimited" : String.valueOf(volumeLimit - volumeTotal);
+        final long volumeLimit = ApiDBUtils.findCorrectResourceLimit(account.getVolumeLimit(), account.getId(), ResourceType.volume);
+        final String volumeLimitDisplay = (fullView || volumeLimit == -1) ? "Unlimited" : String.valueOf(volumeLimit);
+        final long volumeTotal = (account.getVolumeTotal() == null) ? 0 : account.getVolumeTotal();
+        final String volumeAvail = (fullView || volumeLimit == -1) ? "Unlimited" : String.valueOf(volumeLimit - volumeTotal);
         response.setVolumeLimit(volumeLimitDisplay);
         response.setVolumeTotal(volumeTotal);
         response.setVolumeAvailable(volumeAvail);
 
-        long snapshotLimit = ApiDBUtils.findCorrectResourceLimit(account.getSnapshotLimit(), account.getId(), ResourceType.snapshot);
-        String snapshotLimitDisplay = (fullView || snapshotLimit == -1) ? "Unlimited" : String.valueOf(snapshotLimit);
-        long snapshotTotal = (account.getSnapshotTotal() == null) ? 0 : account.getSnapshotTotal();
-        String snapshotAvail = (fullView || snapshotLimit == -1) ? "Unlimited" : String.valueOf(snapshotLimit - snapshotTotal);
+        final long snapshotLimit = ApiDBUtils.findCorrectResourceLimit(account.getSnapshotLimit(), account.getId(), ResourceType.snapshot);
+        final String snapshotLimitDisplay = (fullView || snapshotLimit == -1) ? "Unlimited" : String.valueOf(snapshotLimit);
+        final long snapshotTotal = (account.getSnapshotTotal() == null) ? 0 : account.getSnapshotTotal();
+        final String snapshotAvail = (fullView || snapshotLimit == -1) ? "Unlimited" : String.valueOf(snapshotLimit - snapshotTotal);
         response.setSnapshotLimit(snapshotLimitDisplay);
         response.setSnapshotTotal(snapshotTotal);
         response.setSnapshotAvailable(snapshotAvail);
 
-        Long templateLimit = ApiDBUtils.findCorrectResourceLimit(account.getTemplateLimit(), account.getId(), ResourceType.template);
-        String templateLimitDisplay = (fullView || templateLimit == -1) ? "Unlimited" : String.valueOf(templateLimit);
-        Long templateTotal = (account.getTemplateTotal() == null) ? 0 : account.getTemplateTotal();
-        String templateAvail = (fullView || templateLimit == -1) ? "Unlimited" : String.valueOf(templateLimit - templateTotal);
+        final Long templateLimit = ApiDBUtils.findCorrectResourceLimit(account.getTemplateLimit(), account.getId(), ResourceType.template);
+        final String templateLimitDisplay = (fullView || templateLimit == -1) ? "Unlimited" : String.valueOf(templateLimit);
+        final Long templateTotal = (account.getTemplateTotal() == null) ? 0 : account.getTemplateTotal();
+        final String templateAvail = (fullView || templateLimit == -1) ? "Unlimited" : String.valueOf(templateLimit - templateTotal);
         response.setTemplateLimit(templateLimitDisplay);
         response.setTemplateTotal(templateTotal);
         response.setTemplateAvailable(templateAvail);
@@ -163,71 +155,61 @@ public class AccountJoinDaoImpl extends GenericDaoBase<AccountJoinVO, Long> impl
         response.setVmRunning(account.getVmRunning());
 
         //get resource limits for networks
-        long networkLimit = ApiDBUtils.findCorrectResourceLimit(account.getNetworkLimit(), account.getId(), ResourceType.network);
-        String networkLimitDisplay = (fullView || networkLimit == -1) ? "Unlimited" : String.valueOf(networkLimit);
-        long networkTotal = (account.getNetworkTotal() == null) ? 0 : account.getNetworkTotal();
-        String networkAvail = (fullView || networkLimit == -1) ? "Unlimited" : String.valueOf(networkLimit - networkTotal);
+        final long networkLimit = ApiDBUtils.findCorrectResourceLimit(account.getNetworkLimit(), account.getId(), ResourceType.network);
+        final String networkLimitDisplay = (fullView || networkLimit == -1) ? "Unlimited" : String.valueOf(networkLimit);
+        final long networkTotal = (account.getNetworkTotal() == null) ? 0 : account.getNetworkTotal();
+        final String networkAvail = (fullView || networkLimit == -1) ? "Unlimited" : String.valueOf(networkLimit - networkTotal);
         response.setNetworkLimit(networkLimitDisplay);
         response.setNetworkTotal(networkTotal);
         response.setNetworkAvailable(networkAvail);
 
         //get resource limits for vpcs
-        long vpcLimit = ApiDBUtils.findCorrectResourceLimit(account.getVpcLimit(), account.getId(), ResourceType.vpc);
-        String vpcLimitDisplay = (fullView || vpcLimit == -1) ? "Unlimited" : String.valueOf(vpcLimit);
-        long vpcTotal = (account.getVpcTotal() == null) ? 0 : account.getVpcTotal();
-        String vpcAvail = (fullView || vpcLimit == -1) ? "Unlimited" : String.valueOf(vpcLimit - vpcTotal);
+        final long vpcLimit = ApiDBUtils.findCorrectResourceLimit(account.getVpcLimit(), account.getId(), ResourceType.vpc);
+        final String vpcLimitDisplay = (fullView || vpcLimit == -1) ? "Unlimited" : String.valueOf(vpcLimit);
+        final long vpcTotal = (account.getVpcTotal() == null) ? 0 : account.getVpcTotal();
+        final String vpcAvail = (fullView || vpcLimit == -1) ? "Unlimited" : String.valueOf(vpcLimit - vpcTotal);
         response.setVpcLimit(vpcLimitDisplay);
         response.setVpcTotal(vpcTotal);
         response.setVpcAvailable(vpcAvail);
 
         //get resource limits for cpu cores
-        long cpuLimit = ApiDBUtils.findCorrectResourceLimit(account.getCpuLimit(), account.getId(), ResourceType.cpu);
-        String cpuLimitDisplay = (fullView || cpuLimit == -1) ? "Unlimited" : String.valueOf(cpuLimit);
-        long cpuTotal = (account.getCpuTotal() == null) ? 0 : account.getCpuTotal();
-        String cpuAvail = (fullView || cpuLimit == -1) ? "Unlimited" : String.valueOf(cpuLimit - cpuTotal);
+        final long cpuLimit = ApiDBUtils.findCorrectResourceLimit(account.getCpuLimit(), account.getId(), ResourceType.cpu);
+        final String cpuLimitDisplay = (fullView || cpuLimit == -1) ? "Unlimited" : String.valueOf(cpuLimit);
+        final long cpuTotal = (account.getCpuTotal() == null) ? 0 : account.getCpuTotal();
+        final String cpuAvail = (fullView || cpuLimit == -1) ? "Unlimited" : String.valueOf(cpuLimit - cpuTotal);
         response.setCpuLimit(cpuLimitDisplay);
         response.setCpuTotal(cpuTotal);
         response.setCpuAvailable(cpuAvail);
 
         //get resource limits for memory
-        long memoryLimit = ApiDBUtils.findCorrectResourceLimit(account.getMemoryLimit(), account.getId(), ResourceType.memory);
-        String memoryLimitDisplay = (fullView || memoryLimit == -1) ? "Unlimited" : String.valueOf(memoryLimit);
-        long memoryTotal = (account.getMemoryTotal() == null) ? 0 : account.getMemoryTotal();
-        String memoryAvail = (fullView || memoryLimit == -1) ? "Unlimited" : String.valueOf(memoryLimit - memoryTotal);
+        final long memoryLimit = ApiDBUtils.findCorrectResourceLimit(account.getMemoryLimit(), account.getId(), ResourceType.memory);
+        final String memoryLimitDisplay = (fullView || memoryLimit == -1) ? "Unlimited" : String.valueOf(memoryLimit);
+        final long memoryTotal = (account.getMemoryTotal() == null) ? 0 : account.getMemoryTotal();
+        final String memoryAvail = (fullView || memoryLimit == -1) ? "Unlimited" : String.valueOf(memoryLimit - memoryTotal);
         response.setMemoryLimit(memoryLimitDisplay);
         response.setMemoryTotal(memoryTotal);
         response.setMemoryAvailable(memoryAvail);
 
-      //get resource limits for primary storage space and convert it from Bytes to GiB
-        long primaryStorageLimit = ApiDBUtils.findCorrectResourceLimit(account.getPrimaryStorageLimit(), account.getId(), ResourceType.primary_storage);
-        String primaryStorageLimitDisplay = (fullView || primaryStorageLimit == -1) ? "Unlimited" : String.valueOf(primaryStorageLimit / ResourceType.bytesToGiB);
-        long primaryStorageTotal = (account.getPrimaryStorageTotal() == null) ? 0 : (account.getPrimaryStorageTotal() / ResourceType.bytesToGiB);
-        String primaryStorageAvail = (fullView || primaryStorageLimit == -1) ? "Unlimited" : String.valueOf((primaryStorageLimit / ResourceType.bytesToGiB) - primaryStorageTotal);
+        //get resource limits for primary storage space and convert it from Bytes to GiB
+        final long primaryStorageLimit = ApiDBUtils.findCorrectResourceLimit(account.getPrimaryStorageLimit(), account.getId(), ResourceType.primary_storage);
+        final String primaryStorageLimitDisplay = (fullView || primaryStorageLimit == -1) ? "Unlimited" : String.valueOf(primaryStorageLimit / ResourceType.bytesToGiB);
+        final long primaryStorageTotal = (account.getPrimaryStorageTotal() == null) ? 0 : (account.getPrimaryStorageTotal() / ResourceType.bytesToGiB);
+        final String primaryStorageAvail = (fullView || primaryStorageLimit == -1) ? "Unlimited" : String.valueOf((primaryStorageLimit / ResourceType.bytesToGiB) -
+                primaryStorageTotal);
 
         response.setPrimaryStorageLimit(primaryStorageLimitDisplay);
         response.setPrimaryStorageTotal(primaryStorageTotal);
         response.setPrimaryStorageAvailable(primaryStorageAvail);
 
         //get resource limits for secondary storage space and convert it from Bytes to GiB
-        long secondaryStorageLimit = ApiDBUtils.findCorrectResourceLimit(account.getSecondaryStorageLimit(), account.getId(), ResourceType.secondary_storage);
-        String secondaryStorageLimitDisplay = (fullView || secondaryStorageLimit == -1) ? "Unlimited" : String.valueOf(secondaryStorageLimit / ResourceType.bytesToGiB);
-        long secondaryStorageTotal = (account.getSecondaryStorageTotal() == null) ? 0 : (account.getSecondaryStorageTotal() / ResourceType.bytesToGiB);
-        String secondaryStorageAvail = (fullView || secondaryStorageLimit == -1) ? "Unlimited" : String.valueOf((secondaryStorageLimit / ResourceType.bytesToGiB)
+        final long secondaryStorageLimit = ApiDBUtils.findCorrectResourceLimit(account.getSecondaryStorageLimit(), account.getId(), ResourceType.secondary_storage);
+        final String secondaryStorageLimitDisplay = (fullView || secondaryStorageLimit == -1) ? "Unlimited" : String.valueOf(secondaryStorageLimit / ResourceType.bytesToGiB);
+        final long secondaryStorageTotal = (account.getSecondaryStorageTotal() == null) ? 0 : (account.getSecondaryStorageTotal() / ResourceType.bytesToGiB);
+        final String secondaryStorageAvail = (fullView || secondaryStorageLimit == -1) ? "Unlimited" : String.valueOf((secondaryStorageLimit / ResourceType.bytesToGiB)
                 - secondaryStorageTotal);
 
         response.setSecondaryStorageLimit(secondaryStorageLimitDisplay);
         response.setSecondaryStorageTotal(secondaryStorageTotal);
         response.setSecondaryStorageAvailable(secondaryStorageAvail);
     }
-
-    @Override
-    public AccountJoinVO newAccountView(Account acct) {
-        SearchCriteria<AccountJoinVO> sc = acctIdSearch.create();
-        sc.setParameters("id", acct.getId());
-        List<AccountJoinVO> accounts = searchIncludingRemoved(sc, null, null, false);
-        assert accounts != null && accounts.size() == 1 : "No account found for account id " + acct.getId();
-        return accounts.get(0);
-
-    }
-
 }

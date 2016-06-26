@@ -1,30 +1,13 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 # Import Local Modules
 from marvin.cloudstackTestCase import *
-from marvin.lib.utils import *
+from marvin.codes import PASS, FAIL
 from marvin.lib.base import *
 from marvin.lib.common import *
-from marvin.codes import PASS, FAIL
+from marvin.lib.utils import *
 from nose.plugins.attrib import attr
 
-class TestNetworks_1(cloudstackTestCase):
 
+class TestNetworks_1(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         try:
@@ -347,7 +330,7 @@ class TestNetworks_1(cloudstackTestCase):
                 vpcofferingid=vpc_offs.id,
                 zoneid=self.zone.id,
             )
-            if(i < (self.test_data["pagesize"])):
+            if (i < (self.test_data["pagesize"])):
                 self.cleanup.append(vpc_1)
             # verify vpc is created and not none
             self.assertIsNotNone(vpc_1, "VPC is not created")
@@ -1036,7 +1019,7 @@ class TestNetworks_1(cloudstackTestCase):
                 vm_created,
                 "VM creation failed"
             )
-            if(i < (self.test_data["pagesize"])):
+            if (i < (self.test_data["pagesize"])):
                 self.cleanup.append(vm_created)
 
             self.assertEqual(
@@ -1568,7 +1551,6 @@ class TestNetworks_1(cloudstackTestCase):
 
 
 class TestNetworks_2(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         try:
@@ -1850,12 +1832,12 @@ class TestNetworks_2(cloudstackTestCase):
         expected_dict = {
             "account": public_ipaddress_created.ipaddress.account,
             "associatednetworkid":
-            public_ipaddress_created.ipaddress.associatednetworkid,
+                public_ipaddress_created.ipaddress.associatednetworkid,
             "associatednetworkname":
-            public_ipaddress_created.ipaddress.associatednetworkname,
+                public_ipaddress_created.ipaddress.associatednetworkname,
             "domainid": public_ipaddress_created.ipaddress.domainid,
             "forvirtualnetwork":
-            public_ipaddress_created.ipaddress.forvirtualnetwork,
+                public_ipaddress_created.ipaddress.forvirtualnetwork,
             "id": public_ipaddress_created.ipaddress.id,
             "ipaddress": public_ipaddress_created.ipaddress.ipaddress,
             "isportable": public_ipaddress_created.ipaddress.isportable,
@@ -1864,17 +1846,17 @@ class TestNetworks_2(cloudstackTestCase):
             "issystem": public_ipaddress_created.ipaddress.issystem,
             "networkid": public_ipaddress_created.ipaddress.network,
             "physicalnetworkid":
-            public_ipaddress_created.ipaddress.physicalnetworkid,
-            "zoneid": public_ipaddress_created.ipaddress.zoneid}
+                public_ipaddress_created.ipaddress.physicalnetworkid,
+            "zoneid": public_ipaddress_created.ipaddress.zoneid }
         actual_dict = {
             "account": list_public_ipaddress_byid[0].account,
             "associatednetworkid":
-            list_public_ipaddress_byid[0].associatednetworkid,
+                list_public_ipaddress_byid[0].associatednetworkid,
             "associatednetworkname":
-            list_public_ipaddress_byid[0].associatednetworkname,
+                list_public_ipaddress_byid[0].associatednetworkname,
             "domainid": list_public_ipaddress_byid[0].domainid,
             "forvirtualnetwork":
-            list_public_ipaddress_byid[0].forvirtualnetwork,
+                list_public_ipaddress_byid[0].forvirtualnetwork,
             "id": list_public_ipaddress_byid[0].id,
             "ipaddress": list_public_ipaddress_byid[0].ipaddress,
             "isportable": list_public_ipaddress_byid[0].isportable,
@@ -1883,8 +1865,8 @@ class TestNetworks_2(cloudstackTestCase):
             "issystem": list_public_ipaddress_byid[0].issystem,
             "networkid": list_public_ipaddress_byid[0].network,
             "physicalnetworkid":
-            list_public_ipaddress_byid[0].physicalnetworkid,
-            "zoneid": list_public_ipaddress_byid[0].zoneid}
+                list_public_ipaddress_byid[0].physicalnetworkid,
+            "zoneid": list_public_ipaddress_byid[0].zoneid }
         list_public_ipaddress_status = self.__verify_values(
             expected_dict,
             actual_dict
@@ -1999,10 +1981,10 @@ class TestNetworks_2(cloudstackTestCase):
             "ipaddress": list_privategateway_byvpcid[0].ipaddress,
             "netmask": list_privategateway_byvpcid[0].netmask,
             "sourcenatsupported":
-            list_privategateway_byvpcid[0].sourcenatsupported,
+                list_privategateway_byvpcid[0].sourcenatsupported,
             "vlan": list_privategateway_byvpcid[0].vlan,
             "vpcid": list_privategateway_byvpcid[0].vpcid,
-            "zoneid": list_privategateway_byvpcid[0].zoneid}
+            "zoneid": list_privategateway_byvpcid[0].zoneid }
         list_private_gateway_status = self.__verify_values(
             expected_dict,
             actual_dict
@@ -2141,7 +2123,7 @@ class TestNetworks_2(cloudstackTestCase):
             "id": list_egressfirewallrule_bynetworkid[0].id,
             "networkid": list_egressfirewallrule_bynetworkid[0].networkid,
             "protocol": str(
-                list_egressfirewallrule_bynetworkid[0].protocol).upper()}
+                list_egressfirewallrule_bynetworkid[0].protocol).upper() }
         list_egressfirewallrule_status = self.__verify_values(
             expected_dict,
             actual_dict
@@ -2555,8 +2537,8 @@ class TestNetworks_2(cloudstackTestCase):
             "passive": list_vpn_connection_after[0].passive,
             "publicip": list_vpn_connection_after[0].publicip,
             "s2scustomergatewayid":
-            list_vpn_connection_after[0].s2scustomergatewayid,
-            "s2svpngatewayid": list_vpn_connection_after[0].s2svpngatewayid}
+                list_vpn_connection_after[0].s2scustomergatewayid,
+            "s2svpngatewayid": list_vpn_connection_after[0].s2svpngatewayid }
         actual_dict = {
             "account": list_vpn_connection_after_reset[0].account,
             "cidrlist": list_vpn_connection_after_reset[0].cidrlist,
@@ -2567,9 +2549,9 @@ class TestNetworks_2(cloudstackTestCase):
             "passive": list_vpn_connection_after_reset[0].passive,
             "publicip": list_vpn_connection_after_reset[0].publicip,
             "s2scustomergatewayid":
-            list_vpn_connection_after_reset[0].s2scustomergatewayid,
+                list_vpn_connection_after_reset[0].s2scustomergatewayid,
             "s2svpngatewayid":
-            list_vpn_connection_after_reset[0].s2svpngatewayid}
+                list_vpn_connection_after_reset[0].s2svpngatewayid }
         list_vpn_connection_status = self.__verify_values(
             expected_dict,
             actual_dict

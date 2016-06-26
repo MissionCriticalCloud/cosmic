@@ -1,43 +1,33 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package groovy.org.apache.cloudstack.ldap
 
+import com.cloud.exception.InvalidParameterValueException
+import com.cloud.utils.Pair
 import org.apache.cloudstack.api.command.LDAPConfigCmd
 import org.apache.cloudstack.api.command.LDAPRemoveCmd
 import org.apache.cloudstack.api.command.LdapAddConfigurationCmd
 import org.apache.cloudstack.api.command.LdapCreateAccountCmd
 import org.apache.cloudstack.api.command.LdapDeleteConfigurationCmd
 import org.apache.cloudstack.api.command.LdapImportUsersCmd
+import org.apache.cloudstack.api.command.LdapListConfigurationCmd
 import org.apache.cloudstack.api.command.LdapListUsersCmd
 import org.apache.cloudstack.api.command.LdapUserSearchCmd
 import org.apache.cloudstack.api.command.LinkDomainToLdapCmd
 import org.apache.cloudstack.api.response.LinkDomainToLdapResponse
+import org.apache.cloudstack.ldap.LdapConfiguration
+import org.apache.cloudstack.ldap.LdapConfigurationVO
+import org.apache.cloudstack.ldap.LdapContextFactory
+import org.apache.cloudstack.ldap.LdapManager
+import org.apache.cloudstack.ldap.LdapManagerImpl
+import org.apache.cloudstack.ldap.LdapTrustMapVO
+import org.apache.cloudstack.ldap.LdapUser
+import org.apache.cloudstack.ldap.LdapUserManager
+import org.apache.cloudstack.ldap.LdapUserManagerFactory
+import org.apache.cloudstack.ldap.NoLdapUserMatchingQueryException
+import org.apache.cloudstack.ldap.dao.LdapConfigurationDaoImpl
 import org.apache.cloudstack.ldap.dao.LdapTrustMapDao
 
 import javax.naming.NamingException
 import javax.naming.ldap.InitialLdapContext
-
-import org.apache.cloudstack.api.command.LdapListConfigurationCmd
-import org.apache.cloudstack.ldap.*
-import org.apache.cloudstack.ldap.dao.LdapConfigurationDaoImpl
-
-import com.cloud.exception.InvalidParameterValueException
-import com.cloud.utils.Pair
-
 import javax.naming.ldap.LdapContext
 
 class LdapManagerImplSpec extends spock.lang.Specification {
@@ -440,23 +430,25 @@ class LdapManagerImplSpec extends spock.lang.Specification {
 
         def domainId = 1
         when:
-            println("using type: " + type)
-            LinkDomainToLdapResponse response = ldapManager.linkDomainToLdap(domainId, type, "CN=test,DC=CCP,DC=Citrix,DC=Com", (short)2)
+        println("using type: " + type)
+        LinkDomainToLdapResponse response = ldapManager.linkDomainToLdap(domainId, type, "CN=test,DC=CCP,DC=Citrix,DC=Com", (short) 2)
         then:
-            thrown(IllegalArgumentException)
+        thrown(IllegalArgumentException)
         where:
-            type << ["", null, "TEST", "TEST TEST"]
+        type << ["", null, "TEST", "TEST TEST"]
     }
+
     def "test linkDomainToLdap invalid domain"() {
         def ldapManager = new LdapManagerImpl()
         LdapTrustMapDao ldapTrustMapDao = Mock(LdapTrustMapDao)
         ldapManager._ldapTrustMapDao = ldapTrustMapDao
 
         when:
-            LinkDomainToLdapResponse response = ldapManager.linkDomainToLdap(null, "GROUP", "CN=test,DC=CCP,DC=Citrix,DC=Com", (short)2)
+        LinkDomainToLdapResponse response = ldapManager.linkDomainToLdap(null, "GROUP", "CN=test,DC=CCP,DC=Citrix,DC=Com", (short) 2)
         then:
-            thrown(IllegalArgumentException)
+        thrown(IllegalArgumentException)
     }
+
     def "test linkDomainToLdap invalid ldap name"() {
         def ldapManager = new LdapManagerImpl()
         LdapTrustMapDao ldapTrustMapDao = Mock(LdapTrustMapDao)
@@ -465,13 +457,14 @@ class LdapManagerImplSpec extends spock.lang.Specification {
         def domainId = 1
         when:
         println("using name: " + name)
-            LinkDomainToLdapResponse response = ldapManager.linkDomainToLdap(domainId, "GROUP", name, (short)2)
+        LinkDomainToLdapResponse response = ldapManager.linkDomainToLdap(domainId, "GROUP", name, (short) 2)
         then:
-            thrown(IllegalArgumentException)
+        thrown(IllegalArgumentException)
         where:
-            name << ["", null]
+        name << ["", null]
     }
-    def "test linkDomainToLdap invalid accountType"(){
+
+    def "test linkDomainToLdap invalid accountType"() {
 
         def ldapManager = new LdapManagerImpl()
         LdapTrustMapDao ldapTrustMapDao = Mock(LdapTrustMapDao)
@@ -479,35 +472,36 @@ class LdapManagerImplSpec extends spock.lang.Specification {
 
         def domainId = 1
         when:
-            println("using accountType: " + accountType)
-            LinkDomainToLdapResponse response = ldapManager.linkDomainToLdap(domainId, "GROUP", "TEST", (short)accountType)
+        println("using accountType: " + accountType)
+        LinkDomainToLdapResponse response = ldapManager.linkDomainToLdap(domainId, "GROUP", "TEST", (short) accountType)
         then:
-            thrown(IllegalArgumentException)
+        thrown(IllegalArgumentException)
         where:
-            accountType << [-1, 1, 3, 4, 5, 6, 20000, -500000]
+        accountType << [-1, 1, 3, 4, 5, 6, 20000, -500000]
     }
-    def "test linkDomainToLdap when all is well"(){
+
+    def "test linkDomainToLdap when all is well"() {
         def ldapManager = new LdapManagerImpl()
         LdapTrustMapDao ldapTrustMapDao = Mock(LdapTrustMapDao)
         ldapManager._ldapTrustMapDao = ldapTrustMapDao
 
-        def domainId=1
-        def type=LdapManager.LinkType.GROUP
-        def name="CN=test,DC=CCP, DC=citrix,DC=com"
-        short accountType=2
+        def domainId = 1
+        def type = LdapManager.LinkType.GROUP
+        def name = "CN=test,DC=CCP, DC=citrix,DC=com"
+        short accountType = 2
 
         1 * ldapTrustMapDao.persist(new LdapTrustMapVO(domainId, type, name, accountType)) >> new LdapTrustMapVO(domainId, type, name, accountType)
 
         when:
-            LinkDomainToLdapResponse response = ldapManager.linkDomainToLdap(domainId, type.toString(), name, accountType)
+        LinkDomainToLdapResponse response = ldapManager.linkDomainToLdap(domainId, type.toString(), name, accountType)
         then:
-            response.getDomainId() == domainId
-            response.getType() == type.toString()
-            response.getName() == name
-            response.getAccountType() == accountType
+        response.getDomainId() == domainId
+        response.getType() == type.toString()
+        response.getName() == name
+        response.getAccountType() == accountType
     }
 
-    def "test getUser(username,type,group) when username disabled in ldap"(){
+    def "test getUser(username,type,group) when username disabled in ldap"() {
         def ldapUserManager = Mock(LdapUserManager)
         def ldapUserManagerFactory = Mock(LdapUserManagerFactory)
         ldapUserManagerFactory.getInstance(_) >> ldapUserManager
@@ -527,13 +521,13 @@ class LdapManagerImplSpec extends spock.lang.Specification {
         ldapUserManager.getUser(username, type, name, _) >> new LdapUser(username, "email", "firstname", "lastname", "principal", "domain", true)
 
         when:
-            LdapUser user = ldapManager.getUser(username, type, name)
+        LdapUser user = ldapManager.getUser(username, type, name)
         then:
-            user.getUsername() == username
-            user.isDisabled() == true
+        user.getUsername() == username
+        user.isDisabled() == true
     }
 
-    def "test getUser(username,type,group) when username doesnt exist in ldap"(){
+    def "test getUser(username,type,group) when username doesnt exist in ldap"() {
         def ldapUserManager = Mock(LdapUserManager)
         def ldapUserManagerFactory = Mock(LdapUserManagerFactory)
         ldapUserManagerFactory.getInstance(_) >> ldapUserManager
@@ -553,11 +547,12 @@ class LdapManagerImplSpec extends spock.lang.Specification {
         ldapUserManager.getUser(username, type, name, _) >> { throw new NamingException("Test naming exception") }
 
         when:
-            LdapUser user = ldapManager.getUser(username, type, name)
+        LdapUser user = ldapManager.getUser(username, type, name)
         then:
-            thrown(NoLdapUserMatchingQueryException)
+        thrown(NoLdapUserMatchingQueryException)
     }
-    def "test getUser(username,type,group) when username is an active member of the group in ldap"(){
+
+    def "test getUser(username,type,group) when username is an active member of the group in ldap"() {
         def ldapUserManager = Mock(LdapUserManager)
         def ldapUserManagerFactory = Mock(LdapUserManagerFactory)
         ldapUserManagerFactory.getInstance(_) >> ldapUserManager

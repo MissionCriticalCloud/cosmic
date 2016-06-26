@@ -1,23 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package org.apache.cloudstack.network.topology;
-
-import java.util.List;
 
 import com.cloud.dc.DataCenter;
 import com.cloud.deploy.DeployDestination;
@@ -34,7 +15,6 @@ import com.cloud.network.rules.DhcpPvlanRules;
 import com.cloud.network.rules.NetworkAclsRules;
 import com.cloud.network.rules.NicPlugInOutRules;
 import com.cloud.network.rules.PrivateGatewayRules;
-import com.cloud.network.rules.RuleApplier;
 import com.cloud.network.rules.RuleApplierWrapper;
 import com.cloud.network.rules.StaticRoutesRules;
 import com.cloud.network.rules.UserdataPwdRules;
@@ -47,9 +27,11 @@ import com.cloud.vm.NicProfile;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 
+import javax.inject.Inject;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -58,13 +40,22 @@ public class AdvancedNetworkTopology extends BasicNetworkTopology {
 
     private static final Logger s_logger = LoggerFactory.getLogger(AdvancedNetworkTopology.class);
 
-    @Autowired
+    @Inject
     @Qualifier("advancedNetworkVisitor")
     protected AdvancedNetworkVisitor _advancedVisitor;
 
     @Override
     public BasicNetworkVisitor getVisitor() {
         return _advancedVisitor;
+    }
+
+    @Override
+    public boolean setupPrivateGateway(final PrivateGateway gateway, final VirtualRouter router) throws ConcurrentOperationException, ResourceUnavailableException {
+        s_logger.debug("SETUP PRIVATE GATEWAY RULES");
+
+        final PrivateGatewayRules routesRules = new PrivateGatewayRules(gateway);
+
+        return routesRules.accept(_advancedVisitor, router);
     }
 
     @Override
@@ -105,7 +96,6 @@ public class AdvancedNetworkTopology extends BasicNetworkTopology {
             if (router.getState() == State.Running) {
 
                 result = result && routesRules.accept(_advancedVisitor, router);
-
             } else if (router.getState() == State.Stopped || router.getState() == State.Stopping) {
                 s_logger.debug("Router " + router.getInstanceName() + " is in " + router.getState() + ", so not sending StaticRoute command to the backend");
             } else {
@@ -116,6 +106,27 @@ public class AdvancedNetworkTopology extends BasicNetworkTopology {
             }
         }
         return result;
+    }
+
+    @Override
+    public boolean applyNetworkACLs(final Network network, final List<? extends NetworkACLItem> rules, final VirtualRouter router, final boolean isPrivateGateway)
+            throws ResourceUnavailableException {
+
+        if (rules == null || rules.isEmpty()) {
+            s_logger.debug("No network ACLs to be applied for network " + network.getId());
+            return true;
+        }
+
+        s_logger.debug("APPLYING NETWORK ACLs RULES");
+
+        final String typeString = "network acls";
+        final boolean isPodLevelException = false;
+        final boolean failWhenDisconnect = false;
+        final Long podId = null;
+
+        final NetworkAclsRules aclsRules = new NetworkAclsRules(network, rules, isPrivateGateway);
+
+        return applyRules(network, router, typeString, isPodLevelException, podId, failWhenDisconnect, new RuleApplierWrapper<>(aclsRules));
     }
 
     @Override
@@ -133,12 +144,19 @@ public class AdvancedNetworkTopology extends BasicNetworkTopology {
     }
 
     @Override
-    public boolean setupPrivateGateway(final PrivateGateway gateway, final VirtualRouter router) throws ConcurrentOperationException, ResourceUnavailableException {
-        s_logger.debug("SETUP PRIVATE GATEWAY RULES");
+    public boolean applyDhcpEntry(final Network network, final NicProfile nic, final VirtualMachineProfile profile, final DeployDestination dest,
+                                  final DomainRouterVO router) throws ResourceUnavailableException {
 
-        final PrivateGatewayRules routesRules = new PrivateGatewayRules(gateway);
+        s_logger.debug("APPLYING VPC DHCP ENTRY RULES");
 
-        return routesRules.accept(_advancedVisitor, router);
+        final String typeString = "dhcp entry";
+        final Long podId = null;
+        final boolean isPodLevelException = false;
+        final boolean failWhenDisconnect = false;
+
+        final DhcpEntryRules dhcpRules = new DhcpEntryRules(network, nic, profile, dest);
+
+        return applyRules(network, router, typeString, isPodLevelException, podId, failWhenDisconnect, new RuleApplierWrapper<>(dhcpRules));
     }
 
     @Override
@@ -154,23 +172,7 @@ public class AdvancedNetworkTopology extends BasicNetworkTopology {
 
         final UserdataPwdRules pwdRules = new UserdataPwdRules(network, nic, profile, dest);
 
-        return applyRules(network, router, typeString, isPodLevelException, podId, failWhenDisconnect, new RuleApplierWrapper<RuleApplier>(pwdRules));
-    }
-
-    @Override
-    public boolean applyDhcpEntry(final Network network, final NicProfile nic, final VirtualMachineProfile profile, final DeployDestination dest,
-            final DomainRouterVO router) throws ResourceUnavailableException {
-
-        s_logger.debug("APPLYING VPC DHCP ENTRY RULES");
-
-        final String typeString = "dhcp entry";
-        final Long podId = null;
-        final boolean isPodLevelException = false;
-        final boolean failWhenDisconnect = false;
-
-        final DhcpEntryRules dhcpRules = new DhcpEntryRules(network, nic, profile, dest);
-
-        return applyRules(network, router, typeString, isPodLevelException, podId, failWhenDisconnect, new RuleApplierWrapper<RuleApplier>(dhcpRules));
+        return applyRules(network, router, typeString, isPodLevelException, podId, failWhenDisconnect, new RuleApplierWrapper<>(pwdRules));
     }
 
     @Override
@@ -197,33 +199,12 @@ public class AdvancedNetworkTopology extends BasicNetworkTopology {
         nicPlugInOutRules.accept(_advancedVisitor, router);
 
         final VpcIpAssociationRules ipAssociationRules = new VpcIpAssociationRules(network, ipAddresses);
-        final boolean result = applyRules(network, router, typeString, isPodLevelException, podId, failWhenDisconnect, new RuleApplierWrapper<RuleApplier>(ipAssociationRules));
+        final boolean result = applyRules(network, router, typeString, isPodLevelException, podId, failWhenDisconnect, new RuleApplierWrapper<>(ipAssociationRules));
 
         if (result) {
             _advancedVisitor.visit(nicPlugInOutRules);
         }
 
         return result;
-    }
-
-    @Override
-    public boolean applyNetworkACLs(final Network network, final List<? extends NetworkACLItem> rules, final VirtualRouter router, final boolean isPrivateGateway)
-            throws ResourceUnavailableException {
-
-        if (rules == null || rules.isEmpty()) {
-            s_logger.debug("No network ACLs to be applied for network " + network.getId());
-            return true;
-        }
-
-        s_logger.debug("APPLYING NETWORK ACLs RULES");
-
-        final String typeString = "network acls";
-        final boolean isPodLevelException = false;
-        final boolean failWhenDisconnect = false;
-        final Long podId = null;
-
-        final NetworkAclsRules aclsRules = new NetworkAclsRules(network, rules, isPrivateGateway);
-
-        return applyRules(network, router, typeString, isPodLevelException, podId, failWhenDisconnect, new RuleApplierWrapper<RuleApplier>(aclsRules));
     }
 }

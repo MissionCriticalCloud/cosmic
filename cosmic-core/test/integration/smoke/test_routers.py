@@ -1,31 +1,12 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ BVT tests for routers
 """
 # Import Local Modules
-from marvin.codes import FAILED
-from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.cloudstackAPI import (stopRouter,
                                   restartNetwork,
                                   startRouter,
                                   rebootRouter)
-from marvin.lib.utils import (cleanup_resources,
-                              get_process_status,
-                              get_host_credentials)
+from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import FAILED
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              VirtualMachine)
@@ -37,16 +18,18 @@ from marvin.lib.common import (get_domain,
                                list_networks,
                                list_zones,
                                list_vlan_ipranges)
+from marvin.lib.utils import (cleanup_resources,
+                              get_process_status,
+                              get_host_credentials)
 from nose.plugins.attrib import attr
+
 # Import System modules
 import time
-
 
 _multiprocess_shared_ = True
 
 
 class TestRouterServices(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
 
@@ -747,8 +730,8 @@ class TestRouterServices(cloudstackTestCase):
 
     def verifyRouterResponse(self, router_response, ip):
         if (router_response) and (isinstance(router_response, list)) and \
-           (router_response[0].state == "Running") and \
-           (router_response[0].publicip == ip):
+                (router_response[0].state == "Running") and \
+                (router_response[0].publicip == ip):
             return True
         return False
 

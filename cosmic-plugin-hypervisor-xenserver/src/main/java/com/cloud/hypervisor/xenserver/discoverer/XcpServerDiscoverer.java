@@ -1,34 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.hypervisor.xenserver.discoverer;
-
-import java.net.InetAddress;
-import java.net.URI;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-import javax.persistence.EntityExistsException;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
@@ -86,6 +56,21 @@ import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.HypervisorVersionChangedException;
+import org.apache.cloudstack.hypervisor.xenserver.XenserverConfigs;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import javax.persistence.EntityExistsException;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Host;
 import com.xensource.xenapi.HostPatch;
@@ -95,12 +80,9 @@ import com.xensource.xenapi.Session;
 import com.xensource.xenapi.Types.SessionAuthenticationFailed;
 import com.xensource.xenapi.Types.UuidInvalid;
 import com.xensource.xenapi.Types.XenAPIException;
-
-import org.apache.cloudstack.hypervisor.xenserver.XenserverConfigs;
 import org.apache.xmlrpc.XmlRpcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, Listener, ResourceStateAdapter {
     private static final Logger s_logger = LoggerFactory.getLogger(XcpServerDiscoverer.class);
@@ -114,8 +96,6 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
     protected String _guestNic;
     protected boolean _setupMultipath;
     protected String _instance;
-    private String xs620snapshothotfix = "Xenserver-Vdi-Copy-HotFix";
-
     @Inject
     protected AlertManager _alertMgr;
     @Inject
@@ -124,107 +104,60 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
     VMTemplateDao _tmpltDao;
     @Inject
     HostPodDao _podDao;
+    private final String xs620snapshothotfix = "Xenserver-Vdi-Copy-HotFix";
 
     protected XcpServerDiscoverer() {
     }
 
-    void setClusterGuid(ClusterVO cluster, String guid) {
-        cluster.setGuid(guid);
-        try {
-            _clusterDao.update(cluster.getId(), cluster);
-        } catch (EntityExistsException e) {
-            QueryBuilder<ClusterVO> sc = QueryBuilder.create(ClusterVO.class);
-            sc.and(sc.entity().getGuid(), Op.EQ, guid);
-            List<ClusterVO> clusters = sc.list();
-            ClusterVO clu = clusters.get(0);
-            List<HostVO> clusterHosts = _resourceMgr.listAllHostsInCluster(clu.getId());
-            if (clusterHosts == null || clusterHosts.size() == 0) {
-                clu.setGuid(null);
-                _clusterDao.update(clu.getId(), clu);
-                _clusterDao.update(cluster.getId(), cluster);
-                return;
-            }
-            throw e;
-        }
-    }
-
-    protected boolean poolHasHotFix(Connection conn, String hostIp, String hotFixUuid) {
-        try {
-            Map<Host, Host.Record> hosts = Host.getAllRecords(conn);
-            for (Map.Entry<Host, Host.Record> entry : hosts.entrySet()) {
-
-                Host.Record re = entry.getValue();
-                if (!re.address.equalsIgnoreCase(hostIp)){
-                    continue;
-                }
-                Set<HostPatch> patches = re.patches;
-                PoolPatch poolPatch = PoolPatch.getByUuid(conn, hotFixUuid);
-                for(HostPatch patch : patches) {
-                    PoolPatch pp = patch.getPoolPatch(conn);
-                    if (pp != null && pp.equals(poolPatch) && patch.getApplied(conn)) {
-                        s_logger.debug("host " + hostIp + " does have " + hotFixUuid +" Hotfix.");
-                        return true;
-                    }
-                }
-            }
-            return false;
-        } catch (UuidInvalid e) {
-            s_logger.debug("host " + hostIp + " doesn't have " + hotFixUuid + " Hotfix");
-        } catch (Exception e) {
-            s_logger.debug("can't get patches information, consider it doesn't have " + hotFixUuid + " Hotfix");
-        }
-        return false;
-    }
-
-
-
     @Override
     public Map<? extends ServerResource, Map<String, String>>
-    find(long dcId, Long podId, Long clusterId, URI url, String username, String password, List<String> hostTags) throws DiscoveryException {
-        Map<CitrixResourceBase, Map<String, String>> resources = new HashMap<CitrixResourceBase, Map<String, String>>();
+    find(final long dcId, final Long podId, final Long clusterId, final URI url, final String username, final String password, final List<String> hostTags) throws
+            DiscoveryException {
+        final Map<CitrixResourceBase, Map<String, String>> resources = new HashMap<>();
         Connection conn = null;
         if (!url.getScheme().equals("http")) {
-            String msg = "urlString is not http so we're not taking care of the discovery for this: " + url;
+            final String msg = "urlString is not http so we're not taking care of the discovery for this: " + url;
             s_logger.debug(msg);
             return null;
         }
         if (clusterId == null) {
-            String msg = "must specify cluster Id when add host";
+            final String msg = "must specify cluster Id when add host";
             s_logger.debug(msg);
             throw new RuntimeException(msg);
         }
 
         if (podId == null) {
-            String msg = "must specify pod Id when add host";
+            final String msg = "must specify pod Id when add host";
             s_logger.debug(msg);
             throw new RuntimeException(msg);
         }
 
-        ClusterVO cluster = _clusterDao.findById(clusterId);
+        final ClusterVO cluster = _clusterDao.findById(clusterId);
         if (cluster == null || cluster.getHypervisorType() != HypervisorType.XenServer) {
-            if (s_logger.isInfoEnabled())
+            if (s_logger.isInfoEnabled()) {
                 s_logger.info("invalid cluster id or cluster is not for XenServer hypervisors");
+            }
             return null;
         }
 
         try {
-            String hostname = url.getHost();
-            InetAddress ia = InetAddress.getByName(hostname);
-            String hostIp = ia.getHostAddress();
-            Queue<String> pass = new LinkedList<String>();
+            final String hostname = url.getHost();
+            final InetAddress ia = InetAddress.getByName(hostname);
+            final String hostIp = ia.getHostAddress();
+            final Queue<String> pass = new LinkedList<>();
             pass.add(password);
             conn = _connPool.getConnect(hostIp, username, pass);
             if (conn == null) {
-                String msg = "Unable to get a connection to " + url;
+                final String msg = "Unable to get a connection to " + url;
                 s_logger.debug(msg);
                 throw new DiscoveryException(msg);
             }
 
-            Set<Pool> pools = Pool.getAll(conn);
-            Pool pool = pools.iterator().next();
-            Pool.Record pr = pool.getRecord(conn);
+            final Set<Pool> pools = Pool.getAll(conn);
+            final Pool pool = pools.iterator().next();
+            final Pool.Record pr = pool.getRecord(conn);
             String poolUuid = pr.uuid;
-            Map<Host, Host.Record> hosts = Host.getAllRecords(conn);
+            final Map<Host, Host.Record> hosts = Host.getAllRecords(conn);
             String latestHotFix = "";
             if (poolHasHotFix(conn, hostIp, XenserverConfigs.XSHotFix62ESP1004)) {
                 latestHotFix = XenserverConfigs.XSHotFix62ESP1004;
@@ -233,15 +166,15 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
             }
 
             /*set cluster hypervisor type to xenserver*/
-            ClusterVO clu = _clusterDao.findById(clusterId);
+            final ClusterVO clu = _clusterDao.findById(clusterId);
             if (clu.getGuid() == null) {
                 setClusterGuid(clu, poolUuid);
             } else {
-                List<HostVO> clusterHosts = _resourceMgr.listAllHostsInCluster(clusterId);
+                final List<HostVO> clusterHosts = _resourceMgr.listAllHostsInCluster(clusterId);
                 if (clusterHosts != null && clusterHosts.size() > 0) {
                     if (!clu.getGuid().equals(poolUuid)) {
-                        String msg = "Please join the host " +  hostIp + " to XS pool  "
-                                       + clu.getGuid() + " through XC/XS before adding it through CS UI";
+                        final String msg = "Please join the host " + hostIp + " to XS pool  "
+                                + clu.getGuid() + " through XC/XS before adding it through CS UI";
                         s_logger.warn(msg);
                         throw new DiscoveryException(msg);
                     }
@@ -253,7 +186,7 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
             if (conn != null) {
                 try {
                     Session.logout(conn);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     s_logger.debug("Caught exception during logout", e);
                 }
                 conn.dispose();
@@ -264,18 +197,18 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
             _clusterDao.update(clusterId, clu);
 
             if (_checkHvm) {
-                for (Map.Entry<Host, Host.Record> entry : hosts.entrySet()) {
-                    Host.Record record = entry.getValue();
+                for (final Map.Entry<Host, Host.Record> entry : hosts.entrySet()) {
+                    final Host.Record record = entry.getValue();
 
                     boolean support_hvm = false;
-                    for (String capability : record.capabilities) {
+                    for (final String capability : record.capabilities) {
                         if (capability.contains("hvm")) {
                             support_hvm = true;
                             break;
                         }
                     }
                     if (!support_hvm) {
-                        String msg = "Unable to add host " + record.address + " because it doesn't support hvm";
+                        final String msg = "Unable to add host " + record.address + " because it doesn't support hvm";
                         _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_HOST, dcId, podId, msg, msg);
                         s_logger.debug(msg);
                         throw new RuntimeException(msg);
@@ -283,30 +216,30 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
                 }
             }
 
-            for (Map.Entry<Host, Host.Record> entry : hosts.entrySet()) {
-                Host.Record record = entry.getValue();
-                String hostAddr = record.address;
+            for (final Map.Entry<Host, Host.Record> entry : hosts.entrySet()) {
+                final Host.Record record = entry.getValue();
+                final String hostAddr = record.address;
 
-                String prodVersion = CitrixHelper.getProductVersion(record);
-                String xenVersion = record.softwareVersion.get("xen");
+                final String prodVersion = CitrixHelper.getProductVersion(record);
+                final String xenVersion = record.softwareVersion.get("xen");
                 String hostOS = record.softwareVersion.get("product_brand");
                 if (hostOS == null) {
                     hostOS = record.softwareVersion.get("platform_name");
                 }
 
-                String hostOSVer = prodVersion;
-                String hostKernelVer = record.softwareVersion.get("linux");
+                final String hostOSVer = prodVersion;
+                final String hostKernelVer = record.softwareVersion.get("linux");
 
                 if (_resourceMgr.findHostByGuid(record.uuid) != null) {
                     s_logger.debug("Skipping " + record.address + " because " + record.uuid + " is already in the database.");
                     continue;
                 }
 
-                CitrixResourceBase resource = createServerResource(dcId, podId, record, latestHotFix);
+                final CitrixResourceBase resource = createServerResource(dcId, podId, record, latestHotFix);
                 s_logger.info("Found host " + record.hostname + " ip=" + record.address + " product version=" + prodVersion);
 
-                Map<String, String> details = new HashMap<String, String>();
-                Map<String, Object> params = new HashMap<String, Object>();
+                final Map<String, String> details = new HashMap<>();
+                final Map<String, Object> params = new HashMap<>();
                 details.put("url", hostAddr);
                 details.put("username", username);
                 params.put("username", username);
@@ -324,8 +257,8 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
                 details.put(HostInfo.HOST_OS_KERNEL_VERSION, hostKernelVer);
                 details.put(HostInfo.HYPERVISOR_VERSION, xenVersion);
 
-                String privateNetworkLabel = _networkMgr.getDefaultManagementTrafficLabel(dcId, HypervisorType.XenServer);
-                String storageNetworkLabel = _networkMgr.getDefaultStorageTrafficLabel(dcId, HypervisorType.XenServer);
+                final String privateNetworkLabel = _networkMgr.getDefaultManagementTrafficLabel(dcId, HypervisorType.XenServer);
+                final String storageNetworkLabel = _networkMgr.getDefaultStorageTrafficLabel(dcId, HypervisorType.XenServer);
 
                 if (!params.containsKey("private.network.device") && privateNetworkLabel != null) {
                     params.put("private.network.device", privateNetworkLabel);
@@ -337,8 +270,8 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
                     details.put("storage.network.device1", storageNetworkLabel);
                 }
 
-                DataCenterVO zone = _dcDao.findById(dcId);
-                boolean securityGroupEnabled = zone.isSecurityGroupEnabled();
+                final DataCenterVO zone = _dcDao.findById(dcId);
+                final boolean securityGroupEnabled = zone.isSecurityGroupEnabled();
                 params.put("securitygroupenabled", Boolean.toString(securityGroupEnabled));
 
                 params.put("router.aggregation.command.each.timeout", _configDao.getValue(Config.RouterAggregationCommandEachTimeout.toString()));
@@ -352,7 +285,7 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
                 details.put(Config.InstanceName.toString().toLowerCase(), _instance);
                 try {
                     resource.configure("XenServer", params);
-                } catch (ConfigurationException e) {
+                } catch (final ConfigurationException e) {
                     _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_HOST, dcId, podId, "Unable to add " + record.address, "Error is " + e.getMessage());
                     s_logger.warn("Unable to instantiate " + record.address, e);
                     continue;
@@ -360,59 +293,102 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
                 resource.start();
                 resources.put(resource, details);
             }
-        } catch (SessionAuthenticationFailed e) {
+        } catch (final SessionAuthenticationFailed e) {
             throw new DiscoveredWithErrorException("Authentication error");
-        } catch (XenAPIException e) {
+        } catch (final XenAPIException e) {
             s_logger.warn("XenAPI exception", e);
             return null;
-        } catch (XmlRpcException e) {
+        } catch (final XmlRpcException e) {
             s_logger.warn("Xml Rpc Exception", e);
             return null;
-        } catch (UnknownHostException e) {
+        } catch (final UnknownHostException e) {
             s_logger.warn("Unable to resolve the host name", e);
             return null;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             s_logger.debug("other exceptions: " + e.toString(), e);
             return null;
         }
         return resources;
     }
 
-    String getPoolUuid(Connection conn) throws XenAPIException, XmlRpcException {
-        Map<Pool, Pool.Record> pools = Pool.getAllRecords(conn);
-        assert pools.size() == 1 : "Pools size is " + pools.size();
-        return pools.values().iterator().next().uuid;
+    protected boolean poolHasHotFix(final Connection conn, final String hostIp, final String hotFixUuid) {
+        try {
+            final Map<Host, Host.Record> hosts = Host.getAllRecords(conn);
+            for (final Map.Entry<Host, Host.Record> entry : hosts.entrySet()) {
+
+                final Host.Record re = entry.getValue();
+                if (!re.address.equalsIgnoreCase(hostIp)) {
+                    continue;
+                }
+                final Set<HostPatch> patches = re.patches;
+                final PoolPatch poolPatch = PoolPatch.getByUuid(conn, hotFixUuid);
+                for (final HostPatch patch : patches) {
+                    final PoolPatch pp = patch.getPoolPatch(conn);
+                    if (pp != null && pp.equals(poolPatch) && patch.getApplied(conn)) {
+                        s_logger.debug("host " + hostIp + " does have " + hotFixUuid + " Hotfix.");
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } catch (final UuidInvalid e) {
+            s_logger.debug("host " + hostIp + " doesn't have " + hotFixUuid + " Hotfix");
+        } catch (final Exception e) {
+            s_logger.debug("can't get patches information, consider it doesn't have " + hotFixUuid + " Hotfix");
+        }
+        return false;
     }
 
-    protected void addSamePool(Connection conn, Map<CitrixResourceBase, Map<String, String>> resources) throws XenAPIException, XmlRpcException {
-        Map<Pool, Pool.Record> hps = Pool.getAllRecords(conn);
-        assert (hps.size() == 1) : "How can it be more than one but it's actually " + hps.size();
-
-        // This is the pool.
-        String poolUuid = hps.values().iterator().next().uuid;
-
-        for (Map<String, String> details : resources.values()) {
-            details.put("pool", poolUuid);
+    void setClusterGuid(final ClusterVO cluster, final String guid) {
+        cluster.setGuid(guid);
+        try {
+            _clusterDao.update(cluster.getId(), cluster);
+        } catch (final EntityExistsException e) {
+            final QueryBuilder<ClusterVO> sc = QueryBuilder.create(ClusterVO.class);
+            sc.and(sc.entity().getGuid(), Op.EQ, guid);
+            final List<ClusterVO> clusters = sc.list();
+            final ClusterVO clu = clusters.get(0);
+            final List<HostVO> clusterHosts = _resourceMgr.listAllHostsInCluster(clu.getId());
+            if (clusterHosts == null || clusterHosts.size() == 0) {
+                clu.setGuid(null);
+                _clusterDao.update(clu.getId(), clu);
+                _clusterDao.update(cluster.getId(), cluster);
+                return;
+            }
+            throw e;
         }
     }
 
-    protected CitrixResourceBase createServerResource(String prodBrand, String prodVersion, String prodVersionTextShort, String hotfix) {
+    protected CitrixResourceBase createServerResource(final long dcId, final Long podId, final Host.Record record, final String hotfix) {
+        String prodBrand = record.softwareVersion.get("product_brand");
+        if (prodBrand == null) {
+            prodBrand = record.softwareVersion.get("platform_name").trim();
+        } else {
+            prodBrand = prodBrand.trim();
+        }
+        final String prodVersion = CitrixHelper.getProductVersion(record);
+
+        final String prodVersionTextShort = record.softwareVersion.get("product_version_text_short");
+        return createServerResource(prodBrand, prodVersion, prodVersionTextShort, hotfix);
+    }
+
+    protected CitrixResourceBase createServerResource(final String prodBrand, final String prodVersion, final String prodVersionTextShort, final String hotfix) {
         // Xen Cloud Platform group of hypervisors
         if (prodBrand.equals("XCP") && (prodVersion.equals("1.0.0") || prodVersion.equals("1.1.0")
-              || prodVersion.equals("5.6.100") || prodVersion.startsWith("1.4") || prodVersion.startsWith("1.6"))) {
+                || prodVersion.equals("5.6.100") || prodVersion.startsWith("1.4") || prodVersion.startsWith("1.6"))) {
             return new XcpServerResource();
         } // Citrix Xenserver group of hypervisors
-        else if (prodBrand.equals("XenServer") && prodVersion.equals("5.6.0"))
+        else if (prodBrand.equals("XenServer") && prodVersion.equals("5.6.0")) {
             return new XenServer56Resource();
-        else if (prodBrand.equals("XenServer") && prodVersion.equals("6.0.0"))
+        } else if (prodBrand.equals("XenServer") && prodVersion.equals("6.0.0")) {
             return new XenServer600Resource();
-        else if (prodBrand.equals("XenServer") && prodVersion.equals("6.0.2"))
+        } else if (prodBrand.equals("XenServer") && prodVersion.equals("6.0.2")) {
             return new XenServer600Resource();
-        else if (prodBrand.equals("XenServer") && prodVersion.equals("6.1.0"))
+        } else if (prodBrand.equals("XenServer") && prodVersion.equals("6.1.0")) {
             return new XenServer610Resource();
-        else if (prodBrand.equals("XenServer") && prodVersion.equals("6.5.0"))
+        } else if (prodBrand.equals("XenServer") && prodVersion.equals("6.5.0")) {
             return new XenServer650Resource();
-        else if (prodBrand.equals("XenServer") && prodVersion.equals("6.2.0")) {
+        } else if (prodBrand.equals("XenServer") && prodVersion.equals("6.2.0")) {
             if (hotfix != null && hotfix.equals(XenserverConfigs.XSHotFix62ESP1004)) {
                 return new Xenserver625Resource();
             } else if (hotfix != null && hotfix.equals(XenserverConfigs.XSHotFix62ESP1)) {
@@ -429,35 +405,52 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
         } else if (prodBrand.equals("XCP_Kronos")) {
             return new XcpOssResource();
         }
-        String msg =
-                "Only support XCP 1.0.0, 1.1.0, 1.4.x, 1.5 beta, 1.6.x; XenServer 5.6,  XenServer 5.6 FP1, XenServer 5.6 SP2, Xenserver 6.0, 6.0.2, 6.1.0, 6.2.0, 6.5.0 but this one is " +
+        final String msg =
+                "Only support XCP 1.0.0, 1.1.0, 1.4.x, 1.5 beta, 1.6.x; XenServer 5.6,  XenServer 5.6 FP1, XenServer 5.6 SP2, Xenserver 6.0, 6.0.2, 6.1.0, 6.2.0, 6.5.0 but this " +
+                        "one is " +
                         prodBrand + " " + prodVersion;
         s_logger.warn(msg);
         throw new RuntimeException(msg);
     }
 
-
-
-    protected CitrixResourceBase createServerResource(long dcId, Long podId, Host.Record record, String hotfix) {
-        String prodBrand = record.softwareVersion.get("product_brand");
-        if (prodBrand == null) {
-            prodBrand = record.softwareVersion.get("platform_name").trim();
-        } else {
-            prodBrand = prodBrand.trim();
-        }
-        String prodVersion = CitrixHelper.getProductVersion(record);
-
-        String prodVersionTextShort = record.softwareVersion.get("product_version_text_short");
-        return createServerResource(prodBrand, prodVersion, prodVersionTextShort, hotfix);
-    }
-
-    protected void serverConfig() {
-        String value = _params.get(Config.XenServerSetupMultipath.key());
-        _setupMultipath = Boolean.parseBoolean(value);
+    @Override
+    public void postDiscovery(final List<HostVO> hosts, final long msId) throws DiscoveryException {
+        //do nothing
     }
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean matchHypervisor(final String hypervisor) {
+        if (hypervisor == null) {
+            return true;
+        }
+        return Hypervisor.HypervisorType.XenServer.toString().equalsIgnoreCase(hypervisor);
+    }
+
+    @Override
+    public Hypervisor.HypervisorType getHypervisorType() {
+        return Hypervisor.HypervisorType.XenServer;
+    }
+
+    String getPoolUuid(final Connection conn) throws XenAPIException, XmlRpcException {
+        final Map<Pool, Pool.Record> pools = Pool.getAllRecords(conn);
+        assert pools.size() == 1 : "Pools size is " + pools.size();
+        return pools.values().iterator().next().uuid;
+    }
+
+    protected void addSamePool(final Connection conn, final Map<CitrixResourceBase, Map<String, String>> resources) throws XenAPIException, XmlRpcException {
+        final Map<Pool, Pool.Record> hps = Pool.getAllRecords(conn);
+        assert (hps.size() == 1) : "How can it be more than one but it's actually " + hps.size();
+
+        // This is the pool.
+        final String poolUuid = hps.values().iterator().next().uuid;
+
+        for (final Map<String, String> details : resources.values()) {
+            details.put("pool", poolUuid);
+        }
+    }
+
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         super.configure(name, params);
         serverConfig();
 
@@ -488,50 +481,18 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
         return true;
     }
 
-    @Override
-    public boolean matchHypervisor(String hypervisor) {
-        if (hypervisor == null)
-            return true;
-        return Hypervisor.HypervisorType.XenServer.toString().equalsIgnoreCase(hypervisor);
-    }
-
-    @Override
-    public Hypervisor.HypervisorType getHypervisorType() {
-        return Hypervisor.HypervisorType.XenServer;
-    }
-
-    @Override
-    public void postDiscovery(List<HostVO> hosts, long msId) throws DiscoveryException {
-        //do nothing
-    }
-
-    @Override
-    public int getTimeout() {
-        return 0;
-    }
-
-    @Override
-    public boolean isRecurring() {
-        return false;
-    }
-
-    @Override
-    public boolean processAnswers(long agentId, long seq, Answer[] answers) {
-        return false;
-    }
-
-    @Override
-    public boolean processCommands(long agentId, long seq, Command[] commands) {
-        return false;
+    protected void serverConfig() {
+        final String value = _params.get(Config.XenServerSetupMultipath.key());
+        _setupMultipath = Boolean.parseBoolean(value);
     }
 
     private void createXsToolsISO() {
-        String isoName = "xs-tools.iso";
-        VMTemplateVO tmplt = _tmpltDao.findByTemplateName(isoName);
-        Long id;
+        final String isoName = "xs-tools.iso";
+        final VMTemplateVO tmplt = _tmpltDao.findByTemplateName(isoName);
+        final Long id;
         if (tmplt == null) {
             id = _tmpltDao.getNextInSequence(Long.class, "id");
-            VMTemplateVO template =
+            final VMTemplateVO template =
                     VMTemplateVO.createPreHostIso(id, isoName, isoName, ImageFormat.ISO, true, true, TemplateType.PERHOST, null, null, true, 64, Account.ACCOUNT_ID_SYSTEM,
                             null, "xen-pv-drv-iso", false, 1, false, HypervisorType.XenServer);
             _tmpltDao.persist(template);
@@ -544,40 +505,72 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
     }
 
     @Override
-    public void processConnect(com.cloud.host.Host agent, StartupCommand cmd, boolean forRebalance) throws ConnectionException {
+    public boolean stop() {
+        _resourceMgr.unregisterResourceStateAdapter(this.getClass().getSimpleName());
+        return super.stop();
+    }
+
+    @Override
+    protected HashMap<String, Object> buildConfigParams(final HostVO host) {
+        final HashMap<String, Object> params = super.buildConfigParams(host);
+        final DataCenterVO zone = _dcDao.findById(host.getDataCenterId());
+        if (zone != null) {
+            final boolean securityGroupEnabled = zone.isSecurityGroupEnabled();
+            params.put("securitygroupenabled", Boolean.toString(securityGroupEnabled));
+        }
+        return params;
+    }
+
+    @Override
+    public boolean processAnswers(final long agentId, final long seq, final Answer[] answers) {
+        return false;
+    }
+
+    @Override
+    public boolean processCommands(final long agentId, final long seq, final Command[] commands) {
+        return false;
+    }
+
+    @Override
+    public AgentControlAnswer processControlCommand(final long agentId, final AgentControlCommand cmd) {
+        return null;
+    }
+
+    @Override
+    public void processConnect(final com.cloud.host.Host agent, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
         if (!(cmd instanceof StartupRoutingCommand)) {
             return;
         }
-        long agentId = agent.getId();
+        final long agentId = agent.getId();
 
-        StartupRoutingCommand startup = (StartupRoutingCommand)cmd;
+        final StartupRoutingCommand startup = (StartupRoutingCommand) cmd;
         if (startup.getHypervisorType() != HypervisorType.XenServer) {
             s_logger.debug("Not XenServer so moving on.");
             return;
         }
 
-        HostVO host = _hostDao.findById(agentId);
+        final HostVO host = _hostDao.findById(agentId);
 
-        ClusterVO cluster = _clusterDao.findById(host.getClusterId());
+        final ClusterVO cluster = _clusterDao.findById(host.getClusterId());
         if (cluster.getGuid() == null) {
             cluster.setGuid(startup.getPool());
             _clusterDao.update(cluster.getId(), cluster);
         } else if (!cluster.getGuid().equals(startup.getPool())) {
-            String msg = "pool uuid for cluster " + cluster.getId() + " changed from " + cluster.getGuid() + " to " + startup.getPool();
+            final String msg = "pool uuid for cluster " + cluster.getId() + " changed from " + cluster.getGuid() + " to " + startup.getPool();
             s_logger.warn(msg);
             throw new CloudRuntimeException(msg);
         }
 
-        Map<String, String> details = startup.getHostDetails();
-        String prodBrand = details.get("product_brand").trim();
-        String prodVersion = details.get("product_version").trim();
-        String hotfix = details.get(XenserverConfigs.XS620HotFix);
-        String prodVersionTextShort = details.get("product_version_text_short");
+        final Map<String, String> details = startup.getHostDetails();
+        final String prodBrand = details.get("product_brand").trim();
+        final String prodVersion = details.get("product_version").trim();
+        final String hotfix = details.get(XenserverConfigs.XS620HotFix);
+        final String prodVersionTextShort = details.get("product_version_text_short");
 
-        String resource = createServerResource(prodBrand, prodVersion, prodVersionTextShort, hotfix).getClass().getName();
+        final String resource = createServerResource(prodBrand, prodVersion, prodVersionTextShort, hotfix).getClass().getName();
 
         if (!resource.equals(host.getResource())) {
-            String msg = "host " + host.getPrivateIpAddress() + " changed from " + host.getResource() + " to " + resource;
+            final String msg = "host " + host.getPrivateIpAddress() + " changed from " + host.getResource() + " to " + resource;
             s_logger.debug(msg);
             host.setResource(resource);
             host.setSetup(false);
@@ -588,9 +581,9 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Setting up host " + agentId);
         }
-        HostEnvironment env = new HostEnvironment();
+        final HostEnvironment env = new HostEnvironment();
 
-        SetupCommand setup = new SetupCommand(env);
+        final SetupCommand setup = new SetupCommand(env);
         if (_setupMultipath) {
             setup.setMultipathOn();
         }
@@ -599,91 +592,80 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
         }
 
         try {
-            Answer answer = _agentMgr.send(agentId, setup);
+            final Answer answer = _agentMgr.send(agentId, setup);
             if (answer != null && answer.getResult() && answer instanceof SetupAnswer) {
                 host.setSetup(true);
                 host.setLastPinged((System.currentTimeMillis() >> 10) - 5 * 60);
                 host.setHypervisorVersion(prodVersion);
                 _hostDao.update(host.getId(), host);
-                if (((SetupAnswer)answer).needReconnect()) {
+                if (((SetupAnswer) answer).needReconnect()) {
                     throw new ConnectionException(false, "Reinitialize agent after setup.");
                 }
                 return;
             } else {
                 s_logger.warn("Unable to setup agent " + agentId + " due to " + ((answer != null) ? answer.getDetails() : "return null"));
             }
-        } catch (AgentUnavailableException e) {
+        } catch (final AgentUnavailableException e) {
             s_logger.warn("Unable to setup agent " + agentId + " because it became unavailable.", e);
-        } catch (OperationTimedoutException e) {
+        } catch (final OperationTimedoutException e) {
             s_logger.warn("Unable to setup agent " + agentId + " because it timed out", e);
         }
         throw new ConnectionException(true, "Reinitialize agent after setup.");
     }
 
     @Override
-    public AgentControlAnswer processControlCommand(long agentId, AgentControlCommand cmd) {
-        return null;
-    }
-
-    @Override
-    public boolean processDisconnect(long agentId, Status state) {
+    public boolean processDisconnect(final long agentId, final Status state) {
         return false;
     }
 
     @Override
-    public boolean processTimeout(long agentId, long seq) {
+    public boolean isRecurring() {
         return false;
     }
 
     @Override
-    public HostVO createHostVOForConnectedAgent(HostVO host, StartupCommand[] cmd) {
+    public int getTimeout() {
+        return 0;
+    }
+
+    @Override
+    public boolean processTimeout(final long agentId, final long seq) {
+        return false;
+    }
+
+    @Override
+    public HostVO createHostVOForConnectedAgent(final HostVO host, final StartupCommand[] cmd) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public HostVO createHostVOForDirectConnectAgent(HostVO host, StartupCommand[] startup, ServerResource resource, Map<String, String> details, List<String> hostTags) {
-        StartupCommand firstCmd = startup[0];
+    public HostVO createHostVOForDirectConnectAgent(final HostVO host, final StartupCommand[] startup, final ServerResource resource, final Map<String, String> details, final
+    List<String> hostTags) {
+        final StartupCommand firstCmd = startup[0];
         if (!(firstCmd instanceof StartupRoutingCommand)) {
             return null;
         }
 
-        StartupRoutingCommand ssCmd = ((StartupRoutingCommand)firstCmd);
+        final StartupRoutingCommand ssCmd = ((StartupRoutingCommand) firstCmd);
         if (ssCmd.getHypervisorType() != HypervisorType.XenServer) {
             return null;
         }
 
-        HostPodVO pod = _podDao.findById(host.getPodId());
-        DataCenterVO dc = _dcDao.findById(host.getDataCenterId());
+        final HostPodVO pod = _podDao.findById(host.getPodId());
+        final DataCenterVO dc = _dcDao.findById(host.getDataCenterId());
         s_logger.info("Host: " + host.getName() + " connected with hypervisor type: " + HypervisorType.XenServer + ". Checking CIDR...");
         _resourceMgr.checkCIDR(pod, dc, ssCmd.getPrivateIpAddress(), ssCmd.getPrivateNetmask());
         return _resourceMgr.fillRoutingHostVO(host, ssCmd, HypervisorType.XenServer, details, hostTags);
     }
 
     @Override
-    public DeleteHostAnswer deleteHost(HostVO host, boolean isForced, boolean isForceDeleteStorage) throws UnableDeleteHostException {
+    public DeleteHostAnswer deleteHost(final HostVO host, final boolean isForced, final boolean isForceDeleteStorage) throws UnableDeleteHostException {
         if (host.getType() != com.cloud.host.Host.Type.Routing || host.getHypervisorType() != HypervisorType.XenServer) {
             return null;
         }
 
         _resourceMgr.deleteRoutingHost(host, isForced, isForceDeleteStorage);
         return new DeleteHostAnswer(true);
-    }
-
-    @Override
-    protected HashMap<String, Object> buildConfigParams(HostVO host) {
-        HashMap<String, Object> params = super.buildConfigParams(host);
-        DataCenterVO zone = _dcDao.findById(host.getDataCenterId());
-        if (zone != null) {
-            boolean securityGroupEnabled = zone.isSecurityGroupEnabled();
-            params.put("securitygroupenabled", Boolean.toString(securityGroupEnabled));
-        }
-        return params;
-    }
-
-    @Override
-    public boolean stop() {
-        _resourceMgr.unregisterResourceStateAdapter(this.getClass().getSimpleName());
-        return super.stop();
     }
 }

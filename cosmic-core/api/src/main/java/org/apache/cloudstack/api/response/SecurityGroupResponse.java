@@ -1,33 +1,16 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
 
-@SuppressWarnings("unused")
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import com.google.gson.annotations.SerializedName;
+
 @EntityReference(value = SecurityGroup.class)
 public class SecurityGroupResponse extends BaseResponse implements ControlledViewEntityResponse {
 
@@ -84,10 +67,10 @@ public class SecurityGroupResponse extends BaseResponse implements ControlledVie
     private Set<String> virtualMachineIds;
 
     public SecurityGroupResponse() {
-        this.virtualMachineIds = new LinkedHashSet<String>();
-        this.ingressRules = new LinkedHashSet<SecurityGroupRuleResponse>();
-        this.egressRules = new LinkedHashSet<SecurityGroupRuleResponse>();
-        this.tags = new LinkedHashSet<ResourceTagResponse>();
+        this.virtualMachineIds = new LinkedHashSet<>();
+        this.ingressRules = new LinkedHashSet<>();
+        this.egressRules = new LinkedHashSet<>();
+        this.tags = new LinkedHashSet<>();
     }
 
     @Override
@@ -99,46 +82,56 @@ public class SecurityGroupResponse extends BaseResponse implements ControlledVie
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
     @Override
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
     @Override
-    public void setDomainId(String domainId) {
+    public void setProjectId(final String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public void setProjectName(final String projectName) {
+        this.projectName = projectName;
+    }
+
+    @Override
+    public void setDomainId(final String domainId) {
         this.domainId = domainId;
     }
 
     @Override
-    public void setDomainName(String domainName) {
+    public void setDomainName(final String domainName) {
         this.domainName = domainName;
     }
 
-    public void setSecurityGroupIngressRules(Set<SecurityGroupRuleResponse> securityGroupRules) {
+    public void setSecurityGroupIngressRules(final Set<SecurityGroupRuleResponse> securityGroupRules) {
         this.ingressRules = securityGroupRules;
     }
 
-    public void addSecurityGroupIngressRule(SecurityGroupRuleResponse rule) {
+    public void addSecurityGroupIngressRule(final SecurityGroupRuleResponse rule) {
         this.ingressRules.add(rule);
     }
 
-    public void setSecurityGroupEgressRules(Set<SecurityGroupRuleResponse> securityGroupRules) {
+    public void setSecurityGroupEgressRules(final Set<SecurityGroupRuleResponse> securityGroupRules) {
         this.egressRules = securityGroupRules;
     }
 
-    public void addSecurityGroupEgressRule(SecurityGroupRuleResponse rule) {
+    public void addSecurityGroupEgressRule(final SecurityGroupRuleResponse rule) {
         this.egressRules.add(rule);
     }
 
@@ -151,49 +144,44 @@ public class SecurityGroupResponse extends BaseResponse implements ControlledVie
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        SecurityGroupResponse other = (SecurityGroupResponse)obj;
+        }
+        final SecurityGroupResponse other = (SecurityGroupResponse) obj;
         if (id == null) {
-            if (other.id != null)
+            if (other.id != null) {
                 return false;
-        } else if (!id.equals(other.id))
+            }
+        } else if (!id.equals(other.id)) {
             return false;
+        }
         return true;
     }
 
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public void setTags(Set<ResourceTagResponse> tags) {
+    public void setTags(final Set<ResourceTagResponse> tags) {
         this.tags = tags;
     }
 
-    public void addTag(ResourceTagResponse tag) {
+    public void addTag(final ResourceTagResponse tag) {
         this.tags.add(tag);
     }
 
-    public void setVirtualMachineCount(Integer virtualMachineCount) {
+    public void setVirtualMachineCount(final Integer virtualMachineCount) {
         this.virtualMachineCount = virtualMachineCount;
     }
 
-    public void setVirtualMachineIds(Set<String> virtualMachineIds) {
+    public void setVirtualMachineIds(final Set<String> virtualMachineIds) {
         this.virtualMachineIds = virtualMachineIds;
     }
 
-    public void addVirtualMachineId(String virtualMachineId) {
+    public void addVirtualMachineId(final String virtualMachineId) {
         this.virtualMachineIds.add(virtualMachineId);
     }
 }

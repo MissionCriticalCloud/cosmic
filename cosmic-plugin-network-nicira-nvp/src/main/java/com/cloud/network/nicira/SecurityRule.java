@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.network.nicira;
@@ -22,7 +7,6 @@ package com.cloud.network.nicira;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-@SuppressWarnings("serial")
 public class SecurityRule extends AccessRule {
 
     protected String ipPrefix;
@@ -32,7 +16,6 @@ public class SecurityRule extends AccessRule {
     protected int portRangeMax;
 
     protected String profileUuid;
-
 
     /**
      * Default constructor
@@ -44,7 +27,7 @@ public class SecurityRule extends AccessRule {
      * Fully parameterized constructor
      */
     public SecurityRule(final String ethertype, final String ipPrefix, final String profileUuid,
-            final int portRangeMin, final int portRangeMax, final int protocol) {
+                        final int portRangeMin, final int portRangeMax, final int protocol) {
         this.ethertype = ethertype;
         this.ipPrefix = ipPrefix;
         this.portRangeMin = portRangeMin;
@@ -61,6 +44,16 @@ public class SecurityRule extends AccessRule {
     @Override
     public void setEthertype(final String ethertype) {
         this.ethertype = ethertype;
+    }
+
+    @Override
+    public int getProtocol() {
+        return protocol;
+    }
+
+    @Override
+    public void setProtocol(final int protocol) {
+        this.protocol = protocol;
     }
 
     public String getIpPrefix() {
@@ -96,22 +89,12 @@ public class SecurityRule extends AccessRule {
     }
 
     @Override
-    public int getProtocol() {
-        return protocol;
-    }
-
-    @Override
-    public void setProtocol(final int protocol) {
-        this.protocol = protocol;
-    }
-
-    @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 31)
-            .append(ethertype).append(ipPrefix)
-            .append(portRangeMin).append(portRangeMax)
-            .append(profileUuid).append(protocol)
-            .toHashCode();
+                .append(ethertype).append(ipPrefix)
+                .append(portRangeMin).append(portRangeMax)
+                .append(profileUuid).append(protocol)
+                .toHashCode();
     }
 
     @Override

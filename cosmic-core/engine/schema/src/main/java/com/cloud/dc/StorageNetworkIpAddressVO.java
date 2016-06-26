@@ -1,22 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.dc;
 
-import java.util.Date;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,8 +13,7 @@ import javax.persistence.SecondaryTables;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "op_dc_storage_network_ip_address")
@@ -46,22 +29,17 @@ public class StorageNetworkIpAddressVO implements InternalIdentity {
 
     @Column(name = "ip_address", updatable = false, nullable = false)
     String ipAddress;
-
+    @Column(name = "mac_address")
+    long mac;
+    @Column(name = "vlan", table = "dc_storage_network_ip_range", insertable = false, updatable = false)
+    Integer vlan;
+    @Column(name = "gateway", table = "dc_storage_network_ip_range", insertable = false, updatable = false)
+    String gateway;
     @Column(name = "taken")
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date takenAt;
-
     @Column(name = "netmask", table = "dc_storage_network_ip_range", insertable = false, updatable = false)
     private String netmask;
-
-    @Column(name = "mac_address")
-    long mac;
-
-    @Column(name = "vlan", table = "dc_storage_network_ip_range", insertable = false, updatable = false)
-    Integer vlan;
-
-    @Column(name = "gateway", table = "dc_storage_network_ip_range", insertable = false, updatable = false)
-    String gateway;
 
     protected StorageNetworkIpAddressVO() {
     }
@@ -71,15 +49,11 @@ public class StorageNetworkIpAddressVO implements InternalIdentity {
         return id;
     }
 
-    public void setTakenAt(Date takenDate) {
-        this.takenAt = takenDate;
-    }
-
     public String getIpAddress() {
         return ipAddress;
     }
 
-    public void setIpAddress(String ip) {
+    public void setIpAddress(final String ip) {
         this.ipAddress = ip;
     }
 
@@ -87,11 +61,15 @@ public class StorageNetworkIpAddressVO implements InternalIdentity {
         return takenAt;
     }
 
+    public void setTakenAt(final Date takenDate) {
+        this.takenAt = takenDate;
+    }
+
     public long getRangeId() {
         return rangeId;
     }
 
-    public void setRangeId(long id) {
+    public void setRangeId(final long id) {
         this.rangeId = id;
     }
 
@@ -99,7 +77,7 @@ public class StorageNetworkIpAddressVO implements InternalIdentity {
         return mac;
     }
 
-    public void setMac(long mac) {
+    public void setMac(final long mac) {
         this.mac = mac;
     }
 
@@ -107,7 +85,7 @@ public class StorageNetworkIpAddressVO implements InternalIdentity {
         return netmask;
     }
 
-    public void setNetmask(String netmask) {
+    public void setNetmask(final String netmask) {
         this.netmask = netmask;
     }
 

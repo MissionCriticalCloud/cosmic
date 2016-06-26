@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.event;
 
 import com.cloud.dc.DataCenter;
@@ -22,18 +6,43 @@ import com.cloud.dc.StorageNetworkIpRange;
 import com.cloud.dc.Vlan;
 import com.cloud.domain.Domain;
 import com.cloud.host.Host;
-import com.cloud.network.*;
-import com.cloud.network.as.*;
+import com.cloud.network.GuestVlan;
+import com.cloud.network.IpAddress;
+import com.cloud.network.Network;
+import com.cloud.network.PhysicalNetwork;
+import com.cloud.network.PhysicalNetworkServiceProvider;
+import com.cloud.network.PhysicalNetworkTrafficType;
+import com.cloud.network.RemoteAccessVpn;
+import com.cloud.network.Site2SiteCustomerGateway;
+import com.cloud.network.Site2SiteVpnConnection;
+import com.cloud.network.Site2SiteVpnGateway;
+import com.cloud.network.as.AutoScaleCounter;
+import com.cloud.network.as.AutoScalePolicy;
+import com.cloud.network.as.AutoScaleVmGroup;
+import com.cloud.network.as.AutoScaleVmProfile;
+import com.cloud.network.as.Condition;
 import com.cloud.network.router.VirtualRouter;
-import com.cloud.network.rules.*;
+import com.cloud.network.rules.FirewallRule;
+import com.cloud.network.rules.HealthCheckPolicy;
+import com.cloud.network.rules.LoadBalancer;
+import com.cloud.network.rules.StaticNat;
+import com.cloud.network.rules.StickinessPolicy;
 import com.cloud.network.security.SecurityGroup;
-import com.cloud.network.vpc.*;
+import com.cloud.network.vpc.NetworkACL;
+import com.cloud.network.vpc.NetworkACLItem;
+import com.cloud.network.vpc.PrivateGateway;
+import com.cloud.network.vpc.StaticRoute;
+import com.cloud.network.vpc.Vpc;
 import com.cloud.offering.DiskOffering;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.projects.Project;
 import com.cloud.server.ResourceTag;
-import com.cloud.storage.*;
+import com.cloud.storage.GuestOS;
+import com.cloud.storage.GuestOSHypervisor;
+import com.cloud.storage.Snapshot;
+import com.cloud.storage.StoragePool;
+import com.cloud.storage.Volume;
 import com.cloud.storage.snapshot.SnapshotPolicy;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
@@ -48,9 +57,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EventTypes {
-
-    //map of Event and corresponding entity for which Event is applicable
-    private static Map<String, Object> entityEventDetails = null;
 
     // VM Events
     public static final String EVENT_VM_CREATE = "VM.CREATE";
@@ -67,7 +73,6 @@ public class EventTypes {
     public static final String EVENT_VM_MOVE = "VM.MOVE";
     public static final String EVENT_VM_RESTORE = "VM.RESTORE";
     public static final String EVENT_VM_EXPUNGE = "VM.EXPUNGE";
-
     // Domain Router
     public static final String EVENT_ROUTER_CREATE = "ROUTER.CREATE";
     public static final String EVENT_ROUTER_DESTROY = "ROUTER.DESTROY";
@@ -76,7 +81,6 @@ public class EventTypes {
     public static final String EVENT_ROUTER_REBOOT = "ROUTER.REBOOT";
     public static final String EVENT_ROUTER_HA = "ROUTER.HA";
     public static final String EVENT_ROUTER_UPGRADE = "ROUTER.UPGRADE";
-
     // Console proxy
     public static final String EVENT_PROXY_CREATE = "PROXY.CREATE";
     public static final String EVENT_PROXY_DESTROY = "PROXY.DESTROY";
@@ -84,11 +88,9 @@ public class EventTypes {
     public static final String EVENT_PROXY_STOP = "PROXY.STOP";
     public static final String EVENT_PROXY_REBOOT = "PROXY.REBOOT";
     public static final String EVENT_PROXY_HA = "PROXY.HA";
-
     // VNC Console Events
     public static final String EVENT_VNC_CONNECT = "VNC.CONNECT";
     public static final String EVENT_VNC_DISCONNECT = "VNC.DISCONNECT";
-
     // Network Events
     public static final String EVENT_NET_IP_ASSIGN = "NET.IPASSIGN";
     public static final String EVENT_NET_IP_RELEASE = "NET.IPRELEASE";
@@ -104,11 +106,9 @@ public class EventTypes {
     public static final String EVENT_FIREWALL_OPEN = "FIREWALL.OPEN";
     public static final String EVENT_FIREWALL_CLOSE = "FIREWALL.CLOSE";
     public static final String EVENT_FIREWALL_UPDATE = "FIREWALL.UPDATE";
-
     public static final String EVENT_FIREWALL_EGRESS_OPEN = "FIREWALL.EGRESS.OPEN";
     public static final String EVENT_FIREWALL_EGRESS_CLOSE = "FIREWALL.EGRESS.CLOSE";
     public static final String EVENT_FIREWALL_EGRESS_UPDATE = "FIREWALL.EGRESS.UPDATE";
-
     //NIC Events
     public static final String EVENT_NIC_CREATE = "NIC.CREATE";
     public static final String EVENT_NIC_DELETE = "NIC.DELETE";
@@ -116,7 +116,6 @@ public class EventTypes {
     public static final String EVENT_NIC_DETAIL_ADD = "NIC.DETAIL.ADD";
     public static final String EVENT_NIC_DETAIL_UPDATE = "NIC.DETAIL.UPDATE";
     public static final String EVENT_NIC_DETAIL_REMOVE = "NIC.DETAIL.REMOVE";
-
     // Load Balancers
     public static final String EVENT_ASSIGN_TO_LOAD_BALANCER_RULE = "LB.ASSIGN.TO.RULE";
     public static final String EVENT_REMOVE_FROM_LOAD_BALANCER_RULE = "LB.REMOVE.FROM.RULE";
@@ -133,14 +132,12 @@ public class EventTypes {
     public static final String EVENT_LB_CERT_DELETE = "LB.CERT.DELETE";
     public static final String EVENT_LB_CERT_ASSIGN = "LB.CERT.ASSIGN";
     public static final String EVENT_LB_CERT_REMOVE = "LB.CERT.REMOVE";
-
     // Global Load Balancer rules
     public static final String EVENT_ASSIGN_TO_GLOBAL_LOAD_BALANCER_RULE = "GLOBAL.LB.ASSIGN";
     public static final String EVENT_REMOVE_FROM_GLOBAL_LOAD_BALANCER_RULE = "GLOBAL.LB.REMOVE";
     public static final String EVENT_GLOBAL_LOAD_BALANCER_CREATE = "GLOBAL.LB.CREATE";
     public static final String EVENT_GLOBAL_LOAD_BALANCER_DELETE = "GLOBAL.LB.DELETE";
     public static final String EVENT_GLOBAL_LOAD_BALANCER_UPDATE = "GLOBAL.LB.UPDATE";
-
     // Account events
     public static final String EVENT_ACCOUNT_ENABLE = "ACCOUNT.ENABLE";
     public static final String EVENT_ACCOUNT_DISABLE = "ACCOUNT.DISABLE";
@@ -148,7 +145,6 @@ public class EventTypes {
     public static final String EVENT_ACCOUNT_DELETE = "ACCOUNT.DELETE";
     public static final String EVENT_ACCOUNT_UPDATE = "ACCOUNT.UPDATE";
     public static final String EVENT_ACCOUNT_MARK_DEFAULT_ZONE = "ACCOUNT.MARK.DEFAULT.ZONE";
-
     // UserVO Events
     public static final String EVENT_USER_LOGIN = "USER.LOGIN";
     public static final String EVENT_USER_LOGOUT = "USER.LOGOUT";
@@ -158,13 +154,10 @@ public class EventTypes {
     public static final String EVENT_USER_UPDATE = "USER.UPDATE";
     public static final String EVENT_USER_ENABLE = "USER.ENABLE";
     public static final String EVENT_USER_LOCK = "USER.LOCK";
-
     //registering SSH keypair events
     public static final String EVENT_REGISTER_SSH_KEYPAIR = "REGISTER.SSH.KEYPAIR";
-
     //register for user API and secret keys
     public static final String EVENT_REGISTER_FOR_SECRET_API_KEY = "REGISTER.USER.KEY";
-
     // Template Events
     public static final String EVENT_TEMPLATE_CREATE = "TEMPLATE.CREATE";
     public static final String EVENT_TEMPLATE_DELETE = "TEMPLATE.DELETE";
@@ -176,7 +169,6 @@ public class EventTypes {
     public static final String EVENT_TEMPLATE_EXTRACT = "TEMPLATE.EXTRACT";
     public static final String EVENT_TEMPLATE_UPLOAD = "TEMPLATE.UPLOAD";
     public static final String EVENT_TEMPLATE_CLEANUP = "TEMPLATE.CLEANUP";
-
     // Volume Events
     public static final String EVENT_VOLUME_CREATE = "VOLUME.CREATE";
     public static final String EVENT_VOLUME_DELETE = "VOLUME.DELETE";
@@ -190,12 +182,10 @@ public class EventTypes {
     public static final String EVENT_VOLUME_DETAIL_ADD = "VOLUME.DETAIL.ADD";
     public static final String EVENT_VOLUME_DETAIL_REMOVE = "VOLUME.DETAIL.REMOVE";
     public static final String EVENT_VOLUME_UPDATE = "VOLUME.UPDATE";
-
     // Domains
     public static final String EVENT_DOMAIN_CREATE = "DOMAIN.CREATE";
     public static final String EVENT_DOMAIN_DELETE = "DOMAIN.DELETE";
     public static final String EVENT_DOMAIN_UPDATE = "DOMAIN.UPDATE";
-
     // Snapshots
     public static final String EVENT_SNAPSHOT_CREATE = "SNAPSHOT.CREATE";
     public static final String EVENT_SNAPSHOT_DELETE = "SNAPSHOT.DELETE";
@@ -203,7 +193,6 @@ public class EventTypes {
     public static final String EVENT_SNAPSHOT_POLICY_CREATE = "SNAPSHOTPOLICY.CREATE";
     public static final String EVENT_SNAPSHOT_POLICY_UPDATE = "SNAPSHOTPOLICY.UPDATE";
     public static final String EVENT_SNAPSHOT_POLICY_DELETE = "SNAPSHOTPOLICY.DELETE";
-
     // ISO
     public static final String EVENT_ISO_CREATE = "ISO.CREATE";
     public static final String EVENT_ISO_DELETE = "ISO.DELETE";
@@ -212,7 +201,6 @@ public class EventTypes {
     public static final String EVENT_ISO_DETACH = "ISO.DETACH";
     public static final String EVENT_ISO_EXTRACT = "ISO.EXTRACT";
     public static final String EVENT_ISO_UPLOAD = "ISO.UPLOAD";
-
     // SSVM
     public static final String EVENT_SSVM_CREATE = "SSVM.CREATE";
     public static final String EVENT_SSVM_DESTROY = "SSVM.DESTROY";
@@ -220,47 +208,38 @@ public class EventTypes {
     public static final String EVENT_SSVM_STOP = "SSVM.STOP";
     public static final String EVENT_SSVM_REBOOT = "SSVM.REBOOT";
     public static final String EVENT_SSVM_HA = "SSVM.HA";
-
     // Service Offerings
     public static final String EVENT_SERVICE_OFFERING_CREATE = "SERVICE.OFFERING.CREATE";
     public static final String EVENT_SERVICE_OFFERING_EDIT = "SERVICE.OFFERING.EDIT";
     public static final String EVENT_SERVICE_OFFERING_DELETE = "SERVICE.OFFERING.DELETE";
-
     // Disk Offerings
     public static final String EVENT_DISK_OFFERING_CREATE = "DISK.OFFERING.CREATE";
     public static final String EVENT_DISK_OFFERING_EDIT = "DISK.OFFERING.EDIT";
     public static final String EVENT_DISK_OFFERING_DELETE = "DISK.OFFERING.DELETE";
-
     // Network offerings
     public static final String EVENT_NETWORK_OFFERING_CREATE = "NETWORK.OFFERING.CREATE";
     public static final String EVENT_NETWORK_OFFERING_ASSIGN = "NETWORK.OFFERING.ASSIGN";
     public static final String EVENT_NETWORK_OFFERING_EDIT = "NETWORK.OFFERING.EDIT";
     public static final String EVENT_NETWORK_OFFERING_REMOVE = "NETWORK.OFFERING.REMOVE";
     public static final String EVENT_NETWORK_OFFERING_DELETE = "NETWORK.OFFERING.DELETE";
-
     // Pods
     public static final String EVENT_POD_CREATE = "POD.CREATE";
     public static final String EVENT_POD_EDIT = "POD.EDIT";
     public static final String EVENT_POD_DELETE = "POD.DELETE";
-
     // Zones
     public static final String EVENT_ZONE_CREATE = "ZONE.CREATE";
     public static final String EVENT_ZONE_EDIT = "ZONE.EDIT";
     public static final String EVENT_ZONE_DELETE = "ZONE.DELETE";
-
     // VLANs/IP ranges
     public static final String EVENT_VLAN_IP_RANGE_CREATE = "VLAN.IP.RANGE.CREATE";
     public static final String EVENT_VLAN_IP_RANGE_DELETE = "VLAN.IP.RANGE.DELETE";
     public static final String EVENT_VLAN_IP_RANGE_DEDICATE = "VLAN.IP.RANGE.DEDICATE";
     public static final String EVENT_VLAN_IP_RANGE_RELEASE = "VLAN.IP.RANGE.RELEASE";
-
     public static final String EVENT_STORAGE_IP_RANGE_CREATE = "STORAGE.IP.RANGE.CREATE";
     public static final String EVENT_STORAGE_IP_RANGE_DELETE = "STORAGE.IP.RANGE.DELETE";
     public static final String EVENT_STORAGE_IP_RANGE_UPDATE = "STORAGE.IP.RANGE.UPDATE";
-
     // Configuration Table
     public static final String EVENT_CONFIGURATION_VALUE_EDIT = "CONFIGURATION.VALUE.EDIT";
-
     // Security Groups
     public static final String EVENT_SECURITY_GROUP_AUTHORIZE_INGRESS = "SG.AUTH.INGRESS";
     public static final String EVENT_SECURITY_GROUP_REVOKE_INGRESS = "SG.REVOKE.INGRESS";
@@ -270,20 +249,16 @@ public class EventTypes {
     public static final String EVENT_SECURITY_GROUP_DELETE = "SG.DELETE";
     public static final String EVENT_SECURITY_GROUP_ASSIGN = "SG.ASSIGN";
     public static final String EVENT_SECURITY_GROUP_REMOVE = "SG.REMOVE";
-
     // Host
     public static final String EVENT_HOST_RECONNECT = "HOST.RECONNECT";
-
     // Maintenance
     public static final String EVENT_MAINTENANCE_CANCEL = "MAINT.CANCEL";
     public static final String EVENT_MAINTENANCE_CANCEL_PRIMARY_STORAGE = "MAINT.CANCEL.PS";
     public static final String EVENT_MAINTENANCE_PREPARE = "MAINT.PREPARE";
     public static final String EVENT_MAINTENANCE_PREPARE_PRIMARY_STORAGE = "MAINT.PREPARE.PS";
-
     // Primary storage pool
     public static final String EVENT_ENABLE_PRIMARY_STORAGE = "ENABLE.PS";
     public static final String EVENT_DISABLE_PRIMARY_STORAGE = "DISABLE.PS";
-
     // VPN
     public static final String EVENT_REMOTE_ACCESS_VPN_CREATE = "VPN.REMOTE.ACCESS.CREATE";
     public static final String EVENT_REMOTE_ACCESS_VPN_DESTROY = "VPN.REMOTE.ACCESS.DESTROY";
@@ -300,20 +275,15 @@ public class EventTypes {
     public static final String EVENT_S2S_VPN_CONNECTION_DELETE = "VPN.S2S.CONNECTION.DELETE";
     public static final String EVENT_S2S_VPN_CONNECTION_RESET = "VPN.S2S.CONNECTION.RESET";
     public static final String EVENT_S2S_VPN_CONNECTION_UPDATE = "VPN.S2S.CONNECTION.UPDATE";
-
     // Network
     public static final String EVENT_NETWORK_RESTART = "NETWORK.RESTART";
-
     // Custom certificates
     public static final String EVENT_UPLOAD_CUSTOM_CERTIFICATE = "UPLOAD.CUSTOM.CERTIFICATE";
-
     // OneToOnenat
     public static final String EVENT_ENABLE_STATIC_NAT = "STATICNAT.ENABLE";
     public static final String EVENT_DISABLE_STATIC_NAT = "STATICNAT.DISABLE";
-
     public static final String EVENT_ZONE_VLAN_ASSIGN = "ZONE.VLAN.ASSIGN";
     public static final String EVENT_ZONE_VLAN_RELEASE = "ZONE.VLAN.RELEASE";
-
     // Projects
     public static final String EVENT_PROJECT_CREATE = "PROJECT.CREATE";
     public static final String EVENT_PROJECT_UPDATE = "PROJECT.UPDATE";
@@ -324,47 +294,38 @@ public class EventTypes {
     public static final String EVENT_PROJECT_INVITATION_UPDATE = "PROJECT.INVITATION.UPDATE";
     public static final String EVENT_PROJECT_INVITATION_REMOVE = "PROJECT.INVITATION.REMOVE";
     public static final String EVENT_PROJECT_ACCOUNT_REMOVE = "PROJECT.ACCOUNT.REMOVE";
-
     // Network as a Service
     public static final String EVENT_NETWORK_ELEMENT_CONFIGURE = "NETWORK.ELEMENT.CONFIGURE";
-
     // Physical Network Events
     public static final String EVENT_PHYSICAL_NETWORK_CREATE = "PHYSICAL.NETWORK.CREATE";
     public static final String EVENT_PHYSICAL_NETWORK_DELETE = "PHYSICAL.NETWORK.DELETE";
     public static final String EVENT_PHYSICAL_NETWORK_UPDATE = "PHYSICAL.NETWORK.UPDATE";
-
     // Physical Network Service Provider Events
     public static final String EVENT_SERVICE_PROVIDER_CREATE = "SERVICE.PROVIDER.CREATE";
     public static final String EVENT_SERVICE_PROVIDER_DELETE = "SERVICE.PROVIDER.DELETE";
     public static final String EVENT_SERVICE_PROVIDER_UPDATE = "SERVICE.PROVIDER.UPDATE";
-
     // Physical Network TrafficType Events
     public static final String EVENT_TRAFFIC_TYPE_CREATE = "TRAFFIC.TYPE.CREATE";
     public static final String EVENT_TRAFFIC_TYPE_DELETE = "TRAFFIC.TYPE.DELETE";
     public static final String EVENT_TRAFFIC_TYPE_UPDATE = "TRAFFIC.TYPE.UPDATE";
-
     // external network device events
     public static final String EVENT_EXTERNAL_LB_DEVICE_ADD = "PHYSICAL.LOADBALANCER.ADD";
     public static final String EVENT_EXTERNAL_LB_DEVICE_DELETE = "PHYSICAL.LOADBALANCER.DELETE";
     public static final String EVENT_EXTERNAL_LB_DEVICE_CONFIGURE = "PHYSICAL.LOADBALANCER.CONFIGURE";
-
     // external switch management device events (E.g.: Cisco Nexus 1000v Virtual Supervisor Module.
     public static final String EVENT_EXTERNAL_SWITCH_MGMT_DEVICE_ADD = "SWITCH.MGMT.ADD";
     public static final String EVENT_EXTERNAL_SWITCH_MGMT_DEVICE_DELETE = "SWITCH.MGMT.DELETE";
     public static final String EVENT_EXTERNAL_SWITCH_MGMT_DEVICE_CONFIGURE = "SWITCH.MGMT.CONFIGURE";
     public static final String EVENT_EXTERNAL_SWITCH_MGMT_DEVICE_ENABLE = "SWITCH.MGMT.ENABLE";
     public static final String EVENT_EXTERNAL_SWITCH_MGMT_DEVICE_DISABLE = "SWITCH.MGMT.DISABLE";
-
     public static final String EVENT_EXTERNAL_FIREWALL_DEVICE_ADD = "PHYSICAL.FIREWALL.ADD";
     public static final String EVENT_EXTERNAL_FIREWALL_DEVICE_DELETE = "PHYSICAL.FIREWALL.DELETE";
     public static final String EVENT_EXTERNAL_FIREWALL_DEVICE_CONFIGURE = "PHYSICAL.FIREWALL.CONFIGURE";
-
     // VPC
     public static final String EVENT_VPC_CREATE = "VPC.CREATE";
     public static final String EVENT_VPC_UPDATE = "VPC.UPDATE";
     public static final String EVENT_VPC_DELETE = "VPC.DELETE";
     public static final String EVENT_VPC_RESTART = "VPC.RESTART";
-
     // Network ACL
     public static final String EVENT_NETWORK_ACL_CREATE = "NETWORK.ACL.CREATE";
     public static final String EVENT_NETWORK_ACL_DELETE = "NETWORK.ACL.DELETE";
@@ -373,38 +334,30 @@ public class EventTypes {
     public static final String EVENT_NETWORK_ACL_ITEM_CREATE = "NETWORK.ACL.ITEM.CREATE";
     public static final String EVENT_NETWORK_ACL_ITEM_UPDATE = "NETWORK.ACL.ITEM.UPDATE";
     public static final String EVENT_NETWORK_ACL_ITEM_DELETE = "NETWORK.ACL.ITEM.DELETE";
-
     // VPC offerings
     public static final String EVENT_VPC_OFFERING_CREATE = "VPC.OFFERING.CREATE";
     public static final String EVENT_VPC_OFFERING_UPDATE = "VPC.OFFERING.UPDATE";
     public static final String EVENT_VPC_OFFERING_DELETE = "VPC.OFFERING.DELETE";
-
     // Private gateway
     public static final String EVENT_PRIVATE_GATEWAY_CREATE = "PRIVATE.GATEWAY.CREATE";
     public static final String EVENT_PRIVATE_GATEWAY_DELETE = "PRIVATE.GATEWAY.DELETE";
-
     // Static routes
     public static final String EVENT_STATIC_ROUTE_CREATE = "STATIC.ROUTE.CREATE";
     public static final String EVENT_STATIC_ROUTE_DELETE = "STATIC.ROUTE.DELETE";
-
     // tag related events
     public static final String EVENT_TAGS_CREATE = "CREATE_TAGS";
     public static final String EVENT_TAGS_DELETE = "DELETE_TAGS";
-
     // meta data related events
     public static final String EVENT_RESOURCE_DETAILS_CREATE = "CREATE_RESOURCE_DETAILS";
     public static final String EVENT_RESOURCE_DETAILS_DELETE = "DELETE_RESOURCE_DETAILS";
-
     // vm snapshot events
     public static final String EVENT_VM_SNAPSHOT_CREATE = "VMSNAPSHOT.CREATE";
     public static final String EVENT_VM_SNAPSHOT_DELETE = "VMSNAPSHOT.DELETE";
     public static final String EVENT_VM_SNAPSHOT_REVERT = "VMSNAPSHOT.REVERTTO";
-
     // external network device events
     public static final String EVENT_EXTERNAL_NVP_CONTROLLER_ADD = "PHYSICAL.NVPCONTROLLER.ADD";
     public static final String EVENT_EXTERNAL_NVP_CONTROLLER_DELETE = "PHYSICAL.NVPCONTROLLER.DELETE";
     public static final String EVENT_EXTERNAL_NVP_CONTROLLER_CONFIGURE = "PHYSICAL.NVPCONTROLLER.CONFIGURE";
-
     // external network mapping events
     public static final String EVENT_EXTERNAL_VSP_VSD_ADD = "PHYSICAL.NUAGE.VSD.ADD";
     public static final String EVENT_EXTERNAL_VSP_VSD_UPDATE = "PHYSICAL.NUAGE.VSD.UPDATE";
@@ -425,37 +378,28 @@ public class EventTypes {
     public static final String EVENT_AUTOSCALEVMGROUP_UPDATE = "AUTOSCALEVMGROUP.UPDATE";
     public static final String EVENT_AUTOSCALEVMGROUP_ENABLE = "AUTOSCALEVMGROUP.ENABLE";
     public static final String EVENT_AUTOSCALEVMGROUP_DISABLE = "AUTOSCALEVMGROUP.DISABLE";
-
     public static final String EVENT_AFFINITY_GROUP_CREATE = "AG.CREATE";
     public static final String EVENT_AFFINITY_GROUP_DELETE = "AG.DELETE";
     public static final String EVENT_AFFINITY_GROUP_ASSIGN = "AG.ASSIGN";
     public static final String EVENT_AFFINITY_GROUP_REMOVE = "AG.REMOVE";
     public static final String EVENT_VM_AFFINITY_GROUP_UPDATE = "VM.AG.UPDATE";
-
     public static final String EVENT_INTERNAL_LB_VM_START = "INTERNALLBVM.START";
     public static final String EVENT_INTERNAL_LB_VM_STOP = "INTERNALLBVM.STOP";
-
     public static final String EVENT_HOST_RESERVATION_RELEASE = "HOST.RESERVATION.RELEASE";
     // Dedicated guest vlan range
     public static final String EVENT_GUEST_VLAN_RANGE_DEDICATE = "GUESTVLANRANGE.DEDICATE";
     public static final String EVENT_DEDICATED_GUEST_VLAN_RANGE_RELEASE = "GUESTVLANRANGE.RELEASE";
-
     public static final String EVENT_PORTABLE_IP_RANGE_CREATE = "PORTABLE.IP.RANGE.CREATE";
     public static final String EVENT_PORTABLE_IP_RANGE_DELETE = "PORTABLE.IP.RANGE.DELETE";
     public static final String EVENT_PORTABLE_IP_TRANSFER = "PORTABLE.IP.TRANSFER";
-
     // Dedicated Resources
     public static final String EVENT_DEDICATE_RESOURCE = "DEDICATE.RESOURCE";
     public static final String EVENT_DEDICATE_RESOURCE_RELEASE = "DEDICATE.RESOURCE.RELEASE";
-
     public static final String EVENT_CLEANUP_VM_RESERVATION = "VM.RESERVATION.CLEANUP";
-
     // Object store migration
     public static final String EVENT_MIGRATE_PREPARE_SECONDARY_STORAGE = "MIGRATE.PREPARE.SS";
-
     //Alert generation
     public static final String ALERT_GENERATE = "ALERT.GENERATE";
-
     //Guest OS related events
     public static final String EVENT_GUEST_OS_ADD = "GUEST.OS.ADD";
     public static final String EVENT_GUEST_OS_REMOVE = "GUEST.OS.REMOVE";
@@ -463,14 +407,14 @@ public class EventTypes {
     public static final String EVENT_GUEST_OS_MAPPING_ADD = "GUEST.OS.MAPPING.ADD";
     public static final String EVENT_GUEST_OS_MAPPING_REMOVE = "GUEST.OS.MAPPING.REMOVE";
     public static final String EVENT_GUEST_OS_MAPPING_UPDATE = "GUEST.OS.MAPPING.UPDATE";
-
     public static final String EVENT_NIC_SECONDARY_IP_ASSIGN = "NIC.SECONDARY.IP.ASSIGN";
     public static final String EVENT_NIC_SECONDARY_IP_UNASSIGN = "NIC.SECONDARY.IP.UNASSIGN";
     public static final String EVENT_NIC_SECONDARY_IP_CONFIGURE = "NIC.SECONDARY.IP.CONFIGURE";
     public static final String EVENT_NETWORK_EXTERNAL_DHCP_VM_IPFETCH = "EXTERNAL.DHCP.VM.IP.FETCH";
-
     //Usage related events
     public static final String EVENT_USAGE_REMOVE_USAGE_RECORDS = "USAGE.REMOVE.USAGE.RECORDS";
+    //map of Event and corresponding entity for which Event is applicable
+    private static Map<String, Object> entityEventDetails = null;
 
     static {
 

@@ -1,27 +1,18 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package org.apache.cloudstack.api;
 
 import com.cloud.configuration.ConfigurationService;
 import com.cloud.dao.EntityManager;
 import com.cloud.dao.UUIDManager;
-import com.cloud.exception.*;
-import com.cloud.network.*;
+import com.cloud.exception.ConcurrentOperationException;
+import com.cloud.exception.InsufficientCapacityException;
+import com.cloud.exception.NetworkRuleConflictException;
+import com.cloud.exception.ResourceAllocationException;
+import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.network.NetworkModel;
+import com.cloud.network.NetworkService;
+import com.cloud.network.NetworkUsageService;
+import com.cloud.network.StorageNetworkService;
+import com.cloud.network.VpcVirtualNetworkApplianceService;
 import com.cloud.network.as.AutoScaleService;
 import com.cloud.network.firewall.FirewallService;
 import com.cloud.network.lb.LoadBalancingRulesService;
@@ -59,40 +50,29 @@ import org.apache.cloudstack.network.lb.ApplicationLoadBalancerService;
 import org.apache.cloudstack.network.lb.InternalLoadBalancerVMService;
 import org.apache.cloudstack.query.QueryService;
 import org.apache.cloudstack.usage.UsageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class BaseCmd {
-    private static final Logger s_logger = LoggerFactory.getLogger(BaseCmd.class.getName());
     public static final String RESPONSE_TYPE_XML = HttpUtils.RESPONSE_TYPE_XML;
     public static final String RESPONSE_TYPE_JSON = HttpUtils.RESPONSE_TYPE_JSON;
     public static final String USER_ERROR_MESSAGE = "Internal error executing command, please contact your system administrator";
-    public static Pattern newInputDateFormat = Pattern.compile("[\\d]+-[\\d]+-[\\d]+ [\\d]+:[\\d]+:[\\d]+");
-    private static final DateFormat s_outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     protected static final Map<Class<?>, List<Field>> fieldsForCmdClass = new HashMap<>();
-
-    public static enum HTTPMethod {
-        GET, POST, PUT, DELETE
-    }
-
-    public static enum CommandType {
-        BOOLEAN, DATE, FLOAT, DOUBLE, INTEGER, SHORT, LIST, LONG, OBJECT, MAP, STRING, TZDATE, UUID
-    }
-
-    private Object _responseObject;
-    private Map<String, String> fullUrlParams;
-    private HTTPMethod httpMethod;
-    @Parameter(name = "response", type = CommandType.STRING)
-    private String responseType;
-
-
+    private static final Logger s_logger = LoggerFactory.getLogger(BaseCmd.class.getName());
+    private static final DateFormat s_outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    public static Pattern newInputDateFormat = Pattern.compile("[\\d]+-[\\d]+-[\\d]+ [\\d]+:[\\d]+:[\\d]+");
     @Inject
     public ConfigurationService _configService;
     @Inject
@@ -177,6 +157,22 @@ public abstract class BaseCmd {
     public AlertService _alertSvc;
     @Inject
     public UUIDManager _uuidMgr;
+    private Object _responseObject;
+    private Map<String, String> fullUrlParams;
+    private HTTPMethod httpMethod;
+    @Parameter(name = "response", type = CommandType.STRING)
+    private String responseType;
+
+    public static String getDateString(final Date date) {
+        if (date == null) {
+            return "";
+        }
+        String formattedString = null;
+        synchronized (s_outputFormat) {
+            formattedString = s_outputFormat.format(date);
+        }
+        return formattedString;
+    }
 
     public abstract void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
             ResourceAllocationException, NetworkRuleConflictException;
@@ -190,14 +186,15 @@ public abstract class BaseCmd {
 
     public void setHttpMethod(final String method) {
         if (method != null) {
-            if (method.equalsIgnoreCase("GET"))
+            if (method.equalsIgnoreCase("GET")) {
                 httpMethod = HTTPMethod.GET;
-            else if (method.equalsIgnoreCase("PUT"))
+            } else if (method.equalsIgnoreCase("PUT")) {
                 httpMethod = HTTPMethod.PUT;
-            else if (method.equalsIgnoreCase("POST"))
+            } else if (method.equalsIgnoreCase("POST")) {
                 httpMethod = HTTPMethod.POST;
-            else if (method.equalsIgnoreCase("DELETE"))
+            } else if (method.equalsIgnoreCase("DELETE")) {
                 httpMethod = HTTPMethod.DELETE;
+            }
         } else {
             httpMethod = HTTPMethod.GET;
         }
@@ -223,7 +220,6 @@ public abstract class BaseCmd {
      * @return
      */
     public abstract String getCommandName();
-
 
     /**
      * Gets the CommandName based on the class annotations: the value from {@link APICommand#name()}
@@ -254,38 +250,6 @@ public abstract class BaseCmd {
 
     public void setResponseObject(final Object responseObject) {
         _responseObject = responseObject;
-    }
-
-    public static String getDateString(final Date date) {
-        if (date == null) {
-            return "";
-        }
-        String formattedString = null;
-        synchronized (s_outputFormat) {
-            formattedString = s_outputFormat.format(date);
-        }
-        return formattedString;
-    }
-
-    protected List<Field> getAllFieldsForClass(final Class<?> clazz) {
-        List<Field> filteredFields = fieldsForCmdClass.get(clazz);
-
-        // If list of fields was not cached yet
-        if (filteredFields == null) {
-            final List<Field> allFields = ReflectUtil.getAllFieldsForClass(this.getClass(), BaseCmd.class);
-            filteredFields = new ArrayList<>();
-
-            for (final Field field : allFields) {
-                final Parameter parameterAnnotation = field.getAnnotation(Parameter.class);
-                if ((parameterAnnotation != null) && parameterAnnotation.expose()) {
-                    filteredFields.add(field);
-                }
-            }
-
-            // Cache the prepared list for future use
-            fieldsForCmdClass.put(clazz, filteredFields);
-        }
-        return filteredFields;
     }
 
     /**
@@ -328,12 +292,33 @@ public abstract class BaseCmd {
         return validFields;
     }
 
-    public void setFullUrlParams(final Map<String, String> map) {
-        fullUrlParams = map;
+    protected List<Field> getAllFieldsForClass(final Class<?> clazz) {
+        List<Field> filteredFields = fieldsForCmdClass.get(clazz);
+
+        // If list of fields was not cached yet
+        if (filteredFields == null) {
+            final List<Field> allFields = ReflectUtil.getAllFieldsForClass(this.getClass(), BaseCmd.class);
+            filteredFields = new ArrayList<>();
+
+            for (final Field field : allFields) {
+                final Parameter parameterAnnotation = field.getAnnotation(Parameter.class);
+                if ((parameterAnnotation != null) && parameterAnnotation.expose()) {
+                    filteredFields.add(field);
+                }
+            }
+
+            // Cache the prepared list for future use
+            fieldsForCmdClass.put(clazz, filteredFields);
+        }
+        return filteredFields;
     }
 
     public Map<String, String> getFullUrlParams() {
         return fullUrlParams;
+    }
+
+    public void setFullUrlParams(final Map<String, String> map) {
+        fullUrlParams = map;
     }
 
     /**
@@ -364,8 +349,9 @@ public abstract class BaseCmd {
                 }
 
                 // If the flag is false break immediately
-                if (!isDisplay)
+                if (!isDisplay) {
                     break;
+                }
             } catch (final Exception e) {
                 s_logger.trace("Caught exception while checking first class entities for display property, continuing on", e);
             }
@@ -373,7 +359,6 @@ public abstract class BaseCmd {
 
         context.setEventDisplayEnabled(isDisplay);
         return isDisplay;
-
     }
 
     private Object getEntityVO(final Class entityType, final Object entityId) {
@@ -397,4 +382,11 @@ public abstract class BaseCmd {
         return null;
     }
 
+    public static enum HTTPMethod {
+        GET, POST, PUT, DELETE
+    }
+
+    public static enum CommandType {
+        BOOLEAN, DATE, FLOAT, DOUBLE, INTEGER, SHORT, LIST, LONG, OBJECT, MAP, STRING, TZDATE, UUID
+    }
 }

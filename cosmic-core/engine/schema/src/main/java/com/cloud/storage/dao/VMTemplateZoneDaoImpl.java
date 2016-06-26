@@ -1,28 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.storage.dao;
-
-import java.util.List;
 
 import com.cloud.storage.VMTemplateZoneVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,30 +36,30 @@ public class VMTemplateZoneDaoImpl extends GenericDaoBase<VMTemplateZoneVO, Long
     }
 
     @Override
-    public List<VMTemplateZoneVO> listByZoneId(long id) {
-        SearchCriteria<VMTemplateZoneVO> sc = ZoneSearch.create();
+    public List<VMTemplateZoneVO> listByZoneId(final long id) {
+        final SearchCriteria<VMTemplateZoneVO> sc = ZoneSearch.create();
         sc.setParameters("zone_id", id);
         return listIncludingRemovedBy(sc);
     }
 
     @Override
-    public List<VMTemplateZoneVO> listByTemplateId(long templateId) {
-        SearchCriteria<VMTemplateZoneVO> sc = TemplateSearch.create();
+    public List<VMTemplateZoneVO> listByTemplateId(final long templateId) {
+        final SearchCriteria<VMTemplateZoneVO> sc = TemplateSearch.create();
         sc.setParameters("template_id", templateId);
         return listIncludingRemovedBy(sc);
     }
 
     @Override
-    public VMTemplateZoneVO findByZoneTemplate(long zoneId, long templateId) {
-        SearchCriteria<VMTemplateZoneVO> sc = ZoneTemplateSearch.create();
+    public VMTemplateZoneVO findByZoneTemplate(final long zoneId, final long templateId) {
+        final SearchCriteria<VMTemplateZoneVO> sc = ZoneTemplateSearch.create();
         sc.setParameters("zone_id", zoneId);
         sc.setParameters("template_id", templateId);
         return findOneIncludingRemovedBy(sc);
     }
 
     @Override
-    public List<VMTemplateZoneVO> listByZoneTemplate(Long zoneId, long templateId) {
-        SearchCriteria<VMTemplateZoneVO> sc = ZoneTemplateSearch.create();
+    public List<VMTemplateZoneVO> listByZoneTemplate(final Long zoneId, final long templateId) {
+        final SearchCriteria<VMTemplateZoneVO> sc = ZoneTemplateSearch.create();
         if (zoneId != null) {
             sc.setParameters("zone_id", zoneId);
         }
@@ -84,14 +68,12 @@ public class VMTemplateZoneDaoImpl extends GenericDaoBase<VMTemplateZoneVO, Long
     }
 
     @Override
-    public void deletePrimaryRecordsForTemplate(long templateId) {
-        SearchCriteria<VMTemplateZoneVO> sc = TemplateSearch.create();
+    public void deletePrimaryRecordsForTemplate(final long templateId) {
+        final SearchCriteria<VMTemplateZoneVO> sc = TemplateSearch.create();
         sc.setParameters("template_id", templateId);
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
         remove(sc);
         txn.commit();
-
     }
-
 }

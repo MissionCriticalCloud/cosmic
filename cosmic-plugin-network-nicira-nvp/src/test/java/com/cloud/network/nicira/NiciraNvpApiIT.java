@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.network.nicira;
@@ -22,12 +7,12 @@ package com.cloud.network.nicira;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.cloud.utils.PropertiesUtil;
+import com.cloud.utils.rest.HttpClientHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import com.cloud.utils.PropertiesUtil;
-import com.cloud.utils.rest.HttpClientHelper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,11 +30,11 @@ public class NiciraNvpApiIT {
         final String user = System.getProperty("nvp.admin.user");
         final String pass = System.getProperty("nvp.admin.pwd");
         api = NiciraNvpApi.create()
-            .host(host)
-            .username(user)
-            .password(pass)
-            .httpClient(HttpClientHelper.createHttpClient(5))
-            .build();
+                          .host(host)
+                          .username(user)
+                          .password(pass)
+                          .httpClient(HttpClientHelper.createHttpClient(5))
+                          .build();
     }
 
     @Test
@@ -57,17 +42,17 @@ public class NiciraNvpApiIT {
         SecurityProfile sProfile = new SecurityProfile();
         sProfile.setDisplayName("SecProfile" + timestamp);
 
-        final List<SecurityRule> egressRules = new ArrayList<SecurityRule>();
+        final List<SecurityRule> egressRules = new ArrayList<>();
         sProfile.setLogicalPortEgressRules(egressRules);
         egressRules.add(new SecurityRule(SecurityRule.ETHERTYPE_IPV4, "1.10.10.0", null, 80, 88, 6));
         egressRules.add(new SecurityRule(SecurityRule.ETHERTYPE_IPV6, "2a80:34ac::1", null, 90, 98, 6));
 
-        final List<SecurityRule> ingressRules = new ArrayList<SecurityRule>();
+        final List<SecurityRule> ingressRules = new ArrayList<>();
         sProfile.setLogicalPortIngressRules(ingressRules);
         ingressRules.add(new SecurityRule(SecurityRule.ETHERTYPE_IPV4, "1.10.10.0", null, 50, 58, 6));
         ingressRules.add(new SecurityRule(SecurityRule.ETHERTYPE_IPV6, "280a:3ac4::1", null, 60, 68, 6));
 
-        final List<NiciraNvpTag> tags = new ArrayList<NiciraNvpTag>();
+        final List<NiciraNvpTag> tags = new ArrayList<>();
         sProfile.setTags(tags);
         tags.add(new NiciraNvpTag("nvp", "MyTag1"));
         tags.add(new NiciraNvpTag("nicira", "MyTag2"));
@@ -110,17 +95,17 @@ public class NiciraNvpApiIT {
 
         // Note that if the protocol is 6 (TCP) then you cannot put ICMP code and type
         // Note that if the protocol is 1 (ICMP) then you cannot put ports
-        final List<AclRule> egressRules = new ArrayList<AclRule>();
+        final List<AclRule> egressRules = new ArrayList<>();
         acl.setLogicalPortEgressRules(egressRules);
         egressRules.add(new AclRule(AclRule.ETHERTYPE_IPV4, 1, "allow", null, null, "1.10.10.0", "1.10.10.1", null, null, null, null, 0, 0, 5));
         egressRules.add(new AclRule(AclRule.ETHERTYPE_IPV4, 6, "allow", null, null, "1.10.10.6", "1.10.10.7", 80, 80, 80, 80, 1, null, null));
 
-        final List<AclRule> ingressRules = new ArrayList<AclRule>();
+        final List<AclRule> ingressRules = new ArrayList<>();
         acl.setLogicalPortIngressRules(ingressRules);
         ingressRules.add(new AclRule(AclRule.ETHERTYPE_IPV4, 1, "allow", null, null, "1.10.10.0", "1.10.10.1", null, null, null, null, 0, 0, 5));
         ingressRules.add(new AclRule(AclRule.ETHERTYPE_IPV4, 6, "allow", null, null, "1.10.10.6", "1.10.10.7", 80, 80, 80, 80, 1, null, null));
 
-        final List<NiciraNvpTag> tags = new ArrayList<NiciraNvpTag>();
+        final List<NiciraNvpTag> tags = new ArrayList<>();
         acl.setTags(tags);
         tags.add(new NiciraNvpTag("nvp", "MyTag1"));
         tags.add(new NiciraNvpTag("nicira", "MyTag2"));
@@ -162,7 +147,7 @@ public class NiciraNvpApiIT {
         logicalSwitch.setDisplayName("LogicalSwitch" + timestamp);
         logicalSwitch.setPortIsolationEnabled(true);
         logicalSwitch.setReplicationMode("service");
-        logicalSwitch.setTags(new ArrayList<NiciraNvpTag>());
+        logicalSwitch.setTags(new ArrayList<>());
         logicalSwitch.getTags().add(new NiciraNvpTag("anto", "hugo"));
 
         // In the creation we don't get to specify UUID, href or schema: they don't exist yet
@@ -187,7 +172,7 @@ public class NiciraNvpApiIT {
         assertEquals("Read a LogicalSwitch filtered by unique id (UUID) with more than one item", 1, logicalSwitches.size());
 
         // Before deleting the test LogicalSwitch, test its ports
-        final List<NiciraNvpTag> tags = new ArrayList<NiciraNvpTag>();
+        final List<NiciraNvpTag> tags = new ArrayList<>();
         tags.add(new NiciraNvpTag("cs_account", "OwnerName"));
 
         LogicalSwitchPort logicalSwitchPort = new LogicalSwitchPort("LSwitchPort" + timestamp, tags, true);
@@ -209,7 +194,7 @@ public class NiciraNvpApiIT {
         api.updateLogicalSwitchPortAttachment(logicalSwitch.getUuid(), logicalSwitchPort.getUuid(), vifAttachment);
 
         assertEquals("Read a LogicalSwitchPort by vifAttachment different than expected",
-                        api.findLogicalSwitchPortUuidByVifAttachmentUuid(logicalSwitch.getUuid(), vifAttachment.getVifUuid()), logicalSwitchPort.getUuid());
+                api.findLogicalSwitchPortUuidByVifAttachmentUuid(logicalSwitch.getUuid(), vifAttachment.getVifUuid()), logicalSwitchPort.getUuid());
 
         api.deleteLogicalSwitchPort(logicalSwitch.getUuid(), logicalSwitchPort.getUuid());
 
@@ -225,7 +210,7 @@ public class NiciraNvpApiIT {
         logicalRouter.setNatSynchronizationEnabled(true);
         logicalRouter.setReplicationMode(LogicalRouter.REPLICATION_MODE_SERVICE);
         final RoutingConfig routingConfig = new SingleDefaultRouteImplicitRoutingConfig(
-                        new RouterNextHop("192.168.10.20"));
+                new RouterNextHop("192.168.10.20"));
         logicalRouter.setRoutingConfig(routingConfig);
 
         // In the creation we don't get to specify UUID, href or schema: they don't exist yet
@@ -255,7 +240,7 @@ public class NiciraNvpApiIT {
             assertEquals(logicalRouters.get(0), api.findOneLogicalRouterByUuid(logicalRouter.getUuid()));
 
             // Before deleting the test LogicalRouter, test its ports
-            final List<NiciraNvpTag> tags = new ArrayList<NiciraNvpTag>();
+            final List<NiciraNvpTag> tags = new ArrayList<>();
             tags.add(new NiciraNvpTag("cs_account", "OwnerName"));
 
             LogicalRouterPort logicalRouterPort = new LogicalRouterPort();
@@ -265,7 +250,7 @@ public class NiciraNvpApiIT {
             logicalRouterPort.setPortno(1024);
             logicalRouterPort.setMacAddress("00:00:00:00:00:00");
 
-            final List<String> ipAddresses = new ArrayList<String>();
+            final List<String> ipAddresses = new ArrayList<>();
             // Add some ips to this list
             logicalRouterPort.setIpAddresses(ipAddresses);
             logicalRouterPort = api.createLogicalRouterPort(logicalRouter.getUuid(), logicalRouterPort);
@@ -312,8 +297,7 @@ public class NiciraNvpApiIT {
         final ControlClusterStatus controlClusterStatus = api.getControlClusterStatus();
         final String clusterStatus = controlClusterStatus.getClusterStatus();
         final boolean correctStatus = clusterStatus.equalsIgnoreCase("stable") ||
-                        clusterStatus.equalsIgnoreCase("joining") || clusterStatus.equalsIgnoreCase("unstable");
+                clusterStatus.equalsIgnoreCase("joining") || clusterStatus.equalsIgnoreCase("unstable");
         assertTrue("Not recognizable cluster status", correctStatus);
     }
-
 }

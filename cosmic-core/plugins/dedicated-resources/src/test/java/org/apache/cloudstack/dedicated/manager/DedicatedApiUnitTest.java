@@ -1,30 +1,9 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.dedicated.manager;
 
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.UUID;
-
-import javax.inject.Inject;
 
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.dao.ClusterDao;
@@ -44,13 +23,18 @@ import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.dao.UserVmDao;
-
 import org.apache.cloudstack.affinity.AffinityGroupService;
 import org.apache.cloudstack.affinity.dao.AffinityGroupDao;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.dedicated.DedicatedResourceManagerImpl;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.test.utils.SpringUtils;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.UUID;
+
+import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,59 +54,46 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-import junit.framework.Assert;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
 public class DedicatedApiUnitTest {
     public static final Logger s_logger = LoggerFactory.getLogger(DedicatedApiUnitTest.class);
+    private static final long domainId = 5L;
+    private static final long accountId = 5L;
+    private static final String accountName = "admin";
     @Inject
     DedicatedResourceManagerImpl _dedicatedService = new DedicatedResourceManagerImpl();
-
     @Inject
     AccountManager _acctMgr;
-
     @Inject
     AccountDao _accountDao;
-
     @Inject
     DomainDao _domainDao;
-
     @Inject
     UserVmDao _vmDao;
-
     @Inject
     DedicatedResourceDao _dedicatedDao;
-
     @Inject
     DataCenterDao _dcDao;
-
     @Inject
     HostPodDao _podDao;
-
     @Inject
     ClusterDao _clusterDao;
-
     @Inject
     HostDao _hostDao;
-
     @Inject
     ConfigurationDao _configDao;
-
-    private static long domainId = 5L;
-    private static long accountId = 5L;
-    private static String accountName = "admin";
 
     @Before
     public void setUp() {
         ComponentContext.initComponentsLifeCycle();
-        AccountVO account = new AccountVO(accountName, domainId, "networkDomain", Account.ACCOUNT_TYPE_NORMAL, "uuid");
-        DomainVO domain = new DomainVO("rootDomain", 5L, 5L, "networkDomain");
+        final AccountVO account = new AccountVO(accountName, domainId, "networkDomain", Account.ACCOUNT_TYPE_NORMAL, "uuid");
+        final DomainVO domain = new DomainVO("rootDomain", 5L, 5L, "networkDomain");
 
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
 
         CallContext.register(user, account);
-        when(_acctMgr.finalizeOwner((Account)anyObject(), anyString(), anyLong(), anyLong())).thenReturn(account);
+        when(_acctMgr.finalizeOwner((Account) anyObject(), anyString(), anyLong(), anyLong())).thenReturn(account);
         when(_accountDao.findByIdIncludingRemoved(0L)).thenReturn(account);
         when(_accountDao.findById(anyLong())).thenReturn(account);
         when(_domainDao.findById(domainId)).thenReturn(domain);
@@ -148,7 +119,7 @@ public class DedicatedApiUnitTest {
         when(_dedicatedDao.findByZoneId(10L)).thenReturn(null);
         try {
             _dedicatedService.releaseDedicatedResource(10L, null, null, null);
-        } catch (InvalidParameterValueException e) {
+        } catch (final InvalidParameterValueException e) {
             Assert.assertTrue(e.getMessage().contains("No Dedicated Resource available to release"));
         }
     }
@@ -214,28 +185,28 @@ public class DedicatedApiUnitTest {
 
     @Test(expected = CloudRuntimeException.class)
     public void dedicateZoneExistTest() {
-        DedicatedResourceVO dr = new DedicatedResourceVO(10L, null, null, null, domainId, accountId, 12L);
+        final DedicatedResourceVO dr = new DedicatedResourceVO(10L, null, null, null, domainId, accountId, 12L);
         when(_dedicatedDao.findByZoneId(10L)).thenReturn(dr);
         _dedicatedService.dedicateZone(10L, domainId, accountName);
     }
 
     @Test(expected = CloudRuntimeException.class)
     public void dedicatePodExistTest() {
-        DedicatedResourceVO dr = new DedicatedResourceVO(null, 10L, null, null, domainId, accountId, 12L);
+        final DedicatedResourceVO dr = new DedicatedResourceVO(null, 10L, null, null, domainId, accountId, 12L);
         when(_dedicatedDao.findByPodId(10L)).thenReturn(dr);
         _dedicatedService.dedicatePod(10L, domainId, accountName);
     }
 
     @Test(expected = CloudRuntimeException.class)
     public void dedicateClusterExistTest() {
-        DedicatedResourceVO dr = new DedicatedResourceVO(null, null, 10L, null, domainId, accountId, 12L);
+        final DedicatedResourceVO dr = new DedicatedResourceVO(null, null, 10L, null, domainId, accountId, 12L);
         when(_dedicatedDao.findByClusterId(10L)).thenReturn(dr);
         _dedicatedService.dedicateCluster(10L, domainId, accountName);
     }
 
     @Test(expected = CloudRuntimeException.class)
     public void dedicateHostExistTest() {
-        DedicatedResourceVO dr = new DedicatedResourceVO(null, null, null, 10L, domainId, accountId, 12L);
+        final DedicatedResourceVO dr = new DedicatedResourceVO(null, null, null, 10L, domainId, accountId, 12L);
         when(_dedicatedDao.findByHostId(10L)).thenReturn(dr);
         _dedicatedService.dedicateHost(10L, domainId, accountName);
     }
@@ -260,8 +231,8 @@ public class DedicatedApiUnitTest {
 
     @Configuration
     @ComponentScan(basePackageClasses = {DedicatedResourceManagerImpl.class},
-                   includeFilters = {@Filter(value = TestConfiguration.Library.class, type = FilterType.CUSTOM)},
-                   useDefaultFilters = false)
+            includeFilters = {@Filter(value = TestConfiguration.Library.class, type = FilterType.CUSTOM)},
+            useDefaultFilters = false)
     public static class TestConfiguration extends SpringUtils.CloudStackTestConfiguration {
 
         @Bean
@@ -326,8 +297,8 @@ public class DedicatedApiUnitTest {
 
         public static class Library implements TypeFilter {
             @Override
-            public boolean match(MetadataReader mdr, MetadataReaderFactory arg1) throws IOException {
-                ComponentScan cs = TestConfiguration.class.getAnnotation(ComponentScan.class);
+            public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) throws IOException {
+                final ComponentScan cs = TestConfiguration.class.getAnnotation(ComponentScan.class);
                 return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);
             }
         }

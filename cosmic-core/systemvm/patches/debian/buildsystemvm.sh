@@ -1,20 +1,5 @@
 #!/bin/bash
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+
 
 echo "####################################################"
 echo " Note there is a new systemvm build script based on "
@@ -43,17 +28,17 @@ baseimage() {
   losetup $loopdev $IMAGELOC
   parted $loopdev -s 'mklabel msdos'
   parted $loopdev -s 'mkpart primary ext3 4096B -1'
-  sleep 2 
+  sleep 2
   losetup -d $loopdev
   loopdev=$(losetup --show -o $offset -f $IMAGELOC )
   mkfs.ext3  -L ROOT $loopdev
   mkdir -p $MOUNTPOINT
   tune2fs -c 100 -i 0 $loopdev
-  sleep 2 
+  sleep 2
   losetup -d $loopdev
-  
+
   mount -o loop,offset=$offset $IMAGELOC  $MOUNTPOINT
-  
+
   #debootstrap --variant=minbase --keyring=/usr/share/keyrings/debian-archive-keyring.gpg wheezy $MOUNTPOINT http://${APT_PROXY}${DEBIAN_MIRROR}
   debootstrap --variant=minbase --arch=i386 wheezy $MOUNTPOINT http://${APT_PROXY}${DEBIAN_MIRROR}
 }
@@ -78,7 +63,7 @@ deb-src http://http.debian.net/debian/ wheezy-backports main
 EOF
 
   cat >> etc/apt/apt.conf << EOF
-APT::Default-Release "stable"; 
+APT::Default-Release "stable";
 EOF
 
   cat >> etc/apt/preferences << EOF
@@ -108,7 +93,7 @@ EOF
 
   DEBIAN_FRONTEND=noninteractive
   DEBIAN_PRIORITY=critical
-  export DEBIAN_FRONTEND DEBIAN_PRIORITY 
+  export DEBIAN_FRONTEND DEBIAN_PRIORITY
   chroot . dpkg-reconfigure debconf --frontend=noninteractive
   chroot . apt-get -q -y install locales
 }
@@ -116,7 +101,7 @@ EOF
 network() {
 
   echo "$HOSTNAME" > etc/hostname &&
-  cat > etc/hosts << EOF 
+  cat > etc/hosts << EOF
 127.0.0.1       localhost
 # The following lines are desirable for IPv6 capable hosts
 ::1     localhost ip6-localhost ip6-loopback
@@ -232,7 +217,7 @@ cat > etc/init.d/iptables-persistent << EOF
 # Required-Stop:     $local_fs
 # Should-Start:      cloud-early-config
 # Default-Start:     S
-# Default-Stop:     
+# Default-Stop:
 # Short-Description: Set up iptables rules
 ### END INIT INFO
 
@@ -326,7 +311,7 @@ EOF
   chmod a+x etc/init.d/iptables-persistent
 
 
-  touch etc/iptables/iptables.conf 
+  touch etc/iptables/iptables.conf
   cat > etc/iptables/iptables.conf << EOF
 # A basic config file for the /etc/init.d/iptable-persistent script
 
@@ -349,7 +334,7 @@ vpn_config() {
 
 #
 # IMPORTANT REMARK
-# Package intallation is no longer done via this script. We are not removing the code yet, but we want to 
+# Package intallation is no longer done via this script. We are not removing the code yet, but we want to
 # make sure that everybody willing to install/update packages should refer to the file:
 #   ==> cloud-tools/appliance/definitions/systemvmtemplate/install_systemvm_packages.sh
 #
@@ -368,11 +353,11 @@ packages() {
   chroot . echo 'sysstat sysstat/enable boolean true' | chroot . debconf-set-selections
   chroot .  apt-get --no-install-recommends -q -y --force-yes install sysstat
   #apache
-  chroot .  apt-get --no-install-recommends -q -y --force-yes install apache2 ssl-cert 
+  chroot .  apt-get --no-install-recommends -q -y --force-yes install apache2 ssl-cert
   #haproxy
-  chroot . apt-get --no-install-recommends -q -y --force-yes install haproxy 
+  chroot . apt-get --no-install-recommends -q -y --force-yes install haproxy
   #dnsmasq
-  chroot . apt-get --no-install-recommends -q -y --force-yes install dnsmasq 
+  chroot . apt-get --no-install-recommends -q -y --force-yes install dnsmasq
   #nfs client
   chroot . apt-get --no-install-recommends -q -y --force-yes install nfs-common
   #vpn stuff
@@ -415,7 +400,7 @@ services() {
   mkdir -p ./root/.ssh
   #Fix haproxy directory issue
   mkdir -p ./var/lib/haproxy
-  
+
   /bin/cp -r ${scriptdir}/config/* ./
   chroot . chkconfig xl2tpd off
   chroot . chkconfig --add cloud-early-config
@@ -450,7 +435,7 @@ install_xs_tool() {
 cleanup() {
   rm -f usr/sbin/policy-rc.d
   rm -f root/config.dat
-  rm -f etc/apt/apt.conf.d/01proxy 
+  rm -f etc/apt/apt.conf.d/01proxy
 
   if [ "$MINIMIZE" == "true" ]
   then
@@ -506,7 +491,7 @@ mount -o bind /proc $MOUNTPOINT/proc
 mount -o bind /dev $MOUNTPOINT/dev
 
 echo "*************CONFIGURING APT********************"
-fixapt  
+fixapt
 echo "*************DONE CONFIGURING APT********************"
 
 echo "*************CONFIGURING NETWORK********************"
@@ -561,7 +546,7 @@ echo "*************INSTALL XS TOOLS********************"
 #install_xs_tool
 
 echo "*************CLEANING UP********************"
-cleanup 
+cleanup
 
 echo "*************GENERATING SIGNATURE********************"
 signature

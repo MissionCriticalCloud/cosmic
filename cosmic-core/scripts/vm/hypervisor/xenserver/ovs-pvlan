@@ -1,34 +1,14 @@
 #!/usr/bin/python
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 
+
+
+import XenAPIPlugin
+import logging
+import sys
 
 import cloudstack_pluginlib as lib
-import logging
-import os
-import sys
-import subprocess
-import time
-import XenAPIPlugin
 
 sys.path.append("/opt/xensource/sm/")
-import util
-
-from time import localtime as _localtime, asctime as _asctime
 
 xePath = "/opt/xensource/bin/xe"
 lib.setup_logging("/var/log/cloud/ovs-pvlan.log")
@@ -38,6 +18,7 @@ getDhcpIfacePath = "/opt/cloud/bin/ovs-get-dhcp-iface.sh"
 pvlanCleanupPath = "/opt/cloud/bin/ovs-pvlan-cleanup.sh"
 getBridgePath = "/opt/cloud/bin/ovs-get-bridge.sh"
 
+
 def echo(fn):
     def wrapped(*v, **k):
         name = fn.__name__
@@ -45,7 +26,9 @@ def echo(fn):
         res = fn(*v, **k)
         logging.debug("#### VMOPS exit  %s ####" % name)
         return res
+
     return wrapped
+
 
 @echo
 def setup_pvlan_dhcp(session, args):
@@ -70,24 +53,25 @@ def setup_pvlan_dhcp(session, args):
         dhcp_iface = lib.do_cmd([getDhcpIfacePath, bridge, dhcp_name])
         logging.debug("About to setup dhcp vm on the switch:%s" % bridge)
         res = lib.do_cmd([dhcpSetupPath, "-A", "-b", bridge, "-p", primary,
-            "-i", isolated, "-n", dhcp_name, "-d", dhcp_ip, "-m", dhcp_mac,
-            "-I", dhcp_iface])
-	if res:
-	    result = "FAILURE:%s" % res
-	    return result;
-	logging.debug("Setup dhcp vm on switch program done")
+                          "-i", isolated, "-n", dhcp_name, "-d", dhcp_ip, "-m", dhcp_mac,
+                          "-I", dhcp_iface])
+        if res:
+            result = "FAILURE:%s" % res
+            return result;
+        logging.debug("Setup dhcp vm on switch program done")
     elif op == "delete":
         logging.debug("About to remove dhcp the switch:%s" % bridge)
         res = lib.do_cmd([dhcpSetupPath, "-D", "-b", bridge, "-p", primary,
-            "-i", isolated, "-n", dhcp_name, "-d", dhcp_ip, "-m", dhcp_mac])
-	if res:
-	    result = "FAILURE:%s" % res
-	    return result;
-	logging.debug("Remove DHCP on switch program done")
-    
+                          "-i", isolated, "-n", dhcp_name, "-d", dhcp_ip, "-m", dhcp_mac])
+        if res:
+            result = "FAILURE:%s" % res
+            return result;
+        logging.debug("Remove DHCP on switch program done")
+
     result = "true"
     logging.debug("Setup_pvlan_dhcp completed with result:%s" % result)
     return result
+
 
 @echo
 def setup_pvlan_vm(session, args):
@@ -108,21 +92,22 @@ def setup_pvlan_vm(session, args):
     if op == "add":
         logging.debug("About to setup vm on the switch:%s" % bridge)
         res = lib.do_cmd([vmSetupPath, "-A", "-b", bridge, "-p", primary, "-i", isolated, "-v", vm_mac])
-	if res:
-	    result = "FAILURE:%s" % res
-	    return result;
-	logging.debug("Setup vm on switch program done")
+        if res:
+            result = "FAILURE:%s" % res
+            return result;
+        logging.debug("Setup vm on switch program done")
     elif op == "delete":
         logging.debug("About to remove vm on the switch:%s" % bridge)
         res = lib.do_cmd([vmSetupPath, "-D", "-b", bridge, "-p", primary, "-i", isolated, "-v", vm_mac])
-	if res:
-	    result = "FAILURE:%s" % res
-	    return result;
-	logging.debug("Remove vm on switch program done")
+        if res:
+            result = "FAILURE:%s" % res
+            return result;
+        logging.debug("Remove vm on switch program done")
 
     result = "true"
     logging.debug("Setup_pvlan_vm_alone completed with result:%s" % result)
     return result
+
 
 @echo
 def cleanup(session, args):
@@ -139,7 +124,8 @@ def cleanup(session, args):
     logging.debug("Setup_pvlan_vm_dhcp completed with result:%s" % result)
     return result
 
+
 if __name__ == "__main__":
-    XenAPIPlugin.dispatch({"setup-pvlan-dhcp": setup_pvlan_dhcp,
-                           "setup-pvlan-vm": setup_pvlan_vm,
-                           "cleanup":cleanup})
+    XenAPIPlugin.dispatch({ "setup-pvlan-dhcp": setup_pvlan_dhcp,
+                            "setup-pvlan-vm": setup_pvlan_vm,
+                            "cleanup": cleanup })

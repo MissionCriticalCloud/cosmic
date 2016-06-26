@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.spring.lifecycle;
 
 import java.util.Collections;
@@ -32,12 +14,11 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  * it will only find the types in the current context and not the parent.  This class
  * should only be used for very specific Spring bootstrap logic.  In general @Inject
  * is infinitely better.  Basically you need a very good reason to use this.
- *
  */
 public abstract class AbstractBeanCollector extends AbstractSmartLifeCycle implements BeanPostProcessor {
 
-    Class<?>[] typeClasses = new Class<?>[] {};
-    Map<Class<?>, Set<Object>> beans = new HashMap<Class<?>, Set<Object>>();
+    Class<?>[] typeClasses = new Class<?>[]{};
+    Map<Class<?>, Set<Object>> beans = new HashMap<>();
 
     @Override
     public int getPhase() {
@@ -45,8 +26,8 @@ public abstract class AbstractBeanCollector extends AbstractSmartLifeCycle imple
     }
 
     @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        for (Class<?> typeClass : typeClasses) {
+    public Object postProcessBeforeInitialization(final Object bean, final String beanName) throws BeansException {
+        for (final Class<?> typeClass : typeClasses) {
             if (typeClass.isAssignableFrom(bean.getClass())) {
                 doPostProcessBeforeInitialization(bean, beanName);
                 break;
@@ -56,23 +37,12 @@ public abstract class AbstractBeanCollector extends AbstractSmartLifeCycle imple
         return bean;
     }
 
-    protected void doPostProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-    }
-
-    protected void doPostProcessAfterInitialization(Object bean, Class<?> typeClass, String beanName) throws BeansException {
-        Set<Object> beansOfType = beans.get(typeClass);
-
-        if (beansOfType == null) {
-            beansOfType = new HashSet<Object>();
-            beans.put(typeClass, beansOfType);
-        }
-
-        beansOfType.add(bean);
+    protected void doPostProcessBeforeInitialization(final Object bean, final String beanName) throws BeansException {
     }
 
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        for (Class<?> typeClass : typeClasses) {
+    public Object postProcessAfterInitialization(final Object bean, final String beanName) throws BeansException {
+        for (final Class<?> typeClass : typeClasses) {
             if (typeClass.isAssignableFrom(bean.getClass())) {
                 doPostProcessAfterInitialization(bean, typeClass, beanName);
             }
@@ -81,33 +51,45 @@ public abstract class AbstractBeanCollector extends AbstractSmartLifeCycle imple
         return bean;
     }
 
-    protected <T> Set<T> getBeans(Class<T> typeClass) {
-        @SuppressWarnings("unchecked")
-        Set<T> result = (Set<T>)beans.get(typeClass);
+    protected void doPostProcessAfterInitialization(final Object bean, final Class<?> typeClass, final String beanName) throws BeansException {
+        Set<Object> beansOfType = beans.get(typeClass);
 
-        if (result == null)
+        if (beansOfType == null) {
+            beansOfType = new HashSet<>();
+            beans.put(typeClass, beansOfType);
+        }
+
+        beansOfType.add(bean);
+    }
+
+    protected <T> Set<T> getBeans(final Class<T> typeClass) {
+        final
+        Set<T> result = (Set<T>) beans.get(typeClass);
+
+        if (result == null) {
             return Collections.emptySet();
+        }
 
         return result;
     }
 
     public Class<?> getTypeClass() {
-        if (typeClasses == null || typeClasses.length == 0)
+        if (typeClasses == null || typeClasses.length == 0) {
             return null;
+        }
 
         return typeClasses[0];
     }
 
-    public void setTypeClass(Class<?> typeClass) {
-        this.typeClasses = new Class<?>[] {typeClass};
+    public void setTypeClass(final Class<?> typeClass) {
+        this.typeClasses = new Class<?>[]{typeClass};
     }
 
     public Class<?>[] getTypeClasses() {
         return typeClasses;
     }
 
-    public void setTypeClasses(Class<?>[] typeClasses) {
+    public void setTypeClasses(final Class<?>[] typeClasses) {
         this.typeClasses = typeClasses;
     }
-
 }

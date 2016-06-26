@@ -1,28 +1,8 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xen610;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.MigrateWithStorageSendAnswer;
@@ -35,6 +15,12 @@ import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.Pair;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.gson.Gson;
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Network;
@@ -44,11 +30,10 @@ import com.xensource.xenapi.Types;
 import com.xensource.xenapi.VDI;
 import com.xensource.xenapi.VIF;
 import com.xensource.xenapi.VM;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  MigrateWithStorageSendCommand.class)
+@ResourceWrapper(handles = MigrateWithStorageSendCommand.class)
 public final class XenServer610MigrateWithStorageSendCommandWrapper extends CommandWrapper<MigrateWithStorageSendCommand, Answer, XenServer610Resource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(XenServer610MigrateWithStorageSendCommandWrapper.class);
@@ -74,16 +59,16 @@ public final class XenServer610MigrateWithStorageSendCommandWrapper extends Comm
             // agent attache. Seriliaze the SR and Network objects here to a string and pass in
             // the answer object. It'll be deserialzed and object created in migrate with
             // storage send command execution.
-            Gson gson = new Gson();
-            final Map<String, String> other = new HashMap<String, String>();
+            final Gson gson = new Gson();
+            final Map<String, String> other = new HashMap<>();
             other.put("live", "true");
 
             // Create the vdi map which tells what volumes of the vm need to go
             // on which sr on the destination.
-            final Map<VDI, SR> vdiMap = new HashMap<VDI, SR>();
+            final Map<VDI, SR> vdiMap = new HashMap<>();
             for (final Pair<VolumeTO, Object> entry : volumeToSr) {
                 if (entry.second() instanceof SR) {
-                    final SR sr = (SR)entry.second();
+                    final SR sr = (SR) entry.second();
                     final VDI vdi = xenServer610Resource.getVDIbyUuid(connection, entry.first().getPath());
                     vdiMap.put(vdi, sr);
                 } else {
@@ -98,10 +83,10 @@ public final class XenServer610MigrateWithStorageSendCommandWrapper extends Comm
             }
 
             // Create the vif map.
-            final Map<VIF, Network> vifMap = new HashMap<VIF, Network>();
+            final Map<VIF, Network> vifMap = new HashMap<>();
             for (final Pair<NicTO, Object> entry : nicToNetwork) {
                 if (entry.second() instanceof Network) {
-                    final Network network = (Network)entry.second();
+                    final Network network = (Network) entry.second();
                     final VIF vif = xenServer610Resource.getVifByMac(connection, vmToMigrate, entry.first().getMac());
                     vifMap.put(vif, network);
                 } else {

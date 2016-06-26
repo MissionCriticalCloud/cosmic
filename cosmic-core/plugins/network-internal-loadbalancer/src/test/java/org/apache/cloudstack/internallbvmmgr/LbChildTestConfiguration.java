@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.internallbvmmgr;
-
-import java.io.IOException;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.dc.dao.DataCenterDao;
@@ -37,11 +19,13 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.lb.dao.ApplicationLoadBalancerRuleDao;
 import org.apache.cloudstack.test.utils.SpringUtils;
+
+import java.io.IOException;
+
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -54,8 +38,8 @@ import org.springframework.core.type.filter.TypeFilter;
 
 @Configuration
 @ComponentScan(basePackageClasses = {NetUtils.class},
-               includeFilters = {@Filter(value = LbChildTestConfiguration.Library.class, type = FilterType.CUSTOM)},
-               useDefaultFilters = false)
+        includeFilters = {@Filter(value = LbChildTestConfiguration.Library.class, type = FilterType.CUSTOM)},
+        useDefaultFilters = false)
 public class LbChildTestConfiguration {
 
     public static class Library implements TypeFilter {
@@ -166,11 +150,10 @@ public class LbChildTestConfiguration {
         }
 
         @Override
-        public boolean match(MetadataReader mdr, MetadataReaderFactory arg1) throws IOException {
+        public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) throws IOException {
             mdr.getClassMetadata().getClassName();
-            ComponentScan cs = LbChildTestConfiguration.class.getAnnotation(ComponentScan.class);
+            final ComponentScan cs = LbChildTestConfiguration.class.getAnnotation(ComponentScan.class);
             return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);
         }
-
     }
 }

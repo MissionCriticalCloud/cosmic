@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.agent.api.to;
 
 import com.cloud.host.Host;
@@ -28,7 +12,7 @@ public class HostTO {
     protected HostTO() {
     }
 
-    public HostTO(Host vo) {
+    public HostTO(final Host vo) {
         guid = vo.getGuid();
         privateNetwork = new NetworkTO(vo.getPrivateIpAddress(), vo.getPrivateNetmask(), vo.getPrivateMacAddress());
         if (vo.getPublicIpAddress() != null) {
@@ -46,7 +30,7 @@ public class HostTO {
         return guid;
     }
 
-    public void setGuid(String guid) {
+    public void setGuid(final String guid) {
         this.guid = guid;
     }
 
@@ -54,7 +38,7 @@ public class HostTO {
         return privateNetwork;
     }
 
-    public void setPrivateNetwork(NetworkTO privateNetwork) {
+    public void setPrivateNetwork(final NetworkTO privateNetwork) {
         this.privateNetwork = privateNetwork;
     }
 
@@ -62,7 +46,7 @@ public class HostTO {
         return publicNetwork;
     }
 
-    public void setPublicNetwork(NetworkTO publicNetwork) {
+    public void setPublicNetwork(final NetworkTO publicNetwork) {
         this.publicNetwork = publicNetwork;
     }
 
@@ -70,7 +54,7 @@ public class HostTO {
         return storageNetwork1;
     }
 
-    public void setStorageNetwork1(NetworkTO storageNetwork1) {
+    public void setStorageNetwork1(final NetworkTO storageNetwork1) {
         this.storageNetwork1 = storageNetwork1;
     }
 
@@ -78,7 +62,7 @@ public class HostTO {
         return storageNetwork2;
     }
 
-    public void setStorageNetwork2(NetworkTO storageNetwork2) {
+    public void setStorageNetwork2(final NetworkTO storageNetwork2) {
         this.storageNetwork2 = storageNetwork2;
     }
 }

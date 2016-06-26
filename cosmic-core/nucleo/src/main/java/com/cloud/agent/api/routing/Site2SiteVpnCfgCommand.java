@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.api.routing;
@@ -36,17 +21,14 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
     private boolean passive;
     private boolean encap;
 
-    @Override
-    public boolean executeInSequence() {
-        return true;
-    }
-
     public Site2SiteVpnCfgCommand() {
         this.create = false;
     }
 
-    public Site2SiteVpnCfgCommand(boolean create, String localPublicIp, String localPublicGateway, String localGuestCidr, String peerGatewayIp, String peerGuestCidrList,
-            String ikePolicy, String espPolicy, String ipsecPsk, Long ikeLifetime, Long espLifetime, Boolean dpd, boolean passive, boolean encap) {
+    public Site2SiteVpnCfgCommand(final boolean create, final String localPublicIp, final String localPublicGateway, final String localGuestCidr, final String peerGatewayIp,
+                                  final String peerGuestCidrList,
+                                  final String ikePolicy, final String espPolicy, final String ipsecPsk, final Long ikeLifetime, final Long espLifetime, final Boolean dpd, final
+                                  boolean passive, final boolean encap) {
         this.create = create;
         this.setLocalPublicIp(localPublicIp);
         this.setLocalPublicGateway(localPublicGateway);
@@ -63,11 +45,16 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
         this.encap = encap;
     }
 
+    @Override
+    public boolean executeInSequence() {
+        return true;
+    }
+
     public boolean isCreate() {
         return create;
     }
 
-    public void setCreate(boolean create) {
+    public void setCreate(final boolean create) {
         this.create = create;
     }
 
@@ -75,7 +62,7 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
         return ipsecPsk;
     }
 
-    public void setIpsecPsk(String ipsecPsk) {
+    public void setIpsecPsk(final String ipsecPsk) {
         this.ipsecPsk = ipsecPsk;
     }
 
@@ -83,7 +70,7 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
         return ikePolicy;
     }
 
-    public void setIkePolicy(String ikePolicy) {
+    public void setIkePolicy(final String ikePolicy) {
         this.ikePolicy = ikePolicy;
     }
 
@@ -91,7 +78,7 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
         return espPolicy;
     }
 
-    public void setEspPolicy(String espPolicy) {
+    public void setEspPolicy(final String espPolicy) {
         this.espPolicy = espPolicy;
     }
 
@@ -99,7 +86,7 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
         return ikeLifetime;
     }
 
-    public void setikeLifetime(long ikeLifetime) {
+    public void setikeLifetime(final long ikeLifetime) {
         this.ikeLifetime = ikeLifetime;
     }
 
@@ -107,7 +94,7 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
         return espLifetime;
     }
 
-    public void setEspLifetime(long espLifetime) {
+    public void setEspLifetime(final long espLifetime) {
         this.espLifetime = espLifetime;
     }
 
@@ -115,7 +102,7 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
         return dpd;
     }
 
-    public void setDpd(Boolean dpd) {
+    public void setDpd(final Boolean dpd) {
         this.dpd = dpd;
     }
 
@@ -123,7 +110,7 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
         return encap;
     }
 
-    public void setEncap(Boolean encap) {
+    public void setEncap(final Boolean encap) {
         this.encap = encap;
     }
 
@@ -131,7 +118,7 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
         return localPublicIp;
     }
 
-    public void setLocalPublicIp(String localPublicIp) {
+    public void setLocalPublicIp(final String localPublicIp) {
         this.localPublicIp = localPublicIp;
     }
 
@@ -139,7 +126,7 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
         return localGuestCidr;
     }
 
-    public void setLocalGuestCidr(String localGuestCidr) {
+    public void setLocalGuestCidr(final String localGuestCidr) {
         this.localGuestCidr = localGuestCidr;
     }
 
@@ -147,7 +134,7 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
         return localPublicGateway;
     }
 
-    public void setLocalPublicGateway(String localPublicGateway) {
+    public void setLocalPublicGateway(final String localPublicGateway) {
         this.localPublicGateway = localPublicGateway;
     }
 
@@ -155,7 +142,7 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
         return peerGatewayIp;
     }
 
-    public void setPeerGatewayIp(String peerGatewayIp) {
+    public void setPeerGatewayIp(final String peerGatewayIp) {
         this.peerGatewayIp = peerGatewayIp;
     }
 
@@ -163,7 +150,7 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
         return peerGuestCidrList;
     }
 
-    public void setPeerGuestCidrList(String peerGuestCidrList) {
+    public void setPeerGuestCidrList(final String peerGuestCidrList) {
         this.peerGuestCidrList = peerGuestCidrList;
     }
 
@@ -171,7 +158,7 @@ public class Site2SiteVpnCfgCommand extends NetworkElementCommand {
         return passive;
     }
 
-    public void setPassive(boolean passive) {
+    public void setPassive(final boolean passive) {
         this.passive = passive;
     }
 }

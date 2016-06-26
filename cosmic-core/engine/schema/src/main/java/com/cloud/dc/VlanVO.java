@@ -1,23 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.dc;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,8 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.db.GenericDao;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "vlan")
@@ -75,16 +58,15 @@ public class VlanVO implements Vlan {
 
     @Column(name = "uuid")
     String uuid;
-
-    @Column(name= GenericDao.REMOVED_COLUMN)
+    transient String toString;
+    @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
-
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
 
-
-    public VlanVO(VlanType vlanType, String vlanTag, String vlanGateway, String vlanNetmask, long dataCenterId, String ipRange, Long networkId, Long physicalNetworkId,
-            String ip6Gateway, String ip6Cidr, String ip6Range) {
+    public VlanVO(final VlanType vlanType, final String vlanTag, final String vlanGateway, final String vlanNetmask, final long dataCenterId, final String ipRange, final Long
+            networkId, final Long physicalNetworkId,
+                  final String ip6Gateway, final String ip6Cidr, final String ip6Range) {
         this.vlanType = vlanType;
         this.vlanTag = vlanTag;
         this.vlanGateway = vlanGateway;
@@ -128,7 +110,7 @@ public class VlanVO implements Vlan {
         return dataCenterId;
     }
 
-    public void setDataCenterId(long dcId) {
+    public void setDataCenterId(final long dcId) {
         this.dataCenterId = dcId;
     }
 
@@ -147,17 +129,8 @@ public class VlanVO implements Vlan {
         return networkId;
     }
 
-    public void setNetworkId(Long networkId) {
+    public void setNetworkId(final Long networkId) {
         this.networkId = networkId;
-    }
-
-    @Override
-    public String getUuid() {
-        return this.uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 
     @Override
@@ -175,35 +148,8 @@ public class VlanVO implements Vlan {
         return physicalNetworkId;
     }
 
-    public void setPhysicalNetworkId(Long physicalNetworkId) {
+    public void setPhysicalNetworkId(final Long physicalNetworkId) {
         this.physicalNetworkId = physicalNetworkId;
-    }
-
-    transient String toString;
-
-    @Override
-    public String toString() {
-        if (toString == null) {
-            toString =
-                new StringBuilder("Vlan[").append(vlanTag)
-                    .append("|")
-                    .append(vlanGateway)
-                    .append("|")
-                    .append(vlanNetmask)
-                    .append("|")
-                    .append(ip6Gateway)
-                    .append("|")
-                    .append(ip6Cidr)
-                    .append("|")
-                    .append(ipRange)
-                    .append("|")
-                    .append("|")
-                    .append(ip6Range)
-                    .append(networkId)
-                    .append("]")
-                    .toString();
-        }
-        return toString;
     }
 
     @Override
@@ -211,7 +157,7 @@ public class VlanVO implements Vlan {
         return ip6Gateway;
     }
 
-    public void setIp6Gateway(String ip6Gateway) {
+    public void setIp6Gateway(final String ip6Gateway) {
         this.ip6Gateway = ip6Gateway;
     }
 
@@ -220,7 +166,7 @@ public class VlanVO implements Vlan {
         return ip6Cidr;
     }
 
-    public void setIp6Cidr(String ip6Cidr) {
+    public void setIp6Cidr(final String ip6Cidr) {
         this.ip6Cidr = ip6Cidr;
     }
 
@@ -229,11 +175,45 @@ public class VlanVO implements Vlan {
         return ip6Range;
     }
 
-    public void setIp6Range(String ip6Range) {
+    public void setIp6Range(final String ip6Range) {
         this.ip6Range = ip6Range;
     }
 
-    public void setIpRange(String ipRange) {
+    public void setIpRange(final String ipRange) {
         this.ip6Range = ipRange;
+    }
+
+    @Override
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
+    }
+
+    @Override
+    public String toString() {
+        if (toString == null) {
+            toString =
+                    new StringBuilder("Vlan[").append(vlanTag)
+                                              .append("|")
+                                              .append(vlanGateway)
+                                              .append("|")
+                                              .append(vlanNetmask)
+                                              .append("|")
+                                              .append(ip6Gateway)
+                                              .append("|")
+                                              .append(ip6Cidr)
+                                              .append("|")
+                                              .append(ipRange)
+                                              .append("|")
+                                              .append("|")
+                                              .append(ip6Range)
+                                              .append(networkId)
+                                              .append("]")
+                                              .toString();
+        }
+        return toString;
     }
 }

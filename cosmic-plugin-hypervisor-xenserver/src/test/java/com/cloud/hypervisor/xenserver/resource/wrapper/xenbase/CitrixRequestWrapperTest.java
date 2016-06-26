@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
 import static org.junit.Assert.assertEquals;
@@ -26,13 +10,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.AttachIsoCommand;
@@ -108,6 +85,18 @@ import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.utils.Pair;
 import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachine;
+import org.apache.cloudstack.storage.command.AttachAnswer;
+import org.apache.cloudstack.storage.command.AttachCommand;
+import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+import org.apache.cloudstack.storage.to.VolumeObjectTO;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Host;
 import com.xensource.xenapi.Marshalling;
@@ -117,11 +106,6 @@ import com.xensource.xenapi.Types.BadServerResponse;
 import com.xensource.xenapi.Types.XenAPIException;
 import com.xensource.xenapi.VM;
 import com.xensource.xenapi.VMGuestMetrics;
-
-import org.apache.cloudstack.storage.command.AttachAnswer;
-import org.apache.cloudstack.storage.command.AttachCommand;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.junit.Test;
@@ -239,7 +223,7 @@ public class CitrixRequestWrapperTest {
 
     @Test
     public void testGetVmStatsCommand() {
-        final GetVmStatsCommand statsCommand = new GetVmStatsCommand(new ArrayList<String>(), null, null);
+        final GetVmStatsCommand statsCommand = new GetVmStatsCommand(new ArrayList<>(), null, null);
 
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
@@ -251,7 +235,7 @@ public class CitrixRequestWrapperTest {
 
     @Test
     public void testGetVmDiskStatsCommand() {
-        final GetVmDiskStatsCommand diskStatsCommand = new GetVmDiskStatsCommand(new ArrayList<String>(), null, null);
+        final GetVmDiskStatsCommand diskStatsCommand = new GetVmDiskStatsCommand(new ArrayList<>(), null, null);
 
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
@@ -444,7 +428,7 @@ public class CitrixRequestWrapperTest {
         final StoragePoolVO poolVO = Mockito.mock(StoragePoolVO.class);
 
         final UpgradeSnapshotCommand upgradeSnapshotCommand = new UpgradeSnapshotCommand(poolVO, "http", 1l, 1l, 1l, 1l, 1l, "/", "58c5778b-7dd1-47cc-a7b5-f768541bf278", "Test",
-                        "2.1");
+                "2.1");
 
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
@@ -460,7 +444,7 @@ public class CitrixRequestWrapperTest {
         final StoragePoolVO poolVO = Mockito.mock(StoragePoolVO.class);
 
         final UpgradeSnapshotCommand upgradeSnapshotCommand = new UpgradeSnapshotCommand(poolVO, "http", 1l, 1l, 1l, 1l, 1l, "/", "58c5778b-7dd1-47cc-a7b5-f768541bf278", "Test",
-                        "3.1");
+                "3.1");
 
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
@@ -553,7 +537,7 @@ public class CitrixRequestWrapperTest {
 
         final MaintainCommand maintainCommand = new MaintainCommand();
 
-        final Map<String, Object> map = new Hashtable<String, Object>();
+        final Map<String, Object> map = new Hashtable<>();
         map.put("Value", "Xen");
 
         final Map<String, Object> spiedMap = spy(map);
@@ -567,8 +551,8 @@ public class CitrixRequestWrapperTest {
         when(conn.getSessionReference()).thenReturn("befc4dcd");
 
         try {
-            final Object[] params = { Marshalling.toXMLRPC("befc4dcd"), Marshalling.toXMLRPC(uuid) };
-            when(client.execute("host.get_by_uuid", new Object[] { "befc4dcd", uuid })).thenReturn(spiedMap);
+            final Object[] params = {Marshalling.toXMLRPC("befc4dcd"), Marshalling.toXMLRPC(uuid)};
+            when(client.execute("host.get_by_uuid", new Object[]{"befc4dcd", uuid})).thenReturn(spiedMap);
             PowerMockito.when(conn, "dispatch", "host.get_by_uuid", params).thenReturn(spiedMap);
         } catch (final Exception e) {
             fail(e.getMessage());
@@ -831,7 +815,6 @@ public class CitrixRequestWrapperTest {
         assertFalse(answer.getResult());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testUpdateHostPasswordCommand() {
         final XenServerUtilitiesHelper xenServerUtilitiesHelper = Mockito.mock(XenServerUtilitiesHelper.class);
@@ -851,7 +834,7 @@ public class CitrixRequestWrapperTest {
 
         when(citrixResourceBase.getXenServerUtilitiesHelper()).thenReturn(xenServerUtilitiesHelper);
         when(xenServerUtilitiesHelper.buildCommandLine(XenServerUtilitiesHelper.SCRIPT_CMD_PATH, VRScripts.UPDATE_HOST_PASSWD, username, newPassword)).thenReturn(
-                        cmdLine.toString());
+                cmdLine.toString());
 
         try {
             when(xenServerUtilitiesHelper.executeSshWrapper(hostIp, 22, username, null, hostPasswd, cmdLine.toString())).thenReturn(result);
@@ -880,7 +863,6 @@ public class CitrixRequestWrapperTest {
         assertTrue(answer.getResult());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testUpdateHostPasswordCommandFail() {
         final XenServerUtilitiesHelper xenServerUtilitiesHelper = Mockito.mock(XenServerUtilitiesHelper.class);
@@ -900,7 +882,7 @@ public class CitrixRequestWrapperTest {
 
         when(citrixResourceBase.getXenServerUtilitiesHelper()).thenReturn(xenServerUtilitiesHelper);
         when(xenServerUtilitiesHelper.buildCommandLine(XenServerUtilitiesHelper.SCRIPT_CMD_PATH, VRScripts.UPDATE_HOST_PASSWD, username, newPassword)).thenReturn(
-                        cmdLine.toString());
+                cmdLine.toString());
 
         try {
             when(xenServerUtilitiesHelper.executeSshWrapper(hostIp, 22, username, null, hostPasswd, cmdLine.toString())).thenReturn(result);
@@ -947,7 +929,7 @@ public class CitrixRequestWrapperTest {
 
         when(citrixResourceBase.getXenServerUtilitiesHelper()).thenReturn(xenServerUtilitiesHelper);
         when(xenServerUtilitiesHelper.buildCommandLine(XenServerUtilitiesHelper.SCRIPT_CMD_PATH, VRScripts.UPDATE_HOST_PASSWD, username, newPassword)).thenReturn(
-                        cmdLine.toString());
+                cmdLine.toString());
 
         try {
             when(xenServerUtilitiesHelper.executeSshWrapper(hostIp, 22, username, null, hostPasswd, cmdLine.toString())).thenThrow(new Exception("testing failure"));
@@ -1000,7 +982,6 @@ public class CitrixRequestWrapperTest {
             poolr.master = master;
             when(poolr.master.getRecord(conn)).thenReturn(hostr);
             hostr.uuid = uuid;
-
         } catch (final BadServerResponse e) {
             fail(e.getMessage());
         } catch (final XenAPIException e) {
@@ -1018,7 +999,7 @@ public class CitrixRequestWrapperTest {
 
     @Test
     public void testCheckNetworkCommandSuccess() {
-        final List<PhysicalNetworkSetupInfo> setupInfos = new ArrayList<PhysicalNetworkSetupInfo>();
+        final List<PhysicalNetworkSetupInfo> setupInfos = new ArrayList<>();
 
         final CheckNetworkCommand checkNet = new CheckNetworkCommand(setupInfos);
 
@@ -1034,7 +1015,7 @@ public class CitrixRequestWrapperTest {
     public void testCheckNetworkCommandFailure() {
         final PhysicalNetworkSetupInfo info = new PhysicalNetworkSetupInfo();
 
-        final List<PhysicalNetworkSetupInfo> setupInfos = new ArrayList<PhysicalNetworkSetupInfo>();
+        final List<PhysicalNetworkSetupInfo> setupInfos = new ArrayList<>();
         setupInfos.add(info);
 
         final CheckNetworkCommand checkNet = new CheckNetworkCommand(setupInfos);
@@ -1090,7 +1071,7 @@ public class CitrixRequestWrapperTest {
         final Connection conn = Mockito.mock(Connection.class);
 
         final VMSnapshotTO snapshotTO = Mockito.mock(VMSnapshotTO.class);
-        final List<VolumeObjectTO> volumeTOs = new ArrayList<VolumeObjectTO>();
+        final List<VolumeObjectTO> volumeTOs = new ArrayList<>();
 
         final CreateVMSnapshotCommand vmSnapshot = new CreateVMSnapshotCommand("Test", "uuid", snapshotTO, volumeTOs, "Debian");
 
@@ -1111,7 +1092,7 @@ public class CitrixRequestWrapperTest {
         final Connection conn = Mockito.mock(Connection.class);
 
         final VMSnapshotTO snapshotTO = Mockito.mock(VMSnapshotTO.class);
-        final List<VolumeObjectTO> volumeTOs = new ArrayList<VolumeObjectTO>();
+        final List<VolumeObjectTO> volumeTOs = new ArrayList<>();
 
         final DeleteVMSnapshotCommand vmSnapshot = new DeleteVMSnapshotCommand("Test", snapshotTO, volumeTOs, "Debian");
 
@@ -1132,7 +1113,7 @@ public class CitrixRequestWrapperTest {
         final Connection conn = Mockito.mock(Connection.class);
 
         final VMSnapshotTO snapshotTO = Mockito.mock(VMSnapshotTO.class);
-        final List<VolumeObjectTO> volumeTOs = new ArrayList<VolumeObjectTO>();
+        final List<VolumeObjectTO> volumeTOs = new ArrayList<>();
 
         final RevertToVMSnapshotCommand vmSnapshot = new RevertToVMSnapshotCommand("Test", "uuid", snapshotTO, volumeTOs, "Debian");
 
@@ -1159,7 +1140,7 @@ public class CitrixRequestWrapperTest {
 
         when(citrixResourceBase.getConnection()).thenReturn(conn);
         when(citrixResourceBase.callHostPlugin(conn, "vmops", "network_rules_vmSecondaryIp", "vmName", rulesVm.getVmName(), "vmMac", rulesVm.getVmMac(),
-                        "vmSecIp", rulesVm.getVmSecIp(), "action", rulesVm.getAction())).thenReturn("true");
+                "vmSecIp", rulesVm.getVmSecIp(), "action", rulesVm.getAction())).thenReturn("true");
 
         final Answer answer = wrapper.execute(rulesVm, citrixResourceBase);
 
@@ -1179,7 +1160,7 @@ public class CitrixRequestWrapperTest {
 
         when(citrixResourceBase.getConnection()).thenReturn(conn);
         when(citrixResourceBase.callHostPlugin(conn, "vmops", "network_rules_vmSecondaryIp", "vmName", rulesVm.getVmName(), "vmMac", rulesVm.getVmMac(),
-                        "vmSecIp", rulesVm.getVmSecIp(), "action", rulesVm.getAction())).thenReturn("false");
+                "vmSecIp", rulesVm.getVmSecIp(), "action", rulesVm.getAction())).thenReturn("false");
 
         final Answer answer = wrapper.execute(rulesVm, citrixResourceBase);
 
@@ -1253,7 +1234,7 @@ public class CitrixRequestWrapperTest {
         }
 
         when(citrixResourceBase.callHostPlugin(conn, "ovs-pvlan", "setup-pvlan-dhcp", "op", op, "nw-label", label, "primary-pvlan", primaryPvlan, "isolated-pvlan",
-                        isolatedPvlan, "dhcp-name", dhcpName, "dhcp-ip", dhcpIp, "dhcp-mac", dhcpMac)).thenReturn("true");
+                isolatedPvlan, "dhcp-name", dhcpName, "dhcp-ip", dhcpIp, "dhcp-mac", dhcpMac)).thenReturn("true");
 
         final Answer answer = wrapper.execute(lanSetup, citrixResourceBase);
 
@@ -1294,7 +1275,7 @@ public class CitrixRequestWrapperTest {
         }
 
         when(citrixResourceBase.callHostPlugin(conn, "ovs-pvlan", "setup-pvlan-dhcp", "op", op, "nw-label", label, "primary-pvlan", primaryPvlan, "isolated-pvlan",
-                        isolatedPvlan, "dhcp-name", dhcpName, "dhcp-ip", dhcpIp, "dhcp-mac", dhcpMac)).thenReturn("false");
+                isolatedPvlan, "dhcp-name", dhcpName, "dhcp-ip", dhcpIp, "dhcp-mac", dhcpMac)).thenReturn("false");
 
         final Answer answer = wrapper.execute(lanSetup, citrixResourceBase);
 
@@ -1333,7 +1314,7 @@ public class CitrixRequestWrapperTest {
         }
 
         when(citrixResourceBase.callHostPlugin(conn, "ovs-pvlan", "setup-pvlan-vm", "op", op, "nw-label", label, "primary-pvlan", primaryPvlan, "isolated-pvlan",
-                        isolatedPvlan, "vm-mac", vmMac)).thenReturn("true");
+                isolatedPvlan, "vm-mac", vmMac)).thenReturn("true");
 
         final Answer answer = wrapper.execute(lanSetup, citrixResourceBase);
 
@@ -1372,7 +1353,7 @@ public class CitrixRequestWrapperTest {
         }
 
         when(citrixResourceBase.callHostPlugin(conn, "ovs-pvlan", "setup-pvlan-vm", "op", op, "nw-label", label, "primary-pvlan", primaryPvlan, "isolated-pvlan",
-                        isolatedPvlan, "vm-mac", vmMac)).thenReturn("false");
+                isolatedPvlan, "vm-mac", vmMac)).thenReturn("false");
 
         final Answer answer = wrapper.execute(lanSetup, citrixResourceBase);
 
@@ -1385,7 +1366,7 @@ public class CitrixRequestWrapperTest {
     public void testPerformanceMonitorCommandSuccess() {
         final Connection conn = Mockito.mock(Connection.class);
 
-        final PerformanceMonitorCommand performanceMonitor = new PerformanceMonitorCommand(new Hashtable<String, String>(), 200);
+        final PerformanceMonitorCommand performanceMonitor = new PerformanceMonitorCommand(new Hashtable<>(), 200);
 
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
@@ -1404,7 +1385,7 @@ public class CitrixRequestWrapperTest {
     public void testPerformanceMonitorCommandFailure() {
         final Connection conn = Mockito.mock(Connection.class);
 
-        final PerformanceMonitorCommand performanceMonitor = new PerformanceMonitorCommand(new Hashtable<String, String>(), 200);
+        final PerformanceMonitorCommand performanceMonitor = new PerformanceMonitorCommand(new Hashtable<>(), 200);
 
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
@@ -1505,7 +1486,6 @@ public class CitrixRequestWrapperTest {
 
         assertTrue(answer.getResult());
     }
-
 }
 
 class NotAValidCommand extends Command {
@@ -1514,5 +1494,4 @@ class NotAValidCommand extends Command {
     public boolean executeInSequence() {
         return false;
     }
-
 }

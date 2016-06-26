@@ -1,21 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
-(function($, cloudstack) {
+(function ($, cloudstack) {
     var scaleUpData = [];
     var totalScaleUpCondition = 0;
     var scaleDownData = [];
@@ -26,21 +9,21 @@
         autoscaleActions: {
             enable: {
                 label: 'label.enable.autoscale',
-                action: function(args) {
+                action: function (args) {
                     $.ajax({
                         url: createURL('enableAutoScaleVmGroup'),
                         data: {
                             id: args.context.originalAutoscaleData.context.autoscaleVmGroup.id
                         },
-                        success: function(json) {
+                        success: function (json) {
                             var jid = json.enableautoscalevmGroupresponse.jobid;
                             args.response.success({
                                 _custom: {
                                     jobId: jid,
-                                    getUpdatedItem: function(json) {
+                                    getUpdatedItem: function (json) {
                                         return json.queryasyncjobresultresponse.jobresult.autoscalevmgroup;
                                     },
-                                    getActionFilter: function() {
+                                    getActionFilter: function () {
                                         return cloudStack.autoscaler.actionFilter;
                                     }
                                 },
@@ -54,21 +37,21 @@
             },
             disable: {
                 label: 'label.disable.autoscale',
-                action: function(args) {
+                action: function (args) {
                     $.ajax({
                         url: createURL('disableAutoScaleVmGroup'),
                         data: {
                             id: args.context.originalAutoscaleData.context.autoscaleVmGroup.id
                         },
-                        success: function(json) {
+                        success: function (json) {
                             var jid = json.disableautoscalevmGroupresponse.jobid;
                             args.response.success({
                                 _custom: {
                                     jobId: jid,
-                                    getUpdatedItem: function(json) {
+                                    getUpdatedItem: function (json) {
                                         return json.queryasyncjobresultresponse.jobresult.autoscalevmgroup;
                                     },
-                                    getActionFilter: function() {
+                                    getActionFilter: function () {
                                         return cloudStack.autoscaler.actionFilter;
                                     }
                                 },
@@ -81,7 +64,7 @@
                 }
             }
         },
-        actionFilter: function(args) {
+        actionFilter: function (args) {
             var allowedActions = [];
             if (args.context.originalAutoscaleData == null) { //new LB rule
                 //no actions  for new LB rule
@@ -100,7 +83,7 @@
             }
             return allowedActions;
         },
-        dataProvider: function(args) {
+        dataProvider: function (args) {
             // Reset data
             scaleUpData = [];
             totalScaleUpCondition = 0;
@@ -118,7 +101,7 @@
                         listAll: true,
                         lbruleid: args.context.multiRules[0].id
                     },
-                    success: function(json) {
+                    success: function (json) {
                         var autoscaleVmGroup = json.listautoscalevmgroupsresponse.autoscalevmgroup[0];
 
                         $.ajax({
@@ -127,7 +110,7 @@
                                 listAll: true,
                                 id: autoscaleVmGroup.vmprofileid
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 var autoscaleVmProfile = json.listautoscalevmprofilesresponse.autoscalevmprofile[0];
 
                                 var scaleUpPolicy = {
@@ -135,7 +118,7 @@
                                     duration: autoscaleVmGroup.scaleuppolicies[0].duration,
                                     conditions: []
                                 };
-                                $(autoscaleVmGroup.scaleuppolicies[0].conditions).each(function() {
+                                $(autoscaleVmGroup.scaleuppolicies[0].conditions).each(function () {
                                     var condition = {
                                         id: this.id,
                                         counterid: this.counter[0].id,
@@ -150,7 +133,7 @@
                                     duration: autoscaleVmGroup.scaledownpolicies[0].duration,
                                     conditions: []
                                 };
-                                $(autoscaleVmGroup.scaledownpolicies[0].conditions).each(function() {
+                                $(autoscaleVmGroup.scaledownpolicies[0].conditions).each(function () {
                                     var condition = {
                                         id: this.id,
                                         counterid: this.counter[0].id,
@@ -164,7 +147,7 @@
                                 var otherdeployparams = autoscaleVmProfile.otherdeployparams;
                                 if (otherdeployparams != null && otherdeployparams.length > 0) {
                                     var array1 = otherdeployparams.split('&');
-                                    $(array1).each(function() {
+                                    $(array1).each(function () {
                                         var array2 = this.split('=');
                                         if (array2[0] == 'diskofferingid')
                                             diskOfferingId = array2[1];
@@ -238,7 +221,7 @@
                 templateNames: {
                     label: 'label.template',
                     id: 'templatename',
-                    select: function(args) {
+                    select: function (args) {
                         var templates;
                         var templateIdMap = {};
                         $.ajax({
@@ -248,11 +231,11 @@
                                 zoneid: args.context.networks[0].zoneid
                             },
                             async: false,
-                            success: function(json) {
+                            success: function (json) {
                                 templates = json.listtemplatesresponse.template;
                                 if (templates == null)
                                     templates = [];
-                                $(templates).each(function() {
+                                $(templates).each(function () {
                                     templateIdMap[this.id] = 1;
                                 });
                             }
@@ -265,9 +248,9 @@
                                 zoneid: args.context.networks[0].zoneid
                             },
                             async: false,
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listtemplatesresponse.template;
-                                $(items).each(function() {
+                                $(items).each(function () {
                                     if (!(this.id in templateIdMap)) {
                                         templates.push(this);
                                         templateIdMap[this.id] = 1;
@@ -283,9 +266,9 @@
                                 zoneid: args.context.networks[0].zoneid
                             },
                             async: false,
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listtemplatesresponse.template;
-                                $(items).each(function() {
+                                $(items).each(function () {
                                     if (!(this.id in templateIdMap)) {
                                         templates.push(this);
                                         templateIdMap[this.id] = 1;
@@ -295,7 +278,7 @@
                         });
 
                         args.response.success({
-                            data: $.map(templates, function(template) {
+                            data: $.map(templates, function (template) {
                                 return {
                                     id: template.id,
                                     description: template.name
@@ -307,15 +290,15 @@
 
                 serviceOfferingId: {
                     label: 'label.compute.offering',
-                    select: function(args) {
+                    select: function (args) {
                         $.ajax({
                             url: createURL("listServiceOfferings&issystem=false"),
                             dataType: "json",
                             async: true,
-                            success: function(json) {
+                            success: function (json) {
                                 var serviceofferings = json.listserviceofferingsresponse.serviceoffering;
                                 args.response.success({
-                                    data: $.map(serviceofferings, function(serviceoffering) {
+                                    data: $.map(serviceofferings, function (serviceoffering) {
                                         return {
                                             id: serviceoffering.id,
                                             description: serviceoffering.name
@@ -383,19 +366,19 @@
                     label: 'label.menu.security.groups',
                     isHidden: true,
                     dependsOn: 'isAdvanced',
-                    select: function(args) {
+                    select: function (args) {
                         $.ajax({
                             url: createURL("listSecurityGroups&listAll=true"),
                             dataType: "json",
                             async: true,
-                            success: function(json) {
+                            success: function (json) {
                                 var securitygroups = json.listsecuritygroupsresponse.securitygroup;
                                 var items = [];
                                 items.push({
                                     id: "",
                                     description: ""
                                 });
-                                $(securitygroups).each(function() {
+                                $(securitygroups).each(function () {
                                     items.push({
                                         id: this.id,
                                         description: this.name
@@ -413,19 +396,19 @@
                     label: 'label.menu.disk.offerings',
                     isHidden: true,
                     dependsOn: 'isAdvanced',
-                    select: function(args) {
+                    select: function (args) {
                         $.ajax({
                             url: createURL("listDiskOfferings&listAll=true"),
                             dataType: "json",
                             async: true,
-                            success: function(json) {
+                            success: function (json) {
                                 var diskofferings = json.listdiskofferingsresponse.diskoffering;
                                 var items = [];
                                 items.push({
                                     id: "",
                                     description: ""
                                 });
-                                $(diskofferings).each(function() {
+                                $(diskofferings).each(function () {
                                     items.push({
                                         id: this.id,
                                         description: this.name
@@ -464,7 +447,7 @@
                     isHidden: true,
                     dependsOn: 'isAdvanced',
                     label: 'label.user',
-                    select: function(args) {
+                    select: function (args) {
                         var items = [];
                         if (args.context.originalAutoscaleData == null) { //new LB rule
                             if (isAdmin() || isDomainAdmin()) {
@@ -474,9 +457,9 @@
                                         domainid: g_domainid,
                                         account: g_account
                                     },
-                                    success: function(json) {
+                                    success: function (json) {
                                         var users = json.listusersresponse.user;
-                                        $(users).each(function() {
+                                        $(users).each(function () {
                                             items.push({
                                                 id: this.id,
                                                 description: this.username
@@ -504,9 +487,9 @@
                                         domainid: args.context.originalAutoscaleData.context.autoscaleVmProfile.domainid,
                                         account: args.context.originalAutoscaleData.context.autoscaleVmProfile.account
                                     },
-                                    success: function(json) {
+                                    success: function (json) {
                                         var users = json.listusersresponse.user;
-                                        $(users).each(function() {
+                                        $(users).each(function () {
                                             items.push({
                                                 id: this.id,
                                                 description: this.username
@@ -539,16 +522,16 @@
                 fields: {
                     'counterid': {
                         label: 'label.counter',
-                        select: function(args) {
+                        select: function (args) {
                             $.ajax({
                                 url: createURL("listCounters"),
                                 dataType: "json",
                                 async: false,
-                                success: function(json) {
+                                success: function (json) {
                                     var counters = json.counterresponse.counter;
 
                                     args.response.success({
-                                        data: $.map(counters, function(counter) {
+                                        data: $.map(counters, function (counter) {
                                             return {
                                                 name: counter.id,
                                                 description: counter.name
@@ -561,7 +544,7 @@
                     },
                     'relationaloperator': {
                         label: 'label.operator',
-                        select: function(args) {
+                        select: function (args) {
                             args.response.success({
                                 data: [{
                                     name: 'GT',
@@ -593,7 +576,7 @@
                 },
                 add: {
                     label: 'label.add',
-                    action: function(args) {
+                    action: function (args) {
                         scaleUpData.push($.extend(args.data, {
                             index: totalScaleUpCondition
                         }));
@@ -605,8 +588,8 @@
                 actions: {
                     destroy: {
                         label: '',
-                        action: function(args) {
-                            scaleUpData = $.grep(scaleUpData, function(item) {
+                        action: function (args) {
+                            scaleUpData = $.grep(scaleUpData, function (item) {
                                 return item.index != args.context.multiRule[0].index;
                             });
                             totalScaleUpCondition--;
@@ -614,13 +597,13 @@
                         }
                     }
                 },
-                dataProvider: function(args) {
+                dataProvider: function (args) {
                     var data = scaleUpData;
                     var $autoscaler = $('.ui-dialog .autoscaler');
                     var initialData = $autoscaler.data('autoscaler-scale-up-data');
 
                     if ($.isArray(initialData)) {
-                        $(initialData).each(function() {
+                        $(initialData).each(function () {
                             this.index = totalScaleUpCondition;
                             totalScaleUpCondition++;
                             scaleUpData.push(this);
@@ -643,16 +626,16 @@
                 fields: {
                     'counterid': {
                         label: 'label.counter',
-                        select: function(args) {
+                        select: function (args) {
                             $.ajax({
                                 url: createURL("listCounters"),
                                 dataType: "json",
                                 async: false,
-                                success: function(json) {
+                                success: function (json) {
                                     var counters = json.counterresponse.counter;
 
                                     args.response.success({
-                                        data: $.map(counters, function(counter) {
+                                        data: $.map(counters, function (counter) {
                                             return {
                                                 name: counter.id,
                                                 description: counter.name
@@ -665,7 +648,7 @@
                     },
                     'relationaloperator': {
                         label: 'label.operator',
-                        select: function(args) {
+                        select: function (args) {
                             args.response.success({
                                 data: [{
                                     name: 'GT',
@@ -697,7 +680,7 @@
                 },
                 add: {
                     label: 'label.add',
-                    action: function(args) {
+                    action: function (args) {
                         scaleDownData.push($.extend(args.data, {
                             index: totalScaleDownCondition
                         }));
@@ -708,8 +691,8 @@
                 actions: {
                     destroy: {
                         label: '',
-                        action: function(args) {
-                            scaleDownData = $.grep(scaleDownData, function(item) {
+                        action: function (args) {
+                            scaleDownData = $.grep(scaleDownData, function (item) {
                                 return item.index != args.context.multiRule[0].index;
                             });
                             totalScaleDownCondition--;
@@ -717,13 +700,13 @@
                         }
                     }
                 },
-                dataProvider: function(args) {
+                dataProvider: function (args) {
                     var data = scaleDownData;
                     var $autoscaler = $('.ui-dialog .autoscaler');
                     var initialData = $autoscaler.data('autoscaler-scale-down-data');
 
                     if ($.isArray(initialData)) {
-                        $(initialData).each(function() {
+                        $(initialData).each(function () {
                             this.index = totalScaleDownCondition;
                             totalScaleDownCondition++;
                             scaleDownData.push(this);
@@ -740,7 +723,7 @@
         },
 
         actions: {
-            apply: function(args) {
+            apply: function (args) {
                 //validation (begin) *****
                 if (!('multiRules' in args.context)) { //from a new LB
                     if (args.formData.name == '' || args.formData.publicport == '' || args.formData.privateport == '') {
@@ -769,7 +752,7 @@
                             id: args.data.username
                         },
                         async: false,
-                        success: function(json) {
+                        success: function (json) {
                             if (json.listusersresponse.user[0].apikey != null && json.listusersresponse.user[0].secretkey != null) {
                                 havingApiKeyAndSecretKey = true;
                             }
@@ -789,7 +772,7 @@
                             name: 'endpointe.url'
                         },
                         async: false,
-                        success: function(json) {
+                        success: function (json) {
                             if (json.listconfigurationsresponse.configuration != null) {
                                 if (json.listconfigurationsresponse.configuration[0].value.indexOf('localhost') == -1) {
                                     hasValidEndpointeUrl = true;
@@ -846,9 +829,9 @@
                 var scaleUpConditionIds = [];
                 var scaleDownConditionIds = [];
 
-                var scaleUp = function(args) {
+                var scaleUp = function (args) {
                     var scaleUpConditionIds = [];
-                    $(scaleUpData).each(function() {
+                    $(scaleUpData).each(function () {
                         var data = {
                             counterid: this.counterid,
                             relationaloperator: this.relationaloperator,
@@ -857,12 +840,12 @@
                         $.ajax({
                             url: createURL('createCondition'),
                             data: data,
-                            success: function(json) {
-                                var createConditionIntervalID = setInterval(function() {
+                            success: function (json) {
+                                var createConditionIntervalID = setInterval(function () {
                                     $.ajax({
                                         url: createURL("queryAsyncJobResult&jobid=" + json.conditionresponse.jobid),
                                         dataType: "json",
-                                        success: function(json) {
+                                        success: function (json) {
                                             var result = json.queryasyncjobresultresponse;
                                             if (result.jobstatus == 0) {
                                                 return;
@@ -882,13 +865,13 @@
                                                             $.ajax({
                                                                 url: createURL('createAutoScalePolicy'),
                                                                 data: data,
-                                                                success: function(json) {
+                                                                success: function (json) {
                                                                     var jobId = json.autoscalepolicyresponse.jobid;
-                                                                    var createAutoScalePolicyInterval = setInterval(function() {
+                                                                    var createAutoScalePolicyInterval = setInterval(function () {
                                                                         $.ajax({
                                                                             url: createURL("queryAsyncJobResult&jobId=" + jobId),
                                                                             dataType: "json",
-                                                                            success: function(json) {
+                                                                            success: function (json) {
                                                                                 var result = json.queryasyncjobresultresponse;
                                                                                 if (result.jobstatus == 0) {
                                                                                     return; //Job has not completed
@@ -907,7 +890,7 @@
                                                                         });
                                                                     }, g_queryAsyncJobResultInterval);
                                                                 },
-                                                                error: function(XMLHttpResponse) {
+                                                                error: function (XMLHttpResponse) {
                                                                     args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                                                                 }
                                                             });
@@ -922,12 +905,12 @@
                                                             $.ajax({
                                                                 url: createURL('updateAutoScalePolicy'),
                                                                 data: data,
-                                                                success: function(json) {
-                                                                    var updateAutoScalePolicyInterval = setInterval(function() {
+                                                                success: function (json) {
+                                                                    var updateAutoScalePolicyInterval = setInterval(function () {
                                                                         $.ajax({
                                                                             url: createURL("queryAsyncJobResult&jobId=" + json.updateautoscalepolicyresponse.jobid),
                                                                             dataType: "json",
-                                                                            success: function(json) {
+                                                                            success: function (json) {
                                                                                 var result = json.queryasyncjobresultresponse;
                                                                                 if (result.jobstatus == 0) {
                                                                                     return; //Job has not completed
@@ -937,7 +920,7 @@
                                                                                         var item = result.jobresult.autoscalepolicy;
 
                                                                                         //delete old conditions which are orphans now. Don't need to call queryAsyncJobResult because subsequent API calls have no dependency on deleteCondition.
-                                                                                        $(args.context.originalAutoscaleData.scaleUpPolicy.conditions).each(function() {
+                                                                                        $(args.context.originalAutoscaleData.scaleUpPolicy.conditions).each(function () {
                                                                                             $.ajax({
                                                                                                 url: createURL('deleteCondition'),
                                                                                                 data: {
@@ -957,7 +940,7 @@
                                                                         });
                                                                     }, g_queryAsyncJobResultInterval);
                                                                 },
-                                                                error: function(XMLHttpResponse) {
+                                                                error: function (XMLHttpResponse) {
                                                                     args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                                                                 }
                                                             });
@@ -971,16 +954,16 @@
                                     });
                                 }, g_queryAsyncJobResultInterval);
                             },
-                            error: function(XMLHttpResponse) {
+                            error: function (XMLHttpResponse) {
                                 args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                             }
                         });
                     });
                 };
 
-                var scaleDown = function(args) {
+                var scaleDown = function (args) {
                     var scaleDownConditionIds = [];
-                    $(scaleDownData).each(function() {
+                    $(scaleDownData).each(function () {
                         var data = {
                             counterid: this.counterid,
                             relationaloperator: this.relationaloperator,
@@ -989,12 +972,12 @@
                         $.ajax({
                             url: createURL('createCondition'),
                             data: data,
-                            success: function(json) {
-                                var createConditionIntervalID = setInterval(function() {
+                            success: function (json) {
+                                var createConditionIntervalID = setInterval(function () {
                                     $.ajax({
                                         url: createURL("queryAsyncJobResult&jobid=" + json.conditionresponse.jobid),
                                         dataType: "json",
-                                        success: function(json) {
+                                        success: function (json) {
                                             var result = json.queryasyncjobresultresponse;
                                             if (result.jobstatus == 0) {
                                                 return;
@@ -1014,13 +997,13 @@
                                                             $.ajax({
                                                                 url: createURL('createAutoScalePolicy'),
                                                                 data: data,
-                                                                success: function(json) {
+                                                                success: function (json) {
                                                                     var jobId = json.autoscalepolicyresponse.jobid;
-                                                                    var createAutoScalePolicyInterval = setInterval(function() {
+                                                                    var createAutoScalePolicyInterval = setInterval(function () {
                                                                         $.ajax({
                                                                             url: createURL("queryAsyncJobResult&jobId=" + jobId),
                                                                             dataType: "json",
-                                                                            success: function(json) {
+                                                                            success: function (json) {
                                                                                 var result = json.queryasyncjobresultresponse;
                                                                                 if (result.jobstatus == 0) {
                                                                                     return; //Job has not completed
@@ -1039,7 +1022,7 @@
                                                                         });
                                                                     }, g_queryAsyncJobResultInterval);
                                                                 },
-                                                                error: function(XMLHttpResponse) {
+                                                                error: function (XMLHttpResponse) {
                                                                     args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                                                                 }
                                                             });
@@ -1054,13 +1037,13 @@
                                                             $.ajax({
                                                                 url: createURL('updateAutoScalePolicy'),
                                                                 data: data,
-                                                                success: function(json) {
+                                                                success: function (json) {
                                                                     var jobId = json.updateautoscalepolicyresponse.jobid;
-                                                                    var updateAutoScalePolicyInterval = setInterval(function() {
+                                                                    var updateAutoScalePolicyInterval = setInterval(function () {
                                                                         $.ajax({
                                                                             url: createURL("queryAsyncJobResult&jobId=" + jobId),
                                                                             dataType: "json",
-                                                                            success: function(json) {
+                                                                            success: function (json) {
                                                                                 var result = json.queryasyncjobresultresponse;
                                                                                 if (result.jobstatus == 0) {
                                                                                     return; //Job has not completed
@@ -1070,7 +1053,7 @@
                                                                                         var item = result.jobresult.autoscalepolicy;
 
                                                                                         //delete old conditions which are orphans now. Don't need to call queryAsyncJobResult because subsequent API calls have no dependency on deleteCondition.
-                                                                                        $(args.context.originalAutoscaleData.scaleDownPolicy.conditions).each(function() {
+                                                                                        $(args.context.originalAutoscaleData.scaleDownPolicy.conditions).each(function () {
                                                                                             $.ajax({
                                                                                                 url: createURL('deleteCondition'),
                                                                                                 data: {
@@ -1090,7 +1073,7 @@
                                                                         });
                                                                     }, g_queryAsyncJobResultInterval);
                                                                 },
-                                                                error: function(XMLHttpResponse) {
+                                                                error: function (XMLHttpResponse) {
                                                                     args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                                                                 }
                                                             });
@@ -1101,7 +1084,7 @@
                                                 }
                                             }
                                         },
-                                        error: function(XMLHttpResponse) {
+                                        error: function (XMLHttpResponse) {
                                             args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                                         }
                                     });
@@ -1111,7 +1094,7 @@
                     });
                 };
 
-                var createOrUpdateVmProfile = function(args) {
+                var createOrUpdateVmProfile = function (args) {
                     var array1 = [];
                     var apiCmd, apiCmdRes;
                     if (!('multiRules' in args.context)) { //from a new LB
@@ -1124,13 +1107,13 @@
                             snmpport: args.data.snmpPort
                         };
 
-                        var allParamNames = $.map(data, function(value, key) {
+                        var allParamNames = $.map(data, function (value, key) {
                             return key;
                         });
 
                         var notParams = ['zoneid', 'serviceofferingid', 'templateid', 'destroyvmgraceperiod'];
                         var index = 0;
-                        $(allParamNames).each(function() {
+                        $(allParamNames).each(function () {
                             var param = 'counterparam[' + index + ']';
                             var name = this.toString();
                             var value = data[name];
@@ -1168,13 +1151,13 @@
                         $.ajax({
                             url: createURL('createAutoScaleVmProfile'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var jobId = json.autoscalevmprofileresponse.jobid;
-                                var autoscaleVmProfileTimer = setInterval(function() {
+                                var autoscaleVmProfileTimer = setInterval(function () {
                                     $.ajax({
                                         url: createURL("queryAsyncJobResult&jobId=" + jobId),
                                         dataType: "json",
-                                        success: function(json) {
+                                        success: function (json) {
                                             var result = json.queryasyncjobresultresponse;
                                             if (result.jobstatus == 0) {
                                                 return; //Job has not completed
@@ -1191,7 +1174,7 @@
                                     });
                                 }, g_queryAsyncJobResultInterval);
                             },
-                            error: function(XMLHttpResponse) {
+                            error: function (XMLHttpResponse) {
                                 args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                             }
                         });
@@ -1204,13 +1187,13 @@
                             snmpport: args.data.snmpPort
                         };
 
-                        var allParamNames = $.map(data, function(value, key) {
+                        var allParamNames = $.map(data, function (value, key) {
                             return key;
                         });
 
                         var notParams = ['id', 'templateid', 'destroyvmgraceperiod'];
                         var index = 0;
-                        $(allParamNames).each(function() {
+                        $(allParamNames).each(function () {
                             var param = 'counterparam[' + index + ']';
                             var name = this.toString();
                             var value = data[name];
@@ -1224,8 +1207,6 @@
                         });
 
 
-
-
                         if (args.data.username != null && args.data.username.length > 0) {
                             $.extend(data, {
                                 autoscaleuserid: args.data.username
@@ -1235,13 +1216,13 @@
                         $.ajax({
                             url: createURL('updateAutoScaleVmProfile'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var jobId = json.updateautoscalevmprofileresponse.jobid;
-                                var autoscaleVmProfileTimer = setInterval(function() {
+                                var autoscaleVmProfileTimer = setInterval(function () {
                                     $.ajax({
                                         url: createURL("queryAsyncJobResult&jobId=" + jobId),
                                         dataType: "json",
-                                        success: function(json) {
+                                        success: function (json) {
                                             var result = json.queryasyncjobresultresponse;
                                             if (result.jobstatus == 0) {
                                                 return; //Job has not completed
@@ -1258,14 +1239,14 @@
                                     });
                                 }, g_queryAsyncJobResultInterval);
                             },
-                            error: function(XMLHttpResponse) {
+                            error: function (XMLHttpResponse) {
                                 args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                             }
                         });
                     }
                 };
 
-                var loadBalancer = function(args) {
+                var loadBalancer = function (args) {
                     var networkid;
                     if ('vpc' in args.context) { //from VPC section
                         if (args.data.tier == null) {
@@ -1302,13 +1283,13 @@
                         dataType: 'json',
                         data: data,
                         async: true,
-                        success: function(json) {
+                        success: function (json) {
                             var jobId = json.createloadbalancerruleresponse.jobid;
-                            var loadBalancerTimer = setInterval(function() {
+                            var loadBalancerTimer = setInterval(function () {
                                 $.ajax({
                                     url: createURL("queryAsyncJobResult&jobId=" + jobId),
                                     dataType: "json",
-                                    success: function(json) {
+                                    success: function (json) {
                                         var result = json.queryasyncjobresultresponse;
                                         if (result.jobstatus == 0) {
                                             return; //Job has not completed
@@ -1325,13 +1306,13 @@
                                 });
                             }, g_queryAsyncJobResultInterval);
                         },
-                        error: function(XMLHttpResponse) {
+                        error: function (XMLHttpResponse) {
                             args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                         }
                     });
                 };
 
-                var autoScaleVmGroup = function(args) {
+                var autoScaleVmGroup = function (args) {
                     if (!('multiRules' in args.context)) { //from a new LB
                         var array1 = [];
                         array1.push("&lbruleid=" + loadBalancerResponse.id);
@@ -1346,13 +1327,13 @@
                             url: createURL('createAutoScaleVmGroup' + array1.join("")),
                             dataType: 'json',
                             async: true,
-                            success: function(json) {
+                            success: function (json) {
                                 var jobId = json.autoscalevmgroupresponse.jobid;
-                                var scaleVmGroupTimer = setInterval(function() {
+                                var scaleVmGroupTimer = setInterval(function () {
                                     $.ajax({
                                         url: createURL("queryAsyncJobResult&jobId=" + jobId),
                                         dataType: "json",
-                                        success: function(json) {
+                                        success: function (json) {
                                             var result = json.queryasyncjobresultresponse;
                                             if (result.jobstatus == 0) {
                                                 return; //Job has not completed
@@ -1369,7 +1350,7 @@
                                     });
                                 }, g_queryAsyncJobResultInterval);
                             },
-                            error: function(XMLHttpResponse) {
+                            error: function (XMLHttpResponse) {
                                 args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                             }
                         });
@@ -1386,13 +1367,13 @@
                         $.ajax({
                             url: createURL('updateAutoScaleVmGroup'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var jobId = json.updateautoscalevmgroupresponse.jobid;
-                                var updateAutoScaleVmGroupTimer = setInterval(function() {
+                                var updateAutoScaleVmGroupTimer = setInterval(function () {
                                     $.ajax({
                                         url: createURL("queryAsyncJobResult&jobId=" + jobId),
                                         dataType: "json",
-                                        success: function(json) {
+                                        success: function (json) {
                                             var result = json.queryasyncjobresultresponse;
                                             if (result.jobstatus == 0) {
                                                 return; //Job has not completed
@@ -1408,7 +1389,7 @@
                                     });
                                 }, g_queryAsyncJobResultInterval);
                             },
-                            error: function(XMLHttpResponse) {
+                            error: function (XMLHttpResponse) {
                                 args.response.error(parseXMLHttpResponse(XMLHttpResponse));
                             }
                         });
@@ -1423,7 +1404,7 @@
                         templatefilter: 'executable'
                     },
                     async: false,
-                    success: function(json) {
+                    success: function (json) {
                         var template = json.listtemplatesresponse.template;
 
                         //*** API calls start!!! ********
@@ -1432,15 +1413,15 @@
                 });
 
             },
-            destroy: function(args) {
+            destroy: function (args) {
                 $.ajax({
                     url: createURL('')
                 });
             }
         },
 
-        dialog: function(args) {
-            return function(args) {
+        dialog: function (args) {
+            return function (args) {
                 var context = args.context;
 
                 var $dialog = $('<div>');
@@ -1452,20 +1433,20 @@
                     width: 825,
                     height: 600,
                     buttons: {
-                        'Cancel': function() {
+                        'Cancel': function () {
                             $(this).dialog("close");
                             $('.overlay').remove();
                         },
 
 
-                        'Apply': function() {
+                        'Apply': function () {
                             $(':ui-dialog').remove();
                             $('.overlay').remove();
                         }
                     }
                 }).closest('.ui-dialog').overlay();
 
-                $("buttons").each(function() {
+                $("buttons").each(function () {
                     $(this).attr('style', 'float: right');
                 });
                 var $field = $('<div>').addClass('field username');

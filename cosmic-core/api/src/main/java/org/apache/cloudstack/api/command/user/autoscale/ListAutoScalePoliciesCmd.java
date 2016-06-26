@@ -1,26 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.autoscale;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.network.as.AutoScalePolicy;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListAccountResourcesCmd;
@@ -29,6 +9,10 @@ import org.apache.cloudstack.api.response.AutoScalePolicyResponse;
 import org.apache.cloudstack.api.response.AutoScaleVmGroupResponse;
 import org.apache.cloudstack.api.response.ConditionResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +34,8 @@ public class ListAutoScalePoliciesCmd extends BaseListAccountResourcesCmd {
     private Long conditionId;
 
     @Parameter(name = ApiConstants.ACTION,
-               type = CommandType.STRING,
-               description = "the action to be executed if all the conditions evaluate to true for the specified duration.")
+            type = CommandType.STRING,
+            description = "the action to be executed if all the conditions evaluate to true for the specified duration.")
     private String action;
 
     @Parameter(name = ApiConstants.VMGROUP_ID, type = CommandType.UUID, entityType = AutoScaleVmGroupResponse.class, description = "the ID of the autoscale vm group")
@@ -82,18 +66,13 @@ public class ListAutoScalePoliciesCmd extends BaseListAccountResourcesCmd {
     // ///////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
-        List<? extends AutoScalePolicy> autoScalePolicies = _autoScaleService.listAutoScalePolicies(this);
-        ListResponse<AutoScalePolicyResponse> response = new ListResponse<AutoScalePolicyResponse>();
-        List<AutoScalePolicyResponse> responses = new ArrayList<AutoScalePolicyResponse>();
+        final List<? extends AutoScalePolicy> autoScalePolicies = _autoScaleService.listAutoScalePolicies(this);
+        final ListResponse<AutoScalePolicyResponse> response = new ListResponse<>();
+        final List<AutoScalePolicyResponse> responses = new ArrayList<>();
         if (autoScalePolicies != null) {
-            for (AutoScalePolicy autoScalePolicy : autoScalePolicies) {
-                AutoScalePolicyResponse autoScalePolicyResponse = _responseGenerator.createAutoScalePolicyResponse(autoScalePolicy);
+            for (final AutoScalePolicy autoScalePolicy : autoScalePolicies) {
+                final AutoScalePolicyResponse autoScalePolicyResponse = _responseGenerator.createAutoScalePolicyResponse(autoScalePolicy);
                 autoScalePolicyResponse.setObjectName("autoscalepolicy");
                 responses.add(autoScalePolicyResponse);
             }
@@ -103,4 +82,8 @@ public class ListAutoScalePoliciesCmd extends BaseListAccountResourcesCmd {
         setResponseObject(response);
     }
 
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
 }

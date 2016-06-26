@@ -1,30 +1,14 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.List;
 
 import com.cloud.network.rules.StickinessPolicy;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = StickinessPolicy.class)
 public class LBStickinessResponse extends BaseResponse {
@@ -38,7 +22,7 @@ public class LBStickinessResponse extends BaseResponse {
 
     @SerializedName("description")
     @Param(description = "the description of the Stickiness policy")
-    private String description;;
+    private String description;
 
     @SerializedName("account")
     @Param(description = "the account of the Stickiness policy")
@@ -64,11 +48,15 @@ public class LBStickinessResponse extends BaseResponse {
     @Param(description = "the list of stickinesspolicies", responseObject = LBStickinessPolicyResponse.class)
     private List<LBStickinessPolicyResponse> stickinessPolicies;
 
-    public void setlbRuleId(String lbRuleId) {
+    public LBStickinessResponse() {
+
+    }
+
+    public void setlbRuleId(final String lbRuleId) {
         this.lbRuleId = lbRuleId;
     }
 
-    public void setRules(List<LBStickinessPolicyResponse> policies) {
+    public void setRules(final List<LBStickinessPolicyResponse> policies) {
         this.stickinessPolicies = policies;
     }
 
@@ -76,7 +64,7 @@ public class LBStickinessResponse extends BaseResponse {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -88,7 +76,7 @@ public class LBStickinessResponse extends BaseResponse {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
@@ -96,15 +84,15 @@ public class LBStickinessResponse extends BaseResponse {
         return accountName;
     }
 
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
-    public void setDomainId(String domainId) {
+    public void setDomainId(final String domainId) {
         this.domainId = domainId;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
@@ -112,7 +100,7 @@ public class LBStickinessResponse extends BaseResponse {
         return domainName;
     }
 
-    public void setDomainName(String domainName) {
+    public void setDomainName(final String domainName) {
         this.domainName = domainName;
     }
 
@@ -120,12 +108,7 @@ public class LBStickinessResponse extends BaseResponse {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
-
-    public LBStickinessResponse() {
-
-    }
-
 }

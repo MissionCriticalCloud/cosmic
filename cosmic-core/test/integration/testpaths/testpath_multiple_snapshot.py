@@ -1,26 +1,7 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 """ Test case for Multiple Volume Snapshot in ZWPS
 """
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources,
-                              validateList)
+from marvin.codes import PASS, ZONETAG1, ROOT, DATA
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              DiskOffering,
@@ -34,12 +15,12 @@ from marvin.lib.common import (get_domain,
                                list_clusters,
                                get_template
                                )
-
-from marvin.codes import PASS, ZONETAG1, ROOT, DATA
+from marvin.lib.utils import (cleanup_resources,
+                              validateList)
+from nose.plugins.attrib import attr
 
 
 class TestMultipleVolumeSnapshots(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestMultipleVolumeSnapshots, cls).getClsTestClient()
@@ -283,7 +264,7 @@ class TestMultipleVolumeSnapshots(cloudstackTestCase):
                 "snapshot list validation failed due to %s" %
                 snap_list_validation_result[2])
 
-            assert len(snapshots_list) >= 10,\
+            assert len(snapshots_list) >= 10, \
                 "Less than 10 snapshots created...."
             raise Exception("Snapshot creation failed !: %s" % e)
 

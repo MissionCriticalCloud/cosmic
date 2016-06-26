@@ -1,31 +1,12 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.ldap;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -37,12 +18,12 @@ public class ADLdapUserManagerImpl extends OpenLdapUserManagerImpl implements Ld
     private static final String MICROSOFT_AD_MEMBERS_FILTER = "memberOf";
 
     @Override
-    public List<LdapUser> getUsersInGroup(String groupName, LdapContext context) throws NamingException {
+    public List<LdapUser> getUsersInGroup(final String groupName, final LdapContext context) throws NamingException {
         if (StringUtils.isBlank(groupName)) {
             throw new IllegalArgumentException("ldap group name cannot be blank");
         }
 
-        String basedn = _ldapConfiguration.getBaseDn();
+        final String basedn = _ldapConfiguration.getBaseDn();
         if (StringUtils.isBlank(basedn)) {
             throw new IllegalArgumentException("ldap basedn is not configured");
         }
@@ -51,8 +32,8 @@ public class ADLdapUserManagerImpl extends OpenLdapUserManagerImpl implements Ld
         searchControls.setSearchScope(_ldapConfiguration.getScope());
         searchControls.setReturningAttributes(_ldapConfiguration.getReturnAttributes());
 
-        NamingEnumeration<SearchResult> results = context.search(basedn, generateADGroupSearchFilter(groupName), searchControls);
-        final List<LdapUser> users = new ArrayList<LdapUser>();
+        final NamingEnumeration<SearchResult> results = context.search(basedn, generateADGroupSearchFilter(groupName), searchControls);
+        final List<LdapUser> users = new ArrayList<>();
         while (results.hasMoreElements()) {
             final SearchResult result = results.nextElement();
             users.add(createUser(result));
@@ -60,14 +41,14 @@ public class ADLdapUserManagerImpl extends OpenLdapUserManagerImpl implements Ld
         return users;
     }
 
-    private String generateADGroupSearchFilter(String groupName) {
+    private String generateADGroupSearchFilter(final String groupName) {
         final StringBuilder userObjectFilter = new StringBuilder();
         userObjectFilter.append("(objectClass=");
         userObjectFilter.append(_ldapConfiguration.getUserObject());
         userObjectFilter.append(")");
 
         final StringBuilder memberOfFilter = new StringBuilder();
-        String groupCnName =  _ldapConfiguration.getCommonNameAttribute() + "=" +groupName + "," +  _ldapConfiguration.getBaseDn();
+        final String groupCnName = _ldapConfiguration.getCommonNameAttribute() + "=" + groupName + "," + _ldapConfiguration.getBaseDn();
         memberOfFilter.append("(").append(getMemberOfAttribute()).append("=");
         memberOfFilter.append(groupCnName);
         memberOfFilter.append(")");
@@ -82,11 +63,11 @@ public class ADLdapUserManagerImpl extends OpenLdapUserManagerImpl implements Ld
         return result.toString();
     }
 
-    protected boolean isUserDisabled(SearchResult result) throws NamingException {
+    protected boolean isUserDisabled(final SearchResult result) throws NamingException {
         boolean isDisabledUser = false;
-        String userAccountControl = LdapUtils.getAttributeValue(result.getAttributes(), _ldapConfiguration.getUserAccountControlAttribute());
+        final String userAccountControl = LdapUtils.getAttributeValue(result.getAttributes(), _ldapConfiguration.getUserAccountControlAttribute());
         if (userAccountControl != null) {
-            int control = Integer.parseInt(userAccountControl);
+            final int control = Integer.parseInt(userAccountControl);
             // second bit represents disabled user flag in AD
             if ((control & 2) > 0) {
                 isDisabledUser = true;
@@ -96,7 +77,7 @@ public class ADLdapUserManagerImpl extends OpenLdapUserManagerImpl implements Ld
     }
 
     protected String getMemberOfAttribute() {
-        if(_ldapConfiguration.isNestedGroupsEnabled()) {
+        if (_ldapConfiguration.isNestedGroupsEnabled()) {
             return MICROSOFT_AD_NESTED_MEMBERS_FILTER;
         } else {
             return MICROSOFT_AD_MEMBERS_FILTER;

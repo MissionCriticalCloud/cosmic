@@ -12,10 +12,10 @@ import com.cloud.resource.ResourceWrapper;
 
 @ResourceWrapper(handles = UpgradeSnapshotCommand.class)
 public final class LibvirtUpgradeSnapshotCommandWrapper
-    extends CommandWrapper<UpgradeSnapshotCommand, Answer, LibvirtComputingResource> {
+        extends CommandWrapper<UpgradeSnapshotCommand, Answer, LibvirtComputingResource> {
 
-  @Override
-  public Answer execute(final UpgradeSnapshotCommand command, final LibvirtComputingResource libvirtComputingResource) {
-    return new Answer(command, true, "success");
-  }
+    @Override
+    public Answer execute(final UpgradeSnapshotCommand command, final LibvirtComputingResource libvirtComputingResource) {
+        return new Answer(command, true, "success");
+    }
 }

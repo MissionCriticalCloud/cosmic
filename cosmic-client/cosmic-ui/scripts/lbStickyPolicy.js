@@ -1,24 +1,7 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
-(function($, cloudStack) {
+(function ($, cloudStack) {
     cloudStack.lbStickyPolicy = {
-        dialog: function(args) {
-            return function(args) {
+        dialog: function (args) {
+            return function (args) {
                 var success = args.response.success;
                 var context = args.context;
 
@@ -42,7 +25,7 @@
                         url: createURL("listNetworks"), //check whether the VPC has a network including Lb service
                         data: data,
                         async: false,
-                        success: function(json) {
+                        success: function (json) {
                             var items = json.listnetworksresponse.network;
                             if (items != null && items.length > 0) {
                                 network = items[0];
@@ -55,13 +38,13 @@
 
                 var $item = args.$item;
 
-                var lbService = $.grep(network.service, function(service) {
+                var lbService = $.grep(network.service, function (service) {
                     return service.name == 'Lb';
                 })[0];
 
                 var stickinessCapabilities = JSON.parse($.grep(
                     lbService.capability,
-                    function(capability) {
+                    function (capability) {
                         return capability.name == 'SupportedStickinessMethods';
                     }
                 )[0].value);
@@ -78,11 +61,11 @@
                 $.map(
                     $.map(
                         stickinessCapabilities,
-                        function(c) {
+                        function (c) {
                             return c.paramlist;
                         }
                     ),
-                    function(p) {
+                    function (p) {
                         baseFields[p.paramname] = {
                             label: _l('label.sticky.' + p.paramname),
                             isHidden: true,
@@ -97,7 +80,7 @@
                 var conditionalFields = {
                     methodname: {
                         label: 'label.stickiness.method',
-                        select: function(args) {
+                        select: function (args) {
                             var $select = args.$select;
                             var $form = $select.closest('form');
                             var stickyOptions = [];
@@ -106,7 +89,7 @@
                                 methodname: 'None',
                                 paramlist: []
                             });
-                            $(stickinessCapabilities).each(function() {
+                            $(stickinessCapabilities).each(function () {
                                 var stickyCapability = this;
 
                                 stickyOptions.push({
@@ -115,7 +98,7 @@
                                 });
                             });
 
-                            stickyOptions = stickyOptions.sort(function() {
+                            stickyOptions = stickyOptions.sort(function () {
                                 return this.id != 'None';
                             });
 
@@ -123,17 +106,17 @@
                                 data: stickyOptions
                             }, 500);
 
-                            $select.change(function() {
+                            $select.change(function () {
                                 var value = $select.val();
                                 var showFields = [];
-                                var targetMethod = $.grep(stickinessCapabilities, function(stickyCapability) {
+                                var targetMethod = $.grep(stickinessCapabilities, function (stickyCapability) {
                                     return stickyCapability.methodname == value;
                                 })[0];
-                                var visibleParams = $.map(targetMethod.paramlist, function(param) {
+                                var visibleParams = $.map(targetMethod.paramlist, function (param) {
                                     return param.paramname;
                                 });
 
-                                $select.closest('.form-item').siblings('.form-item').each(function() {
+                                $select.closest('.form-item').siblings('.form-item').each(function () {
                                     var $field = $(this);
                                     var id = $field.attr('rel');
 
@@ -161,11 +144,11 @@
                 var fields = $.extend(conditionalFields, baseFields);
 
                 if (args.data) {
-                    var populatedFields = $.map(fields, function(field, id) {
+                    var populatedFields = $.map(fields, function (field, id) {
                         return id;
                     });
 
-                    $(populatedFields).each(function() {
+                    $(populatedFields).each(function () {
                         var id = this;
                         var field = fields[id];
                         var dataItem = args.data[id];
@@ -184,14 +167,14 @@
                         desc: 'label.please.complete.the.following.fields',
                         fields: fields
                     },
-                    after: function(args) {
+                    after: function (args) {
                         // Remove fields not applicable to sticky method
                         args.$form.find('.form-item:hidden').remove();
 
                         var data = cloudStack.serializeForm(args.$form);
 
                         /* $item indicates that this is an existing sticky rule;
-               re-create sticky rule with new parameters */
+                         re-create sticky rule with new parameters */
                         if ($item) {
                             var $loading = $('<div>').addClass('loading-overlay');
 
@@ -200,10 +183,10 @@
                                 $item.data('multi-custom-data').id,
                                 $item.data('multi-custom-data').lbRuleID,
                                 data,
-                                function() { // Complete
+                                function () { // Complete
                                     $(window).trigger('cloudStack.fullRefresh');
                                 },
-                                function(error) { // Error
+                                function (error) { // Error
                                     $(window).trigger('cloudStack.fullRefresh');
                                 }
                             );
@@ -218,16 +201,16 @@
         },
 
         actions: {
-            add: function(lbRuleID, data, complete, error) {
+            add: function (lbRuleID, data, complete, error) {
                 var stickyURLData = '';
-                var stickyParams = $.map(data, function(value, key) {
+                var stickyParams = $.map(data, function (value, key) {
                     return key;
                 });
 
                 var notParams = ['methodname', 'stickyName'];
 
                 var index = 0;
-                $(stickyParams).each(function() {
+                $(stickyParams).each(function () {
                     var param = '&param[' + index + ']';
                     var name = this.toString();
                     var value = data[name];
@@ -249,7 +232,7 @@
                         name: data.stickyName,
                         methodname: data.methodname
                     },
-                    success: function(json) {
+                    success: function (json) {
                         cloudStack.ui.notifications.add({
                                 desc: 'message.desc.add.new.lb.sticky.rule',
                                 section: 'Network',
@@ -262,7 +245,7 @@
                             error, {}
                         );
                     },
-                    error: function(json) {
+                    error: function (json) {
                         complete();
                         cloudStack.dialog.notice({
                             message: parseXMLHttpResponse(json)
@@ -270,13 +253,13 @@
                     }
                 });
             },
-            'delete': function(stickyRuleID, complete, error) {
+            'delete': function (stickyRuleID, complete, error) {
                 $.ajax({
                     url: createURL('deleteLBStickinessPolicy'),
                     data: {
                         id: stickyRuleID
                     },
-                    success: function(json) {
+                    success: function (json) {
                         cloudStack.ui.notifications.add({
                                 desc: 'Remove previous LB sticky rule',
                                 section: 'Network',
@@ -289,7 +272,7 @@
                             error, {}
                         );
                     },
-                    error: function(json) {
+                    error: function (json) {
                         complete();
                         cloudStack.dialog.notice({
                             message: parseXMLHttpResponse(json)
@@ -297,8 +280,8 @@
                     }
                 });
             },
-            recreate: function(stickyRuleID, lbRuleID, data, complete, error) {
-                var addStickyPolicy = function() {
+            recreate: function (stickyRuleID, lbRuleID, data, complete, error) {
+                var addStickyPolicy = function () {
                     cloudStack.lbStickyPolicy.actions.add(
                         lbRuleID,
                         data,

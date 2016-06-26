@@ -1,26 +1,29 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.network.element;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.*;
+import com.cloud.agent.api.ConfigurePortForwardingRulesOnLogicalRouterAnswer;
+import com.cloud.agent.api.ConfigurePortForwardingRulesOnLogicalRouterCommand;
+import com.cloud.agent.api.ConfigurePublicIpsOnLogicalRouterAnswer;
+import com.cloud.agent.api.ConfigurePublicIpsOnLogicalRouterCommand;
+import com.cloud.agent.api.ConfigureStaticNatRulesOnLogicalRouterAnswer;
+import com.cloud.agent.api.ConfigureStaticNatRulesOnLogicalRouterCommand;
+import com.cloud.agent.api.CreateLogicalRouterAnswer;
+import com.cloud.agent.api.CreateLogicalRouterCommand;
+import com.cloud.agent.api.CreateLogicalSwitchPortAnswer;
+import com.cloud.agent.api.CreateLogicalSwitchPortCommand;
+import com.cloud.agent.api.DeleteLogicalRouterAnswer;
+import com.cloud.agent.api.DeleteLogicalRouterCommand;
+import com.cloud.agent.api.DeleteLogicalSwitchPortAnswer;
+import com.cloud.agent.api.DeleteLogicalSwitchPortCommand;
+import com.cloud.agent.api.FindLogicalSwitchPortAnswer;
+import com.cloud.agent.api.FindLogicalSwitchPortCommand;
+import com.cloud.agent.api.StartupCommand;
+import com.cloud.agent.api.StartupNiciraNvpCommand;
+import com.cloud.agent.api.UpdateLogicalSwitchPortCommand;
 import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.agent.api.to.StaticNatRuleTO;
 import com.cloud.api.ApiDBUtils;
@@ -33,21 +36,49 @@ import com.cloud.configuration.ConfigurationManager;
 import com.cloud.dc.Vlan;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.deploy.DeployDestination;
-import com.cloud.exception.*;
+import com.cloud.exception.ConcurrentOperationException;
+import com.cloud.exception.IllegalVirtualMachineException;
+import com.cloud.exception.InsufficientCapacityException;
+import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.exception.NicPreparationException;
+import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.host.DetailVO;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostDetailsDao;
-import com.cloud.network.*;
+import com.cloud.network.IpAddress;
+import com.cloud.network.IpAddressManager;
+import com.cloud.network.Network;
+import com.cloud.network.NetworkModel;
+import com.cloud.network.Networks;
 import com.cloud.network.Networks.BroadcastDomainType;
+import com.cloud.network.NiciraNvpDeviceVO;
+import com.cloud.network.NiciraNvpNicMappingVO;
+import com.cloud.network.NiciraNvpRouterMappingVO;
+import com.cloud.network.PhysicalNetwork;
+import com.cloud.network.PhysicalNetworkServiceProvider;
+import com.cloud.network.PublicIpAddress;
 import com.cloud.network.addr.PublicIp;
-import com.cloud.network.dao.*;
+import com.cloud.network.dao.NetworkDao;
+import com.cloud.network.dao.NetworkServiceMapDao;
+import com.cloud.network.dao.NetworkVO;
+import com.cloud.network.dao.NiciraNvpDao;
+import com.cloud.network.dao.NiciraNvpNicMappingDao;
+import com.cloud.network.dao.NiciraNvpRouterMappingDao;
+import com.cloud.network.dao.PhysicalNetworkDao;
+import com.cloud.network.dao.PhysicalNetworkServiceProviderDao;
+import com.cloud.network.dao.PhysicalNetworkServiceProviderVO;
+import com.cloud.network.dao.PhysicalNetworkVO;
 import com.cloud.network.resource.NiciraNvpResource;
 import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.StaticNat;
 import com.cloud.offering.NetworkOffering;
-import com.cloud.resource.*;
+import com.cloud.resource.ResourceManager;
+import com.cloud.resource.ResourceState;
+import com.cloud.resource.ResourceStateAdapter;
+import com.cloud.resource.ServerResource;
+import com.cloud.resource.UnableDeleteHostException;
 import com.cloud.user.Account;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.db.DB;
@@ -63,14 +94,21 @@ import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.network.ExternalNetworkDeviceManager.NetworkDevice;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 @Component
 public class NiciraNvpElement extends AdapterBase implements ConnectivityProvider, SourceNatServiceProvider, PortForwardingServiceProvider, StaticNatServiceProvider,
@@ -118,6 +156,30 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
     @Inject
     protected IpAddressManager ipAddrMgr;
 
+    private static Map<Network.Service, Map<Network.Capability, String>> setCapabilities() {
+        final Map<Network.Service, Map<Network.Capability, String>> capabilities = new HashMap<>();
+
+        // L2 Support : SDN provisioning
+        capabilities.put(Network.Service.Connectivity, null);
+
+        // L3 Support : Generic?
+        capabilities.put(Network.Service.Gateway, null);
+
+        // L3 Support : SourceNat
+        final Map<Network.Capability, String> sourceNatCapabilities = new HashMap<>();
+        sourceNatCapabilities.put(Network.Capability.SupportedSourceNatTypes, "peraccount");
+        sourceNatCapabilities.put(Network.Capability.RedundantRouter, "false");
+        capabilities.put(Network.Service.SourceNat, sourceNatCapabilities);
+
+        // L3 Support : Port Forwarding
+        capabilities.put(Network.Service.PortForwarding, null);
+
+        // L3 support : StaticNat
+        capabilities.put(Network.Service.StaticNat, null);
+
+        return capabilities;
+    }
+
     @Override
     public Map<Network.Service, Map<Network.Capability, String>> getCapabilities() {
         return capabilities;
@@ -128,34 +190,9 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
         return Network.Provider.NiciraNvp;
     }
 
-    protected boolean canHandle(final Network network, final Network.Service service) {
-        s_logger.debug("Checking if NiciraNvpElement can handle service " + service.getName() + " on network " + network.getDisplayText());
-        if (network.getBroadcastDomainType() != BroadcastDomainType.Lswitch) {
-            return false;
-        }
-
-        if (!networkModel.isProviderForNetwork(getProvider(), network.getId())) {
-            s_logger.debug("NiciraNvpElement is not a provider for network " + network.getDisplayText());
-            return false;
-        }
-
-        if (!ntwkSrvcDao.canProviderSupportServiceInNetwork(network.getId(), service, Network.Provider.NiciraNvp)) {
-            s_logger.debug("NiciraNvpElement can't provide the " + service.getName() + " service on network " + network.getDisplayText());
-            return false;
-        }
-
-        return true;
-    }
-
     @Override
-    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        super.configure(name, params);
-        resourceMgr.registerResourceStateAdapter(name, this);
-        return true;
-    }
-
-    @Override
-    public boolean implement(final Network network, final NetworkOffering offering, final DeployDestination dest, final ReservationContext context) throws ConcurrentOperationException,
+    public boolean implement(final Network network, final NetworkOffering offering, final DeployDestination dest, final ReservationContext context) throws
+            ConcurrentOperationException,
             ResourceUnavailableException, InsufficientCapacityException {
         s_logger.debug("entering NiciraNvpElement implement function for network " + network.getDisplayText() + " (state " + network.getState() + ")");
 
@@ -219,6 +256,25 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
             // Store the uuid so we can easily find it during cleanup
             final NiciraNvpRouterMappingVO routermapping = new NiciraNvpRouterMappingVO(answer.getLogicalRouterUuid(), network.getId());
             niciraNvpRouterMappingDao.persist(routermapping);
+        }
+
+        return true;
+    }
+
+    protected boolean canHandle(final Network network, final Network.Service service) {
+        s_logger.debug("Checking if NiciraNvpElement can handle service " + service.getName() + " on network " + network.getDisplayText());
+        if (network.getBroadcastDomainType() != BroadcastDomainType.Lswitch) {
+            return false;
+        }
+
+        if (!networkModel.isProviderForNetwork(getProvider(), network.getId())) {
+            s_logger.debug("NiciraNvpElement is not a provider for network " + network.getDisplayText());
+            return false;
+        }
+
+        if (!ntwkSrvcDao.canProviderSupportServiceInNetwork(network.getId(), service, Network.Provider.NiciraNvp)) {
+            s_logger.debug("NiciraNvpElement can't provide the " + service.getName() + " service on network " + network.getDisplayText());
+            return false;
         }
 
         return true;
@@ -403,28 +459,11 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
         return true;
     }
 
-    private static Map<Network.Service, Map<Network.Capability, String>> setCapabilities() {
-        final Map<Network.Service, Map<Network.Capability, String>> capabilities = new HashMap<>();
-
-        // L2 Support : SDN provisioning
-        capabilities.put(Network.Service.Connectivity, null);
-
-        // L3 Support : Generic?
-        capabilities.put(Network.Service.Gateway, null);
-
-        // L3 Support : SourceNat
-        final Map<Network.Capability, String> sourceNatCapabilities = new HashMap<>();
-        sourceNatCapabilities.put(Network.Capability.SupportedSourceNatTypes, "peraccount");
-        sourceNatCapabilities.put(Network.Capability.RedundantRouter, "false");
-        capabilities.put(Network.Service.SourceNat, sourceNatCapabilities);
-
-        // L3 Support : Port Forwarding
-        capabilities.put(Network.Service.PortForwarding, null);
-
-        // L3 support : StaticNat
-        capabilities.put(Network.Service.StaticNat, null);
-
-        return capabilities;
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+        super.configure(name, params);
+        resourceMgr.registerResourceStateAdapter(name, this);
+        return true;
     }
 
     @Override
@@ -569,33 +608,6 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
     }
 
     @Override
-    public List<NiciraNvpDeviceVO> listNiciraNvpDevices(final ListNiciraNvpDevicesCmd cmd) {
-        final Long physicalNetworkId = cmd.getPhysicalNetworkId();
-        final Long niciraNvpDeviceId = cmd.getNiciraNvpDeviceId();
-        List<NiciraNvpDeviceVO> responseList = new ArrayList<>();
-
-        if (physicalNetworkId == null && niciraNvpDeviceId == null) {
-            throw new InvalidParameterValueException("Either physical network Id or nicira device Id must be specified");
-        }
-
-        if (niciraNvpDeviceId != null) {
-            final NiciraNvpDeviceVO niciraNvpDevice = niciraNvpDao.findById(niciraNvpDeviceId);
-            if (niciraNvpDevice == null) {
-                throw new InvalidParameterValueException("Could not find Nicira Nvp device with id: " + niciraNvpDevice);
-            }
-            responseList.add(niciraNvpDevice);
-        } else {
-            final PhysicalNetworkVO physicalNetwork = physicalNetworkDao.findById(physicalNetworkId);
-            if (physicalNetwork == null) {
-                throw new InvalidParameterValueException("Could not find a physical network with id: " + physicalNetworkId);
-            }
-            responseList = niciraNvpDao.listByPhysicalNetwork(physicalNetworkId);
-        }
-
-        return responseList;
-    }
-
-    @Override
     public List<? extends Network> listNiciraNvpDeviceNetworks(final ListNiciraNvpDeviceNetworksCmd cmd) {
         final Long niciraDeviceId = cmd.getNiciraNvpDeviceId();
         final NiciraNvpDeviceVO niciraNvpDevice = niciraNvpDao.findById(niciraDeviceId);
@@ -629,13 +641,41 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
     }
 
     @Override
+    public List<NiciraNvpDeviceVO> listNiciraNvpDevices(final ListNiciraNvpDevicesCmd cmd) {
+        final Long physicalNetworkId = cmd.getPhysicalNetworkId();
+        final Long niciraNvpDeviceId = cmd.getNiciraNvpDeviceId();
+        List<NiciraNvpDeviceVO> responseList = new ArrayList<>();
+
+        if (physicalNetworkId == null && niciraNvpDeviceId == null) {
+            throw new InvalidParameterValueException("Either physical network Id or nicira device Id must be specified");
+        }
+
+        if (niciraNvpDeviceId != null) {
+            final NiciraNvpDeviceVO niciraNvpDevice = niciraNvpDao.findById(niciraNvpDeviceId);
+            if (niciraNvpDevice == null) {
+                throw new InvalidParameterValueException("Could not find Nicira Nvp device with id: " + niciraNvpDevice);
+            }
+            responseList.add(niciraNvpDevice);
+        } else {
+            final PhysicalNetworkVO physicalNetwork = physicalNetworkDao.findById(physicalNetworkId);
+            if (physicalNetwork == null) {
+                throw new InvalidParameterValueException("Could not find a physical network with id: " + physicalNetworkId);
+            }
+            responseList = niciraNvpDao.listByPhysicalNetwork(physicalNetworkId);
+        }
+
+        return responseList;
+    }
+
+    @Override
     public HostVO createHostVOForConnectedAgent(final HostVO host, final StartupCommand[] cmd) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public HostVO createHostVOForDirectConnectAgent(final HostVO host, final StartupCommand[] startup, final ServerResource resource, final Map<String, String> details, final List<String> hostTags) {
+    public HostVO createHostVOForDirectConnectAgent(final HostVO host, final StartupCommand[] startup, final ServerResource resource, final Map<String, String> details, final
+    List<String> hostTags) {
         if (!(startup[0] instanceof StartupNiciraNvpCommand)) {
             return null;
         }
@@ -786,5 +826,4 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
 
         return answer.getResult();
     }
-
 }

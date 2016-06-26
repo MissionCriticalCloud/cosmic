@@ -1,47 +1,27 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.query.dao;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
 
 import com.cloud.api.ApiResponseHelper;
 import com.cloud.api.query.vo.AffinityGroupJoinVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.affinity.AffinityGroup;
 import org.apache.cloudstack.affinity.AffinityGroupResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AffinityGroupJoinDaoImpl extends GenericDaoBase<AffinityGroupJoinVO, Long> implements AffinityGroupJoinDao {
     public static final Logger s_logger = LoggerFactory.getLogger(AffinityGroupJoinDaoImpl.class);
-
+    private final SearchBuilder<AffinityGroupJoinVO> agSearch;
+    private final SearchBuilder<AffinityGroupJoinVO> agIdSearch;
     @Inject
     private ConfigurationDao _configDao;
-
-    private final SearchBuilder<AffinityGroupJoinVO> agSearch;
-
-    private final SearchBuilder<AffinityGroupJoinVO> agIdSearch;
 
     protected AffinityGroupJoinDaoImpl() {
 
@@ -57,8 +37,8 @@ public class AffinityGroupJoinDaoImpl extends GenericDaoBase<AffinityGroupJoinVO
     }
 
     @Override
-    public AffinityGroupResponse newAffinityGroupResponse(AffinityGroupJoinVO vag) {
-        AffinityGroupResponse agResponse = new AffinityGroupResponse();
+    public AffinityGroupResponse newAffinityGroupResponse(final AffinityGroupJoinVO vag) {
+        final AffinityGroupResponse agResponse = new AffinityGroupResponse();
         agResponse.setId(vag.getUuid());
         agResponse.setName(vag.getName());
         agResponse.setDescription(vag.getDescription());
@@ -67,9 +47,9 @@ public class AffinityGroupJoinDaoImpl extends GenericDaoBase<AffinityGroupJoinVO
         ApiResponseHelper.populateOwner(agResponse, vag);
 
         // update vm information
-        long instanceId = vag.getVmId();
+        final long instanceId = vag.getVmId();
         if (instanceId > 0) {
-            List<String> vmIdList = new ArrayList<String>();
+            final List<String> vmIdList = new ArrayList<>();
             vmIdList.add(vag.getVmUuid());
             agResponse.setVMIdList(vmIdList);
         }
@@ -79,9 +59,9 @@ public class AffinityGroupJoinDaoImpl extends GenericDaoBase<AffinityGroupJoinVO
     }
 
     @Override
-    public AffinityGroupResponse setAffinityGroupResponse(AffinityGroupResponse vagData, AffinityGroupJoinVO vag) {
+    public AffinityGroupResponse setAffinityGroupResponse(final AffinityGroupResponse vagData, final AffinityGroupJoinVO vag) {
         // update vm information
-        long instanceId = vag.getVmId();
+        final long instanceId = vag.getVmId();
         if (instanceId > 0) {
             vagData.addVMId(vag.getVmUuid());
         }
@@ -89,34 +69,34 @@ public class AffinityGroupJoinDaoImpl extends GenericDaoBase<AffinityGroupJoinVO
     }
 
     @Override
-    public List<AffinityGroupJoinVO> newAffinityGroupView(AffinityGroup ag) {
+    public List<AffinityGroupJoinVO> newAffinityGroupView(final AffinityGroup ag) {
 
-        SearchCriteria<AffinityGroupJoinVO> sc = agIdSearch.create();
+        final SearchCriteria<AffinityGroupJoinVO> sc = agIdSearch.create();
         sc.setParameters("id", ag.getId());
         return searchIncludingRemoved(sc, null, null, false);
     }
 
     @Override
-    public List<AffinityGroupJoinVO> searchByIds(Long... agIds) {
+    public List<AffinityGroupJoinVO> searchByIds(final Long... agIds) {
         // set detail batch query size
         int DETAILS_BATCH_SIZE = 2000;
-        String batchCfg = _configDao.getValue("detail.batch.query.size");
+        final String batchCfg = _configDao.getValue("detail.batch.query.size");
         if (batchCfg != null) {
             DETAILS_BATCH_SIZE = Integer.parseInt(batchCfg);
         }
         // query details by batches
-        List<AffinityGroupJoinVO> uvList = new ArrayList<AffinityGroupJoinVO>();
+        final List<AffinityGroupJoinVO> uvList = new ArrayList<>();
         // query details by batches
         int curr_index = 0;
         if (agIds.length > DETAILS_BATCH_SIZE) {
             while ((curr_index + DETAILS_BATCH_SIZE) <= agIds.length) {
-                Long[] ids = new Long[DETAILS_BATCH_SIZE];
+                final Long[] ids = new Long[DETAILS_BATCH_SIZE];
                 for (int k = 0, j = curr_index; j < curr_index + DETAILS_BATCH_SIZE; j++, k++) {
                     ids[k] = agIds[j];
                 }
-                SearchCriteria<AffinityGroupJoinVO> sc = agSearch.create();
+                final SearchCriteria<AffinityGroupJoinVO> sc = agSearch.create();
                 sc.setParameters("idIN", ids);
-                List<AffinityGroupJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
+                final List<AffinityGroupJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
                 if (vms != null) {
                     uvList.addAll(vms);
                 }
@@ -124,15 +104,15 @@ public class AffinityGroupJoinDaoImpl extends GenericDaoBase<AffinityGroupJoinVO
             }
         }
         if (curr_index < agIds.length) {
-            int batch_size = (agIds.length - curr_index);
+            final int batch_size = (agIds.length - curr_index);
             // set the ids value
-            Long[] ids = new Long[batch_size];
+            final Long[] ids = new Long[batch_size];
             for (int k = 0, j = curr_index; j < curr_index + batch_size; j++, k++) {
                 ids[k] = agIds[j];
             }
-            SearchCriteria<AffinityGroupJoinVO> sc = agSearch.create();
+            final SearchCriteria<AffinityGroupJoinVO> sc = agSearch.create();
             sc.setParameters("idIN", ids);
-            List<AffinityGroupJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
+            final List<AffinityGroupJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
             if (vms != null) {
                 uvList.addAll(vms);
             }

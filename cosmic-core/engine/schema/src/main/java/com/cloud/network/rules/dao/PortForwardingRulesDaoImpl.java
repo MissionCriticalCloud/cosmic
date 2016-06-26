@@ -1,24 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.rules.dao;
-
-import java.util.List;
-
-import javax.inject.Inject;
 
 import com.cloud.network.dao.FirewallRulesCidrsDao;
 import com.cloud.network.rules.FirewallRule.Purpose;
@@ -28,6 +8,9 @@ import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
+
+import javax.inject.Inject;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -82,8 +65,8 @@ public class PortForwardingRulesDaoImpl extends GenericDaoBase<PortForwardingRul
     }
 
     @Override
-    public List<PortForwardingRuleVO> listForApplication(long ipId) {
-        SearchCriteria<PortForwardingRuleVO> sc = ApplicationSearch.create();
+    public List<PortForwardingRuleVO> listForApplication(final long ipId) {
+        final SearchCriteria<PortForwardingRuleVO> sc = ApplicationSearch.create();
         sc.setParameters("ipId", ipId);
         sc.setParameters("state", State.Staged);
         sc.setParameters("purpose", Purpose.PortForwarding);
@@ -92,8 +75,37 @@ public class PortForwardingRulesDaoImpl extends GenericDaoBase<PortForwardingRul
     }
 
     @Override
-    public List<PortForwardingRuleVO> listByVm(Long vmId) {
-        SearchCriteria<PortForwardingRuleVO> sc = AllRulesSearchByVM.create();
+    public List<PortForwardingRuleVO> listByIpAndNotRevoked(final long ipId) {
+        final SearchCriteria<PortForwardingRuleVO> sc = ActiveRulesSearch.create();
+        sc.setParameters("ipId", ipId);
+        sc.setParameters("state", State.Revoke);
+        sc.setParameters("purpose", Purpose.PortForwarding);
+
+        return listBy(sc, null);
+    }
+
+    @Override
+    public List<PortForwardingRuleVO> listByNetworkAndNotRevoked(final long networkId) {
+        final SearchCriteria<PortForwardingRuleVO> sc = ActiveRulesSearch.create();
+        sc.setParameters("networkId", networkId);
+        sc.setParameters("state", State.Revoke);
+        sc.setParameters("purpose", Purpose.PortForwarding);
+
+        return listBy(sc, null);
+    }
+
+    @Override
+    public List<PortForwardingRuleVO> listByIp(final long ipId) {
+        final SearchCriteria<PortForwardingRuleVO> sc = AllFieldsSearch.create();
+        sc.setParameters("ipId", ipId);
+        sc.setParameters("purpose", Purpose.PortForwarding);
+
+        return listBy(sc, null);
+    }
+
+    @Override
+    public List<PortForwardingRuleVO> listByVm(final Long vmId) {
+        final SearchCriteria<PortForwardingRuleVO> sc = AllRulesSearchByVM.create();
         sc.setParameters("vmId", vmId);
         sc.setParameters("purpose", Purpose.PortForwarding);
 
@@ -101,37 +113,8 @@ public class PortForwardingRulesDaoImpl extends GenericDaoBase<PortForwardingRul
     }
 
     @Override
-    public List<PortForwardingRuleVO> listByIpAndNotRevoked(long ipId) {
-        SearchCriteria<PortForwardingRuleVO> sc = ActiveRulesSearch.create();
-        sc.setParameters("ipId", ipId);
-        sc.setParameters("state", State.Revoke);
-        sc.setParameters("purpose", Purpose.PortForwarding);
-
-        return listBy(sc, null);
-    }
-
-    @Override
-    public List<PortForwardingRuleVO> listByNetworkAndNotRevoked(long networkId) {
-        SearchCriteria<PortForwardingRuleVO> sc = ActiveRulesSearch.create();
-        sc.setParameters("networkId", networkId);
-        sc.setParameters("state", State.Revoke);
-        sc.setParameters("purpose", Purpose.PortForwarding);
-
-        return listBy(sc, null);
-    }
-
-    @Override
-    public List<PortForwardingRuleVO> listByIp(long ipId) {
-        SearchCriteria<PortForwardingRuleVO> sc = AllFieldsSearch.create();
-        sc.setParameters("ipId", ipId);
-        sc.setParameters("purpose", Purpose.PortForwarding);
-
-        return listBy(sc, null);
-    }
-
-    @Override
-    public List<PortForwardingRuleVO> listByNetwork(long networkId) {
-        SearchCriteria<PortForwardingRuleVO> sc = AllFieldsSearch.create();
+    public List<PortForwardingRuleVO> listByNetwork(final long networkId) {
+        final SearchCriteria<PortForwardingRuleVO> sc = AllFieldsSearch.create();
         sc.setParameters("networkId", networkId);
         sc.setParameters("purpose", Purpose.PortForwarding);
 
@@ -139,8 +122,8 @@ public class PortForwardingRulesDaoImpl extends GenericDaoBase<PortForwardingRul
     }
 
     @Override
-    public List<PortForwardingRuleVO> listByAccount(long accountId) {
-        SearchCriteria<PortForwardingRuleVO> sc = ActiveRulesSearchByAccount.create();
+    public List<PortForwardingRuleVO> listByAccount(final long accountId) {
+        final SearchCriteria<PortForwardingRuleVO> sc = ActiveRulesSearchByAccount.create();
         sc.setParameters("accountId", accountId);
         sc.setParameters("state", State.Revoke);
         sc.setParameters("purpose", Purpose.PortForwarding);
@@ -149,25 +132,25 @@ public class PortForwardingRulesDaoImpl extends GenericDaoBase<PortForwardingRul
     }
 
     @Override
-    public List<PortForwardingRuleVO> listByDestIpAddr(String ip4Address) {
-        SearchCriteria<PortForwardingRuleVO> sc = AllFieldsSearch.create();
+    public List<PortForwardingRuleVO> listByDestIpAddr(final String ip4Address) {
+        final SearchCriteria<PortForwardingRuleVO> sc = AllFieldsSearch.create();
         sc.setParameters("dstIp", ip4Address);
         return listBy(sc);
     }
 
     @Override
-    public List<PortForwardingRuleVO> listByNetworkAndDestIpAddr(String ip4Address, long networkId) {
-        SearchCriteria<PortForwardingRuleVO> sc = AllFieldsSearch.create();
-        sc.setParameters("dstIp", ip4Address);
-        sc.setParameters("networkId", networkId);
-        return listBy(sc);
-    }
-
-    @Override
-    public PortForwardingRuleVO findByIdAndIp(long id, String secondaryIp) {
-        SearchCriteria<PortForwardingRuleVO> sc = AllFieldsSearch.create();
+    public PortForwardingRuleVO findByIdAndIp(final long id, final String secondaryIp) {
+        final SearchCriteria<PortForwardingRuleVO> sc = AllFieldsSearch.create();
         sc.setParameters("id", id);
         sc.setParameters("dstIp", secondaryIp);
         return findOneBy(sc);
+    }
+
+    @Override
+    public List<PortForwardingRuleVO> listByNetworkAndDestIpAddr(final String ip4Address, final long networkId) {
+        final SearchCriteria<PortForwardingRuleVO> sc = AllFieldsSearch.create();
+        sc.setParameters("dstIp", ip4Address);
+        sc.setParameters("networkId", networkId);
+        return listBy(sc);
     }
 }

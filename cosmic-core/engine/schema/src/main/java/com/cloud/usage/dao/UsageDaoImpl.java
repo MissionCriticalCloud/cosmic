@@ -1,28 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.usage.dao;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
 
 import com.cloud.usage.UsageVO;
 import com.cloud.user.AccountVO;
@@ -40,6 +16,14 @@ import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -47,39 +31,39 @@ import org.springframework.stereotype.Component;
 @Component
 public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements UsageDao {
     public static final Logger s_logger = LoggerFactory.getLogger(UsageDaoImpl.class.getName());
+    protected final static TimeZone s_gmtTimeZone = TimeZone.getTimeZone("GMT");
     private static final String DELETE_ALL = "DELETE FROM cloud_usage";
     private static final String DELETE_ALL_BY_ACCOUNTID = "DELETE FROM cloud_usage WHERE account_id = ?";
     private static final String DELETE_ALL_BY_INTERVAL = "DELETE FROM cloud_usage WHERE end_date < DATE_SUB(CURRENT_DATE(), INTERVAL ? DAY)";
     private static final String INSERT_ACCOUNT = "INSERT INTO cloud_usage.account (id, account_name, type, domain_id, removed, cleanup_needed) VALUES (?,?,?,?,?,?)";
-    private static final String INSERT_USER_STATS = "INSERT INTO cloud_usage.user_statistics (id, data_center_id, account_id, public_ip_address, device_id, device_type, network_id, net_bytes_received,"
+    private static final String INSERT_USER_STATS = "INSERT INTO cloud_usage.user_statistics (id, data_center_id, account_id, public_ip_address, device_id, device_type, " +
+            "network_id, net_bytes_received,"
             + " net_bytes_sent, current_bytes_received, current_bytes_sent, agg_bytes_received, agg_bytes_sent) VALUES (?,?,?,?,?,?,?,?,?,?, ?, ?, ?)";
-
     private static final String UPDATE_ACCOUNT = "UPDATE cloud_usage.account SET account_name=?, removed=? WHERE id=?";
-    private static final String UPDATE_USER_STATS = "UPDATE cloud_usage.user_statistics SET net_bytes_received=?, net_bytes_sent=?, current_bytes_received=?, current_bytes_sent=?, agg_bytes_received=?, agg_bytes_sent=? WHERE id=?";
-
+    private static final String UPDATE_USER_STATS = "UPDATE cloud_usage.user_statistics SET net_bytes_received=?, net_bytes_sent=?, current_bytes_received=?, " +
+            "current_bytes_sent=?, agg_bytes_received=?, agg_bytes_sent=? WHERE id=?";
     private static final String GET_LAST_ACCOUNT = "SELECT id FROM cloud_usage.account ORDER BY id DESC LIMIT 1";
     private static final String GET_LAST_USER_STATS = "SELECT id FROM cloud_usage.user_statistics ORDER BY id DESC LIMIT 1";
     private static final String GET_PUBLIC_TEMPLATES_BY_ACCOUNTID = "SELECT id FROM cloud.vm_template WHERE account_id = ? AND public = '1' AND removed IS NULL";
-
     private static final String GET_LAST_VM_DISK_STATS = "SELECT id FROM cloud_usage.vm_disk_statistics ORDER BY id DESC LIMIT 1";
-    private static final String INSERT_VM_DISK_STATS = "INSERT INTO cloud_usage.vm_disk_statistics (id, data_center_id, account_id, vm_id, volume_id, net_io_read, net_io_write, current_io_read, "
+    private static final String INSERT_VM_DISK_STATS = "INSERT INTO cloud_usage.vm_disk_statistics (id, data_center_id, account_id, vm_id, volume_id, net_io_read, net_io_write, " +
+            "current_io_read, "
             + "current_io_write, agg_io_read, agg_io_write, net_bytes_read, net_bytes_write, current_bytes_read, current_bytes_write, agg_bytes_read, agg_bytes_write) "
             + " VALUES (?,?,?,?,?,?,?,?,?,?, ?, ?, ?, ?,?, ?, ?)";
-    private static final String UPDATE_VM_DISK_STATS = "UPDATE cloud_usage.vm_disk_statistics SET net_io_read=?, net_io_write=?, current_io_read=?, current_io_write=?, agg_io_read=?, agg_io_write=?, "
+    private static final String UPDATE_VM_DISK_STATS = "UPDATE cloud_usage.vm_disk_statistics SET net_io_read=?, net_io_write=?, current_io_read=?, current_io_write=?, " +
+            "agg_io_read=?, agg_io_write=?, "
             + "net_bytes_read=?, net_bytes_write=?, current_bytes_read=?, current_bytes_write=?, agg_bytes_read=?, agg_bytes_write=?  WHERE id=?";
     private static final String INSERT_USAGE_RECORDS = "INSERT INTO cloud_usage.cloud_usage (zone_id, account_id, domain_id, description, usage_display, "
             + "usage_type, raw_usage, vm_instance_id, vm_name, offering_id, template_id, "
             + "usage_id, type, size, network_id, start_date, end_date, virtual_size) VALUES (?,?,?,?,?,?,?,?,?, ?, ?, ?,?,?,?,?,?,?)";
 
-    protected final static TimeZone s_gmtTimeZone = TimeZone.getTimeZone("GMT");
-
     public UsageDaoImpl() {
     }
 
     @Override
-    public void deleteRecordsForAccount(Long accountId) {
-        String sql = ((accountId == null) ? DELETE_ALL : DELETE_ALL_BY_ACCOUNTID);
-        TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
+    public void deleteRecordsForAccount(final Long accountId) {
+        final String sql = ((accountId == null) ? DELETE_ALL : DELETE_ALL_BY_ACCOUNTID);
+        final TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
         PreparedStatement pstmt = null;
         try {
             txn.start();
@@ -89,7 +73,7 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             }
             pstmt.executeUpdate();
             txn.commit();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             txn.rollback();
             s_logger.error("error retrieving usage vm instances for account id: " + accountId);
         } finally {
@@ -98,25 +82,25 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
     }
 
     @Override
-    public Pair<List<UsageVO>, Integer> searchAndCountAllRecords(SearchCriteria<UsageVO> sc, Filter filter) {
+    public Pair<List<UsageVO>, Integer> searchAndCountAllRecords(final SearchCriteria<UsageVO> sc, final Filter filter) {
         return listAndCountIncludingRemovedBy(sc, filter);
     }
 
     @Override
-    public void saveAccounts(List<AccountVO> accounts) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public void saveAccounts(final List<AccountVO> accounts) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
             txn.start();
-            String sql = INSERT_ACCOUNT;
+            final String sql = INSERT_ACCOUNT;
             PreparedStatement pstmt = null;
             pstmt = txn.prepareAutoCloseStatement(sql); // in reality I just want CLOUD_USAGE dataSource connection
-            for (AccountVO acct : accounts) {
+            for (final AccountVO acct : accounts) {
                 pstmt.setLong(1, acct.getId());
                 pstmt.setString(2, acct.getAccountName());
                 pstmt.setShort(3, acct.getType());
                 pstmt.setLong(4, acct.getDomainId());
 
-                Date removed = acct.getRemoved();
+                final Date removed = acct.getRemoved();
                 if (removed == null) {
                     pstmt.setString(5, null);
                 } else {
@@ -129,7 +113,7 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             }
             pstmt.executeBatch();
             txn.commit();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             txn.rollback();
             s_logger.error("error saving account to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
@@ -137,17 +121,17 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
     }
 
     @Override
-    public void updateAccounts(List<AccountVO> accounts) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public void updateAccounts(final List<AccountVO> accounts) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
             txn.start();
-            String sql = UPDATE_ACCOUNT;
+            final String sql = UPDATE_ACCOUNT;
             PreparedStatement pstmt = null;
             pstmt = txn.prepareAutoCloseStatement(sql); // in reality I just want CLOUD_USAGE dataSource connection
-            for (AccountVO acct : accounts) {
+            for (final AccountVO acct : accounts) {
                 pstmt.setString(1, acct.getAccountName());
 
-                Date removed = acct.getRemoved();
+                final Date removed = acct.getRemoved();
                 if (removed == null) {
                     pstmt.setString(2, null);
                 } else {
@@ -159,7 +143,7 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             }
             pstmt.executeBatch();
             txn.commit();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             txn.rollback();
             s_logger.error("error saving account to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
@@ -167,14 +151,14 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
     }
 
     @Override
-    public void saveUserStats(List<UserStatisticsVO> userStats) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public void saveUserStats(final List<UserStatisticsVO> userStats) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
             txn.start();
-            String sql = INSERT_USER_STATS;
+            final String sql = INSERT_USER_STATS;
             PreparedStatement pstmt = null;
             pstmt = txn.prepareAutoCloseStatement(sql); // in reality I just want CLOUD_USAGE dataSource connection
-            for (UserStatisticsVO userStat : userStats) {
+            for (final UserStatisticsVO userStat : userStats) {
                 pstmt.setLong(1, userStat.getId());
                 pstmt.setLong(2, userStat.getDataCenterId());
                 pstmt.setLong(3, userStat.getAccountId());
@@ -200,7 +184,7 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             }
             pstmt.executeBatch();
             txn.commit();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             txn.rollback();
             s_logger.error("error saving user stats to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
@@ -208,14 +192,14 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
     }
 
     @Override
-    public void updateUserStats(List<UserStatisticsVO> userStats) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public void updateUserStats(final List<UserStatisticsVO> userStats) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
             txn.start();
-            String sql = UPDATE_USER_STATS;
+            final String sql = UPDATE_USER_STATS;
             PreparedStatement pstmt = null;
             pstmt = txn.prepareAutoCloseStatement(sql); // in reality I just want CLOUD_USAGE dataSource connection
-            for (UserStatisticsVO userStat : userStats) {
+            for (final UserStatisticsVO userStat : userStats) {
                 pstmt.setLong(1, userStat.getNetBytesReceived());
                 pstmt.setLong(2, userStat.getNetBytesSent());
                 pstmt.setLong(3, userStat.getCurrentBytesReceived());
@@ -227,7 +211,7 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             }
             pstmt.executeBatch();
             txn.commit();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             txn.rollback();
             s_logger.error("error saving user stats to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
@@ -236,16 +220,16 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
 
     @Override
     public Long getLastAccountId() {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
-        String sql = GET_LAST_ACCOUNT;
+        final String sql = GET_LAST_ACCOUNT;
         try {
             pstmt = txn.prepareAutoCloseStatement(sql);
-            ResultSet rs = pstmt.executeQuery();
+            final ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 return Long.valueOf(rs.getLong(1));
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             s_logger.error("error getting last account id", ex);
         }
         return null;
@@ -253,35 +237,35 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
 
     @Override
     public Long getLastUserStatsId() {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
-        String sql = GET_LAST_USER_STATS;
+        final String sql = GET_LAST_USER_STATS;
         try {
             pstmt = txn.prepareAutoCloseStatement(sql);
-            ResultSet rs = pstmt.executeQuery();
+            final ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 return Long.valueOf(rs.getLong(1));
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             s_logger.error("error getting last user stats id", ex);
         }
         return null;
     }
 
     @Override
-    public List<Long> listPublicTemplatesByAccount(long accountId) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public List<Long> listPublicTemplatesByAccount(final long accountId) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
-        String sql = GET_PUBLIC_TEMPLATES_BY_ACCOUNTID;
-        List<Long> templateList = new ArrayList<Long>();
+        final String sql = GET_PUBLIC_TEMPLATES_BY_ACCOUNTID;
+        final List<Long> templateList = new ArrayList<>();
         try {
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, accountId);
-            ResultSet rs = pstmt.executeQuery();
+            final ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 templateList.add(Long.valueOf(rs.getLong(1)));
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             s_logger.error("error listing public templates", ex);
         }
         return templateList;
@@ -289,30 +273,30 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
 
     @Override
     public Long getLastVmDiskStatsId() {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
-        String sql = GET_LAST_VM_DISK_STATS;
+        final String sql = GET_LAST_VM_DISK_STATS;
         try {
             pstmt = txn.prepareAutoCloseStatement(sql);
-            ResultSet rs = pstmt.executeQuery();
+            final ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 return Long.valueOf(rs.getLong(1));
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             s_logger.error("error getting last vm disk stats id", ex);
         }
         return null;
     }
 
     @Override
-    public void updateVmDiskStats(List<VmDiskStatisticsVO> vmDiskStats) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public void updateVmDiskStats(final List<VmDiskStatisticsVO> vmDiskStats) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
             txn.start();
-            String sql = UPDATE_VM_DISK_STATS;
+            final String sql = UPDATE_VM_DISK_STATS;
             PreparedStatement pstmt = null;
             pstmt = txn.prepareAutoCloseStatement(sql); // in reality I just want CLOUD_USAGE dataSource connection
-            for (VmDiskStatisticsVO vmDiskStat : vmDiskStats) {
+            for (final VmDiskStatisticsVO vmDiskStat : vmDiskStats) {
                 pstmt.setLong(1, vmDiskStat.getNetIORead());
                 pstmt.setLong(2, vmDiskStat.getNetIOWrite());
                 pstmt.setLong(3, vmDiskStat.getCurrentIORead());
@@ -330,23 +314,22 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             }
             pstmt.executeBatch();
             txn.commit();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             txn.rollback();
             s_logger.error("error saving vm disk stats to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
         }
-
     }
 
     @Override
-    public void saveVmDiskStats(List<VmDiskStatisticsVO> vmDiskStats) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public void saveVmDiskStats(final List<VmDiskStatisticsVO> vmDiskStats) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
             txn.start();
-            String sql = INSERT_VM_DISK_STATS;
+            final String sql = INSERT_VM_DISK_STATS;
             PreparedStatement pstmt = null;
             pstmt = txn.prepareAutoCloseStatement(sql); // in reality I just want CLOUD_USAGE dataSource connection
-            for (VmDiskStatisticsVO vmDiskStat : vmDiskStats) {
+            for (final VmDiskStatisticsVO vmDiskStat : vmDiskStats) {
                 pstmt.setLong(1, vmDiskStat.getId());
                 pstmt.setLong(2, vmDiskStat.getDataCenterId());
                 pstmt.setLong(3, vmDiskStat.getAccountId());
@@ -376,23 +359,22 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             }
             pstmt.executeBatch();
             txn.commit();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             txn.rollback();
             s_logger.error("error saving vm disk stats to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
         }
-
     }
 
     @Override
-    public void saveUsageRecords(List<UsageVO> usageRecords) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public void saveUsageRecords(final List<UsageVO> usageRecords) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
             txn.start();
-            String sql = INSERT_USAGE_RECORDS;
+            final String sql = INSERT_USAGE_RECORDS;
             PreparedStatement pstmt = null;
             pstmt = txn.prepareAutoCloseStatement(sql); // in reality I just want CLOUD_USAGE dataSource connection
-            for (UsageVO usageRecord : usageRecords) {
+            for (final UsageVO usageRecord : usageRecords) {
                 pstmt.setLong(1, usageRecord.getZoneId());
                 pstmt.setLong(2, usageRecord.getAccountId());
                 pstmt.setLong(3, usageRecord.getDomainId());
@@ -443,7 +425,7 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             }
             pstmt.executeBatch();
             txn.commit();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             txn.rollback();
             s_logger.error("error saving usage records to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
@@ -451,9 +433,9 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
     }
 
     @Override
-    public void removeOldUsageRecords(int days) {
-        String sql = DELETE_ALL_BY_INTERVAL;
-        TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
+    public void removeOldUsageRecords(final int days) {
+        final String sql = DELETE_ALL_BY_INTERVAL;
+        final TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.USAGE_DB);
         PreparedStatement pstmt = null;
         try {
             txn.start();
@@ -461,7 +443,7 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             pstmt.setLong(1, days);
             pstmt.executeUpdate();
             txn.commit();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             txn.rollback();
             s_logger.error("error removing old cloud_usage records for interval: " + days);
         } finally {
@@ -485,9 +467,9 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
         return Transaction.execute(TransactionLegacy.USAGE_DB, new TransactionCallback<Pair<List<? extends UsageVO>, Integer>>() {
             @Override
             public Pair<List<? extends UsageVO>, Integer> doInTransaction(final TransactionStatus status) {
-                Pair<List<UsageVO>, Integer> usageRecords = new Pair<List<UsageVO>, Integer>(new ArrayList<UsageVO>(), 0);
-                Filter usageFilter = new Filter(UsageVO.class, "startDate", true, 0L, Long.MAX_VALUE);
-                QueryBuilder<UsageVO> qb = QueryBuilder.create(UsageVO.class);
+                Pair<List<UsageVO>, Integer> usageRecords = new Pair<>(new ArrayList<>(), 0);
+                final Filter usageFilter = new Filter(UsageVO.class, "startDate", true, 0L, Long.MAX_VALUE);
+                final QueryBuilder<UsageVO> qb = QueryBuilder.create(UsageVO.class);
                 if (accountId != -1) {
                     qb.and(qb.entity().getAccountId(), SearchCriteria.Op.EQ, accountId);
                 }
@@ -500,7 +482,7 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
                     s_logger.debug("Getting usage records" + usageFilter.getOrderBy());
                 }
                 usageRecords = searchAndCountAllRecords(qb.create(), usageFilter);
-                return new Pair<List<? extends UsageVO>, Integer>(usageRecords.first(), usageRecords.second());
+                return new Pair<>(usageRecords.first(), usageRecords.second());
             }
         });
     }

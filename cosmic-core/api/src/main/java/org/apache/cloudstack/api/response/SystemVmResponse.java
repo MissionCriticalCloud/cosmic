@@ -1,30 +1,14 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.Date;
 
 import com.cloud.serializer.Param;
 import com.cloud.vm.VirtualMachine;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.Date;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = VirtualMachine.class)
 public class SystemVmResponse extends BaseResponse {
@@ -151,7 +135,7 @@ public class SystemVmResponse extends BaseResponse {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -159,7 +143,7 @@ public class SystemVmResponse extends BaseResponse {
         return systemVmType;
     }
 
-    public void setSystemVmType(String systemVmType) {
+    public void setSystemVmType(final String systemVmType) {
         this.systemVmType = systemVmType;
     }
 
@@ -167,7 +151,7 @@ public class SystemVmResponse extends BaseResponse {
         return zoneId;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
@@ -175,7 +159,7 @@ public class SystemVmResponse extends BaseResponse {
         return zoneName;
     }
 
-    public void setZoneName(String zoneName) {
+    public void setZoneName(final String zoneName) {
         this.zoneName = zoneName;
     }
 
@@ -183,7 +167,7 @@ public class SystemVmResponse extends BaseResponse {
         return dns1;
     }
 
-    public void setDns1(String dns1) {
+    public void setDns1(final String dns1) {
         this.dns1 = dns1;
     }
 
@@ -191,7 +175,7 @@ public class SystemVmResponse extends BaseResponse {
         return dns2;
     }
 
-    public void setDns2(String dns2) {
+    public void setDns2(final String dns2) {
         this.dns2 = dns2;
     }
 
@@ -199,7 +183,7 @@ public class SystemVmResponse extends BaseResponse {
         return networkDomain;
     }
 
-    public void setNetworkDomain(String networkDomain) {
+    public void setNetworkDomain(final String networkDomain) {
         this.networkDomain = networkDomain;
     }
 
@@ -207,7 +191,7 @@ public class SystemVmResponse extends BaseResponse {
         return gateway;
     }
 
-    public void setGateway(String gateway) {
+    public void setGateway(final String gateway) {
         this.gateway = gateway;
     }
 
@@ -215,7 +199,7 @@ public class SystemVmResponse extends BaseResponse {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -223,7 +207,7 @@ public class SystemVmResponse extends BaseResponse {
         return podId;
     }
 
-    public void setPodId(String podId) {
+    public void setPodId(final String podId) {
         this.podId = podId;
     }
 
@@ -231,7 +215,7 @@ public class SystemVmResponse extends BaseResponse {
         return hostId;
     }
 
-    public void setHostId(String hostId) {
+    public void setHostId(final String hostId) {
         this.hostId = hostId;
     }
 
@@ -239,7 +223,7 @@ public class SystemVmResponse extends BaseResponse {
         return hostName;
     }
 
-    public void setHostName(String hostName) {
+    public void setHostName(final String hostName) {
         this.hostName = hostName;
     }
 
@@ -247,7 +231,7 @@ public class SystemVmResponse extends BaseResponse {
         return hypervisor;
     }
 
-    public void setHypervisor(String hypervisor) {
+    public void setHypervisor(final String hypervisor) {
         this.hypervisor = hypervisor;
     }
 
@@ -255,7 +239,7 @@ public class SystemVmResponse extends BaseResponse {
         return privateIp;
     }
 
-    public void setPrivateIp(String privateIp) {
+    public void setPrivateIp(final String privateIp) {
         this.privateIp = privateIp;
     }
 
@@ -263,7 +247,7 @@ public class SystemVmResponse extends BaseResponse {
         return privateMacAddress;
     }
 
-    public void setPrivateMacAddress(String privateMacAddress) {
+    public void setPrivateMacAddress(final String privateMacAddress) {
         this.privateMacAddress = privateMacAddress;
     }
 
@@ -271,7 +255,7 @@ public class SystemVmResponse extends BaseResponse {
         return privateNetmask;
     }
 
-    public void setPrivateNetmask(String privateNetmask) {
+    public void setPrivateNetmask(final String privateNetmask) {
         this.privateNetmask = privateNetmask;
     }
 
@@ -279,7 +263,7 @@ public class SystemVmResponse extends BaseResponse {
         return publicIp;
     }
 
-    public void setPublicIp(String publicIp) {
+    public void setPublicIp(final String publicIp) {
         this.publicIp = publicIp;
     }
 
@@ -287,7 +271,7 @@ public class SystemVmResponse extends BaseResponse {
         return publicMacAddress;
     }
 
-    public void setPublicMacAddress(String publicMacAddress) {
+    public void setPublicMacAddress(final String publicMacAddress) {
         this.publicMacAddress = publicMacAddress;
     }
 
@@ -295,7 +279,7 @@ public class SystemVmResponse extends BaseResponse {
         return publicNetmask;
     }
 
-    public void setPublicNetmask(String publicNetmask) {
+    public void setPublicNetmask(final String publicNetmask) {
         this.publicNetmask = publicNetmask;
     }
 
@@ -303,7 +287,7 @@ public class SystemVmResponse extends BaseResponse {
         return templateId;
     }
 
-    public void setTemplateId(String templateId) {
+    public void setTemplateId(final String templateId) {
         this.templateId = templateId;
     }
 
@@ -311,7 +295,7 @@ public class SystemVmResponse extends BaseResponse {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 
@@ -319,7 +303,7 @@ public class SystemVmResponse extends BaseResponse {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
@@ -327,7 +311,7 @@ public class SystemVmResponse extends BaseResponse {
         return activeViewerSessions;
     }
 
-    public void setActiveViewerSessions(Integer activeViewerSessions) {
+    public void setActiveViewerSessions(final Integer activeViewerSessions) {
         this.activeViewerSessions = activeViewerSessions;
     }
 
@@ -335,7 +319,7 @@ public class SystemVmResponse extends BaseResponse {
         return linkLocalIp;
     }
 
-    public void setLinkLocalIp(String linkLocalIp) {
+    public void setLinkLocalIp(final String linkLocalIp) {
         this.linkLocalIp = linkLocalIp;
     }
 
@@ -343,7 +327,7 @@ public class SystemVmResponse extends BaseResponse {
         return linkLocalMacAddress;
     }
 
-    public void setLinkLocalMacAddress(String linkLocalMacAddress) {
+    public void setLinkLocalMacAddress(final String linkLocalMacAddress) {
         this.linkLocalMacAddress = linkLocalMacAddress;
     }
 
@@ -351,7 +335,7 @@ public class SystemVmResponse extends BaseResponse {
         return linkLocalNetmask;
     }
 
-    public void setLinkLocalNetmask(String linkLocalNetmask) {
+    public void setLinkLocalNetmask(final String linkLocalNetmask) {
         this.linkLocalNetmask = linkLocalNetmask;
     }
 }

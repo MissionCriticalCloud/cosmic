@@ -1,33 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.vm.dao;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.dao.ResourceTagDao;
@@ -50,45 +21,33 @@ import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.UserVmData.NicData;
 import com.cloud.vm.dao.UserVmData.SecurityGroupData;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements UserVmDao {
     public static final Logger s_logger = LoggerFactory.getLogger(UserVmDaoImpl.class);
-
-    protected SearchBuilder<UserVmVO> AccountPodSearch;
-    protected SearchBuilder<UserVmVO> AccountDataCenterSearch;
-    protected SearchBuilder<UserVmVO> AccountSearch;
-    protected SearchBuilder<UserVmVO> HostSearch;
-    protected SearchBuilder<UserVmVO> LastHostSearch;
-    protected SearchBuilder<UserVmVO> HostUpSearch;
-    protected SearchBuilder<UserVmVO> HostRunningSearch;
-    protected SearchBuilder<UserVmVO> StateChangeSearch;
-    protected SearchBuilder<UserVmVO> AccountHostSearch;
-
-    protected SearchBuilder<UserVmVO> DestroySearch;
-    protected SearchBuilder<UserVmVO> AccountDataCenterVirtualSearch;
-    protected GenericSearchBuilder<UserVmVO, Long> CountByAccountPod;
-    protected GenericSearchBuilder<UserVmVO, Long> CountByAccount;
-    protected GenericSearchBuilder<UserVmVO, Long> PodsHavingVmsForAccount;
-
-    protected SearchBuilder<UserVmVO> UserVmSearch;
-    protected SearchBuilder<UserVmVO> UserVmByIsoSearch;
-    protected Attribute _updateTimeAttr;
-    // ResourceTagsDaoImpl _tagsDao = ComponentLocator.inject(ResourceTagsDaoImpl.class);
-    @Inject
-    ResourceTagDao _tagsDao;
-
     private static final String LIST_PODS_HAVING_VMS_FOR_ACCOUNT =
             "SELECT pod_id FROM cloud.vm_instance WHERE data_center_id = ? AND account_id = ? AND pod_id IS NOT NULL AND (state = 'Running' OR state = 'Stopped') "
                     + "GROUP BY pod_id HAVING count(id) > 0 ORDER BY count(id) DESC";
-
     private static final String VM_DETAILS = "select vm_instance.id, "
             + "account.id, account.account_name, account.type, domain.name, instance_group.id, instance_group.name,"
             + "data_center.id, data_center.name, data_center.is_security_group_enabled, host.id, host.name, "
             + "vm_template.id, vm_template.name, vm_template.display_text, iso.id, iso.name, "
             + "vm_template.enable_password, service_offering.id, disk_offering.name, storage_pool.id, storage_pool.pool_type, "
-            + "service_offering.cpu, service_offering.speed, service_offering.ram_size, volumes.id, volumes.device_id, volumes.volume_type, security_group.id, security_group.name, "
+            + "service_offering.cpu, service_offering.speed, service_offering.ram_size, volumes.id, volumes.device_id, volumes.volume_type, security_group.id, security_group" +
+            ".name, "
             + "security_group.description, nics.id, nics.ip4_address, nics.default_nic, nics.gateway, nics.network_id, nics.netmask, nics.mac_address, nics.broadcast_uri, " +
             "nics.isolation_uri, "
             + "networks.traffic_type, networks.guest_type, user_ip_address.id, user_ip_address.public_ip_address from vm_instance "
@@ -102,16 +61,35 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             + "left join storage_pool on volumes.pool_id=storage_pool.id " + "left join security_group_vm_map on vm_instance.id=security_group_vm_map.instance_id "
             + "left join security_group on security_group_vm_map.security_group_id=security_group.id " + "left join nics on vm_instance.id=nics.instance_id "
             + "left join networks on nics.network_id=networks.id " + "left join user_ip_address on user_ip_address.vm_id=vm_instance.id " + "where vm_instance.id in (";
-
-    private static final String VMS_DETAIL_BY_NAME = "select vm_instance.instance_name, vm_instance.vm_type, vm_instance.id , user_vm_details.value, user_vm_details.name from vm_instance "
-            + "left join user_vm_details on vm_instance.id = user_vm_details.vm_id where (user_vm_details.name is null or user_vm_details.name = ? ) and vm_instance.instance_name in (";
-
+    private static final String VMS_DETAIL_BY_NAME = "select vm_instance.instance_name, vm_instance.vm_type, vm_instance.id , user_vm_details.value, user_vm_details.name from " +
+            "vm_instance "
+            + "left join user_vm_details on vm_instance.id = user_vm_details.vm_id where (user_vm_details.name is null or user_vm_details.name = ? ) and vm_instance" +
+            ".instance_name in (";
     private static final int VM_DETAILS_BATCH_SIZE = 100;
-
+    protected SearchBuilder<UserVmVO> AccountPodSearch;
+    protected SearchBuilder<UserVmVO> AccountDataCenterSearch;
+    protected SearchBuilder<UserVmVO> AccountSearch;
+    protected SearchBuilder<UserVmVO> HostSearch;
+    protected SearchBuilder<UserVmVO> LastHostSearch;
+    protected SearchBuilder<UserVmVO> HostUpSearch;
+    protected SearchBuilder<UserVmVO> HostRunningSearch;
+    protected SearchBuilder<UserVmVO> StateChangeSearch;
+    protected SearchBuilder<UserVmVO> AccountHostSearch;
+    protected SearchBuilder<UserVmVO> DestroySearch;
+    protected SearchBuilder<UserVmVO> AccountDataCenterVirtualSearch;
+    protected GenericSearchBuilder<UserVmVO, Long> CountByAccountPod;
+    protected GenericSearchBuilder<UserVmVO, Long> CountByAccount;
+    protected GenericSearchBuilder<UserVmVO, Long> PodsHavingVmsForAccount;
+    protected SearchBuilder<UserVmVO> UserVmSearch;
+    protected SearchBuilder<UserVmVO> UserVmByIsoSearch;
+    protected Attribute _updateTimeAttr;
     @Inject
     protected UserVmDetailsDao _detailsDao;
     @Inject
     protected NicDao _nicDao;
+    // ResourceTagsDaoImpl _tagsDao = ComponentLocator.inject(ResourceTagsDaoImpl.class);
+    @Inject
+    ResourceTagDao _tagsDao;
 
     public UserVmDaoImpl() {
     }
@@ -182,7 +160,7 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
         CountByAccount.and("displayVm", CountByAccount.entity().isDisplayVm(), SearchCriteria.Op.EQ);
         CountByAccount.done();
 
-        SearchBuilder<NicVO> nicSearch = _nicDao.createSearchBuilder();
+        final SearchBuilder<NicVO> nicSearch = _nicDao.createSearchBuilder();
         nicSearch.and("networkId", nicSearch.entity().getNetworkId(), SearchCriteria.Op.EQ);
         nicSearch.and("ip4Address", nicSearch.entity().getIPv4Address(), SearchCriteria.Op.NNULL);
 
@@ -202,8 +180,15 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     }
 
     @Override
-    public List<UserVmVO> listByAccountAndPod(long accountId, long podId) {
-        SearchCriteria<UserVmVO> sc = AccountPodSearch.create();
+    public List<UserVmVO> listByAccountId(final long id) {
+        final SearchCriteria<UserVmVO> sc = AccountSearch.create();
+        sc.setParameters("account", id);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<UserVmVO> listByAccountAndPod(final long accountId, final long podId) {
+        final SearchCriteria<UserVmVO> sc = AccountPodSearch.create();
         sc.setParameters("account", accountId);
         sc.setParameters("pod", podId);
 
@@ -211,8 +196,8 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     }
 
     @Override
-    public List<UserVmVO> listByAccountAndDataCenter(long accountId, long dcId) {
-        SearchCriteria<UserVmVO> sc = AccountDataCenterSearch.create();
+    public List<UserVmVO> listByAccountAndDataCenter(final long accountId, final long dcId) {
+        final SearchCriteria<UserVmVO> sc = AccountDataCenterSearch.create();
         sc.setParameters("account", accountId);
         sc.setParameters("dc", dcId);
 
@@ -220,9 +205,33 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     }
 
     @Override
-    public void updateVM(long id, String displayName, boolean enable, Long osTypeId, String userData, boolean displayVm,
-            boolean isDynamicallyScalable, String customId, String hostName, String instanceName) {
-        UserVmVO vo = createForUpdate();
+    public List<UserVmVO> listByHostId(final Long id) {
+        final SearchCriteria<UserVmVO> sc = HostSearch.create();
+        sc.setParameters("host", id);
+
+        return listBy(sc);
+    }
+
+    @Override
+    public List<UserVmVO> listByLastHostId(final Long hostId) {
+        final SearchCriteria<UserVmVO> sc = LastHostSearch.create();
+        sc.setParameters("lastHost", hostId);
+        sc.setParameters("state", State.Stopped);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<UserVmVO> listUpByHostId(final Long hostId) {
+        final SearchCriteria<UserVmVO> sc = HostUpSearch.create();
+        sc.setParameters("host", hostId);
+        sc.setParameters("states", new Object[]{State.Destroyed, State.Stopped, State.Expunging});
+        return listBy(sc);
+    }
+
+    @Override
+    public void updateVM(final long id, final String displayName, final boolean enable, final Long osTypeId, final String userData, final boolean displayVm,
+                         final boolean isDynamicallyScalable, final String customId, final String hostName, final String instanceName) {
+        final UserVmVO vo = createForUpdate();
         vo.setDisplayName(displayName);
         vo.setHaEnabled(enable);
         vo.setGuestOSId(osTypeId);
@@ -235,7 +244,7 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
         if (customId != null) {
             vo.setUuid(customId);
         }
-        if(instanceName != null){
+        if (instanceName != null) {
             vo.setInstanceName(instanceName);
         }
 
@@ -243,8 +252,8 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     }
 
     @Override
-    public List<UserVmVO> findDestroyedVms(Date date) {
-        SearchCriteria<UserVmVO> sc = DestroySearch.create();
+    public List<UserVmVO> findDestroyedVms(final Date date) {
+        final SearchCriteria<UserVmVO> sc = DestroySearch.create();
         sc.setParameters("state", State.Destroyed, State.Expunging, State.Error);
         sc.setParameters("updateTime", date);
 
@@ -252,38 +261,8 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     }
 
     @Override
-    public List<UserVmVO> listByAccountId(long id) {
-        SearchCriteria<UserVmVO> sc = AccountSearch.create();
-        sc.setParameters("account", id);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<UserVmVO> listByHostId(Long id) {
-        SearchCriteria<UserVmVO> sc = HostSearch.create();
-        sc.setParameters("host", id);
-
-        return listBy(sc);
-    }
-
-    @Override
-    public List<UserVmVO> listByIsoId(Long isoId) {
-        SearchCriteria<UserVmVO> sc = UserVmByIsoSearch.create();
-        sc.setParameters("isoId", isoId);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<UserVmVO> listUpByHostId(Long hostId) {
-        SearchCriteria<UserVmVO> sc = HostUpSearch.create();
-        sc.setParameters("host", hostId);
-        sc.setParameters("states", new Object[] {State.Destroyed, State.Stopped, State.Expunging});
-        return listBy(sc);
-    }
-
-    @Override
-    public List<UserVmVO> listRunningByHostId(long hostId) {
-        SearchCriteria<UserVmVO> sc = HostRunningSearch.create();
+    public List<UserVmVO> listRunningByHostId(final long hostId) {
+        final SearchCriteria<UserVmVO> sc = HostRunningSearch.create();
         sc.setParameters("host", hostId);
         sc.setParameters("state", State.Running);
 
@@ -291,9 +270,9 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     }
 
     @Override
-    public List<UserVmVO> listVirtualNetworkInstancesByAcctAndNetwork(long accountId, long networkId) {
+    public List<UserVmVO> listVirtualNetworkInstancesByAcctAndNetwork(final long accountId, final long networkId) {
 
-        SearchCriteria<UserVmVO> sc = AccountDataCenterVirtualSearch.create();
+        final SearchCriteria<UserVmVO> sc = AccountDataCenterVirtualSearch.create();
         sc.setParameters("account", accountId);
         sc.setJoinParameters("nicSearch", "networkId", networkId);
 
@@ -301,9 +280,9 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     }
 
     @Override
-    public List<UserVmVO> listByNetworkIdAndStates(long networkId, State... states) {
+    public List<UserVmVO> listByNetworkIdAndStates(final long networkId, final State... states) {
         if (UserVmSearch == null) {
-            SearchBuilder<NicVO> nicSearch = _nicDao.createSearchBuilder();
+            final SearchBuilder<NicVO> nicSearch = _nicDao.createSearchBuilder();
             nicSearch.and("networkId", nicSearch.entity().getNetworkId(), SearchCriteria.Op.EQ);
             nicSearch.and("removed", nicSearch.entity().getRemoved(), SearchCriteria.Op.NULL);
             nicSearch.and().op("ip4Address", nicSearch.entity().getIPv4Address(), SearchCriteria.Op.NNULL);
@@ -316,9 +295,9 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             UserVmSearch.done();
         }
 
-        SearchCriteria<UserVmVO> sc = UserVmSearch.create();
+        final SearchCriteria<UserVmVO> sc = UserVmSearch.create();
         if (states != null && states.length != 0) {
-            sc.setParameters("states", (Object[])states);
+            sc.setParameters("states", (Object[]) states);
         }
         sc.setJoinParameters("nicSearch", "networkId", networkId);
 
@@ -326,35 +305,27 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     }
 
     @Override
-    public List<UserVmVO> listByLastHostId(Long hostId) {
-        SearchCriteria<UserVmVO> sc = LastHostSearch.create();
-        sc.setParameters("lastHost", hostId);
-        sc.setParameters("state", State.Stopped);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<UserVmVO> listByAccountIdAndHostId(long accountId, long hostId) {
-        SearchCriteria<UserVmVO> sc = AccountHostSearch.create();
+    public List<UserVmVO> listByAccountIdAndHostId(final long accountId, final long hostId) {
+        final SearchCriteria<UserVmVO> sc = AccountHostSearch.create();
         sc.setParameters("hostId", hostId);
         sc.setParameters("accountId", accountId);
         return listBy(sc);
     }
 
     @Override
-    public void loadDetails(UserVmVO vm) {
-        Map<String, String> details = _detailsDao.listDetailsKeyPairs(vm.getId());
+    public void loadDetails(final UserVmVO vm) {
+        final Map<String, String> details = _detailsDao.listDetailsKeyPairs(vm.getId());
         vm.setDetails(details);
     }
 
     @Override
-    public void saveDetails(UserVmVO vm) {
-        Map<String, String> detailsStr = vm.getDetails();
+    public void saveDetails(final UserVmVO vm) {
+        final Map<String, String> detailsStr = vm.getDetails();
         if (detailsStr == null) {
             return;
         }
-        List<UserVmDetailVO> details = new ArrayList<UserVmDetailVO>();
-        for (String key : detailsStr.keySet()) {
+        final List<UserVmDetailVO> details = new ArrayList<>();
+        for (final String key : detailsStr.keySet()) {
             details.add(new UserVmDetailVO(vm.getId(), key, detailsStr.get(key), true));
         }
 
@@ -362,64 +333,64 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     }
 
     @Override
-    public List<Long> listPodIdsHavingVmsforAccount(long zoneId, long accountId) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        List<Long> result = new ArrayList<Long>();
-        String sql = LIST_PODS_HAVING_VMS_FOR_ACCOUNT;
+    public List<Long> listPodIdsHavingVmsforAccount(final long zoneId, final long accountId) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final List<Long> result = new ArrayList<>();
+        final String sql = LIST_PODS_HAVING_VMS_FOR_ACCOUNT;
 
-        try(PreparedStatement pstmt = txn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = txn.prepareStatement(sql)) {
             pstmt.setLong(1, zoneId);
             pstmt.setLong(2, accountId);
-            try(ResultSet rs = pstmt.executeQuery();)
-            {
+            try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     result.add(rs.getLong(1));
                 }
-            }
-            catch (Exception e) {
-                s_logger.error("listPodIdsHavingVmsforAccount:Exception: " +  e.getMessage());
+            } catch (final Exception e) {
+                s_logger.error("listPodIdsHavingVmsforAccount:Exception: " + e.getMessage());
                 throw new CloudRuntimeException("listPodIdsHavingVmsforAccount:Exception: " + e.getMessage(), e);
             }
             txn.commit();
             return result;
-        } catch (Exception e) {
-            s_logger.error("listPodIdsHavingVmsforAccount:Exception : " +  e.getMessage());
+        } catch (final Exception e) {
+            s_logger.error("listPodIdsHavingVmsforAccount:Exception : " + e.getMessage());
             throw new CloudRuntimeException("listPodIdsHavingVmsforAccount:Exception: " + e.getMessage(), e);
-        }
-        finally {
-            try{
-                if (txn != null)
-                {
+        } finally {
+            try {
+                if (txn != null) {
                     txn.close();
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (final Exception e) {
                 s_logger.error("listVmDetails:Exception:" + e.getMessage());
             }
         }
-
     }
 
     @Override
-    public Hashtable<Long, UserVmData> listVmDetails(Hashtable<Long, UserVmData> userVmDataHash) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public Long countAllocatedVMsForAccount(final long accountId) {
+        final SearchCriteria<Long> sc = CountByAccount.create();
+        sc.setParameters("account", accountId);
+        sc.setParameters("type", VirtualMachine.Type.User);
+        sc.setParameters("state", new Object[]{State.Destroyed, State.Error, State.Expunging});
+        sc.setParameters("displayVm", 1);
+        return customSearch(sc, null).get(0);
+    }
+
+    @Override
+    public Hashtable<Long, UserVmData> listVmDetails(final Hashtable<Long, UserVmData> userVmDataHash) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
             int curr_index = 0;
-            List<UserVmData> userVmDataList = new ArrayList(userVmDataHash.values());
-            if (userVmDataList.size() > VM_DETAILS_BATCH_SIZE)
-            {
-                try (PreparedStatement pstmt = txn.prepareStatement(VM_DETAILS + getQueryBatchAppender(VM_DETAILS_BATCH_SIZE));)
-                {
+            final List<UserVmData> userVmDataList = new ArrayList(userVmDataHash.values());
+            if (userVmDataList.size() > VM_DETAILS_BATCH_SIZE) {
+                try (PreparedStatement pstmt = txn.prepareStatement(VM_DETAILS + getQueryBatchAppender(VM_DETAILS_BATCH_SIZE))) {
                     while ((curr_index + VM_DETAILS_BATCH_SIZE) <= userVmDataList.size()) {
                         // set the vars value
                         for (int k = 1, j = curr_index; j < curr_index + VM_DETAILS_BATCH_SIZE; j++, k++) {
                             pstmt.setLong(k, userVmDataList.get(j).getId());
                         }
-                        try(ResultSet rs = pstmt.executeQuery();)
-                        {
+                        try (ResultSet rs = pstmt.executeQuery()) {
                             while (rs.next()) {
-                                long vm_id = rs.getLong("vm_instance.id");
+                                final long vm_id = rs.getLong("vm_instance.id");
                                 //check if the entry is already there
                                 UserVmData uvm = userVmDataHash.get(vm_id);
                                 if (uvm == null) {
@@ -429,33 +400,28 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
                                 // initialize the data with this row
                                 setUserVmData(uvm, rs);
                             }
-                        }
-                        catch (Exception e)
-                        {
+                        } catch (final Exception e) {
                             s_logger.error("listVmDetails:Exception:" + e.getMessage());
-                            throw new CloudRuntimeException("listVmDetails: Exception:" + e.getMessage(),e);
+                            throw new CloudRuntimeException("listVmDetails: Exception:" + e.getMessage(), e);
                         }
                         curr_index += VM_DETAILS_BATCH_SIZE;
                     }
-                }
-                catch (Exception e)
-                {
+                } catch (final Exception e) {
                     s_logger.error("listVmDetails:Exception:" + e.getMessage());
-                    throw new CloudRuntimeException("listVmDetails: Exception:" + e.getMessage(),e);
+                    throw new CloudRuntimeException("listVmDetails: Exception:" + e.getMessage(), e);
                 }
             }
 
             if (curr_index < userVmDataList.size()) {
-                int batch_size = (userVmDataList.size() - curr_index);
-                try (PreparedStatement vm_details_pstmt = txn.prepareStatement(VM_DETAILS + getQueryBatchAppender(batch_size)))
-                {
+                final int batch_size = (userVmDataList.size() - curr_index);
+                try (PreparedStatement vm_details_pstmt = txn.prepareStatement(VM_DETAILS + getQueryBatchAppender(batch_size))) {
                     // set the vars value
                     for (int k = 1, j = curr_index; j < curr_index + batch_size; j++, k++) {
                         vm_details_pstmt.setLong(k, userVmDataList.get(j).getId());
                     }
-                    try(ResultSet rs = vm_details_pstmt.executeQuery();) {
+                    try (ResultSet rs = vm_details_pstmt.executeQuery()) {
                         while (rs.next()) {
-                            long vm_id = rs.getLong("vm_instance.id");
+                            final long vm_id = rs.getLong("vm_instance.id");
                             //check if the entry is already there
                             UserVmData uvm = userVmDataHash.get(vm_id);
                             if (uvm == null) {
@@ -465,41 +431,75 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
                             // initialize the data with this row
                             setUserVmData(uvm, rs);
                         }
-                    }
-                    catch (Exception e)
-                    {
+                    } catch (final Exception e) {
                         s_logger.error("listVmDetails: Exception:" + e.getMessage());
-                        throw new CloudRuntimeException("listVmDetails: Exception:" + e.getMessage(),e);
+                        throw new CloudRuntimeException("listVmDetails: Exception:" + e.getMessage(), e);
                     }
-                }
-                catch (Exception e)
-                {
+                } catch (final Exception e) {
                     s_logger.error("listVmDetails:Exception:" + e.getMessage());
-                    throw new CloudRuntimeException("listVmDetails: Exception:" + e.getMessage(),e);
+                    throw new CloudRuntimeException("listVmDetails: Exception:" + e.getMessage(), e);
                 }
             }
             txn.commit();
             return userVmDataHash;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             s_logger.error("listVmDetails:Exception:" + e.getMessage());
             throw new CloudRuntimeException("listVmDetails:Exception : ", e);
-        }
-        finally {
-            try{
-                if (txn != null)
-                {
+        } finally {
+            try {
+                if (txn != null) {
                     txn.close();
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (final Exception e) {
                 s_logger.error("listVmDetails:Exception:" + e.getMessage());
             }
         }
-
     }
 
-    public static UserVmData setUserVmData(UserVmData userVmData, ResultSet rs) throws SQLException {
+    @Override
+    public List<UserVmVO> listByIsoId(final Long isoId) {
+        final SearchCriteria<UserVmVO> sc = UserVmByIsoSearch.create();
+        sc.setParameters("isoId", isoId);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<Pair<Pair<String, VirtualMachine.Type>, Pair<Long, String>>> getVmsDetailByNames(final Set<String> vmNames, final String detail) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final List<Pair<Pair<String, VirtualMachine.Type>, Pair<Long, String>>> vmsDetailByNames = new ArrayList<>();
+
+        try (PreparedStatement pstmt = txn.prepareStatement(VMS_DETAIL_BY_NAME + getQueryBatchAppender(vmNames.size()))) {
+            pstmt.setString(1, detail);
+            int i = 2;
+            for (final String name : vmNames) {
+                pstmt.setString(i, name);
+                i++;
+            }
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    vmsDetailByNames.add(new Pair<>(new Pair<>(
+                            rs.getString("vm_instance.instance_name"), VirtualMachine.Type.valueOf(rs.getString("vm_type"))),
+                            new Pair<>(rs.getLong("vm_instance.id"), rs.getString("user_vm_details.value"))));
+                }
+            }
+        } catch (final SQLException e) {
+            s_logger.error("GetVmsDetailsByNames: Exception in sql: " + e.getMessage());
+            throw new CloudRuntimeException("GetVmsDetailsByNames: Exception: " + e.getMessage());
+        }
+
+        return vmsDetailByNames;
+    }
+
+    public String getQueryBatchAppender(final int count) {
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            sb.append(" ?,");
+        }
+        sb.deleteCharAt(sb.length() - 1).append(")");
+        return sb.toString();
+    }
+
+    public static UserVmData setUserVmData(final UserVmData userVmData, final ResultSet rs) throws SQLException {
 
         if (!userVmData.isInitialized()) {
 
@@ -508,7 +508,7 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             userVmData.setAccountName(rs.getString("account.account_name"));
             userVmData.setDomainName(rs.getString("domain.name"));
 
-            long grp_id = rs.getLong("instance_group.id");
+            final long grp_id = rs.getLong("instance_group.id");
             if (grp_id > 0) {
                 userVmData.setGroupId(grp_id);
                 userVmData.setGroup(rs.getString("instance_group.name"));
@@ -521,7 +521,7 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             userVmData.setHostId(rs.getLong("host.id"));
             userVmData.setHostName(rs.getString("host.name"));
 
-            long template_id = rs.getLong("vm_template.id");
+            final long template_id = rs.getLong("vm_template.id");
             if (template_id > 0) {
                 userVmData.setTemplateId(template_id);
                 userVmData.setTemplateName(rs.getString("vm_template.name"));
@@ -534,7 +534,7 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
                 userVmData.setPasswordEnabled(false);
             }
 
-            long iso_id = rs.getLong("iso.id");
+            final long iso_id = rs.getLong("iso.id");
             if (iso_id > 0) {
                 userVmData.setIsoId(iso_id);
                 userVmData.setIsoName(rs.getString("iso.name"));
@@ -549,12 +549,12 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             userVmData.setMemory(rs.getInt("service_offering.ram_size"));
 
             // volumes.device_id, volumes.volume_type,
-            long vol_id = rs.getLong("volumes.id");
+            final long vol_id = rs.getLong("volumes.id");
             if (vol_id > 0) {
                 userVmData.setRootDeviceId(rs.getLong("volumes.device_id"));
                 userVmData.setRootDeviceType(rs.getString("volumes.volume_type"));
                 // storage pool
-                long pool_id = rs.getLong("storage_pool.id");
+                final long pool_id = rs.getLong("storage_pool.id");
                 if (pool_id > 0) {
                     userVmData.setRootDeviceType(rs.getString("storage_pool.pool_type"));
                 } else {
@@ -564,9 +564,9 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             userVmData.setInitialized();
         }
 
-        Long securityGroupId = rs.getLong("security_group.id");
+        final Long securityGroupId = rs.getLong("security_group.id");
         if (securityGroupId != null && securityGroupId.longValue() != 0) {
-            SecurityGroupData resp = userVmData.newSecurityGroupData();
+            final SecurityGroupData resp = userVmData.newSecurityGroupData();
             resp.setId(rs.getLong("security_group.id"));
             resp.setName(rs.getString("security_group.name"));
             resp.setDescription(rs.getString("security_group.description"));
@@ -574,9 +574,9 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             userVmData.addSecurityGroup(resp);
         }
 
-        long nic_id = rs.getLong("nics.id");
+        final long nic_id = rs.getLong("nics.id");
         if (nic_id > 0) {
-            NicData nicResponse = userVmData.newNicData();
+            final NicData nicResponse = userVmData.newNicData();
             nicResponse.setId(nic_id);
             nicResponse.setIpaddress(rs.getString("nics.ip4_address"));
             nicResponse.setGateway(rs.getString("nics.gateway"));
@@ -584,7 +584,7 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             nicResponse.setNetworkid(rs.getLong("nics.network_id"));
             nicResponse.setMacAddress(rs.getString("nics.mac_address"));
 
-            int account_type = rs.getInt("account.type");
+            final int account_type = rs.getInt("account.type");
             if (account_type == Account.ACCOUNT_TYPE_ADMIN) {
                 nicResponse.setBroadcastUri(rs.getString("nics.broadcast_uri"));
                 nicResponse.setIsolationUri(rs.getString("nics.isolation_uri"));
@@ -597,7 +597,7 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             userVmData.addNic(nicResponse);
         }
 
-        long publicIpId = rs.getLong("user_ip_address.id");
+        final long publicIpId = rs.getLong("user_ip_address.id");
         if (publicIpId > 0) {
             userVmData.setPublicIpId(publicIpId);
             userVmData.setPublicIp(rs.getString("user_ip_address.public_ip_address"));
@@ -606,59 +606,13 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
         return userVmData;
     }
 
-    public String getQueryBatchAppender(int count) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            sb.append(" ?,");
-        }
-        sb.deleteCharAt(sb.length() - 1).append(")");
-        return sb.toString();
-    }
-
     @Override
-    public Long countAllocatedVMsForAccount(long accountId) {
-        SearchCriteria<Long> sc = CountByAccount.create();
-        sc.setParameters("account", accountId);
-        sc.setParameters("type", VirtualMachine.Type.User);
-        sc.setParameters("state", new Object[] {State.Destroyed, State.Error, State.Expunging});
-        sc.setParameters("displayVm", 1);
-        return customSearch(sc, null).get(0);
-    }
-
-    @Override
-    public boolean remove(Long id) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public boolean remove(final Long id) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
         _tagsDao.removeByIdAndType(id, ResourceObjectType.UserVm);
-        boolean result = super.remove(id);
+        final boolean result = super.remove(id);
         txn.commit();
         return result;
-    }
-
-    @Override
-    public List<Pair<Pair<String, VirtualMachine.Type>, Pair<Long, String>>> getVmsDetailByNames(Set<String> vmNames, String detail) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        List<Pair<Pair<String, VirtualMachine.Type>, Pair<Long, String>>> vmsDetailByNames = new ArrayList<Pair<Pair<String, VirtualMachine.Type>, Pair<Long, String>>>();
-
-        try (PreparedStatement pstmt = txn.prepareStatement(VMS_DETAIL_BY_NAME + getQueryBatchAppender(vmNames.size()));) {
-            pstmt.setString(1, detail);
-            int i = 2;
-            for(String name : vmNames) {
-                pstmt.setString(i, name);
-                i++;
-            }
-            try (ResultSet rs = pstmt.executeQuery();) {
-                while (rs.next()) {
-                    vmsDetailByNames.add(new Pair<Pair<String, VirtualMachine.Type>, Pair<Long, String>>(new Pair<String, VirtualMachine.Type>(
-                            rs.getString("vm_instance.instance_name"), VirtualMachine.Type.valueOf(rs.getString("vm_type"))),
-                            new Pair<Long, String>(rs.getLong("vm_instance.id"), rs.getString("user_vm_details.value"))));
-                }
-            }
-        } catch (SQLException e) {
-            s_logger.error("GetVmsDetailsByNames: Exception in sql: " + e.getMessage());
-            throw new CloudRuntimeException("GetVmsDetailsByNames: Exception: " + e.getMessage());
-        }
-
-        return vmsDetailByNames;
     }
 }

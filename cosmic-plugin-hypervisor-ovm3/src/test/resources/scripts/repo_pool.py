@@ -1,27 +1,14 @@
 #!/usr/bin/python
 #
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
+
 #
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-#
-import os, sys, subprocess, socket, fcntl, struct
+import fcntl
+import socket
+import struct
 from socket import gethostname
 from xml.dom.minidom import parseString
-
 from xmlrpclib import ServerProxy, Error
+
 
 def get_ip_address(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -30,6 +17,7 @@ def get_ip_address(ifname):
         0x8915,  # SIOCGIFADDR
         struct.pack('256s', ifname[:15])
     )[20:24])
+
 
 def is_it_up(host, port):
     try:
@@ -43,6 +31,7 @@ def is_it_up(host, port):
 
     print "host: %s:%s UP" % (host, port)
     return True
+
 
 # hmm master actions don't apply to a slave
 master = "192.168.1.161"
@@ -100,7 +89,7 @@ try:
 
     # set the basics we require to "operate"
     print server.take_ownership(mgr, '')
-    print server.update_server_roles(role,)
+    print server.update_server_roles(role, )
 
     # if we're pooling pool...
     if (poolNode == True):
@@ -157,23 +146,23 @@ try:
                 )
                 print "create pool"
                 print server.create_server_pool(poolalias,
-                    pooluuid,
-                    poolmvip,
-                    poolCount,
-                    hostname,
-                    ip,
-                    role
-                )
+                                                pooluuid,
+                                                poolmvip,
+                                                poolCount,
+                                                hostname,
+                                                ip,
+                                                role
+                                                )
             else:
                 print "join the pool"
                 print server.join_server_pool(poolalias,
-                    pooluuid,
-                    poolmvip,
-                    poolCount,
-                    hostname,
-                    ip,
-                    role
-                )
+                                              pooluuid,
+                                              poolmvip,
+                                              poolCount,
+                                              hostname,
+                                              ip,
+                                              role
+                                              )
 
         # add member to ip list ?
         poolMembers.append(ip)

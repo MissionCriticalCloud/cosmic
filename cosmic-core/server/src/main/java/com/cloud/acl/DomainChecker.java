@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.acl;
-
-import javax.inject.Inject;
 
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DedicatedResourceVO;
@@ -38,10 +20,12 @@ import com.cloud.user.AccountService;
 import com.cloud.user.User;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.component.AdapterBase;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.affinity.AffinityGroup;
+
+import javax.inject.Inject;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -60,20 +44,20 @@ public class DomainChecker extends AdapterBase implements SecurityChecker {
     @Inject
     NetworkModel _networkMgr;
     @Inject
-    private DedicatedResourceDao _dedicatedDao;
-    @Inject
     AccountService _accountService;
+    @Inject
+    private DedicatedResourceDao _dedicatedDao;
 
     protected DomainChecker() {
         super();
     }
 
     @Override
-    public boolean checkAccess(Account caller, Domain domain) throws PermissionDeniedException {
+    public boolean checkAccess(final Account caller, final Domain domain) throws PermissionDeniedException {
         if (caller.getState() != Account.State.enabled) {
             throw new PermissionDeniedException(caller + " is disabled.");
         }
-        long domainId = domain.getId();
+        final long domainId = domain.getId();
 
         if (_accountService.isNormalUser(caller.getId())) {
             if (caller.getDomainId() != domainId) {
@@ -87,21 +71,21 @@ public class DomainChecker extends AdapterBase implements SecurityChecker {
     }
 
     @Override
-    public boolean checkAccess(User user, Domain domain) throws PermissionDeniedException {
+    public boolean checkAccess(final User user, final Domain domain) throws PermissionDeniedException {
         if (user.getRemoved() != null) {
             throw new PermissionDeniedException(user + " is no longer active.");
         }
-        Account account = _accountDao.findById(user.getAccountId());
+        final Account account = _accountDao.findById(user.getAccountId());
         return checkAccess(account, domain);
     }
 
     @Override
-    public boolean checkAccess(Account caller, ControlledEntity entity, AccessType accessType)
+    public boolean checkAccess(final Account caller, final ControlledEntity entity, final AccessType accessType)
             throws PermissionDeniedException {
         if (entity instanceof VirtualMachineTemplate) {
 
-            VirtualMachineTemplate template = (VirtualMachineTemplate)entity;
-            Account owner = _accountDao.findById(template.getAccountId());
+            final VirtualMachineTemplate template = (VirtualMachineTemplate) entity;
+            final Account owner = _accountDao.findById(template.getAccountId());
             // validate that the template is usable by the account
             if (!template.isPublicTemplate()) {
                 if (_accountService.isRootAdmin(caller.getId()) || (owner.getId() == caller.getId())) {
@@ -114,7 +98,7 @@ public class DomainChecker extends AdapterBase implements SecurityChecker {
 
                 // since the current account is not the owner of the template, check the launch permissions table to see if the
                 // account can launch a VM from this template
-                LaunchPermissionVO permission = _launchPermissionDao.findByTemplateAndAccount(template.getId(), caller.getId());
+                final LaunchPermissionVO permission = _launchPermissionDao.findByTemplateAndAccount(template.getId(), caller.getId());
                 if (permission == null) {
                     throw new PermissionDeniedException(caller + " does not have permission to launch instances from " + template);
                 }
@@ -132,12 +116,12 @@ public class DomainChecker extends AdapterBase implements SecurityChecker {
 
             return true;
         } else if (entity instanceof Network && accessType != null && accessType == AccessType.UseEntry) {
-            _networkMgr.checkNetworkPermissions(caller, (Network)entity);
+            _networkMgr.checkNetworkPermissions(caller, (Network) entity);
         } else if (entity instanceof AffinityGroup) {
             return false;
         } else {
             if (_accountService.isNormalUser(caller.getId())) {
-                Account account = _accountDao.findById(entity.getAccountId());
+                final Account account = _accountDao.findById(entity.getAccountId());
 
                 if (account != null && account.getType() == Account.ACCOUNT_TYPE_PROJECT) {
                     //only project owner can delete/modify the project
@@ -160,13 +144,13 @@ public class DomainChecker extends AdapterBase implements SecurityChecker {
     }
 
     @Override
-    public boolean checkAccess(User user, ControlledEntity entity) throws PermissionDeniedException {
-        Account account = _accountDao.findById(user.getAccountId());
+    public boolean checkAccess(final User user, final ControlledEntity entity) throws PermissionDeniedException {
+        final Account account = _accountDao.findById(user.getAccountId());
         return checkAccess(account, entity, null);
     }
 
     @Override
-    public boolean checkAccess(Account account, DiskOffering dof) throws PermissionDeniedException {
+    public boolean checkAccess(final Account account, final DiskOffering dof) throws PermissionDeniedException {
         if (account == null || dof == null || dof.getDomainId() == null) {//public offering
             return true;
         } else {
@@ -205,7 +189,7 @@ public class DomainChecker extends AdapterBase implements SecurityChecker {
     }
 
     @Override
-    public boolean checkAccess(Account account, ServiceOffering so) throws PermissionDeniedException {
+    public boolean checkAccess(final Account account, final ServiceOffering so) throws PermissionDeniedException {
         if (account == null || so.getDomainId() == null) {//public offering
             return true;
         } else {
@@ -244,7 +228,7 @@ public class DomainChecker extends AdapterBase implements SecurityChecker {
     }
 
     @Override
-    public boolean checkAccess(Account account, DataCenter zone) throws PermissionDeniedException {
+    public boolean checkAccess(final Account account, final DataCenter zone) throws PermissionDeniedException {
         if (account == null || zone.getDomainId() == null) {//public zone
             return true;
         } else {
@@ -257,7 +241,7 @@ public class DomainChecker extends AdapterBase implements SecurityChecker {
             else if (_accountService.isNormalUser(account.getId()) || account.getType() == Account.ACCOUNT_TYPE_PROJECT) {
                 // if zone is dedicated to an account check that the accountId
                 // matches.
-                DedicatedResourceVO dedicatedZone = _dedicatedDao.findByZoneId(zone.getId());
+                final DedicatedResourceVO dedicatedZone = _dedicatedDao.findByZoneId(zone.getId());
                 if (dedicatedZone != null) {
                     if (dedicatedZone.getAccountId() != null) {
                         if (dedicatedZone.getAccountId() == account.getId()) {
@@ -294,8 +278,8 @@ public class DomainChecker extends AdapterBase implements SecurityChecker {
                 if (account.getDomainId() == zone.getDomainId()) {
                     return true; //zone and account at exact node
                 } else {
-                    Domain zoneDomainRecord = _domainDao.findById(zone.getDomainId());
-                    Domain accountDomainRecord = _domainDao.findById(account.getDomainId());
+                    final Domain zoneDomainRecord = _domainDao.findById(zone.getDomainId());
+                    final Domain accountDomainRecord = _domainDao.findById(account.getDomainId());
                     if (accountDomainRecord != null) {
                         Domain localRecord = accountDomainRecord;
                         while (true) {
@@ -325,7 +309,7 @@ public class DomainChecker extends AdapterBase implements SecurityChecker {
     }
 
     @Override
-    public boolean checkAccess(Account caller, ControlledEntity entity, AccessType accessType, String action)
+    public boolean checkAccess(final Account caller, final ControlledEntity entity, final AccessType accessType, final String action)
             throws PermissionDeniedException {
 
         if (action != null && ("SystemCapability".equals(action))) {
@@ -351,11 +335,11 @@ public class DomainChecker extends AdapterBase implements SecurityChecker {
     }
 
     @Override
-    public boolean checkAccess(Account caller, AccessType accessType, String action, ControlledEntity... entities)
+    public boolean checkAccess(final Account caller, final AccessType accessType, final String action, final ControlledEntity... entities)
             throws PermissionDeniedException {
 
         // returns true only if access to all entities is granted
-        for (ControlledEntity entity : entities) {
+        for (final ControlledEntity entity : entities) {
             if (!checkAccess(caller, entity, accessType, action)) {
                 return false;
             }

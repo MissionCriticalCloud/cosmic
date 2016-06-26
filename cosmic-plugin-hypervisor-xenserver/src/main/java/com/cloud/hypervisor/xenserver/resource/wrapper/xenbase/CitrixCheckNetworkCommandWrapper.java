@@ -1,25 +1,8 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
-
-import java.util.List;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CheckNetworkAnswer;
@@ -28,12 +11,14 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.network.PhysicalNetworkSetupInfo;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.xensource.xenapi.Types.XenAPIException;
 
+import java.util.List;
+
+import com.xensource.xenapi.Types.XenAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  CheckNetworkCommand.class)
+@ResourceWrapper(handles = CheckNetworkCommand.class)
 public final class CitrixCheckNetworkCommandWrapper extends CommandWrapper<CheckNetworkCommand, Answer, CitrixResourceBase> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CitrixCheckNetworkCommandWrapper.class);
@@ -83,7 +68,6 @@ public final class CitrixCheckNetworkCommandWrapper extends CommandWrapper<Check
             } else {
                 return new CheckNetworkAnswer(command, true, "Network Setup check by names is done");
             }
-
         } catch (final XenAPIException e) {
             final String msg = "CheckNetworkCommand failed with XenAPIException:" + e.toString() + " host:" + citrixResourceBase.getHost().getUuid();
             s_logger.warn(msg, e);

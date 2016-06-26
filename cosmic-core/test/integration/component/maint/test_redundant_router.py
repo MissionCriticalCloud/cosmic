@@ -1,21 +1,4 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
-from nose.plugins.attrib import attr
+import time
 from marvin.lib.base import (Account,
                              Router,
                              NetworkOffering,
@@ -23,19 +6,18 @@ from marvin.lib.base import (Account,
                              VirtualMachine,
                              ServiceOffering,
                              Host)
-from marvin.lib.utils import cleanup_resources
 from marvin.lib.common import (get_domain,
                                get_template,
                                get_zone,
                                get_process_status)
-import time
+from marvin.lib.utils import cleanup_resources
+from nose.plugins.attrib import attr
 
 # Import Local Modules
 from marvin.cloudstackTestCase import cloudstackTestCase
 
 
 class TestCreateRvRNetworkOffering(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(
@@ -130,7 +112,6 @@ class TestCreateRvRNetworkOffering(cloudstackTestCase):
 
 
 class TestCreateRvRNetwork(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestCreateRvRNetwork, cls).getClsTestClient()
@@ -331,7 +312,6 @@ class TestCreateRvRNetwork(cloudstackTestCase):
 
 
 class TestCreateRvRNetworkNonDefaultGuestCidr(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(
@@ -541,7 +521,6 @@ class TestCreateRvRNetworkNonDefaultGuestCidr(cloudstackTestCase):
 
 
 class TestRVRInternals(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestRVRInternals, cls).getClsTestClient()
@@ -843,7 +822,6 @@ class TestRVRInternals(cloudstackTestCase):
 
 
 class TestRvRRedundancy(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestRvRRedundancy, cls).getClsTestClient()
@@ -1008,7 +986,7 @@ class TestRvRRedundancy(cloudstackTestCase):
             routers[0].redundantstate, [
                 'UNKNOWN', 'FAULT'], "Redundant state of the master router\
                         should be UNKNOWN/FAULT but is %s" %
-            routers[0].redundantstate)
+                                     routers[0].redundantstate)
 
         self.debug(
             "Checking state of the backup router in %s" %
@@ -1140,7 +1118,7 @@ class TestRvRRedundancy(cloudstackTestCase):
             routers[0].redundantstate, [
                 'UNKNOWN', 'FAULT'], "Redundant state of the backup router\
                         should be UNKNOWN/FAULT but is %s" %
-            routers[0].redundantstate)
+                                     routers[0].redundantstate)
 
         self.debug(
             "Checking state of the master router in %s" %

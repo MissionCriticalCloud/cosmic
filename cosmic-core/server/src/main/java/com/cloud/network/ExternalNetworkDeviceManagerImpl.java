@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network;
 
 import com.cloud.agent.AgentManager;
@@ -21,7 +5,17 @@ import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.host.Host;
 import com.cloud.host.dao.HostDao;
-import com.cloud.network.dao.*;
+import com.cloud.network.dao.ExternalFirewallDeviceDao;
+import com.cloud.network.dao.ExternalLoadBalancerDeviceDao;
+import com.cloud.network.dao.IPAddressDao;
+import com.cloud.network.dao.InlineLoadBalancerNicMapDao;
+import com.cloud.network.dao.LoadBalancerDao;
+import com.cloud.network.dao.NetworkDao;
+import com.cloud.network.dao.NetworkExternalFirewallDao;
+import com.cloud.network.dao.NetworkExternalLoadBalancerDao;
+import com.cloud.network.dao.PhysicalNetworkDao;
+import com.cloud.network.dao.PhysicalNetworkServiceProviderDao;
+import com.cloud.network.dao.VpnUserDao;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.user.AccountManager;
@@ -38,17 +32,23 @@ import org.apache.cloudstack.api.command.admin.network.ListNetworkDeviceCmd;
 import org.apache.cloudstack.api.response.NetworkDeviceResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.network.ExternalNetworkDeviceManager;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-import java.util.*;
-import java.util.concurrent.ScheduledExecutorService;
-
 @Component
 public class ExternalNetworkDeviceManagerImpl extends ManagerBase implements ExternalNetworkDeviceManager {
 
+    private static final Logger s_logger = LoggerFactory.getLogger(ExternalNetworkDeviceManagerImpl.class);
     @Inject
     AgentManager _agentMgr;
     @Inject
@@ -97,11 +97,8 @@ public class ExternalNetworkDeviceManagerImpl extends ManagerBase implements Ext
     NetworkExternalLoadBalancerDao _networkExternalLBDao;
     @Inject
     NetworkExternalFirewallDao _networkExternalFirewallDao;
-
     ScheduledExecutorService _executor;
     int _externalNetworkStatsInterval;
-
-    private static final Logger s_logger = LoggerFactory.getLogger(ExternalNetworkDeviceManagerImpl.class);
 
     @Override
     public Host addNetworkDevice(final AddNetworkDeviceCmd cmd) {
@@ -117,10 +114,6 @@ public class ExternalNetworkDeviceManagerImpl extends ManagerBase implements Ext
 
     @Override
     public NetworkDeviceResponse getApiResponse(final Host device) {
-        return null;
-    }
-
-    private List<Host> listNetworkDevice(final Long zoneId, final Long physicalNetworkId, final Long podId, final Host.Type type) {
         return null;
     }
 
@@ -152,6 +145,10 @@ public class ExternalNetworkDeviceManagerImpl extends ManagerBase implements Ext
         }
 
         return res;
+    }
+
+    private List<Host> listNetworkDevice(final Long zoneId, final Long physicalNetworkId, final Long podId, final Host.Type type) {
+        return null;
     }
 
     @Override
