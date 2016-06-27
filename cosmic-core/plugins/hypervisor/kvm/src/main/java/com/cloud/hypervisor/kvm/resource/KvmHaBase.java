@@ -20,7 +20,6 @@ public class KvmHaBase {
     private final long timeout = 60000; /* 1 minutes */
     protected long heartBeatUpdateTimeout = 60000;
     protected long heartBeatUpdateFreq = 60000;
-    protected long heartBeatUpdateMaxRetry = 3;
 
     protected String getMountPoint(final NfsStoragePool storagePool) {
 
