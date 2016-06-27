@@ -5,20 +5,8 @@
     <name>Cosmic Plugin - Skip Heuristics Planner</name>
     <parent>
         <groupId>cloud.cosmic</groupId>
-        <artifactId>cosmic-core</artifactId>
+        <artifactId>cosmic-plugins</artifactId>
         <version>5.1.0.1-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
-
-    <dependencies>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-api</artifactId>
-            <version>5.1.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-server</artifactId>
-            <version>5.1.0.1-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
 </project>
