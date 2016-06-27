@@ -38,9 +38,9 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
     @Column(name = "name", updatable = false, nullable = false, length = 255)
-    private final String name = null;
+    private String name = null;
     @Column(name = "display_name", updatable = false, nullable = false, length = 255)
-    private final String displayName = null;
+    private String displayName = null;
     @Column(name = "user_id")
     private long userId;
     @Column(name = "account_id")
@@ -48,7 +48,7 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Column(name = "account_uuid")
     private String accountUuid;
     @Column(name = "account_name")
-    private final String accountName = null;
+    private String accountName = null;
     @Column(name = "account_type")
     private short accountType;
     @Column(name = "domain_id")
@@ -56,9 +56,9 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Column(name = "domain_uuid")
     private String domainUuid;
     @Column(name = "domain_name")
-    private final String domainName = null;
+    private String domainName = null;
     @Column(name = "domain_path")
-    private final String domainPath = null;
+    private String domainPath = null;
     @Column(name = "instance_group_id")
     private long instanceGroupId;
     @Column(name = "instance_group_uuid")
@@ -72,7 +72,7 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
      */
     @Enumerated(value = EnumType.STRING)
     @Column(name = "state", updatable = true, nullable = false, length = 32)
-    private final State state = null;
+    private State state = null;
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
     @Column(name = GenericDao.REMOVED_COLUMN)
@@ -105,7 +105,7 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Column(name = "data_center_uuid")
     private String dataCenterUuid;
     @Column(name = "data_center_name")
-    private final String dataCenterName = null;
+    private String dataCenterName = null;
     @Column(name = "security_group_enabled")
     private boolean securityGroupEnabled;
     @Column(name = "host_id", updatable = true, nullable = true)
@@ -162,7 +162,7 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Column(name = "volume_uuid")
     private String volumeUuid;
     @Column(name = "volume_device_id")
-    private final Long volumeDeviceId = null;
+    private Long volumeDeviceId = null;
     @Column(name = "volume_type")
     @Enumerated(EnumType.STRING)
     private Volume.Type volumeType;
@@ -271,6 +271,38 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     private boolean isDynamicallyScalable;
 
     public UserVmJoinVO() {
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public void setDisplayName(final String displayName) {
+        this.displayName = displayName;
+    }
+
+    public void setAccountName(final String accountName) {
+        this.accountName = accountName;
+    }
+
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setDomainPath(final String domainPath) {
+        this.domainPath = domainPath;
+    }
+
+    public void setState(final State state) {
+        this.state = state;
+    }
+
+    public void setDataCenterName(final String dataCenterName) {
+        this.dataCenterName = dataCenterName;
+    }
+
+    public void setVolumeDeviceId(final Long volumeDeviceId) {
+        this.volumeDeviceId = volumeDeviceId;
     }
 
     public void setType(final VirtualMachine.Type type) {
