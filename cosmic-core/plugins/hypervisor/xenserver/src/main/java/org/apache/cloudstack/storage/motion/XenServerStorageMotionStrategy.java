@@ -127,7 +127,7 @@ public class XenServerStorageMotionStrategy implements DataMotionStrategy {
                 volumeToFilerto.add(new Pair<>(volumeTo, filerTo));
             }
 
-            final MigrateWithStorageCommand command = new MigrateWithStorageCommand(to, volumeToFilerto);
+            final MigrateWithStorageCommand command = new MigrateWithStorageCommand(to, volumeToFilerto, destHost.getGuid());
             final MigrateWithStorageAnswer answer = (MigrateWithStorageAnswer) agentMgr.send(destHost.getId(), command);
             if (answer == null) {
                 s_logger.error("Migration with storage of vm " + vm + " failed.");
