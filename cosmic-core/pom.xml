@@ -46,7 +46,9 @@
         <module>plugins/network/nicira-nvp</module>
         <module>plugins/event-bus-rabbitmq</module>
         <module>framework</module>
-        <module>services</module>
+        <module>services/console-proxy-server</module>
+        <module>services/secondary-storage-controller</module>
+        <module>services/secondary-storage-server</module>
     </modules>
 
     <dependencyManagement>
