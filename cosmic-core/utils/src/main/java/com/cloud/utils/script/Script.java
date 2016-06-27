@@ -1,23 +1,12 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils.script;
+
+import com.cloud.utils.PropertiesUtil;
+import com.cloud.utils.concurrency.NamedThreadFactory;
+import com.cloud.utils.script.OutputInterpreter.TimedOutLogger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,40 +26,34 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import com.cloud.utils.PropertiesUtil;
-import com.cloud.utils.concurrency.NamedThreadFactory;
-import com.cloud.utils.script.OutputInterpreter.TimedOutLogger;
-
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Script implements Callable<String> {
-    private static final Logger s_logger = LoggerFactory.getLogger(Script.class);
-
-    private final Logger _logger;
-
     public static final String ERR_EXECUTE = "execute.error";
     public static final String ERR_TIMEOUT = "timeout";
-    private int _defaultTimeout = 3600 * 1000; /* 1 hour */
-    private volatile boolean _isTimeOut = false;
-
-    private boolean _passwordCommand = false;
-
+    private static final Logger s_logger = LoggerFactory.getLogger(Script.class);
     private static final ScheduledExecutorService s_executors = Executors.newScheduledThreadPool(10, new NamedThreadFactory("Script"));
-
+    private final Logger _logger;
     String _workDir;
     ArrayList<String> _command;
     long _timeout;
     Process _process;
     Thread _thread;
+    private final int _defaultTimeout = 3600 * 1000; /* 1 hour */
+    private volatile boolean _isTimeOut = false;
+    private boolean _passwordCommand = false;
 
-    public int getExitValue()  {
-        return _process.exitValue();
+    public Script(final boolean runWithSudo, final String command, final long timeout, final Logger logger) {
+        this(command, timeout, logger);
+        if (runWithSudo) {
+            _command.add(0, "sudo");
+        }
     }
 
-    public Script(String command, long timeout, Logger logger) {
-        _command = new ArrayList<String>();
+    public Script(final String command, final long timeout, final Logger logger) {
+        _command = new ArrayList<>();
         _command.add(command);
         _timeout = timeout;
         if (_timeout == 0) {
@@ -81,267 +64,19 @@ public class Script implements Callable<String> {
         _logger = logger != null ? logger : s_logger;
     }
 
-    public Script(boolean runWithSudo, String command, long timeout, Logger logger) {
-        this(command, timeout, logger);
-        if (runWithSudo) {
-            _command.add(0, "sudo");
-        }
-    }
-
-    public Script(String command, Logger logger) {
+    public Script(final String command, final Logger logger) {
         this(command, 0, logger);
     }
 
-    public Script(String command) {
+    public Script(final String command) {
         this(command, 0, s_logger);
     }
 
-    public Script(String command, long timeout) {
+    public Script(final String command, final long timeout) {
         this(command, timeout, s_logger);
     }
 
-    public void add(String... params) {
-        for (String param : params) {
-            _command.add(param);
-        }
-    }
-
-    public void add(String param) {
-        _command.add(param);
-    }
-
-    public Script set(String name, String value) {
-        _command.add(name);
-        _command.add(value);
-        return this;
-    }
-
-    public void setWorkDir(String workDir) {
-        _workDir = workDir;
-    }
-
-    protected String buildCommandLine(String[] command) {
-        StringBuilder builder = new StringBuilder();
-        boolean obscureParam = false;
-        for (int i = 0; i < command.length; i++) {
-            String cmd = command[i];
-            if (obscureParam) {
-                builder.append("******").append(" ");
-                obscureParam = false;
-            } else {
-                builder.append(command[i]).append(" ");
-            }
-
-            if ("-y".equals(cmd) || "-z".equals(cmd)) {
-                obscureParam = true;
-                _passwordCommand = true;
-            }
-        }
-        return builder.toString();
-    }
-
-    protected String buildCommandLine(List<String> command) {
-        StringBuilder builder = new StringBuilder();
-        boolean obscureParam = false;
-        for (String cmd : command) {
-            if (obscureParam) {
-                builder.append("******").append(" ");
-                obscureParam = false;
-            } else {
-                builder.append(cmd).append(" ");
-            }
-
-            if ("-y".equals(cmd) || "-z".equals(cmd)) {
-                obscureParam = true;
-                _passwordCommand = true;
-            }
-        }
-        return builder.toString();
-    }
-
-    public long getTimeout() {
-        return _timeout;
-    }
-
-    public String execute() {
-        return execute(new OutputInterpreter.OutputLogger(_logger));
-    }
-
-    @Override
-    public String toString() {
-        String[] command = _command.toArray(new String[_command.size()]);
-        return buildCommandLine(command);
-    }
-
-    static String stackTraceAsString(Throwable throwable) {
-        //TODO: a StringWriter is bit to heavy weight
-        try(StringWriter out = new StringWriter(); PrintWriter writer = new PrintWriter(out);) {
-            throwable.printStackTrace(writer);
-            return out.toString();
-        } catch (IOException e) {
-            return "";
-        }
-    }
-
-    public String execute(OutputInterpreter interpreter) {
-        String[] command = _command.toArray(new String[_command.size()]);
-
-        if (_logger.isDebugEnabled()) {
-            _logger.debug("Executing: " + buildCommandLine(command));
-        }
-
-        try {
-            ProcessBuilder pb = new ProcessBuilder(command);
-            pb.redirectErrorStream(true);
-            if (_workDir != null)
-                pb.directory(new File(_workDir));
-
-            _process = pb.start();
-            if (_process == null) {
-                _logger.warn("Unable to execute: " + buildCommandLine(command));
-                return "Unable to execute the command: " + command[0];
-            }
-
-            BufferedReader ir = new BufferedReader(new InputStreamReader(_process.getInputStream()));
-
-            _thread = Thread.currentThread();
-            ScheduledFuture<String> future = null;
-            if (_timeout > 0) {
-                future = s_executors.schedule(this, _timeout, TimeUnit.MILLISECONDS);
-            }
-
-            Task task = null;
-            if (interpreter != null && interpreter.drain()) {
-                task = new Task(interpreter, ir);
-                s_executors.execute(task);
-            }
-
-            while (true) {
-                try {
-                    if (_process.waitFor() == 0) {
-                        _logger.debug("Execution is successful.");
-                        if (interpreter != null) {
-                            return interpreter.drain() ? task.getResult() : interpreter.interpret(ir);
-                        } else {
-                            // null return exitValue apparently
-                            return String.valueOf(_process.exitValue());
-                        }
-                    } else {
-                        break;
-                    }
-                } catch (InterruptedException e) {
-                    if (!_isTimeOut) {
-                        /*
-                         * This is not timeout, we are interrupted by others,
-                         * continue
-                         */
-                        _logger.debug("We are interrupted but it's not a timeout, just continue");
-                        continue;
-                    }
-
-                    TimedOutLogger log = new TimedOutLogger(_process);
-                    Task timedoutTask = new Task(log, ir);
-
-                    timedoutTask.run();
-                    if (!_passwordCommand) {
-                        _logger.warn("Timed out: " + buildCommandLine(command) + ".  Output is: " + timedoutTask.getResult());
-                    } else {
-                        _logger.warn("Timed out: " + buildCommandLine(command));
-                    }
-
-                    return ERR_TIMEOUT;
-                } finally {
-                    if (future != null) {
-                        future.cancel(false);
-                    }
-                    Thread.interrupted();
-                }
-            }
-
-            _logger.debug("Exit value is " + _process.exitValue());
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(_process.getInputStream()), 128);
-
-            String error;
-            if (interpreter != null) {
-                error = interpreter.processError(reader);
-            } else {
-                error = String.valueOf(_process.exitValue());
-            }
-
-            if (_logger.isDebugEnabled()) {
-                _logger.debug(error);
-            }
-            return error;
-        } catch (SecurityException ex) {
-            _logger.warn("Security Exception....not running as root?", ex);
-            return stackTraceAsString(ex);
-        } catch (Exception ex) {
-            _logger.warn("Exception: " + buildCommandLine(command), ex);
-            return stackTraceAsString(ex);
-        } finally {
-            if (_process != null) {
-                IOUtils.closeQuietly(_process.getErrorStream());
-                IOUtils.closeQuietly(_process.getOutputStream());
-                IOUtils.closeQuietly(_process.getInputStream());
-                _process.destroy();
-            }
-        }
-    }
-
-    @Override
-    public String call() {
-        try {
-            _logger.trace("Checking exit value of process");
-            _process.exitValue();
-            _logger.trace("Script ran within the alloted time");
-        } catch (IllegalThreadStateException e) {
-            _logger.warn("Interrupting script.");
-            _isTimeOut = true;
-            _thread.interrupt();
-        }
-        return null;
-    }
-
-    public static class Task implements Runnable {
-        OutputInterpreter interpreter;
-        BufferedReader reader;
-        String result;
-        boolean done;
-
-        public Task(OutputInterpreter interpreter, BufferedReader reader) {
-            this.interpreter = interpreter;
-            this.reader = reader;
-            result = null;
-        }
-
-        @Override
-        public void run() {
-            synchronized(this) {
-                done = false;
-                try {
-                    result = interpreter.interpret(reader);
-                } catch (IOException ex) {
-                    result = stackTraceAsString(ex);
-                } catch (Exception ex) {
-                    result = stackTraceAsString(ex);
-                } finally {
-                        done = true;
-                        notifyAll();
-                        IOUtils.closeQuietly(reader);
-                }
-            }
-        }
-
-        public synchronized String getResult() throws InterruptedException {
-            if (!done) {
-                wait();
-            }
-            return result;
-        }
-    }
-
-    public static String findScript(String path, String script) {
+    public static String findScript(String path, final String script) {
         s_logger.debug("Looking for " + script + " in the classpath");
 
         URL url = ClassLoader.getSystemResource(script);
@@ -374,7 +109,7 @@ public class Script implements Callable<String> {
                 file = new File(new URI(url.toString()).getPath());
                 s_logger.debug("Absolute path =  " + file.getAbsolutePath());
                 return file.getAbsolutePath();
-            } catch (URISyntaxException e) {
+            } catch (final URISyntaxException e) {
                 s_logger.warn("Unable to convert " + url.toString() + " to a URI");
             }
         }
@@ -397,17 +132,20 @@ public class Script implements Callable<String> {
                 int begin = cp.indexOf(File.separator);
 
                 // work around with the inconsistency of java classpath and file separator on Windows 7
-                if (begin < 0)
+                if (begin < 0) {
                     begin = cp.indexOf('/');
+                }
 
-                int endBang = cp.lastIndexOf("!");
+                final int endBang = cp.lastIndexOf("!");
                 int end = cp.lastIndexOf(File.separator, endBang);
-                if (end < 0)
+                if (end < 0) {
                     end = cp.lastIndexOf('/', endBang);
-                if (end < 0)
+                }
+                if (end < 0) {
                     cp = cp.substring(begin);
-                else
+                } else {
                     cp = cp.substring(begin, end);
+                }
 
                 s_logger.debug("Current binaries reside at " + cp);
                 search = cp;
@@ -421,7 +159,7 @@ public class Script implements Callable<String> {
                         final Properties props = PropertiesUtil.loadFromFile(propsFile);
                         search = props.getProperty("paths.script");
                     }
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     s_logger.debug("environment.properties could not be opened");
                     continue;
                 }
@@ -441,7 +179,6 @@ public class Script implements Callable<String> {
             if (file.exists()) {
                 return file.getAbsolutePath();
             }
-
         }
 
         search = System.getProperty("paths.script");
@@ -461,47 +198,294 @@ public class Script implements Callable<String> {
         return null;
     }
 
-    public static String runSimpleBashScript(String command) {
+    public static String runSimpleBashScript(final String command) {
         return Script.runSimpleBashScript(command, 0);
     }
 
-    public static String runSimpleBashScript(String command, int timeout) {
+    public static String runSimpleBashScript(final String command, final int timeout) {
 
-        Script s = new Script("/bin/bash", timeout);
+        final Script s = new Script("/bin/bash", timeout);
         s.add("-c");
         s.add(command);
 
-        OutputInterpreter.OneLineParser parser = new OutputInterpreter.OneLineParser();
-        if (s.execute(parser) != null)
+        final OutputInterpreter.OneLineParser parser = new OutputInterpreter.OneLineParser();
+        if (s.execute(parser) != null) {
             return null;
+        }
 
-        String result = parser.getLine();
-        if (result == null || result.trim().isEmpty())
+        final String result = parser.getLine();
+        if (result == null || result.trim().isEmpty()) {
             return null;
-        else
+        } else {
             return result.trim();
+        }
     }
 
-    public static int runSimpleBashScriptForExitValue(String command) {
+    public void add(final String param) {
+        _command.add(param);
+    }
+
+    public String execute(final OutputInterpreter interpreter) {
+        final String[] command = _command.toArray(new String[_command.size()]);
+
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("Executing: " + buildCommandLine(command));
+        }
+
+        try {
+            final ProcessBuilder pb = new ProcessBuilder(command);
+            pb.redirectErrorStream(true);
+            if (_workDir != null) {
+                pb.directory(new File(_workDir));
+            }
+
+            _process = pb.start();
+            if (_process == null) {
+                _logger.warn("Unable to execute: " + buildCommandLine(command));
+                return "Unable to execute the command: " + command[0];
+            }
+
+            final BufferedReader ir = new BufferedReader(new InputStreamReader(_process.getInputStream()));
+
+            _thread = Thread.currentThread();
+            ScheduledFuture<String> future = null;
+            if (_timeout > 0) {
+                future = s_executors.schedule(this, _timeout, TimeUnit.MILLISECONDS);
+            }
+
+            Task task = null;
+            if (interpreter != null && interpreter.drain()) {
+                task = new Task(interpreter, ir);
+                s_executors.execute(task);
+            }
+
+            while (true) {
+                try {
+                    if (_process.waitFor() == 0) {
+                        _logger.debug("Execution is successful.");
+                        if (interpreter != null) {
+                            return interpreter.drain() ? task.getResult() : interpreter.interpret(ir);
+                        } else {
+                            // null return exitValue apparently
+                            return String.valueOf(_process.exitValue());
+                        }
+                    } else {
+                        break;
+                    }
+                } catch (final InterruptedException e) {
+                    if (!_isTimeOut) {
+                        /*
+                         * This is not timeout, we are interrupted by others,
+                         * continue
+                         */
+                        _logger.debug("We are interrupted but it's not a timeout, just continue");
+                        continue;
+                    }
+
+                    final TimedOutLogger log = new TimedOutLogger(_process);
+                    final Task timedoutTask = new Task(log, ir);
+
+                    timedoutTask.run();
+                    if (!_passwordCommand) {
+                        _logger.warn("Timed out: " + buildCommandLine(command) + ".  Output is: " + timedoutTask.getResult());
+                    } else {
+                        _logger.warn("Timed out: " + buildCommandLine(command));
+                    }
+
+                    return ERR_TIMEOUT;
+                } finally {
+                    if (future != null) {
+                        future.cancel(false);
+                    }
+                    Thread.interrupted();
+                }
+            }
+
+            _logger.debug("Exit value is " + _process.exitValue());
+
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(_process.getInputStream()), 128);
+
+            final String error;
+            if (interpreter != null) {
+                error = interpreter.processError(reader);
+            } else {
+                error = String.valueOf(_process.exitValue());
+            }
+
+            if (_logger.isDebugEnabled()) {
+                _logger.debug(error);
+            }
+            return error;
+        } catch (final SecurityException ex) {
+            _logger.warn("Security Exception....not running as root?", ex);
+            return stackTraceAsString(ex);
+        } catch (final Exception ex) {
+            _logger.warn("Exception: " + buildCommandLine(command), ex);
+            return stackTraceAsString(ex);
+        } finally {
+            if (_process != null) {
+                IOUtils.closeQuietly(_process.getErrorStream());
+                IOUtils.closeQuietly(_process.getOutputStream());
+                IOUtils.closeQuietly(_process.getInputStream());
+                _process.destroy();
+            }
+        }
+    }
+
+    protected String buildCommandLine(final String[] command) {
+        final StringBuilder builder = new StringBuilder();
+        boolean obscureParam = false;
+        for (int i = 0; i < command.length; i++) {
+            final String cmd = command[i];
+            if (obscureParam) {
+                builder.append("******").append(" ");
+                obscureParam = false;
+            } else {
+                builder.append(command[i]).append(" ");
+            }
+
+            if ("-y".equals(cmd) || "-z".equals(cmd)) {
+                obscureParam = true;
+                _passwordCommand = true;
+            }
+        }
+        return builder.toString();
+    }
+
+    static String stackTraceAsString(final Throwable throwable) {
+        //TODO: a StringWriter is bit to heavy weight
+        try (StringWriter out = new StringWriter(); PrintWriter writer = new PrintWriter(out)) {
+            throwable.printStackTrace(writer);
+            return out.toString();
+        } catch (final IOException e) {
+            return "";
+        }
+    }
+
+    public static int runSimpleBashScriptForExitValue(final String command) {
         return runSimpleBashScriptForExitValue(command, 0);
     }
 
-    public static int runSimpleBashScriptForExitValue(String command, int timeout) {
+    public static int runSimpleBashScriptForExitValue(final String command, final int timeout) {
 
-        Script s = new Script("/bin/bash", timeout);
+        final Script s = new Script("/bin/bash", timeout);
         s.add("-c");
         s.add(command);
 
-        String result = s.execute(null);
-        if (result == null || result.trim().isEmpty())
+        final String result = s.execute(null);
+        if (result == null || result.trim().isEmpty()) {
             return -1;
-        else {
+        } else {
             try {
                 return Integer.parseInt(result.trim());
-            } catch (NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 return -1;
             }
         }
     }
 
+    public int getExitValue() {
+        return _process.exitValue();
+    }
+
+    public void add(final String... params) {
+        for (final String param : params) {
+            _command.add(param);
+        }
+    }
+
+    public Script set(final String name, final String value) {
+        _command.add(name);
+        _command.add(value);
+        return this;
+    }
+
+    public void setWorkDir(final String workDir) {
+        _workDir = workDir;
+    }
+
+    protected String buildCommandLine(final List<String> command) {
+        final StringBuilder builder = new StringBuilder();
+        boolean obscureParam = false;
+        for (final String cmd : command) {
+            if (obscureParam) {
+                builder.append("******").append(" ");
+                obscureParam = false;
+            } else {
+                builder.append(cmd).append(" ");
+            }
+
+            if ("-y".equals(cmd) || "-z".equals(cmd)) {
+                obscureParam = true;
+                _passwordCommand = true;
+            }
+        }
+        return builder.toString();
+    }
+
+    public long getTimeout() {
+        return _timeout;
+    }
+
+    public String execute() {
+        return execute(new OutputInterpreter.OutputLogger(_logger));
+    }
+
+    @Override
+    public String toString() {
+        final String[] command = _command.toArray(new String[_command.size()]);
+        return buildCommandLine(command);
+    }
+
+    @Override
+    public String call() {
+        try {
+            _logger.trace("Checking exit value of process");
+            _process.exitValue();
+            _logger.trace("Script ran within the alloted time");
+        } catch (final IllegalThreadStateException e) {
+            _logger.warn("Interrupting script.");
+            _isTimeOut = true;
+            _thread.interrupt();
+        }
+        return null;
+    }
+
+    public static class Task implements Runnable {
+        OutputInterpreter interpreter;
+        BufferedReader reader;
+        String result;
+        boolean done;
+
+        public Task(final OutputInterpreter interpreter, final BufferedReader reader) {
+            this.interpreter = interpreter;
+            this.reader = reader;
+            result = null;
+        }
+
+        @Override
+        public void run() {
+            synchronized (this) {
+                done = false;
+                try {
+                    result = interpreter.interpret(reader);
+                } catch (final IOException ex) {
+                    result = stackTraceAsString(ex);
+                } catch (final Exception ex) {
+                    result = stackTraceAsString(ex);
+                } finally {
+                    done = true;
+                    notifyAll();
+                    IOUtils.closeQuietly(reader);
+                }
+            }
+        }
+
+        public synchronized String getResult() throws InterruptedException {
+            if (!done) {
+                wait();
+            }
+            return result;
+        }
+    }
 }

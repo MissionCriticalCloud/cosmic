@@ -1,0 +1,107 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cloud-plugin-hypervisor-ovm3</artifactId>
+    <name>Cosmic Plugin - Hypervisor OracleVM3</name>
+    <version>5.1.0.1-SNAPSHOT</version>
+    <parent>
+        <groupId>cloud.cosmic</groupId>
+        <artifactId>cosmic-core</artifactId>
+        <version>5.1.0.1-SNAPSHOT</version>
+        <relativePath>../../../</relativePath>
+    </parent>
+
+    <distributionManagement>
+        <repository>
+            <id>beta-nexus</id>
+            <name>MCC Nexus</name>
+            <url>https://beta-nexus.mcc.schubergphilis.com/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>beta-nexus</id>
+            <name>MCC Nexus</name>
+            <url>https://beta-nexus.mcc.schubergphilis.com/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-server</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-api</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-utils</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-config</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-api</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlrpc</groupId>
+            <artifactId>xmlrpc-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlrpc</groupId>
+            <artifactId>xmlrpc-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>integration</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

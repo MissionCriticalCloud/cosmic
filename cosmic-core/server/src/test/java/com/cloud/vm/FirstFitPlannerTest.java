@@ -1,34 +1,9 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.vm;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityManager;
@@ -64,12 +39,20 @@ import com.cloud.utils.Pair;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.test.utils.SpringUtils;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,6 +75,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
 public class FirstFitPlannerTest {
 
+    private static final long domainId = 1L;
     @Inject
     FirstFitPlanner planner = new FirstFitPlanner();
     @Inject
@@ -114,8 +98,6 @@ public class FirstFitPlannerTest {
     HostGpuGroupsDao hostGpuGroupsDao;
     @Inject
     HostTagsDao hostTagsDao;
-
-    private static long domainId = 1L;
     long dataCenterId = 1L;
     long accountId = 1L;
     long offeringId = 12L;
@@ -143,13 +125,13 @@ public class FirstFitPlannerTest {
 
     @Test
     public void checkClusterReorderingBasedOnImplicitHostTags() throws InsufficientServerCapacityException {
-        VirtualMachineProfileImpl vmProfile = mock(VirtualMachineProfileImpl.class);
-        DataCenterDeployment plan = mock(DataCenterDeployment.class);
-        ExcludeList avoids = mock(ExcludeList.class);
+        final VirtualMachineProfileImpl vmProfile = mock(VirtualMachineProfileImpl.class);
+        final DataCenterDeployment plan = mock(DataCenterDeployment.class);
+        final ExcludeList avoids = mock(ExcludeList.class);
         initializeForTest(vmProfile, plan, avoids);
 
-        List<Long> clusterList = planner.orderClusters(vmProfile, plan, avoids);
-        List<Long> reorderedClusterList = new ArrayList<Long>();
+        final List<Long> clusterList = planner.orderClusters(vmProfile, plan, avoids);
+        final List<Long> reorderedClusterList = new ArrayList<>();
         reorderedClusterList.add(4L);
         reorderedClusterList.add(3L);
         reorderedClusterList.add(1L);
@@ -160,13 +142,13 @@ public class FirstFitPlannerTest {
         assertTrue("Reordered cluster list is not ownering the implict host tags", (clusterList.equals(reorderedClusterList)));
     }
 
-    private void initializeForTest(VirtualMachineProfileImpl vmProfile, DataCenterDeployment plan, ExcludeList avoids) {
-        DataCenterVO mockDc = mock(DataCenterVO.class);
-        VMInstanceVO vm = mock(VMInstanceVO.class);
-        UserVmVO userVm = mock(UserVmVO.class);
-        ServiceOfferingVO offering = mock(ServiceOfferingVO.class);
+    private void initializeForTest(final VirtualMachineProfileImpl vmProfile, final DataCenterDeployment plan, final ExcludeList avoids) {
+        final DataCenterVO mockDc = mock(DataCenterVO.class);
+        final VMInstanceVO vm = mock(VMInstanceVO.class);
+        final UserVmVO userVm = mock(UserVmVO.class);
+        final ServiceOfferingVO offering = mock(ServiceOfferingVO.class);
 
-        AccountVO account = mock(AccountVO.class);
+        final AccountVO account = mock(AccountVO.class);
         when(account.getId()).thenReturn(accountId);
         when(account.getAccountId()).thenReturn(accountId);
         when(vmProfile.getOwner()).thenReturn(account);
@@ -190,7 +172,7 @@ public class FirstFitPlannerTest {
         when(offering.getSpeed()).thenReturn(cpuSpeedInOffering);
         when(offering.getRamSize()).thenReturn(ramInOffering);
 
-        List<Long> clustersWithEnoughCapacity = new ArrayList<Long>();
+        final List<Long> clustersWithEnoughCapacity = new ArrayList<>();
         clustersWithEnoughCapacity.add(1L);
         clustersWithEnoughCapacity.add(2L);
         clustersWithEnoughCapacity.add(3L);
@@ -199,10 +181,10 @@ public class FirstFitPlannerTest {
         clustersWithEnoughCapacity.add(6L);
 
         when(
-            capacityDao.listClustersInZoneOrPodByHostCapacities(dataCenterId, noOfCpusInOffering * cpuSpeedInOffering, ramInOffering * 1024L * 1024L,
-                Capacity.CAPACITY_TYPE_CPU, true)).thenReturn(clustersWithEnoughCapacity);
+                capacityDao.listClustersInZoneOrPodByHostCapacities(dataCenterId, noOfCpusInOffering * cpuSpeedInOffering, ramInOffering * 1024L * 1024L,
+                        Capacity.CAPACITY_TYPE_CPU, true)).thenReturn(clustersWithEnoughCapacity);
 
-        Map<Long, Double> clusterCapacityMap = new HashMap<Long, Double>();
+        final Map<Long, Double> clusterCapacityMap = new HashMap<>();
         clusterCapacityMap.put(1L, 2048D);
         clusterCapacityMap.put(2L, 2048D);
         clusterCapacityMap.put(3L, 2048D);
@@ -210,21 +192,21 @@ public class FirstFitPlannerTest {
         clusterCapacityMap.put(5L, 2048D);
         clusterCapacityMap.put(6L, 2048D);
 
-        Pair<List<Long>, Map<Long, Double>> clustersOrderedByCapacity = new Pair<List<Long>, Map<Long, Double>>(clustersWithEnoughCapacity, clusterCapacityMap);
+        final Pair<List<Long>, Map<Long, Double>> clustersOrderedByCapacity = new Pair<>(clustersWithEnoughCapacity, clusterCapacityMap);
         when(capacityDao.orderClustersByAggregateCapacity(dataCenterId, Capacity.CAPACITY_TYPE_CPU, true)).thenReturn(clustersOrderedByCapacity);
 
-        List<Long> disabledClusters = new ArrayList<Long>();
-        List<Long> clustersWithDisabledPods = new ArrayList<Long>();
+        final List<Long> disabledClusters = new ArrayList<>();
+        final List<Long> clustersWithDisabledPods = new ArrayList<>();
         when(clusterDao.listDisabledClusters(dataCenterId, null)).thenReturn(disabledClusters);
         when(clusterDao.listClustersWithDisabledPods(dataCenterId)).thenReturn(clustersWithDisabledPods);
 
-        List<Long> hostList0 = new ArrayList<Long>();
-        List<Long> hostList1 = new ArrayList<Long>();
-        List<Long> hostList2 = new ArrayList<Long>();
-        List<Long> hostList3 = new ArrayList<Long>();
-        List<Long> hostList4 = new ArrayList<Long>();
-        List<Long> hostList5 = new ArrayList<Long>();
-        List<Long> hostList6 = new ArrayList<Long>();
+        final List<Long> hostList0 = new ArrayList<>();
+        final List<Long> hostList1 = new ArrayList<>();
+        final List<Long> hostList2 = new ArrayList<>();
+        final List<Long> hostList3 = new ArrayList<>();
+        final List<Long> hostList4 = new ArrayList<>();
+        final List<Long> hostList5 = new ArrayList<>();
+        final List<Long> hostList6 = new ArrayList<>();
         hostList0.add(new Long(1));
         hostList1.add(new Long(10));
         hostList2.add(new Long(11));
@@ -232,8 +214,8 @@ public class FirstFitPlannerTest {
         hostList4.add(new Long(13));
         hostList5.add(new Long(14));
         hostList6.add(new Long(15));
-        String[] implicitHostTags = {"GPU"};
-        int ramInBytes = ramInOffering * 1024 * 1024;
+        final String[] implicitHostTags = {"GPU"};
+        final int ramInBytes = ramInOffering * 1024 * 1024;
         when(serviceOfferingDetailsDao.findDetail(Matchers.anyLong(), anyString())).thenReturn(null);
         when(hostGpuGroupsDao.listHostIds()).thenReturn(hostList0);
         when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering * cpuSpeedInOffering, ramInBytes, new Long(1), Host.Type.Routing.toString())).thenReturn(hostList1);
@@ -242,18 +224,18 @@ public class FirstFitPlannerTest {
         when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering * cpuSpeedInOffering, ramInBytes, new Long(4), Host.Type.Routing.toString())).thenReturn(hostList4);
         when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering * cpuSpeedInOffering, ramInBytes, new Long(5), Host.Type.Routing.toString())).thenReturn(hostList5);
         when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering * cpuSpeedInOffering, ramInBytes, new Long(6), Host.Type.Routing.toString())).thenReturn(hostList6);
-        when(hostTagsDao.getDistinctImplicitHostTags(hostList1, implicitHostTags)).thenReturn(Arrays.asList("abc", "pqr","xyz"));
+        when(hostTagsDao.getDistinctImplicitHostTags(hostList1, implicitHostTags)).thenReturn(Arrays.asList("abc", "pqr", "xyz"));
         when(hostTagsDao.getDistinctImplicitHostTags(hostList2, implicitHostTags)).thenReturn(Arrays.asList("abc", "123", "pqr", "456", "xyz"));
         when(hostTagsDao.getDistinctImplicitHostTags(hostList3, implicitHostTags)).thenReturn(Arrays.asList("abc", "pqr"));
         when(hostTagsDao.getDistinctImplicitHostTags(hostList4, implicitHostTags)).thenReturn(Arrays.asList("abc"));
-        when(hostTagsDao.getDistinctImplicitHostTags(hostList5, implicitHostTags)).thenReturn(Arrays.asList("abc", "pqr","xyz"));
-        when(hostTagsDao.getDistinctImplicitHostTags(hostList6, implicitHostTags)).thenReturn(Arrays.asList("abc", "123", "pqr","xyz"));
+        when(hostTagsDao.getDistinctImplicitHostTags(hostList5, implicitHostTags)).thenReturn(Arrays.asList("abc", "pqr", "xyz"));
+        when(hostTagsDao.getDistinctImplicitHostTags(hostList6, implicitHostTags)).thenReturn(Arrays.asList("abc", "123", "pqr", "xyz"));
     }
 
     @Configuration
     @ComponentScan(basePackageClasses = {FirstFitPlanner.class},
-                   includeFilters = {@Filter(value = TestConfiguration.Library.class, type = FilterType.CUSTOM)},
-                   useDefaultFilters = false)
+            includeFilters = {@Filter(value = TestConfiguration.Library.class, type = FilterType.CUSTOM)},
+            useDefaultFilters = false)
     public static class TestConfiguration extends SpringUtils.CloudStackTestConfiguration {
 
         @Bean
@@ -378,8 +360,8 @@ public class FirstFitPlannerTest {
 
         public static class Library implements TypeFilter {
             @Override
-            public boolean match(MetadataReader mdr, MetadataReaderFactory arg1) throws IOException {
-                ComponentScan cs = TestConfiguration.class.getAnnotation(ComponentScan.class);
+            public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) throws IOException {
+                final ComponentScan cs = TestConfiguration.class.getAnnotation(ComponentScan.class);
                 return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);
             }
         }

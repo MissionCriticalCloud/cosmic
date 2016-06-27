@@ -1,21 +1,10 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// the License.  You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.utils.db;
 
+import com.cloud.utils.exception.CloudRuntimeException;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
+import javax.persistence.JoinColumn;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -25,12 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.ElementCollection;
-import javax.persistence.JoinColumn;
-
-import com.cloud.utils.exception.CloudRuntimeException;
-
 public class EcInfo {
     protected String insertSql;
     protected String selectSql;
@@ -38,20 +21,20 @@ public class EcInfo {
     protected Class<?> targetClass;
     protected Class<?> rawClass;
 
-    public EcInfo(Attribute attr, Attribute idAttr) {
+    public EcInfo(final Attribute attr, final Attribute idAttr) {
         attr.attache = this;
-        ElementCollection ec = attr.field.getAnnotation(ElementCollection.class);
+        final ElementCollection ec = attr.field.getAnnotation(ElementCollection.class);
         targetClass = ec.targetClass();
-        Class<?> type = attr.field.getType();
+        final Class<?> type = attr.field.getType();
         if (type.isArray()) {
             rawClass = null;
         } else {
-            ParameterizedType pType = (ParameterizedType)attr.field.getGenericType();
-            Type rawType = pType.getRawType();
-            Class<?> rawClazz = (Class<?>)rawType;
+            final ParameterizedType pType = (ParameterizedType) attr.field.getGenericType();
+            final Type rawType = pType.getRawType();
+            final Class<?> rawClazz = (Class<?>) rawType;
             try {
                 if (!Modifier.isAbstract(rawClazz.getModifiers()) && !rawClazz.isInterface() && rawClazz.getConstructors().length != 0 &&
-                    rawClazz.getConstructor() != null) {
+                        rawClazz.getConstructor() != null) {
                     rawClass = rawClazz;
                 } else if (Set.class == rawClazz) {
                     rawClass = HashSet.class;
@@ -62,16 +45,16 @@ public class EcInfo {
                 } else {
                     assert (false) : " We don't know how to create this calss " + rawType.toString() + " for " + attr.field.getName();
                 }
-            } catch (NoSuchMethodException e) {
+            } catch (final NoSuchMethodException e) {
                 throw new CloudRuntimeException("Write your own support for " + rawClazz + " defined by " + attr.field.getName());
             }
         }
 
-        CollectionTable ct = attr.field.getAnnotation(CollectionTable.class);
+        final CollectionTable ct = attr.field.getAnnotation(CollectionTable.class);
         assert (ct.name().length() > 0) : "Please sepcify the table for " + attr.field.getName();
-        StringBuilder selectBuf = new StringBuilder("SELECT ");
-        StringBuilder insertBuf = new StringBuilder("INSERT INTO ");
-        StringBuilder clearBuf = new StringBuilder("DELETE FROM ");
+        final StringBuilder selectBuf = new StringBuilder("SELECT ");
+        final StringBuilder insertBuf = new StringBuilder("INSERT INTO ");
+        final StringBuilder clearBuf = new StringBuilder("DELETE FROM ");
 
         clearBuf.append(ct.name()).append(" WHERE ");
         selectBuf.append(attr.columnName);
@@ -79,9 +62,9 @@ public class EcInfo {
         selectBuf.append(" WHERE ");
 
         insertBuf.append(ct.name()).append("(");
-        StringBuilder valuesBuf = new StringBuilder("SELECT ");
+        final StringBuilder valuesBuf = new StringBuilder("SELECT ");
 
-        for (JoinColumn jc : ct.joinColumns()) {
+        for (final JoinColumn jc : ct.joinColumns()) {
             selectBuf.append(ct.name()).append(".").append(jc.name()).append("=");
             if (jc.referencedColumnName().length() == 0) {
                 selectBuf.append(idAttr.table).append(".").append(idAttr.columnName);

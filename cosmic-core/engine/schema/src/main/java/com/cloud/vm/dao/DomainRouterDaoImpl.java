@@ -1,26 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.vm.dao;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
@@ -45,6 +23,11 @@ import com.cloud.utils.db.UpdateBuilder;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.VirtualMachine.State;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 
@@ -60,6 +43,7 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
     protected SearchBuilder<DomainRouterVO> OutsidePodSearch;
     protected SearchBuilder<DomainRouterVO> clusterSearch;
     protected SearchBuilder<DomainRouterVO> SearchByStateAndManagementServerId;
+    protected SearchBuilder<DomainRouterVO> VpcSearch;
     @Inject
     HostDao _hostsDao;
     @Inject
@@ -68,7 +52,6 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
     UserStatisticsDao _userStatsDao;
     @Inject
     NetworkOfferingDao _offDao;
-    protected SearchBuilder<DomainRouterVO> VpcSearch;
 
     public DomainRouterDaoImpl() {
     }
@@ -195,15 +178,6 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
     }
 
     @Override
-    public List<DomainRouterVO> findBy(final long accountId, final long dcId, final Role role) {
-        final SearchCriteria<DomainRouterVO> sc = AllFieldsSearch.create();
-        sc.setParameters("account", accountId);
-        sc.setParameters("dc", dcId);
-        sc.setParameters("role", role);
-        return listBy(sc);
-    }
-
-    @Override
     public List<DomainRouterVO> listBy(final long accountId) {
         final SearchCriteria<DomainRouterVO> sc = AllFieldsSearch.create();
         sc.setParameters("account", accountId);
@@ -218,6 +192,14 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
     }
 
     @Override
+    public List<DomainRouterVO> listByLastHostId(final Long hostId) {
+        final SearchCriteria<DomainRouterVO> sc = AllFieldsSearch.create();
+        sc.setParameters("lastHost", hostId);
+        sc.setParameters("state", State.Stopped);
+        return listBy(sc);
+    }
+
+    @Override
     public List<DomainRouterVO> listRunningByPodId(final Long podId) {
         final SearchCriteria<DomainRouterVO> sc = RunningSearch.create();
         sc.setParameters("state", State.Running);
@@ -226,18 +208,10 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
     }
 
     @Override
-    public List<DomainRouterVO> listRunningByClusterId(final Long clusterId) {
-        final SearchCriteria<DomainRouterVO> sc = clusterSearch.create();
-        sc.setParameters("state", State.Running);
-        sc.setJoinParameters("host", "clusterId", clusterId);
-        return listBy(sc);
-    }
-
-    @Override
     public List<DomainRouterVO> listByPodIdAndStates(final Long podId, final State... states) {
         final SearchCriteria<DomainRouterVO> sc = AllFieldsSearch.create();
         sc.setParameters("podId", podId);
-        sc.setParameters("states", (Object[])states);
+        sc.setParameters("states", (Object[]) states);
         return listBy(sc);
     }
 
@@ -249,7 +223,7 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
         }
         sc.setJoinParameters("networkRouter", "type", Network.GuestType.Isolated);
         final List<DomainRouterVO> routerIds = listBy(sc);
-        final List<DomainRouterVO> routers = new ArrayList<DomainRouterVO>();
+        final List<DomainRouterVO> routers = new ArrayList<>();
         for (final DomainRouterVO router : routerIds) {
             CollectionUtils.addIgnoreNull(routers, findById(router.getId()));
         }
@@ -265,17 +239,18 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
     }
 
     @Override
-    public List<DomainRouterVO> findByNetwork(final long networkId) {
+    public List<DomainRouterVO> findBy(final long accountId, final long dcId, final Role role) {
         final SearchCriteria<DomainRouterVO> sc = AllFieldsSearch.create();
-        sc.setJoinParameters("networkRouter", "networkId", networkId);
+        sc.setParameters("account", accountId);
+        sc.setParameters("dc", dcId);
+        sc.setParameters("role", role);
         return listBy(sc);
     }
 
     @Override
-    public List<DomainRouterVO> listByLastHostId(final Long hostId) {
+    public List<DomainRouterVO> findByNetwork(final long networkId) {
         final SearchCriteria<DomainRouterVO> sc = AllFieldsSearch.create();
-        sc.setParameters("lastHost", hostId);
-        sc.setParameters("state", State.Stopped);
+        sc.setJoinParameters("networkRouter", "networkId", networkId);
         return listBy(sc);
     }
 
@@ -294,7 +269,7 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
         sc.setJoinParameters("networkRouter", "type", type);
         sc.setJoinParameters("host", "mgmtServerId", mgmtSrvrId);
         final List<DomainRouterVO> routerIds = listBy(sc);
-        final List<DomainRouterVO> routers = new ArrayList<DomainRouterVO>();
+        final List<DomainRouterVO> routers = new ArrayList<>();
         for (final DomainRouterVO router : routerIds) {
             routers.add(findById(router.getId()));
         }
@@ -365,6 +340,19 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
     }
 
     @Override
+    public List<Long> getRouterNetworks(final long routerId) {
+        return _routerNetworkDao.getRouterNetworks(routerId);
+    }
+
+    @Override
+    public List<DomainRouterVO> listByVpcId(final long vpcId) {
+        final SearchCriteria<DomainRouterVO> sc = VpcSearch.create();
+        sc.setParameters("vpcId", vpcId);
+        sc.setParameters("role", Role.VIRTUAL_ROUTER);
+        return listBy(sc);
+    }
+
+    @Override
     @DB
     public void addRouterToGuestNetwork(final VirtualRouter router, final Network guestNetwork) {
         if (_routerNetworkDao.findByRouterAndNetwork(router.getId(), guestNetwork.getId()) == null) {
@@ -397,15 +385,10 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
     }
 
     @Override
-    public List<Long> getRouterNetworks(final long routerId) {
-        return _routerNetworkDao.getRouterNetworks(routerId);
-    }
-
-    @Override
-    public List<DomainRouterVO> listByVpcId(final long vpcId) {
-        final SearchCriteria<DomainRouterVO> sc = VpcSearch.create();
-        sc.setParameters("vpcId", vpcId);
-        sc.setParameters("role", Role.VIRTUAL_ROUTER);
+    public List<DomainRouterVO> listRunningByClusterId(final Long clusterId) {
+        final SearchCriteria<DomainRouterVO> sc = clusterSearch.create();
+        sc.setParameters("state", State.Running);
+        sc.setJoinParameters("host", "clusterId", clusterId);
         return listBy(sc);
     }
 

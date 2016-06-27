@@ -1,26 +1,8 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
-#Import Local Modules
+# Import Local Modules
+from ast import literal_eval
+from marvin.cloudstackException import CloudstackAPIException
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (
-    cleanup_resources,
-    validateList
-)
+from marvin.codes import PASS
 from marvin.lib.base import (
     Account,
     VirtualMachine,
@@ -31,18 +13,19 @@ from marvin.lib.base import (
     listConfigurations
 )
 from marvin.lib.common import (
-    get_domain,list_isos,
+    get_domain, list_isos,
     get_zone,
     get_template,
     get_hypervisor_type
 )
+from marvin.lib.utils import (
+    cleanup_resources,
+    validateList
+)
 from nose.plugins.attrib import attr
-from ast import literal_eval
-from marvin.codes import PASS
-from marvin.cloudstackException import CloudstackAPIException
+
 
 class TestVMware(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         try:
@@ -103,7 +86,7 @@ class TestVMware(cloudstackTestCase):
         self.cleanup = []
 
     def tearDown(self):
-        #Clean up, terminate the created volumes
+        # Clean up, terminate the created volumes
         cleanup_resources(self.apiClient, self.cleanup)
         return
 
@@ -150,10 +133,10 @@ class TestVMware(cloudstackTestCase):
             domainid=self.account.domainid,
             hypervisor=self.hypervisor
         )
-        self.assertIsNotNone(template,"Failed to register Rhel6 template")
+        self.assertIsNotNone(template, "Failed to register Rhel6 template")
         self.debug(
             "Registered a template with format {} and id {}".format(
-                self.services["rhel60template"]["format"],template.id)
+                self.services["rhel60template"]["format"], template.id)
         )
         template.download(self.userapiclient)
         self.cleanup.append(template)
@@ -166,11 +149,11 @@ class TestVMware(cloudstackTestCase):
             templateid=template.id,
             zoneid=self.zone.id
         )
-        self.assertIsNotNone(vm,"Failed to deploy virtual machine")
+        self.assertIsNotNone(vm, "Failed to deploy virtual machine")
         self.cleanup.append(vm)
-        response = VirtualMachine.list(self.userapiclient,id=vm.id)
+        response = VirtualMachine.list(self.userapiclient, id=vm.id)
         status = validateList(response)
-        self.assertEqual(status[0],PASS,"list vm response returned invalid list")
+        self.assertEqual(status[0], PASS, "list vm response returned invalid list")
         """
         list root disk of the vm created above and make sure that device type is ide
         """
@@ -180,7 +163,7 @@ class TestVMware(cloudstackTestCase):
             type="root",
             listAll="true"
         )
-        self.assertEqual(validateList(volume_res)[0],PASS,"list vm response returned invalid list")
+        self.assertEqual(validateList(volume_res)[0], PASS, "list vm response returned invalid list")
         chaininfo = volume_res[0].chaininfo
         device_Bus = literal_eval(chaininfo)["diskDeviceBusName"]
         if "ide" not in device_Bus:
@@ -191,10 +174,10 @@ class TestVMware(cloudstackTestCase):
             zoneid=self.zone.id,
             diskofferingid=self.disk_offering.id
         )
-        self.assertIsNotNone(disk,"Failed to create custom volume")
+        self.assertIsNotNone(disk, "Failed to create custom volume")
         self.cleanup.append(disk)
         try:
-            vm.attach_volume(self.userapiclient,disk)
+            vm.attach_volume(self.userapiclient, disk)
             list_volumes = Volume.list(
                 self.userapiclient,
                 listall=self.services["listall"],
@@ -232,7 +215,7 @@ class TestVMware(cloudstackTestCase):
         )
         self.debug(
             "Registered a template with format {} and id {}".format(
-                self.services["CentOS6.3template"]["format"],template.id)
+                self.services["CentOS6.3template"]["format"], template.id)
         )
         template.download(self.userapiclient)
         self.cleanup.append(template)
@@ -246,9 +229,9 @@ class TestVMware(cloudstackTestCase):
             zoneid=self.zone.id
         )
         self.cleanup.append(vm)
-        response = VirtualMachine.list(self.userapiclient,id=vm.id)
+        response = VirtualMachine.list(self.userapiclient, id=vm.id)
         status = validateList(response)
-        self.assertEqual(status[0],PASS,"list vm response returned invalid list")
+        self.assertEqual(status[0], PASS, "list vm response returned invalid list")
         list_default_iso_response = list_isos(
             self.api_client,
             name="vmware-tools.iso",
@@ -257,18 +240,18 @@ class TestVMware(cloudstackTestCase):
         )
         status = validateList(list_default_iso_response)
         self.assertEquals(
-                PASS,
-                status[0],
-                "ISO list is empty")
+            PASS,
+            status[0],
+            "ISO list is empty")
         self.debug(
             "Registered a ISO with name {}".format(list_default_iso_response[0].name))
         try:
-            vm.attach_iso(self.userapiclient,list_default_iso_response[0])
+            vm.attach_iso(self.userapiclient, list_default_iso_response[0])
         except CloudstackAPIException  as e:
             self.fail("Attached ISO failed : %s" % e)
         response = VirtualMachine.list(self.userapiclient, id=vm.id)
         status = validateList(response)
-        self.assertEqual(status[0], PASS,"list vm response returned invalid list")
-        attachedIsoName=response[0].isoname;
+        self.assertEqual(status[0], PASS, "list vm response returned invalid list")
+        attachedIsoName = response[0].isoname;
         self.assertEqual(attachedIsoName, "vmware-tools.iso", "vmware-tools.iso not attached")
         return

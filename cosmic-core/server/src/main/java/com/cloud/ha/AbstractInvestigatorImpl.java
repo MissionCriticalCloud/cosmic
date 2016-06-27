@@ -1,27 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.ha;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
@@ -37,6 +14,12 @@ import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
 
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +34,7 @@ public abstract class AbstractInvestigatorImpl extends AdapterBase implements In
     private final ResourceManager _resourceMgr = null;
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
 
         return true;
     }
@@ -67,15 +50,15 @@ public abstract class AbstractInvestigatorImpl extends AdapterBase implements In
     }
 
     // Host.status is up and Host.type is routing
-    protected List<Long> findHostByPod(long podId, Long excludeHostId) {
-        QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
+    protected List<Long> findHostByPod(final long podId, final Long excludeHostId) {
+        final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
         sc.and(sc.entity().getType(), Op.EQ, Type.Routing);
         sc.and(sc.entity().getPodId(), Op.EQ, podId);
         sc.and(sc.entity().getStatus(), Op.EQ, Status.Up);
-        List<HostVO> hosts = sc.list();
+        final List<HostVO> hosts = sc.list();
 
-        List<Long> hostIds = new ArrayList<Long>(hosts.size());
-        for (HostVO h : hosts) {
+        final List<Long> hostIds = new ArrayList<>(hosts.size());
+        for (final HostVO h : hosts) {
             hostIds.add(h.getId());
         }
 
@@ -87,9 +70,9 @@ public abstract class AbstractInvestigatorImpl extends AdapterBase implements In
     }
 
     // Method only returns Status.Up, Status.Down and Status.Unknown
-    protected Status testIpAddress(Long hostId, String testHostIp) {
+    protected Status testIpAddress(final Long hostId, final String testHostIp) {
         try {
-            Answer pingTestAnswer = _agentMgr.send(hostId, new PingTestCommand(testHostIp));
+            final Answer pingTestAnswer = _agentMgr.send(hostId, new PingTestCommand(testHostIp));
             if (pingTestAnswer == null) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("host (" + testHostIp + ") returns Unknown (null) answer");
@@ -109,12 +92,12 @@ public abstract class AbstractInvestigatorImpl extends AdapterBase implements In
                 }
                 return Status.Unknown;
             }
-        } catch (AgentUnavailableException e) {
+        } catch (final AgentUnavailableException e) {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("host (" + testHostIp + "): " + e.getLocalizedMessage() + ", trapped AgentUnavailableException returning Unknown state");
             }
             return Status.Unknown;
-        } catch (OperationTimedoutException e) {
+        } catch (final OperationTimedoutException e) {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("host (" + testHostIp + "): " + e.getLocalizedMessage() + ", trapped OperationTimedoutException returning Unknown state");
             }

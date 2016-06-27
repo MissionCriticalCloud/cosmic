@@ -1,36 +1,15 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils.component;
+
+import com.cloud.utils.Pair;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.cloud.utils.Pair;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.PropertyValues;
-import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.CallbackFilter;
@@ -38,13 +17,17 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import net.sf.cglib.proxy.NoOp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.PropertyValues;
+import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 
 public class ComponentInstantiationPostProcessor implements InstantiationAwareBeanPostProcessor {
     private static final Logger s_logger = LoggerFactory.getLogger(ComponentInstantiationPostProcessor.class);
-
-    private List<ComponentMethodInterceptor> _interceptors = new ArrayList<ComponentMethodInterceptor>();
-    private Callback[] _callbacks;
-    private CallbackFilter _callbackFilter;
+    private final Callback[] _callbacks;
+    private final CallbackFilter _callbackFilter;
+    private List<ComponentMethodInterceptor> _interceptors = new ArrayList<>();
 
     public ComponentInstantiationPostProcessor() {
         _callbacks = new Callback[2];
@@ -58,8 +41,35 @@ public class ComponentInstantiationPostProcessor implements InstantiationAwareBe
         return _interceptors;
     }
 
-    public void setInterceptors(List<ComponentMethodInterceptor> interceptors) {
+    public void setInterceptors(final List<ComponentMethodInterceptor> interceptors) {
         _interceptors = interceptors;
+    }
+
+    @Override
+    public Object postProcessBeforeInitialization(final Object bean, final String beanName) throws BeansException {
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(final Object bean, final String beanName) throws BeansException {
+        return bean;
+    }
+
+    @Override
+    public Object postProcessBeforeInstantiation(final Class<?> beanClass, final String beanName) throws BeansException {
+        if (_interceptors != null && _interceptors.size() > 0) {
+            if (ComponentMethodInterceptable.class.isAssignableFrom(beanClass)) {
+                final Enhancer enhancer = new Enhancer();
+                enhancer.setSuperclass(beanClass);
+                enhancer.setCallbacks(getCallbacks());
+                enhancer.setCallbackFilter(getCallbackFilter());
+                enhancer.setNamingPolicy(ComponentNamingPolicy.INSTANCE);
+
+                final Object bean = enhancer.create();
+                return bean;
+            }
+        }
+        return null;
     }
 
     private Callback[] getCallbacks() {
@@ -71,60 +81,33 @@ public class ComponentInstantiationPostProcessor implements InstantiationAwareBe
     }
 
     @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
-    }
-
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
-    }
-
-    @Override
-    public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
-        if (_interceptors != null && _interceptors.size() > 0) {
-            if (ComponentMethodInterceptable.class.isAssignableFrom(beanClass)) {
-                Enhancer enhancer = new Enhancer();
-                enhancer.setSuperclass(beanClass);
-                enhancer.setCallbacks(getCallbacks());
-                enhancer.setCallbackFilter(getCallbackFilter());
-                enhancer.setNamingPolicy(ComponentNamingPolicy.INSTANCE);
-
-                Object bean = enhancer.create();
-                return bean;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
+    public boolean postProcessAfterInstantiation(final Object bean, final String beanName) throws BeansException {
         return true;
     }
 
     @Override
-    public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException {
+    public PropertyValues postProcessPropertyValues(final PropertyValues pvs, final PropertyDescriptor[] pds, final Object bean, final String beanName) throws BeansException {
         return pvs;
     }
 
     protected class InterceptorDispatcher implements MethodInterceptor {
         @Override
-        public Object intercept(Object target, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
-            ArrayList<Pair<ComponentMethodInterceptor, Object>> interceptors = new ArrayList<Pair<ComponentMethodInterceptor, Object>>();
+        public Object intercept(final Object target, final Method method, final Object[] args, final MethodProxy methodProxy) throws Throwable {
+            final ArrayList<Pair<ComponentMethodInterceptor, Object>> interceptors = new ArrayList<>();
 
-            for (ComponentMethodInterceptor interceptor : getInterceptors()) {
+            for (final ComponentMethodInterceptor interceptor : getInterceptors()) {
                 if (interceptor.needToIntercept(method)) {
-                    Object objReturnedInInterceptStart = interceptor.interceptStart(method, target);
-                    interceptors.add(new Pair<ComponentMethodInterceptor, Object>(interceptor, objReturnedInInterceptStart));
+                    final Object objReturnedInInterceptStart = interceptor.interceptStart(method, target);
+                    interceptors.add(new Pair<>(interceptor, objReturnedInInterceptStart));
                 }
             }
             boolean success = false;
             try {
-                Object obj = methodProxy.invokeSuper(target, args);
+                final Object obj = methodProxy.invokeSuper(target, args);
                 success = true;
                 return obj;
             } finally {
-                for (Pair<ComponentMethodInterceptor, Object> interceptor : interceptors) {
+                for (final Pair<ComponentMethodInterceptor, Object> interceptor : interceptors) {
                     if (success) {
                         interceptor.first().interceptComplete(method, target, interceptor.second());
                     } else {
@@ -137,8 +120,8 @@ public class ComponentInstantiationPostProcessor implements InstantiationAwareBe
 
     protected class InterceptorFilter implements CallbackFilter {
         @Override
-        public int accept(Method method) {
-            for (ComponentMethodInterceptor interceptor : getInterceptors()) {
+        public int accept(final Method method) {
+            for (final ComponentMethodInterceptor interceptor : getInterceptors()) {
 
                 if (interceptor.needToIntercept(method)) {
                     return 1;

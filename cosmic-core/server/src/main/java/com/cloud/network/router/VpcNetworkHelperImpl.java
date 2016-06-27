@@ -1,29 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.router;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.TreeSet;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.exception.ConcurrentOperationException;
@@ -43,24 +18,29 @@ import com.cloud.service.ServiceOfferingVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.vm.NicProfile;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.TreeSet;
+
 import org.apache.commons.lang.StringUtils;
 import org.cloud.network.router.deployment.RouterDeploymentDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class VpcNetworkHelperImpl extends NetworkHelperImpl {
 
     private static final Logger s_logger = LoggerFactory.getLogger(VpcNetworkHelperImpl.class);
-
-    @Inject
-    private VlanDao _vlanDao;
     @Inject
     protected VpcManager vpcMgr;
     @Inject
     protected NicProfileHelper nicProfileHelper;
-
     protected String noHypervisorsErrMsgDetails;
+    @Inject
+    private VlanDao _vlanDao;
 
     @PostConstruct
     protected void setupNoHypervisorsErrMsgDetails() {
@@ -69,20 +49,21 @@ public class VpcNetworkHelperImpl extends NetworkHelperImpl {
     }
 
     @Override
-    protected String getNoHypervisorsErrMsgDetails() {
-        return noHypervisorsErrMsgDetails;
-    }
-
-    @Override
     protected void filterSupportedHypervisors(final List<HypervisorType> hypervisors) {
         hypervisors.retainAll(vpcMgr.getSupportedVpcHypervisors());
     }
 
     @Override
-    public void reallocateRouterNetworks(final RouterDeploymentDefinition vpcRouterDeploymentDefinition, final VirtualRouter router, final VMTemplateVO template, final HypervisorType hType)
+    protected String getNoHypervisorsErrMsgDetails() {
+        return noHypervisorsErrMsgDetails;
+    }
+
+    @Override
+    public void reallocateRouterNetworks(final RouterDeploymentDefinition vpcRouterDeploymentDefinition, final VirtualRouter router, final VMTemplateVO template, final
+    HypervisorType hType)
             throws ConcurrentOperationException, InsufficientCapacityException {
 
-        final TreeSet<String> publicVlans = new TreeSet<String>();
+        final TreeSet<String> publicVlans = new TreeSet<>();
         if (vpcRouterDeploymentDefinition.needsPublicNic()) {
             publicVlans.add(vpcRouterDeploymentDefinition.getSourceNatIP().getVlanTag());
         } else {
@@ -99,7 +80,7 @@ public class VpcNetworkHelperImpl extends NetworkHelperImpl {
             for (final PrivateGateway privateGateway : privateGateways) {
                 final NicProfile privateNic = nicProfileHelper.createPrivateNicProfileForGateway(privateGateway, router);
                 final Network privateNetwork = _networkModel.getNetwork(privateGateway.getNetworkId());
-                networks.put(privateNetwork, new ArrayList<NicProfile>(Arrays.asList(privateNic)));
+                networks.put(privateNetwork, new ArrayList<>(Arrays.asList(privateNic)));
             }
         }
 
@@ -111,13 +92,13 @@ public class VpcNetworkHelperImpl extends NetworkHelperImpl {
             }
             if (guestNetwork.getState() == Network.State.Implemented || guestNetwork.getState() == Network.State.Setup) {
                 final NicProfile guestNic = nicProfileHelper.createGuestNicProfileForVpcRouter(vpcRouterDeploymentDefinition, guestNetwork);
-                networks.put(guestNetwork, new ArrayList<NicProfile>(Arrays.asList(guestNic)));
+                networks.put(guestNetwork, new ArrayList<>(Arrays.asList(guestNic)));
             }
         }
 
         //4) allocate nic for additional public network(s)
         final List<IPAddressVO> ips = _ipAddressDao.listByAssociatedVpc(vpcId, false);
-        final List<NicProfile> publicNics = new ArrayList<NicProfile>();
+        final List<NicProfile> publicNics = new ArrayList<>();
         Network publicNetwork = null;
         for (final IPAddressVO ip : ips) {
             final PublicIp publicIp = PublicIp.createFromAddrAndVlan(ip, _vlanDao.findById(ip.getVlanId()));
@@ -135,7 +116,8 @@ public class VpcNetworkHelperImpl extends NetworkHelperImpl {
                 publicNic.setIsolationUri(IsolationType.Vlan.toUri(publicIp.getVlanTag()));
                 final NetworkOffering publicOffering = _networkModel.getSystemAccountNetworkOfferings(NetworkOffering.SystemPublicNetwork).get(0);
                 if (publicNetwork == null) {
-                    final List<? extends Network> publicNetworks = _networkMgr.setupNetwork(s_systemAccount, publicOffering, vpcRouterDeploymentDefinition.getPlan(), null, null, false);
+                    final List<? extends Network> publicNetworks = _networkMgr.setupNetwork(s_systemAccount, publicOffering, vpcRouterDeploymentDefinition.getPlan(), null, null,
+                            false);
                     publicNetwork = publicNetworks.get(0);
                 }
                 publicNics.add(publicNic);
@@ -144,9 +126,8 @@ public class VpcNetworkHelperImpl extends NetworkHelperImpl {
         }
         if (publicNetwork != null) {
             if (networks.get(publicNetwork) != null) {
-                @SuppressWarnings("unchecked")
                 final
-                List<NicProfile> publicNicProfiles = (List<NicProfile>)networks.get(publicNetwork);
+                List<NicProfile> publicNicProfiles = (List<NicProfile>) networks.get(publicNetwork);
                 publicNicProfiles.addAll(publicNics);
                 networks.put(publicNetwork, publicNicProfiles);
             } else {
@@ -160,9 +141,10 @@ public class VpcNetworkHelperImpl extends NetworkHelperImpl {
     }
 
     @Override
-    public LinkedHashMap<Network, List<? extends NicProfile>> configureDefaultNics(final RouterDeploymentDefinition routerDeploymentDefinition) throws ConcurrentOperationException, InsufficientAddressCapacityException {
+    public LinkedHashMap<Network, List<? extends NicProfile>> configureDefaultNics(final RouterDeploymentDefinition routerDeploymentDefinition) throws
+            ConcurrentOperationException, InsufficientAddressCapacityException {
 
-        final LinkedHashMap<Network, List<? extends NicProfile>> networks = new LinkedHashMap<Network, List<? extends NicProfile>>(3);
+        final LinkedHashMap<Network, List<? extends NicProfile>> networks = new LinkedHashMap<>(3);
 
         // 1) Control network
         final LinkedHashMap<Network, List<? extends NicProfile>> controlNic = configureControlNic(routerDeploymentDefinition);

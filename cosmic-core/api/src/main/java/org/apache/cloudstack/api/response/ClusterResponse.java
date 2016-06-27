@@ -1,31 +1,15 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
+
+import com.cloud.org.Cluster;
+import com.cloud.serializer.Param;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
+import org.apache.cloudstack.api.EntityReference;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cloud.org.Cluster;
-import com.cloud.serializer.Param;
 import com.google.gson.annotations.SerializedName;
-
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.EntityReference;
 
 @EntityReference(value = Cluster.class)
 public class ClusterResponse extends BaseResponse {
@@ -89,7 +73,7 @@ public class ClusterResponse extends BaseResponse {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -97,7 +81,7 @@ public class ClusterResponse extends BaseResponse {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -105,7 +89,7 @@ public class ClusterResponse extends BaseResponse {
         return podId;
     }
 
-    public void setPodId(String podId) {
+    public void setPodId(final String podId) {
         this.podId = podId;
     }
 
@@ -113,7 +97,7 @@ public class ClusterResponse extends BaseResponse {
         return podName;
     }
 
-    public void setPodName(String podName) {
+    public void setPodName(final String podName) {
         this.podName = podName;
     }
 
@@ -121,7 +105,7 @@ public class ClusterResponse extends BaseResponse {
         return zoneId;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
@@ -129,7 +113,7 @@ public class ClusterResponse extends BaseResponse {
         return zoneName;
     }
 
-    public void setZoneName(String zoneName) {
+    public void setZoneName(final String zoneName) {
         this.zoneName = zoneName;
     }
 
@@ -137,7 +121,7 @@ public class ClusterResponse extends BaseResponse {
         return clusterType;
     }
 
-    public void setClusterType(String clusterType) {
+    public void setClusterType(final String clusterType) {
         this.clusterType = clusterType;
     }
 
@@ -145,7 +129,7 @@ public class ClusterResponse extends BaseResponse {
         return this.hypervisorType;
     }
 
-    public void setHypervisorType(String hypervisorType) {
+    public void setHypervisorType(final String hypervisorType) {
         this.hypervisorType = hypervisorType;
     }
 
@@ -153,7 +137,7 @@ public class ClusterResponse extends BaseResponse {
         return allocationState;
     }
 
-    public void setAllocationState(String allocationState) {
+    public void setAllocationState(final String allocationState) {
         this.allocationState = allocationState;
     }
 
@@ -161,7 +145,7 @@ public class ClusterResponse extends BaseResponse {
         return managedState;
     }
 
-    public void setManagedState(String managedState) {
+    public void setManagedState(final String managedState) {
         this.managedState = managedState;
     }
 
@@ -169,31 +153,31 @@ public class ClusterResponse extends BaseResponse {
         return capacitites;
     }
 
-    public void setCapacitites(ArrayList<CapacityResponse> arrayList) {
+    public void setCapacitites(final ArrayList<CapacityResponse> arrayList) {
         this.capacitites = arrayList;
-    }
-
-    public void setCpuOvercommitRatio(String cpuovercommitratio) {
-        this.cpuovercommitratio = cpuovercommitratio;
     }
 
     public String getCpuOvercommitRatio() {
         return cpuovercommitratio;
     }
 
-    public void setMemoryOvercommitRatio(String memoryovercommitratio) {
-        this.memoryovercommitratio = memoryovercommitratio;
+    public void setCpuOvercommitRatio(final String cpuovercommitratio) {
+        this.cpuovercommitratio = cpuovercommitratio;
     }
 
     public String getMemoryOvercommitRatio() {
         return memoryovercommitratio;
     }
 
-    public void setOvm3Vip(String ovm3vip) {
-        this.ovm3vip = ovm3vip;
+    public void setMemoryOvercommitRatio(final String memoryovercommitratio) {
+        this.memoryovercommitratio = memoryovercommitratio;
     }
 
     public String getOvm3Vip() {
         return ovm3vip;
+    }
+
+    public void setOvm3Vip(final String ovm3vip) {
+        this.ovm3vip = ovm3vip;
     }
 }

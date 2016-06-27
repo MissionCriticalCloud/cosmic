@@ -1,25 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.cluster;
 
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.org.Cluster;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -27,6 +10,7 @@ import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ClusterResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,37 +43,39 @@ public class UpdateClusterCmd extends BaseCmd {
         return clusterName;
     }
 
+    @Override
+    public void execute() {
+        final Cluster cluster = _resourceService.getCluster(getId());
+        if (cluster == null) {
+            throw new InvalidParameterValueException("Unable to find the cluster by id=" + getId());
+        }
+        final Cluster result = _resourceService.updateCluster(cluster, getClusterType(), getHypervisor(), getAllocationState(), getManagedstate());
+        if (result != null) {
+            final ClusterResponse clusterResponse = _responseGenerator.createClusterResponse(cluster, false);
+            clusterResponse.setResponseName(getCommandName());
+            this.setResponseObject(clusterResponse);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update cluster");
+        }
+    }
+
     public Long getId() {
         return id;
-    }
-
-    public String getHypervisor() {
-        return hypervisor;
-    }
-
-    @Override
-    public String getCommandName() {
-        return s_name;
     }
 
     public String getClusterType() {
         return clusterType;
     }
 
-    public void setClusterType(String type) {
-        this.clusterType = type;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
+    public String getHypervisor() {
+        return hypervisor;
     }
 
     public String getAllocationState() {
         return allocationState;
     }
 
-    public void setAllocationState(String allocationState) {
+    public void setAllocationState(final String allocationState) {
         this.allocationState = allocationState;
     }
 
@@ -97,23 +83,21 @@ public class UpdateClusterCmd extends BaseCmd {
         return managedState;
     }
 
-    public void setManagedstate(String managedstate) {
+    public void setManagedstate(final String managedstate) {
         this.managedState = managedstate;
     }
 
+    public void setClusterType(final String type) {
+        this.clusterType = type;
+    }
+
     @Override
-    public void execute() {
-        Cluster cluster = _resourceService.getCluster(getId());
-        if (cluster == null) {
-            throw new InvalidParameterValueException("Unable to find the cluster by id=" + getId());
-        }
-        Cluster result = _resourceService.updateCluster(cluster, getClusterType(), getHypervisor(), getAllocationState(), getManagedstate());
-        if (result != null) {
-            ClusterResponse clusterResponse = _responseGenerator.createClusterResponse(cluster, false);
-            clusterResponse.setResponseName(getCommandName());
-            this.setResponseObject(clusterResponse);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update cluster");
-        }
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

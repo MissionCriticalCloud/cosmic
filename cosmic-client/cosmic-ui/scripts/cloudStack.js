@@ -1,24 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function(cloudStack, $) {
+(function (cloudStack, $) {
     $.extend(cloudStack, {
         home: 'dashboard',
 
-        sectionPreFilter: function(args) {
+        sectionPreFilter: function (args) {
             var sections = [];
 
             if (isAdmin()) {
@@ -31,7 +15,7 @@
                 sections = ["dashboard", "instances", "storage", "network", "templates", "accounts", "events", "regions", "affinityGroups"];
             }
 
-            $.each(cloudStack.plugins, function(idx, plugin) {
+            $.each(cloudStack.plugins, function (idx, plugin) {
                 if (cloudStack.sections.hasOwnProperty(plugin) && !cloudStack.sections[plugin].showOnNavigation) {
                     sections.push('plugins');
                     return false;
@@ -64,7 +48,7 @@
         }
     });
 
-    $(window).bind('cloudStack.pluginReady', function() {
+    $(window).bind('cloudStack.pluginReady', function () {
         // Get language
         g_lang = $.cookie('lang') ? $.cookie('lang') : 'en';
 
@@ -77,16 +61,17 @@
             async: true,
             dataType: 'json',
             cache: false,
-            error: function(data) {
+            error: function (data) {
                 var clickAction = false;
                 if (isValidJsonString(data.responseText)) {
                     var json = JSON.parse(data.responseText);
                     if (json != null) {
                         var property;
-                        for (property in json) {}
+                        for (property in json) {
+                        }
                         var errorObj = json[property];
                         if (errorObj.errorcode == 401 && errorObj.errortext == "unable to verify user credentials and/or request signature") {
-                            clickAction = function() {
+                            clickAction = function () {
                                 $('#user-options a').eq(0).trigger('click');
                             };
                         }
@@ -105,7 +90,7 @@
             $container: $container,
 
             // Use this for checking the session, to bypass login screen
-            bypassLoginCheck: function(args) { //determine to show or bypass login screen
+            bypassLoginCheck: function (args) { //determine to show or bypass login screen
                 if (g_loginResponse == null) { //show login screen
                     var unBoxCookieValue = function (cookieName) {
                         return decodeURIComponent($.cookie(cookieName)).replace(/"([^"]+(?="))"/g, '$1');
@@ -135,7 +120,7 @@
                     url: createURL("listCapabilities"),
                     dataType: "json",
                     async: false,
-                    success: function(json) {
+                    success: function (json) {
                         g_capabilities = json.listcapabilitiesresponse.capability;
                         g_supportELB = json.listcapabilitiesresponse.capability.supportELB.toString(); //convert boolean to string if it's boolean
                         g_kvmsnapshotenabled = json.listcapabilitiesresponse.capability.kvmsnapshotenabled; //boolean
@@ -158,9 +143,9 @@
 
                         userValid = true;
                     },
-                    error: function(xmlHTTP) { //override default error handling, do nothing instead of showing error "unable to verify user credentials" on login screen
+                    error: function (xmlHTTP) { //override default error handling, do nothing instead of showing error "unable to verify user credentials" on login screen
                     },
-                    beforeSend: function(XMLHttpResponse) {
+                    beforeSend: function (XMLHttpResponse) {
                         return true;
                     }
                 });
@@ -172,7 +157,7 @@
                     data: {name: 'default.ui.page.size'},
                     dataType: 'json',
                     async: false,
-                    success: function(data, textStatus, xhr) {
+                    success: function (data, textStatus, xhr) {
                         if (data && data.listconfigurationsresponse && data.listconfigurationsresponse.configuration) {
                             var config = data.listconfigurationsresponse.configuration[0];
                             if (config && config.name == 'default.ui.page.size') {
@@ -180,7 +165,7 @@
                             }
                         }
                     },
-                    error: function(xhr) { // ignore any errors, fallback to the default
+                    error: function (xhr) { // ignore any errors, fallback to the default
                     }
                 });
 
@@ -191,7 +176,7 @@
                     url: createURL('listIdps'),
                     dataType: 'json',
                     async: false,
-                    success: function(data, textStatus, xhr) {
+                    success: function (data, textStatus, xhr) {
                         if (data && data.listidpsresponse && data.listidpsresponse.idp) {
                             var idpList = data.listidpsresponse.idp.sort(function (a, b) {
                                 return a.orgName.localeCompare(b.orgName);
@@ -199,7 +184,7 @@
                             g_idpList = idpList;
                         }
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                     }
                 });
 
@@ -216,7 +201,7 @@
             },
 
             // Actual login process, via form
-            loginAction: function(args) {
+            loginAction: function (args) {
                 var array1 = [];
                 array1.push("&username=" + encodeURIComponent(args.data.username));
 
@@ -245,7 +230,7 @@
                     data: "command=login" + loginCmdText + "&response=json",
                     dataType: "json",
                     async: false,
-                    success: function(json) {
+                    success: function (json) {
                         var loginresponse = json.loginresponse;
                         // sessionkey is recevied as a HttpOnly cookie
                         // therefore reset any g_sessionKey value, an explicit
@@ -285,7 +270,7 @@
                             url: createURL("listCapabilities"),
                             dataType: "json",
                             async: false,
-                            success: function(json) {
+                            success: function (json) {
                                 g_capabilities = json.listcapabilitiesresponse.capability;
                                 g_supportELB = json.listcapabilitiesresponse.capability.supportELB.toString(); //convert boolean to string if it's boolean
                                 g_kvmsnapshotenabled = json.listcapabilitiesresponse.capability.kvmsnapshotenabled; //boolean
@@ -315,7 +300,7 @@
                                     }
                                 });
                             },
-                            error: function(xmlHTTP) {
+                            error: function (xmlHTTP) {
                                 args.response.error();
                             }
                         });
@@ -324,7 +309,7 @@
                         // TEMPORARY -- replace w/ output of capability response, etc., once implemented
                         window.g_projectsInviteRequired = false;
                     },
-                    error: function(XMLHttpRequest) {
+                    error: function (XMLHttpRequest) {
                         var errorMsg = parseXMLHttpResponse(XMLHttpRequest);
                         if (errorMsg.length == 0 && XMLHttpRequest.status == 0)
                             errorMsg = dictionary['error.unable.to.reach.management.server'];
@@ -332,17 +317,17 @@
                             errorMsg = _l('error.invalid.username.password'); //override error message
                         args.response.error(errorMsg);
                     },
-                    beforeSend: function(XMLHttpResponse) {
+                    beforeSend: function (XMLHttpResponse) {
                         return true;
                     }
                 });
             },
 
-            logoutAction: function(args) {
+            logoutAction: function (args) {
                 $.ajax({
                     url: createURL('logout'),
                     async: false,
-                    success: function() {
+                    success: function () {
                         g_sessionKey = null;
                         g_username = null;
                         g_account = null;
@@ -367,18 +352,18 @@
                             document.location.reload(); //when onLogoutCallback() returns true, reload the current document.
                         }
                     },
-                    error: function() {
+                    error: function () {
                         if (onLogoutCallback()) { //onLogoutCallback() will set g_loginResponse(single-sign-on variable) to null, then bypassLoginCheck() will show login screen.
                             document.location.reload(); //when onLogoutCallback() returns true, reload the current document.
                         }
                     },
-                    beforeSend: function(XMLHttpResponse) {
+                    beforeSend: function (XMLHttpResponse) {
                         return true;
                     }
                 });
             },
 
-            samlLoginAction: function(args) {
+            samlLoginAction: function (args) {
                 g_sessionKey = null;
                 g_username = null;
                 g_account = null;
@@ -410,7 +395,7 @@
             },
 
             // Show cloudStack main UI widget
-            complete: function(args) {
+            complete: function (args) {
                 var context = {
                     users: [args.user]
                 };
@@ -422,13 +407,13 @@
                 cloudStack.installWizard.check({
                     context: context,
                     response: {
-                        success: function(args) {
+                        success: function (args) {
                             if (args.doInstall && isAdmin()) {
-                                var initInstallWizard = function() {
+                                var initInstallWizard = function () {
                                     cloudStack.uiCustom.installWizard({
                                         $container: $container,
                                         context: context,
-                                        complete: function() {
+                                        complete: function () {
                                             // Show cloudStack main UI
                                             $container.cloudStack($.extend(cloudStackArgs, {
                                                 hasLogo: false
@@ -449,13 +434,13 @@
                 });
 
                 // Logout action
-                $('#user-options a').live('click', function() {
+                $('#user-options a').live('click', function () {
                     loginArgs.logoutAction({
                         context: cloudStack.context
                     });
                 });
 
-                window._reloadUI = function() {
+                window._reloadUI = function () {
                     $('#container').html('');
                     $('#container').cloudStack(window.cloudStack);
                 };
@@ -469,7 +454,7 @@
 
         // Localization
         if (!$.isFunction(cloudStack.localizationFn)) { // i.e., localize is overridden by a plugin/module
-            cloudStack.localizationFn = function(str) {
+            cloudStack.localizationFn = function (str) {
                 var localized = dictionary[str];
 
                 return localized ? localized : str;

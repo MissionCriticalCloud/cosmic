@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.resource.virtualnetwork.model;
@@ -34,8 +19,9 @@ public class VmDhcpConfig extends ConfigBase {
         super(VM_DHCP);
     }
 
-    public VmDhcpConfig(String hostName, String macAddress, String ipv4Adress, String ipv6Address, String ipv6Duid, String dnsAdresses, String defaultGateway,
-            String staticRoutes, boolean defaultEntry) {
+    public VmDhcpConfig(final String hostName, final String macAddress, final String ipv4Adress, final String ipv6Address, final String ipv6Duid, final String dnsAdresses, final
+    String defaultGateway,
+                        final String staticRoutes, final boolean defaultEntry) {
         super(VM_DHCP);
         this.hostName = hostName;
         this.macAddress = macAddress;
@@ -52,7 +38,7 @@ public class VmDhcpConfig extends ConfigBase {
         return hostName;
     }
 
-    public void setHostName(String hostName) {
+    public void setHostName(final String hostName) {
         this.hostName = hostName;
     }
 
@@ -60,7 +46,7 @@ public class VmDhcpConfig extends ConfigBase {
         return macAddress;
     }
 
-    public void setMacAddress(String macAddress) {
+    public void setMacAddress(final String macAddress) {
         this.macAddress = macAddress;
     }
 
@@ -68,7 +54,7 @@ public class VmDhcpConfig extends ConfigBase {
         return ipv4Adress;
     }
 
-    public void setIpv4Adress(String ipv4Adress) {
+    public void setIpv4Adress(final String ipv4Adress) {
         this.ipv4Adress = ipv4Adress;
     }
 
@@ -76,7 +62,7 @@ public class VmDhcpConfig extends ConfigBase {
         return ipv6Address;
     }
 
-    public void setIpv6Address(String ipv6Address) {
+    public void setIpv6Address(final String ipv6Address) {
         this.ipv6Address = ipv6Address;
     }
 
@@ -84,7 +70,7 @@ public class VmDhcpConfig extends ConfigBase {
         return ipv6Duid;
     }
 
-    public void setIpv6Duid(String ipv6Duid) {
+    public void setIpv6Duid(final String ipv6Duid) {
         this.ipv6Duid = ipv6Duid;
     }
 
@@ -92,7 +78,7 @@ public class VmDhcpConfig extends ConfigBase {
         return dnsAdresses;
     }
 
-    public void setDnsAdresses(String dnsAdresses) {
+    public void setDnsAdresses(final String dnsAdresses) {
         this.dnsAdresses = dnsAdresses;
     }
 
@@ -100,7 +86,7 @@ public class VmDhcpConfig extends ConfigBase {
         return defaultGateway;
     }
 
-    public void setDefaultGateway(String defaultGateway) {
+    public void setDefaultGateway(final String defaultGateway) {
         this.defaultGateway = defaultGateway;
     }
 
@@ -108,7 +94,7 @@ public class VmDhcpConfig extends ConfigBase {
         return staticRoutes;
     }
 
-    public void setStaticRoutes(String staticRoutes) {
+    public void setStaticRoutes(final String staticRoutes) {
         this.staticRoutes = staticRoutes;
     }
 
@@ -116,8 +102,7 @@ public class VmDhcpConfig extends ConfigBase {
         return defaultEntry;
     }
 
-    public void setDefaultEntry(boolean defaultEntry) {
+    public void setDefaultEntry(final boolean defaultEntry) {
         this.defaultEntry = defaultEntry;
     }
-
 }

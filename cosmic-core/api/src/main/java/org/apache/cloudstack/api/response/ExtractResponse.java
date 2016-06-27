@@ -1,28 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
+
+import com.cloud.serializer.Param;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
 
 import java.util.Date;
 
-import com.cloud.serializer.Param;
 import com.google.gson.annotations.SerializedName;
-
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
 
 public class ExtractResponse extends BaseResponse {
     @SerializedName(ApiConstants.ID)
@@ -87,7 +71,7 @@ public class ExtractResponse extends BaseResponse {
     public ExtractResponse() {
     }
 
-    public ExtractResponse(String typeId, String typeName, String accountId, String state, String uploadId) {
+    public ExtractResponse(final String typeId, final String typeName, final String accountId, final String state, final String uploadId) {
         this.id = typeId;
         this.name = typeName;
         this.accountId = accountId;
@@ -99,7 +83,7 @@ public class ExtractResponse extends BaseResponse {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -107,7 +91,7 @@ public class ExtractResponse extends BaseResponse {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -115,7 +99,7 @@ public class ExtractResponse extends BaseResponse {
         return uploadId;
     }
 
-    public void setUploadId(String uploadId) {
+    public void setUploadId(final String uploadId) {
         this.uploadId = uploadId;
     }
 
@@ -123,7 +107,7 @@ public class ExtractResponse extends BaseResponse {
         return uploadPercent;
     }
 
-    public void setUploadPercent(int uploadPercent) {
+    public void setUploadPercent(final int uploadPercent) {
         this.uploadPercent = uploadPercent;
     }
 
@@ -131,7 +115,7 @@ public class ExtractResponse extends BaseResponse {
         return status;
     }
 
-    public void setUploadStatus(String status) {
+    public void setUploadStatus(final String status) {
         this.status = status;
     }
 
@@ -139,7 +123,7 @@ public class ExtractResponse extends BaseResponse {
         return accountId;
     }
 
-    public void setAccountId(String accountId) {
+    public void setAccountId(final String accountId) {
         this.accountId = accountId;
     }
 
@@ -147,7 +131,7 @@ public class ExtractResponse extends BaseResponse {
         return resultString;
     }
 
-    public void setResultString(String resultString) {
+    public void setResultString(final String resultString) {
         this.resultString = resultString;
     }
 
@@ -155,7 +139,7 @@ public class ExtractResponse extends BaseResponse {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(final Date createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -163,7 +147,7 @@ public class ExtractResponse extends BaseResponse {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
@@ -171,7 +155,7 @@ public class ExtractResponse extends BaseResponse {
         return storageType;
     }
 
-    public void setStorageType(String storageType) {
+    public void setStorageType(final String storageType) {
         this.storageType = storageType;
     }
 
@@ -179,7 +163,7 @@ public class ExtractResponse extends BaseResponse {
         return storage;
     }
 
-    public void setStorage(String storage) {
+    public void setStorage(final String storage) {
         this.storage = storage;
     }
 
@@ -187,7 +171,7 @@ public class ExtractResponse extends BaseResponse {
         return zoneId;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
@@ -195,7 +179,7 @@ public class ExtractResponse extends BaseResponse {
         return zoneName;
     }
 
-    public void setZoneName(String zoneName) {
+    public void setZoneName(final String zoneName) {
         this.zoneName = zoneName;
     }
 
@@ -203,7 +187,7 @@ public class ExtractResponse extends BaseResponse {
         return mode;
     }
 
-    public void setMode(String mode) {
+    public void setMode(final String mode) {
         this.mode = mode;
     }
 
@@ -211,7 +195,7 @@ public class ExtractResponse extends BaseResponse {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(final String url) {
         this.url = url;
     }
 }

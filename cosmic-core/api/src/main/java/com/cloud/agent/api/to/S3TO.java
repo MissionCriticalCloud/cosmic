@@ -1,30 +1,15 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.agent.api.to;
-
-import java.util.Date;
 
 import com.cloud.agent.api.LogLevel;
 import com.cloud.agent.api.LogLevel.Log4jLevel;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.utils.storage.S3.ClientOptions;
 
+import java.util.Date;
+
 public final class S3TO implements ClientOptions, DataStoreTO {
 
+    private static final String pathSeparator = "/";
     private Long id;
     private String uuid;
     @LogLevel(Log4jLevel.Off)
@@ -43,11 +28,10 @@ public final class S3TO implements ClientOptions, DataStoreTO {
     private Date created;
     private boolean enableRRS;
     private long maxSingleUploadSizeInBytes;
-    private static final String pathSeparator = "/";
 
     public S3TO(final Long id, final String uuid, final String accessKey, final String secretKey, final String endPoint, final String bucketName,
-            final String signer, final Boolean httpsFlag, final Integer connectionTimeout, final Integer maxErrorRetry, final Integer socketTimeout,
-            final Date created, final boolean enableRRS, final long maxUploadSize, final Integer connectionTtl, final Boolean useTCPKeepAlive) {
+                final String signer, final Boolean httpsFlag, final Integer connectionTimeout, final Integer maxErrorRetry, final Integer socketTimeout,
+                final Date created, final boolean enableRRS, final long maxUploadSize, final Integer connectionTtl, final Boolean useTCPKeepAlive) {
 
         this.id = id;
         this.uuid = uuid;
@@ -65,7 +49,6 @@ public final class S3TO implements ClientOptions, DataStoreTO {
         this.maxSingleUploadSizeInBytes = maxUploadSize;
         this.connectionTtl = connectionTtl;
         this.useTCPKeepAlive = useTCPKeepAlive;
-
     }
 
     public Long getId() {
@@ -74,20 +57,6 @@ public final class S3TO implements ClientOptions, DataStoreTO {
 
     public void setId(final Long id) {
         this.id = id;
-    }
-
-    @Override
-    public String getUuid() {
-        return this.uuid;
-    }
-
-    @Override
-    public String getUrl() {
-        return null;
-    }
-
-    public void setUuid(final String uuid) {
-        this.uuid = uuid;
     }
 
     @Override
@@ -117,14 +86,6 @@ public final class S3TO implements ClientOptions, DataStoreTO {
         this.endPoint = endPoint;
     }
 
-    public String getBucketName() {
-        return this.bucketName;
-    }
-
-    public void setBucketName(final String bucketName) {
-        this.bucketName = bucketName;
-    }
-
     @Override
     public String getSigner() {
         return this.signer;
@@ -137,10 +98,6 @@ public final class S3TO implements ClientOptions, DataStoreTO {
     @Override
     public Boolean isHttps() {
         return this.httpsFlag;
-    }
-
-    public void setHttps(final Boolean httpsFlag) {
-        this.httpsFlag = httpsFlag;
     }
 
     @Override
@@ -171,6 +128,11 @@ public final class S3TO implements ClientOptions, DataStoreTO {
     }
 
     @Override
+    public Boolean getUseTCPKeepAlive() {
+        return this.useTCPKeepAlive;
+    }
+
+    @Override
     public Integer getConnectionTtl() {
         return this.connectionTtl;
     }
@@ -179,13 +141,20 @@ public final class S3TO implements ClientOptions, DataStoreTO {
         this.connectionTtl = connectionTtl;
     }
 
-    @Override
-    public Boolean getUseTCPKeepAlive() {
-        return this.useTCPKeepAlive;
-    }
-
     public void setUseTCPKeepAlive(final Boolean useTCPKeepAlive) {
         this.useTCPKeepAlive = useTCPKeepAlive;
+    }
+
+    public String getBucketName() {
+        return this.bucketName;
+    }
+
+    public void setBucketName(final String bucketName) {
+        this.bucketName = bucketName;
+    }
+
+    public void setHttps(final Boolean httpsFlag) {
+        this.httpsFlag = httpsFlag;
     }
 
     public Date getCreated() {
@@ -201,11 +170,30 @@ public final class S3TO implements ClientOptions, DataStoreTO {
         return DataStoreRole.Image;
     }
 
+    @Override
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    @Override
+    public String getUrl() {
+        return null;
+    }
+
+    @Override
+    public String getPathSeparator() {
+        return pathSeparator;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
+    }
+
     public boolean getEnableRRS() {
         return enableRRS;
     }
 
-    public void setEnableRRS(boolean enableRRS) {
+    public void setEnableRRS(final boolean enableRRS) {
         this.enableRRS = enableRRS;
     }
 
@@ -213,11 +201,11 @@ public final class S3TO implements ClientOptions, DataStoreTO {
         return maxSingleUploadSizeInBytes;
     }
 
-    public void setMaxSingleUploadSizeInBytes(long maxSingleUploadSizeInBytes) {
+    public void setMaxSingleUploadSizeInBytes(final long maxSingleUploadSizeInBytes) {
         this.maxSingleUploadSizeInBytes = maxSingleUploadSizeInBytes;
     }
 
-    public boolean getSingleUpload(long objSize) {
+    public boolean getSingleUpload(final long objSize) {
         if (maxSingleUploadSizeInBytes < 0) {
             // always use single part upload
             return true;
@@ -235,8 +223,23 @@ public final class S3TO implements ClientOptions, DataStoreTO {
     }
 
     @Override
-    public String getPathSeparator() {
-        return pathSeparator;
+    public int hashCode() {
+
+        int result = id != null ? id.hashCode() : 0;
+
+        result = 31 * result + (accessKey != null ? accessKey.hashCode() : 0);
+        result = 31 * result + (secretKey != null ? secretKey.hashCode() : 0);
+        result = 31 * result + (endPoint != null ? endPoint.hashCode() : 0);
+        result = 31 * result + (bucketName != null ? bucketName.hashCode() : 0);
+        result = 31 * result + (signer != null ? signer.hashCode() : 0);
+        result = 31 * result + (httpsFlag ? 1 : 0);
+        result = 31 * result + (connectionTimeout != null ? connectionTimeout.hashCode() : 0);
+        result = 31 * result + (maxErrorRetry != null ? maxErrorRetry.hashCode() : 0);
+        result = 31 * result + (socketTimeout != null ? socketTimeout.hashCode() : 0);
+        result = 31 * result + (connectionTtl != null ? connectionTtl.hashCode() : 0);
+        result = 31 * result + (useTCPKeepAlive ? 1 : 0);
+
+        return result;
     }
 
     @Override
@@ -249,7 +252,7 @@ public final class S3TO implements ClientOptions, DataStoreTO {
             return false;
         }
 
-        final S3TO thatS3TO = (S3TO)thatObject;
+        final S3TO thatS3TO = (S3TO) thatObject;
 
         if (httpsFlag != null ? !httpsFlag.equals(thatS3TO.httpsFlag) : thatS3TO.httpsFlag != null) {
             return false;
@@ -312,26 +315,5 @@ public final class S3TO implements ClientOptions, DataStoreTO {
         }
 
         return true;
-
-    }
-
-    @Override
-    public int hashCode() {
-
-        int result = id != null ? id.hashCode() : 0;
-
-        result = 31 * result + (accessKey != null ? accessKey.hashCode() : 0);
-        result = 31 * result + (secretKey != null ? secretKey.hashCode() : 0);
-        result = 31 * result + (endPoint != null ? endPoint.hashCode() : 0);
-        result = 31 * result + (bucketName != null ? bucketName.hashCode() : 0);
-        result = 31 * result + (signer != null ? signer.hashCode() : 0);
-        result = 31 * result + (httpsFlag ? 1 : 0);
-        result = 31 * result + (connectionTimeout != null ? connectionTimeout.hashCode() : 0);
-        result = 31 * result + (maxErrorRetry != null ? maxErrorRetry.hashCode() : 0);
-        result = 31 * result + (socketTimeout != null ? socketTimeout.hashCode() : 0);
-        result = 31 * result + (connectionTtl != null ? connectionTtl.hashCode() : 0);
-        result = 31 * result + (useTCPKeepAlive ? 1 : 0);
-
-        return result;
     }
 }

@@ -1,27 +1,8 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 """ Component tests for VPC network functionality - with and without Netscaler (Netscaler tests will be skipped if Netscaler configuration fails)
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase, unittest
 from marvin.cloudstackAPI import startVirtualMachine, stopVirtualMachine
-from marvin.lib.utils import cleanup_resources, validateList
+from marvin.cloudstackTestCase import cloudstackTestCase, unittest
 from marvin.lib.base import (
     VirtualMachine,
     ServiceOffering,
@@ -46,6 +27,9 @@ from marvin.lib.common import (
     list_networks,
     verifyRouterState
 )
+from marvin.lib.utils import cleanup_resources, validateList
+from nose.plugins.attrib import attr
+
 # For more info on ddt refer to
 # http://ddt.readthedocs.org/en/latest/api.html#module-ddt
 from ddt import ddt, data
@@ -54,7 +38,6 @@ from marvin.codes import PASS
 
 
 class Services:
-
     """Test VPC network services
     """
 
@@ -96,7 +79,7 @@ class Services:
                     "NetworkACL": 'VpcVirtualRouter'
                 },
                 "serviceCapabilityList": {
-                    "SourceNat": {"SupportedSourceNatTypes": "peraccount"},
+                    "SourceNat": { "SupportedSourceNatTypes": "peraccount" },
                 },
             },
             # Offering that uses Netscaler as provider for LB inside VPC,
@@ -120,7 +103,7 @@ class Services:
                     "StaticNat": 'VpcVirtualRouter',
                 },
                 "serviceCapabilityList": {
-                    "SourceNat": {"SupportedSourceNatTypes": "peraccount"},
+                    "SourceNat": { "SupportedSourceNatTypes": "peraccount" },
                 },
             },
             # Offering that uses Netscaler as provider for LB in VPC, dedicated = True
@@ -246,7 +229,6 @@ class Services:
 
 @ddt
 class TestVPCNetwork(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestVPCNetwork, cls).getClsTestClient()
@@ -1024,7 +1006,6 @@ class TestVPCNetwork(cloudstackTestCase):
 
 @ddt
 class TestVPCNetworkRanges(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestVPCNetworkRanges, cls).getClsTestClient()
@@ -1573,7 +1554,6 @@ class TestVPCNetworkRanges(cloudstackTestCase):
 
 
 class TestVPCNetworkUpgrade(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestVPCNetworkUpgrade, cls).getClsTestClient()
@@ -2163,7 +2143,6 @@ class TestVPCNetworkUpgrade(cloudstackTestCase):
 
 
 class TestVPCNetworkGc(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestVPCNetworkGc, cls).getClsTestClient()
@@ -2591,7 +2570,6 @@ class TestVPCNetworkGc(cloudstackTestCase):
 
 
 class TestRouterOperations(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestRouterOperations, cls).getClsTestClient()

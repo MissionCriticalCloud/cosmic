@@ -1,20 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function(cloudStack) {
+(function (cloudStack) {
 
     var diskofferingObjs, selectedDiskOfferingObj;
 
@@ -34,7 +18,7 @@
                 listView: {
                     id: 'volumes',
                     label: 'label.volumes',
-                    preFilter: function(args) {
+                    preFilter: function (args) {
                         var hiddenFields = [];
                         if (isAdmin() != true)
                             hiddenFields.push('hypervisor');
@@ -61,15 +45,15 @@
                         add: {
                             label: 'label.add',
 
-                            preFilter: function(args) {
+                            preFilter: function (args) {
                                 return !args.context.instances;
                             },
 
                             messages: {
-                                confirm: function(args) {
+                                confirm: function (args) {
                                     return 'message.add.volume';
                                 },
-                                notification: function(args) {
+                                notification: function (args) {
                                     return 'label.add.volume';
                                 }
                             },
@@ -85,12 +69,12 @@
                                     availabilityZone: {
                                         label: 'label.availability.zone',
                                         docID: 'helpVolumeAvailabilityZone',
-                                        select: function(args) {
+                                        select: function (args) {
                                             $.ajax({
                                                 url: createURL("listZones&available=true"),
                                                 dataType: "json",
                                                 async: true,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var zoneObjs = json.listzonesresponse.zone;
                                                     args.response.success({
                                                         descriptionField: 'name',
@@ -103,15 +87,15 @@
                                     diskOffering: {
                                         label: 'label.disk.offering',
                                         docID: 'helpVolumeDiskOffering',
-                                        select: function(args) {
+                                        select: function (args) {
                                             $.ajax({
                                                 url: createURL("listDiskOfferings"),
                                                 dataType: "json",
                                                 async: false,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     diskofferingObjs = json.listdiskofferingsresponse.diskoffering;
                                                     var items = [];
-                                                    $(diskofferingObjs).each(function() {
+                                                    $(diskofferingObjs).each(function () {
                                                         items.push({
                                                             id: this.id,
                                                             description: this.displaytext
@@ -123,9 +107,9 @@
                                                 }
                                             });
 
-                                            args.$select.change(function() {
+                                            args.$select.change(function () {
                                                 var diskOfferingId = $(this).val();
-                                                $(diskofferingObjs).each(function() {
+                                                $(diskofferingObjs).each(function () {
                                                     if (this.id == diskOfferingId) {
                                                         selectedDiskOfferingObj = this;
                                                         return false; //break the $.each() loop
@@ -186,7 +170,7 @@
                                 }
                             },
 
-                            action: function(args) {
+                            action: function (args) {
                                 var data = {
                                     name: args.data.name,
                                     zoneId: args.data.availabilityZone,
@@ -217,21 +201,21 @@
                                 $.ajax({
                                     url: createURL('createVolume'),
                                     data: data,
-                                    success: function(json) {
+                                    success: function (json) {
                                         var jid = json.createvolumeresponse.jobid;
                                         args.response.success({
                                             _custom: {
                                                 jobId: jid,
-                                                getUpdatedItem: function(json) {
+                                                getUpdatedItem: function (json) {
                                                     return json.queryasyncjobresultresponse.jobresult.volume;
                                                 },
-                                                getActionFilter: function() {
+                                                getActionFilter: function () {
                                                     return volumeActionfilter;
                                                 }
                                             }
                                         });
                                     },
-                                    error: function(json) {
+                                    error: function (json) {
                                         args.response.error(parseXMLHttpResponse(json));
                                     }
                                 });
@@ -259,11 +243,11 @@
                         uploadVolume: {
                             isHeader: true,
                             label: 'label.upload',
-                            preFilter: function(args) {
+                            preFilter: function (args) {
                                 return !args.context.instances;
                             },
                             messages: {
-                                notification: function() {
+                                notification: function () {
                                     return 'label.upload.volume.from.url';
                                 }
                             },
@@ -287,12 +271,12 @@
                                     availabilityZone: {
                                         label: 'label.availability.zone',
                                         docID: 'helpUploadVolumeZone',
-                                        select: function(args) {
+                                        select: function (args) {
                                             $.ajax({
                                                 url: createURL("listZones&available=true"),
                                                 dataType: "json",
                                                 async: true,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var zoneObjs = json.listzonesresponse.zone;
                                                     args.response.success({
                                                         descriptionField: 'name',
@@ -305,7 +289,7 @@
                                     format: {
                                         label: 'label.format',
                                         docID: 'helpUploadVolumeFormat',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: 'RAW',
@@ -336,19 +320,19 @@
                                     diskOffering: {
                                         label: 'label.custom.disk.offering',
                                         docID: 'helpVolumeDiskOffering',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var diskofferingObjs;
                                             $.ajax({
                                                 url: createURL("listDiskOfferings"),
                                                 dataType: "json",
                                                 async: false,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     diskofferingObjs = json.listdiskofferingsresponse.diskoffering;
                                                     var items = [{
                                                         id: '',
                                                         description: ''
                                                     }];
-                                                    $(diskofferingObjs).each(function() {
+                                                    $(diskofferingObjs).each(function () {
                                                         if (this.iscustomized == true) {
                                                             items.push({
                                                                 id: this.id,
@@ -366,19 +350,19 @@
                                     diskOffering: {
                                         label: 'label.custom.disk.offering',
                                         docID: 'helpVolumeDiskOffering',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var diskofferingObjs;
                                             $.ajax({
                                                 url: createURL("listDiskOfferings"),
                                                 dataType: "json",
                                                 async: false,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     diskofferingObjs = json.listdiskofferingsresponse.diskoffering;
                                                     var items = [{
                                                         id: '',
                                                         description: ''
                                                     }];
-                                                    $(diskofferingObjs).each(function() {
+                                                    $(diskofferingObjs).each(function () {
                                                         if (this.iscustomized == true) {
                                                             items.push({
                                                                 id: this.id,
@@ -400,7 +384,7 @@
                                 }
                             },
 
-                            action: function(args) {
+                            action: function (args) {
                                 var data = {
                                     name: args.data.name,
                                     zoneId: args.data.availabilityZone,
@@ -423,21 +407,21 @@
                                 $.ajax({
                                     url: createURL('uploadVolume'),
                                     data: data,
-                                    success: function(json) {
+                                    success: function (json) {
                                         var jid = json.uploadvolumeresponse.jobid;
                                         args.response.success({
                                             _custom: {
                                                 jobId: jid,
-                                                getUpdatedItem: function(json) {
+                                                getUpdatedItem: function (json) {
                                                     return json.queryasyncjobresultresponse.jobresult.volume;
                                                 },
-                                                getActionFilter: function() {
+                                                getActionFilter: function () {
                                                     return volumeActionfilter;
                                                 }
                                             }
                                         });
                                     },
-                                    error: function(json) {
+                                    error: function (json) {
                                         args.response.error(parseXMLHttpResponse(json));
                                     }
                                 });
@@ -451,18 +435,18 @@
                         uploadVolumefromLocal: {
                             isHeader: true,
                             label: 'label.upload.from.local',
-                            preFilter: function(args) {
+                            preFilter: function (args) {
                                 return !args.context.instances;
                             },
                             messages: {
-                                notification: function() {
+                                notification: function () {
                                     return 'label.upload.volume.from.local';
                                 }
                             },
                             createForm: {
                                 title: 'label.upload.volume.from.local',
                                 fileUpload: {
-                                    getURL: function(args) {
+                                    getURL: function (args) {
                                         args.data = args.formData;
 
                                         var data = {
@@ -482,7 +466,7 @@
                                             url: createURL('getUploadParamsForVolume'),
                                             data: data,
                                             async: false,
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var uploadparams = json.postuploadvolumeresponse.getuploadparams; //son.postuploadvolumeresponse.getuploadparams is an object, not an array of object.
                                                 var volumeId = uploadparams.id;
 
@@ -498,8 +482,8 @@
                                             }
                                         });
                                     },
-                                    postUpload: function(args) {
-                                        if(args.error) {
+                                    postUpload: function (args) {
+                                        if (args.error) {
                                             args.response.error(args.errorMsg);
                                         } else {
                                             cloudStack.dialog.notice({
@@ -527,12 +511,12 @@
                                     availabilityZone: {
                                         label: 'label.availability.zone',
                                         docID: 'helpUploadVolumeZone',
-                                        select: function(args) {
+                                        select: function (args) {
                                             $.ajax({
                                                 url: createURL("listZones&available=true"),
                                                 dataType: "json",
                                                 async: true,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var zoneObjs = json.listzonesresponse.zone;
                                                     args.response.success({
                                                         descriptionField: 'name',
@@ -545,7 +529,7 @@
                                     format: {
                                         label: 'label.format',
                                         docID: 'helpUploadVolumeFormat',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var items = [];
                                             items.push({
                                                 id: 'RAW',
@@ -579,7 +563,7 @@
                                 }
                             },
 
-                            action: function(args) {
+                            action: function (args) {
                                 return; //createForm.fileUpload.getURL() has executed the whole action. Therefore, nothing needs to be done here.
                             },
 
@@ -595,15 +579,15 @@
                         },
                         zoneid: {
                             label: 'label.zone',
-                            select: function(args) {
+                            select: function (args) {
                                 $.ajax({
                                     url: createURL('listZones'),
                                     data: {},
-                                    success: function(json) {
+                                    success: function (json) {
                                         var zones = json.listzonesresponse.zone ? json.listzonesresponse.zone : [];
 
                                         args.response.success({
-                                            data: $.map(zones, function(zone) {
+                                            data: $.map(zones, function (zone) {
                                                 return {
                                                     id: zone.id,
                                                     description: zone.name
@@ -617,7 +601,7 @@
 
                         domainid: {
                             label: 'label.domain',
-                            select: function(args) {
+                            select: function (args) {
                                 if (isAdmin() || isDomainAdmin()) {
                                     $.ajax({
                                         url: createURL('listDomains'),
@@ -625,7 +609,7 @@
                                             listAll: true,
                                             details: 'min'
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             var array1 = [{
                                                 id: '',
                                                 description: ''
@@ -639,7 +623,7 @@
                                                     });
                                                 }
                                             }
-                                            array1.sort(function(a, b) {
+                                            array1.sort(function (a, b) {
                                                 return a.description.localeCompare(b.description);
                                             });
                                             args.response.success({
@@ -653,7 +637,7 @@
                                     });
                                 }
                             },
-                            isHidden: function(args) {
+                            isHidden: function (args) {
                                 if (isAdmin() || isDomainAdmin())
                                     return false;
                                 else
@@ -663,7 +647,7 @@
 
                         account: {
                             label: 'label.account',
-                            isHidden: function(args) {
+                            isHidden: function (args) {
                                 if (isAdmin() || isDomainAdmin())
                                     return false;
                                 else
@@ -679,7 +663,7 @@
                         }
                     },
 
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var data = {};
                         listViewDataProvider(args, data);
 
@@ -699,19 +683,19 @@
                         $.ajax({
                             url: createURL('listVolumes'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listvolumesresponse.volume;
                                 args.response.success({
                                     actionFilter: volumeActionfilter,
                                     data: items
                                 });
                             },
-                            error: function(XMLHttpResponse) {
+                            error: function (XMLHttpResponse) {
                                 cloudStack.dialog.notice({
                                     message: parseXMLHttpResponse(XMLHttpResponse)
                                 });
                                 args.response.error();
-                             }
+                            }
                         });
                     },
 
@@ -726,10 +710,10 @@
                             migrateVolume: {
                                 label: 'label.migrate.volume',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.confirm.migrate.volume';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.volume.migrated';
                                     }
                                 },
@@ -743,15 +727,15 @@
                                             validation: {
                                                 required: true
                                             },
-                                            select: function(args) {
+                                            select: function (args) {
                                                 $.ajax({
                                                     url: createURL("listStoragePools"),
                                                     dataType: "json",
                                                     async: true,
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         var pools = json.liststoragepoolsresponse.storagepool;
                                                         var items = [];
-                                                        $(pools).each(function() {
+                                                        $(pools).each(function () {
                                                             items.push({
                                                                 id: this.id,
                                                                 description: this.name + " (" + (this.suitableformigration ? "Suitable" : "Not Suitable") + ")"
@@ -769,12 +753,12 @@
 
                                 },
 
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL("migrateVolume&livemigrate=true&storageid=" + args.data.storagePool + "&volumeid=" + args.context.volumes[0].id),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.migratevolumeresponse.jobid;
                                             args.response.success({
                                                 _custom: {
@@ -793,7 +777,7 @@
                             takeSnapshot: {
                                 label: 'label.action.take.snapshot',
                                 messages: {
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.take.snapshot';
                                     }
                                 },
@@ -804,10 +788,10 @@
                                         quiescevm: {
                                             label: 'label.quiesce.vm',
                                             isBoolean: true,
-                                            isHidden: function(args) {
+                                            isHidden: function (args) {
                                                 if (args.context.volumes[0].quiescevm == true)
                                                     return false;
-                                                        else
+                                                else
                                                     return true;
                                             }
                                         },
@@ -816,10 +800,10 @@
                                         }
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         volumeId: args.context.volumes[0].id,
-                                        quiescevm: (args.data.quiescevm == 'on' ? true: false)
+                                        quiescevm: (args.data.quiescevm == 'on' ? true : false)
                                     };
                                     if (args.data.name != null && args.data.name.length > 0) {
                                         $.extend(data, {
@@ -831,7 +815,7 @@
                                         data: data,
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.createsnapshotresponse.jobid;
                                             args.response.success({
                                                 _custom: {
@@ -851,7 +835,7 @@
                                 action: {
                                     custom: cloudStack.uiCustom.recurringSnapshots({
                                         desc: 'message.snapshot.schedule',
-                                        dataProvider: function(args) {
+                                        dataProvider: function (args) {
                                             $.ajax({
                                                 url: createURL('listSnapshotPolicies'),
                                                 data: {
@@ -859,11 +843,11 @@
                                                 },
                                                 async: true,
                                                 dataType: 'json',
-                                                success: function(data) {
+                                                success: function (data) {
                                                     args.response.success({
                                                         data: $.map(
                                                             data.listsnapshotpoliciesresponse.snapshotpolicy ? data.listsnapshotpoliciesresponse.snapshotpolicy : [],
-                                                            function(snapshot, index) {
+                                                            function (snapshot, index) {
                                                                 return {
                                                                     id: snapshot.id,
                                                                     type: snapshot.intervaltype,
@@ -880,7 +864,7 @@
                                             });
                                         },
                                         actions: {
-                                            add: function(args) {
+                                            add: function (args) {
                                                 var snap = args.snapshot;
 
                                                 var data = {
@@ -888,7 +872,7 @@
                                                     timezone: snap.timezone
                                                 };
 
-                                                var convertTime = function(minute, hour, meridiem, extra) {
+                                                var convertTime = function (minute, hour, meridiem, extra) {
                                                     var convertedHour = meridiem == 'PM' ?
                                                         (hour != 12 ? parseInt(hour) + 12 : 12) : (hour != 12 ? hour : '00');
                                                     var time = minute + ':' + convertedHour;
@@ -948,7 +932,7 @@
                                                     },
                                                     dataType: 'json',
                                                     async: true,
-                                                    success: function(successData) {
+                                                    success: function (successData) {
                                                         var snapshot = successData.createsnapshotpolicyresponse.snapshotpolicy;
 
                                                         args.response.success({
@@ -965,7 +949,7 @@
                                                     }
                                                 });
                                             },
-                                            remove: function(args) {
+                                            remove: function (args) {
                                                 $.ajax({
                                                     url: createURL('deleteSnapshotPolicies'),
                                                     data: {
@@ -973,7 +957,7 @@
                                                     },
                                                     dataType: 'json',
                                                     async: true,
-                                                    success: function(data) {
+                                                    success: function (data) {
                                                         args.response.success();
                                                     }
                                                 });
@@ -982,7 +966,7 @@
 
                                         // Select data
                                         selects: {
-                                            schedule: function(args) {
+                                            schedule: function (args) {
                                                 var time = [];
 
                                                 for (var i = 1; i <= 59; i++) {
@@ -996,9 +980,9 @@
                                                     data: time
                                                 });
                                             },
-                                            timezone: function(args) {
+                                            timezone: function (args) {
                                                 args.response.success({
-                                                    data: $.map(timezoneMap, function(value, key) {
+                                                    data: $.map(timezoneMap, function (value, key) {
                                                         return {
                                                             id: key,
                                                             name: value
@@ -1006,7 +990,7 @@
                                                     })
                                                 });
                                             },
-                                            'day-of-week': function(args) {
+                                            'day-of-week': function (args) {
                                                 args.response.success({
                                                     data: [{
                                                         id: 1,
@@ -1033,7 +1017,7 @@
                                                 });
                                             },
 
-                                            'day-of-month': function(args) {
+                                            'day-of-month': function (args) {
                                                 var time = [];
 
                                                 for (var i = 1; i <= 28; i++) {
@@ -1048,7 +1032,7 @@
                                                 });
                                             },
 
-                                            'time-hour': function(args) {
+                                            'time-hour': function (args) {
                                                 var time = [];
 
                                                 for (var i = 1; i <= 12; i++) {
@@ -1063,7 +1047,7 @@
                                                 });
                                             },
 
-                                            'time-minute': function(args) {
+                                            'time-minute': function (args) {
                                                 var time = [];
 
                                                 for (var i = 0; i <= 59; i++) {
@@ -1078,7 +1062,7 @@
                                                 });
                                             },
 
-                                            'time-meridiem': function(args) {
+                                            'time-meridiem': function (args) {
                                                 args.response.success({
                                                     data: [{
                                                         id: 'AM',
@@ -1093,7 +1077,7 @@
                                     })
                                 },
                                 messages: {
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.snapshot.schedule';
                                     }
                                 }
@@ -1103,10 +1087,10 @@
                                 addRow: 'false',
                                 label: 'label.action.attach.disk',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.confirm.attach.disk';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.attach.disk';
                                     }
                                 },
@@ -1116,7 +1100,7 @@
                                     fields: {
                                         virtualMachineId: {
                                             label: 'label.instance',
-                                            select: function(args) {
+                                            select: function (args) {
                                                 var zoneid = args.context.volumes[0].zoneid;
                                                 var items = [];
                                                 var data;
@@ -1140,16 +1124,16 @@
                                                     });
                                                 }
 
-                                                $(['Running', 'Stopped']).each(function() {
+                                                $(['Running', 'Stopped']).each(function () {
                                                     $.ajax({
                                                         url: createURL('listVirtualMachines'),
                                                         data: $.extend(data, {
                                                             state: this.toString()
                                                         }),
                                                         async: false,
-                                                        success: function(json) {
+                                                        success: function (json) {
                                                             var instanceObjs = json.listvirtualmachinesresponse.virtualmachine;
-                                                            $(instanceObjs).each(function() {
+                                                            $(instanceObjs).each(function () {
                                                                 items.push({
                                                                     id: this.id,
                                                                     description: this.displayname ? this.displayname : this.name
@@ -1166,20 +1150,20 @@
                                         }
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL("attachVolume&id=" + args.context.volumes[0].id + '&virtualMachineId=' + args.data.virtualMachineId),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.attachvolumeresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function(json) {
+                                                    getUpdatedItem: function (json) {
                                                         return json.queryasyncjobresultresponse.jobresult.volume;
                                                     },
-                                                    getActionFilter: function() {
+                                                    getActionFilter: function () {
                                                         return volumeActionfilter;
                                                     }
                                                 }
@@ -1194,30 +1178,30 @@
                             detachDisk: {
                                 label: 'label.action.detach.disk',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.detach.disk';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.detach.disk';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL("detachVolume&id=" + args.context.volumes[0].id),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.detachvolumeresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function(json) {
+                                                    getUpdatedItem: function (json) {
                                                         return {
                                                             virtualmachineid: null,
                                                             vmdisplayname: null
                                                         };
                                                     },
-                                                    getActionFilter: function() {
+                                                    getActionFilter: function () {
                                                         return volumeActionfilter;
                                                     }
                                                 }
@@ -1233,13 +1217,13 @@
                             downloadVolume: {
                                 label: 'label.action.download.volume',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.download.volume.confirm';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.download.volume';
                                     },
-                                    complete: function(args) {
+                                    complete: function (args) {
                                         var url = args.url;
                                         var htmlMsg = _l('message.download.volume');
                                         var htmlMsg2 = htmlMsg.replace(/#/, url).replace(/00000/, url);
@@ -1247,20 +1231,20 @@
                                         return htmlMsg2;
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL("extractVolume&id=" + args.context.volumes[0].id + "&zoneid=" + args.context.volumes[0].zoneid + "&mode=HTTP_DOWNLOAD"),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.extractvolumeresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function(json) {
+                                                    getUpdatedItem: function (json) {
                                                         return json.queryasyncjobresultresponse.jobresult.volume;
                                                     },
-                                                    getActionFilter: function() {
+                                                    getActionFilter: function () {
                                                         return volumeActionfilter;
                                                     }
                                                 }
@@ -1276,10 +1260,10 @@
                             createTemplate: {
                                 label: 'label.create.template',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.create.template';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.create.template';
                                     }
                                 },
@@ -1287,7 +1271,7 @@
                                     title: 'label.create.template',
                                     preFilter: cloudStack.preFilter.createTemplate,
                                     desc: '',
-                                    preFilter: function(args) {
+                                    preFilter: function (args) {
                                         if (args.context.volumes[0].hypervisor == "XenServer") {
                                             if (isAdmin()) {
                                                 args.$form.find('.form-item[rel=xenserverToolsVersion61plus]').css('display', 'inline-block');
@@ -1319,7 +1303,7 @@
                                                         id: args.context.volumes[0].virtualmachineid
                                                     },
                                                     async: false,
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         vmObj = json.listvirtualmachinesresponse.virtualmachine[0];
                                                     }
                                                 });
@@ -1339,12 +1323,12 @@
                                                         });
                                                     }
                                                 } else {
-                                                     if ('details' in vmObj && 'hypervisortoolsversion' in vmObj.details) {
-                                                         if (vmObj.details.hypervisortoolsversion == 'xenserver61')
-                                                             b = true;
-                                                         else
-                                                             b = false;
-                                                     }
+                                                    if ('details' in vmObj && 'hypervisortoolsversion' in vmObj.details) {
+                                                        if (vmObj.details.hypervisortoolsversion == 'xenserver61')
+                                                            b = true;
+                                                        else
+                                                            b = false;
+                                                    }
                                                 }
                                                 return b;
                                             },
@@ -1352,15 +1336,15 @@
                                         },
                                         osTypeId: {
                                             label: 'label.os.type',
-                                            select: function(args) {
+                                            select: function (args) {
                                                 $.ajax({
                                                     url: createURL("listOsTypes"),
                                                     dataType: "json",
                                                     async: true,
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         var ostypes = json.listostypesresponse.ostype;
                                                         var items = [];
-                                                        $(ostypes).each(function() {
+                                                        $(ostypes).each(function () {
                                                             items.push({
                                                                 id: this.id,
                                                                 description: this.description
@@ -1391,7 +1375,7 @@
                                         }
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         volumeId: args.context.volumes[0].id,
                                         name: args.data.name,
@@ -1422,15 +1406,15 @@
                                     $.ajax({
                                         url: createURL('createTemplate'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.createtemplateresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function(json) {
+                                                    getUpdatedItem: function (json) {
                                                         return {}; //no properties in this volume needs to be updated
                                                     },
-                                                    getActionFilter: function() {
+                                                    getActionFilter: function () {
                                                         return volumeActionfilter;
                                                     }
                                                 }
@@ -1446,10 +1430,10 @@
                             migrateToAnotherStorage: {
                                 label: 'label.migrate.volume.to.primary.storage',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.migrate.volume';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.migrate.volume.to.primary.storage';
                                     }
                                 },
@@ -1462,15 +1446,15 @@
                                             validation: {
                                                 required: true
                                             },
-                                            select: function(args) {
+                                            select: function (args) {
                                                 $.ajax({
                                                     url: createURL("listStoragePools&zoneid=" + args.context.volumes[0].zoneid),
                                                     dataType: "json",
                                                     async: true,
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         var pools = json.liststoragepoolsresponse.storagepool;
                                                         var items = [];
-                                                        $(pools).each(function() {
+                                                        $(pools).each(function () {
                                                             items.push({
                                                                 id: this.id,
                                                                 description: this.name
@@ -1485,20 +1469,20 @@
                                         }
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL("migrateVolume&storageid=" + args.data.storageId + "&volumeid=" + args.context.volumes[0].id),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.migratevolumeresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function(json) {
+                                                    getUpdatedItem: function (json) {
                                                         return json.queryasyncjobresultresponse.jobresult.volume;
                                                     },
-                                                    getActionFilter: function() {
+                                                    getActionFilter: function () {
                                                         return volumeActionfilter;
                                                     }
                                                 }
@@ -1514,25 +1498,25 @@
                             remove: {
                                 label: 'label.action.delete.volume',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.action.delete.volume';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.delete.volume';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL("deleteVolume&id=" + args.context.volumes[0].id),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success();
                                         }
                                     });
                                 },
                                 notification: {
-                                    poll: function(args) {
+                                    poll: function (args) {
                                         args.complete();
                                     }
                                 }
@@ -1541,13 +1525,13 @@
                             resize: {
                                 label: 'label.action.resize.volume',
                                 messages: {
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.resize.volume';
                                     }
                                 },
                                 createForm: {
                                     title: 'label.action.resize.volume',
-                                    preFilter: function(args) {
+                                    preFilter: function (args) {
                                         if (args.context.volumes != null && args.context.volumes[0].type == 'ROOT') {
                                             args.$form.find('.form-item[rel=newdiskoffering]').hide();
                                         } else {
@@ -1557,7 +1541,7 @@
                                     fields: {
                                         newdiskoffering: {
                                             label: 'label.resize.new.offering.id',
-                                            select: function(args) {
+                                            select: function (args) {
                                                 if (args.context.volumes != null && args.context.volumes[0].type == 'ROOT') {
                                                     args.response.success({
                                                         data: []
@@ -1568,10 +1552,10 @@
                                                 $.ajax({
                                                     url: createURL("listDiskOfferings"),
                                                     dataType: "json",
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         diskofferingObjs = json.listdiskofferingsresponse.diskoffering;
                                                         var items = [];
-                                                        $(diskofferingObjs).each(function() {
+                                                        $(diskofferingObjs).each(function () {
                                                             items.push({
                                                                 id: this.id,
                                                                 description: this.displaytext
@@ -1583,9 +1567,9 @@
                                                     }
                                                 });
 
-                                                args.$select.change(function() {
+                                                args.$select.change(function () {
                                                     var diskOfferingId = $(this).val();
-                                                    $(diskofferingObjs).each(function() {
+                                                    $(diskofferingObjs).each(function () {
                                                         if (this.id == diskOfferingId) {
                                                             selectedDiskOfferingObj = this;
                                                             return false; //break the $.each() loop
@@ -1654,10 +1638,10 @@
                                         }
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var array1 = [];
 
-                                    if(args.$form.find('.form-item[rel=shrinkok]').css("display") != "none") {
+                                    if (args.$form.find('.form-item[rel=shrinkok]').css("display") != "none") {
                                         array1.push("&shrinkok=" + (args.data.shrinkok == "on"));
                                     }
 
@@ -1693,15 +1677,15 @@
                                         url: createURL("resizeVolume&id=" + args.context.volumes[0].id + array1.join("")),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.resizevolumeresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function(json) {
+                                                    getUpdatedItem: function (json) {
                                                         return json.queryasyncjobresultresponse.jobresult.volume;
                                                     },
-                                                    getActionFilter: function() {
+                                                    getActionFilter: function () {
                                                         return volumeActionfilter;
                                                     }
                                                 }
@@ -1718,7 +1702,7 @@
                             details: {
                                 title: 'label.details',
 
-                                preFilter: function(args) {
+                                preFilter: function (args) {
                                     var hiddenFields;
                                     if (isAdmin()) {
                                         hiddenFields = [];
@@ -1745,13 +1729,13 @@
                                         pollAgainIfValueIsIn: {
                                             'UploadNotStarted': 1
                                         },
-                                        pollAgainFn: function(context) {
+                                        pollAgainFn: function (context) {
                                             var toClearInterval = false;
                                             $.ajax({
                                                 url: createURL("listVolumes&id=" + context.volumes[0].id),
                                                 dataType: "json",
                                                 async: false,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var jsonObj = json.listvolumesresponse.volume[0];
                                                     if (jsonObj.state != context.volumes[0].state) {
                                                         toClearInterval = true; //to clear interval
@@ -1781,7 +1765,7 @@
                                     },
                                     size: {
                                         label: 'label.size',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args == null || args == 0)
                                                 return "";
                                             else
@@ -1790,7 +1774,7 @@
                                     },
                                     miniops: {
                                         label: 'label.disk.iops.min',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args == null || args == 0)
                                                 return "";
                                             else
@@ -1799,7 +1783,7 @@
                                     },
                                     maxiops: {
                                         label: 'label.disk.iops.max',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args == null || args == 0)
                                                 return "";
                                             else
@@ -1808,7 +1792,7 @@
                                     },
                                     virtualmachineid: {
                                         label: 'label.vm.id',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             if (args == null)
                                                 return _l('state.detached');
                                             else
@@ -1846,12 +1830,12 @@
                                 }),
 
 
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     $.ajax({
                                         url: createURL("listVolumes&id=" + args.context.volumes[0].id),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jsonObj = json.listvolumesresponse.volume[0];
 
                                             $(window).trigger('cloudStack.module.sharedFunctions.addExtraProperties', {
@@ -1911,7 +1895,7 @@
 
                         domainid: {
                             label: 'label.domain',
-                            select: function(args) {
+                            select: function (args) {
                                 if (isAdmin() || isDomainAdmin()) {
                                     $.ajax({
                                         url: createURL('listDomains'),
@@ -1919,7 +1903,7 @@
                                             listAll: true,
                                             details: 'min'
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             var array1 = [{
                                                 id: '',
                                                 description: ''
@@ -1933,7 +1917,7 @@
                                                     });
                                                 }
                                             }
-                                            array1.sort(function(a, b) {
+                                            array1.sort(function (a, b) {
                                                 return a.description.localeCompare(b.description);
                                             });
                                             args.response.success({
@@ -1947,7 +1931,7 @@
                                     });
                                 }
                             },
-                            isHidden: function(args) {
+                            isHidden: function (args) {
                                 if (isAdmin() || isDomainAdmin())
                                     return false;
                                 else
@@ -1957,7 +1941,7 @@
 
                         account: {
                             label: 'label.account',
-                            isHidden: function(args) {
+                            isHidden: function (args) {
                                 if (isAdmin() || isDomainAdmin())
                                     return false;
                                 else
@@ -1972,7 +1956,7 @@
                         }
                     },
 
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var data = {};
                         var instanceVolumeIds = [];
                         listViewDataProvider(args, data);
@@ -1990,8 +1974,8 @@
                                         listAll: true
                                     },
                                     async: false,
-                                    success: function(json) {
-                                        instanceVolumeIds = $.map(json.listvolumesresponse.volume, function(volume) {
+                                    success: function (json) {
+                                        instanceVolumeIds = $.map(json.listvolumesresponse.volume, function (volume) {
                                             return volume.id;
                                         })
                                     }
@@ -2003,19 +1987,19 @@
                         $.ajax({
                             url: createURL('listSnapshots'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listsnapshotsresponse.snapshot;
                                 args.response.success({
                                     actionFilter: snapshotActionfilter,
                                     data: items
                                 });
                             },
-                            error: function(XMLHttpResponse) {
+                            error: function (XMLHttpResponse) {
                                 cloudStack.dialog.notice({
                                     message: parseXMLHttpResponse(XMLHttpResponse)
                                 });
                                 args.response.error();
-                             }
+                            }
                         });
                     },
 
@@ -2025,10 +2009,10 @@
                             createTemplate: {
                                 label: 'label.create.template',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.create.template';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.create.template';
                                     }
                                 },
@@ -2050,15 +2034,15 @@
                                         },
                                         osTypeId: {
                                             label: 'label.os.type',
-                                            select: function(args) {
+                                            select: function (args) {
                                                 $.ajax({
                                                     url: createURL("listOsTypes"),
                                                     dataType: "json",
                                                     async: true,
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         var ostypes = json.listostypesresponse.ostype;
                                                         var items = [];
-                                                        $(ostypes).each(function() {
+                                                        $(ostypes).each(function () {
                                                             items.push({
                                                                 id: this.id,
                                                                 description: this.description
@@ -2085,7 +2069,7 @@
                                         }
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         snapshotid: args.context.snapshots[0].id,
                                         name: args.data.name,
@@ -2099,15 +2083,15 @@
                                     $.ajax({
                                         url: createURL('createTemplate'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.createtemplateresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function(json) {
+                                                    getUpdatedItem: function (json) {
                                                         return {}; //nothing in this snapshot needs to be updated
                                                     },
-                                                    getActionFilter: function() {
+                                                    getActionFilter: function () {
                                                         return snapshotActionfilter;
                                                     }
                                                 }
@@ -2123,17 +2107,17 @@
                             createVolume: {
                                 label: 'label.action.create.volume',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.confirm.create.volume';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.create.volume';
                                     }
                                 },
                                 createForm: {
                                     title: 'label.action.create.volume',
                                     desc: '',
-                                    preFilter: function(args) {
+                                    preFilter: function (args) {
                                         if (g_regionsecondaryenabled == true) {
                                             args.$form.find('.form-item[rel=zoneid]').css('display', 'inline-block');
                                         } else {
@@ -2150,12 +2134,12 @@
                                         zoneid: {
                                             label: 'label.availability.zone',
                                             isHidden: true,
-                                            select: function(args) {
+                                            select: function (args) {
                                                 $.ajax({
                                                     url: createURL("listZones&available=true"),
                                                     dataType: "json",
                                                     async: true,
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         var zoneObjs = json.listzonesresponse.zone;
                                                         var items = [{
                                                             id: '',
@@ -2178,7 +2162,7 @@
                                         }
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         snapshotid: args.context.snapshots[0].id,
                                         name: args.data.name
@@ -2193,15 +2177,15 @@
                                     $.ajax({
                                         url: createURL('createVolume'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.createvolumeresponse.jobid;
                                             args.response.success({
                                                 _custom: {
                                                     jobId: jid,
-                                                    getUpdatedItem: function(json) {
+                                                    getUpdatedItem: function (json) {
                                                         return {}; //nothing in this snapshot needs to be updated
                                                     },
-                                                    getActionFilter: function() {
+                                                    getActionFilter: function () {
                                                         return snapshotActionfilter;
                                                     }
                                                 }
@@ -2217,19 +2201,19 @@
                             revertSnapshot: {
                                 label: 'label.action.revert.snapshot',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.action.revert.snapshot';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.revert.snapshot';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
-                                        url: createURL("revertSnapshot&id="+args.context.snapshots[0].id),
+                                        url: createURL("revertSnapshot&id=" + args.context.snapshots[0].id),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.revertsnapshotresponse.jobid;
                                             args.response.success({
                                                 _custom: {
@@ -2247,19 +2231,19 @@
                             remove: {
                                 label: 'label.action.delete.snapshot',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.action.delete.snapshot';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.delete.snapshot';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL("deleteSnapshot&id=" + args.context.snapshots[0].id),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.deletesnapshotresponse.jobid;
                                             args.response.success({
                                                 _custom: {
@@ -2311,12 +2295,12 @@
                                     contextId: 'snapshots'
                                 }),
 
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     $.ajax({
                                         url: createURL("listSnapshots&id=" + args.context.snapshots[0].id),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jsonObj = json.listsnapshotsresponse.snapshot[0];
                                             args.response.success({
                                                 actionFilter: snapshotActionfilter,
@@ -2334,7 +2318,7 @@
     };
 
 
-    var volumeActionfilter = cloudStack.actionFilter.volumeActionfilter = function(args) {
+    var volumeActionfilter = cloudStack.actionFilter.volumeActionfilter = function (args) {
         var jsonObj = args.context.item;
         var allowedActions = [];
 
@@ -2402,7 +2386,7 @@
         return allowedActions;
     };
 
-    var snapshotActionfilter = cloudStack.actionFilter.snapshotActionfilter = function(args) {
+    var snapshotActionfilter = cloudStack.actionFilter.snapshotActionfilter = function (args) {
         var jsonObj = args.context.item;
 
         if (jsonObj.state == 'Destroyed') {

@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.api;
@@ -23,10 +8,10 @@ import com.cloud.agent.api.LogLevel.Log4jLevel;
 
 @LogLevel(Log4jLevel.Trace)
 public class NetworkUsageCommand extends Command {
+    boolean forVpc = false;
     private String privateIP;
     private String domRName;
     private String option;
-    boolean forVpc = false;
     private String gatewayIP;
     private String vpcCIDR;
 
@@ -34,7 +19,7 @@ public class NetworkUsageCommand extends Command {
 
     }
 
-    public NetworkUsageCommand(String privateIP, String domRName, boolean forVpc, String gatewayIP) {
+    public NetworkUsageCommand(final String privateIP, final String domRName, final boolean forVpc, final String gatewayIP) {
         this.privateIP = privateIP;
         this.domRName = domRName;
         this.forVpc = forVpc;
@@ -42,14 +27,14 @@ public class NetworkUsageCommand extends Command {
         this.option = "get";
     }
 
-    public NetworkUsageCommand(String privateIP, String domRName, String option, boolean forVpc) {
+    public NetworkUsageCommand(final String privateIP, final String domRName, final String option, final boolean forVpc) {
         this.privateIP = privateIP;
         this.domRName = domRName;
         this.option = option;
         this.forVpc = forVpc;
     }
 
-    public NetworkUsageCommand(String privateIP, String domRName, boolean forVpc, String gatewayIP, String vpcCIDR) {
+    public NetworkUsageCommand(final String privateIP, final String domRName, final boolean forVpc, final String gatewayIP, final String vpcCIDR) {
         this.privateIP = privateIP;
         this.domRName = domRName;
         this.forVpc = forVpc;
@@ -58,7 +43,7 @@ public class NetworkUsageCommand extends Command {
         this.vpcCIDR = vpcCIDR;
     }
 
-    public NetworkUsageCommand(String privateIP, String domRName, String option, boolean forVpc, String gatewayIP) {
+    public NetworkUsageCommand(final String privateIP, final String domRName, final String option, final boolean forVpc, final String gatewayIP) {
         this.privateIP = privateIP;
         this.domRName = domRName;
         this.forVpc = forVpc;

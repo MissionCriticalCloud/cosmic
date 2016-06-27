@@ -1,22 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.rules;
 
-import java.util.List;
+import com.cloud.utils.net.Ip;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -25,8 +9,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
-
-import com.cloud.utils.net.Ip;
+import java.util.List;
 
 @Entity
 @Table(name = ("port_forwarding_rules"))
@@ -50,18 +33,20 @@ public class PortForwardingRuleVO extends FirewallRuleVO implements PortForwardi
     public PortForwardingRuleVO() {
     }
 
-    public PortForwardingRuleVO(String xId, long srcIpId, int srcPortStart, int srcPortEnd, Ip dstIp, int dstPortStart, int dstPortEnd, String protocol, long networkId,
-            long accountId, long domainId, long instanceId) {
+    public PortForwardingRuleVO(final String xId, final long srcIpId, final int srcPort, final Ip dstIp, final int dstPort, final String protocol, final List<String>
+            sourceCidrs, final long networkId, final long accountId,
+                                final long domainId, final long instanceId) {
+        this(xId, srcIpId, srcPort, srcPort, dstIp, dstPort, dstPort, protocol.toLowerCase(), networkId, accountId, domainId, instanceId);
+    }
+
+    public PortForwardingRuleVO(final String xId, final long srcIpId, final int srcPortStart, final int srcPortEnd, final Ip dstIp, final int dstPortStart, final int dstPortEnd,
+                                final String protocol, final long networkId,
+                                final long accountId, final long domainId, final long instanceId) {
         super(xId, srcIpId, srcPortStart, srcPortEnd, protocol, networkId, accountId, domainId, Purpose.PortForwarding, null, null, null, null, null);
         this.destinationIpAddress = dstIp;
         this.virtualMachineId = instanceId;
         this.destinationPortStart = dstPortStart;
         this.destinationPortEnd = dstPortEnd;
-    }
-
-    public PortForwardingRuleVO(String xId, long srcIpId, int srcPort, Ip dstIp, int dstPort, String protocol, List<String> sourceCidrs, long networkId, long accountId,
-            long domainId, long instanceId) {
-        this(xId, srcIpId, srcPort, srcPort, dstIp, dstPort, dstPort, protocol.toLowerCase(), networkId, accountId, domainId, instanceId);
     }
 
     @Override
@@ -70,7 +55,7 @@ public class PortForwardingRuleVO extends FirewallRuleVO implements PortForwardi
     }
 
     @Override
-    public void setDestinationIpAddress(Ip destinationIpAddress) {
+    public void setDestinationIpAddress(final Ip destinationIpAddress) {
         this.destinationIpAddress = destinationIpAddress;
     }
 
@@ -79,7 +64,7 @@ public class PortForwardingRuleVO extends FirewallRuleVO implements PortForwardi
         return destinationPortStart;
     }
 
-    public void setDestinationPortStart(int destinationPortStart) {
+    public void setDestinationPortStart(final int destinationPortStart) {
         this.destinationPortStart = destinationPortStart;
     }
 
@@ -88,7 +73,7 @@ public class PortForwardingRuleVO extends FirewallRuleVO implements PortForwardi
         return destinationPortEnd;
     }
 
-    public void setDestinationPortEnd(int destinationPortEnd) {
+    public void setDestinationPortEnd(final int destinationPortEnd) {
         this.destinationPortEnd = destinationPortEnd;
     }
 
@@ -97,7 +82,7 @@ public class PortForwardingRuleVO extends FirewallRuleVO implements PortForwardi
         return virtualMachineId;
     }
 
-    public void setVirtualMachineId(long virtualMachineId) {
+    public void setVirtualMachineId(final long virtualMachineId) {
         this.virtualMachineId = virtualMachineId;
     }
 
@@ -105,5 +90,4 @@ public class PortForwardingRuleVO extends FirewallRuleVO implements PortForwardi
     public Long getRelated() {
         return null;
     }
-
 }

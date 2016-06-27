@@ -1,20 +1,3 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 """ P1 tests for primary storage domain limits
 
     Test Plan: https://cwiki.apache.org/confluence/display/CLOUDSTACK/Limit+Resources+to+domain+or+accounts
@@ -24,8 +7,11 @@
     Feature Specifications: https://cwiki.apache.org/confluence/display/CLOUDSTACK/Limit+Resources+to+domains+and+accounts
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+from marvin.codes import (PASS,
+                          FAIL,
+                          FAILED,
+                          RESOURCE_PRIMARY_STORAGE)
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              VirtualMachine,
@@ -39,17 +25,12 @@ from marvin.lib.common import (get_domain,
                                get_template,
                                createSnapshotFromVirtualMachineVolume,
                                isVmExpunged,
-                               isDomainResourceCountEqualToExpectedCount,
-                               find_storage_pool_type)
+                               isDomainResourceCountEqualToExpectedCount)
 from marvin.lib.utils import (cleanup_resources)
-from marvin.codes import (PASS,
-                          FAIL,
-                          FAILED,
-                          RESOURCE_PRIMARY_STORAGE)
+from nose.plugins.attrib import attr
 
 
 class TestMultipleChildDomain(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cloudstackTestClient = super(TestMultipleChildDomain,
@@ -581,7 +562,7 @@ class TestMultipleChildDomain(cloudstackTestCase):
                 templatesize = (self.template.size / (1024 ** 3))
 
                 initialResourceCount = expectedCount = templatesize + \
-                    self.disk_offering.disksize
+                                                       self.disk_offering.disksize
                 result = isDomainResourceCountEqualToExpectedCount(
                     self.apiclient, self.domain.id,
                     initialResourceCount, RESOURCE_PRIMARY_STORAGE)

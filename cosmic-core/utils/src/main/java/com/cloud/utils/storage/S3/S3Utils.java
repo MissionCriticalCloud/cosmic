@@ -1,31 +1,14 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils.storage.S3;
 
+import static com.amazonaws.Protocol.HTTP;
+import static com.amazonaws.Protocol.HTTPS;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
-
-import static com.amazonaws.Protocol.HTTP;
-import static com.amazonaws.Protocol.HTTPS;
-
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 import java.io.File;
@@ -52,24 +35,32 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public final class S3Utils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(S3Utils.class);
-
     public static final String SEPARATOR = "/";
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(S3Utils.class);
     private static final Map<String, TransferManager> TRANSFERMANAGER_ACCESSKEY_MAP = new HashMap<>();
 
-    private S3Utils() {}
+    private S3Utils() {
+    }
+
+    public static AmazonS3 getAmazonS3Client(final ClientOptions clientOptions) {
+
+        return getTransferManager(clientOptions).getAmazonS3Client();
+    }
+
+    public static Upload putFile(final ClientOptions clientOptions, final File sourceFile, final String bucketName, final String key) {
+        LOGGER.debug(format("Sending file %1$s as S3 object %2$s in bucket %3$s", sourceFile.getName(), key, bucketName));
+
+        return getTransferManager(clientOptions).upload(bucketName, key, sourceFile);
+    }
 
     public static TransferManager getTransferManager(final ClientOptions clientOptions) {
 
-        if(TRANSFERMANAGER_ACCESSKEY_MAP.containsKey(clientOptions.getAccessKey())) {
+        if (TRANSFERMANAGER_ACCESSKEY_MAP.containsKey(clientOptions.getAccessKey())) {
             return TRANSFERMANAGER_ACCESSKEY_MAP.get(clientOptions.getAccessKey());
         }
 
@@ -106,8 +97,10 @@ public final class S3Utils {
             configuration.setSignerOverride(clientOptions.getSigner());
         }
 
-        LOGGER.debug(format("Creating S3 client with configuration: [protocol: %1$s, signer: %2$s, connectionTimeOut: %3$s, maxErrorRetry: %4$s, socketTimeout: %5$s, useTCPKeepAlive: %6$s, connectionTtl: %7$s]",
-                configuration.getProtocol(), configuration.getSignerOverride(), configuration.getConnectionTimeout(), configuration.getMaxErrorRetry(), configuration.getSocketTimeout(),
+        LOGGER.debug(format("Creating S3 client with configuration: [protocol: %1$s, signer: %2$s, connectionTimeOut: %3$s, maxErrorRetry: %4$s, socketTimeout: %5$s, " +
+                        "useTCPKeepAlive: %6$s, connectionTtl: %7$s]",
+                configuration.getProtocol(), configuration.getSignerOverride(), configuration.getConnectionTimeout(), configuration.getMaxErrorRetry(), configuration
+                        .getSocketTimeout(),
                 clientOptions.getUseTCPKeepAlive(), clientOptions.getConnectionTtl()));
 
         final AmazonS3Client client = new AmazonS3Client(basicAWSCredentials, configuration);
@@ -121,17 +114,6 @@ public final class S3Utils {
         TRANSFERMANAGER_ACCESSKEY_MAP.put(clientOptions.getAccessKey(), new TransferManager(client));
 
         return TRANSFERMANAGER_ACCESSKEY_MAP.get(clientOptions.getAccessKey());
-    }
-
-    public static AmazonS3 getAmazonS3Client(final ClientOptions clientOptions) {
-
-        return getTransferManager(clientOptions).getAmazonS3Client();
-    }
-
-    public static Upload putFile(final ClientOptions clientOptions, final File sourceFile, final String bucketName, final String key) {
-        LOGGER.debug(format("Sending file %1$s as S3 object %2$s in bucket %3$s", sourceFile.getName(), key, bucketName));
-
-        return getTransferManager(clientOptions).upload(bucketName, key, sourceFile);
     }
 
     public static Upload putObject(final ClientOptions clientOptions, final InputStream sourceStream, final String bucketName, final String key) {
@@ -153,7 +135,8 @@ public final class S3Utils {
     }
 
     public static Download getFile(final ClientOptions clientOptions, final GetObjectRequest getObjectRequest, final File file) {
-        LOGGER.debug(format("Receiving object %1$s as file %2$s from bucket %3$s using GetObjectRequest", getObjectRequest.getKey(), file.getAbsolutePath(), getObjectRequest.getBucketName()));
+        LOGGER.debug(format("Receiving object %1$s as file %2$s from bucket %3$s using GetObjectRequest", getObjectRequest.getKey(), file.getAbsolutePath(), getObjectRequest
+                .getBucketName()));
 
         return getTransferManager(clientOptions).download(getObjectRequest, file);
     }
@@ -174,21 +157,20 @@ public final class S3Utils {
     public static List<S3ObjectSummary> listDirectory(final ClientOptions clientOptions, final String bucketName, final String directory) {
         LOGGER.debug(format("Listing S3 directory %1$s in bucket %2$s", directory, bucketName));
 
-        List<S3ObjectSummary> objects = new ArrayList<>();
-        ListObjectsRequest listObjectsRequest = new ListObjectsRequest();
+        final List<S3ObjectSummary> objects = new ArrayList<>();
+        final ListObjectsRequest listObjectsRequest = new ListObjectsRequest();
 
         listObjectsRequest.withBucketName(bucketName);
         listObjectsRequest.withPrefix(directory);
 
         ObjectListing ol = getAmazonS3Client(clientOptions).listObjects(listObjectsRequest);
-        if(ol.isTruncated()) {
+        if (ol.isTruncated()) {
             do {
                 objects.addAll(ol.getObjectSummaries());
                 listObjectsRequest.setMarker(ol.getNextMarker());
                 ol = getAmazonS3Client(clientOptions).listObjects(listObjectsRequest);
             } while (ol.isTruncated());
-        }
-        else {
+        } else {
             objects.addAll(ol.getObjectSummaries());
         }
 
@@ -202,7 +184,7 @@ public final class S3Utils {
     public static void deleteObject(final ClientOptions clientOptions, final String bucketName, final String key) {
         LOGGER.debug(format("Deleting S3 Object %1$s in bucket %2$s", key, bucketName));
 
-        getAmazonS3Client(clientOptions).deleteObject(bucketName,key);
+        getAmazonS3Client(clientOptions).deleteObject(bucketName, key);
     }
 
     public static void deleteDirectory(final ClientOptions clientOptions, final String bucketName, final String directoryName) {

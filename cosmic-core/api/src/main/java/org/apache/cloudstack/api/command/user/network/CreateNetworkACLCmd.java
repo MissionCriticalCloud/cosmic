@@ -1,23 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.network;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
@@ -25,7 +6,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.vpc.NetworkACLItem;
 import com.cloud.user.Account;
 import com.cloud.utils.net.NetUtils;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -37,15 +17,19 @@ import org.apache.cloudstack.api.response.NetworkACLItemResponse;
 import org.apache.cloudstack.api.response.NetworkACLResponse;
 import org.apache.cloudstack.api.response.NetworkResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "createNetworkACL",
-            description = "Creates a ACL rule in the given network (the network has to belong to VPC)",
-            responseObject = NetworkACLItemResponse.class,
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = false)
+        description = "Creates a ACL rule in the given network (the network has to belong to VPC)",
+        responseObject = NetworkACLItemResponse.class,
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = false)
 public class CreateNetworkACLCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateNetworkACLCmd.class.getName());
 
@@ -56,9 +40,9 @@ public class CreateNetworkACLCmd extends BaseAsyncCreateCmd {
     // ///////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.PROTOCOL,
-               type = CommandType.STRING,
-               required = true,
-               description = "the protocol for the ACL rule. Valid values are TCP/UDP/ICMP/ALL or valid protocol number")
+            type = CommandType.STRING,
+            required = true,
+            description = "the protocol for the ACL rule. Valid values are TCP/UDP/ICMP/ALL or valid protocol number")
     private String protocol;
 
     @Parameter(name = ApiConstants.START_PORT, type = CommandType.INTEGER, description = "the starting port of ACL")
@@ -77,19 +61,19 @@ public class CreateNetworkACLCmd extends BaseAsyncCreateCmd {
     private Integer icmpCode;
 
     @Parameter(name = ApiConstants.NETWORK_ID,
-               type = CommandType.UUID,
-               entityType = NetworkResponse.class,
-               description = "The network of the VM the ACL will be created for")
+            type = CommandType.UUID,
+            entityType = NetworkResponse.class,
+            description = "The network of the VM the ACL will be created for")
     private Long networkId;
 
     @Parameter(name = ApiConstants.ACL_ID,
-               type = CommandType.UUID,
-               entityType = NetworkACLResponse.class,
-               description = "The network of the VM the ACL will be created for")
+            type = CommandType.UUID,
+            entityType = NetworkACLResponse.class,
+            description = "The network of the VM the ACL will be created for")
     private Long aclId;
 
     @Parameter(name = ApiConstants.TRAFFIC_TYPE, type = CommandType.STRING, description = "the traffic type for the ACL,"
-        + "can be ingress or egress, defaulted to ingress if not specified")
+            + "can be ingress or egress, defaulted to ingress if not specified")
     private String trafficType;
 
     @Parameter(name = ApiConstants.NUMBER, type = CommandType.INTEGER, description = "The network of the VM the ACL will be created for")
@@ -98,7 +82,8 @@ public class CreateNetworkACLCmd extends BaseAsyncCreateCmd {
     @Parameter(name = ApiConstants.ACTION, type = CommandType.STRING, description = "scl entry action, allow or deny")
     private String action;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4" +
+            ".4", authorized = {RoleType.Admin})
     private Boolean display;
 
     // ///////////////////////////////////////////////////
@@ -109,32 +94,11 @@ public class CreateNetworkACLCmd extends BaseAsyncCreateCmd {
         return display;
     }
 
-    @Override
-    public boolean isDisplay() {
-        if (display != null) {
-            return display;
-        } else {
-            return true;
-        }
-    }
-
-    public String getProtocol() {
-        String p = protocol.trim();
-        // Deal with ICMP(protocol number 1) specially because it need to be paired with icmp type and code
-        if (StringUtils.isNumeric(p)) {
-            int protoNumber = Integer.parseInt(p);
-            if (protoNumber == 1) {
-                p = "icmp";
-            }
-        }
-        return p;
-    }
-
     public List<String> getSourceCidrList() {
         if (cidrlist != null) {
             return cidrlist;
         } else {
-            List<String> oneCidrList = new ArrayList<String>();
+            final List<String> oneCidrList = new ArrayList<>();
             oneCidrList.add(NetUtils.ALL_CIDRS);
             return oneCidrList;
         }
@@ -144,21 +108,12 @@ public class CreateNetworkACLCmd extends BaseAsyncCreateCmd {
         if (trafficType == null) {
             return NetworkACLItem.TrafficType.Ingress;
         }
-        for (NetworkACLItem.TrafficType type : NetworkACLItem.TrafficType.values()) {
+        for (final NetworkACLItem.TrafficType type : NetworkACLItem.TrafficType.values()) {
             if (type.toString().equalsIgnoreCase(trafficType)) {
                 return type;
             }
         }
         throw new InvalidParameterValueException("Invalid traffic type " + trafficType);
-    }
-
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
     }
 
     public String getAction() {
@@ -168,6 +123,10 @@ public class CreateNetworkACLCmd extends BaseAsyncCreateCmd {
     public Integer getNumber() {
         return number;
     }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
 
     public Integer getSourcePortStart() {
         return publicStartPort;
@@ -190,12 +149,6 @@ public class CreateNetworkACLCmd extends BaseAsyncCreateCmd {
     }
 
     @Override
-    public long getEntityOwnerId() {
-        Account caller = CallContext.current().getCallingAccount();
-        return caller.getAccountId();
-    }
-
-    @Override
     public String getEventType() {
         return EventTypes.EVENT_NETWORK_ACL_ITEM_CREATE;
     }
@@ -214,12 +167,23 @@ public class CreateNetworkACLCmd extends BaseAsyncCreateCmd {
         return null;
     }
 
+    public String getProtocol() {
+        String p = protocol.trim();
+        // Deal with ICMP(protocol number 1) specially because it need to be paired with icmp type and code
+        if (StringUtils.isNumeric(p)) {
+            final int protoNumber = Integer.parseInt(p);
+            if (protoNumber == 1) {
+                p = "icmp";
+            }
+        }
+        return p;
+    }
+
     public Integer getIcmpType() {
         if (icmpType != null) {
             return icmpType;
         } else if (getProtocol().equalsIgnoreCase(NetUtils.ICMP_PROTO)) {
             return -1;
-
         }
         return null;
     }
@@ -230,7 +194,7 @@ public class CreateNetworkACLCmd extends BaseAsyncCreateCmd {
 
     @Override
     public void create() {
-        NetworkACLItem result = _networkACLService.createNetworkACLItem(this);
+        final NetworkACLItem result = _networkACLService.createNetworkACLItem(this);
         setEntityId(result.getId());
         setEntityUuid(result.getUuid());
     }
@@ -259,4 +223,23 @@ public class CreateNetworkACLCmd extends BaseAsyncCreateCmd {
         }
     }
 
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final Account caller = CallContext.current().getCallingAccount();
+        return caller.getAccountId();
+    }
+
+    @Override
+    public boolean isDisplay() {
+        if (display != null) {
+            return display;
+        } else {
+            return true;
+        }
+    }
 }

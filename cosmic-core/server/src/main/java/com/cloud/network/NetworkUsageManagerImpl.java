@@ -1,32 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
@@ -82,22 +54,30 @@ import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.MacAddress;
-
 import org.apache.cloudstack.api.command.admin.usage.AddTrafficMonitorCmd;
 import org.apache.cloudstack.api.command.admin.usage.DeleteTrafficMonitorCmd;
 import org.apache.cloudstack.api.command.admin.usage.ListTrafficMonitorsCmd;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsageService, NetworkUsageManager, ResourceStateAdapter {
-    public enum NetworkUsageResourceName {
-        TrafficSentinel;
-    }
-
     private static final Logger s_logger = LoggerFactory.getLogger(NetworkUsageManagerImpl.class);
+    protected SearchBuilder<IPAddressVO> AllocatedIpSearch;
     @Inject
     HostDao _hostDao;
     @Inject
@@ -126,42 +106,41 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
     int _networkStatsInterval;
     String _TSinclZones;
     String _TSexclZones;
-    protected SearchBuilder<IPAddressVO> AllocatedIpSearch;
 
     @Override
-    public Host addTrafficMonitor(AddTrafficMonitorCmd cmd) {
+    public Host addTrafficMonitor(final AddTrafficMonitorCmd cmd) {
 
-        long zoneId = cmd.getZoneId();
+        final long zoneId = cmd.getZoneId();
 
-        DataCenterVO zone = _dcDao.findById(zoneId);
-        String zoneName;
+        final DataCenterVO zone = _dcDao.findById(zoneId);
+        final String zoneName;
         if (zone == null) {
             throw new InvalidParameterValueException("Could not find zone with ID: " + zoneId);
         } else {
             zoneName = zone.getName();
         }
 
-        List<HostVO> trafficMonitorsInZone = _resourceMgr.listAllHostsInOneZoneByType(Host.Type.TrafficMonitor, zoneId);
+        final List<HostVO> trafficMonitorsInZone = _resourceMgr.listAllHostsInOneZoneByType(Host.Type.TrafficMonitor, zoneId);
         if (trafficMonitorsInZone.size() != 0) {
             throw new InvalidParameterValueException("Already added an traffic monitor in zone: " + zoneName);
         }
 
-        URI uri;
+        final URI uri;
         try {
             uri = new URI(cmd.getUrl());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             s_logger.debug(e.toString());
             throw new InvalidParameterValueException(e.getMessage());
         }
 
-        String ipAddress = uri.getHost();
+        final String ipAddress = uri.getHost();
         //String numRetries = params.get("numretries");
         //String timeout = params.get("timeout");
 
-        TrafficSentinelResource resource = new TrafficSentinelResource();
-        String guid = getTrafficMonitorGuid(zoneId, NetworkUsageResourceName.TrafficSentinel, ipAddress);
+        final TrafficSentinelResource resource = new TrafficSentinelResource();
+        final String guid = getTrafficMonitorGuid(zoneId, NetworkUsageResourceName.TrafficSentinel, ipAddress);
 
-        Map<String, Object> hostParams = new HashMap<String, Object>();
+        final Map<String, Object> hostParams = new HashMap<>();
         hostParams.put("zone", String.valueOf(zoneId));
         hostParams.put("ipaddress", ipAddress);
         hostParams.put("url", cmd.getUrl());
@@ -172,11 +151,11 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
 
         try {
             resource.configure(guid, hostParams);
-        } catch (ConfigurationException e) {
+        } catch (final ConfigurationException e) {
             throw new CloudRuntimeException(e.getMessage());
         }
 
-        Map<String, String> hostDetails = new HashMap<String, String>();
+        final Map<String, String> hostDetails = new HashMap<>();
         hostDetails.put("url", cmd.getUrl());
         hostDetails.put("last_collection", "" + System.currentTimeMillis());
         if (cmd.getInclZones() != null) {
@@ -186,18 +165,18 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
             hostDetails.put("exclZones", cmd.getExclZones());
         }
 
-        Host trafficMonitor = _resourceMgr.addHost(zoneId, resource, Host.Type.TrafficMonitor, hostDetails);
+        final Host trafficMonitor = _resourceMgr.addHost(zoneId, resource, Host.Type.TrafficMonitor, hostDetails);
         return trafficMonitor;
     }
 
-    public String getTrafficMonitorGuid(long zoneId, NetworkUsageResourceName name, String ip) {
+    public String getTrafficMonitorGuid(final long zoneId, final NetworkUsageResourceName name, final String ip) {
         return zoneId + "-" + name + "-" + ip;
     }
 
     @Override
-    public boolean deleteTrafficMonitor(DeleteTrafficMonitorCmd cmd) {
-        long hostId = cmd.getId();
-        HostVO trafficMonitor = _hostDao.findById(hostId);
+    public boolean deleteTrafficMonitor(final DeleteTrafficMonitorCmd cmd) {
+        final long hostId = cmd.getId();
+        final HostVO trafficMonitor = _hostDao.findById(hostId);
         if (trafficMonitor == null) {
             throw new InvalidParameterValueException("Could not find an traffic monitor with ID: " + hostId);
         }
@@ -210,17 +189,17 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
     }
 
     @Override
-    public List<HostVO> listTrafficMonitors(ListTrafficMonitorsCmd cmd) {
-        long zoneId = cmd.getZoneId();
+    public List<HostVO> listTrafficMonitors(final ListTrafficMonitorsCmd cmd) {
+        final long zoneId = cmd.getZoneId();
         return _resourceMgr.listAllHostsInOneZoneByType(Host.Type.TrafficMonitor, zoneId);
     }
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         AllocatedIpSearch = _ipAddressDao.createSearchBuilder();
         AllocatedIpSearch.and("allocated", AllocatedIpSearch.entity().getAllocatedTime(), Op.NNULL);
         AllocatedIpSearch.and("dc", AllocatedIpSearch.entity().getDataCenterId(), Op.EQ);
-        SearchBuilder<NetworkVO> networkJoin = _networksDao.createSearchBuilder();
+        final SearchBuilder<NetworkVO> networkJoin = _networksDao.createSearchBuilder();
         networkJoin.and("guestType", networkJoin.entity().getGuestType(), Op.EQ);
         AllocatedIpSearch.join("network", networkJoin, AllocatedIpSearch.entity().getSourceNetworkId(), networkJoin.entity().getId(), JoinBuilder.JoinType.INNER);
         AllocatedIpSearch.done();
@@ -245,35 +224,69 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
     }
 
     @Override
-    public List<IPAddressVO> listAllocatedDirectIps(long zoneId) {
-        SearchCriteria<IPAddressVO> sc = AllocatedIpSearch.create();
+    public List<IPAddressVO> listAllocatedDirectIps(final long zoneId) {
+        final SearchCriteria<IPAddressVO> sc = AllocatedIpSearch.create();
         sc.setParameters("dc", zoneId);
         sc.setJoinParameters("network", "guestType", Network.GuestType.Shared);
         return _ipAddressDao.search(sc, null);
     }
 
+    @Override
+    public HostVO createHostVOForConnectedAgent(final HostVO host, final StartupCommand[] cmd) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public HostVO createHostVOForDirectConnectAgent(final HostVO host, final StartupCommand[] startup, final ServerResource resource, final Map<String, String> details, final
+    List<String> hostTags) {
+        if (!(startup[0] instanceof StartupTrafficMonitorCommand)) {
+            return null;
+        }
+
+        host.setType(Host.Type.TrafficMonitor);
+        return host;
+    }
+
+    @Override
+    public DeleteHostAnswer deleteHost(final HostVO host, final boolean isForced, final boolean isForceDeleteStorage) throws UnableDeleteHostException {
+        if (host.getType() != Host.Type.TrafficMonitor) {
+            return null;
+        }
+
+        final long hostId = host.getId();
+        _agentMgr.disconnectWithoutInvestigation(hostId, Status.Event.Remove);
+        _detailsDao.deleteDetails(hostId);
+        _hostGpuGroupsDao.deleteGpuEntries(hostId);
+        host.setGuid(null);
+        _hostDao.update(hostId, host);
+        _hostDao.remove(hostId);
+        return new DeleteHostAnswer(false);
+    }
+
+    public enum NetworkUsageResourceName {
+        TrafficSentinel
+    }
+
     protected class DirectNetworkStatsListener implements Listener {
 
+        private final long mgmtSrvrId = MacAddress.getMacAddress().toLong();
         private int _interval;
 
-        private final long mgmtSrvrId = MacAddress.getMacAddress().toLong();
-
-        protected DirectNetworkStatsListener(int interval) {
+        protected DirectNetworkStatsListener(final int interval) {
             _interval = interval;
         }
 
-        @Override
-        public boolean isRecurring() {
-            return true;
+        protected DirectNetworkStatsListener() {
         }
 
         @Override
         @DB
-        public boolean processAnswers(long agentId, long seq, Answer[] answers) {
+        public boolean processAnswers(final long agentId, final long seq, final Answer[] answers) {
             /*
              * Do not collect Direct Network usage stats if the Traffic Monitor is not owned by this mgmt server
              */
-            HostVO host = _hostDao.findById(agentId);
+            final HostVO host = _hostDao.findById(agentId);
             if (host != null) {
                 if ((host.getManagementServerId() == null) || (mgmtSrvrId != host.getManagementServerId())) {
                     s_logger.warn("Not the owner. Not collecting Direct Network usage from  TrafficMonitor : " + agentId);
@@ -284,7 +297,7 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
                 return false;
             }
 
-            GlobalLock scanLock = GlobalLock.getInternLock("direct.network.usage.collect" + host.getDataCenterId());
+            final GlobalLock scanLock = GlobalLock.getInternLock("direct.network.usage.collect" + host.getDataCenterId());
             try {
                 if (scanLock.lock(10)) {
                     try {
@@ -308,11 +321,11 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
                 s_logger.warn("Last collection time not available. Skipping direct usage collection for Traffic Monitor: " + host.getId());
                 return false;
             }
-            Date lastCollection = new Date(Long.parseLong(lastCollectDetail.getValue()));
+            final Date lastCollection = new Date(Long.parseLong(lastCollectDetail.getValue()));
 
             //Get list of IPs currently allocated
-            List<IPAddressVO> allocatedIps = listAllocatedDirectIps(zoneId);
-            Calendar rightNow = Calendar.getInstance();
+            final List<IPAddressVO> allocatedIps = listAllocatedDirectIps(zoneId);
+            final Calendar rightNow = Calendar.getInstance();
 
             // Allow 2 hours for traffic sentinel to populate historical traffic
             // This coule be made configurable
@@ -322,27 +335,27 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
 
             if (lastCollection.after(now)) {
                 s_logger.debug("Current time is less than 2 hours after last collection time : " + lastCollection.toString() +
-                    ". Skipping direct network usage collection");
+                        ". Skipping direct network usage collection");
                 return false;
             }
 
             //Get IP Assign/Release events from lastCollection time till now
-            List<UsageEventVO> IpEvents = _eventDao.listDirectIpEvents(lastCollection, now, zoneId);
+            final List<UsageEventVO> IpEvents = _eventDao.listDirectIpEvents(lastCollection, now, zoneId);
 
-            Map<String, Date> ipAssigment = new HashMap<String, Date>();
-            List<UsageIPAddressVO> IpPartialUsage = new ArrayList<UsageIPAddressVO>(); //Ips which were allocated only for the part of collection duration
-            List<UsageIPAddressVO> fullDurationIpUsage = new ArrayList<UsageIPAddressVO>(); //Ips which were allocated only for the entire collection duration
+            final Map<String, Date> ipAssigment = new HashMap<>();
+            final List<UsageIPAddressVO> IpPartialUsage = new ArrayList<>(); //Ips which were allocated only for the part of collection duration
+            final List<UsageIPAddressVO> fullDurationIpUsage = new ArrayList<>(); //Ips which were allocated only for the entire collection duration
 
             // Use UsageEvents to track the IP assignment
             // Add them to IpUsage list with account_id , ip_address, alloc_date, release_date
 
-            for (UsageEventVO IpEvent : IpEvents) {
-                String address = IpEvent.getResourceName();
+            for (final UsageEventVO IpEvent : IpEvents) {
+                final String address = IpEvent.getResourceName();
                 if (EventTypes.EVENT_NET_IP_ASSIGN.equals(IpEvent.getType())) {
                     ipAssigment.put(address, IpEvent.getCreateDate());
                 } else if (EventTypes.EVENT_NET_IP_RELEASE.equals(IpEvent.getType())) {
                     if (ipAssigment.containsKey(address)) {
-                        Date assigned = ipAssigment.get(address);
+                        final Date assigned = ipAssigment.get(address);
                         ipAssigment.remove(address);
                         IpPartialUsage.add(new UsageIPAddressVO(IpEvent.getAccountId(), address, assigned, IpEvent.getCreateDate()));
                     } else {
@@ -352,13 +365,13 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
                 }
             }
 
-            List<String> IpList = new ArrayList<String>();
-            for (IPAddressVO ip : allocatedIps) {
+            List<String> IpList = new ArrayList<>();
+            for (final IPAddressVO ip : allocatedIps) {
                 if (ip.getAllocatedToAccountId() == Account.ACCOUNT_ID_SYSTEM) {
                     //Ignore usage for system account
                     continue;
                 }
-                String address = (ip.getAddress()).toString();
+                final String address = (ip.getAddress()).toString();
                 if (ipAssigment.containsKey(address)) {
                     // Ip was assigned during the current period but not release till Date now
                     IpPartialUsage.add(new UsageIPAddressVO(ip.getAllocatedToAccountId(), address, ipAssigment.get(address), now));
@@ -368,26 +381,25 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
                     //Store just the Ips to send the list as part of DirectNetworkUsageCommand
                     IpList.add(address);
                 }
-
             }
 
-            final List<UserStatisticsVO> collectedStats = new ArrayList<UserStatisticsVO>();
+            final List<UserStatisticsVO> collectedStats = new ArrayList<>();
 
             //Get usage for Ips which were assigned for the entire duration
             if (fullDurationIpUsage.size() > 0) {
-                DirectNetworkUsageCommand cmd = new DirectNetworkUsageCommand(IpList, lastCollection, now, _TSinclZones, _TSexclZones);
-                DirectNetworkUsageAnswer answer = (DirectNetworkUsageAnswer)_agentMgr.easySend(host.getId(), cmd);
+                final DirectNetworkUsageCommand cmd = new DirectNetworkUsageCommand(IpList, lastCollection, now, _TSinclZones, _TSexclZones);
+                final DirectNetworkUsageAnswer answer = (DirectNetworkUsageAnswer) _agentMgr.easySend(host.getId(), cmd);
                 if (answer == null || !answer.getResult()) {
-                    String details = (answer != null) ? answer.getDetails() : "details unavailable";
-                    String msg = "Unable to get network usage stats from " + host.getId() + " due to: " + details + ".";
+                    final String details = (answer != null) ? answer.getDetails() : "details unavailable";
+                    final String msg = "Unable to get network usage stats from " + host.getId() + " due to: " + details + ".";
                     s_logger.error(msg);
                     return false;
                 } else {
-                    for (UsageIPAddressVO usageIp : fullDurationIpUsage) {
-                        String publicIp = usageIp.getAddress();
-                        long[] bytesSentRcvd = answer.get(publicIp);
-                        Long bytesSent = bytesSentRcvd[0];
-                        Long bytesRcvd = bytesSentRcvd[1];
+                    for (final UsageIPAddressVO usageIp : fullDurationIpUsage) {
+                        final String publicIp = usageIp.getAddress();
+                        final long[] bytesSentRcvd = answer.get(publicIp);
+                        final Long bytesSent = bytesSentRcvd[0];
+                        final Long bytesRcvd = bytesSentRcvd[1];
                         if (bytesSent == null || bytesRcvd == null) {
                             s_logger.debug("Incorrect bytes for IP: " + publicIp);
                             continue;
@@ -396,7 +408,7 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
                             s_logger.trace("Ignore zero bytes for IP: " + publicIp);
                             continue;
                         }
-                        UserStatisticsVO stats = new UserStatisticsVO(usageIp.getAccountId(), zoneId, null, null, null, null);
+                        final UserStatisticsVO stats = new UserStatisticsVO(usageIp.getAccountId(), zoneId, null, null, null, null);
                         stats.setCurrentBytesSent(bytesSent);
                         stats.setCurrentBytesReceived(bytesRcvd);
                         collectedStats.add(stats);
@@ -405,21 +417,21 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
             }
 
             //Get usage for Ips which were assigned for part of the duration period
-            for (UsageIPAddressVO usageIp : IpPartialUsage) {
-                IpList = new ArrayList<String>();
+            for (final UsageIPAddressVO usageIp : IpPartialUsage) {
+                IpList = new ArrayList<>();
                 IpList.add(usageIp.getAddress());
-                DirectNetworkUsageCommand cmd = new DirectNetworkUsageCommand(IpList, usageIp.getAssigned(), usageIp.getReleased(), _TSinclZones, _TSexclZones);
-                DirectNetworkUsageAnswer answer = (DirectNetworkUsageAnswer)_agentMgr.easySend(host.getId(), cmd);
+                final DirectNetworkUsageCommand cmd = new DirectNetworkUsageCommand(IpList, usageIp.getAssigned(), usageIp.getReleased(), _TSinclZones, _TSexclZones);
+                final DirectNetworkUsageAnswer answer = (DirectNetworkUsageAnswer) _agentMgr.easySend(host.getId(), cmd);
                 if (answer == null || !answer.getResult()) {
-                    String details = (answer != null) ? answer.getDetails() : "details unavailable";
-                    String msg = "Unable to get network usage stats from " + host.getId() + " due to: " + details + ".";
+                    final String details = (answer != null) ? answer.getDetails() : "details unavailable";
+                    final String msg = "Unable to get network usage stats from " + host.getId() + " due to: " + details + ".";
                     s_logger.error(msg);
                     return false;
                 } else {
-                    String publicIp = usageIp.getAddress();
-                    long[] bytesSentRcvd = answer.get(publicIp);
-                    Long bytesSent = bytesSentRcvd[0];
-                    Long bytesRcvd = bytesSentRcvd[1];
+                    final String publicIp = usageIp.getAddress();
+                    final long[] bytesSentRcvd = answer.get(publicIp);
+                    final Long bytesSent = bytesSentRcvd[0];
+                    final Long bytesRcvd = bytesSentRcvd[1];
                     if (bytesSent == null || bytesRcvd == null) {
                         s_logger.debug("Incorrect bytes for IP: " + publicIp);
                         continue;
@@ -428,11 +440,10 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
                         s_logger.trace("Ignore zero bytes for IP: " + publicIp);
                         continue;
                     }
-                    UserStatisticsVO stats = new UserStatisticsVO(usageIp.getAccountId(), zoneId, null, null, null, null);
+                    final UserStatisticsVO stats = new UserStatisticsVO(usageIp.getAccountId(), zoneId, null, null, null, null);
                     stats.setCurrentBytesSent(bytesSent);
                     stats.setCurrentBytesReceived(bytesRcvd);
                     collectedStats.add(stats);
-
                 }
             }
 
@@ -443,8 +454,8 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
             //Persist all the stats and last_collection time in a single transaction
             Transaction.execute(new TransactionCallbackNoReturn() {
                 @Override
-                public void doInTransactionWithoutResult(TransactionStatus status) {
-                    for (UserStatisticsVO stat : collectedStats) {
+                public void doInTransactionWithoutResult(final TransactionStatus status) {
+                    for (final UserStatisticsVO stat : collectedStats) {
                         UserStatisticsVO stats = _statsDao.lock(stat.getAccountId(), stat.getDataCenterId(), 0L, null, host.getId(), "DirectNetwork");
                         if (stats == null) {
                             stats = new UserStatisticsVO(stat.getAccountId(), zoneId, null, host.getId(), "DirectNetwork", 0L);
@@ -466,32 +477,24 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
         }
 
         @Override
-        public boolean processCommands(long agentId, long seq, Command[] commands) {
+        public boolean processCommands(final long agentId, final long seq, final Command[] commands) {
             return false;
         }
 
         @Override
-        public AgentControlAnswer processControlCommand(long agentId, AgentControlCommand cmd) {
+        public AgentControlAnswer processControlCommand(final long agentId, final AgentControlCommand cmd) {
             return null;
         }
 
         @Override
-        public boolean processDisconnect(long agentId, Status state) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Disconnected called on " + agentId + " with status " + state.toString());
-            }
-            return true;
-        }
-
-        @Override
-        public void processConnect(Host agent, StartupCommand cmd, boolean forRebalance) {
+        public void processConnect(final Host agent, final StartupCommand cmd, final boolean forRebalance) {
             if (cmd instanceof StartupTrafficMonitorCommand) {
-                long agentId = agent.getId();
+                final long agentId = agent.getId();
                 s_logger.debug("Sending RecurringNetworkUsageCommand to " + agentId);
-                RecurringNetworkUsageCommand watch = new RecurringNetworkUsageCommand(_interval);
+                final RecurringNetworkUsageCommand watch = new RecurringNetworkUsageCommand(_interval);
                 try {
                     _agentMgr.send(agentId, new Commands(watch), this);
-                } catch (AgentUnavailableException e) {
+                } catch (final AgentUnavailableException e) {
                     s_logger.debug("Can not process connect for host " + agentId, e);
                 }
             }
@@ -499,7 +502,15 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
         }
 
         @Override
-        public boolean processTimeout(long agentId, long seq) {
+        public boolean processDisconnect(final long agentId, final Status state) {
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("Disconnected called on " + agentId + " with status " + state.toString());
+            }
+            return true;
+        }
+
+        @Override
+        public boolean isRecurring() {
             return true;
         }
 
@@ -508,42 +519,9 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
             return -1;
         }
 
-        protected DirectNetworkStatsListener() {
+        @Override
+        public boolean processTimeout(final long agentId, final long seq) {
+            return true;
         }
-
     }
-
-    @Override
-    public HostVO createHostVOForConnectedAgent(HostVO host, StartupCommand[] cmd) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public HostVO createHostVOForDirectConnectAgent(HostVO host, StartupCommand[] startup, ServerResource resource, Map<String, String> details, List<String> hostTags) {
-        if (!(startup[0] instanceof StartupTrafficMonitorCommand)) {
-            return null;
-        }
-
-        host.setType(Host.Type.TrafficMonitor);
-        return host;
-    }
-
-    @Override
-    public DeleteHostAnswer deleteHost(HostVO host, boolean isForced, boolean isForceDeleteStorage) throws UnableDeleteHostException {
-        if (host.getType() != Host.Type.TrafficMonitor) {
-            return null;
-        }
-
-        long hostId = host.getId();
-        _agentMgr.disconnectWithoutInvestigation(hostId, Status.Event.Remove);
-        _detailsDao.deleteDetails(hostId);
-        _hostGpuGroupsDao.deleteGpuEntries(hostId);
-        host.setGuid(null);
-        _hostDao.update(hostId, host);
-        _hostDao.remove(hostId);
-        return new DeleteHostAnswer(false);
-
-    }
-
 }

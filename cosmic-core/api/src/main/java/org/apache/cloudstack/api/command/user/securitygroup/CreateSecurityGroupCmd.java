@@ -1,24 +1,7 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.securitygroup;
 
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -29,6 +12,7 @@ import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.api.response.SecurityGroupResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,9 +31,9 @@ public class CreateSecurityGroupCmd extends BaseCmd {
     private String accountName;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               description = "an optional domainId for the security group. If the account parameter is used, domainId must also be used.",
-               entityType = DomainResponse.class)
+            type = CommandType.UUID,
+            description = "an optional domainId for the security group. If the account parameter is used, domainId must also be used.",
+            entityType = DomainResponse.class)
     private Long domainId;
 
     @Parameter(name = ApiConstants.DESCRIPTION, type = CommandType.STRING, description = "the description of the security group")
@@ -90,16 +74,28 @@ public class CreateSecurityGroupCmd extends BaseCmd {
     // ///////////////////////////////////////////////////
 
     @Override
+    public void execute() {
+        final SecurityGroup group = _securityGroupService.createSecurityGroup(this);
+        if (group != null) {
+            final SecurityGroupResponse response = _responseGenerator.createSecurityGroupResponse(group);
+            response.setResponseName(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create security group");
+        }
+    }
+
+    @Override
     public String getCommandName() {
         return s_name;
     }
 
     @Override
     public long getEntityOwnerId() {
-        Account account = CallContext.current().getCallingAccount();
+        final Account account = CallContext.current().getCallingAccount();
         if ((account == null) || _accountService.isAdmin(account.getId())) {
             if ((domainId != null) && (accountName != null)) {
-                Account userAccount = _responseGenerator.findAccountByNameDomain(accountName, domainId);
+                final Account userAccount = _responseGenerator.findAccountByNameDomain(accountName, domainId);
                 if (userAccount != null) {
                     return userAccount.getId();
                 }
@@ -111,18 +107,6 @@ public class CreateSecurityGroupCmd extends BaseCmd {
         }
 
         return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are
-// tracked
-    }
-
-    @Override
-    public void execute() {
-        SecurityGroup group = _securityGroupService.createSecurityGroup(this);
-        if (group != null) {
-            SecurityGroupResponse response = _responseGenerator.createSecurityGroupResponse(group);
-            response.setResponseName(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create security group");
-        }
+        // tracked
     }
 }

@@ -1,29 +1,10 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.api;
 
 public class SecurityGroupRuleAnswer extends Answer {
-    public static enum FailureReason {
-        NONE, UNKNOWN, PROGRAMMING_FAILED, CANNOT_BRIDGE_FIREWALL
-    }
-
     Long logSequenceNumber = null;
     Long vmId = null;
     FailureReason reason = FailureReason.NONE;
@@ -31,20 +12,20 @@ public class SecurityGroupRuleAnswer extends Answer {
     protected SecurityGroupRuleAnswer() {
     }
 
-    public SecurityGroupRuleAnswer(SecurityGroupRulesCmd cmd) {
+    public SecurityGroupRuleAnswer(final SecurityGroupRulesCmd cmd) {
         super(cmd);
         this.logSequenceNumber = cmd.getSeqNum();
         this.vmId = cmd.getVmId();
     }
 
-    public SecurityGroupRuleAnswer(SecurityGroupRulesCmd cmd, boolean result, String detail) {
+    public SecurityGroupRuleAnswer(final SecurityGroupRulesCmd cmd, final boolean result, final String detail) {
         super(cmd, result, detail);
         this.logSequenceNumber = cmd.getSeqNum();
         this.vmId = cmd.getVmId();
         reason = FailureReason.PROGRAMMING_FAILED;
     }
 
-    public SecurityGroupRuleAnswer(SecurityGroupRulesCmd cmd, boolean result, String detail, FailureReason r) {
+    public SecurityGroupRuleAnswer(final SecurityGroupRulesCmd cmd, final boolean result, final String detail, final FailureReason r) {
         super(cmd, result, detail);
         this.logSequenceNumber = cmd.getSeqNum();
         this.vmId = cmd.getVmId();
@@ -63,8 +44,11 @@ public class SecurityGroupRuleAnswer extends Answer {
         return reason;
     }
 
-    public void setReason(FailureReason reason) {
+    public void setReason(final FailureReason reason) {
         this.reason = reason;
     }
 
+    public static enum FailureReason {
+        NONE, UNKNOWN, PROGRAMMING_FAILED, CANNOT_BRIDGE_FIREWALL
+    }
 }

@@ -1,28 +1,11 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+(function ($, cloudStack) {
 
-(function($, cloudStack) {
-
-    cloudStack.uiCustom.healthCheck = function(args) {
+    cloudStack.uiCustom.healthCheck = function (args) {
 
         // Place outer args here as local variables
         // i.e, -- var dataProvider = args.dataProvider
 
-        return function(args) {
+        return function (args) {
             if (args.context.multiRules == undefined) { //LB rule is not created yet
                 cloudStack.dialog.notice({
                     message: _l('Health Check can only be configured on a created LB rule')
@@ -57,7 +40,7 @@
                     lbruleid: args.context.multiRules[0].id
                 },
                 async: false,
-                success: function(json) {
+                success: function (json) {
                     if (json.listlbhealthcheckpoliciesresponse.healthcheckpolicies[0].healthcheckpolicy[0] != undefined) {
                         policyObj = json.listlbhealthcheckpoliciesresponse.healthcheckpolicies[0].healthcheckpolicy[0];
                         pingpath1 = policyObj.pingpath; //API bug: API doesn't return it
@@ -136,7 +119,7 @@
             var buttons = [{
                 text: _l('label.cancel'),
                 'class': 'cancel',
-                click: function() {
+                click: function () {
                     $healthCheckDialog.dialog('destroy');
                     $('.overlay').remove();
                 }
@@ -146,7 +129,7 @@
                 buttons.push({
                     text: _l('Create'),
                     'class': 'ok',
-                    click: function() {
+                    click: function () {
                         $loadingOnDialog.appendTo($healthCheckDialog);
                         var formData = cloudStack.serializeForm($healthCheckDialog.find('form'));
                         var data = {
@@ -161,15 +144,15 @@
                         $.ajax({
                             url: createURL('createLBHealthCheckPolicy'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var jobId = json.createlbhealthcheckpolicyresponse.jobid;
-                                var createLBHealthCheckPolicyIntervalId = setInterval(function() {
+                                var createLBHealthCheckPolicyIntervalId = setInterval(function () {
                                     $.ajax({
                                         url: createURL('queryAsyncJobResult'),
                                         data: {
                                             jobid: jobId
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             var result = json.queryasyncjobresultresponse;
                                             if (result.jobstatus == 0) {
                                                 return; //Job has not completed
@@ -197,7 +180,7 @@
                                 }, g_queryAsyncJobResultInterval);
                             },
 
-                            error: function(json) {
+                            error: function (json) {
 
                                 cloudStack.dialog.notice({
                                     message: parseXMLHttpResponse(json)
@@ -215,7 +198,7 @@
                     {
                         text: _l('Update'),
                         'class': 'ok',
-                        click: function() {
+                        click: function () {
                             $loadingOnDialog.appendTo($healthCheckDialog);
 
                             $.ajax({
@@ -223,15 +206,15 @@
                                 data: {
                                     id: policyObj.id
                                 },
-                                success: function(json) {
+                                success: function (json) {
                                     var jobId = json.deletelbhealthcheckpolicyresponse.jobid;
-                                    var deleteLBHealthCheckPolicyIntervalId = setInterval(function() {
+                                    var deleteLBHealthCheckPolicyIntervalId = setInterval(function () {
                                         $.ajax({
                                             url: createURL('queryAsyncJobResult'),
                                             data: {
                                                 jobid: jobId
                                             },
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var result = json.queryasyncjobresultresponse;
                                                 if (result.jobstatus == 0) {
                                                     return; //Job has not completed
@@ -252,15 +235,15 @@
                                                         $.ajax({
                                                             url: createURL('createLBHealthCheckPolicy'),
                                                             data: data,
-                                                            success: function(json) {
+                                                            success: function (json) {
                                                                 var jobId = json.createlbhealthcheckpolicyresponse.jobid;
-                                                                var createLBHealthCheckPolicyIntervalId = setInterval(function() {
+                                                                var createLBHealthCheckPolicyIntervalId = setInterval(function () {
                                                                     $.ajax({
                                                                         url: createURL('queryAsyncJobResult'),
                                                                         data: {
                                                                             jobid: jobId
                                                                         },
-                                                                        success: function(json) {
+                                                                        success: function (json) {
                                                                             var result = json.queryasyncjobresultresponse;
                                                                             if (result.jobstatus == 0) {
                                                                                 return; //Job has not completed
@@ -310,7 +293,7 @@
                     {
                         text: _l('Delete'),
                         'class': 'delete',
-                        click: function() {
+                        click: function () {
                             $loadingOnDialog.appendTo($healthCheckDialog);
 
                             $.ajax({
@@ -318,15 +301,15 @@
                                 data: {
                                     id: policyObj.id
                                 },
-                                success: function(json) {
+                                success: function (json) {
                                     var jobId = json.deletelbhealthcheckpolicyresponse.jobid;
-                                    var deleteLBHealthCheckPolicyIntervalId = setInterval(function() {
+                                    var deleteLBHealthCheckPolicyIntervalId = setInterval(function () {
                                         $.ajax({
                                             url: createURL('queryAsyncJobResult'),
                                             data: {
                                                 jobid: jobId
                                             },
-                                            success: function(json) {
+                                            success: function (json) {
                                                 var result = json.queryasyncjobresultresponse;
                                                 if (result.jobstatus == 0) {
                                                     return; //Job has not completed
@@ -367,8 +350,8 @@
                 draggable: true,
                 closeonEscape: false,
                 overflow: 'auto',
-                open: function() {
-                    $("button").each(function() {
+                open: function () {
+                    $("button").each(function () {
                         $(this).attr("style", "left: 400px; position: relative; margin-right: 5px; ");
                     });
 

@@ -1,31 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.engine.orchestration;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.exception.InsufficientCapacityException;
@@ -49,7 +22,6 @@ import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.engine.cloud.entity.api.NetworkEntity;
 import org.apache.cloudstack.engine.cloud.entity.api.TemplateEntity;
 import org.apache.cloudstack.engine.cloud.entity.api.VMEntityManager;
@@ -58,63 +30,63 @@ import org.apache.cloudstack.engine.cloud.entity.api.VirtualMachineEntityImpl;
 import org.apache.cloudstack.engine.cloud.entity.api.VolumeEntity;
 import org.apache.cloudstack.engine.orchestration.service.VolumeOrchestrationService;
 import org.apache.cloudstack.engine.service.api.OrchestrationService;
+
+import javax.inject.Inject;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class CloudOrchestrator implements OrchestrationService {
 
     @Inject
-    private VMEntityManager vmEntityManager;
-
-    @Inject
-    private VirtualMachineManager _itMgr;
-
-    @Inject
     protected VMTemplateDao _templateDao = null;
-
     @Inject
     protected VMInstanceDao _vmDao;
-
     @Inject
     protected UserVmDao _userVmDao = null;
-
     @Inject
     protected UserVmDetailsDao _userVmDetailsDao = null;
-
     @Inject
     protected ServiceOfferingDao _serviceOfferingDao;
-
     @Inject
     protected DiskOfferingDao _diskOfferingDao = null;
-
     @Inject
     protected NetworkDao _networkDao;
-
     @Inject
     protected AccountDao _accountDao = null;
-
     @Inject
     VolumeOrchestrationService _volumeMgr;
+    @Inject
+    private VMEntityManager vmEntityManager;
+    @Inject
+    private VirtualMachineManager _itMgr;
 
     public CloudOrchestrator() {
     }
 
-    public VirtualMachineEntity createFromScratch(String uuid, String iso, String os, String hypervisor, String hostName, int cpu, int speed, long memory,
-        List<String> networks, List<String> computeTags, Map<String, String> details, String owner) {
+    public VirtualMachineEntity createFromScratch(final String uuid, final String iso, final String os, final String hypervisor, final String hostName, final int cpu, final int
+            speed, final long memory,
+                                                  final List<String> networks, final List<String> computeTags, final Map<String, String> details, final String owner) {
         return null;
     }
 
-    public String reserve(String vm, String planner, Long until) throws InsufficientCapacityException {
+    public String reserve(final String vm, final String planner, final Long until) throws InsufficientCapacityException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public String deploy(String reservationId) {
+    public String deploy(final String reservationId) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public void joinNetwork(String network1, String network2) {
+    public void joinNetwork(final String network1, final String network2) {
         // TODO Auto-generated method stub
 
     }
@@ -130,69 +102,49 @@ public class CloudOrchestrator implements OrchestrationService {
     }
 
     @Override
-    public VolumeEntity createVolume() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public TemplateEntity registerTemplate(String name, URL path, String os, Hypervisor hypervisor) {
-        return null;
-    }
-
-    @Override
-    public void destroyNetwork(String networkUuid) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void destroyVolume(String volumeEntity) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public VirtualMachineEntity createVirtualMachine(String id, String owner, String templateId, String hostName, String displayName, String hypervisor, int cpu,
-        int speed, long memory, Long diskSize, List<String> computeTags, List<String> rootDiskTags, Map<String, NicProfile> networkNicMap, DeploymentPlan plan,
-        Long rootDiskSize) throws InsufficientCapacityException {
+    public VirtualMachineEntity createVirtualMachine(final String id, final String owner, final String templateId, final String hostName, final String displayName, final String
+            hypervisor, final int cpu,
+                                                     final int speed, final long memory, final Long diskSize, final List<String> computeTags, final List<String> rootDiskTags,
+                                                     final Map<String, NicProfile>
+                                                             networkNicMap, final DeploymentPlan plan,
+                                                     final Long rootDiskSize) throws InsufficientCapacityException {
 
         // VirtualMachineEntityImpl vmEntity = new VirtualMachineEntityImpl(id, owner, hostName, displayName, cpu, speed, memory, computeTags, rootDiskTags, networks,
         // vmEntityManager);
 
-        LinkedHashMap<NetworkVO, List<? extends NicProfile>> networkIpMap = new LinkedHashMap<NetworkVO, List<? extends NicProfile>>();
-        for (String uuid : networkNicMap.keySet()) {
-            NetworkVO network = _networkDao.findByUuid(uuid);
-            if(network != null){
-                networkIpMap.put(network, new ArrayList<NicProfile>(Arrays.asList(networkNicMap.get(uuid))));
+        final LinkedHashMap<NetworkVO, List<? extends NicProfile>> networkIpMap = new LinkedHashMap<>();
+        for (final String uuid : networkNicMap.keySet()) {
+            final NetworkVO network = _networkDao.findByUuid(uuid);
+            if (network != null) {
+                networkIpMap.put(network, new ArrayList<>(Arrays.asList(networkNicMap.get(uuid))));
             }
         }
 
-        VirtualMachineEntityImpl vmEntity = ComponentContext.inject(VirtualMachineEntityImpl.class);
-        vmEntity.init(id, owner, hostName, displayName, cpu, speed, memory, computeTags, rootDiskTags, new ArrayList<String>(networkNicMap.keySet()));
+        final VirtualMachineEntityImpl vmEntity = ComponentContext.inject(VirtualMachineEntityImpl.class);
+        vmEntity.init(id, owner, hostName, displayName, cpu, speed, memory, computeTags, rootDiskTags, new ArrayList<>(networkNicMap.keySet()));
 
-        HypervisorType hypervisorType = HypervisorType.valueOf(hypervisor);
+        final HypervisorType hypervisorType = HypervisorType.valueOf(hypervisor);
 
         //load vm instance and offerings and call virtualMachineManagerImpl
-        VMInstanceVO vm = _vmDao.findByUuid(id);
+        final VMInstanceVO vm = _vmDao.findByUuid(id);
 
         // If the template represents an ISO, a disk offering must be passed in, and will be used to create the root disk
         // Else, a disk offering is optional, and if present will be used to create the data disk
 
-        DiskOfferingInfo rootDiskOfferingInfo = new DiskOfferingInfo();
-        List<DiskOfferingInfo> dataDiskOfferings = new ArrayList<DiskOfferingInfo>();
+        final DiskOfferingInfo rootDiskOfferingInfo = new DiskOfferingInfo();
+        final List<DiskOfferingInfo> dataDiskOfferings = new ArrayList<>();
 
-        ServiceOfferingVO computeOffering = _serviceOfferingDao.findById(vm.getId(), vm.getServiceOfferingId());
+        final ServiceOfferingVO computeOffering = _serviceOfferingDao.findById(vm.getId(), vm.getServiceOfferingId());
 
         rootDiskOfferingInfo.setDiskOffering(computeOffering);
         rootDiskOfferingInfo.setSize(rootDiskSize);
 
         if (computeOffering.isCustomizedIops() != null && computeOffering.isCustomizedIops()) {
-            Map<String, String> userVmDetails = _userVmDetailsDao.listDetailsKeyPairs(vm.getId());
+            final Map<String, String> userVmDetails = _userVmDetailsDao.listDetailsKeyPairs(vm.getId());
 
             if (userVmDetails != null) {
-                String minIops = userVmDetails.get("minIops");
-                String maxIops = userVmDetails.get("maxIops");
+                final String minIops = userVmDetails.get("minIops");
+                final String maxIops = userVmDetails.get("maxIops");
 
                 rootDiskOfferingInfo.setMinIops(minIops != null && minIops.trim().length() > 0 ? Long.parseLong(minIops) : null);
                 rootDiskOfferingInfo.setMaxIops(maxIops != null && maxIops.trim().length() > 0 ? Long.parseLong(maxIops) : null);
@@ -200,7 +152,7 @@ public class CloudOrchestrator implements OrchestrationService {
         }
 
         if (vm.getDiskOfferingId() != null) {
-            DiskOfferingVO diskOffering = _diskOfferingDao.findById(vm.getDiskOfferingId());
+            final DiskOfferingVO diskOffering = _diskOfferingDao.findById(vm.getDiskOfferingId());
             if (diskOffering == null) {
                 throw new InvalidParameterValueException("Unable to find disk offering " + vm.getDiskOfferingId());
             }
@@ -213,17 +165,17 @@ public class CloudOrchestrator implements OrchestrationService {
                 _volumeMgr.validateVolumeSizeRange(size * 1024 * 1024 * 1024);
             }
 
-            DiskOfferingInfo dataDiskOfferingInfo = new DiskOfferingInfo();
+            final DiskOfferingInfo dataDiskOfferingInfo = new DiskOfferingInfo();
 
             dataDiskOfferingInfo.setDiskOffering(diskOffering);
             dataDiskOfferingInfo.setSize(size);
 
             if (diskOffering.isCustomizedIops() != null && diskOffering.isCustomizedIops()) {
-                Map<String, String> userVmDetails = _userVmDetailsDao.listDetailsKeyPairs(vm.getId());
+                final Map<String, String> userVmDetails = _userVmDetailsDao.listDetailsKeyPairs(vm.getId());
 
                 if (userVmDetails != null) {
-                    String minIops = userVmDetails.get("minIopsDo");
-                    String maxIops = userVmDetails.get("maxIopsDo");
+                    final String minIops = userVmDetails.get("minIopsDo");
+                    final String maxIops = userVmDetails.get("maxIopsDo");
 
                     dataDiskOfferingInfo.setMinIops(minIops != null && minIops.trim().length() > 0 ? Long.parseLong(minIops) : null);
                     dataDiskOfferingInfo.setMaxIops(maxIops != null && maxIops.trim().length() > 0 ? Long.parseLong(maxIops) : null);
@@ -234,34 +186,38 @@ public class CloudOrchestrator implements OrchestrationService {
         }
 
         _itMgr.allocate(vm.getInstanceName(), _templateDao.findById(new Long(templateId)), computeOffering, rootDiskOfferingInfo, dataDiskOfferings, networkIpMap, plan,
-            hypervisorType);
+                hypervisorType);
 
         return vmEntity;
     }
 
     @Override
-    public VirtualMachineEntity createVirtualMachineFromScratch(String id, String owner, String isoId, String hostName, String displayName, String hypervisor, String os,
-        int cpu, int speed, long memory, Long diskSize, List<String> computeTags, List<String> rootDiskTags, Map<String, NicProfile> networkNicMap, DeploymentPlan plan)
-        throws InsufficientCapacityException {
+    public VirtualMachineEntity createVirtualMachineFromScratch(final String id, final String owner, final String isoId, final String hostName, final String displayName, final
+    String hypervisor, final String os,
+                                                                final int cpu, final int speed, final long memory, final Long diskSize, final List<String> computeTags, final
+                                                                List<String> rootDiskTags, final Map<String,
+            NicProfile> networkNicMap, final DeploymentPlan plan)
+            throws InsufficientCapacityException {
 
-        // VirtualMachineEntityImpl vmEntity = new VirtualMachineEntityImpl(id, owner, hostName, displayName, cpu, speed, memory, computeTags, rootDiskTags, networks, vmEntityManager);
-        VirtualMachineEntityImpl vmEntity = ComponentContext.inject(VirtualMachineEntityImpl.class);
-        vmEntity.init(id, owner, hostName, displayName, cpu, speed, memory, computeTags, rootDiskTags, new ArrayList<String>(networkNicMap.keySet()));
+        // VirtualMachineEntityImpl vmEntity = new VirtualMachineEntityImpl(id, owner, hostName, displayName, cpu, speed, memory, computeTags, rootDiskTags, networks,
+        // vmEntityManager);
+        final VirtualMachineEntityImpl vmEntity = ComponentContext.inject(VirtualMachineEntityImpl.class);
+        vmEntity.init(id, owner, hostName, displayName, cpu, speed, memory, computeTags, rootDiskTags, new ArrayList<>(networkNicMap.keySet()));
 
         //load vm instance and offerings and call virtualMachineManagerImpl
-        VMInstanceVO vm = _vmDao.findByUuid(id);
+        final VMInstanceVO vm = _vmDao.findByUuid(id);
 
-        ServiceOfferingVO computeOffering = _serviceOfferingDao.findById(vm.getId(), vm.getServiceOfferingId());
+        final ServiceOfferingVO computeOffering = _serviceOfferingDao.findById(vm.getId(), vm.getServiceOfferingId());
 
-        DiskOfferingInfo rootDiskOfferingInfo = new DiskOfferingInfo();
+        final DiskOfferingInfo rootDiskOfferingInfo = new DiskOfferingInfo();
 
         rootDiskOfferingInfo.setDiskOffering(computeOffering);
 
-        Long diskOfferingId = vm.getDiskOfferingId();
+        final Long diskOfferingId = vm.getDiskOfferingId();
         if (diskOfferingId == null) {
             throw new InvalidParameterValueException("Installing from ISO requires a disk offering to be specified for the root disk.");
         }
-        DiskOfferingVO diskOffering = _diskOfferingDao.findById(diskOfferingId);
+        final DiskOfferingVO diskOffering = _diskOfferingDao.findById(diskOfferingId);
         if (diskOffering == null) {
             throw new InvalidParameterValueException("Unable to find disk offering " + diskOfferingId);
         }
@@ -278,42 +234,65 @@ public class CloudOrchestrator implements OrchestrationService {
         rootDiskOfferingInfo.setSize(size);
 
         if (diskOffering.isCustomizedIops() != null && diskOffering.isCustomizedIops()) {
-            Map<String, String> userVmDetails = _userVmDetailsDao.listDetailsKeyPairs(vm.getId());
+            final Map<String, String> userVmDetails = _userVmDetailsDao.listDetailsKeyPairs(vm.getId());
 
             if (userVmDetails != null) {
-                String minIops = userVmDetails.get("minIopsDo");
-                String maxIops = userVmDetails.get("maxIopsDo");
+                final String minIops = userVmDetails.get("minIopsDo");
+                final String maxIops = userVmDetails.get("maxIopsDo");
 
                 rootDiskOfferingInfo.setMinIops(minIops != null && minIops.trim().length() > 0 ? Long.parseLong(minIops) : null);
                 rootDiskOfferingInfo.setMaxIops(maxIops != null && maxIops.trim().length() > 0 ? Long.parseLong(maxIops) : null);
             }
         }
 
-        LinkedHashMap<Network, List<? extends NicProfile>> networkIpMap = new LinkedHashMap<Network, List<? extends NicProfile>>();
-        for (String uuid : networkNicMap.keySet()) {
-            NetworkVO network = _networkDao.findByUuid(uuid);
-            if(network != null){
-                networkIpMap.put(network, new ArrayList<NicProfile>(Arrays.asList(networkNicMap.get(uuid))));
+        final LinkedHashMap<Network, List<? extends NicProfile>> networkIpMap = new LinkedHashMap<>();
+        for (final String uuid : networkNicMap.keySet()) {
+            final NetworkVO network = _networkDao.findByUuid(uuid);
+            if (network != null) {
+                networkIpMap.put(network, new ArrayList<>(Arrays.asList(networkNicMap.get(uuid))));
             }
         }
 
-        HypervisorType hypervisorType = HypervisorType.valueOf(hypervisor);
+        final HypervisorType hypervisorType = HypervisorType.valueOf(hypervisor);
 
-        _itMgr.allocate(vm.getInstanceName(), _templateDao.findById(new Long(isoId)), computeOffering, rootDiskOfferingInfo, new ArrayList<DiskOfferingInfo>(), networkIpMap, plan, hypervisorType);
+        _itMgr.allocate(vm.getInstanceName(), _templateDao.findById(new Long(isoId)), computeOffering, rootDiskOfferingInfo, new ArrayList<>(), networkIpMap,
+                plan, hypervisorType);
 
         return vmEntity;
     }
 
     @Override
-    public NetworkEntity createNetwork(String id, String name, String domainName, String cidr, String gateway) {
+    public NetworkEntity createNetwork(final String id, final String name, final String domainName, final String cidr, final String gateway) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public VirtualMachineEntity getVirtualMachine(String id) {
-        VirtualMachineEntityImpl vmEntity = new VirtualMachineEntityImpl(id, vmEntityManager);
-        return vmEntity;
+    public void destroyNetwork(final String networkUuid) {
+        // TODO Auto-generated method stub
+
     }
 
+    @Override
+    public VolumeEntity createVolume() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void destroyVolume(final String volumeEntity) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public TemplateEntity registerTemplate(final String name, final URL path, final String os, final Hypervisor hypervisor) {
+        return null;
+    }
+
+    @Override
+    public VirtualMachineEntity getVirtualMachine(final String id) {
+        final VirtualMachineEntityImpl vmEntity = new VirtualMachineEntityImpl(id, vmEntityManager);
+        return vmEntity;
+    }
 }

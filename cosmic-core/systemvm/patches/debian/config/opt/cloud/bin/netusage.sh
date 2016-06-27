@@ -1,22 +1,7 @@
 #!/usr/bin/env bash
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 
- 
+
+
 
 # netusage.sh -- create iptable rules to gather network stats, running within DomR
 
@@ -121,33 +106,33 @@ do
   esac
 done
 
-if [ "$cflag" == "1" ] 
+if [ "$cflag" == "1" ]
 then
-  #create_usage_rules  
+  #create_usage_rules
   unlock_exit $? $lock $locked
 fi
 
-if [ "$gflag" == "1" ] 
+if [ "$gflag" == "1" ]
 then
-  get_usage 
+  get_usage
   unlock_exit $? $lock $locked
 fi
 
-if [ "$rflag" == "1" ] 
+if [ "$rflag" == "1" ]
 then
-  reset_usage  
+  reset_usage
   unlock_exit $? $lock $locked
 fi
 
-if [ "$aflag" == "1" ] 
+if [ "$aflag" == "1" ]
 then
-  #add_public_interface $publicIf 
+  #add_public_interface $publicIf
   unlock_exit $? $lock $locked
 fi
 
-if [ "$dflag" == "1" ] 
+if [ "$dflag" == "1" ]
 then
-  #delete_public_interface $publicIf 
+  #delete_public_interface $publicIf
   unlock_exit $? $lock $locked
 fi
 

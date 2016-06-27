@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.resource.virtualnetwork.model;
@@ -28,7 +13,8 @@ public class RemoteAccessVpn extends ConfigBase {
         super(ConfigBase.REMOTEACCESSVPN);
     }
 
-    public RemoteAccessVpn(boolean create, String ipRange, String presharedKey, String vpnServerIp, String localIp, String localCidr, String publicInterface) {
+    public RemoteAccessVpn(final boolean create, final String ipRange, final String presharedKey, final String vpnServerIp, final String localIp, final String localCidr, final
+    String publicInterface) {
         super(ConfigBase.REMOTEACCESSVPN);
         this.create = create;
         this.ipRange = ipRange;
@@ -43,7 +29,7 @@ public class RemoteAccessVpn extends ConfigBase {
         return create;
     }
 
-    public void setCreate(boolean create) {
+    public void setCreate(final boolean create) {
         this.create = create;
     }
 
@@ -51,7 +37,7 @@ public class RemoteAccessVpn extends ConfigBase {
         return ipRange;
     }
 
-    public void setIpRange(String ipRange) {
+    public void setIpRange(final String ipRange) {
         this.ipRange = ipRange;
     }
 
@@ -59,7 +45,7 @@ public class RemoteAccessVpn extends ConfigBase {
         return presharedKey;
     }
 
-    public void setPresharedKey(String presharedKey) {
+    public void setPresharedKey(final String presharedKey) {
         this.presharedKey = presharedKey;
     }
 
@@ -67,7 +53,7 @@ public class RemoteAccessVpn extends ConfigBase {
         return vpnServerIp;
     }
 
-    public void setVpnServerIp(String vpnServerIp) {
+    public void setVpnServerIp(final String vpnServerIp) {
         this.vpnServerIp = vpnServerIp;
     }
 
@@ -75,7 +61,7 @@ public class RemoteAccessVpn extends ConfigBase {
         return localIp;
     }
 
-    public void setLocalIp(String localIp) {
+    public void setLocalIp(final String localIp) {
         this.localIp = localIp;
     }
 
@@ -83,7 +69,7 @@ public class RemoteAccessVpn extends ConfigBase {
         return localCidr;
     }
 
-    public void setLocalCidr(String localCidr) {
+    public void setLocalCidr(final String localCidr) {
         this.localCidr = localCidr;
     }
 
@@ -91,8 +77,7 @@ public class RemoteAccessVpn extends ConfigBase {
         return publicInterface;
     }
 
-    public void setPublicInterface(String publicInterface) {
+    public void setPublicInterface(final String publicInterface) {
         this.publicInterface = publicInterface;
     }
-
 }

@@ -1,23 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// the License.  You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.vpc;
-
-import java.io.IOException;
 
 import com.cloud.alert.AlertManager;
 import com.cloud.cluster.agentlb.dao.HostTransferMapDaoImpl;
@@ -93,9 +74,11 @@ import com.cloud.vpc.dao.MockNetworkServiceMapDaoImpl;
 import com.cloud.vpc.dao.MockVpcDaoImpl;
 import com.cloud.vpc.dao.MockVpcOfferingDaoImpl;
 import com.cloud.vpc.dao.MockVpcOfferingServiceMapDaoImpl;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDaoImpl;
 import org.apache.cloudstack.test.utils.SpringUtils;
+
+import java.io.IOException;
+
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -108,22 +91,22 @@ import org.springframework.core.type.filter.TypeFilter;
 
 @Configuration
 @ComponentScan(basePackageClasses = {VpcManagerImpl.class, NetworkElement.class, VpcOfferingDao.class, ConfigurationDaoImpl.class, IPAddressDaoImpl.class,
-    DomainRouterDaoImpl.class, VpcGatewayDaoImpl.class, PrivateIpDaoImpl.class, StaticRouteDaoImpl.class, PhysicalNetworkDaoImpl.class,
-    ResourceTagsDaoImpl.class, FirewallRulesDaoImpl.class, VlanDaoImpl.class, AccountDaoImpl.class, ResourceCountDaoImpl.class,
-    Site2SiteVpnGatewayDaoImpl.class, PodVlanMapDaoImpl.class, AccountVlanMapDaoImpl.class, DomainVlanMapDaoImpl.class, HostDaoImpl.class, HostDetailsDaoImpl.class,
-    HostTagsDaoImpl.class, HostTransferMapDaoImpl.class, ClusterDaoImpl.class, HostPodDaoImpl.class, RouterNetworkDaoImpl.class,
-    UserStatisticsDaoImpl.class, PhysicalNetworkTrafficTypeDaoImpl.class, FirewallRulesCidrsDaoImpl.class, ResourceLimitManagerImpl.class,
-    ResourceLimitDaoImpl.class, ResourceCountDaoImpl.class, DomainDaoImpl.class, UserVmDaoImpl.class, UserVmDetailsDaoImpl.class, NicDaoImpl.class,
-    SnapshotDaoImpl.class, VMInstanceDaoImpl.class, VolumeDaoImpl.class, UserIpv6AddressDaoImpl.class, NicSecondaryIpDaoImpl.class,
-    VpcServiceMapDaoImpl.class, ServiceOfferingDaoImpl.class, VMTemplateHostDaoImpl.class, MockVpcDaoImpl.class, VMTemplateDaoImpl.class,
-    VMTemplateZoneDaoImpl.class, VMTemplateDetailsDaoImpl.class, DataCenterDaoImpl.class, DataCenterIpAddressDaoImpl.class,
-    DataCenterLinkLocalIpAddressDaoImpl.class, DataCenterVnetDaoImpl.class, PodVlanDaoImpl.class, DataCenterDetailsDaoImpl.class,
-    MockNetworkManagerImpl.class, MockVpcVirtualNetworkApplianceManager.class, EntityManagerImpl.class, LoadBalancerDaoImpl.class,
-    FirewallRulesCidrsDaoImpl.class, VirtualRouterProviderDaoImpl.class, ProjectDaoImpl.class, ProjectAccountDaoImpl.class, MockVpcOfferingDaoImpl.class,
-    MockConfigurationManagerImpl.class, MockNetworkOfferingServiceMapDaoImpl.class, MockNetworkServiceMapDaoImpl.class,
-    MockVpcOfferingServiceMapDaoImpl.class, MockNetworkOfferingDaoImpl.class, MockNetworkModelImpl.class, Ipv6AddressManagerImpl.class},
-               includeFilters = {@Filter(value = VpcTestConfiguration.VpcLibrary.class, type = FilterType.CUSTOM)},
-               useDefaultFilters = false)
+        DomainRouterDaoImpl.class, VpcGatewayDaoImpl.class, PrivateIpDaoImpl.class, StaticRouteDaoImpl.class, PhysicalNetworkDaoImpl.class,
+        ResourceTagsDaoImpl.class, FirewallRulesDaoImpl.class, VlanDaoImpl.class, AccountDaoImpl.class, ResourceCountDaoImpl.class,
+        Site2SiteVpnGatewayDaoImpl.class, PodVlanMapDaoImpl.class, AccountVlanMapDaoImpl.class, DomainVlanMapDaoImpl.class, HostDaoImpl.class, HostDetailsDaoImpl.class,
+        HostTagsDaoImpl.class, HostTransferMapDaoImpl.class, ClusterDaoImpl.class, HostPodDaoImpl.class, RouterNetworkDaoImpl.class,
+        UserStatisticsDaoImpl.class, PhysicalNetworkTrafficTypeDaoImpl.class, FirewallRulesCidrsDaoImpl.class, ResourceLimitManagerImpl.class,
+        ResourceLimitDaoImpl.class, ResourceCountDaoImpl.class, DomainDaoImpl.class, UserVmDaoImpl.class, UserVmDetailsDaoImpl.class, NicDaoImpl.class,
+        SnapshotDaoImpl.class, VMInstanceDaoImpl.class, VolumeDaoImpl.class, UserIpv6AddressDaoImpl.class, NicSecondaryIpDaoImpl.class,
+        VpcServiceMapDaoImpl.class, ServiceOfferingDaoImpl.class, VMTemplateHostDaoImpl.class, MockVpcDaoImpl.class, VMTemplateDaoImpl.class,
+        VMTemplateZoneDaoImpl.class, VMTemplateDetailsDaoImpl.class, DataCenterDaoImpl.class, DataCenterIpAddressDaoImpl.class,
+        DataCenterLinkLocalIpAddressDaoImpl.class, DataCenterVnetDaoImpl.class, PodVlanDaoImpl.class, DataCenterDetailsDaoImpl.class,
+        MockNetworkManagerImpl.class, MockVpcVirtualNetworkApplianceManager.class, EntityManagerImpl.class, LoadBalancerDaoImpl.class,
+        FirewallRulesCidrsDaoImpl.class, VirtualRouterProviderDaoImpl.class, ProjectDaoImpl.class, ProjectAccountDaoImpl.class, MockVpcOfferingDaoImpl.class,
+        MockConfigurationManagerImpl.class, MockNetworkOfferingServiceMapDaoImpl.class, MockNetworkServiceMapDaoImpl.class,
+        MockVpcOfferingServiceMapDaoImpl.class, MockNetworkOfferingDaoImpl.class, MockNetworkModelImpl.class, Ipv6AddressManagerImpl.class},
+        includeFilters = {@Filter(value = VpcTestConfiguration.VpcLibrary.class, type = FilterType.CUSTOM)},
+        useDefaultFilters = false)
 public class VpcTestConfiguration {
 
     @Bean
@@ -176,10 +159,10 @@ public class VpcTestConfiguration {
         return Mockito.mock(RemoteAccessVpnService.class);
     }
 
-//    @Bean
-//    public VpcDao vpcDao() {
-//        return Mockito.mock(VpcDao.class);
-//    }
+    //    @Bean
+    //    public VpcDao vpcDao() {
+    //        return Mockito.mock(VpcDao.class);
+    //    }
 
     @Bean
     public NetworkDao networkDao() {
@@ -188,9 +171,9 @@ public class VpcTestConfiguration {
 
     public static class VpcLibrary implements TypeFilter {
         @Override
-        public boolean match(MetadataReader mdr, MetadataReaderFactory arg1) throws IOException {
+        public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) throws IOException {
             mdr.getClassMetadata().getClassName();
-            ComponentScan cs = VpcTestConfiguration.class.getAnnotation(ComponentScan.class);
+            final ComponentScan cs = VpcTestConfiguration.class.getAnnotation(ComponentScan.class);
             return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);
         }
     }

@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils.backoff.impl;
@@ -34,7 +19,7 @@ public class ConstantTimeBackoffTest {
         final ConstantTimeBackoff backoff = new ConstantTimeBackoff();
         backoff.setTimeToWait(10);
         Assert.assertTrue(backoff.getWaiters().isEmpty());
-        Thread waitThread = new Thread(new Runnable() {
+        final Thread waitThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 backoff.waitBeforeRetry();
@@ -66,14 +51,14 @@ public class ConstantTimeBackoffTest {
         // at this point this is the only way rhe configure method gets invoked,
         // therefore have to make sure it works correctly
         final ConstantTimeBackoff backoff = new ConstantTimeBackoff();
-        backoff.configure("foo", new HashMap<String, Object>());
+        backoff.configure("foo", new HashMap<>());
         Assert.assertEquals(5000, backoff.getTimeToWait());
     }
 
     @Test
     public void configureWithValue() {
         final ConstantTimeBackoff backoff = new ConstantTimeBackoff();
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        final HashMap<String, Object> params = new HashMap<>();
         params.put("seconds", "100");
         backoff.configure("foo", params);
         Assert.assertEquals(100000, backoff.getTimeToWait());
@@ -95,7 +80,7 @@ public class ConstantTimeBackoffTest {
     public void wakeupExisting() throws InterruptedException {
         final ConstantTimeBackoff backoff = new ConstantTimeBackoff();
         backoff.setTimeToWait(10);
-        Thread thread = new Thread(new Runnable() {
+        final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 LOG.debug("before");

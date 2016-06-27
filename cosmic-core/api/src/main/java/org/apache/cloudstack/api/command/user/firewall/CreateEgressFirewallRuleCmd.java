@@ -1,24 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.package org.apache.cloudstack.api.command.user.firewall;
-
 package org.apache.cloudstack.api.command.user.firewall;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
@@ -28,7 +8,6 @@ import com.cloud.network.Network;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.user.Account;
 import com.cloud.utils.net.NetUtils;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
@@ -41,10 +20,15 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.FirewallResponse;
 import org.apache.cloudstack.api.response.NetworkResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createEgressFirewallRule", description = "Creates a egress firewall rule for a given network ", responseObject = FirewallResponse.class, entityType = {FirewallRule.class},
+@APICommand(name = "createEgressFirewallRule", description = "Creates a egress firewall rule for a given network ", responseObject = FirewallResponse.class, entityType =
+        {FirewallRule.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateEgressFirewallRuleCmd extends BaseAsyncCreateCmd implements FirewallRule {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateEgressFirewallRuleCmd.class.getName());
@@ -56,16 +40,16 @@ public class CreateEgressFirewallRuleCmd extends BaseAsyncCreateCmd implements F
     // ///////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.NETWORK_ID,
-               type = CommandType.UUID,
-               entityType = NetworkResponse.class,
-               required = true,
-               description = "the network id of the port forwarding rule")
+            type = CommandType.UUID,
+            entityType = NetworkResponse.class,
+            required = true,
+            description = "the network id of the port forwarding rule")
     private Long networkId;
 
     @Parameter(name = ApiConstants.PROTOCOL,
-               type = CommandType.STRING,
-               required = true,
-               description = "the protocol for the firewall rule. Valid values are TCP/UDP/ICMP.")
+            type = CommandType.STRING,
+            required = true,
+            description = "the protocol for the firewall rule. Valid values are TCP/UDP/ICMP.")
     private String protocol;
 
     @Parameter(name = ApiConstants.START_PORT, type = CommandType.INTEGER, description = "the starting port of firewall rule")
@@ -86,7 +70,8 @@ public class CreateEgressFirewallRuleCmd extends BaseAsyncCreateCmd implements F
     @Parameter(name = ApiConstants.TYPE, type = CommandType.STRING, description = "type of firewallrule: system/user")
     private String type;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4" +
+            ".4", authorized = {RoleType.Admin})
     private Boolean display;
 
     // ///////////////////////////////////////////////////
@@ -98,47 +83,8 @@ public class CreateEgressFirewallRuleCmd extends BaseAsyncCreateCmd implements F
     }
 
     @Override
-    public String getProtocol() {
-        return protocol.trim();
-    }
-
-    @Override
-    public List<String> getSourceCidrList() {
-        if (cidrlist != null) {
-            return cidrlist;
-        } else {
-            List<String> oneCidrList = new ArrayList<String>();
-            oneCidrList.add(_networkService.getNetwork(networkId).getCidr());
-            return oneCidrList;
-        }
-    }
-
-    public Long getVpcId() {
-        Network network = _networkService.getNetwork(getNetworkId());
-        if (network == null) {
-            throw new InvalidParameterValueException("Invalid networkId is given");
-        }
-
-        Long vpcId = network.getVpcId();
-        return vpcId;
-    }
-
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public void setSourceCidrList(List<String> cidrs) {
-        cidrlist = cidrs;
-    }
-
-    @Override
     public void execute() throws ResourceUnavailableException {
-        CallContext callerContext = CallContext.current();
+        final CallContext callerContext = CallContext.current();
         boolean success = false;
         FirewallRule rule = _entityMgr.findById(FirewallRule.class, getEntityId());
         try {
@@ -161,6 +107,35 @@ public class CreateEgressFirewallRuleCmd extends BaseAsyncCreateCmd implements F
     }
 
     @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final Account account = CallContext.current().getCallingAccount();
+
+        if (account != null) {
+            return account.getId();
+        }
+
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
+    }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
+
+    @Override
+    public boolean isDisplay() {
+        if (display != null) {
+            return display;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
     public long getId() {
         throw new UnsupportedOperationException("database id can only provided by VO objects");
     }
@@ -168,11 +143,6 @@ public class CreateEgressFirewallRuleCmd extends BaseAsyncCreateCmd implements F
     @Override
     public String getXid() {
         // FIXME: We should allow for end user to specify Xid.
-        return null;
-    }
-
-    @Override
-    public Long getSourceIpAddressId() {
         return null;
     }
 
@@ -197,6 +167,11 @@ public class CreateEgressFirewallRuleCmd extends BaseAsyncCreateCmd implements F
     }
 
     @Override
+    public String getProtocol() {
+        return protocol.trim();
+    }
+
+    @Override
     public Purpose getPurpose() {
         return Purpose.Firewall;
     }
@@ -212,89 +187,8 @@ public class CreateEgressFirewallRuleCmd extends BaseAsyncCreateCmd implements F
     }
 
     @Override
-    public long getEntityOwnerId() {
-        Account account = CallContext.current().getCallingAccount();
-
-        if (account != null) {
-            return account.getId();
-        }
-
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
-    }
-
-    @Override
-    public long getDomainId() {
-        Network network = _networkService.getNetwork(networkId);
-            return  network.getDomainId();
-        }
-
-    @Override
-    public void create() {
-        if (getSourceCidrList() != null) {
-            String guestCidr = _networkService.getNetwork(getNetworkId()).getCidr();
-
-            for (String cidr : getSourceCidrList()) {
-                if (!NetUtils.isValidCIDR(cidr)) {
-                    throw new ServerApiException(ApiErrorCode.PARAM_ERROR, "Source cidrs formatting error " + cidr);
-                }
-                if (cidr.equals(NetUtils.ALL_CIDRS)) {
-                    continue;
-                }
-                if (!NetUtils.isNetworkAWithinNetworkB(cidr, guestCidr)) {
-                    throw new ServerApiException(ApiErrorCode.PARAM_ERROR, cidr + " is not within the guest cidr " + guestCidr);
-                }
-            }
-        }
-        if (getProtocol().equalsIgnoreCase(NetUtils.ALL_PROTO)) {
-            if (getSourcePortStart() != null && getSourcePortEnd() != null) {
-                throw new InvalidParameterValueException("Do not pass ports to protocol ALL, protocol ALL do not require ports. Unable to create " +
-                    "firewall rule for the network id=" + networkId);
-            }
-        }
-
-        if (getVpcId() != null) {
-                throw new  InvalidParameterValueException("Unable to create firewall rule for the network id=" + networkId +
-                        " as firewall egress rule can be created only for non vpc networks.");
-            }
-
-        try {
-            FirewallRule result = _firewallService.createEgressFirewallRule(this);
-            if (result != null) {
-                setEntityId(result.getId());
-                setEntityUuid(result.getUuid());
-            }
-        } catch (NetworkRuleConflictException ex) {
-            s_logger.info("Network rule conflict: " + ex.getMessage());
-            s_logger.trace("Network Rule Conflict: ", ex);
-            throw new ServerApiException(ApiErrorCode.NETWORK_RULE_CONFLICT_ERROR, ex.getMessage());
-        }
-    }
-
-    @Override
-    public String getEventType() {
-        return EventTypes.EVENT_FIREWALL_EGRESS_OPEN;
-    }
-
-    @Override
-    public String getEventDescription() {
-         Network network = _networkService.getNetwork(networkId);
-        return ("Creating firewall rule for network: " + network + " for protocol:" + getProtocol());
-    }
-
-    @Override
-    public long getAccountId() {
-        Network network = _networkService.getNetwork(networkId);
-        return network.getAccountId();
-    }
-
-    @Override
-    public String getSyncObjType() {
-        return BaseAsyncCmd.networkSyncObject;
-    }
-
-    @Override
-    public Long getSyncObjId() {
-                return  getNetworkId();
+    public Long getSourceIpAddressId() {
+        return null;
     }
 
     @Override
@@ -313,9 +207,23 @@ public class CreateEgressFirewallRuleCmd extends BaseAsyncCreateCmd implements F
             return icmpType;
         } else if (protocol.equalsIgnoreCase(NetUtils.ICMP_PROTO)) {
             return -1;
-
         }
         return null;
+    }
+
+    @Override
+    public List<String> getSourceCidrList() {
+        if (cidrlist != null) {
+            return cidrlist;
+        } else {
+            final List<String> oneCidrList = new ArrayList<>();
+            oneCidrList.add(_networkService.getNetwork(networkId).getCidr());
+            return oneCidrList;
+        }
+    }
+
+    public void setSourceCidrList(final List<String> cidrs) {
+        cidrlist = cidrs;
     }
 
     @Override
@@ -333,13 +241,98 @@ public class CreateEgressFirewallRuleCmd extends BaseAsyncCreateCmd implements F
     }
 
     @Override
+    public TrafficType getTrafficType() {
+        return TrafficType.Egress;
+    }
+
+    @Override
+    public long getDomainId() {
+        final Network network = _networkService.getNetwork(networkId);
+        return network.getDomainId();
+    }
+
+    @Override
+    public void create() {
+        if (getSourceCidrList() != null) {
+            final String guestCidr = _networkService.getNetwork(getNetworkId()).getCidr();
+
+            for (final String cidr : getSourceCidrList()) {
+                if (!NetUtils.isValidCIDR(cidr)) {
+                    throw new ServerApiException(ApiErrorCode.PARAM_ERROR, "Source cidrs formatting error " + cidr);
+                }
+                if (cidr.equals(NetUtils.ALL_CIDRS)) {
+                    continue;
+                }
+                if (!NetUtils.isNetworkAWithinNetworkB(cidr, guestCidr)) {
+                    throw new ServerApiException(ApiErrorCode.PARAM_ERROR, cidr + " is not within the guest cidr " + guestCidr);
+                }
+            }
+        }
+        if (getProtocol().equalsIgnoreCase(NetUtils.ALL_PROTO)) {
+            if (getSourcePortStart() != null && getSourcePortEnd() != null) {
+                throw new InvalidParameterValueException("Do not pass ports to protocol ALL, protocol ALL do not require ports. Unable to create " +
+                        "firewall rule for the network id=" + networkId);
+            }
+        }
+
+        if (getVpcId() != null) {
+            throw new InvalidParameterValueException("Unable to create firewall rule for the network id=" + networkId +
+                    " as firewall egress rule can be created only for non vpc networks.");
+        }
+
+        try {
+            final FirewallRule result = _firewallService.createEgressFirewallRule(this);
+            if (result != null) {
+                setEntityId(result.getId());
+                setEntityUuid(result.getUuid());
+            }
+        } catch (final NetworkRuleConflictException ex) {
+            s_logger.info("Network rule conflict: " + ex.getMessage());
+            s_logger.trace("Network Rule Conflict: ", ex);
+            throw new ServerApiException(ApiErrorCode.NETWORK_RULE_CONFLICT_ERROR, ex.getMessage());
+        }
+    }
+
+    public Long getVpcId() {
+        final Network network = _networkService.getNetwork(getNetworkId());
+        if (network == null) {
+            throw new InvalidParameterValueException("Invalid networkId is given");
+        }
+
+        final Long vpcId = network.getVpcId();
+        return vpcId;
+    }
+
+    @Override
+    public String getEventType() {
+        return EventTypes.EVENT_FIREWALL_EGRESS_OPEN;
+    }
+
+    @Override
+    public String getEventDescription() {
+        final Network network = _networkService.getNetwork(networkId);
+        return ("Creating firewall rule for network: " + network + " for protocol:" + getProtocol());
+    }
+
+    @Override
     public ApiCommandJobType getInstanceType() {
         return ApiCommandJobType.FirewallRule;
     }
 
     @Override
-    public TrafficType getTrafficType() {
-           return TrafficType.Egress;
+    public String getSyncObjType() {
+        return BaseAsyncCmd.networkSyncObject;
+    }
+
+    @Override
+    public Long getSyncObjId() {
+        return getNetworkId();
+    }
+
+    @Override
+    public long getAccountId() {
+        final Network network = _networkService.getNetwork(networkId);
+        return network.getAccountId();
     }
 
     @Override
@@ -349,17 +342,7 @@ public class CreateEgressFirewallRuleCmd extends BaseAsyncCreateCmd implements F
     }
 
     @Override
-    public boolean isDisplay() {
-        if (display != null) {
-            return display;
-        } else {
-            return true;
-        }
-    }
-
-    @Override
     public Class<?> getEntityType() {
         return FirewallRule.class;
     }
-
 }

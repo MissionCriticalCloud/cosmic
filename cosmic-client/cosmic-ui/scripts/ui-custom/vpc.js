@@ -1,22 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function($, cloudStack) {
+(function ($, cloudStack) {
     var elems = {
-        aclDialog: function(args) {
+        aclDialog: function (args) {
             var isDialog = args.isDialog;
             var actionArgs = args.actionArgs;
             var context = args.context;
@@ -34,7 +18,7 @@
                     width: 900,
                     height: 600,
                     buttons: {
-                        'Done': function() {
+                        'Done': function () {
                             $(':ui-dialog').remove();
                             $('.overlay').remove();
                         }
@@ -44,7 +28,7 @@
 
             return $acl;
         },
-        vpcConfigureTooltip: function(args) {
+        vpcConfigureTooltip: function (args) {
             var context = args.context;
             var $browser = args.$browser;
             var $chart = args.$chart;
@@ -65,7 +49,7 @@
             var tierDetailView = args.tierDetailView;
 
             // Make links
-            $.map(links, function(label, id) {
+            $.map(links, function (label, id) {
                 var $link = $('<li>').addClass('link').addClass(id);
                 var $label = $('<span>').html(label);
 
@@ -73,13 +57,13 @@
                 $link.appendTo($links);
 
                 // Link event
-                $link.click(function() {
+                $link.click(function () {
                     switch (id) {
                         case 'network-acls':
                             $browser.cloudBrowser('addPanel', {
                                 title: _l('label.network.ACLs'),
                                 maximizeIfSelected: true,
-                                complete: function($panel) {
+                                complete: function ($panel) {
                                     $panel.listView(
                                         $.extend(true, {}, acl.listView, {
                                             listView: {
@@ -87,7 +71,7 @@
                                                     add: {
                                                         label: 'label.add.network.ACL',
                                                         action: {
-                                                            custom: function() {
+                                                            custom: function () {
                                                                 elems.aclDialog({
                                                                     isDialog: true,
                                                                     actionArgs: acl,
@@ -97,7 +81,7 @@
                                                         }
                                                     }
                                                 },
-                                                detailView: function() {
+                                                detailView: function () {
                                                     var detailView = $.extend(true, {}, tierDetailView);
 
                                                     detailView.tabs = {
@@ -119,7 +103,7 @@
                             $browser.cloudBrowser('addPanel', {
                                 title: _l('label.menu.ipaddresses'),
                                 maximizeIfSelected: true,
-                                complete: function($panel) {
+                                complete: function ($panel) {
                                     //ipAddresses.listView is a function
                                     $panel.listView(ipAddresses.listView(), {
                                         context: ipAddresses.context
@@ -133,11 +117,11 @@
                             var isGatewayPresent = addAction.preCheck({
                                 context: gateways.context
                             });
-                            var showGatewayListView = function() {
+                            var showGatewayListView = function () {
                                 $browser.cloudBrowser('addPanel', {
                                     title: _l('label.private.Gateway'),
                                     maximizeIfSelected: true,
-                                    complete: function($panel) {
+                                    complete: function ($panel) {
                                         $panel.listView(gateways.listView(), {
                                             context: gateways.context
                                         });
@@ -151,9 +135,9 @@
                                 cloudStack.dialog.createForm({
                                     form: addAction.createForm,
                                     context: args.gateways.context,
-                                    after: function(args) {
+                                    after: function (args) {
                                         var data = args.data;
-                                        var error = function(message) {
+                                        var error = function (message) {
                                             cloudStack.dialog.notice({
                                                 message: message
                                             });
@@ -164,14 +148,14 @@
                                             $form: args.$form,
                                             context: gateways.context,
                                             response: {
-                                                success: function(args) {
+                                                success: function (args) {
                                                     var _custom = args._custom;
                                                     var notification = {
                                                         poll: addAction.notification.poll,
                                                         _custom: _custom,
                                                         desc: addAction.messages.notification()
                                                     };
-                                                    var success = function(args) {
+                                                    var success = function (args) {
                                                         if (!$chart.is(':visible')) return;
 
                                                         cloudStack.dialog.confirm({
@@ -203,11 +187,11 @@
                             var isVPNPresent = addAction.preCheck({
                                 context: siteToSiteVPN.context
                             });
-                            var showVPNListView = function() {
+                            var showVPNListView = function () {
                                 $browser.cloudBrowser('addPanel', {
                                     title: _l('label.site.to.site.VPN'),
                                     maximizeIfSelected: true,
-                                    complete: function($panel) {
+                                    complete: function ($panel) {
                                         $panel.listView(siteToSiteVPN, {
                                             context: siteToSiteVPN.context
                                         });
@@ -220,8 +204,8 @@
                             } else {
                                 cloudStack.dialog.confirm({
                                     message: 'Please confirm that you want to add a Site-to-Site VPN gateway.',
-                                    action: function() {
-                                        var error = function(message) {
+                                    action: function () {
+                                        var error = function (message) {
                                             cloudStack.dialog.notice({
                                                 message: message
                                             });
@@ -230,14 +214,14 @@
                                         addAction.action({
                                             context: siteToSiteVPN.context,
                                             response: {
-                                                success: function(args) {
+                                                success: function (args) {
                                                     var _custom = args._custom;
                                                     var notification = {
                                                         poll: addAction.notification.poll,
                                                         _custom: _custom,
                                                         desc: addAction.messages.notification()
                                                     };
-                                                    var success = function(args) {
+                                                    var success = function (args) {
                                                         if (!$chart.is(':visible')) return;
                                                         cloudStack.dialog.confirm({
                                                             message: 'Gateway for VPC has been created successfully. Would you like to see its details?',
@@ -270,13 +254,13 @@
 
             // Tooltip hover event
             $tooltip.hover(
-                function() {
+                function () {
                     $tooltip.addClass('active');
                 },
-                function() {
+                function () {
                     $tooltip.removeClass('active');
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         if (!$tooltip.hasClass('active')) {
                             $tooltip.remove();
                         }
@@ -286,7 +270,7 @@
 
             return $tooltip;
         },
-        vpcConfigureArea: function(args) {
+        vpcConfigureArea: function (args) {
             var context = args.context;
             var $browser = args.$browser;
             var $chart = args.$chart;
@@ -301,7 +285,7 @@
             $config.append($configIcon);
 
             // Tooltip event
-            $configIcon.mouseover(function() {
+            $configIcon.mouseover(function () {
                 var $tooltip = elems.vpcConfigureTooltip({
                     context: context,
                     $browser: $browser,
@@ -323,7 +307,7 @@
 
             return $config;
         },
-        router: function(args) {
+        router: function (args) {
             var $browser = args.$browser;
             var detailView = args.detailView;
             var $router = $('<li>').addClass('tier virtual-router');
@@ -334,12 +318,12 @@
             // Append horizontal chart line
             $router.append($('<div>').addClass('connect-line'));
 
-            $router.click(function() {
+            $router.click(function () {
                 if ($router.hasClass('disabled')) return false;
 
                 $browser.cloudBrowser('addPanel', {
                     title: _l('label.VPC.router.details'),
-                    complete: function($panel) {
+                    complete: function ($panel) {
                         $panel.detailView(detailView);
                     }
                 });
@@ -347,7 +331,7 @@
 
             return $router;
         },
-        tier: function(args) {
+        tier: function (args) {
             var ipAddresses = args.ipAddresses;
             var acl = args.acl;
             var name = args.name;
@@ -356,7 +340,7 @@
             var vmListView = args.vmListView;
             var actionPreFilter = args.actionPreFilter;
             var actions = $.map(
-                args.actions ? args.actions : {}, function(value, key) {
+                args.actions ? args.actions : {}, function (value, key) {
                     return {
                         id: key,
                         action: value
@@ -375,18 +359,18 @@
 
             // Ignore special actions
             // -- Add tier action is handled separately
-            actions = $.grep(actions, function(action) {
+            actions = $.grep(actions, function (action) {
                 return action.id != 'add';
             });
 
             // Add loading indicator
             $vmCount.append(
                 $('<div>').addClass('loading-overlay')
-                .attr('title', 'VMs are launching in this tier.')
+                    .attr('title', 'VMs are launching in this tier.')
             );
 
             // VM count shows instance list
-            $vmCount.click(function() {
+            $vmCount.click(function () {
                 var $dialog = $('<div>');
                 var $listView = $('<div>').listView($.extend(true, {}, vmListView, {
                     context: context
@@ -399,7 +383,7 @@
                     width: 825,
                     height: 600,
                     buttons: {
-                        'Done': function() {
+                        'Done': function () {
                             $(':ui-dialog').remove();
                             $('.overlay').remove();
                         }
@@ -408,12 +392,12 @@
             });
 
             // Title shows tier details
-            $title.click(function() {
+            $title.click(function () {
                 if ($browser && $browser.size()) { // Fix null exception, if add tier returns error
                     $browser.cloudBrowser('addPanel', {
                         title: name,
                         maximizeIfSelected: true,
-                        complete: function($panel) {
+                        complete: function ($panel) {
                             $panel.detailView($.extend(true, {}, detailView, {
                                 $browser: $browser,
                                 context: context
@@ -439,7 +423,7 @@
                 $tier.append($actions);
 
                 // Build action buttons
-                $(actions).map(function(index, action) {
+                $(actions).map(function (index, action) {
                     var $action = $('<div>').addClass('action');
                     var shortLabel = action.action.shortLabel;
                     var label = action.action.label;
@@ -457,7 +441,7 @@
                     $action.data('vpc-tier-action-id', action.id);
 
                     // Action event
-                    $action.click(function() {
+                    $action.click(function () {
                         if ($action.hasClass('disabled')) {
                             return false;
                         }
@@ -493,7 +477,7 @@
 
             return $tier;
         },
-        chart: function(args) {
+        chart: function (args) {
             var $browser = args.$browser;
             var acl = args.acl;
             var ipAddresses = args.ipAddresses;
@@ -522,7 +506,7 @@
             var $title = $('<div>').addClass('vpc-title')
                 .append(
                     $('<span>').html(vpcName)
-            )
+                )
                 .append(
                     elems.vpcConfigureArea({
                         context: context,
@@ -542,9 +526,9 @@
                         }),
                         tierDetailView: tierDetailView
                     })
-            );
+                );
 
-            var showAddTierDialog = function() {
+            var showAddTierDialog = function () {
                 if ($(this).find('.loading-overlay').size()) {
                     return false;
                 }
@@ -565,7 +549,7 @@
             };
 
             if (tiers != null && tiers.length > 0) {
-                $(tiers).map(function(index, tier) {
+                $(tiers).map(function (index, tier) {
                     var $tier = elems.tier({
                         ipAddresses: ipAddresses,
                         acl: acl,
@@ -602,7 +586,7 @@
         }
     };
 
-    var filterActions = function(args) {
+    var filterActions = function (args) {
         var $actions = args.$actions;
         var actionPreFilter = args.actionPreFilter;
         var context = args.context;
@@ -613,7 +597,7 @@
         }) : [];
 
         // Visual appearance for disabled actions
-        $actions.find('.action').map(function(index, action) {
+        $actions.find('.action').map(function (index, action) {
             var $action = $(action);
             var actionID = $action.data('vpc-tier-action-id');
 
@@ -626,7 +610,7 @@
     };
 
     // Handles tier action, including UI effects
-    var tierAction = function(args) {
+    var tierAction = function (args) {
         var $tier = args.$tier;
         var $loading = $('<div>').addClass('loading-overlay');
         var $actions = args.$actions;
@@ -638,11 +622,11 @@
         var context = args.context;
         var actionPreFilter = args.actionPreFilter;
 
-        var success = function(args) {
+        var success = function (args) {
             var remove = args ? args.remove : false;
             var _custom = args ? args._custom : {};
 
-            var updateVMLoadingState = function() {
+            var updateVMLoadingState = function () {
                 var pendingVMs = $tier.data('vpc-tier-pending-vms');
 
                 pendingVMs = pendingVMs ? pendingVMs - 1 : 0;
@@ -665,7 +649,7 @@
 
                 // Success
 
-                function(args) {
+                function (args) {
                     if (actionID == 'addVM') {
                         // Increment VM total
                         var $total = $tier.find('.vm-count .total');
@@ -698,7 +682,7 @@
 
                 // Error
 
-                function(args) {
+                function (args) {
                     if (actionID == 'addVM') {
                         updateVMLoadingState();
                     } else {
@@ -712,7 +696,7 @@
             case 'addVM':
                 action({
                     context: context,
-                    complete: function(args) {
+                    complete: function (args) {
                         var pendingVMs = $tier.data('vpc-tier-pending-vms');
 
                         pendingVMs = pendingVMs ? pendingVMs + 1 : 1;
@@ -727,7 +711,7 @@
                 action({
                     context: context,
                     response: {
-                        success: function(args) {
+                        success: function (args) {
                             success($.extend(args, {
                                 remove: true
                             }));
@@ -749,7 +733,7 @@
                     complete: success,
                     response: {
                         success: success,
-                        error: function(args) {
+                        error: function (args) {
                             $loading.remove();
                         }
                     }
@@ -758,7 +742,7 @@
     };
 
     // Appends a new tier to chart
-    var addNewTier = function(args) {
+    var addNewTier = function (args) {
         var ipAddresses = args.ipAddresses;
         var acl = args.acl;
         var actions = args.actions;
@@ -783,13 +767,13 @@
         $tiers.find('li.placeholder')
             .before(
                 elems.tier(tier)
-                .hide()
-                .fadeIn('slow')
-        );
+                    .hide()
+                    .fadeIn('slow')
+            );
     };
 
     // Renders the add tier form, in a dialog
-    var addTierDialog = function(args) {
+    var addTierDialog = function (args) {
         var ipAddresses = args.ipAddresses;
         var actions = args.actions;
         var context = args.context;
@@ -803,13 +787,13 @@
         cloudStack.dialog.createForm({
             context: context,
             form: actions.add.createForm,
-            after: function(args) {
+            after: function (args) {
                 var $loading = $('<div>').addClass('loading-overlay').prependTo($tiers.find('li.placeholder'));
                 actions.add.action({
                     context: context,
                     data: args.data,
                     response: {
-                        success: function(args) {
+                        success: function (args) {
                             var tier = args.data;
 
                             cloudStack.ui.notifications.add(
@@ -820,7 +804,7 @@
 
                                 // Success
 
-                                function(args) {
+                                function (args) {
                                     $loading.remove();
                                     addNewTier({
                                         ipAddresses: ipAddresses,
@@ -842,12 +826,12 @@
 
                                 // Error
 
-                                function(args) {
+                                function (args) {
                                     $loading.remove();
                                 }
                             );
                         },
-                        error: function(errorMsg) {
+                        error: function (errorMsg) {
                             cloudStack.dialog.notice({
                                 message: _s(errorMsg)
                             });
@@ -859,7 +843,7 @@
         });
     };
 
-    cloudStack.uiCustom.vpc = function(args) {
+    cloudStack.uiCustom.vpc = function (args) {
         var vmListView = args.vmListView;
         var tierArgs = args.tiers;
         var ipAddresses = args.ipAddresses;
@@ -868,7 +852,7 @@
         var siteToSiteVPN = args.siteToSiteVPN;
         var routerDetailView = args.routerDetailView;
 
-        return function(args) {
+        return function (args) {
             var context = args.context;
             var $browser = $('#browser .container');
             var $toolbar = $('<div>').addClass('toolbar');
@@ -877,7 +861,7 @@
             $browser.cloudBrowser('addPanel', {
                 maximizeIfSelected: true,
                 title: _l('label.configure.vpc') + ': ' + vpc.name,
-                complete: function($panel) {
+                complete: function ($panel) {
                     var $loading = $('<div>').addClass('loading-overlay').appendTo($panel);
 
                     $panel.append($toolbar);
@@ -886,12 +870,12 @@
                     tierArgs.dataProvider({
                         context: context,
                         response: {
-                            success: function(args) {
+                            success: function (args) {
                                 // Setup detail view tabs
                                 var tierDetailView = $.extend(true, {}, tierArgs.detailView, {
                                     tabs: {
                                         acl: {
-                                            custom: function(args) {
+                                            custom: function (args) {
                                                 var $acl = elems.aclDialog({
                                                     isDialog: false,
                                                     actionArgs: acl,
@@ -902,7 +886,7 @@
                                             }
                                         },
                                         ipAddresses: {
-                                            custom: function(args) {
+                                            custom: function (args) {
                                                 return $('<div>').listView(ipAddresses.listView(), {
                                                     context: args.context
                                                 });
@@ -929,7 +913,8 @@
                                 }).appendTo($panel);
 
                                 $loading.remove();
-                                $chart.fadeIn(function() {});
+                                $chart.fadeIn(function () {
+                                });
                             }
                         }
                     });

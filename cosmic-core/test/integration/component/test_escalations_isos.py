@@ -1,59 +1,20 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
-#Import Local Modules
+# Import Local Modules
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.cloudstackAPI import (createVolume,
-                                  createTemplate)
-from marvin.lib.base import (Volume,
-                             Iso,
-                             VirtualMachine,
-                             Template,
-                             Snapshot,
-                             SecurityGroup,
+from marvin.codes import (PASS)
+from marvin.lib.base import (Iso,
                              Account,
-                             Zone,
-                             Network,
-                             NetworkOffering,
-                             DiskOffering,
-                             ServiceOffering,
-                             VmSnapshot,
-                             SnapshotPolicy,
-                             SSHKeyPair,
-                             Resources,
-                             Configurations,
-                             VpnCustomerGateway,
-                             Hypervisor,
-                             VpcOffering,
-                             VPC,
-                             NetworkACL)
+                             Zone)
 from marvin.lib.common import (get_zone,
                                get_domain,
                                get_template,
                                list_os_types)
 from marvin.lib.utils import (validateList,
-                              cleanup_resources,
-                              random_gen)
-from marvin.codes import (PASS, FAIL, EMPTY_LIST)
+                              cleanup_resources)
 from nose.plugins.attrib import attr
-import time
+
 
 class TestIsos(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         try:
@@ -65,17 +26,17 @@ class TestIsos(cloudstackTestCase):
             cls.domain = get_domain(cls.api_client)
             cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
             cls.template = get_template(
-                                cls.api_client,
-                                cls.zone.id,
-                                cls.services["ostype"]
-                                )
+                cls.api_client,
+                cls.zone.id,
+                cls.services["ostype"]
+            )
             cls.hypervisor = cls.testClient.getHypervisorInfo()
             cls.services['mode'] = cls.zone.networktype
             cls.account = Account.create(
-                                cls.api_client,
-                                cls.services["account"],
-                                domainid=cls.domain.id
-                                )
+                cls.api_client,
+                cls.services["account"],
+                domainid=cls.domain.id
+            )
             # Getting authentication for user in newly created Account
             cls.user = cls.account.user[0]
             cls.userapiclient = cls.testClient.getUserApiClient(cls.user.username, cls.domain.name)
@@ -91,7 +52,7 @@ class TestIsos(cloudstackTestCase):
         self.cleanup = []
 
     def tearDown(self):
-        #Clean up, terminate the created resources
+        # Clean up, terminate the created resources
         cleanup_resources(self.apiClient, self.cleanup)
         return
 
@@ -130,9 +91,9 @@ class TestIsos(cloudstackTestCase):
             else:
                 return_flag = return_flag and False
                 self.debug("expected Value: %s, is not matching with actual value: %s" % (
-                                                                                          exp_val,
-                                                                                          act_val
-                                                                                          ))
+                    exp_val,
+                    act_val
+                ))
         return return_flag
 
     @attr(tags=["advanced", "basic"], required_hardware="true")
@@ -159,103 +120,103 @@ class TestIsos(cloudstackTestCase):
         """
         # Listing all the ISO's for a User
         list_iso_before = Iso.list(
-                                   self.userapiclient,
-                                   listall=self.services["listall"],
-                                   isofilter=self.services["templatefilter"]
-                                   )
+            self.userapiclient,
+            listall=self.services["listall"],
+            isofilter=self.services["templatefilter"]
+        )
         # Verifying that no ISOs are listed
         self.assertIsNone(
-                          list_iso_before,
-                          "ISOs listed for newly created User"
-                          )
+            list_iso_before,
+            "ISOs listed for newly created User"
+        )
         self.services["iso"]["zoneid"] = self.zone.id
         # Creating pagesize + 1 number of ISO's
         for i in range(0, (self.services["pagesize"] + 1)):
             iso_created = Iso.create(
-                                     self.userapiclient,
-                                     self.services["iso"]
-                                     )
+                self.userapiclient,
+                self.services["iso"]
+            )
             self.assertIsNotNone(
-                                 iso_created,
-                                 "ISO creation failed"
-                                 )
-            if(i < self.services["pagesize"]):
+                iso_created,
+                "ISO creation failed"
+            )
+            if (i < self.services["pagesize"]):
                 self.cleanup.append(iso_created)
 
         # Listing all the ISO's for a User
         list_iso_after = Iso.list(
-                                  self.userapiclient,
-                                  listall=self.services["listall"],
-                                  isofilter=self.services["templatefilter"]
-                                  )
+            self.userapiclient,
+            listall=self.services["listall"],
+            isofilter=self.services["templatefilter"]
+        )
         status = validateList(list_iso_after)
         self.assertEquals(
-                          PASS,
-                          status[0],
-                          "ISO's creation failed"
-                          )
+            PASS,
+            status[0],
+            "ISO's creation failed"
+        )
         # Verifying that list size is pagesize + 1
         self.assertEquals(
-                          self.services["pagesize"] + 1,
-                          len(list_iso_after),
-                          "Failed to create pagesize + 1 number of ISO's"
-                          )
+            self.services["pagesize"] + 1,
+            len(list_iso_after),
+            "Failed to create pagesize + 1 number of ISO's"
+        )
         # Listing all the ISO's in page 1
         list_iso_page1 = Iso.list(
-                                  self.userapiclient,
-                                  listall=self.services["listall"],
-                                  isofilter=self.services["templatefilter"],
-                                  page=1,
-                                  pagesize=self.services["pagesize"]
-                                  )
+            self.userapiclient,
+            listall=self.services["listall"],
+            isofilter=self.services["templatefilter"],
+            page=1,
+            pagesize=self.services["pagesize"]
+        )
         status = validateList(list_iso_page1)
         self.assertEquals(
-                          PASS,
-                          status[0],
-                          "Failed to list ISO's in page 1"
-                          )
+            PASS,
+            status[0],
+            "Failed to list ISO's in page 1"
+        )
         # Verifying the list size to be equal to pagesize
         self.assertEquals(
-                          self.services["pagesize"],
-                          len(list_iso_page1),
-                          "Size of ISO's in page 1 is not matching"
-                          )
+            self.services["pagesize"],
+            len(list_iso_page1),
+            "Size of ISO's in page 1 is not matching"
+        )
         # Listing all the Templates in page 2
         list_iso_page2 = Iso.list(
-                                  self.userapiclient,
-                                  listall=self.services["listall"],
-                                  isofilter=self.services["templatefilter"],
-                                  page=2,
-                                  pagesize=self.services["pagesize"]
-                                  )
+            self.userapiclient,
+            listall=self.services["listall"],
+            isofilter=self.services["templatefilter"],
+            page=2,
+            pagesize=self.services["pagesize"]
+        )
         status = validateList(list_iso_page2)
         self.assertEquals(
-                          PASS,
-                          status[0],
-                          "Failed to list ISo's in page 2"
-                          )
+            PASS,
+            status[0],
+            "Failed to list ISo's in page 2"
+        )
         # Verifying the list size to be equal to 1
         self.assertEquals(
-                          1,
-                          len(list_iso_page2),
-                          "Size of ISO's in page 2 is not matching"
-                          )
+            1,
+            len(list_iso_page2),
+            "Size of ISO's in page 2 is not matching"
+        )
         # Verifying the state of the ISO to be ready. If not waiting for state to become ready
         iso_ready = False
         count = 0
         while iso_ready is False:
             list_iso = Iso.list(
-                                self.userapiclient,
-                                listall=self.services["listall"],
-                                isofilter=self.services["templatefilter"],
-                                id=iso_created.id
-                                )
+                self.userapiclient,
+                listall=self.services["listall"],
+                isofilter=self.services["templatefilter"],
+                id=iso_created.id
+            )
             status = validateList(list_iso)
             self.assertEquals(
-                              PASS,
-                              status[0],
-                              "Failed to list ISO by Id"
-                              )
+                PASS,
+                status[0],
+                "Failed to list ISO by Id"
+            )
             if list_iso[0].isready is True:
                 iso_ready = True
             elif (str(list_iso[0].status) == "Error"):
@@ -270,22 +231,22 @@ class TestIsos(cloudstackTestCase):
 
         # Deleting the ISO present in page 2
         Iso.delete(
-                   iso_created,
-                   self.userapiclient
-                   )
+            iso_created,
+            self.userapiclient
+        )
         # Listing all the ISO's in page 2 again
         list_iso_page2 = Iso.list(
-                                  self.userapiclient,
-                                  listall=self.services["listall"],
-                                  isofilter=self.services["templatefilter"],
-                                  page=2,
-                                  pagesize=self.services["pagesize"]
-                                  )
+            self.userapiclient,
+            listall=self.services["listall"],
+            isofilter=self.services["templatefilter"],
+            page=2,
+            pagesize=self.services["pagesize"]
+        )
         # Verifying that there are no ISO's listed
         self.assertIsNone(
-                          list_iso_page2,
-                          "ISO's not deleted from page 2"
-                          )
+            list_iso_page2,
+            "ISO's not deleted from page 2"
+        )
         del self.services["iso"]["zoneid"]
         return
 
@@ -307,61 +268,61 @@ class TestIsos(cloudstackTestCase):
         """
         # Listing all the ISO's for a User
         list_iso_before = Iso.list(
-                                   self.userapiclient,
-                                   listall=self.services["listall"],
-                                   isofilter=self.services["templatefilter"]
-                                   )
+            self.userapiclient,
+            listall=self.services["listall"],
+            isofilter=self.services["templatefilter"]
+        )
         # Verifying that no ISOs are listed
         self.assertIsNone(
-                          list_iso_before,
-                          "ISOs listed for newly created User"
-                          )
+            list_iso_before,
+            "ISOs listed for newly created User"
+        )
         self.services["iso"]["zoneid"] = self.zone.id
         self.services["iso"]["isextractable"] = True
         # Creating an ISO's
         iso_created = Iso.create(
-                                 self.userapiclient,
-                                 self.services["iso"]
-                                 )
+            self.userapiclient,
+            self.services["iso"]
+        )
         self.assertIsNotNone(
-                             iso_created,
-                             "ISO creation failed"
-                             )
+            iso_created,
+            "ISO creation failed"
+        )
         self.cleanup.append(iso_created)
         # Listing all the ISO's for a User
         list_iso_after = Iso.list(
-                                  self.userapiclient,
-                                  listall=self.services["listall"],
-                                  isofilter=self.services["templatefilter"]
-                                  )
+            self.userapiclient,
+            listall=self.services["listall"],
+            isofilter=self.services["templatefilter"]
+        )
         status = validateList(list_iso_after)
         self.assertEquals(
-                          PASS,
-                          status[0],
-                          "ISO's creation failed"
-                          )
+            PASS,
+            status[0],
+            "ISO's creation failed"
+        )
         # Verifying that list size is 1
         self.assertEquals(
-                          1,
-                          len(list_iso_after),
-                          "Failed to create an ISO's"
-                          )
+            1,
+            len(list_iso_after),
+            "Failed to create an ISO's"
+        )
         # Verifying the state of the ISO to be ready. If not waiting for state to become ready
         iso_ready = False
         count = 0
         while iso_ready is False:
             list_iso = Iso.list(
-                                self.userapiclient,
-                                listall=self.services["listall"],
-                                isofilter=self.services["templatefilter"],
-                                id=iso_created.id
-                                )
+                self.userapiclient,
+                listall=self.services["listall"],
+                isofilter=self.services["templatefilter"],
+                id=iso_created.id
+            )
             status = validateList(list_iso)
             self.assertEquals(
-                              PASS,
-                              status[0],
-                              "Failed to list ISO by Id"
-                              )
+                PASS,
+                status[0],
+                "Failed to list ISO by Id"
+            )
             if list_iso[0].isready is True:
                 iso_ready = True
             elif (str(list_iso[0].status) == "Error"):
@@ -376,30 +337,30 @@ class TestIsos(cloudstackTestCase):
 
         # Downloading the ISO
         download_iso = Iso.extract(
-                                   self.userapiclient,
-                                   iso_created.id,
-                                   mode="HTTP_DOWNLOAD",
-                                   zoneid=self.zone.id
-                                   )
+            self.userapiclient,
+            iso_created.id,
+            mode="HTTP_DOWNLOAD",
+            zoneid=self.zone.id
+        )
         self.assertIsNotNone(
-                             download_iso,
-                             "Download ISO failed"
-                             )
-         # Verifying the details of downloaded ISO
+            download_iso,
+            "Download ISO failed"
+        )
+        # Verifying the details of downloaded ISO
         self.assertEquals(
-                          "DOWNLOAD_URL_CREATED",
-                          download_iso.state,
-                          "Download URL not created for ISO"
-                          )
+            "DOWNLOAD_URL_CREATED",
+            download_iso.state,
+            "Download URL not created for ISO"
+        )
         self.assertIsNotNone(
-                             download_iso.url,
-                             "Download URL not created for ISO"
-                             )
+            download_iso.url,
+            "Download URL not created for ISO"
+        )
         self.assertEquals(
-                          iso_created.id,
-                          download_iso.id,
-                          "Download ISO details are not same as ISO created"
-                          )
+            iso_created.id,
+            download_iso.id,
+            "Download ISO details are not same as ISO created"
+        )
         del self.services["iso"]["zoneid"]
         del self.services["iso"]["isextractable"]
         return
@@ -424,60 +385,60 @@ class TestIsos(cloudstackTestCase):
         """
         # Listing all the ISO's for a User
         list_iso_before = Iso.list(
-                                   self.userapiclient,
-                                   listall=self.services["listall"],
-                                   isofilter=self.services["templatefilter"]
-                                   )
+            self.userapiclient,
+            listall=self.services["listall"],
+            isofilter=self.services["templatefilter"]
+        )
         # Verifying that no ISOs are listed
         self.assertIsNone(
-                          list_iso_before,
-                          "ISOs listed for newly created User"
-                          )
+            list_iso_before,
+            "ISOs listed for newly created User"
+        )
         self.services["iso"]["zoneid"] = self.zone.id
         # Creating an ISO's
         iso_created = Iso.create(
-                                 self.userapiclient,
-                                 self.services["iso"]
-                                 )
+            self.userapiclient,
+            self.services["iso"]
+        )
         self.assertIsNotNone(
-                             iso_created,
-                             "ISO creation failed"
-                             )
+            iso_created,
+            "ISO creation failed"
+        )
         self.cleanup.append(iso_created)
         # Listing all the ISO's for a User
         list_iso_after = Iso.list(
-                                  self.userapiclient,
-                                  listall=self.services["listall"],
-                                  isofilter=self.services["templatefilter"]
-                                  )
+            self.userapiclient,
+            listall=self.services["listall"],
+            isofilter=self.services["templatefilter"]
+        )
         status = validateList(list_iso_after)
         self.assertEquals(
-                          PASS,
-                          status[0],
-                          "ISO's creation failed"
-                          )
+            PASS,
+            status[0],
+            "ISO's creation failed"
+        )
         # Verifying that list size is 1
         self.assertEquals(
-                          1,
-                          len(list_iso_after),
-                          "Failed to create an ISO's"
-                          )
+            1,
+            len(list_iso_after),
+            "Failed to create an ISO's"
+        )
         # Verifying the state of the ISO to be ready. If not waiting for state to become ready
         iso_ready = False
         count = 0
         while iso_ready is False:
             list_iso = Iso.list(
-                                self.userapiclient,
-                                listall=self.services["listall"],
-                                isofilter=self.services["templatefilter"],
-                                id=iso_created.id
-                                )
+                self.userapiclient,
+                listall=self.services["listall"],
+                isofilter=self.services["templatefilter"],
+                id=iso_created.id
+            )
             status = validateList(list_iso)
             self.assertEquals(
-                              PASS,
-                              status[0],
-                              "Failed to list ISO by Id"
-                              )
+                PASS,
+                status[0],
+                "Failed to list ISO by Id"
+            )
             if list_iso[0].isready is True:
                 iso_ready = True
             elif (str(list_iso[0].status) == "Error"):
@@ -492,99 +453,99 @@ class TestIsos(cloudstackTestCase):
 
         # Editing the ISO name, displaytext
         edited_iso = Iso.update(
-                                iso_created,
-                                self.userapiclient,
-                                name="NewISOName",
-                                displaytext="NewISODisplayText"
-                                )
+            iso_created,
+            self.userapiclient,
+            name="NewISOName",
+            displaytext="NewISODisplayText"
+        )
         self.assertIsNotNone(
-                             edited_iso,
-                             "Editing ISO failed"
-                             )
-         # Verifying the details of edited template
+            edited_iso,
+            "Editing ISO failed"
+        )
+        # Verifying the details of edited template
         expected_dict = {
-                         "id":iso_created.id,
-                         "name":"NewISOName",
-                         "displaytest":"NewISODisplayText",
-                         "account":iso_created.account,
-                         "domainid":iso_created.domainid,
-                         "isfeatured":iso_created.isfeatured,
-                         "ostypeid":iso_created.ostypeid,
-                         "ispublic":iso_created.ispublic,
-                         }
+            "id": iso_created.id,
+            "name": "NewISOName",
+            "displaytest": "NewISODisplayText",
+            "account": iso_created.account,
+            "domainid": iso_created.domainid,
+            "isfeatured": iso_created.isfeatured,
+            "ostypeid": iso_created.ostypeid,
+            "ispublic": iso_created.ispublic,
+        }
         actual_dict = {
-                       "id":edited_iso.id,
-                       "name":edited_iso.name,
-                       "displaytest":edited_iso.displaytext,
-                       "account":edited_iso.account,
-                       "domainid":edited_iso.domainid,
-                       "isfeatured":edited_iso.isfeatured,
-                       "ostypeid":edited_iso.ostypeid,
-                       "ispublic":edited_iso.ispublic,
-                       }
+            "id": edited_iso.id,
+            "name": edited_iso.name,
+            "displaytest": edited_iso.displaytext,
+            "account": edited_iso.account,
+            "domainid": edited_iso.domainid,
+            "isfeatured": edited_iso.isfeatured,
+            "ostypeid": edited_iso.ostypeid,
+            "ispublic": edited_iso.ispublic,
+        }
         edit_iso_status = self.__verify_values(
-                                               expected_dict,
-                                               actual_dict
-                                               )
+            expected_dict,
+            actual_dict
+        )
         self.assertEqual(
-                         True,
-                         edit_iso_status,
-                         "Edited ISO details are not as expected"
-                         )
+            True,
+            edit_iso_status,
+            "Edited ISO details are not as expected"
+        )
         # Editing the ISO name, displaytext, ostypeid
         ostype_list = list_os_types(self.userapiclient)
         status = validateList(ostype_list)
         self.assertEquals(
-                          PASS,
-                          status[0],
-                          "Failed to list OS Types"
-                          )
+            PASS,
+            status[0],
+            "Failed to list OS Types"
+        )
         for i in range(0, len(ostype_list)):
             if ostype_list[i].id != iso_created.ostypeid:
                 newostypeid = ostype_list[i].id
                 break
 
         edited_iso = Iso.update(
-                                iso_created,
-                                self.userapiclient,
-                                name=iso_created.name,
-                                displaytext=iso_created.displaytext,
-                                ostypeid=newostypeid
-                                )
+            iso_created,
+            self.userapiclient,
+            name=iso_created.name,
+            displaytext=iso_created.displaytext,
+            ostypeid=newostypeid
+        )
         self.assertIsNotNone(
-                             edited_iso,
-                             "Editing ISO failed"
-                             )
+            edited_iso,
+            "Editing ISO failed"
+        )
         # Verifying the details of edited template
         expected_dict = {
-                         "id":iso_created.id,
-                         "name":iso_created.name,
-                         "displaytest":iso_created.displaytext,
-                         "account":iso_created.account,
-                         "domainid":iso_created.domainid,
-                         "isfeatured":iso_created.isfeatured,
-                         "ostypeid":newostypeid,
-                         "ispublic":iso_created.ispublic,
-                         }
+            "id": iso_created.id,
+            "name": iso_created.name,
+            "displaytest": iso_created.displaytext,
+            "account": iso_created.account,
+            "domainid": iso_created.domainid,
+            "isfeatured": iso_created.isfeatured,
+            "ostypeid": newostypeid,
+            "ispublic": iso_created.ispublic,
+        }
         actual_dict = {
-                       "id":edited_iso.id,
-                       "name":edited_iso.name,
-                       "displaytest":edited_iso.displaytext,
-                       "account":edited_iso.account,
-                       "domainid":edited_iso.domainid,
-                       "isfeatured":edited_iso.isfeatured,
-                       "ostypeid":edited_iso.ostypeid,
-                       "ispublic":edited_iso.ispublic,
-                       }
+            "id": edited_iso.id,
+            "name": edited_iso.name,
+            "displaytest": edited_iso.displaytext,
+            "account": edited_iso.account,
+            "domainid": edited_iso.domainid,
+            "isfeatured": edited_iso.isfeatured,
+            "ostypeid": edited_iso.ostypeid,
+            "ispublic": edited_iso.ispublic,
+        }
         edit_iso_status = self.__verify_values(
-                                               expected_dict,
-                                               actual_dict
-                                               )
+            expected_dict,
+            actual_dict
+        )
         self.assertEqual(
-                         True,
-                         edit_iso_status,
-                         "Edited ISO details are not as expected"
-                         )
+            True,
+            edit_iso_status,
+            "Edited ISO details are not as expected"
+        )
         del self.services["iso"]["zoneid"]
         return
 
@@ -614,100 +575,100 @@ class TestIsos(cloudstackTestCase):
         """
         # Listing Zones available for a user
         zones_list = Zone.list(
-                               self.userapiclient,
-                               available=True
-                               )
+            self.userapiclient,
+            available=True
+        )
         status = validateList(zones_list)
         self.assertEquals(
-                          PASS,
-                          status[0],
-                          "Failed to list Zones"
-                          )
+            PASS,
+            status[0],
+            "Failed to list Zones"
+        )
         if not len(zones_list) > 1:
             self.skipTest("Not enough zones exist to copy iso")
         else:
             # Listing all the ISO's for a User in Zone 1
             list_isos_zone1 = Iso.list(
-                                       self.userapiclient,
-                                       listall=self.services["listall"],
-                                       isofilter=self.services["templatefilter"],
-                                       zoneid=zones_list[0].id
-                                       )
+                self.userapiclient,
+                listall=self.services["listall"],
+                isofilter=self.services["templatefilter"],
+                zoneid=zones_list[0].id
+            )
             # Verifying that no ISO's are listed
             self.assertIsNone(
-                              list_isos_zone1,
-                              "ISO's listed for newly created User in Zone1"
-                              )
+                list_isos_zone1,
+                "ISO's listed for newly created User in Zone1"
+            )
             # Listing all the ISO's for a User in Zone 2
             list_isos_zone2 = Iso.list(
-                                       self.userapiclient,
-                                       listall=self.services["listall"],
-                                       isofilter=self.services["templatefilter"],
-                                       zoneid=zones_list[1].id
-                                       )
+                self.userapiclient,
+                listall=self.services["listall"],
+                isofilter=self.services["templatefilter"],
+                zoneid=zones_list[1].id
+            )
             # Verifying that no ISO's are listed
             self.assertIsNone(
-                              list_isos_zone2,
-                              "ISO's listed for newly created User in Zone2"
-                              )
+                list_isos_zone2,
+                "ISO's listed for newly created User in Zone2"
+            )
             self.services["iso"]["zoneid"] = zones_list[0].id
             # Creating an ISO in Zone 1
             iso_created = Iso.create(
-                                     self.userapiclient,
-                                     self.services["iso"]
-                                     )
+                self.userapiclient,
+                self.services["iso"]
+            )
             self.assertIsNotNone(
-                                 iso_created,
-                                 "ISO creation failed"
-                                 )
+                iso_created,
+                "ISO creation failed"
+            )
             self.cleanup.append(iso_created)
             # Listing all the ISO's for a User in Zone 1
             list_isos_zone1 = Iso.list(
-                                       self.userapiclient,
-                                       listall=self.services["listall"],
-                                       isofilter=self.services["templatefilter"],
-                                       zoneid=zones_list[0].id
-                                       )
+                self.userapiclient,
+                listall=self.services["listall"],
+                isofilter=self.services["templatefilter"],
+                zoneid=zones_list[0].id
+            )
             status = validateList(list_isos_zone1)
             self.assertEquals(
-                              PASS,
-                              status[0],
-                              "ISO creation failed in Zone1"
-                              )
+                PASS,
+                status[0],
+                "ISO creation failed in Zone1"
+            )
             # Verifying that list size is 1
             self.assertEquals(
-                              1,
-                              len(list_isos_zone1),
-                              "Failed to create a Template"
-                              )
+                1,
+                len(list_isos_zone1),
+                "Failed to create a Template"
+            )
             # Listing all the ISO's for a User in Zone 2
             list_isos_zone2 = Iso.list(
-                                       self.userapiclient,
-                                       listall=self.services["listall"],
-                                       isofilter=self.services["templatefilter"],
-                                       zoneid=zones_list[1].id
-                                       )
+                self.userapiclient,
+                listall=self.services["listall"],
+                isofilter=self.services["templatefilter"],
+                zoneid=zones_list[1].id
+            )
             # Verifying that no ISO's are listed
             self.assertIsNone(
-                              list_isos_zone2,
-                              "ISO's listed for newly created User in Zone2"
-                              )
+                list_isos_zone2,
+                "ISO's listed for newly created User in Zone2"
+            )
             # Verifying the state of the ISO to be ready. If not waiting for state to become ready
             iso_ready = False
             count = 0
             while iso_ready is False:
                 list_iso = Iso.list(
-                                    self.userapiclient,
-                                    listall=self.services["listall"],
-                                    isofilter=self.services["templatefilter"],
-                                    id=iso_created.id
-                                    )
+                    self.userapiclient,
+                    listall=self.services["listall"],
+                    isofilter=self.services["templatefilter"],
+                    id=iso_created.id
+                )
                 status = validateList(list_iso)
                 self.assertEquals(
-                                  PASS,
-                                  status[0],
-                                  "Failed to list ISO by Id"
-                                  )
+                    PASS,
+                    status[0],
+                    "Failed to list ISO by Id"
+                )
                 if list_iso[0].isready is True:
                     iso_ready = True
                 elif (str(list_iso[0].status) == "Error"):
@@ -722,62 +683,62 @@ class TestIsos(cloudstackTestCase):
 
             # Copying the ISO from Zone1 to Zone2
             copied_iso = Iso.copy(
-                                  self.userapiclient,
-                                  iso_created.id,
-                                  sourcezoneid=iso_created.zoneid,
-                                  destzoneid=zones_list[1].id
-                                  )
+                self.userapiclient,
+                iso_created.id,
+                sourcezoneid=iso_created.zoneid,
+                destzoneid=zones_list[1].id
+            )
             self.assertIsNotNone(
-                                 copied_iso,
-                                 "Copying ISO from Zone1 to Zone2 failed"
-                                 )
+                copied_iso,
+                "Copying ISO from Zone1 to Zone2 failed"
+            )
             # Listing all the ISO's for a User in Zone 1
             list_isos_zone1 = Iso.list(
-                                       self.userapiclient,
-                                       listall=self.services["listall"],
-                                       isofilter=self.services["templatefilter"],
-                                       zoneid=zones_list[0].id
-                                       )
+                self.userapiclient,
+                listall=self.services["listall"],
+                isofilter=self.services["templatefilter"],
+                zoneid=zones_list[0].id
+            )
             status = validateList(list_isos_zone1)
             self.assertEquals(
-                              PASS,
-                              status[0],
-                              "ISO creation failed in Zone1"
-                              )
+                PASS,
+                status[0],
+                "ISO creation failed in Zone1"
+            )
             # Verifying that list size is 1
             self.assertEquals(
-                              1,
-                              len(list_isos_zone1),
-                              "Failed to create a Template"
-                              )
+                1,
+                len(list_isos_zone1),
+                "Failed to create a Template"
+            )
             # Listing all the ISO's for a User in Zone 2
             list_isos_zone2 = Iso.list(
-                                       self.userapiclient,
-                                       listall=self.services["listall"],
-                                       isofilter=self.services["templatefilter"],
-                                       zoneid=zones_list[1].id
-                                       )
+                self.userapiclient,
+                listall=self.services["listall"],
+                isofilter=self.services["templatefilter"],
+                zoneid=zones_list[1].id
+            )
             status = validateList(list_isos_zone2)
             self.assertEquals(
-                              PASS,
-                              status[0],
-                              "ISO failed to copy into Zone2"
-                              )
+                PASS,
+                status[0],
+                "ISO failed to copy into Zone2"
+            )
             # Verifying that list size is 1
             self.assertEquals(
-                              1,
-                              len(list_isos_zone2),
-                              "ISO failed to copy into Zone2"
-                              )
+                1,
+                len(list_isos_zone2),
+                "ISO failed to copy into Zone2"
+            )
             self.assertNotEquals(
-                                 "Connection refused",
-                                 list_isos_zone2[0].status,
-                                 "Failed to copy ISO"
-                                 )
+                "Connection refused",
+                list_isos_zone2[0].status,
+                "Failed to copy ISO"
+            )
             self.assertEquals(
-                              True,
-                              list_isos_zone2[0].isready,
-                              "Failed to copy ISO"
-                              )
+                True,
+                list_isos_zone2[0].isready,
+                "Failed to copy ISO"
+            )
         del self.services["iso"]["zoneid"]
         return

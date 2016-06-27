@@ -1,20 +1,4 @@
-#!/usr/bin/env bash
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+#! /usr/bin/env bash
 
 
 # $Id: modifyvlan.sh 11601 2010-08-11 17:26:15Z kris $ $HeadURL: svn://svn.lab.vmops.com/repos/branches/2.1.refactor/java/scripts/vm/network/vnet/modifyvlan.sh $
@@ -22,7 +6,7 @@
 # set -x
 
 usage() {
-  printf "Usage: %s: -o <op>(add | delete) -v <vlan id> -p <pif> -b <bridge name>\n" 
+  printf "Usage: %s: -o <op>(add | delete) -v <vlan id> -p <pif> -b <bridge name>\n"
 }
 
 addVlan() {
@@ -35,10 +19,10 @@ addVlan() {
 	then
 		ip link add link $pif name $vlanDev type vlan id $vlanId > /dev/null
 		ip link set $vlanDev up
-		
+
 		if [ $? -gt 0 ]
 		then
-            # race condition that someone already creates the vlan 
+            # race condition that someone already creates the vlan
 			if [ ! -d /sys/class/net/$vlanDev ]
             then
 			    printf "Failed to create vlan $vlanId on pif: $pif."
@@ -46,18 +30,18 @@ addVlan() {
             fi
 		fi
 	fi
-	
+
 	# is up?
   	ifconfig |grep -w $vlanDev > /dev/null
 	if [ $? -gt 0 ]
 	then
 		ifconfig $vlanDev up > /dev/null
 	fi
-	
+
 	if [ ! -d /sys/class/net/$vlanBr ]
 	then
 		brctl addbr $vlanBr > /dev/null
-	
+
 		if [ $? -gt 0 ]
 		then
 			if [ ! -d /sys/class/net/$vlanBr ]
@@ -69,15 +53,15 @@ addVlan() {
 
 		brctl setfd $vlanBr 0
 	fi
-	
+
 	#pif is eslaved into vlanBr?
-	ls /sys/class/net/$vlanBr/brif/ |grep -w "$vlanDev" > /dev/null 
+	ls /sys/class/net/$vlanBr/brif/ |grep -w "$vlanDev" > /dev/null
 	if [ $? -gt 0 ]
 	then
 		brctl addif $vlanBr $vlanDev > /dev/null
 		if [ $? -gt 0 ]
 		then
-			ls /sys/class/net/$vlanBr/brif/ |grep -w "$vlanDev" > /dev/null 
+			ls /sys/class/net/$vlanBr/brif/ |grep -w "$vlanDev" > /dev/null
 			if [ $? -gt 0 ]
 			then
 				printf "Failed to add vlan: $vlanDev to $vlanBr"
@@ -102,22 +86,22 @@ deleteVlan() {
         local vlanBr=$3
 
 	ip link delete $vlanDev type vlan > /dev/null
-	
+
 	if [ $? -gt 0 ]
 	then
 		printf "Failed to del vlan: $vlanId"
 		return 1
-	fi	
+	fi
 
 	ifconfig $vlanBr down
-	
+
 	if [ $? -gt 0 ]
 	then
 		return 1
 	fi
-	
+
 	brctl delbr $vlanBr
-	
+
 	if [ $? -gt 0 ]
 	then
 		printf "Failed to del bridge $vlanBr"
@@ -125,7 +109,7 @@ deleteVlan() {
 	fi
 
 	return 0
-	
+
 }
 
 op=
@@ -176,18 +160,18 @@ if [ "$op" == "add" ]
 then
 	# Add the vlan
 	addVlan $vlanId $pif $brName
-	
+
 	# If the add fails then return failure
 	if [ $? -gt 0 ]
 	then
 		exit 1
 	fi
-else 
+else
 	if [ "$op" == "delete" ]
 	then
 		# Delete the vlan
 		deleteVlan $vlanId $pif $brName
-	
+
 		# Always exit with success
 		exit 0
 	fi

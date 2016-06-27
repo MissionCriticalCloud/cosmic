@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.storage.resource;
@@ -27,7 +12,6 @@ import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.Volume;
-
 import org.apache.cloudstack.storage.command.AttachCommand;
 import org.apache.cloudstack.storage.command.CopyCommand;
 import org.apache.cloudstack.storage.command.CreateObjectAnswer;
@@ -37,6 +21,7 @@ import org.apache.cloudstack.storage.command.DettachCommand;
 import org.apache.cloudstack.storage.command.IntroduceObjectCmd;
 import org.apache.cloudstack.storage.command.SnapshotAndCopyCommand;
 import org.apache.cloudstack.storage.command.StorageSubSystemCommand;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,48 +29,48 @@ public class StorageSubsystemCommandHandlerBase implements StorageSubsystemComma
     private static final Logger s_logger = LoggerFactory.getLogger(StorageSubsystemCommandHandlerBase.class);
     protected StorageProcessor processor;
 
-    public StorageSubsystemCommandHandlerBase(StorageProcessor processor) {
+    public StorageSubsystemCommandHandlerBase(final StorageProcessor processor) {
         this.processor = processor;
     }
 
     @Override
-    public Answer handleStorageCommands(StorageSubSystemCommand command) {
+    public Answer handleStorageCommands(final StorageSubSystemCommand command) {
         if (command instanceof CopyCommand) {
-            return this.execute((CopyCommand)command);
+            return this.execute((CopyCommand) command);
         } else if (command instanceof CreateObjectCommand) {
-            return execute((CreateObjectCommand)command);
+            return execute((CreateObjectCommand) command);
         } else if (command instanceof DeleteCommand) {
-            return execute((DeleteCommand)command);
+            return execute((DeleteCommand) command);
         } else if (command instanceof AttachCommand) {
-            return execute((AttachCommand)command);
+            return execute((AttachCommand) command);
         } else if (command instanceof DettachCommand) {
-            return execute((DettachCommand)command);
+            return execute((DettachCommand) command);
         } else if (command instanceof IntroduceObjectCmd) {
-            return processor.introduceObject((IntroduceObjectCmd)command);
+            return processor.introduceObject((IntroduceObjectCmd) command);
         } else if (command instanceof SnapshotAndCopyCommand) {
-            return processor.snapshotAndCopy((SnapshotAndCopyCommand)command);
+            return processor.snapshotAndCopy((SnapshotAndCopyCommand) command);
         }
 
-        return new Answer((Command)command, false, "not implemented yet");
+        return new Answer((Command) command, false, "not implemented yet");
     }
 
-    protected Answer execute(CopyCommand cmd) {
-        DataTO srcData = cmd.getSrcTO();
-        DataTO destData = cmd.getDestTO();
-        DataStoreTO srcDataStore = srcData.getDataStore();
-        DataStoreTO destDataStore = destData.getDataStore();
+    protected Answer execute(final CopyCommand cmd) {
+        final DataTO srcData = cmd.getSrcTO();
+        final DataTO destData = cmd.getDestTO();
+        final DataStoreTO srcDataStore = srcData.getDataStore();
+        final DataStoreTO destDataStore = destData.getDataStore();
 
         if (srcData.getObjectType() == DataObjectType.TEMPLATE &&
-            (srcData.getDataStore().getRole() == DataStoreRole.Image || srcData.getDataStore().getRole() == DataStoreRole.ImageCache) &&
-            destData.getDataStore().getRole() == DataStoreRole.Primary) {
+                (srcData.getDataStore().getRole() == DataStoreRole.Image || srcData.getDataStore().getRole() == DataStoreRole.ImageCache) &&
+                destData.getDataStore().getRole() == DataStoreRole.Primary) {
             //copy template to primary storage
             return processor.copyTemplateToPrimaryStorage(cmd);
         } else if (srcData.getObjectType() == DataObjectType.TEMPLATE && srcDataStore.getRole() == DataStoreRole.Primary &&
-            destDataStore.getRole() == DataStoreRole.Primary) {
+                destDataStore.getRole() == DataStoreRole.Primary) {
             //clone template to a volume
             return processor.cloneVolumeFromBaseTemplate(cmd);
         } else if (srcData.getObjectType() == DataObjectType.VOLUME &&
-            (srcData.getDataStore().getRole() == DataStoreRole.ImageCache || srcDataStore.getRole() == DataStoreRole.Image)) {
+                (srcData.getDataStore().getRole() == DataStoreRole.ImageCache || srcDataStore.getRole() == DataStoreRole.Image)) {
             //copy volume from image cache to primary
             return processor.copyVolumeFromImageCacheToPrimary(cmd);
         } else if (srcData.getObjectType() == DataObjectType.VOLUME && srcData.getDataStore().getRole() == DataStoreRole.Primary) {
@@ -95,7 +80,7 @@ public class StorageSubsystemCommandHandlerBase implements StorageSubsystemComma
                 return processor.createTemplateFromVolume(cmd);
             }
         } else if (srcData.getObjectType() == DataObjectType.SNAPSHOT && destData.getObjectType() == DataObjectType.SNAPSHOT &&
-            srcData.getDataStore().getRole() == DataStoreRole.Primary) {
+                srcData.getDataStore().getRole() == DataStoreRole.Primary) {
             return processor.backupSnapshot(cmd);
         } else if (srcData.getObjectType() == DataObjectType.SNAPSHOT && destData.getObjectType() == DataObjectType.VOLUME) {
             return processor.createVolumeFromSnapshot(cmd);
@@ -106,8 +91,8 @@ public class StorageSubsystemCommandHandlerBase implements StorageSubsystemComma
         return new Answer(cmd, false, "not implemented yet");
     }
 
-    protected Answer execute(CreateObjectCommand cmd) {
-        DataTO data = cmd.getData();
+    protected Answer execute(final CreateObjectCommand cmd) {
+        final DataTO data = cmd.getData();
         try {
             if (data.getObjectType() == DataObjectType.VOLUME) {
                 return processor.createVolume(cmd);
@@ -115,14 +100,14 @@ public class StorageSubsystemCommandHandlerBase implements StorageSubsystemComma
                 return processor.createSnapshot(cmd);
             }
             return new CreateObjectAnswer("not supported type");
-        } catch (Exception e) {
+        } catch (final Exception e) {
             s_logger.debug("Failed to create object: " + data.getObjectType() + ": " + e.toString());
             return new CreateObjectAnswer(e.toString());
         }
     }
 
-    protected Answer execute(DeleteCommand cmd) {
-        DataTO data = cmd.getData();
+    protected Answer execute(final DeleteCommand cmd) {
+        final DataTO data = cmd.getData();
         Answer answer = null;
         if (data.getObjectType() == DataObjectType.VOLUME) {
             answer = processor.deleteVolume(cmd);
@@ -135,8 +120,8 @@ public class StorageSubsystemCommandHandlerBase implements StorageSubsystemComma
         return answer;
     }
 
-    protected Answer execute(AttachCommand cmd) {
-        DiskTO disk = cmd.getDisk();
+    protected Answer execute(final AttachCommand cmd) {
+        final DiskTO disk = cmd.getDisk();
         if (disk.getType() == Volume.Type.ISO) {
             return processor.attachIso(cmd);
         } else {
@@ -144,8 +129,8 @@ public class StorageSubsystemCommandHandlerBase implements StorageSubsystemComma
         }
     }
 
-    protected Answer execute(DettachCommand cmd) {
-        DiskTO disk = cmd.getDisk();
+    protected Answer execute(final DettachCommand cmd) {
+        final DiskTO disk = cmd.getDisk();
         if (disk.getType() == Volume.Type.ISO) {
             return processor.dettachIso(cmd);
         } else {

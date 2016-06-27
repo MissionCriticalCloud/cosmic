@@ -1,32 +1,16 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 import com.cloud.serializer.Param;
 import com.cloud.storage.ImageStore;
 import com.cloud.storage.ScopeType;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = ImageStore.class)
 public class ImageStoreResponse extends BaseResponse {
@@ -67,7 +51,7 @@ public class ImageStoreResponse extends BaseResponse {
     private Set<ImageStoreDetailResponse> details;
 
     public ImageStoreResponse() {
-        this.details = new LinkedHashSet<ImageStoreDetailResponse>();
+        this.details = new LinkedHashSet<>();
     }
 
     @Override
@@ -79,7 +63,7 @@ public class ImageStoreResponse extends BaseResponse {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -87,7 +71,7 @@ public class ImageStoreResponse extends BaseResponse {
         return zoneId;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
@@ -95,7 +79,7 @@ public class ImageStoreResponse extends BaseResponse {
         return zoneName;
     }
 
-    public void setZoneName(String zoneName) {
+    public void setZoneName(final String zoneName) {
         this.zoneName = zoneName;
     }
 
@@ -103,7 +87,7 @@ public class ImageStoreResponse extends BaseResponse {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -111,7 +95,7 @@ public class ImageStoreResponse extends BaseResponse {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(final String url) {
         this.url = url;
     }
 
@@ -119,7 +103,7 @@ public class ImageStoreResponse extends BaseResponse {
         return providerName;
     }
 
-    public void setProviderName(String providerName) {
+    public void setProviderName(final String providerName) {
         this.providerName = providerName;
     }
 
@@ -127,7 +111,7 @@ public class ImageStoreResponse extends BaseResponse {
         return scope;
     }
 
-    public void setScope(ScopeType type) {
+    public void setScope(final ScopeType type) {
         this.scope = type;
     }
 
@@ -135,7 +119,7 @@ public class ImageStoreResponse extends BaseResponse {
         return protocol;
     }
 
-    public void setProtocol(String protocol) {
+    public void setProtocol(final String protocol) {
         this.protocol = protocol;
     }
 
@@ -143,12 +127,11 @@ public class ImageStoreResponse extends BaseResponse {
         return details;
     }
 
-    public void setDetails(Set<ImageStoreDetailResponse> details) {
+    public void setDetails(final Set<ImageStoreDetailResponse> details) {
         this.details = details;
     }
 
-    public void addDetail(ImageStoreDetailResponse detail) {
+    public void addDetail(final ImageStoreDetailResponse detail) {
         this.details.add(detail);
     }
-
 }

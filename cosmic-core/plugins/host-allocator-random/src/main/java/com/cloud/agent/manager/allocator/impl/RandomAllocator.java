@@ -1,26 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.agent.manager.allocator.impl;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.inject.Inject;
 
 import com.cloud.agent.manager.allocator.HostAllocator;
 import com.cloud.deploy.DeploymentPlan;
@@ -35,6 +13,11 @@ import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -48,80 +31,33 @@ public class RandomAllocator extends AdapterBase implements HostAllocator {
     private ResourceManager _resourceMgr;
 
     @Override
-    public List<Host> allocateTo(VirtualMachineProfile vmProfile, DeploymentPlan plan, Type type, ExcludeList avoid, int returnUpTo) {
+    public boolean isVirtualMachineUpgradable(final VirtualMachine vm, final ServiceOffering offering) {
+        // currently we do no special checks to rule out a VM being upgradable to an offering, so
+        // return true
+        return true;
+    }
+
+    @Override
+    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final Type type, final ExcludeList avoid, final int returnUpTo) {
         return allocateTo(vmProfile, plan, type, avoid, returnUpTo, true);
     }
 
     @Override
-    public List<Host> allocateTo(VirtualMachineProfile vmProfile, DeploymentPlan plan, Type type, ExcludeList avoid, List<? extends Host> hosts, int returnUpTo,
-        boolean considerReservedCapacity) {
-        long dcId = plan.getDataCenterId();
-        Long podId = plan.getPodId();
-        Long clusterId = plan.getClusterId();
-        ServiceOffering offering = vmProfile.getServiceOffering();
-        List<Host> suitableHosts = new ArrayList<Host>();
-        List<Host> hostsCopy = new ArrayList<Host>(hosts);
+    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final Type type, final ExcludeList avoid, final int returnUpTo, final boolean
+            considerReservedCapacity) {
+
+        final long dcId = plan.getDataCenterId();
+        final Long podId = plan.getPodId();
+        final Long clusterId = plan.getClusterId();
+        final ServiceOffering offering = vmProfile.getServiceOffering();
+
+        final List<Host> suitableHosts = new ArrayList<>();
 
         if (type == Host.Type.Storage) {
             return suitableHosts;
         }
 
-        String hostTag = offering.getHostTag();
-        if (hostTag != null) {
-            s_logger.debug("Looking for hosts in dc: " + dcId + "  pod:" + podId + "  cluster:" + clusterId + " having host tag:" + hostTag);
-        } else {
-            s_logger.debug("Looking for hosts in dc: " + dcId + "  pod:" + podId + "  cluster:" + clusterId);
-        }
-
-        // list all computing hosts, regardless of whether they support routing...it's random after all
-        if (hostTag != null) {
-            hostsCopy.retainAll(_hostDao.listByHostTag(type, clusterId, podId, dcId, hostTag));
-        } else {
-            hostsCopy.retainAll(_resourceMgr.listAllUpAndEnabledHosts(type, clusterId, podId, dcId));
-        }
-
-        s_logger.debug("Random Allocator found " + hostsCopy.size() + "  hosts");
-        if (hostsCopy.size() == 0) {
-            return suitableHosts;
-        }
-
-        Collections.shuffle(hostsCopy);
-        for (Host host : hostsCopy) {
-            if (suitableHosts.size() == returnUpTo) {
-                break;
-            }
-
-            if (!avoid.shouldAvoid(host)) {
-                suitableHosts.add(host);
-            } else {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Host name: " + host.getName() + ", hostId: " + host.getId() + " is in avoid set, " + "skipping this and trying other available hosts");
-                }
-            }
-        }
-
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Random Host Allocator returning " + suitableHosts.size() + " suitable hosts");
-        }
-
-        return suitableHosts;
-    }
-
-    @Override
-    public List<Host> allocateTo(VirtualMachineProfile vmProfile, DeploymentPlan plan, Type type, ExcludeList avoid, int returnUpTo, boolean considerReservedCapacity) {
-
-        long dcId = plan.getDataCenterId();
-        Long podId = plan.getPodId();
-        Long clusterId = plan.getClusterId();
-        ServiceOffering offering = vmProfile.getServiceOffering();
-
-        List<Host> suitableHosts = new ArrayList<Host>();
-
-        if (type == Host.Type.Storage) {
-            return suitableHosts;
-        }
-
-        String hostTag = offering.getHostTag();
+        final String hostTag = offering.getHostTag();
         if (hostTag != null) {
             s_logger.debug("Looking for hosts in dc: " + dcId + "  pod:" + podId + "  cluster:" + clusterId + " having host tag:" + hostTag);
         } else {
@@ -143,7 +79,7 @@ public class RandomAllocator extends AdapterBase implements HostAllocator {
         }
 
         Collections.shuffle(hosts);
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             if (suitableHosts.size() == returnUpTo) {
                 break;
             }
@@ -163,9 +99,58 @@ public class RandomAllocator extends AdapterBase implements HostAllocator {
     }
 
     @Override
-    public boolean isVirtualMachineUpgradable(VirtualMachine vm, ServiceOffering offering) {
-        // currently we do no special checks to rule out a VM being upgradable to an offering, so
-        // return true
-        return true;
+    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final Type type, final ExcludeList avoid, final List<? extends Host> hosts,
+                                 final int returnUpTo,
+                                 final boolean considerReservedCapacity) {
+        final long dcId = plan.getDataCenterId();
+        final Long podId = plan.getPodId();
+        final Long clusterId = plan.getClusterId();
+        final ServiceOffering offering = vmProfile.getServiceOffering();
+        final List<Host> suitableHosts = new ArrayList<>();
+        final List<Host> hostsCopy = new ArrayList<>(hosts);
+
+        if (type == Host.Type.Storage) {
+            return suitableHosts;
+        }
+
+        final String hostTag = offering.getHostTag();
+        if (hostTag != null) {
+            s_logger.debug("Looking for hosts in dc: " + dcId + "  pod:" + podId + "  cluster:" + clusterId + " having host tag:" + hostTag);
+        } else {
+            s_logger.debug("Looking for hosts in dc: " + dcId + "  pod:" + podId + "  cluster:" + clusterId);
+        }
+
+        // list all computing hosts, regardless of whether they support routing...it's random after all
+        if (hostTag != null) {
+            hostsCopy.retainAll(_hostDao.listByHostTag(type, clusterId, podId, dcId, hostTag));
+        } else {
+            hostsCopy.retainAll(_resourceMgr.listAllUpAndEnabledHosts(type, clusterId, podId, dcId));
+        }
+
+        s_logger.debug("Random Allocator found " + hostsCopy.size() + "  hosts");
+        if (hostsCopy.size() == 0) {
+            return suitableHosts;
+        }
+
+        Collections.shuffle(hostsCopy);
+        for (final Host host : hostsCopy) {
+            if (suitableHosts.size() == returnUpTo) {
+                break;
+            }
+
+            if (!avoid.shouldAvoid(host)) {
+                suitableHosts.add(host);
+            } else {
+                if (s_logger.isDebugEnabled()) {
+                    s_logger.debug("Host name: " + host.getName() + ", hostId: " + host.getId() + " is in avoid set, " + "skipping this and trying other available hosts");
+                }
+            }
+        }
+
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("Random Host Allocator returning " + suitableHosts.size() + " suitable hosts");
+        }
+
+        return suitableHosts;
     }
 }

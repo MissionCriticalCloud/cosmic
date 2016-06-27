@@ -1,39 +1,22 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.engine.datacenter.entity.api;
+
+import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.utils.fsm.NoTransitionException;
+import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
+import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineHostVO;
 
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.utils.fsm.NoTransitionException;
-
-import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
-import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineHostVO;
-
 public class HostEntityImpl implements HostEntity {
 
-    private DataCenterResourceManager manager;
+    private final DataCenterResourceManager manager;
 
-    private EngineHostVO hostVO;
+    private final EngineHostVO hostVO;
 
-    public HostEntityImpl(String uuid, DataCenterResourceManager manager) {
+    public HostEntityImpl(final String uuid, final DataCenterResourceManager manager) {
         this.manager = manager;
         hostVO = manager.loadHost(uuid);
     }
@@ -42,7 +25,7 @@ public class HostEntityImpl implements HostEntity {
     public boolean enable() {
         try {
             manager.changeState(this, Event.EnableRequest);
-        } catch (NoTransitionException e) {
+        } catch (final NoTransitionException e) {
             return false;
         }
         return true;
@@ -52,7 +35,7 @@ public class HostEntityImpl implements HostEntity {
     public boolean disable() {
         try {
             manager.changeState(this, Event.DisableRequest);
-        } catch (NoTransitionException e) {
+        } catch (final NoTransitionException e) {
             return false;
         }
         return true;
@@ -62,7 +45,7 @@ public class HostEntityImpl implements HostEntity {
     public boolean deactivate() {
         try {
             manager.changeState(this, Event.DeactivateRequest);
-        } catch (NoTransitionException e) {
+        } catch (final NoTransitionException e) {
             return false;
         }
         return true;
@@ -72,7 +55,7 @@ public class HostEntityImpl implements HostEntity {
     public boolean reactivate() {
         try {
             manager.changeState(this, Event.ActivatedRequest);
-        } catch (NoTransitionException e) {
+        } catch (final NoTransitionException e) {
             return false;
         }
         return true;
@@ -91,6 +74,10 @@ public class HostEntityImpl implements HostEntity {
     @Override
     public String getName() {
         return hostVO.getName();
+    }
+
+    public void setName(final String name) {
+        hostVO.setName(name);
     }
 
     @Override
@@ -131,27 +118,27 @@ public class HostEntityImpl implements HostEntity {
         return hostVO.getOwner();
     }
 
-    public void setDetails(Map<String, String> details) {
-        hostVO.setDetails(details);
-    }
-
     @Override
     public Map<String, String> getDetails() {
         return hostVO.getDetails();
     }
 
+    public void setDetails(final Map<String, String> details) {
+        hostVO.setDetails(details);
+    }
+
     @Override
-    public void addDetail(String name, String value) {
+    public void addDetail(final String name, final String value) {
         hostVO.setDetail(name, value);
     }
 
     @Override
-    public void delDetail(String name, String value) {
+    public void delDetail(final String name, final String value) {
         // TODO Auto-generated method stub
     }
 
     @Override
-    public void updateDetail(String name, String value) {
+    public void updateDetail(final String name, final String value) {
         // TODO Auto-generated method stub
 
     }
@@ -160,6 +147,10 @@ public class HostEntityImpl implements HostEntity {
     public List<Method> getApplicableActions() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public void setOwner(final String owner) {
+        hostVO.setOwner(owner);
     }
 
     @Override
@@ -201,13 +192,4 @@ public class HostEntityImpl implements HostEntity {
     public Long getClusterId() {
         return hostVO.getClusterId();
     }
-
-    public void setOwner(String owner) {
-        hostVO.setOwner(owner);
-    }
-
-    public void setName(String name) {
-        hostVO.setName(name);
-    }
-
 }

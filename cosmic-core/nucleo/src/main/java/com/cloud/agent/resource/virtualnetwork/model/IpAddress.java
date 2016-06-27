@@ -1,24 +1,8 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.resource.virtualnetwork.model;
-
 
 public class IpAddress {
     private String publicIp;
@@ -36,8 +20,9 @@ public class IpAddress {
         // Empty constructor for (de)serialization
     }
 
-    public IpAddress(String publicIp, boolean sourceNat, boolean add, boolean oneToOneNat, boolean firstIP, String gateway, String netmask, String vifMacAddress,
-            Integer nicDevId, boolean newNic) {
+    public IpAddress(final String publicIp, final boolean sourceNat, final boolean add, final boolean oneToOneNat, final boolean firstIP, final String gateway, final String
+            netmask, final String vifMacAddress,
+                     final Integer nicDevId, final boolean newNic) {
         super();
         this.publicIp = publicIp;
         this.sourceNat = sourceNat;
@@ -55,7 +40,7 @@ public class IpAddress {
         return publicIp;
     }
 
-    public void setPublicIp(String publicIp) {
+    public void setPublicIp(final String publicIp) {
         this.publicIp = publicIp;
     }
 
@@ -63,7 +48,7 @@ public class IpAddress {
         return sourceNat;
     }
 
-    public void setSourceNat(boolean sourceNat) {
+    public void setSourceNat(final boolean sourceNat) {
         this.sourceNat = sourceNat;
     }
 
@@ -71,7 +56,7 @@ public class IpAddress {
         return add;
     }
 
-    public void setAdd(boolean add) {
+    public void setAdd(final boolean add) {
         this.add = add;
     }
 
@@ -79,7 +64,7 @@ public class IpAddress {
         return oneToOneNat;
     }
 
-    public void setOneToOneNat(boolean oneToOneNat) {
+    public void setOneToOneNat(final boolean oneToOneNat) {
         this.oneToOneNat = oneToOneNat;
     }
 
@@ -87,7 +72,7 @@ public class IpAddress {
         return firstIP;
     }
 
-    public void setFirstIP(boolean firstIP) {
+    public void setFirstIP(final boolean firstIP) {
         this.firstIP = firstIP;
     }
 
@@ -95,7 +80,7 @@ public class IpAddress {
         return gateway;
     }
 
-    public void setGateway(String gateway) {
+    public void setGateway(final String gateway) {
         this.gateway = gateway;
     }
 
@@ -103,7 +88,7 @@ public class IpAddress {
         return netmask;
     }
 
-    public void setNetmask(String netmask) {
+    public void setNetmask(final String netmask) {
         this.netmask = netmask;
     }
 
@@ -111,7 +96,7 @@ public class IpAddress {
         return vifMacAddress;
     }
 
-    public void setVifMacAddress(String vifMacAddress) {
+    public void setVifMacAddress(final String vifMacAddress) {
         this.vifMacAddress = vifMacAddress;
     }
 
@@ -119,7 +104,7 @@ public class IpAddress {
         return nicDevId;
     }
 
-    public void setNicDevId(Integer nicDevId) {
+    public void setNicDevId(final Integer nicDevId) {
         this.nicDevId = nicDevId;
     }
 
@@ -127,8 +112,7 @@ public class IpAddress {
         return newNic;
     }
 
-    public void setNewNic(boolean newNic) {
+    public void setNewNic(final boolean newNic) {
         this.newNic = newNic;
     }
-
 }

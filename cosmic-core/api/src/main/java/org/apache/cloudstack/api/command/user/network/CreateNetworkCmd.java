@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.network;
 
 import com.cloud.exception.ConcurrentOperationException;
@@ -24,7 +8,6 @@ import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.utils.net.NetUtils;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -42,6 +25,7 @@ import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.api.response.VpcResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,34 +47,34 @@ public class CreateNetworkCmd extends BaseCmd {
     private String displayText;
 
     @Parameter(name = ApiConstants.NETWORK_OFFERING_ID,
-               type = CommandType.UUID,
-               entityType = NetworkOfferingResponse.class,
-               required = true,
-               description = "the network offering ID")
+            type = CommandType.UUID,
+            entityType = NetworkOfferingResponse.class,
+            required = true,
+            description = "the network offering ID")
     private Long networkOfferingId;
 
     @Parameter(name = ApiConstants.ZONE_ID, type = CommandType.UUID, entityType = ZoneResponse.class, required = true, description = "the zone ID for the network")
     private Long zoneId;
 
     @Parameter(name = ApiConstants.PHYSICAL_NETWORK_ID,
-               type = CommandType.UUID,
-               entityType = PhysicalNetworkResponse.class,
-               description = "the physical network ID the network belongs to")
+            type = CommandType.UUID,
+            entityType = PhysicalNetworkResponse.class,
+            description = "the physical network ID the network belongs to")
     private Long physicalNetworkId;
 
     @Parameter(name = ApiConstants.GATEWAY, type = CommandType.STRING, description = "the gateway of the network. Required "
-        + "for shared networks and isolated networks when it belongs to VPC")
+            + "for shared networks and isolated networks when it belongs to VPC")
     private String gateway;
 
     @Parameter(name = ApiConstants.NETMASK, type = CommandType.STRING, description = "the netmask of the network. Required "
-        + "for shared networks and isolated networks when it belongs to VPC")
+            + "for shared networks and isolated networks when it belongs to VPC")
     private String netmask;
 
     @Parameter(name = ApiConstants.START_IP, type = CommandType.STRING, description = "the beginning IP address in the network IP range")
     private String startIp;
 
     @Parameter(name = ApiConstants.END_IP, type = CommandType.STRING, description = "the ending IP address in the network IP"
-        + " range. If not specified, will be defaulted to startIP")
+            + " range. If not specified, will be defaulted to startIP")
     private String endIp;
 
     @Parameter(name = ApiConstants.ISOLATED_PVLAN, type = CommandType.STRING, description = "the isolated private VLAN for this network")
@@ -100,8 +84,8 @@ public class CreateNetworkCmd extends BaseCmd {
     private String networkDomain;
 
     @Parameter(name = ApiConstants.ACL_TYPE, type = CommandType.STRING, description = "Access control type; supported values"
-        + " are account and domain. In 3.0 all shared networks should have aclType=Domain, and all isolated networks"
-        + " - Account. Account means that only the account owner can use the network, domain - all accounts in the domain can use the network")
+            + " are account and domain. In 3.0 all shared networks should have aclType=Domain, and all isolated networks"
+            + " - Account. Account means that only the account owner can use the network, domain - all accounts in the domain can use the network")
     private String aclType;
 
     @Parameter(name = ApiConstants.ACCOUNT, type = CommandType.STRING, description = "account that will own the network")
@@ -114,9 +98,10 @@ public class CreateNetworkCmd extends BaseCmd {
     private Long domainId;
 
     @Parameter(name = ApiConstants.SUBDOMAIN_ACCESS,
-               type = CommandType.BOOLEAN,
-               description = "Defines whether to allow"
-                   + " subdomains to use networks dedicated to their parent domain(s). Should be used with aclType=Domain, defaulted to allow.subdomain.network.access global config if not specified")
+            type = CommandType.BOOLEAN,
+            description = "Defines whether to allow"
+                    + " subdomains to use networks dedicated to their parent domain(s). Should be used with aclType=Domain, defaulted to allow.subdomain.network.access global " +
+                    "config if not specified")
     private Boolean subdomainAccess;
 
     @Parameter(name = ApiConstants.VPC_ID, type = CommandType.UUID, entityType = VpcResponse.class, description = "the VPC network belongs to")
@@ -135,8 +120,8 @@ public class CreateNetworkCmd extends BaseCmd {
     private String ip6Cidr;
 
     @Parameter(name = ApiConstants.DISPLAY_NETWORK,
-               type = CommandType.BOOLEAN,
- description = "an optional field, whether to the display the network to the end user or not.", authorized = {RoleType.Admin})
+            type = CommandType.BOOLEAN,
+            description = "an optional field, whether to the display the network to the end user or not.", authorized = {RoleType.Admin})
     private Boolean displayNetwork;
 
     @Parameter(name = ApiConstants.ACL_ID, type = CommandType.UUID, entityType = NetworkACLResponse.class, description = "Network ACL ID associated for the network")
@@ -209,16 +194,8 @@ public class CreateNetworkCmd extends BaseCmd {
         return displayNetwork;
     }
 
-    @Override
-    public boolean isDisplay() {
-        if(displayNetwork == null)
-            return true;
-        else
-            return displayNetwork;
-    }
-
     public Long getZoneId() {
-        Long physicalNetworkId = getPhysicalNetworkId();
+        final Long physicalNetworkId = getPhysicalNetworkId();
 
         if (physicalNetworkId == null && zoneId == null) {
             throw new InvalidParameterValueException("Zone ID is required");
@@ -228,7 +205,7 @@ public class CreateNetworkCmd extends BaseCmd {
     }
 
     public Long getPhysicalNetworkId() {
-        NetworkOffering offering = _entityMgr.findById(NetworkOffering.class, networkOfferingId);
+        final NetworkOffering offering = _entityMgr.findById(NetworkOffering.class, networkOfferingId);
         if (offering == null) {
             throw new InvalidParameterValueException("Unable to find network offering by ID " + networkOfferingId);
         }
@@ -279,6 +256,19 @@ public class CreateNetworkCmd extends BaseCmd {
         return aclId;
     }
 
+    @Override
+    // an exception thrown by createNetwork() will be caught by the dispatcher.
+    public void execute() throws InsufficientCapacityException, ConcurrentOperationException, ResourceAllocationException {
+        final Network result = _networkService.createGuestNetwork(this);
+        if (result != null) {
+            final NetworkResponse response = _responseGenerator.createNetworkResponse(ResponseView.Restricted, result);
+            response.setResponseName(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create network");
+        }
+    }
+
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
@@ -289,7 +279,7 @@ public class CreateNetworkCmd extends BaseCmd {
 
     @Override
     public long getEntityOwnerId() {
-        Long accountId = _accountService.finalyzeAccountId(accountName, domainId, projectId, true);
+        final Long accountId = _accountService.finalyzeAccountId(accountName, domainId, projectId, true);
         if (accountId == null) {
             return CallContext.current().getCallingAccount().getId();
         }
@@ -298,16 +288,11 @@ public class CreateNetworkCmd extends BaseCmd {
     }
 
     @Override
-    // an exception thrown by createNetwork() will be caught by the dispatcher.
-        public
-        void execute() throws InsufficientCapacityException, ConcurrentOperationException, ResourceAllocationException {
-        Network result = _networkService.createGuestNetwork(this);
-        if (result != null) {
-            NetworkResponse response = _responseGenerator.createNetworkResponse(ResponseView.Restricted, result);
-            response.setResponseName(getCommandName());
-            setResponseObject(response);
+    public boolean isDisplay() {
+        if (displayNetwork == null) {
+            return true;
         } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create network");
+            return displayNetwork;
         }
     }
 }

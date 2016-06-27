@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.vm;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
@@ -35,6 +19,102 @@ import java.util.Map;
  */
 public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, InternalIdentity, Displayable, StateObject<VirtualMachine.State> {
 
+    static final String IsDynamicScalingEnabled = "enable.dynamic.scaling";
+
+    /**
+     * @return The name of the vm instance used by the cloud stack to uniquely
+     * reference this VM. You can build names that starts with this name and it
+     * guarantees uniqueness for things related to the VM.
+     */
+    String getInstanceName();
+
+    /**
+     * @return the host name of the virtual machine. If the user did not
+     * specify the host name when creating the virtual machine then it is
+     * defaults to the instance name.
+     */
+    String getHostName();
+
+    /**
+     * @return the ip address of the virtual machine.
+     */
+    String getPrivateIpAddress();
+
+    /**
+     * @return mac address.
+     */
+    String getPrivateMacAddress();
+
+    /**
+     * @return password of the host for vnc purposes.
+     */
+    String getVncPassword();
+
+    /**
+     * @return template id.
+     */
+    long getTemplateId();
+
+    /**
+     * returns the guest OS ID
+     *
+     * @return guestOSId
+     */
+    long getGuestOSId();
+
+    /**
+     * @return pod id.
+     */
+    Long getPodIdToDeployIn();
+
+    /**
+     * @return data center id.
+     */
+    long getDataCenterId();
+
+    /**
+     * @return the state of the virtual machine
+     */
+    // State getState();
+
+    /**
+     * @return id of the host it was assigned last time.
+     */
+    Long getLastHostId();
+
+    @Override
+    Long getHostId();
+
+    /**
+     * @return should HA be enabled for this machine?
+     */
+    boolean isHaEnabled();
+
+    /**
+     * @return should limit CPU usage to the service offering?
+     */
+    boolean limitCpuUse();
+
+    /**
+     * @return date when machine was created
+     */
+    Date getCreated();
+
+    long getServiceOfferingId();
+
+    Long getDiskOfferingId();
+
+    Type getType();
+
+    HypervisorType getHypervisorType();
+
+    Map<String, String> getDetails();
+
+    long getUpdated();
+
+    @Override
+    boolean isDisplay();
+
     public enum PowerState {
         PowerUnknown,
         PowerOn,
@@ -53,26 +133,6 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
         Error(false, "VM is in error"),
         Unknown(false, "VM state is unknown."),
         Shutdowned(false, "VM is shutdowned from inside");
-
-        private final boolean _transitional;
-        String _description;
-
-        private State(final boolean transitional, final String description) {
-            _transitional = transitional;
-            _description = description;
-        }
-
-        public String getDescription() {
-            return _description;
-        }
-
-        public boolean isTransitional() {
-            return _transitional;
-        }
-
-        public static StateMachine2<State, VirtualMachine.Event, VirtualMachine> getStateMachine() {
-            return s_fsm;
-        }
 
         protected static final StateMachine2<State, VirtualMachine.Event, VirtualMachine> s_fsm = new StateMachine2<>();
 
@@ -136,6 +196,18 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
             s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.FollowAgentPowerOffReport, State.Stopped, null));
         }
 
+        private final boolean _transitional;
+        String _description;
+
+        private State(final boolean transitional, final String description) {
+            _transitional = transitional;
+            _description = description;
+        }
+
+        public static StateMachine2<State, VirtualMachine.Event, VirtualMachine> getStateMachine() {
+            return s_fsm;
+        }
+
         public static boolean isVmStarted(final State oldState, final Event e, final State newState) {
             if (oldState == State.Starting && newState == State.Running) {
                 return true;
@@ -182,9 +254,15 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
 
             return false;
         }
-    }
 
-    static final String IsDynamicScalingEnabled = "enable.dynamic.scaling";
+        public String getDescription() {
+            return _description;
+        }
+
+        public boolean isTransitional() {
+            return _transitional;
+        }
+    }
 
     public enum Event {
         CreateRequested,
@@ -229,99 +307,4 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
             return _isUsedBySystem;
         }
     }
-
-    /**
-     * @return The name of the vm instance used by the cloud stack to uniquely
-     * reference this VM. You can build names that starts with this name and it
-     * guarantees uniqueness for things related to the VM.
-     */
-    String getInstanceName();
-
-    /**
-     * @return the host name of the virtual machine. If the user did not
-     * specify the host name when creating the virtual machine then it is
-     * defaults to the instance name.
-     */
-    String getHostName();
-
-    /**
-     * @return the ip address of the virtual machine.
-     */
-    String getPrivateIpAddress();
-
-    /**
-     * @return mac address.
-     */
-    String getPrivateMacAddress();
-
-    /**
-     * @return password of the host for vnc purposes.
-     */
-    String getVncPassword();
-
-    /**
-     * @return the state of the virtual machine
-     */
-    // State getState();
-
-    /**
-     * @return template id.
-     */
-    long getTemplateId();
-
-    /**
-     * returns the guest OS ID
-     *
-     * @return guestOSId
-     */
-    long getGuestOSId();
-
-    /**
-     * @return pod id.
-     */
-    Long getPodIdToDeployIn();
-
-    /**
-     * @return data center id.
-     */
-    long getDataCenterId();
-
-    /**
-     * @return id of the host it was assigned last time.
-     */
-    Long getLastHostId();
-
-    @Override
-    Long getHostId();
-
-    /**
-     * @return should HA be enabled for this machine?
-     */
-    boolean isHaEnabled();
-
-    /**
-     * @return should limit CPU usage to the service offering?
-     */
-    boolean limitCpuUse();
-
-    /**
-     * @return date when machine was created
-     */
-    Date getCreated();
-
-    long getServiceOfferingId();
-
-    Long getDiskOfferingId();
-
-    Type getType();
-
-    HypervisorType getHypervisorType();
-
-    Map<String, String> getDetails();
-
-    long getUpdated();
-
-    @Override
-    boolean isDisplay();
-
 }

@@ -1,26 +1,9 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.template;
 
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InternalErrorException;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -32,6 +15,7 @@ import org.apache.cloudstack.api.response.ExtractResponse;
 import org.apache.cloudstack.api.response.TemplateResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,10 +37,10 @@ public class ExtractTemplateCmd extends BaseAsyncCmd {
     private String url;
 
     @Parameter(name = ApiConstants.ZONE_ID,
-               type = CommandType.UUID,
-               entityType = ZoneResponse.class,
-               required = false,
-               description = "the ID of the zone where the ISO is originally located")
+            type = CommandType.UUID,
+            entityType = ZoneResponse.class,
+            required = false,
+            description = "the ID of the zone where the ISO is originally located")
     private Long zoneId;
 
     @Parameter(name = ApiConstants.MODE, type = CommandType.STRING, required = true, description = "the mode of extraction - HTTP_DOWNLOAD or FTP_UPLOAD")
@@ -66,44 +50,16 @@ public class ExtractTemplateCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
+    public static String getStaticName() {
+        return s_name;
     }
 
     public String getUrl() {
         return url;
     }
 
-    public Long getZoneId() {
-        return zoneId;
-    }
-
     public String getMode() {
         return mode;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    public static String getStaticName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        VirtualMachineTemplate template = _entityMgr.findById(VirtualMachineTemplate.class, getId());
-        if (template != null) {
-            return template.getAccountId();
-        }
-
-        // invalid id, parent this command to SYSTEM so ERROR events are tracked
-        return Account.ACCOUNT_ID_SYSTEM;
     }
 
     @Override
@@ -111,9 +67,22 @@ public class ExtractTemplateCmd extends BaseAsyncCmd {
         return EventTypes.EVENT_TEMPLATE_EXTRACT;
     }
 
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
     @Override
     public String getEventDescription() {
         return "extracting template: " + getId() + " from zone: " + getZoneId();
+    }
+
+    @Override
+    public Long getInstanceId() {
+        return getId();
+    }
+
+    public Long getId() {
+        return id;
     }
 
     @Override
@@ -122,25 +91,40 @@ public class ExtractTemplateCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public Long getInstanceId() {
-        return getId();
-    }
-
-    @Override
     public void execute() {
         try {
             CallContext.current().setEventDetails(getEventDescription());
-            String uploadUrl = _templateService.extract(this);
+            final String uploadUrl = _templateService.extract(this);
             if (uploadUrl != null) {
-                ExtractResponse response = _responseGenerator.createExtractResponse(id, zoneId, getEntityOwnerId(), mode, uploadUrl);
+                final ExtractResponse response = _responseGenerator.createExtractResponse(id, zoneId, getEntityOwnerId(), mode, uploadUrl);
                 response.setResponseName(getCommandName());
                 this.setResponseObject(response);
             } else {
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to extract template");
             }
-        } catch (InternalErrorException ex) {
+        } catch (final InternalErrorException ex) {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, ex.getMessage());
         }
+    }
+
+    public Long getZoneId() {
+        return zoneId;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final VirtualMachineTemplate template = _entityMgr.findById(VirtualMachineTemplate.class, getId());
+        if (template != null) {
+            return template.getAccountId();
+        }
+
+        // invalid id, parent this command to SYSTEM so ERROR events are tracked
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

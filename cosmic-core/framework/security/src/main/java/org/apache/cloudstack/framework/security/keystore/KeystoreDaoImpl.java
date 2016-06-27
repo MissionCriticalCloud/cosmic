@@ -1,30 +1,14 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.framework.security.keystore;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -51,13 +35,13 @@ public class KeystoreDaoImpl extends GenericDaoBase<KeystoreVO, Long> implements
 
     @Override
     public List<KeystoreVO> findCertChain() {
-        SearchCriteria<KeystoreVO> sc = CertChainSearch.create();
-        List<KeystoreVO> ks = listBy(sc);
+        final SearchCriteria<KeystoreVO> sc = CertChainSearch.create();
+        final List<KeystoreVO> ks = listBy(sc);
         Collections.sort(ks, new Comparator() {
             @Override
-            public int compare(Object o1, Object o2) {
-                Integer seq1 = ((KeystoreVO)o1).getIndex();
-                Integer seq2 = ((KeystoreVO)o2).getIndex();
+            public int compare(final Object o1, final Object o2) {
+                final Integer seq1 = ((KeystoreVO) o1).getIndex();
+                final Integer seq2 = ((KeystoreVO) o2).getIndex();
                 return seq1.compareTo(seq2);
             }
         });
@@ -65,30 +49,32 @@ public class KeystoreDaoImpl extends GenericDaoBase<KeystoreVO, Long> implements
     }
 
     @Override
-    public List<KeystoreVO> findCertChain(String domainSuffix) {
-        SearchCriteria<KeystoreVO> sc =  CertChainSearchForDomainSuffix.create();
+    public List<KeystoreVO> findCertChain(final String domainSuffix) {
+        final SearchCriteria<KeystoreVO> sc = CertChainSearchForDomainSuffix.create();
         sc.setParameters("domainSuffix", domainSuffix);
-        List<KeystoreVO> ks = listBy(sc);
-        Collections.sort(ks, new Comparator() { public int compare(Object o1, Object o2) {
-            Integer seq1 = ((KeystoreVO)o1).getIndex();
-            Integer seq2 = ((KeystoreVO)o2).getIndex();
-            return seq1.compareTo(seq2);
-        }});
+        final List<KeystoreVO> ks = listBy(sc);
+        Collections.sort(ks, new Comparator() {
+            public int compare(final Object o1, final Object o2) {
+                final Integer seq1 = ((KeystoreVO) o1).getIndex();
+                final Integer seq2 = ((KeystoreVO) o2).getIndex();
+                return seq1.compareTo(seq2);
+            }
+        });
         return ks;
     }
 
     @Override
-    public KeystoreVO findByName(String name) {
+    public KeystoreVO findByName(final String name) {
         assert (name != null);
 
-        SearchCriteria<KeystoreVO> sc = FindByNameSearch.create();
+        final SearchCriteria<KeystoreVO> sc = FindByNameSearch.create();
         sc.setParameters("name", name);
         return findOneBy(sc);
     }
 
     @Override
     @DB
-    public void save(String name, String certificate, String key, String domainSuffix) {
+    public void save(final String name, final String certificate, final String key, final String domainSuffix) {
         KeystoreVO keystore = findByName(name);
         if (keystore != null) {
             keystore.setCertificate(certificate);
@@ -107,7 +93,7 @@ public class KeystoreDaoImpl extends GenericDaoBase<KeystoreVO, Long> implements
 
     @Override
     @DB
-    public void save(String alias, String certificate, Integer index, String domainSuffix) {
+    public void save(final String alias, final String certificate, final Integer index, final String domainSuffix) {
         KeystoreVO ks = findByName(alias);
         if (ks != null) {
             ks.setCertificate(certificate);

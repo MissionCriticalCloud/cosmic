@@ -1,23 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.ha.dao;
-
-import java.util.Date;
-import java.util.List;
 
 import com.cloud.ha.HaWorkVO;
 import com.cloud.ha.HighAvailabilityManager.Step;
@@ -29,6 +10,9 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,36 +99,6 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
     }
 
     @Override
-    public List<HaWorkVO> listPendingHaWorkForVm(long vmId) {
-        SearchCriteria<HaWorkVO> sc = PendingHaWorkSearch.create();
-        sc.setParameters("instance", vmId);
-        sc.setParameters("type", WorkType.HA);
-        sc.setParameters("step", Step.Done, Step.Error, Step.Cancelled);
-
-        return search(sc, null);
-    }
-
-    @Override
-    public List<HaWorkVO> listRunningHaWorkForVm(long vmId) {
-        SearchCriteria<HaWorkVO> sc = RunningHaWorkSearch.create();
-        sc.setParameters("instance", vmId);
-        sc.setParameters("type", WorkType.HA);
-        sc.setParameters("step", Step.Done, Step.Error, Step.Cancelled);
-
-        return search(sc, null);
-    }
-
-    @Override
-    public List<HaWorkVO> listFutureHaWorkForVm(long vmId, long workId) {
-        SearchCriteria<HaWorkVO> sc = FutureHaWorkSearch.create();
-        sc.setParameters("instance", vmId);
-        sc.setParameters("type", WorkType.HA);
-        sc.setParameters("id", workId);
-
-        return search(sc, null);
-    }
-
-    @Override
     public HaWorkVO take(final long serverId) {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
@@ -170,7 +124,6 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
             txn.commit();
 
             return work;
-
         } catch (final Throwable e) {
             throw new CloudRuntimeException("Unable to execute take", e);
         }
@@ -181,6 +134,14 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
         final SearchCriteria<HaWorkVO> sc = PreviousInstanceSearch.create();
         sc.setParameters("instance", instanceId);
         return listIncludingRemovedBy(sc);
+    }
+
+    @Override
+    public boolean delete(final long instanceId, final WorkType type) {
+        final SearchCriteria<HaWorkVO> sc = PreviousWorkSearch.create();
+        sc.setParameters("instance", instanceId);
+        sc.setParameters("type", type);
+        return expunge(sc) > 0;
     }
 
     @Override
@@ -197,8 +158,8 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
         sc.setParameters("host", hostId);
         sc.setParameters("type", type.toString());
 
-        HaWorkVO work = createForUpdate();
-        Date date = new Date();
+        final HaWorkVO work = createForUpdate();
+        final Date date = new Date();
         work.setDateTaken(date);
         work.setServerId(serverId);
         work.setStep(Step.Cancelled);
@@ -207,8 +168,8 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
     }
 
     @Override
-    public List<HaWorkVO> findTakenWorkItems(WorkType type) {
-        SearchCriteria<HaWorkVO> sc = TakenWorkSearch.create();
+    public List<HaWorkVO> findTakenWorkItems(final WorkType type) {
+        final SearchCriteria<HaWorkVO> sc = TakenWorkSearch.create();
         sc.setParameters("type", type);
         sc.setParameters("step", Step.Done, Step.Cancelled, Step.Error);
 
@@ -216,31 +177,53 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
     }
 
     @Override
-    public boolean delete(long instanceId, WorkType type) {
-        SearchCriteria<HaWorkVO> sc = PreviousWorkSearch.create();
-        sc.setParameters("instance", instanceId);
-        sc.setParameters("type", type);
-        return expunge(sc) > 0;
-    }
-
-    @Override
-    public boolean hasBeenScheduled(long instanceId, WorkType type) {
-        SearchCriteria<HaWorkVO> sc = PreviousWorkSearch.create();
+    public boolean hasBeenScheduled(final long instanceId, final WorkType type) {
+        final SearchCriteria<HaWorkVO> sc = PreviousWorkSearch.create();
         sc.setParameters("instance", instanceId);
         sc.setParameters("type", type);
         return listBy(sc, null).size() > 0;
     }
 
     @Override
-    public int releaseWorkItems(long nodeId) {
-        SearchCriteria<HaWorkVO> sc = ReleaseSearch.create();
+    public int releaseWorkItems(final long nodeId) {
+        final SearchCriteria<HaWorkVO> sc = ReleaseSearch.create();
         sc.setParameters("server", nodeId);
         sc.setParameters("step", Step.Done, Step.Cancelled, Step.Error);
 
-        HaWorkVO vo = createForUpdate();
+        final HaWorkVO vo = createForUpdate();
         vo.setDateTaken(null);
         vo.setServerId(null);
 
         return update(vo, sc);
+    }
+
+    @Override
+    public List<HaWorkVO> listFutureHaWorkForVm(final long vmId, final long workId) {
+        final SearchCriteria<HaWorkVO> sc = FutureHaWorkSearch.create();
+        sc.setParameters("instance", vmId);
+        sc.setParameters("type", WorkType.HA);
+        sc.setParameters("id", workId);
+
+        return search(sc, null);
+    }
+
+    @Override
+    public List<HaWorkVO> listRunningHaWorkForVm(final long vmId) {
+        final SearchCriteria<HaWorkVO> sc = RunningHaWorkSearch.create();
+        sc.setParameters("instance", vmId);
+        sc.setParameters("type", WorkType.HA);
+        sc.setParameters("step", Step.Done, Step.Error, Step.Cancelled);
+
+        return search(sc, null);
+    }
+
+    @Override
+    public List<HaWorkVO> listPendingHaWorkForVm(final long vmId) {
+        final SearchCriteria<HaWorkVO> sc = PendingHaWorkSearch.create();
+        sc.setParameters("instance", vmId);
+        sc.setParameters("type", WorkType.HA);
+        sc.setParameters("step", Step.Done, Step.Error, Step.Cancelled);
+
+        return search(sc, null);
     }
 }

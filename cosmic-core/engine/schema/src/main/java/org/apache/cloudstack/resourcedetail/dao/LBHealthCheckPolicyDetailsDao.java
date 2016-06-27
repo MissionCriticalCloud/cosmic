@@ -13,10 +13,9 @@
 package org.apache.cloudstack.resourcedetail.dao;
 
 import com.cloud.utils.db.GenericDao;
-
 import org.apache.cloudstack.resourcedetail.LBHealthCheckPolicyDetailVO;
 import org.apache.cloudstack.resourcedetail.ResourceDetailsDao;
 
-public interface LBHealthCheckPolicyDetailsDao extends GenericDao<LBHealthCheckPolicyDetailVO, Long>, ResourceDetailsDao<LBHealthCheckPolicyDetailVO>{
+public interface LBHealthCheckPolicyDetailsDao extends GenericDao<LBHealthCheckPolicyDetailVO, Long>, ResourceDetailsDao<LBHealthCheckPolicyDetailVO> {
 
 }

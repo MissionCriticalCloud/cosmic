@@ -1,34 +1,17 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.response;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.api.ApiDBUtils;
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.network.security.SecurityGroupRules;
 import com.cloud.serializer.Param;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.api.InternalIdentity;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SecurityGroupResultObject implements ControlledEntity, InternalIdentity {
     @Param(name = "id")
@@ -55,8 +38,8 @@ public class SecurityGroupResultObject implements ControlledEntity, InternalIden
     public SecurityGroupResultObject() {
     }
 
-    public SecurityGroupResultObject(Long id, String name, String description, long domainId, long accountId, String accountName,
-            List<SecurityGroupRuleResultObject> ingressRules) {
+    public SecurityGroupResultObject(final Long id, final String name, final String description, final long domainId, final long accountId, final String accountName,
+                                     final List<SecurityGroupRuleResultObject> ingressRules) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -66,90 +49,31 @@ public class SecurityGroupResultObject implements ControlledEntity, InternalIden
         securityGroupRules = ingressRules;
     }
 
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Override
-    public long getDomainId() {
-        return domainId;
-    }
-
-    public void setDomainId(Long domainId) {
-        this.domainId = domainId;
-    }
-
-    @Override
-    public long getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getAccountName() {
-        return accountName;
-    }
-
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-    }
-
-    public List<SecurityGroupRuleResultObject> getSecurityGroupRules() {
-        return securityGroupRules;
-    }
-
-    public void setSecurityGroupRules(List<SecurityGroupRuleResultObject> securityGroupRules) {
-        this.securityGroupRules = securityGroupRules;
-    }
-
-    public static List<SecurityGroupResultObject> transposeNetworkGroups(List<? extends SecurityGroupRules> groups) {
-        List<SecurityGroupResultObject> resultObjects = new ArrayList<SecurityGroupResultObject>();
-        Map<Long, SecurityGroup> allowedSecurityGroups = new HashMap<Long, SecurityGroup>();
-        Map<Long, Account> accounts = new HashMap<Long, Account>();
+    public static List<SecurityGroupResultObject> transposeNetworkGroups(final List<? extends SecurityGroupRules> groups) {
+        final List<SecurityGroupResultObject> resultObjects = new ArrayList<>();
+        final Map<Long, SecurityGroup> allowedSecurityGroups = new HashMap<>();
+        final Map<Long, Account> accounts = new HashMap<>();
 
         if ((groups != null) && !groups.isEmpty()) {
-            List<SecurityGroupRuleResultObject> securityGroupRuleDataList = new ArrayList<SecurityGroupRuleResultObject>();
+            List<SecurityGroupRuleResultObject> securityGroupRuleDataList = new ArrayList<>();
             SecurityGroupResultObject currentGroup = null;
 
-            List<Long> processedGroups = new ArrayList<Long>();
-            for (SecurityGroupRules netGroupRule : groups) {
-                Long groupId = netGroupRule.getId();
+            final List<Long> processedGroups = new ArrayList<>();
+            for (final SecurityGroupRules netGroupRule : groups) {
+                final Long groupId = netGroupRule.getId();
                 if (!processedGroups.contains(groupId)) {
                     processedGroups.add(groupId);
 
                     if (currentGroup != null) {
                         if (!securityGroupRuleDataList.isEmpty()) {
                             currentGroup.setSecurityGroupRules(securityGroupRuleDataList);
-                            securityGroupRuleDataList = new ArrayList<SecurityGroupRuleResultObject>();
+                            securityGroupRuleDataList = new ArrayList<>();
                         }
                         resultObjects.add(currentGroup);
                     }
 
                     // start a new group
-                    SecurityGroupResultObject groupResult = new SecurityGroupResultObject();
+                    final SecurityGroupResultObject groupResult = new SecurityGroupResultObject();
                     groupResult.setId(netGroupRule.getId());
                     groupResult.setName(netGroupRule.getName());
                     groupResult.setDescription(netGroupRule.getDescription());
@@ -169,13 +93,13 @@ public class SecurityGroupResultObject implements ControlledEntity, InternalIden
 
                 if (netGroupRule.getRuleId() != null) {
                     // there's at least one securitygroup rule for this network group, add the securitygroup rule data
-                    SecurityGroupRuleResultObject securityGroupRuleData = new SecurityGroupRuleResultObject();
+                    final SecurityGroupRuleResultObject securityGroupRuleData = new SecurityGroupRuleResultObject();
                     securityGroupRuleData.setEndPort(netGroupRule.getEndPort());
                     securityGroupRuleData.setStartPort(netGroupRule.getStartPort());
                     securityGroupRuleData.setId(netGroupRule.getRuleId());
                     securityGroupRuleData.setProtocol(netGroupRule.getProtocol());
                     securityGroupRuleData.setRuleType(netGroupRule.getRuleType());
-                    Long allowedSecurityGroupId = netGroupRule.getAllowedNetworkId();
+                    final Long allowedSecurityGroupId = netGroupRule.getAllowedNetworkId();
                     if (allowedSecurityGroupId != null) {
                         SecurityGroup allowedSecurityGroup = allowedSecurityGroups.get(allowedSecurityGroupId);
                         if (allowedSecurityGroup == null) {
@@ -208,6 +132,65 @@ public class SecurityGroupResultObject implements ControlledEntity, InternalIden
             }
         }
         return resultObjects;
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    public void setId(final Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    @Override
+    public long getDomainId() {
+        return domainId;
+    }
+
+    public void setDomainId(final Long domainId) {
+        this.domainId = domainId;
+    }
+
+    @Override
+    public long getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(final Long accountId) {
+        this.accountId = accountId;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(final String accountName) {
+        this.accountName = accountName;
+    }
+
+    public List<SecurityGroupRuleResultObject> getSecurityGroupRules() {
+        return securityGroupRules;
+    }
+
+    public void setSecurityGroupRules(final List<SecurityGroupRuleResultObject> securityGroupRules) {
+        this.securityGroupRules = securityGroupRules;
     }
 
     @Override

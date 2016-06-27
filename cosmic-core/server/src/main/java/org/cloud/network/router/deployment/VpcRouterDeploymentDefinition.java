@@ -1,25 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.cloud.network.router.deployment;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.deploy.DataCenterDeployment;
@@ -42,6 +21,11 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.VirtualMachineProfile.Param;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +41,7 @@ public class VpcRouterDeploymentDefinition extends RouterDeploymentDefinition {
     protected Vpc vpc;
 
     protected VpcRouterDeploymentDefinition(final Network guestNetwork, final Vpc vpc, final DeployDestination dest, final Account owner,
-            final Map<Param, Object> params) {
+                                            final Map<Param, Object> params) {
 
         super(guestNetwork, dest, owner, params);
 
@@ -106,9 +90,8 @@ public class VpcRouterDeploymentDefinition extends RouterDeploymentDefinition {
     }
 
     /**
-     * @see RouterDeploymentDefinition#prepareDeployment()
-     *
      * @return if the deployment can proceed
+     * @see RouterDeploymentDefinition#prepareDeployment()
      */
     @Override
     protected boolean prepareDeployment() {
@@ -118,7 +101,7 @@ public class VpcRouterDeploymentDefinition extends RouterDeploymentDefinition {
         if (isRedundant() && !isPublicNetwork) {
             // TODO Shouldn't be this throw an exception instead of log error and empty list of routers
             logger.error("Didn't support redundant virtual router without public network!");
-            routers = new ArrayList<DomainRouterVO>();
+            routers = new ArrayList<>();
             canProceed = false;
         }
         return canProceed;
@@ -143,7 +126,7 @@ public class VpcRouterDeploymentDefinition extends RouterDeploymentDefinition {
         return hasService(Network.Service.SourceNat);
     }
 
-    private boolean hasService(Network.Service service) {
+    private boolean hasService(final Network.Service service) {
         final Map<Network.Service, Set<Network.Provider>> vpcOffSvcProvidersMap = vpcMgr.getVpcOffSvcProvidersMap(vpc.getVpcOfferingId());
         try {
             vpcOffSvcProvidersMap.get(service).contains(Network.Provider.VPCVirtualRouter);
@@ -204,11 +187,11 @@ public class VpcRouterDeploymentDefinition extends RouterDeploymentDefinition {
 
     @Override
     protected void deployAllVirtualRouters() throws ConcurrentOperationException, InsufficientCapacityException,
-    ResourceUnavailableException {
+            ResourceUnavailableException {
 
         // Implement Redundant Vpc
         final int routersToDeploy = getNumberOfRoutersToDeploy();
-        for(int i = 0; i < routersToDeploy; i++) {
+        for (int i = 0; i < routersToDeploy; i++) {
             // Don't start the router as we are holding the network lock that needs to be released at the end of router allocation
             final DomainRouterVO router = nwHelper.deployRouter(this, false);
 

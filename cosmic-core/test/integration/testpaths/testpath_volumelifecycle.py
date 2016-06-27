@@ -1,23 +1,7 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """Utilities functions
 """
 # All tests inherit from cloudstackTestCase
-from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+from marvin.cloudstackTestCase import cloudstackTestCase
 # Import Integration Libraries
 from marvin.codes import FAILED, PASS
 # base - contains all resources as entities and defines create, delete,
@@ -33,12 +17,11 @@ from marvin.lib.base import (Account,
                              Resources)
 from marvin.lib.utils import cleanup_resources, validateList
 
-#common - commonly used methods for all tests are listed here
+# common - commonly used methods for all tests are listed here
 from marvin.lib.common import (get_zone,
                                get_domain,
                                get_template,
-                               list_virtual_machines,
-                               find_storage_pool_type)
+                               list_virtual_machines)
 from nose.plugins.attrib import attr
 import os
 import urllib
@@ -215,10 +198,10 @@ class TestPathVolume(cloudstackTestCase):
                                   password=cls.testdata["account"]["password"]
                                   )
             assert response.sessionkey is not None
-            #response should have non null value
+            # response should have non null value
         except Exception as e:
-                cls.tearDownClass()
-                raise e
+            cls.tearDownClass()
+            raise e
         return
 
     def setUp(self):
@@ -359,7 +342,6 @@ class TestPathVolume(cloudstackTestCase):
             # V2.create two data disk on local storage
             self.local_volumes = []
             for i in range(2):
-
                 local_volume = Volume.create(
                     self.userapiclient,
                     services=self.testdata["volume"],
@@ -407,7 +389,6 @@ class TestPathVolume(cloudstackTestCase):
             # V5.Create two data disk on zone  wide storage
             self.zone_volumes = []
             for i in range(2):
-
                 zone_volume = Volume.create(
                     self.userapiclient,
                     services=self.testdata["volume"],
@@ -458,7 +439,7 @@ class TestPathVolume(cloudstackTestCase):
             self.assertEqual(
                 list_cluster_volume[0].id, str(
                     self.cluster_volume.id), "volume does not exist %s" %
-                self.cluster_volume.id)
+                                             self.cluster_volume.id)
             self.debug(
                 "volume id %s got created successfuly" %
                 list_cluster_volume[0].id)
@@ -678,7 +659,7 @@ class TestPathVolume(cloudstackTestCase):
         self.assertEqual(
             list_volume[0].id, str(
                 self.migrate_volume.id), "volume does not exist %s" %
-            self.migrate_volume.id)
+                                         self.migrate_volume.id)
         self.debug("volume id %s got created successfuly" % list_volume[0].id)
 
         self.virtual_machine_1.attach_volume(self.userapiclient,
@@ -708,7 +689,7 @@ class TestPathVolume(cloudstackTestCase):
         self.assertEqual(
             list_volume[0].id, str(
                 self.migrate_volume.id), "volume does not exist %s" %
-            self.migrate_volume.id)
+                                         self.migrate_volume.id)
         self.debug("volume id %s got created successfuly" % list_volume[0].id)
         list_pool = StoragePool.list(self.apiclient,
                                      id=list_volume[0].storageid

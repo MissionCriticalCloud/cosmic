@@ -1,29 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// the License.  You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.ratelimit.integration;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Login Response object
- *
  */
 public class LoginResponse extends BaseResponse {
 
@@ -67,7 +50,7 @@ public class LoginResponse extends BaseResponse {
         return timeout;
     }
 
-    public void setTimeout(String timeout) {
+    public void setTimeout(final String timeout) {
         this.timeout = timeout;
     }
 
@@ -75,7 +58,7 @@ public class LoginResponse extends BaseResponse {
         return sessionkey;
     }
 
-    public void setSessionkey(String sessionkey) {
+    public void setSessionkey(final String sessionkey) {
         this.sessionkey = sessionkey;
     }
 
@@ -83,7 +66,7 @@ public class LoginResponse extends BaseResponse {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(final String username) {
         this.username = username;
     }
 
@@ -91,7 +74,7 @@ public class LoginResponse extends BaseResponse {
         return userid;
     }
 
-    public void setUserid(String userid) {
+    public void setUserid(final String userid) {
         this.userid = userid;
     }
 
@@ -99,7 +82,7 @@ public class LoginResponse extends BaseResponse {
         return firstname;
     }
 
-    public void setFirstname(String firstname) {
+    public void setFirstname(final String firstname) {
         this.firstname = firstname;
     }
 
@@ -107,7 +90,7 @@ public class LoginResponse extends BaseResponse {
         return lastname;
     }
 
-    public void setLastname(String lastname) {
+    public void setLastname(final String lastname) {
         this.lastname = lastname;
     }
 
@@ -115,7 +98,7 @@ public class LoginResponse extends BaseResponse {
         return account;
     }
 
-    public void setAccount(String account) {
+    public void setAccount(final String account) {
         this.account = account;
     }
 
@@ -123,7 +106,7 @@ public class LoginResponse extends BaseResponse {
         return domainid;
     }
 
-    public void setDomainid(String domainid) {
+    public void setDomainid(final String domainid) {
         this.domainid = domainid;
     }
 
@@ -131,8 +114,7 @@ public class LoginResponse extends BaseResponse {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(final int type) {
         this.type = type;
     }
-
 }

@@ -1,21 +1,9 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ NIC tests for VM """
+import signal
+import sys
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import PASS
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              Network,
@@ -25,16 +13,10 @@ from marvin.lib.common import (get_zone,
                                get_template,
                                get_domain)
 from marvin.lib.utils import validateList
-from marvin.codes import PASS
 from nose.plugins.attrib import attr
-
-import signal
-import sys
-import time
 
 
 class TestNic(cloudstackTestCase):
-
     def setUp(self):
         self.cleanup = []
 
@@ -57,7 +39,7 @@ class TestNic(cloudstackTestCase):
             self.zone = get_zone(
                 self.apiclient,
                 self.testClient.getZoneForTests()
-                )
+            )
 
             # if local storage is enabled, alter the offerings to use
             # localstorage
@@ -167,9 +149,9 @@ class TestNic(cloudstackTestCase):
         )
 
         self.assertEqual(
-                validateList(vms)[0],
-                PASS,
-                "vms list validation failed")
+            validateList(vms)[0],
+            PASS,
+            "vms list validation failed")
 
         vm_response = vms[0]
 
@@ -188,18 +170,18 @@ class TestNic(cloudstackTestCase):
         existing_nic_id = vm_response.nic[0].id
 
         self.virtual_machine.add_nic(
-                    self.apiclient,
-                    self.test_network2.id)
+            self.apiclient,
+            self.test_network2.id)
         list_vm_response = VirtualMachine.list(
-                self.apiclient,
-                id=self.virtual_machine.id
-            )
+            self.apiclient,
+            id=self.virtual_machine.id
+        )
 
         self.assertEqual(
-                len(list_vm_response[0].nic),
-                2,
-                "Verify we have 2 NIC's now"
-            )
+            len(list_vm_response[0].nic),
+            2,
+            "Verify we have 2 NIC's now"
+        )
 
         # If hypervisor is Vmware, then check if
         # the vmware tools are installed and the process is running
@@ -218,7 +200,6 @@ class TestNic(cloudstackTestCase):
         # be supported
         if hypervisorIsVmware and not isVmwareToolInstalled:
             goForUnplugOperation = False
-
 
         if goForUnplugOperation:
             new_nic_id = ""

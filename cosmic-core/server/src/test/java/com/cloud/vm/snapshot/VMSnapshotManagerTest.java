@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.vm.snapshot;
 
 import static org.mockito.Matchers.any;
@@ -23,9 +7,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.exception.AgentUnavailableException;
@@ -56,11 +37,14 @@ import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -68,6 +52,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
 public class VMSnapshotManagerTest {
+    private static final long TEST_VM_ID = 3L;
     @Spy
     VMSnapshotManagerImpl _vmSnapshotMgr = new VMSnapshotManagerImpl();
     @Mock
@@ -107,8 +92,6 @@ public class VMSnapshotManagerTest {
     @Mock
     ServiceOfferingDetailsDao _serviceOfferingDetailsDao;
     int _vmSnapshotMax = 10;
-
-    private static final long TEST_VM_ID = 3L;
     @Mock
     UserVmVO vmMock;
     @Mock
@@ -134,11 +117,11 @@ public class VMSnapshotManagerTest {
 
         when(_userVMDao.findById(anyLong())).thenReturn(vmMock);
         when(_vmSnapshotDao.findByName(anyLong(), anyString())).thenReturn(null);
-        when(_vmSnapshotDao.findByVm(anyLong())).thenReturn(new ArrayList<VMSnapshotVO>());
+        when(_vmSnapshotDao.findByVm(anyLong())).thenReturn(new ArrayList<>());
         when(_hypervisorCapabilitiesDao.isVmSnapshotEnabled(Hypervisor.HypervisorType.XenServer, "default")).thenReturn(true);
         when(_serviceOfferingDetailsDao.findDetail(anyLong(), anyString())).thenReturn(null);
 
-        List<VolumeVO> mockVolumeList = new ArrayList<VolumeVO>();
+        final List<VolumeVO> mockVolumeList = new ArrayList<>();
         mockVolumeList.add(volumeMock);
         when(volumeMock.getInstanceId()).thenReturn(TEST_VM_ID);
         when(_volumeDao.findByInstance(anyLong())).thenReturn(mockVolumeList);
@@ -171,20 +154,18 @@ public class VMSnapshotManagerTest {
     }
 
     // max snapshot limit case
-    @SuppressWarnings("unchecked")
     @Test(expected = CloudRuntimeException.class)
     public void testAllocVMSnapshotF4() throws ResourceAllocationException {
-        List<VMSnapshotVO> mockList = mock(List.class);
+        final List<VMSnapshotVO> mockList = mock(List.class);
         when(mockList.size()).thenReturn(10);
         when(_vmSnapshotDao.findByVm(TEST_VM_ID)).thenReturn(mockList);
         _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "", true);
     }
 
     // active volume snapshots case
-    @SuppressWarnings("unchecked")
     @Test(expected = CloudRuntimeException.class)
     public void testAllocVMSnapshotF5() throws ResourceAllocationException {
-        List<SnapshotVO> mockList = mock(List.class);
+        final List<SnapshotVO> mockList = mock(List.class);
         when(mockList.size()).thenReturn(1);
         when(_snapshotDao.listByInstanceId(TEST_VM_ID, Snapshot.State.Creating, Snapshot.State.CreatedOnPrimary, Snapshot.State.BackingUp)).thenReturn(mockList);
         _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "", true);
@@ -195,7 +176,5 @@ public class VMSnapshotManagerTest {
     public void testCreateVMSnapshot() throws AgentUnavailableException, OperationTimedoutException, ResourceAllocationException, NoTransitionException {
         when(vmMock.getState()).thenReturn(State.Running);
         _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "", true);
-
     }
-
 }

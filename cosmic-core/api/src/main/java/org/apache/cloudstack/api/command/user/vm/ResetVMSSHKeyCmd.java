@@ -1,20 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package org.apache.cloudstack.api.command.user.vm;
 
 import com.cloud.event.EventTypes;
@@ -23,7 +6,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -38,12 +20,13 @@ import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "resetSSHKeyForVirtualMachine", responseObject = UserVmResponse.class, description = "Resets the SSH Key for virtual machine. " +
         "The virtual machine must be in a \"Stopped\" state. [async]", responseView = ResponseView.Restricted, entityType = {VirtualMachine.class},
-    requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
+        requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class ResetVMSSHKeyCmd extends BaseAsyncCmd {
 
     public static final Logger s_logger = LoggerFactory.getLogger(ResetVMSSHKeyCmd.class.getName());
@@ -65,9 +48,9 @@ public class ResetVMSSHKeyCmd extends BaseAsyncCmd {
     private String accountName;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               description = "an optional domainId for the virtual machine. If the account parameter is used, domainId must also be used.")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            description = "an optional domainId for the virtual machine. If the account parameter is used, domainId must also be used.")
     private Long domainId;
 
     @Parameter(name = ApiConstants.PROJECT_ID, type = CommandType.UUID, entityType = ProjectResponse.class, description = "an optional project for the ssh key")
@@ -79,10 +62,6 @@ public class ResetVMSSHKeyCmd extends BaseAsyncCmd {
 
     public String getName() {
         return name;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public String getAccountName() {
@@ -97,23 +76,47 @@ public class ResetVMSSHKeyCmd extends BaseAsyncCmd {
         return projectId;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
     @Override
     public String getEventType() {
         return EventTypes.EVENT_VM_RESETSSHKEY;
     }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
 
     @Override
     public String getEventDescription() {
         return "resetting SSHKey for vm: " + getId();
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public Long getInstanceId() {
+        return getId();
+    }
+
     @Override
     public ApiCommandJobType getInstanceType() {
         return ApiCommandJobType.VirtualMachine;
+    }
+
+    @Override
+    public void execute() throws ResourceUnavailableException, InsufficientCapacityException {
+
+        CallContext.current().setEventDetails("Vm Id: " + getId());
+        final UserVm result = _userVmService.resetVMSSHKey(this);
+
+        if (result != null) {
+            final UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Restricted, "virtualmachine", result).get(0);
+            response.setResponseName(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to reset vm SSHKey");
+        }
     }
 
     @Override
@@ -123,32 +126,11 @@ public class ResetVMSSHKeyCmd extends BaseAsyncCmd {
 
     @Override
     public long getEntityOwnerId() {
-        UserVm vm = _responseGenerator.findUserVmById(getId());
+        final UserVm vm = _responseGenerator.findUserVmById(getId());
         if (vm != null) {
             return vm.getAccountId();
         }
 
         return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
     }
-
-    @Override
-    public Long getInstanceId() {
-        return getId();
-    }
-
-    @Override
-    public void execute() throws ResourceUnavailableException, InsufficientCapacityException {
-
-        CallContext.current().setEventDetails("Vm Id: " + getId());
-        UserVm result = _userVmService.resetVMSSHKey(this);
-
-        if (result != null) {
-            UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Restricted, "virtualmachine", result).get(0);
-            response.setResponseName(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to reset vm SSHKey");
-        }
-    }
-
 }

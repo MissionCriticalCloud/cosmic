@@ -1,35 +1,20 @@
 # -- coding: utf-8 --
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-from CsDatabag import CsDataBag
-from CsApp import CsApache, CsDnsmasq, CsPasswdSvc
-import logging
-from netaddr import IPAddress, IPNetwork
-import CsHelper
 
+import logging
 import subprocess
 import time
+from netaddr import IPAddress, IPNetwork
+
+import CsHelper
+from CsApp import CsApache, CsDnsmasq, CsPasswdSvc
+from CsDatabag import CsDataBag
 from CsRoute import CsRoute
 from CsRule import CsRule
 
 VRRP_TYPES = ['guest']
 
-class CsAddress(CsDataBag):
 
+class CsAddress(CsDataBag):
     def compare(self):
         for dev in CsDevice('', self.config).list():
             ip = CsIP(dev, self.config)
@@ -115,13 +100,12 @@ class CsAddress(CsDataBag):
                 else:
                     logging.info(
                         "Address %s on device %s not configured", ip.ip(), dev)
-                    
+
                     if CsDevice(dev, self.config).waitfordevice():
                         ip.configure(address)
 
 
 class CsInterface:
-
     """ Hold one single ip """
 
     def __init__(self, o, config):
@@ -192,7 +176,7 @@ class CsInterface:
         if "nw_type" in self.address and self.address['nw_type'] in ['public']:
             return True
         return False
-    
+
     def is_added(self):
         return self.get_attr("add")
 
@@ -201,7 +185,6 @@ class CsInterface:
 
 
 class CsDevice:
-
     """ Configure Network Devices """
 
     def __init__(self, dev, config):
@@ -251,12 +234,11 @@ class CsDevice:
 
 
 class CsIP:
-
     def __init__(self, dev, config):
         self.dev = dev
         self.dnum = hex(int(dev[3:]))
-        self.iplist = {}
-        self.address = {}
+        self.iplist = { }
+        self.address = { }
         self.list()
         self.fw = config.get_fw()
         self.cl = config.cmdline()
@@ -313,12 +295,12 @@ class CsIP:
         else:
             # once we start processing public ip's we need to verify there
             # is a default route and add if needed
-            if(self.cl.get_gateway()):
+            if (self.cl.get_gateway()):
                 route.add_defaultroute(self.cl.get_gateway())
 
     def set_mark(self):
         cmd = "-A PREROUTING -i %s -m state --state NEW -j CONNMARK --set-xmark %s/0xffffffff" % \
-            (self.getDevice(), self.dnum)
+              (self.getDevice(), self.dnum)
         self.fw.append(["mangle", "", cmd])
 
     def get_type(self):
@@ -351,7 +333,6 @@ class CsIP:
         self.fw.append(["filter", "", "-P INPUT DROP"])
         self.fw.append(["filter", "", "-P FORWARD DROP"])
 
-        
     def fw_router(self):
         if self.config.is_vpc():
             return
@@ -422,7 +403,7 @@ class CsIP:
         self.fw.append(['', '', '-A NETWORK_STATS -i eth2 -o eth0'])
         self.fw.append(['', '', '-A NETWORK_STATS -o eth2 ! -i eth0 -p tcp'])
         self.fw.append(['', '', '-A NETWORK_STATS -i eth2 ! -o eth0 -p tcp'])
-        
+
     def fw_vpcrouter(self):
         if not self.config.is_vpc():
             return
@@ -461,7 +442,7 @@ class CsIP:
             self.fw.append(["mangle", "",
                             "-A PREROUTING -m state --state NEW -i %s -s %s ! -d %s/32 -j ACL_OUTBOUND_%s" %
                             (self.dev, self.address[
-                             'network'], self.address['gateway'], self.dev)
+                                'network'], self.address['gateway'], self.dev)
                             ])
             self.fw.append(["", "front", "-A NETWORK_STATS_%s -o %s -s %s" %
                             ("eth1", "eth1", self.address['network'])])
@@ -512,7 +493,6 @@ class CsIP:
 
         # On deletion nw_type will no longer be known
         if self.get_type() in ["guest"] and self.config.is_vpc():
-
             CsDevice(self.dev, self.config).configure_rp()
 
             logging.error(
@@ -540,17 +520,17 @@ class CsIP:
                     ["nat", "", "-A POSTROUTING -j SNAT -o %s --to-source %s" % (self.dev, self.address['public_ip'])])
 
     def list(self):
-        self.iplist = {}
+        self.iplist = { }
         cmd = ("ip addr show dev " + self.dev)
         for i in CsHelper.execute(cmd):
             vals = i.lstrip().split()
             if (vals[0] == 'inet'):
-                
+
                 cidr = vals[1]
                 for ip, device in self.iplist.iteritems():
                     logging.info(
-                                 "Iterating over the existing IPs. CIDR to be configured ==> %s, existing IP ==> %s on device ==> %s",
-                                 cidr, ip, device)
+                        "Iterating over the existing IPs. CIDR to be configured ==> %s, existing IP ==> %s on device ==> %s",
+                        cidr, ip, device)
 
                     if cidr[0] != ip[0] and device != self.dev:
                         self.iplist[cidr] = self.dev
@@ -646,7 +626,6 @@ class CsIP:
 
 
 class CsRpsrfs:
-
     """ Configure rpsrfs if there is more than one cpu """
 
     def __init__(self, dev):

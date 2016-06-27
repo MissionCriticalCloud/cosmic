@@ -1,22 +1,5 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
-(function($, cloudStack) {
-    cloudStack.uiCustom.autoscaler = function(args) {
+(function ($, cloudStack) {
+    cloudStack.uiCustom.autoscaler = function (args) {
         // Place outer args here as local variables
         // i.e, -- var dataProvider = args.dataProvider
         var forms = $.extend(true, {}, args.forms);
@@ -28,7 +11,7 @@
         var actions = cloudStack.autoscaler.autoscaleActions;
         var actionFilter = cloudStack.autoscaler.actionFilter;
 
-        return function(args) {
+        return function (args) {
             var context = args.data ?
                 $.extend(true, {}, args.context, {
                     lbRules: [args.data]
@@ -60,7 +43,7 @@
                 scaleDownPolicyTitleForm, $scaleDownPolicyTitleForm,
                 scaleUpPolicyForm, scaleDownPolicyForm;
 
-            var renderActions = function(args) {
+            var renderActions = function (args) {
                 var targetActionFilter = args.actionFilter ? args.actionFilter : actionFilter;
                 var data = args.data;
                 var context = args.context;
@@ -74,7 +57,7 @@
                             originalAutoscaleData: data ? [data] : null
                         })
                     }) :
-                    $.map(actions, function(value, key) {
+                    $.map(actions, function (value, key) {
                         return key;
                     });
 
@@ -82,7 +65,7 @@
                 $actionsTable.find('tr').append($detailActions);
                 $actions.append($actionsTable);
 
-                $(visibleActions).map(function(index, actionID) {
+                $(visibleActions).map(function (index, actionID) {
                     var action = actions[actionID];
                     var label = _l(action.label);
                     var $action = $('<div>').addClass('action').addClass(actionID);
@@ -98,9 +81,9 @@
                     else if (index == visibleActions.length - 1) $action.addClass('last');
 
                     // Perform action event
-                    $action.click(function() {
+                    $action.click(function () {
                         var $loading = $('<div>').addClass('loading-overlay').appendTo($autoscalerDialog);
-                        var success = function(args) {
+                        var success = function (args) {
                             $loading.remove();
                             cloudStack.dialog.notice({
                                 message: _l('label.task.completed') + ': ' + label
@@ -120,7 +103,7 @@
                             $actions.after($newActions);
                             $actions.remove();
                         };
-                        var error = function(message) {
+                        var error = function (message) {
                             $loading.remove();
                             cloudStack.dialog.notice({
                                 message: message
@@ -132,7 +115,7 @@
                                 originalAutoscaleData: args.data
                             },
                             response: {
-                                success: function(args) {
+                                success: function (args) {
                                     var notification = $.extend(args.notification, {
                                         _custom: args._custom,
                                         desc: label
@@ -158,11 +141,11 @@
                 return $actions;
             };
 
-            var renderDialogContent = function(args) {
+            var renderDialogContent = function (args) {
                 var data = args.data ? args.data : {};
 
                 // Setup default values, in case where existing data is present
-                var setDefaultFields = function(fieldID, field) {
+                var setDefaultFields = function (fieldID, field) {
                     var fieldData = data[fieldID];
 
                     if (fieldData && !field.isBoolean) {
@@ -300,27 +283,27 @@
                 $autoscalerDialog.find('div.scale-down-policy').prepend($scaleDownHideLabel);
 
                 /*Toggling the labels and data-item table - SCALE UP POLICY*/
-                $autoscalerDialog.find('div.scale-up-policy div.hide').click(function() {
+                $autoscalerDialog.find('div.scale-up-policy div.hide').click(function () {
                     $autoscalerDialog.find('div.scale-up-policy div.multi-edit div.data-item').slideToggle();
                     $scaleUpLabel = $autoscalerDialog.find('div.scale-up-policy div.slide-label').replaceWith($scaleUpLabel);
                 });
 
                 /*Toggling the images */
-                $('div.ui-dialog div.autoscaler div.scale-up-policy div.hide').click(function() {
+                $('div.ui-dialog div.autoscaler div.scale-up-policy div.hide').click(function () {
                     $(this).toggleClass('expand hide');
                 });
 
-                $('div.ui-dialog div.autoscaler div.scale-down-policy div.hide').click(function() {
+                $('div.ui-dialog div.autoscaler div.scale-down-policy div.hide').click(function () {
                     $(this).toggleClass('expand hide');
                 });
 
                 /*Toggling the labels and data-item table - SCALE DOWN POLICY*/
-                $('div.ui-dialog div.autoscaler div.scale-down-policy div.hide').click(function() {
+                $('div.ui-dialog div.autoscaler div.scale-down-policy div.hide').click(function () {
                     $('div.ui-dialog div.autoscaler div.scale-down-policy div.multi-edit div.data div.data-item').slideToggle();
                     $scaleDownLabel = $('div.ui-dialog div.autoscaler div.scale-down-policy div.slide-label').replaceWith($scaleDownLabel);
                 });
 
-                $('div.ui-dialog div.autoscaler div.scale-down-policy div.multi-edit div.data div.expand').click(function() {
+                $('div.ui-dialog div.autoscaler div.scale-down-policy div.multi-edit div.data div.expand').click(function () {
                     $('div.ui-dialog div.autoscaler div.scale-down-policy div.multi-edit div.data div.data-item').slideToggle();
                 });
 
@@ -339,22 +322,22 @@
                 draggable: true,
                 closeonEscape: false,
                 overflow: 'auto',
-                open: function() {
-                    $("button").each(function() {
+                open: function () {
+                    $("button").each(function () {
                         $(this).attr("style", "left: 600px; position: relative; margin-right: 5px; ");
                     });
                 },
                 buttons: [{
                     text: _l('label.cancel'),
                     'class': 'cancel',
-                    click: function() {
+                    click: function () {
                         $autoscalerDialog.dialog('destroy');
                         $('.overlay').remove();
                     }
                 }, {
                     text: _l('Apply'),
                     'class': 'ok',
-                    click: function() {
+                    click: function () {
                         var data = cloudStack.serializeForm($('.ui-dialog .autoscaler form'));
 
                         // Fix for missing formData, when editing existing rules;
@@ -371,7 +354,7 @@
                             context: context,
                             data: data,
                             response: {
-                                success: function() {
+                                success: function () {
                                     $loading.remove();
                                     $autoscalerDialog.dialog('destroy');
                                     $autoscalerDialog.closest(':ui-dialog').remove();
@@ -380,7 +363,7 @@
                                         message: 'Autoscale configured successfully.'
                                     });
                                 },
-                                error: function(message) {
+                                error: function (message) {
                                     cloudStack.dialog.notice({
                                         message: message
                                     });
@@ -395,7 +378,7 @@
             dataProvider({
                 context: context,
                 response: {
-                    success: function(args) {
+                    success: function (args) {
                         $loading.remove();
                         renderDialogContent(args);
 

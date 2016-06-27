@@ -1,31 +1,16 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.api;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import com.cloud.host.Host;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.template.TemplateProp;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class StartupStorageCommand extends StartupCommand {
 
@@ -35,14 +20,14 @@ public class StartupStorageCommand extends StartupCommand {
     StoragePoolInfo poolInfo;
     Storage.StorageResourceType resourceType;
     StoragePoolType fsType;
-    Map<String, String> hostDetails = new HashMap<String, String>();
+    Map<String, String> hostDetails = new HashMap<>();
     String nfsShare;
 
     public StartupStorageCommand() {
         super(Host.Type.Storage);
     }
 
-    public StartupStorageCommand(String parent, StoragePoolType fsType, long totalSize, Map<String, TemplateProp> info) {
+    public StartupStorageCommand(final String parent, final StoragePoolType fsType, final long totalSize, final Map<String, TemplateProp> info) {
         super(Host.Type.Storage);
         this.parent = parent;
         this.totalSize = totalSize;
@@ -51,7 +36,7 @@ public class StartupStorageCommand extends StartupCommand {
         this.fsType = fsType;
     }
 
-    public StartupStorageCommand(String parent, StoragePoolType fsType, Map<String, TemplateProp> templateInfo, StoragePoolInfo poolInfo) {
+    public StartupStorageCommand(final String parent, final StoragePoolType fsType, final Map<String, TemplateProp> templateInfo, final StoragePoolInfo poolInfo) {
         super(Host.Type.Storage);
         this.parent = parent;
         this.templateInfo = templateInfo;
@@ -64,16 +49,16 @@ public class StartupStorageCommand extends StartupCommand {
         return parent;
     }
 
-    public void setParent(String parent) {
+    public void setParent(final String parent) {
         this.parent = parent;
-    }
-
-    public void setNfsShare(String nfsShare) {
-        this.nfsShare = nfsShare;
     }
 
     public String getNfsShare() {
         return nfsShare;
+    }
+
+    public void setNfsShare(final String nfsShare) {
+        this.nfsShare = nfsShare;
     }
 
     public long getTotalSize() {
@@ -84,7 +69,7 @@ public class StartupStorageCommand extends StartupCommand {
         return templateInfo;
     }
 
-    public void setTemplateInfo(Map<String, TemplateProp> templateInfo) {
+    public void setTemplateInfo(final Map<String, TemplateProp> templateInfo) {
         this.templateInfo = templateInfo;
     }
 
@@ -92,7 +77,7 @@ public class StartupStorageCommand extends StartupCommand {
         return poolInfo;
     }
 
-    public void setPoolInfo(StoragePoolInfo poolInfo) {
+    public void setPoolInfo(final StoragePoolInfo poolInfo) {
         this.poolInfo = poolInfo;
     }
 
@@ -100,7 +85,7 @@ public class StartupStorageCommand extends StartupCommand {
         return resourceType;
     }
 
-    public void setResourceType(Storage.StorageResourceType resourceType) {
+    public void setResourceType(final Storage.StorageResourceType resourceType) {
         this.resourceType = resourceType;
     }
 

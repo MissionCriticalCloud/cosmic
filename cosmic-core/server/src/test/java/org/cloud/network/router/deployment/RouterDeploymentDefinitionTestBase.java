@@ -1,27 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.cloud.network.router.deployment;
 
 import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.HostPodVO;
@@ -46,6 +25,11 @@ import com.cloud.vm.VirtualMachineProfile.Param;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.VMInstanceDao;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -62,7 +46,7 @@ public class RouterDeploymentDefinitionTestBase {
     protected static final long DEFAULT_OFFERING_ID = 17L;
     protected static final Long DATA_CENTER_ID = 100l;
     protected static final Long NW_ID_1 = 101l;
-    protected static final Long NW_ID_2= 102l;
+    protected static final Long NW_ID_2 = 102l;
     protected static final Long POD_ID1 = 111l;
     protected static final Long POD_ID2 = 112l;
     protected static final Long POD_ID3 = 113l;
@@ -115,19 +99,15 @@ public class RouterDeploymentDefinitionTestBase {
     @Mock
     protected NetworkVO mockNw;
     @Mock
+    protected Account mockOwner;
+    protected List<HostPodVO> mockPods = new ArrayList<>();
+    protected Map<Param, Object> params = new HashMap<>();
+    @InjectMocks
+    protected RouterDeploymentDefinitionBuilder builder = new RouterDeploymentDefinitionBuilder();
+    @Mock
     NetworkOfferingVO mockNwOfferingVO;
     @Mock
     ServiceOfferingVO mockSvcOfferingVO;
-    @Mock
-    protected Account mockOwner;
-
-
-    protected List<HostPodVO> mockPods = new ArrayList<>();
-    protected Map<Param, Object> params = new HashMap<>();
-
-    @InjectMocks
-    protected RouterDeploymentDefinitionBuilder builder = new RouterDeploymentDefinitionBuilder();
-
 
     protected void initMocks() {
         when(mockDestination.getDataCenter()).thenReturn(mockDataCenter);

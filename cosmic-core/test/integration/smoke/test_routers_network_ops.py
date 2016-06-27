@@ -1,37 +1,10 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 # Import Local Modules
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.cloudstackAPI import (stopVirtualMachine,
-                                  stopRouter,
-                                  startRouter)
-from marvin.lib.utils import (cleanup_resources,
-                              get_process_status,
-                              get_host_credentials)
-from marvin.lib.base import (ServiceOffering,
-                             VirtualMachine,
+from marvin.lib.base import (VirtualMachine,
                              Account,
                              ServiceOffering,
                              NATRule,
-                             NetworkACL,
                              FireWallRule,
-                             PublicIPAddress,
                              NetworkOffering,
                              Network,
                              Router,
@@ -39,19 +12,20 @@ from marvin.lib.base import (ServiceOffering,
 from marvin.lib.common import (get_zone,
                                get_template,
                                get_domain,
-                               list_virtual_machines,
                                list_networks,
-                               list_configurations,
                                list_routers,
                                list_nat_rules,
                                list_publicIP,
-                               list_firewall_rules,
                                list_hosts,
                                list_vlan_ipranges)
+from marvin.lib.utils import (cleanup_resources,
+                              get_process_status,
+                              get_host_credentials)
+from nose.plugins.attrib import attr
 
 # Import System modules
-import time
 import logging
+
 
 def check_router_command(virtual_machine, public_ip, ssh_command, check_string, test_case, retries=5):
     result = 'failed'
@@ -64,19 +38,20 @@ def check_router_command(virtual_machine, public_ip, ssh_command, check_string, 
     logging.debug("Result from SSH into the Virtual Machine: %s" % result)
     return result.count(check_string)
 
+
 def find_public_gateway(test_case):
     networks = list_networks(test_case.apiclient,
-                              zoneid = test_case.zone.id,
-                              listall = True,
-                              issystem = True,
-                              traffictype = "Public")
+                             zoneid=test_case.zone.id,
+                             listall=True,
+                             issystem=True,
+                             traffictype="Public")
     test_case.logger.debug('::: Public Networks ::: ==> %s' % networks)
 
     test_case.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
-    
+
     ip_ranges = list_vlan_ipranges(test_case.apiclient,
-                                   zoneid = test_case.zone.id,
-                                   networkid = networks[0].id)
+                                   zoneid=test_case.zone.id,
+                                   networkid=networks[0].id)
     test_case.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)
 
     test_case.assertTrue(len(ip_ranges) == 1, "Test expects only 1 VLAN IP Range network but found -> '%s'" % len(ip_ranges))
@@ -84,8 +59,8 @@ def find_public_gateway(test_case):
 
     return ip_ranges[0].gateway
 
-class TestRedundantIsolateNetworks(cloudstackTestCase):
 
+class TestRedundantIsolateNetworks(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
 
@@ -128,23 +103,23 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
         cls.services["nw_off_persistent_RVR_egress_false"]["egress_policy"] = "false"
 
         cls.services["egress_80"] = {
-                                    "startport": 80,
-                                    "endport": 80,
-                                    "protocol": "TCP",
-                                    "cidrlist": ["0.0.0.0/0"]
-                                    }
+            "startport": 80,
+            "endport": 80,
+            "protocol": "TCP",
+            "cidrlist": ["0.0.0.0/0"]
+        }
 
         cls.services["egress_53"] = {
-                                    "startport": 53,
-                                    "endport": 53,
-                                    "protocol": "UDP",
-                                    "cidrlist": ["0.0.0.0/0"]
-                                    }
+            "startport": 53,
+            "endport": 53,
+            "protocol": "UDP",
+            "cidrlist": ["0.0.0.0/0"]
+        }
 
         cls._cleanup = [
-                        cls.service_offering,
-                        cls.account
-                        ]
+            cls.service_offering,
+            cls.account
+        ]
 
         return
 
@@ -175,45 +150,45 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
 
         self.logger.debug("Creating Network Offering with default egress TRUE")
         network_offering_egress_true = NetworkOffering.create(
-                                            self.apiclient,
-                                            self.services["nw_off_persistent_RVR_egress_true"],
-                                            conservemode=True
-                                            )
+            self.apiclient,
+            self.services["nw_off_persistent_RVR_egress_true"],
+            conservemode=True
+        )
         network_offering_egress_true.update(self.api_client, state='Enabled')
 
         self.logger.debug("Creating network with network offering: %s" % network_offering_egress_true.id)
         network = Network.create(
-                                self.apiclient,
-                                self.services["network"],
-                                accountid=self.account.name,
-                                domainid=self.account.domainid,
-                                networkofferingid=network_offering_egress_true.id,
-                                zoneid=self.zone.id
-                                )
+            self.apiclient,
+            self.services["network"],
+            accountid=self.account.name,
+            domainid=self.account.domainid,
+            networkofferingid=network_offering_egress_true.id,
+            zoneid=self.zone.id
+        )
         self.logger.debug("Created network with ID: %s" % network.id)
 
         networks = Network.list(
-                                self.apiclient,
-                                id=network.id,
-                                listall=True
-                                )
+            self.apiclient,
+            id=network.id,
+            listall=True
+        )
         self.assertEqual(
             isinstance(networks, list),
             True,
             "List networks should return a valid response for created network"
-             )
+        )
         nw_response = networks[0]
 
         self.logger.debug("Deploying VM in account: %s" % self.account.name)
         virtual_machine = VirtualMachine.create(
-                                  self.apiclient,
-                                  self.services["virtual_machine"],
-                                  templateid=self.template.id,
-                                  accountid=self.account.name,
-                                  domainid=self.account.domainid,
-                                  serviceofferingid=self.service_offering.id,
-                                  networkids=[str(network.id)]
-                                  )
+            self.apiclient,
+            self.services["virtual_machine"],
+            templateid=self.template.id,
+            accountid=self.account.name,
+            domainid=self.account.domainid,
+            serviceofferingid=self.service_offering.id,
+            networkids=[str(network.id)]
+        )
 
         self.logger.debug("Deployed VM in network: %s" % network.id)
 
@@ -222,38 +197,38 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
         self.cleanup.insert(0, virtual_machine)
 
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  id=virtual_machine.id,
-                                  listall=True
-                                  )
+            self.apiclient,
+            id=virtual_machine.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(vms, list),
-                         True,
-                         "List Vms should return a valid list"
-                         )
+            isinstance(vms, list),
+            True,
+            "List Vms should return a valid list"
+        )
         vm = vms[0]
         self.assertEqual(
-                         vm.state,
-                         "Running",
-                         "VM should be in running state after deployment"
-                         )
+            vm.state,
+            "Running",
+            "VM should be in running state after deployment"
+        )
 
         self.logger.debug("Listing routers for network: %s" % network.name)
         routers = Router.list(
-                              self.apiclient,
-                              networkid=network.id,
-                              listall=True
-                              )
+            self.apiclient,
+            networkid=network.id,
+            listall=True
+        )
         self.assertEqual(
-                    isinstance(routers, list),
-                    True,
-                    "list router should return Master and backup routers"
-                    )
+            isinstance(routers, list),
+            True,
+            "list router should return Master and backup routers"
+        )
         self.assertEqual(
-                    len(routers),
-                    2,
-                    "Length of the list router should be 2 (Backup & master)"
-                    )
+            len(routers),
+            2,
+            "Length of the list router should be 2 (Backup & master)"
+        )
 
         public_ips = list_publicIP(
             self.apiclient,
@@ -296,10 +271,10 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
-                         result,
-                         expected,
-                         "Ping to outside world from VM should be successful!"
-                         )
+            result,
+            expected,
+            "Ping to outside world from VM should be successful!"
+        )
 
         expected = 1
         ssh_command = "wget -t 1 -T 5 www.google.com"
@@ -307,19 +282,19 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
-                         result,
-                         expected,
-                         "Attempt to retrieve google.com index page should be successful!"
-                         )
+            result,
+            expected,
+            "Attempt to retrieve google.com index page should be successful!"
+        )
 
         EgressFireWallRule.create(
-                                 self.apiclient,
-                                 networkid=network.id,
-                                 protocol=self.services["egress_80"]["protocol"],
-                                 startport=self.services["egress_80"]["startport"],
-                                 endport=self.services["egress_80"]["endport"],
-                                 cidrlist=self.services["egress_80"]["cidrlist"]
-                                 )
+            self.apiclient,
+            networkid=network.id,
+            protocol=self.services["egress_80"]["protocol"],
+            startport=self.services["egress_80"]["startport"],
+            endport=self.services["egress_80"]["endport"],
+            cidrlist=self.services["egress_80"]["cidrlist"]
+        )
 
         expected = 0
         ssh_command = "wget -t 1 -T 1 www.google.com"
@@ -327,10 +302,10 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
-                         result,
-                         expected,
-                         "Attempt to retrieve google.com index page should NOT be successful once rule is added!"
-                         )
+            result,
+            expected,
+            "Attempt to retrieve google.com index page should NOT be successful once rule is added!"
+        )
 
         return
 
@@ -341,45 +316,45 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
 
         self.logger.debug("Creating Network Offering with default egress FALSE")
         network_offering_egress_false = NetworkOffering.create(
-                                            self.apiclient,
-                                            self.services["nw_off_persistent_RVR_egress_false"],
-                                            conservemode=True
-                                            )
+            self.apiclient,
+            self.services["nw_off_persistent_RVR_egress_false"],
+            conservemode=True
+        )
         network_offering_egress_false.update(self.api_client, state='Enabled')
 
         self.logger.debug("Creating network with network offering: %s" % network_offering_egress_false.id)
         network = Network.create(
-                                self.apiclient,
-                                self.services["network"],
-                                accountid=self.account.name,
-                                domainid=self.account.domainid,
-                                networkofferingid=network_offering_egress_false.id,
-                                zoneid=self.zone.id
-                                )
+            self.apiclient,
+            self.services["network"],
+            accountid=self.account.name,
+            domainid=self.account.domainid,
+            networkofferingid=network_offering_egress_false.id,
+            zoneid=self.zone.id
+        )
         self.logger.debug("Created network with ID: %s" % network.id)
 
         networks = Network.list(
-                                self.apiclient,
-                                id=network.id,
-                                listall=True
-                                )
+            self.apiclient,
+            id=network.id,
+            listall=True
+        )
         self.assertEqual(
             isinstance(networks, list),
             True,
             "List networks should return a valid response for created network"
-             )
+        )
         nw_response = networks[0]
 
         self.logger.debug("Deploying VM in account: %s" % self.account.name)
         virtual_machine = VirtualMachine.create(
-                                  self.apiclient,
-                                  self.services["virtual_machine"],
-                                  templateid=self.template.id,
-                                  accountid=self.account.name,
-                                  domainid=self.account.domainid,
-                                  serviceofferingid=self.service_offering.id,
-                                  networkids=[str(network.id)]
-                                  )
+            self.apiclient,
+            self.services["virtual_machine"],
+            templateid=self.template.id,
+            accountid=self.account.name,
+            domainid=self.account.domainid,
+            serviceofferingid=self.service_offering.id,
+            networkids=[str(network.id)]
+        )
 
         self.logger.debug("Deployed VM in network: %s" % network.id)
 
@@ -388,38 +363,38 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
         self.cleanup.insert(0, virtual_machine)
 
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  id=virtual_machine.id,
-                                  listall=True
-                                  )
+            self.apiclient,
+            id=virtual_machine.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(vms, list),
-                         True,
-                         "List Vms should return a valid list"
-                         )
+            isinstance(vms, list),
+            True,
+            "List Vms should return a valid list"
+        )
         vm = vms[0]
         self.assertEqual(
-                         vm.state,
-                         "Running",
-                         "VM should be in running state after deployment"
-                         )
+            vm.state,
+            "Running",
+            "VM should be in running state after deployment"
+        )
 
         self.logger.debug("Listing routers for network: %s" % network.name)
         routers = Router.list(
-                              self.apiclient,
-                              networkid=network.id,
-                              listall=True
-                              )
+            self.apiclient,
+            networkid=network.id,
+            listall=True
+        )
         self.assertEqual(
-                    isinstance(routers, list),
-                    True,
-                    "list router should return Master and backup routers"
-                    )
+            isinstance(routers, list),
+            True,
+            "list router should return Master and backup routers"
+        )
         self.assertEqual(
-                    len(routers),
-                    2,
-                    "Length of the list router should be 2 (Backup & master)"
-                    )
+            len(routers),
+            2,
+            "Length of the list router should be 2 (Backup & master)"
+        )
 
         public_ips = list_publicIP(
             self.apiclient,
@@ -461,10 +436,10 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
-                         result,
-                         expected,
-                         "Ping to outside world from VM should NOT be successful"
-                         )
+            result,
+            expected,
+            "Ping to outside world from VM should NOT be successful"
+        )
 
         expected = 0
         ssh_command = "wget -t 1 -T 1 www.google.com"
@@ -472,28 +447,28 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
-                         result,
-                         expected,
-                         "Attempt to retrieve google.com index page should NOT be successful"
-                         )
+            result,
+            expected,
+            "Attempt to retrieve google.com index page should NOT be successful"
+        )
 
         EgressFireWallRule.create(
-                                 self.apiclient,
-                                 networkid=network.id,
-                                 protocol=self.services["egress_80"]["protocol"],
-                                 startport=self.services["egress_80"]["startport"],
-                                 endport=self.services["egress_80"]["endport"],
-                                 cidrlist=self.services["egress_80"]["cidrlist"]
-                                 )
+            self.apiclient,
+            networkid=network.id,
+            protocol=self.services["egress_80"]["protocol"],
+            startport=self.services["egress_80"]["startport"],
+            endport=self.services["egress_80"]["endport"],
+            cidrlist=self.services["egress_80"]["cidrlist"]
+        )
 
         EgressFireWallRule.create(
-                                 self.apiclient,
-                                 networkid=network.id,
-                                 protocol=self.services["egress_53"]["protocol"],
-                                 startport=self.services["egress_53"]["startport"],
-                                 endport=self.services["egress_53"]["endport"],
-                                 cidrlist=self.services["egress_53"]["cidrlist"]
-                                 )
+            self.apiclient,
+            networkid=network.id,
+            protocol=self.services["egress_53"]["protocol"],
+            startport=self.services["egress_53"]["startport"],
+            endport=self.services["egress_53"]["endport"],
+            cidrlist=self.services["egress_53"]["cidrlist"]
+        )
 
         expected = 1
         ssh_command = "wget -t 1 -T 5 www.google.com"
@@ -501,10 +476,10 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
-                         result,
-                         expected,
-                         "Attempt to retrieve google.com index page should be successful once rule is added!"
-                         )
+            result,
+            expected,
+            "Attempt to retrieve google.com index page should be successful once rule is added!"
+        )
 
         return
 
@@ -517,45 +492,45 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
 
         self.logger.debug("Creating Network Offering with default egress FALSE")
         network_offering_egress_false = NetworkOffering.create(
-                                            self.apiclient,
-                                            self.services["nw_off_persistent_RVR_egress_false"],
-                                            conservemode=True
-                                            )
+            self.apiclient,
+            self.services["nw_off_persistent_RVR_egress_false"],
+            conservemode=True
+        )
         network_offering_egress_false.update(self.apiclient, state='Enabled')
 
         self.logger.debug("Creating network with network offering: %s" % network_offering_egress_false.id)
         network = Network.create(
-                                self.apiclient,
-                                self.services["network"],
-                                accountid=self.account.name,
-                                domainid=self.account.domainid,
-                                networkofferingid=network_offering_egress_false.id,
-                                zoneid=self.zone.id
-                                )
+            self.apiclient,
+            self.services["network"],
+            accountid=self.account.name,
+            domainid=self.account.domainid,
+            networkofferingid=network_offering_egress_false.id,
+            zoneid=self.zone.id
+        )
         self.logger.debug("Created network with ID: %s" % network.id)
 
         networks = Network.list(
-                                self.apiclient,
-                                id=network.id,
-                                listall=True
-                                )
+            self.apiclient,
+            id=network.id,
+            listall=True
+        )
         self.assertEqual(
             isinstance(networks, list),
             True,
             "List networks should return a valid response for created network"
-             )
+        )
         nw_response = networks[0]
 
         self.logger.debug("Deploying VM in account: %s" % self.account.name)
         virtual_machine = VirtualMachine.create(
-                                  self.apiclient,
-                                  self.services["virtual_machine"],
-                                  templateid=self.template.id,
-                                  accountid=self.account.name,
-                                  domainid=self.account.domainid,
-                                  serviceofferingid=self.service_offering.id,
-                                  networkids=[str(network.id)]
-                                  )
+            self.apiclient,
+            self.services["virtual_machine"],
+            templateid=self.template.id,
+            accountid=self.account.name,
+            domainid=self.account.domainid,
+            serviceofferingid=self.service_offering.id,
+            networkids=[str(network.id)]
+        )
 
         self.logger.debug("Deployed VM in network: %s" % network.id)
 
@@ -564,38 +539,38 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
         self.cleanup.insert(0, virtual_machine)
 
         vms = VirtualMachine.list(
-                                  self.apiclient,
-                                  id=virtual_machine.id,
-                                  listall=True
-                                  )
+            self.apiclient,
+            id=virtual_machine.id,
+            listall=True
+        )
         self.assertEqual(
-                         isinstance(vms, list),
-                         True,
-                         "List Vms should return a valid list"
-                         )
+            isinstance(vms, list),
+            True,
+            "List Vms should return a valid list"
+        )
         vm = vms[0]
         self.assertEqual(
-                         vm.state,
-                         "Running",
-                         "VM should be in running state after deployment"
-                         )
+            vm.state,
+            "Running",
+            "VM should be in running state after deployment"
+        )
 
         self.logger.debug("Listing routers for network: %s" % network.name)
         routers = Router.list(
-                              self.apiclient,
-                              networkid=network.id,
-                              listall=True
-                              )
+            self.apiclient,
+            networkid=network.id,
+            listall=True
+        )
         self.assertEqual(
-                    isinstance(routers, list),
-                    True,
-                    "list router should return Master and backup routers"
-                    )
+            isinstance(routers, list),
+            True,
+            "list router should return Master and backup routers"
+        )
         self.assertEqual(
-                    len(routers),
-                    2,
-                    "Length of the list router should be 2 (Backup & master)"
-                    )
+            len(routers),
+            2,
+            "Length of the list router should be 2 (Backup & master)"
+        )
 
         vals = ["MASTER", "BACKUP", "UNKNOWN"]
         cnts = [0, 0, 0]
@@ -618,15 +593,15 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
                 host = hosts[0]
 
                 if hypervisor.lower() in ('vmware'):
-                        result = str(get_process_status(
-                            self.apiclient.connection.mgtSvr,
-                            22,
-                            self.apiclient.connection.user,
-                            self.apiclient.connection.passwd,
-                            router.linklocalip,
-                            "sh /opt/cloud/bin/checkrouter.sh ",
-                            hypervisor=hypervisor
-                        ))
+                    result = str(get_process_status(
+                        self.apiclient.connection.mgtSvr,
+                        22,
+                        self.apiclient.connection.user,
+                        self.apiclient.connection.passwd,
+                        router.linklocalip,
+                        "sh /opt/cloud/bin/checkrouter.sh ",
+                        hypervisor=hypervisor
+                    ))
                 else:
                     try:
                         host.user, host.passwd = get_host_credentials(
@@ -644,7 +619,7 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
                         self.skipTest(
                             "Marvin configuration has no host credentials to\
                                     check router services")
-            
+
                 if result.count(vals[0]) == 1:
                     cnts[vals.index(vals[0])] += 1
 
@@ -655,7 +630,6 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
 
 
 class TestIsolatedNetworks(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
 
@@ -663,7 +637,7 @@ class TestIsolatedNetworks(cloudstackTestCase):
         cls.stream_handler = logging.StreamHandler()
         cls.logger.setLevel(logging.DEBUG)
         cls.logger.addHandler(cls.stream_handler)
-        
+
         cls.testClient = super(TestIsolatedNetworks, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
 
@@ -698,11 +672,11 @@ class TestIsolatedNetworks(cloudstackTestCase):
         cls.services["network_offering_egress_false"]["egress_policy"] = "false"
 
         cls.services["egress_80"] = {
-                                    "startport": 80,
-                                    "endport": 80,
-                                    "protocol": "TCP",
-                                    "cidrlist": ["0.0.0.0/0"]
-                                    }
+            "startport": 80,
+            "endport": 80,
+            "protocol": "TCP",
+            "cidrlist": ["0.0.0.0/0"]
+        }
 
         cls._cleanup = [
             cls.service_offering,
@@ -738,27 +712,27 @@ class TestIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Creating Network Offering with default egress TRUE")
         network_offering_egress_true = NetworkOffering.create(self.apiclient,
-                                                       self.services["network_offering_egress_true"],
-                                                       conservemode=True)
+                                                              self.services["network_offering_egress_true"],
+                                                              conservemode=True)
 
         network_offering_egress_true.update(self.apiclient, state='Enabled')
 
         self.logger.debug("Creating Network with Network Offering ID %s" % network_offering_egress_true.id)
         network = Network.create(self.apiclient,
-                                      self.services["network"],
-                                      accountid=self.account.name,
-                                      domainid=self.account.domainid,
-                                      networkofferingid=network_offering_egress_true.id,
-                                      zoneid=self.zone.id)
+                                 self.services["network"],
+                                 accountid=self.account.name,
+                                 domainid=self.account.domainid,
+                                 networkofferingid=network_offering_egress_true.id,
+                                 zoneid=self.zone.id)
 
         self.logger.debug("Deploying Virtual Machine on Network %s" % network.id)
         virtual_machine = VirtualMachine.create(self.apiclient,
-                                         self.services["virtual_machine"],
-                                         templateid=self.template.id,
-                                         accountid=self.account.name,
-                                         domainid=self.domain.id,
-                                         serviceofferingid=self.service_offering.id,
-                                         networkids=[str(network.id)])
+                                                self.services["virtual_machine"],
+                                                templateid=self.template.id,
+                                                accountid=self.account.name,
+                                                domainid=self.domain.id,
+                                                serviceofferingid=self.service_offering.id,
+                                                networkids=[str(network.id)])
 
         self.logger.debug("Deployed VM in network: %s" % network.id)
 
@@ -850,10 +824,10 @@ class TestIsolatedNetworks(cloudstackTestCase):
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
-                         result,
-                         expected,
-                         "Ping to outside world from VM should be successful!"
-                         )
+            result,
+            expected,
+            "Ping to outside world from VM should be successful!"
+        )
 
         expected = 1
         ssh_command = "wget -t 1 -T 5 www.google.com"
@@ -861,19 +835,19 @@ class TestIsolatedNetworks(cloudstackTestCase):
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
-                         result,
-                         expected,
-                         "Attempt to retrieve google.com index page should be successful!"
-                         )
+            result,
+            expected,
+            "Attempt to retrieve google.com index page should be successful!"
+        )
 
         EgressFireWallRule.create(
-                                 self.apiclient,
-                                 networkid=network.id,
-                                 protocol=self.services["egress_80"]["protocol"],
-                                 startport=self.services["egress_80"]["startport"],
-                                 endport=self.services["egress_80"]["endport"],
-                                 cidrlist=self.services["egress_80"]["cidrlist"]
-                                 )
+            self.apiclient,
+            networkid=network.id,
+            protocol=self.services["egress_80"]["protocol"],
+            startport=self.services["egress_80"]["startport"],
+            endport=self.services["egress_80"]["endport"],
+            cidrlist=self.services["egress_80"]["cidrlist"]
+        )
 
         expected = 0
         ssh_command = "wget -t 1 -T 1 www.google.com"
@@ -881,10 +855,10 @@ class TestIsolatedNetworks(cloudstackTestCase):
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
-                         result,
-                         expected,
-                         "Attempt to retrieve google.com index page should NOT be successful once rule is added!"
-                         )
+            result,
+            expected,
+            "Attempt to retrieve google.com index page should NOT be successful once rule is added!"
+        )
 
         return
 
@@ -895,27 +869,27 @@ class TestIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Creating Network Offering with default egress FALSE")
         network_offering_egress_false = NetworkOffering.create(self.apiclient,
-                                                       self.services["network_offering_egress_false"],
-                                                       conservemode=True)
+                                                               self.services["network_offering_egress_false"],
+                                                               conservemode=True)
 
         network_offering_egress_false.update(self.apiclient, state='Enabled')
 
         self.logger.debug("Creating Network with Network Offering ID %s" % network_offering_egress_false.id)
         network = Network.create(self.apiclient,
-                                      self.services["network"],
-                                      accountid=self.account.name,
-                                      domainid=self.account.domainid,
-                                      networkofferingid=network_offering_egress_false.id,
-                                      zoneid=self.zone.id)
+                                 self.services["network"],
+                                 accountid=self.account.name,
+                                 domainid=self.account.domainid,
+                                 networkofferingid=network_offering_egress_false.id,
+                                 zoneid=self.zone.id)
 
         self.logger.debug("Deploying Virtual Machine on Network %s" % network.id)
         virtual_machine = VirtualMachine.create(self.apiclient,
-                                         self.services["virtual_machine"],
-                                         templateid=self.template.id,
-                                         accountid=self.account.name,
-                                         domainid=self.domain.id,
-                                         serviceofferingid=self.service_offering.id,
-                                         networkids=[str(network.id)])
+                                                self.services["virtual_machine"],
+                                                templateid=self.template.id,
+                                                accountid=self.account.name,
+                                                domainid=self.domain.id,
+                                                serviceofferingid=self.service_offering.id,
+                                                networkids=[str(network.id)])
 
         self.logger.debug("Deployed VM in network: %s" % network.id)
 
@@ -1006,10 +980,10 @@ class TestIsolatedNetworks(cloudstackTestCase):
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
-                         result,
-                         expected,
-                         "Ping to outside world from VM should NOT be successful"
-                         )
+            result,
+            expected,
+            "Ping to outside world from VM should NOT be successful"
+        )
 
         expected = 0
         ssh_command = "wget -t 1 -T 1 www.google.com"
@@ -1017,19 +991,19 @@ class TestIsolatedNetworks(cloudstackTestCase):
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
-                         result,
-                         expected,
-                         "Attempt to retrieve google.com index page should NOT be successful"
-                         )
+            result,
+            expected,
+            "Attempt to retrieve google.com index page should NOT be successful"
+        )
 
         EgressFireWallRule.create(
-                                 self.apiclient,
-                                 networkid=network.id,
-                                 protocol=self.services["egress_80"]["protocol"],
-                                 startport=self.services["egress_80"]["startport"],
-                                 endport=self.services["egress_80"]["endport"],
-                                 cidrlist=self.services["egress_80"]["cidrlist"]
-                                 )
+            self.apiclient,
+            networkid=network.id,
+            protocol=self.services["egress_80"]["protocol"],
+            startport=self.services["egress_80"]["startport"],
+            endport=self.services["egress_80"]["endport"],
+            cidrlist=self.services["egress_80"]["cidrlist"]
+        )
 
         expected = 1
         ssh_command = "wget -t 1 -T 5 www.google.com"
@@ -1037,9 +1011,9 @@ class TestIsolatedNetworks(cloudstackTestCase):
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
-                         result,
-                         expected,
-                         "Attempt to retrieve google.com index page should be successful once rule is added!"
-                         )
+            result,
+            expected,
+            "Attempt to retrieve google.com index page should be successful once rule is added!"
+        )
 
         return

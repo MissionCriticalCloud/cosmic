@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.vm;
 
 import com.cloud.exception.ConcurrentOperationException;
@@ -25,7 +9,6 @@ import com.cloud.exception.StorageUnavailableException;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.exception.ExecutionException;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
@@ -33,41 +16,42 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.vm.StartVMCmd;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "startVirtualMachine", responseObject = UserVmResponse.class, description = "Starts a virtual machine.", responseView = ResponseView.Full, entityType = {VirtualMachine.class},
+@APICommand(name = "startVirtualMachine", responseObject = UserVmResponse.class, description = "Starts a virtual machine.", responseView = ResponseView.Full, entityType =
+        {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class StartVMCmdByAdmin extends StartVMCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(StartVMCmdByAdmin.class.getName());
-
 
     @Override
     public void execute() throws ResourceUnavailableException, ResourceAllocationException {
         try {
             CallContext.current().setEventDetails("Vm Id: " + getId());
 
-            UserVm result ;
+            final UserVm result;
             result = _userVmService.startVirtualMachine(this);
 
             if (result != null) {
-                UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Full, "virtualmachine", result).get(0);
+                final UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Full, "virtualmachine", result).get(0);
                 response.setResponseName(getCommandName());
                 setResponseObject(response);
             } else {
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to start a vm");
             }
-        } catch (ConcurrentOperationException ex) {
+        } catch (final ConcurrentOperationException ex) {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, ex.getMessage());
-        } catch (StorageUnavailableException ex) {
+        } catch (final StorageUnavailableException ex) {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.RESOURCE_UNAVAILABLE_ERROR, ex.getMessage());
-        } catch (ExecutionException ex) {
+        } catch (final ExecutionException ex) {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, ex.getMessage());
-        } catch (InsufficientCapacityException ex) {
-            StringBuilder message = new StringBuilder(ex.getMessage());
+        } catch (final InsufficientCapacityException ex) {
+            final StringBuilder message = new StringBuilder(ex.getMessage());
             if (ex instanceof InsufficientServerCapacityException) {
                 if (((InsufficientServerCapacityException) ex).isAffinityApplied()) {
                     message.append(", Please check the affinity groups provided, there may not be sufficient capacity to follow them");
@@ -78,5 +62,4 @@ public class StartVMCmdByAdmin extends StartVMCmd {
             throw new ServerApiException(ApiErrorCode.INSUFFICIENT_CAPACITY_ERROR, message.toString());
         }
     }
-
 }

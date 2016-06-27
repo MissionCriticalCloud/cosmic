@@ -1,32 +1,7 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.storage.datastore.manager;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 import com.cloud.storage.StorageManager;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProvider;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProviderManager;
 import org.apache.cloudstack.engine.subsystem.api.storage.HypervisorHostListener;
@@ -36,6 +11,12 @@ import org.apache.cloudstack.storage.datastore.PrimaryDataStoreImpl;
 import org.apache.cloudstack.storage.datastore.PrimaryDataStoreProviderManager;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -50,23 +31,23 @@ public class PrimaryDataStoreProviderManagerImpl implements PrimaryDataStoreProv
 
     @PostConstruct
     public void config() {
-        driverMaps = new HashMap<String, PrimaryDataStoreDriver>();
+        driverMaps = new HashMap<>();
     }
 
     @Override
-    public PrimaryDataStore getPrimaryDataStore(long dataStoreId) {
-        StoragePoolVO dataStoreVO = dataStoreDao.findById(dataStoreId);
+    public PrimaryDataStore getPrimaryDataStore(final long dataStoreId) {
+        final StoragePoolVO dataStoreVO = dataStoreDao.findById(dataStoreId);
         if (dataStoreVO == null) {
             throw new CloudRuntimeException("Unable to locate datastore with id " + dataStoreId);
         }
-        String providerName = dataStoreVO.getStorageProviderName();
-        DataStoreProvider provider = providerManager.getDataStoreProvider(providerName);
-        PrimaryDataStoreImpl dataStore = PrimaryDataStoreImpl.createDataStore(dataStoreVO, driverMaps.get(provider.getName()), provider);
+        final String providerName = dataStoreVO.getStorageProviderName();
+        final DataStoreProvider provider = providerManager.getDataStoreProvider(providerName);
+        final PrimaryDataStoreImpl dataStore = PrimaryDataStoreImpl.createDataStore(dataStoreVO, driverMaps.get(provider.getName()), provider);
         return dataStore;
     }
 
     @Override
-    public boolean registerDriver(String providerName, PrimaryDataStoreDriver driver) {
+    public boolean registerDriver(final String providerName, final PrimaryDataStoreDriver driver) {
         if (driverMaps.get(providerName) != null) {
             return false;
         }
@@ -75,13 +56,13 @@ public class PrimaryDataStoreProviderManagerImpl implements PrimaryDataStoreProv
     }
 
     @Override
-    public PrimaryDataStore getPrimaryDataStore(String uuid) {
-        StoragePoolVO dataStoreVO = dataStoreDao.findByUuid(uuid);
+    public PrimaryDataStore getPrimaryDataStore(final String uuid) {
+        final StoragePoolVO dataStoreVO = dataStoreDao.findByUuid(uuid);
         return getPrimaryDataStore(dataStoreVO.getId());
     }
 
     @Override
-    public boolean registerHostListener(String providerName, HypervisorHostListener listener) {
+    public boolean registerHostListener(final String providerName, final HypervisorHostListener listener) {
         return storageMgr.registerHostListener(providerName, listener);
     }
 }

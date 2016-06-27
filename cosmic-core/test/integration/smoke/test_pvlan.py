@@ -1,38 +1,19 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ test for private vlan isolation
 """
-#Import Local Modules
-import marvin
-from marvin.cloudstackTestCase import *
+# Import Local Modules
 from marvin.cloudstackAPI import *
-from marvin.sshClient import SshClient
-from marvin.lib.utils import *
+from marvin.cloudstackTestCase import *
 from marvin.lib.base import *
 from marvin.lib.common import *
+from marvin.lib.utils import *
 from nose.plugins.attrib import attr
-import telnetlib
 
-#Import System modules
-import time
+# Import System modules
+
 _multiprocess_shared_ = True
 
-class TestPVLAN(cloudstackTestCase):
 
+class TestPVLAN(cloudstackTestCase):
     zoneId = 1
     networkOfferingId = 7
     vlan = 1234
@@ -41,7 +22,7 @@ class TestPVLAN(cloudstackTestCase):
     def setUp(self):
         self.apiClient = self.testClient.getApiClient()
 
-    @attr(tags = ["advanced"], required_hardware="false")
+    @attr(tags=["advanced"], required_hardware="false")
     def test_create_pvlan_network(self):
         self.debug("Test create pvlan network")
         createNetworkCmd = createNetwork.createNetworkCmd()
@@ -69,13 +50,13 @@ class TestPVLAN(cloudstackTestCase):
         deleteNetworkCmd.id = self.networkId;
         self.apiClient.deleteNetwork(deleteNetworkCmd)
 
-        #Test invalid parameter
+        # Test invalid parameter
 
         # CLOUDSTACK-2392: Should not allow create pvlan with ipv6
-        createNetworkCmd.ip6gateway="fc00:1234::1"
-        createNetworkCmd.ip6cidr="fc00:1234::/64"
-        createNetworkCmd.startipv6="fc00:1234::10"
-        createNetworkCmd.endipv6="fc00:1234::20"
+        createNetworkCmd.ip6gateway = "fc00:1234::1"
+        createNetworkCmd.ip6cidr = "fc00:1234::/64"
+        createNetworkCmd.startipv6 = "fc00:1234::10"
+        createNetworkCmd.endipv6 = "fc00:1234::20"
         err = 0
         with self.assertRaises(Exception):
             self.apiClient.createNetwork(createNetworkCmd)

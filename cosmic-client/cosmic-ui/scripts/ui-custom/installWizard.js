@@ -1,21 +1,5 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function($, cloudStack) {
-    var installWizard = function(args) {
+(function ($, cloudStack) {
+    var installWizard = function (args) {
         var context = args.context;
         var $installWizard = $('<div>').addClass('install-wizard');
         var $container = args.$container;
@@ -26,7 +10,7 @@
         /**
          * Successful installation action
          */
-        var complete = function() {
+        var complete = function () {
             $installWizard.remove();
             $('html body').removeClass('install-wizard');
 
@@ -38,10 +22,10 @@
          * @param id
          * @param $elem
          */
-        var getCopy = function(id, $elem) {
+        var getCopy = function (id, $elem) {
             cloudStack.installWizard.copy[id]({
                 response: {
-                    success: function(args) {
+                    success: function (args) {
                         $elem.append(_l(args.text));
                     }
                 }
@@ -55,7 +39,7 @@
          * @param stateStepID ID to group state elements in (i.e., zone, pod, cluster, ...)
          * @param $elem (optional) Element containing <form>, to serialize for state
          */
-        var goTo = cloudStack._goto = function(stepID, stateID, $elem, options) {
+        var goTo = cloudStack._goto = function (stepID, stateID, $elem, options) {
             if (!options) options = {};
 
             var $body = $installWizard.find('.body');
@@ -64,7 +48,7 @@
                 state[stateID] = cloudStack.serializeForm($elem.is('form') ? $elem : $elem.find('form'));
             }
 
-            $body.children().fadeOut('fast', function() {
+            $body.children().fadeOut('fast', function () {
                 var $nextStep = steps[stepID]({
                     nextStep: options.nextStep
                 });
@@ -82,7 +66,7 @@
             /**
              * A standard intro text wizard step template
              */
-            stepIntro: function(args) {
+            stepIntro: function (args) {
                 var title = args.title;
                 var subtitle = args.subtitle;
                 var copyID = args.copyID;
@@ -99,17 +83,17 @@
                 var $prev = elems.prevButton(_l('label.back'));
                 var $continue = elems.nextButton('OK');
 
-                $continue.click(function() {
+                $continue.click(function () {
                     goTo(nextStepID);
 
                     return false;
                 });
 
-                $prev.click(function() {
+                $prev.click(function () {
                     goTo(prevStepID);
                 });
 
-                return function(args) {
+                return function (args) {
                     showDiagram(diagram);
 
                     return $intro.append(
@@ -125,7 +109,7 @@
              * A standard form-based wizard step template
              * -- relies on createForm for form generation
              */
-            step: function(args) {
+            step: function (args) {
                 var title = args.title;
                 var formData = args.form;
                 var diagram = args.diagram;
@@ -152,7 +136,7 @@
                         desc: '',
                         fields: formData
                     },
-                    after: function(args) {
+                    after: function (args) {
                         goTo(nextStepID, stateID, $form);
                     }
                 });
@@ -163,14 +147,14 @@
                 $save.appendTo($form.find('form'));
 
                 // Submit handler
-                $form.find('form').submit(function() {
+                $form.find('form').submit(function () {
                     form.completeAction($form);
 
                     return false;
                 });
 
                 // Go back handler
-                $prev.click(function(event) {
+                $prev.click(function (event) {
                     goTo(prevStepID);
                 });
 
@@ -181,8 +165,8 @@
 
                 showTooltip($form, tooltipID);
 
-                return function(args) {
-                    var overrideGotoEvent = function(event) {
+                return function (args) {
+                    var overrideGotoEvent = function (event) {
                         goTo(args.nextStep, stateID, $form);
 
                         return false;
@@ -195,7 +179,7 @@
 
                     // Setup diagram, tooltips
                     showDiagram(diagram);
-                    setTimeout(function() {
+                    setTimeout(function () {
                         $form.find('input[type=text]:first').focus();
                     }, 600);
 
@@ -206,7 +190,7 @@
             /**
              * A form item tooltip
              */
-            tooltip: function(title, content) {
+            tooltip: function (title, content) {
                 return $('<div>').addClass('tooltip-info').append(
                     $('<div>').addClass('arrow'),
                     $('<div>').addClass('title').html(_l(title)),
@@ -217,27 +201,27 @@
             /**
              * The main header
              */
-            header: function() {
+            header: function () {
                 return $('<div></div>').addClass('header')
                     .append(
                         $.merge(
                             $('<h2></h2>').html(_l('label.installWizard.title')),
                             $('<h3></h3>').html(_l('label.installWizard.subtitle'))
                         )
-                );
+                    );
             },
 
             /**
              * The wizard body (contains form)
              */
-            body: function() {
+            body: function () {
                 return $('<div></div>').addClass('body');
             },
 
             /**
              * A standard next button
              */
-            nextButton: function(label, options) {
+            nextButton: function (label, options) {
                 var $button = options && !options.type ?
                     $('<div>').addClass('button goTo').html(label) :
                     $('<input>').attr({
@@ -250,11 +234,11 @@
             /**
              * A standard previous/go back button
              */
-            prevButton: function(label) {
+            prevButton: function (label) {
                 return $('<div>').addClass('button go-back').html(label);
             },
 
-            diagramParts: function() {
+            diagramParts: function () {
                 return $('<div>').addClass('diagram').append(
                     $('<div>').addClass('part zone'),
                     $('<div>').addClass('part pod'),
@@ -269,7 +253,7 @@
 
         var $diagramParts = elems.diagramParts();
 
-        var showDiagram = function(parts) {
+        var showDiagram = function (parts) {
             $diagramParts.children().hide();
             $diagramParts.find(parts).show();
         };
@@ -277,10 +261,10 @@
         /**
          * Show tooltip for focused form elements
          */
-        var showTooltip = function($formContainer, sectionID) {
+        var showTooltip = function ($formContainer, sectionID) {
             var $tooltip = elems.tooltip(_l('label.hints'), '');
 
-            $formContainer.find('input[type=text]').focus(function() {
+            $formContainer.find('input[type=text]').focus(function () {
                 var $input = $(this);
 
                 $tooltip.find('p').html('');
@@ -295,7 +279,7 @@
                 );
             });
 
-            $formContainer.find('input').blur(function() {
+            $formContainer.find('input').blur(function () {
                 $tooltip.remove();
             });
         };
@@ -304,10 +288,10 @@
          * Layout/behavior for each step in wizard
          */
         var steps = {
-            start: function(args) {
+            start: function (args) {
                 if (cloudStack.preInstall) {
                     return cloudStack.preInstall({
-                        complete: function() {
+                        complete: function () {
                             goTo('intro');
                         }
                     });
@@ -315,7 +299,7 @@
 
                 return steps.intro(args);
             },
-            intro: function(args) {
+            intro: function (args) {
                 var $intro = $('<div></div>').addClass('intro what-is-cloudstack');
                 var $title = $('<div></div>').addClass('title').html(_l('label.what.is.cloudstack'));
                 var $subtitle = $('<div></div>').addClass('subtitle').html(_l('label.introduction.to.cloudstack'));
@@ -323,13 +307,13 @@
                 var $continue = elems.nextButton(_l('label.continue.basic.install'));
                 var $advanced = elems.nextButton(_l('label.skip.guide')).addClass('advanced-installation');
 
-                $continue.click(function() {
+                $continue.click(function () {
                     goTo('changeUser');
 
                     return false;
                 });
 
-                $advanced.click(function() {
+                $advanced.click(function () {
                     complete();
 
                     return false;
@@ -341,7 +325,7 @@
                     $continue);
             },
 
-            changeUser: function(args) {
+            changeUser: function (args) {
                 var $changeUser = $('<div></div>').addClass('step change-user');
                 var $form = $('<form></form>').appendTo($changeUser);
 
@@ -385,14 +369,14 @@
                 });
 
                 // Save event
-                $form.submit(function() {
+                $form.submit(function () {
                     if (!$form.valid()) return false;
 
                     var $loading = $('<div></div>').addClass('loading-overlay').prependTo($form);
                     cloudStack.installWizard.changeUser({
                         data: cloudStack.serializeForm($form),
                         response: {
-                            success: function(args) {
+                            success: function (args) {
                                 goTo('addZoneIntro', 'newUser', $form);
                             }
                         }
@@ -574,7 +558,7 @@
                 form: {
                     hypervisor: {
                         label: 'label.hypervisor',
-                        select: function(args) {
+                        select: function (args) {
                             args.response.success({
                                 data: [{
                                     id: 'XenServer',
@@ -680,7 +664,7 @@
 
                     protocol: {
                         label: 'label.protocol',
-                        select: function(args) {
+                        select: function (args) {
                             args.response.success({
                                 data: {
                                     id: 'nfs',
@@ -692,12 +676,12 @@
 
                     scope: {
                         label: 'label.scope',
-                        select: function(args) {
+                        select: function (args) {
                             var scopeData = [];
                             //intelligence to handle different hypervisors to be added here
                             /*  if( selectedHypervisor == 'XenServer'){
-                       scopeData.push({ id: 'cluster', description: _l('label.cluster') });
-               }*/
+                             scopeData.push({ id: 'cluster', description: _l('label.cluster') });
+                             }*/
                             // else if (selectedHypervisor == 'KVM'){
                             scopeData.push({
                                 id: 'cluster',
@@ -765,10 +749,10 @@
                     },
                     provider: {
                         label: 'label.provider',
-                        select: function(args) {
+                        select: function (args) {
                             args.response.success({
                                 data: [
-                                    { id: 'NFS', description: 'NFS' }
+                                    {id: 'NFS', description: 'NFS'}
                                 ]
                             });
                         }
@@ -785,7 +769,7 @@
             /**
              * Pre-launch text
              */
-            launchInfo: function(args) {
+            launchInfo: function (args) {
                 var $intro = $('<div></div>').addClass('intro');
                 var $title = $('<div></div>').addClass('title')
                     .html(_l('label.congratulations'));
@@ -794,13 +778,13 @@
                 var $continue = elems.nextButton(_l('label.launch'));
                 var $prev = elems.prevButton(_l('label.back'));
 
-                $continue.click(function() {
+                $continue.click(function () {
                     goTo('launch');
 
                     return false;
                 });
 
-                $prev.click(function() {
+                $prev.click(function () {
                     goTo('addSecondaryStorage');
                 });
 
@@ -815,7 +799,7 @@
             /**
              * Pre-launch test -- after error correction
              */
-            launchInfoError: function(args) {
+            launchInfoError: function (args) {
                 var $intro = $('<div></div>').addClass('intro');
                 var $title = $('<div></div>').addClass('title')
                     .html(_l('label.corrections.saved'));
@@ -823,7 +807,7 @@
                     .html(_l('message.installWizard.click.retry'));
                 var $continue = elems.nextButton(_l('label.launch'));
 
-                $continue.click(function() {
+                $continue.click(function () {
                     goTo('launch');
 
                     return false;
@@ -840,7 +824,7 @@
             /**
              * Initiates launch tasks
              */
-            launch: function(args) {
+            launch: function (args) {
                 var $intro = $('<div>').addClass('intro');
                 var $title = $('<div>').addClass('title')
                     .html(_l('message.installWizard.now.building'));
@@ -855,16 +839,16 @@
                     data: state,
                     startFn: launchStart,
                     response: {
-                        message: function(msg) {
+                        message: function (msg) {
                             var $li = $('<li>').html(_l(msg));
 
                             $subtitle.append($li);
                             $li.siblings().addClass('complete');
                         },
-                        success: function() {
+                        success: function () {
                             goTo('complete');
                         },
-                        error: function(stepID, message, callback) {
+                        error: function (stepID, message, callback) {
                             launchStart = callback;
                             $subtitle.find('li:last').addClass('error');
 
@@ -874,7 +858,7 @@
                                 ),
                                 $('<div>').addClass('button').append(
                                     $('<span>').html(_l('label.back'))
-                                ).click(function() {
+                                ).click(function () {
                                     goTo(stepID, null, null, {
                                         nextStep: 'launchInfoError'
                                     });
@@ -887,7 +871,7 @@
                 return $intro;
             },
 
-            complete: function(args) {
+            complete: function (args) {
                 var $intro = $('<div></div>').addClass('intro');
                 var $title = $('<div></div>').addClass('title')
                     .html(_l('message.setup.successful'));
@@ -897,8 +881,8 @@
 
                 showDiagram('');
 
-                $continue.click(function() {
-                    $installWizard.fadeOut(function() {
+                $continue.click(function () {
+                    $installWizard.fadeOut(function () {
                         complete();
                     });
                 });

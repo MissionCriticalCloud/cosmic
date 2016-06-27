@@ -1,31 +1,14 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.List;
-
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 
-@SuppressWarnings("unused")
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
+
 public class FirewallResponse extends BaseResponse {
     @SerializedName(ApiConstants.ID)
     @Param(description = "the ID of the firewall rule")
@@ -79,55 +62,55 @@ public class FirewallResponse extends BaseResponse {
     @Param(description = "is rule for display to the regular user", since = "4.4", authorized = {RoleType.Admin})
     private Boolean forDisplay;
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
-    public void setProtocol(String protocol) {
+    public void setProtocol(final String protocol) {
         this.protocol = protocol;
     }
 
-    public void setStartPort(Integer startPort) {
+    public void setStartPort(final Integer startPort) {
         this.startPort = startPort;
     }
 
-    public void setEndPort(Integer endPort) {
+    public void setEndPort(final Integer endPort) {
         this.endPort = endPort;
     }
 
-    public void setPublicIpAddressId(String publicIpAddressId) {
+    public void setPublicIpAddressId(final String publicIpAddressId) {
         this.publicIpAddressId = publicIpAddressId;
     }
 
-    public void setPublicIpAddress(String publicIpAddress) {
+    public void setPublicIpAddress(final String publicIpAddress) {
         this.publicIpAddress = publicIpAddress;
     }
 
-    public void setNetworkId(String networkId) {
+    public void setNetworkId(final String networkId) {
         this.networkId = networkId;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
-    public void setCidrList(String cidrList) {
+    public void setCidrList(final String cidrList) {
         this.cidrList = cidrList;
     }
 
-    public void setIcmpType(Integer icmpType) {
+    public void setIcmpType(final Integer icmpType) {
         this.icmpType = icmpType;
     }
 
-    public void setIcmpCode(Integer icmpCode) {
+    public void setIcmpCode(final Integer icmpCode) {
         this.icmpCode = icmpCode;
     }
 
-    public void setTags(List<ResourceTagResponse> tags) {
+    public void setTags(final List<ResourceTagResponse> tags) {
         this.tags = tags;
     }
 
-    public void setForDisplay(Boolean forDisplay) {
+    public void setForDisplay(final Boolean forDisplay) {
         this.forDisplay = forDisplay;
     }
 }

@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.configuration;
 
 import javax.persistence.Column;
@@ -50,7 +34,7 @@ public class ResourceLimitVO implements ResourceLimit {
     public ResourceLimitVO() {
     }
 
-    public ResourceLimitVO(ResourceCount.ResourceType type, Long max, long ownerId, ResourceOwnerType ownerType) {
+    public ResourceLimitVO(final ResourceCount.ResourceType type, final Long max, final long ownerId, final ResourceOwnerType ownerType) {
         this.type = type;
         this.max = max;
 
@@ -66,7 +50,7 @@ public class ResourceLimitVO implements ResourceLimit {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -75,26 +59,8 @@ public class ResourceLimitVO implements ResourceLimit {
         return type;
     }
 
-    public void setType(ResourceCount.ResourceType type) {
+    public void setType(final ResourceCount.ResourceType type) {
         this.type = type;
-    }
-
-    public Long getDomainId() {
-        return domainId;
-    }
-
-    public Long getAccountId() {
-        return accountId;
-    }
-
-    @Override
-    public Long getMax() {
-        return max;
-    }
-
-    @Override
-    public void setMax(Long max) {
-        this.max = max;
     }
 
     @Override
@@ -115,12 +81,29 @@ public class ResourceLimitVO implements ResourceLimit {
         }
     }
 
-    public void setDomainId(Long domainId) {
+    public Long getDomainId() {
+        return domainId;
+    }
+
+    public void setDomainId(final Long domainId) {
         this.domainId = domainId;
     }
 
-    public void setAccountId(Long accountId) {
+    public Long getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(final Long accountId) {
         this.accountId = accountId;
     }
 
+    @Override
+    public Long getMax() {
+        return max;
+    }
+
+    @Override
+    public void setMax(final Long max) {
+        this.max = max;
+    }
 }

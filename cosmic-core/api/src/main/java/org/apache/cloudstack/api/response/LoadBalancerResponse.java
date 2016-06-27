@@ -1,31 +1,14 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
 
-import java.util.List;
-
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 
-@SuppressWarnings("unused")
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
+
 public class LoadBalancerResponse extends BaseResponse implements ControlledEntityResponse {
     @SerializedName(ApiConstants.ID)
     @Param(description = "the load balancer rule ID")
@@ -107,88 +90,88 @@ public class LoadBalancerResponse extends BaseResponse implements ControlledEnti
     @Param(description = "is rule for display to the regular user", since = "4.4", authorized = {RoleType.Admin})
     private Boolean forDisplay;
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
-    public void setPublicIp(String publicIp) {
+    public void setPublicIp(final String publicIp) {
         this.publicIp = publicIp;
     }
 
-    public void setPublicPort(String publicPort) {
+    public void setPublicPort(final String publicPort) {
         this.publicPort = publicPort;
     }
 
-    public void setPrivatePort(String privatePort) {
+    public void setPrivatePort(final String privatePort) {
         this.privatePort = privatePort;
     }
 
-    public void setCidrList(String cidrs) {
+    public void setCidrList(final String cidrs) {
         this.cidrList = cidrs;
     }
 
-    public void setAlgorithm(String algorithm) {
+    public void setAlgorithm(final String algorithm) {
         this.algorithm = algorithm;
     }
 
     @Override
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
     @Override
-    public void setDomainId(String domainId) {
-        this.domainId = domainId;
-    }
-
-    @Override
-    public void setDomainName(String domainName) {
-        this.domainName = domainName;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public void setPublicIpId(String publicIpId) {
-        this.publicIpId = publicIpId;
-    }
-
-    public void setZoneId(String zoneId) {
-        this.zoneId = zoneId;
-    }
-
-    @Override
-    public void setProjectId(String projectId) {
+    public void setProjectId(final String projectId) {
         this.projectId = projectId;
     }
 
     @Override
-    public void setProjectName(String projectName) {
+    public void setProjectName(final String projectName) {
         this.projectName = projectName;
     }
 
-    public void setTags(List<ResourceTagResponse> tags) {
+    @Override
+    public void setDomainId(final String domainId) {
+        this.domainId = domainId;
+    }
+
+    @Override
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setState(final String state) {
+        this.state = state;
+    }
+
+    public void setPublicIpId(final String publicIpId) {
+        this.publicIpId = publicIpId;
+    }
+
+    public void setZoneId(final String zoneId) {
+        this.zoneId = zoneId;
+    }
+
+    public void setTags(final List<ResourceTagResponse> tags) {
         this.tags = tags;
     }
 
-    public void setNetworkId(String networkId) {
+    public void setNetworkId(final String networkId) {
         this.networkId = networkId;
     }
 
-    public void setLbProtocol(String lbProtocol) {
+    public void setLbProtocol(final String lbProtocol) {
         this.lbProtocol = lbProtocol;
     }
 
-    public void setForDisplay(Boolean forDisplay) {
+    public void setForDisplay(final Boolean forDisplay) {
         this.forDisplay = forDisplay;
     }
 }

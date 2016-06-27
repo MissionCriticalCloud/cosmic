@@ -1,24 +1,8 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ Tests for Persistent Networks without running VMs feature"""
-from marvin.lib.utils import (
-    cleanup_resources,
-    validateList
-)
+import time
+from ddt import ddt, data
+from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+from marvin.codes import PASS, FAIL, FAILED
 from marvin.lib.base import (
     Account,
     VPC,
@@ -46,20 +30,20 @@ from marvin.lib.common import (
     wait_for_cleanup,
     get_hypervisor_type
 )
-from nose.plugins.attrib import attr
-from marvin.codes import PASS, FAIL, FAILED
+from marvin.lib.utils import (
+    cleanup_resources,
+    validateList
+)
 from marvin.sshClient import SshClient
-from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from ddt import ddt, data
-import time
+from nose.plugins.attrib import attr
 
 
 @ddt
 class TestPersistentNetworks(cloudstackTestCase):
-
     '''
     Test Persistent Networks without running VMs
     '''
+
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestPersistentNetworks, cls).getClsTestClient()
@@ -89,7 +73,7 @@ class TestPersistentNetworks(cloudstackTestCase):
         )
         cls.isolated_persistent_network_offering = cls.createNetworkOffering(
             "nw_off_isolated_persistent")
-        cls.isolated_persistent_network_offering_RVR =\
+        cls.isolated_persistent_network_offering_RVR = \
             cls.createNetworkOffering(
                 "nw_off_persistent_RVR"
             )
@@ -1048,7 +1032,6 @@ class TestPersistentNetworks(cloudstackTestCase):
 
 @ddt
 class TestAssignVirtualMachine(cloudstackTestCase):
-
     """Test Persistent Network creation with
     assigning VM to different account/domain
     """
@@ -1082,12 +1065,12 @@ class TestAssignVirtualMachine(cloudstackTestCase):
         )
         cls.isolated_persistent_network_offering = cls.createNetworkOffering(
             "nw_off_isolated_persistent")
-        cls.isolated_persistent_network_offering_RVR =\
+        cls.isolated_persistent_network_offering_RVR = \
             cls.createNetworkOffering(
                 "nw_off_persistent_RVR"
             )
 
-         # network will be deleted as part of account cleanup
+        # network will be deleted as part of account cleanup
         cls._cleanup = [
             cls.service_offering, cls.isolated_persistent_network_offering,
             cls.isolated_persistent_network_offering_RVR
@@ -1231,7 +1214,6 @@ class TestAssignVirtualMachine(cloudstackTestCase):
 
 @ddt
 class TestProjectAccountOperations(cloudstackTestCase):
-
     """Test suspend/disable/lock account/project operations
     when they have persistent network
     """
@@ -1354,7 +1336,7 @@ class TestProjectAccountOperations(cloudstackTestCase):
             accounts)
         self.assertEqual(str(accounts[0].state).lower(
         ), value, "account state should be %s, it is %s"
-            % (value, accounts[0].state))
+                  % (value, accounts[0].state))
 
         # Wait for network cleanup interval
         wait_for_cleanup(
@@ -1478,7 +1460,6 @@ class TestProjectAccountOperations(cloudstackTestCase):
 
 @ddt
 class TestRestartPersistentNetwork(cloudstackTestCase):
-
     """Test restart persistent network with cleanup parameter true and false
     """
 
@@ -1518,7 +1499,6 @@ class TestRestartPersistentNetwork(cloudstackTestCase):
         cls.isolated_persistent_network_offering.update(
             cls.api_client,
             state="enabled")
-
 
         # network will be deleted as part of account cleanup
         cls._cleanup = [
@@ -1724,9 +1704,9 @@ class TestRestartPersistentNetwork(cloudstackTestCase):
                 (virtual_machine.id, ipaddress.ipaddress.ipaddress))
         return
 
+
 @ddt
 class TestVPCNetworkOperations(cloudstackTestCase):
-
     """Test VPC network operations consisting persistent networks
     """
 
@@ -2373,11 +2353,11 @@ class TestVPCNetworkOperations(cloudstackTestCase):
 
             # Create network ACL for both ther persistent networks (tiers of
             # VPC)
-            ingressAclNetwork1, egressAclNetwork1 =\
+            ingressAclNetwork1, egressAclNetwork1 = \
                 self.CreateIngressEgressNetworkACLForNetwork(
                     persistent_network_1.id
                 )
-            ingressAclNetwork2, egressAclNetwork2 =\
+            ingressAclNetwork2, egressAclNetwork2 = \
                 self.CreateIngressEgressNetworkACLForNetwork(
                     persistent_network_2.id
                 )
@@ -2587,11 +2567,11 @@ class TestVPCNetworkOperations(cloudstackTestCase):
         lb_rule.assign(self.api_client, [virtual_machine_3, virtual_machine_4])
 
         # Create network ACL for both ther persistent networks (tiers of VPC)
-        ingressAclNetwork1, egressAclNetwork1 =\
+        ingressAclNetwork1, egressAclNetwork1 = \
             self.CreateIngressEgressNetworkACLForNetwork(
                 persistent_network_1.id
             )
-        ingressAclNetwork2, egressAclNetwork2 =\
+        ingressAclNetwork2, egressAclNetwork2 = \
             self.CreateIngressEgressNetworkACLForNetwork(
                 persistent_network_2.id
             )

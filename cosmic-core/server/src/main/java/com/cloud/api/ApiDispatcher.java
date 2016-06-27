@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api;
 
 import com.cloud.api.dispatch.DispatchChain;
@@ -26,37 +10,37 @@ import com.cloud.user.AccountManager;
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.InfrastructureEntity;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
-import org.apache.cloudstack.api.*;
+import org.apache.cloudstack.api.APICommand;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseAsyncCmd;
+import org.apache.cloudstack.api.BaseAsyncCreateCmd;
+import org.apache.cloudstack.api.BaseAsyncCustomIdCmd;
+import org.apache.cloudstack.api.BaseCmd;
+import org.apache.cloudstack.api.BaseCustomIdCmd;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.jobs.AsyncJob;
 import org.apache.cloudstack.framework.jobs.AsyncJobManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ApiDispatcher {
     private static final Logger s_logger = LoggerFactory.getLogger(ApiDispatcher.class.getName());
-
-    Long _createSnapshotQueueSizeLimit;
-
-    @Inject
-    AsyncJobManager _asyncMgr;
-
-    @Inject
-    AccountManager _accountMgr;
-
-    @Inject
-    EntityManager _entityMgr;
-
     @Inject()
     protected DispatchChainFactory dispatchChainFactory;
-
     protected DispatchChain standardDispatchChain;
-
     protected DispatchChain asyncCreationDispatchChain;
+    Long _createSnapshotQueueSizeLimit;
+    @Inject
+    AsyncJobManager _asyncMgr;
+    @Inject
+    AccountManager _accountMgr;
+    @Inject
+    EntityManager _entityMgr;
 
     public ApiDispatcher() {
     }
@@ -70,7 +54,6 @@ public class ApiDispatcher {
     public void setCreateSnapshotQueueSizeLimit(final Long snapshotLimit) {
         _createSnapshotQueueSizeLimit = snapshotLimit;
     }
-
 
     public void dispatchCreateCmd(final BaseAsyncCreateCmd cmd, final Map<String, String> params) throws Exception {
         asyncCreationDispatchChain.dispatch(new DispatchTask(cmd, params));
@@ -141,5 +124,4 @@ public class ApiDispatcher {
 
         cmd.execute();
     }
-
 }

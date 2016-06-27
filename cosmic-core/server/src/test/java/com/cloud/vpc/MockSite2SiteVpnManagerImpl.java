@@ -1,25 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.vpc;
-
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
 
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
@@ -32,7 +11,6 @@ import com.cloud.network.vpn.Site2SiteVpnService;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.vm.DomainRouterVO;
-
 import org.apache.cloudstack.api.command.user.vpn.CreateVpnConnectionCmd;
 import org.apache.cloudstack.api.command.user.vpn.CreateVpnCustomerGatewayCmd;
 import org.apache.cloudstack.api.command.user.vpn.CreateVpnGatewayCmd;
@@ -44,6 +22,11 @@ import org.apache.cloudstack.api.command.user.vpn.ListVpnCustomerGatewaysCmd;
 import org.apache.cloudstack.api.command.user.vpn.ListVpnGatewaysCmd;
 import org.apache.cloudstack.api.command.user.vpn.ResetVpnConnectionCmd;
 import org.apache.cloudstack.api.command.user.vpn.UpdateVpnCustomerGatewayCmd;
+
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -53,7 +36,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnService#createVpnGateway(org.apache.cloudstack.api.commands.CreateVpnGatewayCmd)
      */
     @Override
-    public Site2SiteVpnGateway createVpnGateway(CreateVpnGatewayCmd cmd) {
+    public Site2SiteVpnGateway createVpnGateway(final CreateVpnGatewayCmd cmd) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -62,7 +45,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnService#createCustomerGateway(org.apache.cloudstack.api.commands.CreateVpnCustomerGatewayCmd)
      */
     @Override
-    public Site2SiteCustomerGateway createCustomerGateway(CreateVpnCustomerGatewayCmd cmd) {
+    public Site2SiteCustomerGateway createCustomerGateway(final CreateVpnCustomerGatewayCmd cmd) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -71,7 +54,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnService#startVpnConnection(long)
      */
     @Override
-    public Site2SiteVpnConnection startVpnConnection(long id) throws ResourceUnavailableException {
+    public Site2SiteVpnConnection startVpnConnection(final long id) throws ResourceUnavailableException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -80,7 +63,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnService#getVpnGateway(java.lang.Long)
      */
     @Override
-    public Site2SiteVpnGateway getVpnGateway(Long vpnGatewayId) {
+    public Site2SiteVpnGateway getVpnGateway(final Long vpnGatewayId) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -89,7 +72,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnService#createVpnConnection(org.apache.cloudstack.api.commands.CreateVpnConnectionCmd)
      */
     @Override
-    public Site2SiteVpnConnection createVpnConnection(CreateVpnConnectionCmd cmd) throws NetworkRuleConflictException {
+    public Site2SiteVpnConnection createVpnConnection(final CreateVpnConnectionCmd cmd) throws NetworkRuleConflictException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -98,7 +81,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnService#deleteCustomerGateway(org.apache.cloudstack.api.commands.DeleteVpnCustomerGatewayCmd)
      */
     @Override
-    public boolean deleteCustomerGateway(DeleteVpnCustomerGatewayCmd deleteVpnCustomerGatewayCmd) {
+    public boolean deleteCustomerGateway(final DeleteVpnCustomerGatewayCmd deleteVpnCustomerGatewayCmd) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -107,7 +90,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnService#deleteVpnGateway(org.apache.cloudstack.api.commands.DeleteVpnGatewayCmd)
      */
     @Override
-    public boolean deleteVpnGateway(DeleteVpnGatewayCmd deleteVpnGatewayCmd) {
+    public boolean deleteVpnGateway(final DeleteVpnGatewayCmd deleteVpnGatewayCmd) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -116,7 +99,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnService#deleteVpnConnection(org.apache.cloudstack.api.commands.DeleteVpnConnectionCmd)
      */
     @Override
-    public boolean deleteVpnConnection(DeleteVpnConnectionCmd deleteVpnConnectionCmd) throws ResourceUnavailableException {
+    public boolean deleteVpnConnection(final DeleteVpnConnectionCmd deleteVpnConnectionCmd) throws ResourceUnavailableException {
         // TODO Auto-generated method stub
         return false;
     }
@@ -125,7 +108,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnService#resetVpnConnection(org.apache.cloudstack.api.commands.ResetVpnConnectionCmd)
      */
     @Override
-    public Site2SiteVpnConnection resetVpnConnection(ResetVpnConnectionCmd resetVpnConnectionCmd) throws ResourceUnavailableException {
+    public Site2SiteVpnConnection resetVpnConnection(final ResetVpnConnectionCmd resetVpnConnectionCmd) throws ResourceUnavailableException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -134,7 +117,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnService#searchForCustomerGateways(org.apache.cloudstack.api.commands.ListVpnCustomerGatewaysCmd)
      */
     @Override
-    public Pair<List<? extends Site2SiteCustomerGateway>, Integer> searchForCustomerGateways(ListVpnCustomerGatewaysCmd listVpnCustomerGatewaysCmd) {
+    public Pair<List<? extends Site2SiteCustomerGateway>, Integer> searchForCustomerGateways(final ListVpnCustomerGatewaysCmd listVpnCustomerGatewaysCmd) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -143,7 +126,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnService#searchForVpnGateways(org.apache.cloudstack.api.commands.ListVpnGatewaysCmd)
      */
     @Override
-    public Pair<List<? extends Site2SiteVpnGateway>, Integer> searchForVpnGateways(ListVpnGatewaysCmd listVpnGatewaysCmd) {
+    public Pair<List<? extends Site2SiteVpnGateway>, Integer> searchForVpnGateways(final ListVpnGatewaysCmd listVpnGatewaysCmd) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -152,7 +135,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnService#searchForVpnConnections(org.apache.cloudstack.api.commands.ListVpnConnectionsCmd)
      */
     @Override
-    public Pair<List<? extends Site2SiteVpnConnection>, Integer> searchForVpnConnections(ListVpnConnectionsCmd listVpnConnectionsCmd) {
+    public Pair<List<? extends Site2SiteVpnConnection>, Integer> searchForVpnConnections(final ListVpnConnectionsCmd listVpnConnectionsCmd) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -161,7 +144,19 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnService#updateCustomerGateway(org.apache.cloudstack.api.commands.UpdateVpnCustomerGatewayCmd)
      */
     @Override
-    public Site2SiteCustomerGateway updateCustomerGateway(UpdateVpnCustomerGatewayCmd updateVpnCustomerGatewayCmd) {
+    public Site2SiteCustomerGateway updateCustomerGateway(final UpdateVpnCustomerGatewayCmd updateVpnCustomerGatewayCmd) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Site2SiteVpnConnection updateVpnConnection(final long id, final String customId, final Boolean forDisplay) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Site2SiteVpnGateway updateVpnGateway(final Long id, final String customId, final Boolean forDisplay) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -170,7 +165,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnManager#cleanupVpnConnectionByVpc(long)
      */
     @Override
-    public boolean cleanupVpnConnectionByVpc(long vpcId) {
+    public boolean cleanupVpnConnectionByVpc(final long vpcId) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -179,7 +174,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnManager#cleanupVpnGatewayByVpc(long)
      */
     @Override
-    public boolean cleanupVpnGatewayByVpc(long vpcId) {
+    public boolean cleanupVpnGatewayByVpc(final long vpcId) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -188,7 +183,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnManager#markDisconnectVpnConnByVpc(long)
      */
     @Override
-    public void markDisconnectVpnConnByVpc(long vpcId) {
+    public void markDisconnectVpnConnByVpc(final long vpcId) {
         // TODO Auto-generated method stub
 
     }
@@ -197,7 +192,7 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnManager#getConnectionsForRouter(com.cloud.vm.DomainRouterVO)
      */
     @Override
-    public List<Site2SiteVpnConnectionVO> getConnectionsForRouter(DomainRouterVO router) {
+    public List<Site2SiteVpnConnectionVO> getConnectionsForRouter(final DomainRouterVO router) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -206,16 +201,34 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
      * @see com.cloud.network.vpn.Site2SiteVpnManager#deleteCustomerGatewayByAccount(long)
      */
     @Override
-    public boolean deleteCustomerGatewayByAccount(long accountId) {
+    public boolean deleteCustomerGatewayByAccount(final long accountId) {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    /* (non-Javadoc)
+     * @see com.cloud.network.vpn.Site2SiteVpnManager#reconnectDisconnectedVpnByVpc(java.lang.Long)
+     */
+    @Override
+    public void reconnectDisconnectedVpnByVpc(final Long vpcId) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /* (non-Javadoc)
+     * @see com.cloud.utils.component.Manager#getName()
+     */
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /* (non-Javadoc)
      * @see com.cloud.utils.component.Manager#configure(java.lang.String, java.util.Map)
      */
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         // TODO Auto-generated method stub
         return true;
     }
@@ -237,35 +250,4 @@ public class MockSite2SiteVpnManagerImpl extends ManagerBase implements Site2Sit
         // TODO Auto-generated method stub
         return true;
     }
-
-    /* (non-Javadoc)
-     * @see com.cloud.utils.component.Manager#getName()
-     */
-    @Override
-    public String getName() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.network.vpn.Site2SiteVpnManager#reconnectDisconnectedVpnByVpc(java.lang.Long)
-     */
-    @Override
-    public void reconnectDisconnectedVpnByVpc(Long vpcId) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Site2SiteVpnConnection updateVpnConnection(long id, String customId, Boolean forDisplay) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Site2SiteVpnGateway updateVpnGateway(Long id, String customId, Boolean forDisplay) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.network.lb;
 
 import com.cloud.dao.EntityManager;
@@ -22,7 +6,11 @@ import com.cloud.domain.dao.DomainDao;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
-import com.cloud.network.dao.*;
+import com.cloud.network.dao.LoadBalancerCertMapDao;
+import com.cloud.network.dao.LoadBalancerCertMapVO;
+import com.cloud.network.dao.LoadBalancerVO;
+import com.cloud.network.dao.SslCertDao;
+import com.cloud.network.dao.SslCertVO;
 import com.cloud.network.lb.CertService;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.projects.Project;
@@ -38,12 +26,6 @@ import org.apache.cloudstack.api.command.user.loadbalancer.ListSslCertsCmd;
 import org.apache.cloudstack.api.command.user.loadbalancer.UploadSslCertCmd;
 import org.apache.cloudstack.api.response.SslCertResponse;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.commons.io.IOUtils;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMReader;
-import org.bouncycastle.openssl.PasswordFinder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -53,13 +35,38 @@ import javax.ejb.Local;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.StringReader;
-import java.security.*;
-import java.security.cert.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Principal;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.security.cert.CertPathBuilder;
+import java.security.cert.CertPathBuilderException;
+import java.security.cert.CertStore;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CollectionCertStoreParameters;
+import java.security.cert.PKIXBuilderParameters;
+import java.security.cert.TrustAnchor;
+import java.security.cert.X509CertSelector;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.io.IOUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PasswordFinder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Local(value = {CertService.class})
 public class CertServiceImpl implements CertService {
@@ -117,11 +124,9 @@ public class CertServiceImpl implements CertService {
             _sslCertDao.persist(certVO);
 
             return createCertResponse(certVO, null);
-
         } catch (final Exception e) {
             throw new CloudRuntimeException("Error parsing certificate data " + e.getMessage());
         }
-
     }
 
     @DB
@@ -213,7 +218,6 @@ public class CertServiceImpl implements CertService {
 
             certResponseList.add(createCertResponse(certVO, certLbMap));
             return certResponseList;
-
         }
 
         if (projectId != null) {
@@ -224,8 +228,9 @@ public class CertServiceImpl implements CertService {
             }
 
             final List<SslCertVO> projectCertVOList = _sslCertDao.listByAccountId(project.getProjectAccountId());
-            if (projectCertVOList == null || projectCertVOList.isEmpty())
+            if (projectCertVOList == null || projectCertVOList.isEmpty()) {
                 return certResponseList;
+            }
             _accountMgr.checkAccess(caller, SecurityChecker.AccessType.UseEntry, true, projectCertVOList.get(0));
 
             for (final SslCertVO cert : projectCertVOList) {
@@ -237,8 +242,9 @@ public class CertServiceImpl implements CertService {
 
         //reached here look by accountId
         final List<SslCertVO> certVOList = _sslCertDao.listByAccountId(accountId);
-        if (certVOList == null || certVOList.isEmpty())
+        if (certVOList == null || certVOList.isEmpty()) {
             return certResponseList;
+        }
         _accountMgr.checkAccess(caller, SecurityChecker.AccessType.UseEntry, true, certVOList.get(0));
 
         for (final SslCertVO cert : certVOList) {
@@ -260,7 +266,6 @@ public class CertServiceImpl implements CertService {
             if (chainInput != null) {
                 chain = parseChain(chainInput);
             }
-
         } catch (final IOException e) {
             throw new IllegalArgumentException("Parsing certificate/key failed: " + e.getMessage(), e);
         }
@@ -268,8 +273,47 @@ public class CertServiceImpl implements CertService {
         validateCert(cert, chainInput != null ? true : false);
         validateKeys(cert.getPublicKey(), key);
 
-        if (chainInput != null)
+        if (chainInput != null) {
             validateChain(chain, cert);
+        }
+    }
+
+    String generateFingerPrint(final Certificate cert) {
+
+        final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+        final StringBuilder buffer = new StringBuilder(60);
+        try {
+
+            final MessageDigest md = MessageDigest.getInstance("SHA-1");
+            final byte[] data = md.digest(cert.getEncoded());
+
+            for (int i = 0; i < data.length; i++) {
+                if (buffer.length() > 0) {
+                    buffer.append(":");
+                }
+
+                buffer.append(HEX[(0xF0 & data[i]) >>> 4]);
+                buffer.append(HEX[0x0F & data[i]]);
+            }
+        } catch (final CertificateEncodingException e) {
+            throw new InvalidParameterValueException("Bad certificate encoding");
+        } catch (final NoSuchAlgorithmException e) {
+            throw new InvalidParameterValueException("Bad certificate algorithm");
+        }
+
+        return buffer.toString();
+    }
+
+    public Certificate parseCertificate(final String cert) {
+        final PEMReader certPem = new PEMReader(new StringReader(cert));
+        try {
+            return (Certificate) certPem.readObject();
+        } catch (final Exception e) {
+            throw new InvalidParameterValueException("Invalid Certificate format. Expected X509 certificate. Failed due to " + e.getMessage());
+        } finally {
+            IOUtils.closeQuietly(certPem);
+        }
     }
 
     public SslCertResponse createCertResponse(final SslCertVO cert, final List<LoadBalancerCertMapVO> lbCertMap) {
@@ -298,8 +342,9 @@ public class CertServiceImpl implements CertService {
         response.setCertificate(cert.getCertificate());
         response.setFingerprint(cert.getFingerPrint());
 
-        if (cert.getChain() != null)
+        if (cert.getChain() != null) {
             response.setCertchain(cert.getChain());
+        }
 
         if (lbCertMap != null && !lbCertMap.isEmpty()) {
             final List<String> lbIds = new ArrayList<>();
@@ -315,10 +360,58 @@ public class CertServiceImpl implements CertService {
         return response;
     }
 
+    public PrivateKey parsePrivateKey(final String key, final String password) throws IOException {
+
+        PasswordFinder pGet = null;
+
+        if (password != null) {
+            pGet = new KeyPassword(password.toCharArray());
+        }
+
+        final PEMReader privateKey = new PEMReader(new StringReader(key), pGet);
+        Object obj = null;
+        try {
+            obj = privateKey.readObject();
+        } finally {
+            IOUtils.closeQuietly(privateKey);
+        }
+
+        try {
+
+            if (obj instanceof KeyPair) {
+                return ((KeyPair) obj).getPrivate();
+            }
+
+            return (PrivateKey) obj;
+        } catch (final Exception e) {
+            throw new IOException("Invalid Key format or invalid password.", e);
+        }
+    }
+
+    public List<Certificate> parseChain(final String chain) throws IOException {
+
+        final List<Certificate> certs = new ArrayList<>();
+        final PEMReader reader = new PEMReader(new StringReader(chain));
+
+        Certificate crt = null;
+
+        while ((crt = (Certificate) reader.readObject()) != null) {
+            if (crt instanceof X509Certificate) {
+                certs.add(crt);
+            }
+        }
+        if (certs.size() == 0) {
+            throw new IllegalArgumentException("Unable to decode certificate chain");
+        }
+
+        return certs;
+    }
+
     private void validateCert(final Certificate cert, final boolean chainPresent) {
 
-        if (!(cert instanceof X509Certificate))
+        if (!(cert instanceof X509Certificate)) {
             throw new IllegalArgumentException("Invalid certificate format. Expected X509 certificate");
+        }
 
         try {
             ((X509Certificate) cert).checkValidity();
@@ -329,12 +422,14 @@ public class CertServiceImpl implements CertService {
 
     private void validateKeys(final PublicKey pubKey, final PrivateKey privKey) {
 
-        if (pubKey.getAlgorithm() != privKey.getAlgorithm())
+        if (pubKey.getAlgorithm() != privKey.getAlgorithm()) {
             throw new IllegalArgumentException("Public and private key have different algorithms");
+        }
 
         // No encryption for DSA
-        if (pubKey.getAlgorithm() != "RSA")
+        if (pubKey.getAlgorithm() != "RSA") {
             return;
+        }
 
         try {
 
@@ -346,9 +441,9 @@ public class CertServiceImpl implements CertService {
 
             cipher.init(Cipher.DECRYPT_MODE, pubKey, random);
             final String decreptedData = new String(cipher.doFinal(encryptedData));
-            if (!decreptedData.equals(data))
+            if (!decreptedData.equals(data)) {
                 throw new IllegalArgumentException("Bad public-private key");
-
+            }
         } catch (final BadPaddingException e) {
             throw new IllegalArgumentException("Bad public-private key", e);
         } catch (final IllegalBlockSizeException e) {
@@ -371,8 +466,9 @@ public class CertServiceImpl implements CertService {
         certs.addAll(chain);
 
         for (final Certificate c : certs) {
-            if (!(c instanceof X509Certificate))
+            if (!(c instanceof X509Certificate)) {
                 throw new IllegalArgumentException("Invalid chain format. Expected X509 certificate");
+            }
 
             final X509Certificate xCert = (X509Certificate) c;
 
@@ -392,7 +488,6 @@ public class CertServiceImpl implements CertService {
             params.addCertStore(CertStore.getInstance("Collection", new CollectionCertStoreParameters(certs)));
             final CertPathBuilder builder = CertPathBuilder.getInstance("PKIX", "BC");
             builder.build(params);
-
         } catch (final InvalidAlgorithmParameterException e) {
             throw new IllegalArgumentException("Invalid certificate chain", e);
         } catch (final CertPathBuilderException e) {
@@ -402,91 +497,6 @@ public class CertServiceImpl implements CertService {
         } catch (final NoSuchProviderException e) {
             throw new CloudRuntimeException("No provider for certificate validation", e);
         }
-
-    }
-
-    public PrivateKey parsePrivateKey(final String key, final String password) throws IOException {
-
-        PasswordFinder pGet = null;
-
-        if (password != null)
-            pGet = new KeyPassword(password.toCharArray());
-
-        final PEMReader privateKey = new PEMReader(new StringReader(key), pGet);
-        Object obj = null;
-        try {
-            obj = privateKey.readObject();
-        } finally {
-            IOUtils.closeQuietly(privateKey);
-        }
-
-        try {
-
-            if (obj instanceof KeyPair)
-                return ((KeyPair) obj).getPrivate();
-
-            return (PrivateKey) obj;
-
-        } catch (final Exception e) {
-            throw new IOException("Invalid Key format or invalid password.", e);
-        }
-    }
-
-    public Certificate parseCertificate(final String cert) {
-        final PEMReader certPem = new PEMReader(new StringReader(cert));
-        try {
-            return (Certificate) certPem.readObject();
-        } catch (final Exception e) {
-            throw new InvalidParameterValueException("Invalid Certificate format. Expected X509 certificate. Failed due to " + e.getMessage());
-        } finally {
-            IOUtils.closeQuietly(certPem);
-        }
-    }
-
-    public List<Certificate> parseChain(final String chain) throws IOException {
-
-        final List<Certificate> certs = new ArrayList<>();
-        final PEMReader reader = new PEMReader(new StringReader(chain));
-
-        Certificate crt = null;
-
-        while ((crt = (Certificate) reader.readObject()) != null) {
-            if (crt instanceof X509Certificate) {
-                certs.add(crt);
-            }
-        }
-        if (certs.size() == 0)
-            throw new IllegalArgumentException("Unable to decode certificate chain");
-
-        return certs;
-    }
-
-    String generateFingerPrint(final Certificate cert) {
-
-        final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-
-        final StringBuilder buffer = new StringBuilder(60);
-        try {
-
-            final MessageDigest md = MessageDigest.getInstance("SHA-1");
-            final byte[] data = md.digest(cert.getEncoded());
-
-            for (int i = 0; i < data.length; i++) {
-                if (buffer.length() > 0) {
-                    buffer.append(":");
-                }
-
-                buffer.append(HEX[(0xF0 & data[i]) >>> 4]);
-                buffer.append(HEX[0x0F & data[i]]);
-            }
-
-        } catch (final CertificateEncodingException e) {
-            throw new InvalidParameterValueException("Bad certificate encoding");
-        } catch (final NoSuchAlgorithmException e) {
-            throw new InvalidParameterValueException("Bad certificate algorithm");
-        }
-
-        return buffer.toString();
     }
 
     public static class KeyPassword implements PasswordFinder {

@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.resource.virtualnetwork;
@@ -22,10 +7,6 @@ package com.cloud.agent.resource.virtualnetwork;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 import com.cloud.agent.api.routing.DeleteIpAliasCommand;
 import com.cloud.agent.api.routing.DnsMasqConfigCommand;
@@ -51,10 +32,14 @@ import com.cloud.agent.resource.virtualnetwork.model.IpAssociation;
 import com.cloud.agent.resource.virtualnetwork.model.LoadBalancerRule;
 import com.cloud.agent.resource.virtualnetwork.model.LoadBalancerRules;
 import com.cloud.network.lb.LoadBalancingRule.LbDestination;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import org.junit.Test;
 
 public class ConfigHelperTest {
@@ -77,7 +62,7 @@ public class ConfigHelperTest {
         assertNotNull(fileConfig);
         assertTrue(fileConfig instanceof FileConfigItem);
 
-        final String fileContents = ((FileConfigItem)fileConfig).getFileContents();
+        final String fileContents = ((FileConfigItem) fileConfig).getFileContents();
         assertNotNull(fileContents);
 
         final LoadBalancerRules jsonClass = gson.fromJson(fileContents, LoadBalancerRules.class);
@@ -88,130 +73,6 @@ public class ConfigHelperTest {
         assertNotNull(rules);
         assertTrue(rules.size() == 1);
         assertEquals(rules.get(0).getRouterIp(), "10.1.10.2");
-
-        final ConfigItem scriptConfig = config.get(1);
-        assertNotNull(scriptConfig);
-        assertTrue(scriptConfig instanceof ScriptConfigItem);
-    }
-
-    @Test
-    public void testSetPortForwardingRulesVpc() {
-
-        final SetPortForwardingRulesVpcCommand command = generateSetPortForwardingRulesVpcCommand();
-
-        final AbstractConfigItemFacade configItemFacade = AbstractConfigItemFacade.getInstance(command.getClass());
-
-        final List<ConfigItem> config = configItemFacade.generateConfig(command);
-        assertTrue(config.size() > 0);
-
-        final ConfigItem fileConfig = config.get(0);
-        assertNotNull(fileConfig);
-        assertTrue(fileConfig instanceof FileConfigItem);
-
-        final String fileContents = ((FileConfigItem)fileConfig).getFileContents();
-        assertNotNull(fileContents);
-
-        final ForwardingRules jsonClass = gson.fromJson(fileContents, ForwardingRules.class);
-        assertNotNull(jsonClass);
-        assertEquals(jsonClass.getType(), "forwardrules");
-
-        final ForwardingRule [] rules = jsonClass.getRules();
-        assertNotNull(rules);
-        assertTrue(rules.length == 2);
-        assertEquals(rules[0].getSourceIpAddress(), "64.1.1.10");
-
-        final ConfigItem scriptConfig = config.get(1);
-        assertNotNull(scriptConfig);
-        assertTrue(scriptConfig instanceof ScriptConfigItem);
-    }
-
-    @Test
-    public void testIpAssocVpc() {
-
-        final IpAssocVpcCommand command = generateIpAssocVpcCommand();
-
-        final AbstractConfigItemFacade configItemFacade = AbstractConfigItemFacade.getInstance(command.getClass());
-
-        final List<ConfigItem> config = configItemFacade.generateConfig(command);
-        assertTrue(config.size() > 0);
-
-        final ConfigItem fileConfig = config.get(0);
-        assertNotNull(fileConfig);
-        assertTrue(fileConfig instanceof FileConfigItem);
-
-        final String fileContents = ((FileConfigItem)fileConfig).getFileContents();
-        assertNotNull(fileContents);
-
-        final IpAssociation jsonClass = gson.fromJson(fileContents, IpAssociation.class);
-        assertNotNull(jsonClass);
-        assertEquals(jsonClass.getType(), "ips");
-
-        final IpAddress [] ips = jsonClass.getIpAddress();
-        assertNotNull(ips);
-        assertTrue(ips.length == 3);
-        assertEquals(ips[0].getPublicIp(), "64.1.1.10");
-
-        final ConfigItem scriptConfig = config.get(1);
-        assertNotNull(scriptConfig);
-        assertTrue(scriptConfig instanceof ScriptConfigItem);
-    }
-
-    @Test
-    public void testDnsMasqConfig() {
-
-        final DnsMasqConfigCommand command = generateDnsMasqConfigCommand();
-
-        final AbstractConfigItemFacade configItemFacade = AbstractConfigItemFacade.getInstance(command.getClass());
-
-        final List<ConfigItem> config = configItemFacade.generateConfig(command);
-        assertTrue(config.size() > 0);
-
-        final ConfigItem fileConfig = config.get(0);
-        assertNotNull(fileConfig);
-        assertTrue(fileConfig instanceof FileConfigItem);
-
-        final String fileContents = ((FileConfigItem)fileConfig).getFileContents();
-        assertNotNull(fileContents);
-
-        final DhcpConfig jsonClass = gson.fromJson(fileContents, DhcpConfig.class);
-        assertNotNull(jsonClass);
-        assertEquals(jsonClass.getType(), "dhcpconfig");
-
-        final List<DhcpConfigEntry> entries = jsonClass.getEntries();
-        assertNotNull(entries);
-        assertTrue(entries.size() == 2);
-        assertEquals(entries.get(0).getRouterIpAddress(), "10.1.20.2");
-
-        final ConfigItem scriptConfig = config.get(1);
-        assertNotNull(scriptConfig);
-        assertTrue(scriptConfig instanceof ScriptConfigItem);
-    }
-
-    @Test
-    public void testDeleteIpAlias() {
-
-        final DeleteIpAliasCommand command = generateDeleteIpAliasCommand();
-
-        final AbstractConfigItemFacade configItemFacade = AbstractConfigItemFacade.getInstance(command.getClass());
-
-        final List<ConfigItem> config = configItemFacade.generateConfig(command);
-        assertTrue(config.size() > 0);
-
-        final ConfigItem fileConfig = config.get(0);
-        assertNotNull(fileConfig);
-        assertTrue(fileConfig instanceof FileConfigItem);
-
-        final String fileContents = ((FileConfigItem)fileConfig).getFileContents();
-        assertNotNull(fileContents);
-
-        final IpAliases jsonClass = gson.fromJson(fileContents, IpAliases.class);
-        assertNotNull(jsonClass);
-        assertEquals(jsonClass.getType(), "ipaliases");
-
-        final List<IpAddressAlias> aliases = jsonClass.getAliases();
-        assertNotNull(aliases);
-        assertTrue(aliases.size() == 6);
-        assertEquals(aliases.get(0).getIpAddress(), "169.254.3.10");
 
         final ConfigItem scriptConfig = config.get(1);
         assertNotNull(scriptConfig);
@@ -236,6 +97,37 @@ public class ConfigHelperTest {
         return cmd;
     }
 
+    @Test
+    public void testSetPortForwardingRulesVpc() {
+
+        final SetPortForwardingRulesVpcCommand command = generateSetPortForwardingRulesVpcCommand();
+
+        final AbstractConfigItemFacade configItemFacade = AbstractConfigItemFacade.getInstance(command.getClass());
+
+        final List<ConfigItem> config = configItemFacade.generateConfig(command);
+        assertTrue(config.size() > 0);
+
+        final ConfigItem fileConfig = config.get(0);
+        assertNotNull(fileConfig);
+        assertTrue(fileConfig instanceof FileConfigItem);
+
+        final String fileContents = ((FileConfigItem) fileConfig).getFileContents();
+        assertNotNull(fileContents);
+
+        final ForwardingRules jsonClass = gson.fromJson(fileContents, ForwardingRules.class);
+        assertNotNull(jsonClass);
+        assertEquals(jsonClass.getType(), "forwardrules");
+
+        final ForwardingRule[] rules = jsonClass.getRules();
+        assertNotNull(rules);
+        assertTrue(rules.length == 2);
+        assertEquals(rules[0].getSourceIpAddress(), "64.1.1.10");
+
+        final ConfigItem scriptConfig = config.get(1);
+        assertNotNull(scriptConfig);
+        assertTrue(scriptConfig instanceof ScriptConfigItem);
+    }
+
     protected SetPortForwardingRulesVpcCommand generateSetPortForwardingRulesVpcCommand() {
         final List<PortForwardingRuleTO> pfRules = new ArrayList<>();
         pfRules.add(new PortForwardingRuleTO(1, "64.1.1.10", 22, 80, "10.10.1.10", 22, 80, "TCP", false, false));
@@ -248,6 +140,82 @@ public class ConfigHelperTest {
         return cmd;
     }
 
+    @Test
+    public void testIpAssocVpc() {
+
+        final IpAssocVpcCommand command = generateIpAssocVpcCommand();
+
+        final AbstractConfigItemFacade configItemFacade = AbstractConfigItemFacade.getInstance(command.getClass());
+
+        final List<ConfigItem> config = configItemFacade.generateConfig(command);
+        assertTrue(config.size() > 0);
+
+        final ConfigItem fileConfig = config.get(0);
+        assertNotNull(fileConfig);
+        assertTrue(fileConfig instanceof FileConfigItem);
+
+        final String fileContents = ((FileConfigItem) fileConfig).getFileContents();
+        assertNotNull(fileContents);
+
+        final IpAssociation jsonClass = gson.fromJson(fileContents, IpAssociation.class);
+        assertNotNull(jsonClass);
+        assertEquals(jsonClass.getType(), "ips");
+
+        final IpAddress[] ips = jsonClass.getIpAddress();
+        assertNotNull(ips);
+        assertTrue(ips.length == 3);
+        assertEquals(ips[0].getPublicIp(), "64.1.1.10");
+
+        final ConfigItem scriptConfig = config.get(1);
+        assertNotNull(scriptConfig);
+        assertTrue(scriptConfig instanceof ScriptConfigItem);
+    }
+
+    protected IpAssocVpcCommand generateIpAssocVpcCommand() {
+        final List<IpAddressTO> ips = new ArrayList<>();
+        ips.add(new IpAddressTO(1, "64.1.1.10", true, true, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false));
+        ips.add(new IpAddressTO(2, "64.1.1.11", false, false, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false));
+        ips.add(new IpAddressTO(3, "65.1.1.11", true, false, false, "vlan://65", "65.1.1.1", "255.255.255.0", "11:23:45:67:89:AB", 1000, false));
+
+        final IpAddressTO[] ipArray = ips.toArray(new IpAddressTO[ips.size()]);
+        final IpAssocVpcCommand cmd = new IpAssocVpcCommand(ipArray);
+        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
+        assertEquals(6, cmd.getAnswersCount()); // AnswersCount is clearly wrong as it doesn't know enough to tell
+
+        return cmd;
+    }
+
+    @Test
+    public void testDnsMasqConfig() {
+
+        final DnsMasqConfigCommand command = generateDnsMasqConfigCommand();
+
+        final AbstractConfigItemFacade configItemFacade = AbstractConfigItemFacade.getInstance(command.getClass());
+
+        final List<ConfigItem> config = configItemFacade.generateConfig(command);
+        assertTrue(config.size() > 0);
+
+        final ConfigItem fileConfig = config.get(0);
+        assertNotNull(fileConfig);
+        assertTrue(fileConfig instanceof FileConfigItem);
+
+        final String fileContents = ((FileConfigItem) fileConfig).getFileContents();
+        assertNotNull(fileContents);
+
+        final DhcpConfig jsonClass = gson.fromJson(fileContents, DhcpConfig.class);
+        assertNotNull(jsonClass);
+        assertEquals(jsonClass.getType(), "dhcpconfig");
+
+        final List<DhcpConfigEntry> entries = jsonClass.getEntries();
+        assertNotNull(entries);
+        assertTrue(entries.size() == 2);
+        assertEquals(entries.get(0).getRouterIpAddress(), "10.1.20.2");
+
+        final ConfigItem scriptConfig = config.get(1);
+        assertNotNull(scriptConfig);
+        assertTrue(scriptConfig instanceof ScriptConfigItem);
+    }
+
     protected DnsMasqConfigCommand generateDnsMasqConfigCommand() {
         final List<DhcpTO> dhcps = new ArrayList<>();
         dhcps.add(new DhcpTO("10.1.20.2", "10.1.20.1", "255.255.255.0", "10.1.20.5"));
@@ -258,6 +226,37 @@ public class ConfigHelperTest {
         return cmd;
     }
 
+    @Test
+    public void testDeleteIpAlias() {
+
+        final DeleteIpAliasCommand command = generateDeleteIpAliasCommand();
+
+        final AbstractConfigItemFacade configItemFacade = AbstractConfigItemFacade.getInstance(command.getClass());
+
+        final List<ConfigItem> config = configItemFacade.generateConfig(command);
+        assertTrue(config.size() > 0);
+
+        final ConfigItem fileConfig = config.get(0);
+        assertNotNull(fileConfig);
+        assertTrue(fileConfig instanceof FileConfigItem);
+
+        final String fileContents = ((FileConfigItem) fileConfig).getFileContents();
+        assertNotNull(fileContents);
+
+        final IpAliases jsonClass = gson.fromJson(fileContents, IpAliases.class);
+        assertNotNull(jsonClass);
+        assertEquals(jsonClass.getType(), "ipaliases");
+
+        final List<IpAddressAlias> aliases = jsonClass.getAliases();
+        assertNotNull(aliases);
+        assertTrue(aliases.size() == 6);
+        assertEquals(aliases.get(0).getIpAddress(), "169.254.3.10");
+
+        final ConfigItem scriptConfig = config.get(1);
+        assertNotNull(scriptConfig);
+        assertTrue(scriptConfig instanceof ScriptConfigItem);
+    }
+
     protected DeleteIpAliasCommand generateDeleteIpAliasCommand() {
         final List<IpAliasTO> aliases = new ArrayList<>();
         aliases.add(new IpAliasTO("169.254.3.10", "255.255.255.0", "1"));
@@ -266,20 +265,6 @@ public class ConfigHelperTest {
 
         final DeleteIpAliasCommand cmd = new DeleteIpAliasCommand("169.254.10.1", aliases, aliases);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
-        return cmd;
-    }
-
-    protected IpAssocVpcCommand generateIpAssocVpcCommand() {
-        final List<IpAddressTO> ips = new ArrayList<IpAddressTO>();
-        ips.add(new IpAddressTO(1, "64.1.1.10", true, true, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false));
-        ips.add(new IpAddressTO(2, "64.1.1.11", false, false, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false));
-        ips.add(new IpAddressTO(3, "65.1.1.11", true, false, false, "vlan://65", "65.1.1.1", "255.255.255.0", "11:23:45:67:89:AB", 1000, false));
-
-        final IpAddressTO[] ipArray = ips.toArray(new IpAddressTO[ips.size()]);
-        final IpAssocVpcCommand cmd = new IpAssocVpcCommand(ipArray);
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
-        assertEquals(6, cmd.getAnswersCount()); // AnswersCount is clearly wrong as it doesn't know enough to tell
-
         return cmd;
     }
 }

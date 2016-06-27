@@ -1,24 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function($, cloudStack) {
+(function ($, cloudStack) {
     /**
      * Login process
      */
-    cloudStack.uiCustom.login = function(args) {
+    cloudStack.uiCustom.login = function (args) {
         var $container = args.$container;
         var $login = $('#template').find('.login').clone();
         var $form = $login.find('form');
@@ -40,9 +24,9 @@
         $('html body').addClass('login');
 
         // Remove label if field was auto filled
-        $.each($form.find('label'), function() {
+        $.each($form.find('label'), function () {
             var $label = $(this);
-            var $input = $form.find('input').filter(function() {
+            var $input = $form.find('input').filter(function () {
                 return $(this).attr('name') == $label.attr('for');
             });
             if ($input.val()) {
@@ -54,9 +38,9 @@
         $form.validate();
 
         // Form label behavior
-        $inputs.bind('keydown focus click blur', function(event) {
+        $inputs.bind('keydown focus click blur', function (event) {
             var $target = $(event.target);
-            var $label = $form.find('label').filter(function() {
+            var $label = $form.find('label').filter(function () {
                 return $(this).attr('for') == $target.attr('name');
             });
 
@@ -83,7 +67,7 @@
         if (!args.hasLogo) $login.addClass('nologo');
 
         // Labels cause related input to be focused
-        $login.find('label').click(function() {
+        $login.find('label').click(function () {
             var $input = $inputs.filter('[name=' + $(this).attr('for') + ']');
             var $label = $(this);
 
@@ -95,7 +79,7 @@
 
         // Login action
         var selectedLogin = 'cloudstack';
-        $login.find('#login-submit').click(function() {
+        $login.find('#login-submit').click(function () {
             if (selectedLogin === 'cloudstack') {
                 // CloudStack Local Login
                 if (!$form.valid()) return false;
@@ -105,14 +89,14 @@
                 args.loginAction({
                     data: data,
                     response: {
-                        success: function(args) {
+                        success: function (args) {
                             $login.remove();
                             $('html body').removeClass('login');
                             complete({
                                 user: args.data.user
                             });
                         },
-                        error: function(args) {
+                        error: function (args) {
                             cloudStack.dialog.notice({
                                 message: args
                             });
@@ -132,19 +116,19 @@
         var toggleLoginView = function (selectedOption) {
             $login.find('#login-submit').show();
             if (selectedOption === '') {
-                    $login.find('#cloudstack-login').hide();
-                    $login.find('#login-submit').hide();
-                    selectedLogin = 'none';
+                $login.find('#cloudstack-login').hide();
+                $login.find('#login-submit').hide();
+                selectedLogin = 'none';
             } else if (selectedOption === 'cloudstack-login') {
-                    $login.find('#cloudstack-login').show();
-                    selectedLogin = 'cloudstack';
+                $login.find('#cloudstack-login').show();
+                selectedLogin = 'cloudstack';
             } else {
-                    $login.find('#cloudstack-login').hide();
-                    selectedLogin = 'saml';
+                $login.find('#cloudstack-login').hide();
+                selectedLogin = 'saml';
             }
         };
 
-        $login.find('#login-options').change(function() {
+        $login.find('#login-options').change(function () {
             var selectedOption = $login.find('#login-options').find(':selected').val();
             toggleLoginView(selectedOption);
             if (selectedOption && selectedOption !== '') {
@@ -170,7 +154,7 @@
                     selected: true
                 }));
 
-            $.each(g_idpList, function(index, idp) {
+            $.each(g_idpList, function (index, idp) {
                 $login.find('#login-options')
                     .append($('<option>', {
                         value: idp.id,
@@ -190,7 +174,7 @@
 
         // Select language
         var $languageSelect = $login.find('select[name=language]');
-        $languageSelect.change(function() {
+        $languageSelect.change(function () {
             if ($(this).val() != '') //language dropdown is not blank
                 $.cookie('lang', $(this).val()); //the selected option in language dropdown will be used (instead of browser's default language)
             else //language dropdown is blank

@@ -1,29 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.storage.volume.datastore;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.capacity.Capacity;
@@ -41,13 +16,19 @@ import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.utils.crypt.DBEncryptionUtil;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.engine.subsystem.api.storage.HostScope;
 import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreParameters;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import javax.inject.Inject;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -56,19 +37,18 @@ import org.springframework.stereotype.Component;
 public class PrimaryDataStoreHelper {
     private static final Logger s_logger = LoggerFactory.getLogger(PrimaryDataStoreHelper.class);
     @Inject
-    private PrimaryDataStoreDao dataStoreDao;
+    protected CapacityDao _capacityDao;
+    @Inject
+    protected StoragePoolHostDao storagePoolHostDao;
     @Inject
     DataStoreManager dataStoreMgr;
     @Inject
     StorageManager storageMgr;
     @Inject
-    protected CapacityDao _capacityDao;
-    @Inject
-    protected StoragePoolHostDao storagePoolHostDao;
+    private PrimaryDataStoreDao dataStoreDao;
 
-    public DataStore createPrimaryDataStore(PrimaryDataStoreParameters params) {
-        if(params == null)
-        {
+    public DataStore createPrimaryDataStore(final PrimaryDataStoreParameters params) {
+        if (params == null) {
             throw new InvalidParameterValueException("createPrimaryDataStore: Input params is null, please check");
         }
         StoragePoolVO dataStoreVO = dataStoreDao.findPoolByUUID(params.getUuid());
@@ -94,15 +74,15 @@ public class PrimaryDataStoreHelper {
         dataStoreVO.setUsedBytes(params.getUsedBytes());
         dataStoreVO.setHypervisor(params.getHypervisorType());
 
-        Map<String, String> details = params.getDetails();
+        final Map<String, String> details = params.getDetails();
         if (params.getType() == StoragePoolType.SMB && details != null) {
-            String user = details.get("user");
+            final String user = details.get("user");
             String password = details.get("password");
-            String domain = details.get("domain");
+            final String domain = details.get("domain");
             String updatedPath = params.getPath();
 
             if (user == null || password == null) {
-                String errMsg = "Missing cifs user and password details. Add them as details parameter.";
+                final String errMsg = "Missing cifs user and password details. Add them as details parameter.";
                 s_logger.warn(errMsg);
                 throw new InvalidParameterValueException(errMsg);
             } else {
@@ -110,16 +90,16 @@ public class PrimaryDataStoreHelper {
                     password = DBEncryptionUtil.encrypt(URLEncoder.encode(password, "UTF-8"));
                     details.put("password", password);
                     updatedPath += "?user=" + user + "&password=" + password + "&domain=" + domain;
-                } catch (UnsupportedEncodingException e) {
+                } catch (final UnsupportedEncodingException e) {
                     throw new CloudRuntimeException("Error while generating the cifs url. " + e.getMessage());
                 }
             }
 
             dataStoreVO.setPath(updatedPath);
         }
-        String tags = params.getTags();
+        final String tags = params.getTags();
         if (tags != null) {
-            String[] tokens = tags.split(",");
+            final String[] tokens = tags.split(",");
 
             for (String tag : tokens) {
                 tag = tag.trim();
@@ -133,14 +113,14 @@ public class PrimaryDataStoreHelper {
         return dataStoreMgr.getDataStore(dataStoreVO.getId(), DataStoreRole.Primary);
     }
 
-    public DataStore attachHost(DataStore store, HostScope scope, StoragePoolInfo existingInfo) {
+    public DataStore attachHost(final DataStore store, final HostScope scope, final StoragePoolInfo existingInfo) {
         StoragePoolHostVO poolHost = storagePoolHostDao.findByPoolHost(store.getId(), scope.getScopeId());
         if (poolHost == null) {
             poolHost = new StoragePoolHostVO(store.getId(), scope.getScopeId(), existingInfo.getLocalPath());
             storagePoolHostDao.persist(poolHost);
         }
 
-        StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
+        final StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
         pool.setScope(scope.getScopeType());
         pool.setUsedBytes(existingInfo.getCapacityBytes() - existingInfo.getAvailableBytes());
         pool.setCapacityBytes(existingInfo.getCapacityBytes());
@@ -150,8 +130,8 @@ public class PrimaryDataStoreHelper {
         return dataStoreMgr.getDataStore(pool.getId(), DataStoreRole.Primary);
     }
 
-    public DataStore attachCluster(DataStore store) {
-        StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
+    public DataStore attachCluster(final DataStore store) {
+        final StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
 
         storageMgr.createCapacityEntry(pool.getId());
 
@@ -161,16 +141,16 @@ public class PrimaryDataStoreHelper {
         return dataStoreMgr.getDataStore(store.getId(), DataStoreRole.Primary);
     }
 
-    public DataStore attachZone(DataStore store) {
-        StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
+    public DataStore attachZone(final DataStore store) {
+        final StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
         pool.setScope(ScopeType.ZONE);
         pool.setStatus(StoragePoolStatus.Up);
         this.dataStoreDao.update(pool.getId(), pool);
         return dataStoreMgr.getDataStore(store.getId(), DataStoreRole.Primary);
     }
 
-    public DataStore attachZone(DataStore store, HypervisorType hypervisor) {
-        StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
+    public DataStore attachZone(final DataStore store, final HypervisorType hypervisor) {
+        final StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
         pool.setScope(ScopeType.ZONE);
         pool.setHypervisor(hypervisor);
         pool.setStatus(StoragePoolStatus.Up);
@@ -178,54 +158,40 @@ public class PrimaryDataStoreHelper {
         return dataStoreMgr.getDataStore(store.getId(), DataStoreRole.Primary);
     }
 
-    public boolean maintain(DataStore store) {
-        StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
+    public boolean maintain(final DataStore store) {
+        final StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
         pool.setStatus(StoragePoolStatus.Maintenance);
         this.dataStoreDao.update(pool.getId(), pool);
         return true;
     }
 
-    public boolean cancelMaintain(DataStore store) {
-        StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
+    public boolean cancelMaintain(final DataStore store) {
+        final StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
         pool.setStatus(StoragePoolStatus.Up);
         dataStoreDao.update(store.getId(), pool);
         return true;
     }
 
-    public boolean disable(DataStore store) {
-        StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
+    public boolean disable(final DataStore store) {
+        final StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
         pool.setStatus(StoragePoolStatus.Disabled);
         this.dataStoreDao.update(pool.getId(), pool);
         return true;
     }
 
-    public boolean enable(DataStore store) {
-        StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
+    public boolean enable(final DataStore store) {
+        final StoragePoolVO pool = this.dataStoreDao.findById(store.getId());
         pool.setStatus(StoragePoolStatus.Up);
         dataStoreDao.update(pool.getId(), pool);
         return true;
     }
 
-    protected boolean deletePoolStats(Long poolId) {
-        CapacityVO capacity1 = _capacityDao.findByHostIdType(poolId, Capacity.CAPACITY_TYPE_STORAGE);
-        CapacityVO capacity2 = _capacityDao.findByHostIdType(poolId, Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED);
-        if (capacity1 != null) {
-            _capacityDao.remove(capacity1.getId());
-        }
-
-        if (capacity2 != null) {
-            _capacityDao.remove(capacity2.getId());
-        }
-
-        return true;
-    }
-
-    public boolean deletePrimaryDataStore(DataStore store) {
-        List<StoragePoolHostVO> hostPoolRecords = this.storagePoolHostDao.listByPoolId(store.getId());
-        StoragePoolVO poolVO = this.dataStoreDao.findById(store.getId());
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public boolean deletePrimaryDataStore(final DataStore store) {
+        final List<StoragePoolHostVO> hostPoolRecords = this.storagePoolHostDao.listByPoolId(store.getId());
+        final StoragePoolVO poolVO = this.dataStoreDao.findById(store.getId());
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
-        for (StoragePoolHostVO host : hostPoolRecords) {
+        for (final StoragePoolHostVO host : hostPoolRecords) {
             storagePoolHostDao.deleteStoragePoolHostDetails(host.getHostId(), host.getPoolId());
         }
         poolVO.setUuid(null);
@@ -240,4 +206,17 @@ public class PrimaryDataStoreHelper {
         return true;
     }
 
+    protected boolean deletePoolStats(final Long poolId) {
+        final CapacityVO capacity1 = _capacityDao.findByHostIdType(poolId, Capacity.CAPACITY_TYPE_STORAGE);
+        final CapacityVO capacity2 = _capacityDao.findByHostIdType(poolId, Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED);
+        if (capacity1 != null) {
+            _capacityDao.remove(capacity1.getId());
+        }
+
+        if (capacity2 != null) {
+            _capacityDao.remove(capacity2.getId());
+        }
+
+        return true;
+    }
 }

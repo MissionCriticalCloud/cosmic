@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.deploy;
 
 import com.cloud.capacity.Capacity;
@@ -36,7 +20,11 @@ import com.cloud.host.dao.HostTagsDao;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.StorageManager;
-import com.cloud.storage.dao.*;
+import com.cloud.storage.dao.DiskOfferingDao;
+import com.cloud.storage.dao.GuestOSCategoryDao;
+import com.cloud.storage.dao.GuestOSDao;
+import com.cloud.storage.dao.StoragePoolHostDao;
+import com.cloud.storage.dao.VolumeDao;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
@@ -50,12 +38,18 @@ import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPlanner, Configurable, DeploymentPlanner {
     private static final Logger s_logger = LoggerFactory.getLogger(FirstFitPlanner.class);
@@ -94,8 +88,6 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
     @Inject
     protected StorageManager storageMgr;
     @Inject
-    DataStoreManager dataStoreMgr;
-    @Inject
     protected ClusterDetailsDao clusterDetailsDao;
     @Inject
     protected ServiceOfferingDetailsDao serviceOfferingDetailsDao;
@@ -103,10 +95,11 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
     protected HostGpuGroupsDao hostGpuGroupsDao;
     @Inject
     protected HostTagsDao hostTagsDao;
-
     protected String allocationAlgorithm = "random";
     protected String globalDeploymentPlanner = "FirstFitPlanner";
     protected String[] implicitHostTags;
+    @Inject
+    DataStoreManager dataStoreMgr;
 
     @Override
     public List<Long> orderClusters(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid) throws InsufficientServerCapacityException {
@@ -181,6 +174,12 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
             }
         }
         return clusterList;
+    }
+
+    @Override
+    public PlannerResourceUsage getResourceUsage(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid) throws
+            InsufficientServerCapacityException {
+        return PlannerResourceUsage.Shared;
     }
 
     private void reorderClustersBasedOnImplicitTags(final List<Long> clusterList, final int requiredCpu, final long requiredRam) {
@@ -330,11 +329,11 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
                 s_logger.debug("Cannot allocate cluster list " + clustersCrossingThreshold.toString() + " for vm creation since their allocated percentage" +
                         " crosses the disable capacity threshold defined at each cluster/ at global value for capacity Type : " + capacity + ", skipping these clusters");
             }
-
         }
     }
 
-    private List<Long> scanClustersForDestinationInZoneOrPod(final long id, final boolean isZone, final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid) {
+    private List<Long> scanClustersForDestinationInZoneOrPod(final long id, final boolean isZone, final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final
+    ExcludeList avoid) {
 
         final VirtualMachine vm = vmProfile.getVirtualMachine();
         final ServiceOffering offering = vmProfile.getServiceOffering();
@@ -369,7 +368,6 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
             }
 
             removeClustersCrossingThreshold(prioritizedClusterIds, avoid, vmProfile, plan);
-
         } else {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("No clusters found having a host with enough capacity, returning.");
@@ -429,7 +427,8 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
         return disabledPods;
     }
 
-    protected Pair<List<Long>, Map<Long, Double>> listClustersByCapacity(final long id, final int requiredCpu, final long requiredRam, final ExcludeList avoid, final boolean isZone) {
+    protected Pair<List<Long>, Map<Long, Double>> listClustersByCapacity(final long id, final int requiredCpu, final long requiredRam, final ExcludeList avoid, final boolean
+            isZone) {
         //look at the aggregate available cpu and ram per cluster
         //although an aggregate value may be false indicator that a cluster can host a vm, it will at the least eliminate those clusters which definitely cannot
 
@@ -461,7 +460,6 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
         }
 
         return result;
-
     }
 
     protected Pair<List<Long>, Map<Long, Double>> listPodsByCapacity(final long zoneId, final int requiredCpu, final long requiredRam) {
@@ -495,7 +493,6 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
         }
 
         return result;
-
     }
 
     private boolean isRootAdmin(final VirtualMachineProfile vmProfile) {
@@ -504,22 +501,6 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
                 return accountMgr.isRootAdmin(vmProfile.getOwner().getId());
             } else {
                 return false;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean canHandle(final VirtualMachineProfile vm, final DeploymentPlan plan, final ExcludeList avoid) {
-        // check what the ServiceOffering says. If null, check the global config
-        final ServiceOffering offering = vm.getServiceOffering();
-        if (offering != null && offering.getDeploymentPlanner() != null) {
-            if (offering.getDeploymentPlanner().equals(getName())) {
-                return true;
-            }
-        } else {
-            if (globalDeploymentPlanner != null && globalDeploymentPlanner.equals(_name)) {
-                return true;
             }
         }
         return false;
@@ -544,8 +525,19 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
     }
 
     @Override
-    public PlannerResourceUsage getResourceUsage(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid) throws InsufficientServerCapacityException {
-        return PlannerResourceUsage.Shared;
+    public boolean canHandle(final VirtualMachineProfile vm, final DeploymentPlan plan, final ExcludeList avoid) {
+        // check what the ServiceOffering says. If null, check the global config
+        final ServiceOffering offering = vm.getServiceOffering();
+        if (offering != null && offering.getDeploymentPlanner() != null) {
+            if (offering.getDeploymentPlanner().equals(getName())) {
+                return true;
+            }
+        } else {
+            if (globalDeploymentPlanner != null && globalDeploymentPlanner.equals(_name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

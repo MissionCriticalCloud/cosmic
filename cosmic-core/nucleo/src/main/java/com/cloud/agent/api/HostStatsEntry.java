@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.api;
@@ -34,8 +19,9 @@ public class HostStatsEntry implements HostStats {
     public HostStatsEntry() {
     }
 
-    public HostStatsEntry(long hostId, double cpuUtilization, double networkReadKBs, double networkWriteKBs, String entityType, double totalMemoryKBs,
-            double freeMemoryKBs, double xapiMemoryUsageKBs, double averageLoad) {
+    public HostStatsEntry(final long hostId, final double cpuUtilization, final double networkReadKBs, final double networkWriteKBs, final String entityType, final double
+            totalMemoryKBs,
+                          final double freeMemoryKBs, final double xapiMemoryUsageKBs, final double averageLoad) {
         this.hostId = hostId;
         this.entityType = entityType;
         this.cpuUtilization = cpuUtilization;
@@ -46,12 +32,8 @@ public class HostStatsEntry implements HostStats {
     }
 
     @Override
-    public double getNetworkReadKBs() {
-        return networkReadKBs;
-    }
-
-    public void setNetworkReadKBs(double networkReadKBs) {
-        this.networkReadKBs = networkReadKBs;
+    public double getCpuUtilization() {
+        return this.cpuUtilization;
     }
 
     @Override
@@ -59,17 +41,8 @@ public class HostStatsEntry implements HostStats {
         return networkWriteKBs;
     }
 
-    public void setNetworkWriteKBs(double networkWriteKBs) {
+    public void setNetworkWriteKBs(final double networkWriteKBs) {
         this.networkWriteKBs = networkWriteKBs;
-    }
-
-    @Override
-    public String getEntityType() {
-        return this.entityType;
-    }
-
-    public void setEntityType(String entityType) {
-        this.entityType = entityType;
     }
 
     @Override
@@ -77,7 +50,7 @@ public class HostStatsEntry implements HostStats {
         return this.totalMemoryKBs;
     }
 
-    public void setTotalMemoryKBs(double totalMemoryKBs) {
+    public void setTotalMemoryKBs(final double totalMemoryKBs) {
         this.totalMemoryKBs = totalMemoryKBs;
     }
 
@@ -86,17 +59,22 @@ public class HostStatsEntry implements HostStats {
         return this.freeMemoryKBs;
     }
 
-    public void setFreeMemoryKBs(double freeMemoryKBs) {
-        this.freeMemoryKBs = freeMemoryKBs;
+    @Override
+    public double getNetworkReadKBs() {
+        return networkReadKBs;
+    }
+
+    public void setNetworkReadKBs(final double networkReadKBs) {
+        this.networkReadKBs = networkReadKBs;
     }
 
     @Override
-    public double getCpuUtilization() {
-        return this.cpuUtilization;
+    public String getEntityType() {
+        return this.entityType;
     }
 
-    public void setCpuUtilization(double cpuUtilization) {
-        this.cpuUtilization = cpuUtilization;
+    public void setEntityType(final String entityType) {
+        this.entityType = entityType;
     }
 
     @Override
@@ -109,7 +87,15 @@ public class HostStatsEntry implements HostStats {
         return this;
     }
 
-    public void setHostId(long hostId) {
+    public void setFreeMemoryKBs(final double freeMemoryKBs) {
+        this.freeMemoryKBs = freeMemoryKBs;
+    }
+
+    public void setCpuUtilization(final double cpuUtilization) {
+        this.cpuUtilization = cpuUtilization;
+    }
+
+    public void setHostId(final long hostId) {
         this.hostId = hostId;
     }
 }

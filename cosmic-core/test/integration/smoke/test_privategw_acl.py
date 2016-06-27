@@ -1,32 +1,15 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-from marvin.cloudstackAPI.createStaticRoute import createStaticRouteCmd
 """ Tests for Network ACLs in VPC
 """
-#Import Local Modules
-from marvin.cloudstackTestCase import *
+# Import Local Modules
+import logging
+import time
 from marvin.cloudstackAPI import *
-from marvin.lib.utils import *
+from marvin.cloudstackTestCase import *
 from marvin.lib.base import *
 from marvin.lib.common import *
+from marvin.lib.utils import *
 from nose.plugins.attrib import attr
 
-import time
-import logging
 
 class Services:
     """Test VPC network services - Port Forwarding Rules Test Data Class.
@@ -154,8 +137,8 @@ class Services:
             "timeout": 10,
         }
 
-class TestPrivateGwACL(cloudstackTestCase):
 
+class TestPrivateGwACL(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
 
@@ -270,7 +253,7 @@ class TestPrivateGwACL(cloudstackTestCase):
         self.logger.debug("Enabling the VPC offering created")
         vpc_off.update(self.apiclient, state='Enabled')
 
-        self.performVPCTests(vpc_off, restart_with_cleanup = True)
+        self.performVPCTests(vpc_off, restart_with_cleanup=True)
 
     @attr(tags=["advanced"], required_hardware="true")
     def test_04_rvpc_privategw_static_routes(self):
@@ -296,10 +279,10 @@ class TestPrivateGwACL(cloudstackTestCase):
 
         self.performPrivateGWInterfaceTests(vpc_off)
 
-    def performVPCTests(self, vpc_off, restart_with_cleanup = False):
+    def performVPCTests(self, vpc_off, restart_with_cleanup=False):
         self.logger.debug("Creating VPCs with  offering ID %s" % vpc_off.id)
-        vpc_1 = self.createVPC(vpc_off, cidr = '10.0.1.0/24')
-        vpc_2 = self.createVPC(vpc_off, cidr = '10.0.2.0/24')
+        vpc_1 = self.createVPC(vpc_off, cidr='10.0.1.0/24')
+        vpc_2 = self.createVPC(vpc_off, cidr='10.0.2.0/24')
 
         self.cleanup += [vpc_1, vpc_2, vpc_off, self.account]
 
@@ -310,8 +293,8 @@ class TestPrivateGwACL(cloudstackTestCase):
         vlans = physical_networks[0].vlan.split('-')
         vlan_1 = int(vlans[0])
 
-        network_1 = self.createNetwork(vpc_1, gateway = '10.0.1.1')
-        network_2 = self.createNetwork(vpc_2, gateway = '10.0.2.1')
+        network_1 = self.createNetwork(vpc_1, gateway='10.0.1.1')
+        network_2 = self.createNetwork(vpc_2, gateway='10.0.2.1')
 
         vm1 = self.createVM(network_1)
         vm2 = self.createVM(network_2)
@@ -320,20 +303,20 @@ class TestPrivateGwACL(cloudstackTestCase):
         self.cleanup.insert(0, vm2)
 
         acl1 = self.createACL(vpc_1)
-        self.createACLItem(acl1.id, cidr = "0.0.0.0/0")
+        self.createACLItem(acl1.id, cidr="0.0.0.0/0")
         privateGw_1 = self.createPvtGw(vpc_1, "10.0.3.100", "10.0.3.101", acl1.id, vlan_1)
         self.replacePvtGwACL(acl1.id, privateGw_1.id)
 
         acl2 = self.createACL(vpc_2)
-        self.createACLItem(acl2.id, cidr = "0.0.0.0/0")
+        self.createACLItem(acl2.id, cidr="0.0.0.0/0")
         privateGw_2 = self.createPvtGw(vpc_2, "10.0.3.101", "10.0.3.100", acl2.id, vlan_1)
         self.replacePvtGwACL(acl2.id, privateGw_2.id)
 
         self.replaceNetworkAcl(acl1.id, network_1)
         self.replaceNetworkAcl(acl2.id, network_2)
 
-        self.createStaticRoute(privateGw_1.id, cidr = '10.0.2.0/24')
-        self.createStaticRoute(privateGw_2.id, cidr = '10.0.1.0/24')
+        self.createStaticRoute(privateGw_1.id, cidr='10.0.2.0/24')
+        self.createStaticRoute(privateGw_2.id, cidr='10.0.1.0/24')
 
         public_ip_1 = self.acquire_publicip(vpc_1, network_1)
         public_ip_2 = self.acquire_publicip(vpc_2, network_2)
@@ -351,7 +334,7 @@ class TestPrivateGwACL(cloudstackTestCase):
 
     def performPrivateGWInterfaceTests(self, vpc_off):
         self.logger.debug("Creating VPCs with  offering ID %s" % vpc_off.id)
-        vpc_1 = self.createVPC(vpc_off, cidr = '10.0.0.0/16')
+        vpc_1 = self.createVPC(vpc_off, cidr='10.0.0.0/16')
 
         self.cleanup += [vpc_1, vpc_off, self.account]
 
@@ -364,10 +347,10 @@ class TestPrivateGwACL(cloudstackTestCase):
 
         net_offering_no_lb = "network_offering_no_lb"
 
-        network_1 = self.createNetwork(vpc_1, gateway = '10.0.0.1')
-        network_2 = self.createNetwork(vpc_1, net_offering = net_offering_no_lb, gateway = '10.0.1.1')
-        network_3 = self.createNetwork(vpc_1, net_offering = net_offering_no_lb, gateway = '10.0.2.1')
-        network_4 = self.createNetwork(vpc_1, net_offering = net_offering_no_lb, gateway = '10.0.3.1')
+        network_1 = self.createNetwork(vpc_1, gateway='10.0.0.1')
+        network_2 = self.createNetwork(vpc_1, net_offering=net_offering_no_lb, gateway='10.0.1.1')
+        network_3 = self.createNetwork(vpc_1, net_offering=net_offering_no_lb, gateway='10.0.2.1')
+        network_4 = self.createNetwork(vpc_1, net_offering=net_offering_no_lb, gateway='10.0.3.1')
 
         vm1 = self.createVM(network_1)
         vm2 = self.createVM(network_2)
@@ -380,7 +363,7 @@ class TestPrivateGwACL(cloudstackTestCase):
         self.cleanup.insert(0, vm4)
 
         acl1 = self.createACL(vpc_1)
-        self.createACLItem(acl1.id, cidr = "0.0.0.0/0")
+        self.createACLItem(acl1.id, cidr="0.0.0.0/0")
 
         privateGw_ip_address = "10.0.3.100"
 
@@ -398,10 +381,10 @@ class TestPrivateGwACL(cloudstackTestCase):
         routers = list_routers(self.apiclient, account=self.account.name, domainid=self.account.domainid)
 
         self.assertEqual(isinstance(routers, list), True,
-            "Check for list routers response return valid data")
+                         "Check for list routers response return valid data")
 
         self.assertEqual(len(routers), 2,
-            "Check for list routers size returned '%s' instead of 2" % len(routers))
+                         "Check for list routers size returned '%s' instead of 2" % len(routers))
 
         self.check_private_gateway_interfaces(routers, privateGw_ip_address)
 
@@ -453,7 +436,7 @@ class TestPrivateGwACL(cloudstackTestCase):
                 cmd.id = router.id
                 self.apiclient.startRouter(cmd)
 
-    def createVPC(self, vpc_offering, cidr = '10.1.1.1/16'):
+    def createVPC(self, vpc_offering, cidr='10.1.1.1/16'):
         try:
             self.logger.debug("Creating a VPC network in the account: %s" % self.account.name)
             self.services["vpc"]["cidr"] = cidr
@@ -489,7 +472,7 @@ class TestPrivateGwACL(cloudstackTestCase):
 
         return vm
 
-    def createStaticRoute(self, privateGwId, cidr = '10.0.0.0/16'):
+    def createStaticRoute(self, privateGwId, cidr='10.0.0.0/16'):
         try:
             staticRoute = StaticRoute.create(self.api_client, cidr, privateGwId)
             self.assertIsNotNone(staticRoute.id, "Failed to create static route.")
@@ -514,7 +497,7 @@ class TestPrivateGwACL(cloudstackTestCase):
 
         return acl
 
-    def createACLItem(self, aclId, cidr = "0.0.0.0/0"):
+    def createACLItem(self, aclId, cidr="0.0.0.0/0"):
         createAclItemCmd = createNetworkACL.createNetworkACLCmd()
         createAclItemCmd.cidr = cidr
         createAclItemCmd.protocol = "All"
@@ -529,7 +512,7 @@ class TestPrivateGwACL(cloudstackTestCase):
         except Exception, e:
             self.fail('Unable to create ACL Item due to %s ' % e)
 
-    def createNetwork(self, vpc, net_offering = "network_offering", gateway = '10.1.1.1'):
+    def createNetwork(self, vpc, net_offering="network_offering", gateway='10.1.1.1'):
         try:
             self.logger.debug('Create NetworkOffering')
             net_offerring = self.services[net_offering]
@@ -672,7 +655,7 @@ class TestPrivateGwACL(cloudstackTestCase):
 
             time.sleep(5)
 
-    def reboot_vpc_with_cleanup(self, vpc, cleanup = True):
+    def reboot_vpc_with_cleanup(self, vpc, cleanup=True):
         self.logger.debug("Restarting VPC %s with cleanup" % vpc.id)
 
         # Reboot the router
@@ -683,8 +666,8 @@ class TestPrivateGwACL(cloudstackTestCase):
         self.api_client.restartVPC(cmd)
 
     def check_private_gateway_interfaces(self, routers, pv_gw_ip_address):
-        state_holder = {routers[0].linklocalip : {"state" : None, "mac" : None},
-                        routers[1].linklocalip : {"state" : None, "mac" : None}}
+        state_holder = { routers[0].linklocalip: { "state": None, "mac": None },
+                         routers[1].linklocalip: { "state": None, "mac": None } }
         state = None
         mac = None
         for router in routers:

@@ -1,23 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.vm;
-
-import java.io.Serializable;
-import java.net.URI;
 
 import com.cloud.network.Network;
 import com.cloud.network.Networks.AddressFormat;
@@ -25,8 +6,10 @@ import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.Mode;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.vm.Nic.ReservationStrategy;
-
 import org.apache.cloudstack.api.InternalIdentity;
+
+import java.io.Serializable;
+import java.net.URI;
 
 public class NicProfile implements InternalIdentity, Serializable {
     private static final long serialVersionUID = 4997005771736090304L;
@@ -75,7 +58,8 @@ public class NicProfile implements InternalIdentity, Serializable {
     public NicProfile() {
     }
 
-    public NicProfile(Nic nic, Network network, URI broadcastUri, URI isolationUri, Integer networkRate, boolean isSecurityGroupEnabled, String name) {
+    public NicProfile(final Nic nic, final Network network, final URI broadcastUri, final URI isolationUri, final Integer networkRate, final boolean isSecurityGroupEnabled,
+                      final String name) {
         id = nic.getId();
         networkId = network.getId();
         mode = network.getMode();
@@ -109,12 +93,12 @@ public class NicProfile implements InternalIdentity, Serializable {
         }
     }
 
-    public NicProfile(String requestedIPv4, String requestedIPv6) {
+    public NicProfile(final String requestedIPv4, final String requestedIPv6) {
         this.requestedIPv4 = requestedIPv4;
         this.requestedIPv6 = requestedIPv6;
     }
 
-    public NicProfile(ReservationStrategy strategy, String iPv4Address, String macAddress, String iPv4gateway, String iPv4netmask) {
+    public NicProfile(final ReservationStrategy strategy, final String iPv4Address, final String macAddress, final String iPv4gateway, final String iPv4netmask) {
         format = AddressFormat.Ip4;
         this.iPv4Address = iPv4Address;
         this.iPv4Gateway = iPv4gateway;
@@ -132,7 +116,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
@@ -140,7 +124,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return networkId;
     }
 
-    public void setNetworId(long networkId){
+    public void setNetworId(final long networkId) {
         this.networkId = networkId;
     }
 
@@ -148,7 +132,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return vmId;
     }
 
-    public void setVirtualMachineId(long virtualMachineId) {
+    public void setVirtualMachineId(final long virtualMachineId) {
         this.vmId = virtualMachineId;
     }
 
@@ -156,7 +140,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return reservationId;
     }
 
-    public void setReservationId(String reservationId) {
+    public void setReservationId(final String reservationId) {
         this.reservationId = reservationId;
     }
 
@@ -164,7 +148,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return deviceId;
     }
 
-    public void setDeviceId(int deviceId) {
+    public void setDeviceId(final int deviceId) {
         this.deviceId = deviceId;
     }
 
@@ -172,7 +156,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -180,7 +164,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(final String uuid) {
         this.uuid = uuid;
     }
 
@@ -188,7 +172,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return macAddress;
     }
 
-    public void setMacAddress(String macAddress) {
+    public void setMacAddress(final String macAddress) {
         this.macAddress = macAddress;
     }
 
@@ -196,7 +180,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return broadcastType;
     }
 
-    public void setBroadcastType(BroadcastDomainType broadcastType) {
+    public void setBroadcastType(final BroadcastDomainType broadcastType) {
         this.broadcastType = broadcastType;
     }
 
@@ -204,7 +188,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return mode;
     }
 
-    public void setMode(Mode mode) {
+    public void setMode(final Mode mode) {
         this.mode = mode;
     }
 
@@ -212,7 +196,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return format;
     }
 
-    public void setFormat(AddressFormat format) {
+    public void setFormat(final AddressFormat format) {
         this.format = format;
     }
 
@@ -220,7 +204,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return trafficType;
     }
 
-    public void setTrafficType(TrafficType trafficType) {
+    public void setTrafficType(final TrafficType trafficType) {
         this.trafficType = trafficType;
     }
 
@@ -228,7 +212,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return isolationUri;
     }
 
-    public void setIsolationUri(URI isolationUri) {
+    public void setIsolationUri(final URI isolationUri) {
         this.isolationUri = isolationUri;
     }
 
@@ -236,7 +220,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return broadcastUri;
     }
 
-    public void setBroadcastUri(URI broadcastUri) {
+    public void setBroadcastUri(final URI broadcastUri) {
         this.broadcastUri = broadcastUri;
     }
 
@@ -244,7 +228,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return strategy;
     }
 
-    public void setReservationStrategy(ReservationStrategy strategy) {
+    public void setReservationStrategy(final ReservationStrategy strategy) {
         this.strategy = strategy;
     }
 
@@ -252,7 +236,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return defaultNic;
     }
 
-    public void setDefaultNic(boolean defaultNic) {
+    public void setDefaultNic(final boolean defaultNic) {
         this.defaultNic = defaultNic;
     }
 
@@ -260,7 +244,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return networkRate;
     }
 
-    public void setNetworkRate(Integer networkRate) {
+    public void setNetworkRate(final Integer networkRate) {
         this.networkRate = networkRate;
     }
 
@@ -268,7 +252,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return isSecurityGroupEnabled;
     }
 
-    public void setSecurityGroupEnabled(boolean enabled) {
+    public void setSecurityGroupEnabled(final boolean enabled) {
         isSecurityGroupEnabled = enabled;
     }
 
@@ -280,7 +264,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return iPv4Address;
     }
 
-    public void setIPv4Address(String ipv4Address) {
+    public void setIPv4Address(final String ipv4Address) {
         this.iPv4Address = ipv4Address;
     }
 
@@ -288,7 +272,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return iPv4Netmask;
     }
 
-    public void setIPv4Netmask(String ipv4Netmask) {
+    public void setIPv4Netmask(final String ipv4Netmask) {
         this.iPv4Netmask = ipv4Netmask;
     }
 
@@ -296,7 +280,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return iPv4Gateway;
     }
 
-    public void setIPv4Gateway(String ipv4Gateway) {
+    public void setIPv4Gateway(final String ipv4Gateway) {
         this.iPv4Gateway = ipv4Gateway;
     }
 
@@ -304,7 +288,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return iPv4Dns1;
     }
 
-    public void setIPv4Dns1(String ipv4Dns1) {
+    public void setIPv4Dns1(final String ipv4Dns1) {
         this.iPv4Dns1 = ipv4Dns1;
     }
 
@@ -312,7 +296,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return iPv4Dns2;
     }
 
-    public void setIPv4Dns2(String ipv4Dns2) {
+    public void setIPv4Dns2(final String ipv4Dns2) {
         this.iPv4Dns2 = ipv4Dns2;
     }
 
@@ -320,7 +304,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return requestedIPv4;
     }
 
-    public void setRequestedIPv4(String requestedIPv4) {
+    public void setRequestedIPv4(final String requestedIPv4) {
         this.requestedIPv4 = requestedIPv4;
     }
 
@@ -332,7 +316,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return iPv6Address;
     }
 
-    public void setIPv6Address(String ipv6Address) {
+    public void setIPv6Address(final String ipv6Address) {
         this.iPv6Address = ipv6Address;
     }
 
@@ -340,7 +324,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return iPv6Gateway;
     }
 
-    public void setIPv6Gateway(String ipv6Gateway) {
+    public void setIPv6Gateway(final String ipv6Gateway) {
         this.iPv6Gateway = ipv6Gateway;
     }
 
@@ -348,7 +332,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return iPv6Cidr;
     }
 
-    public void setIPv6Cidr(String ipv6Cidr) {
+    public void setIPv6Cidr(final String ipv6Cidr) {
         this.iPv6Cidr = ipv6Cidr;
     }
 
@@ -356,7 +340,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return iPv6Dns1;
     }
 
-    public void setIPv6Dns1(String ipv6Dns1) {
+    public void setIPv6Dns1(final String ipv6Dns1) {
         this.iPv6Dns1 = ipv6Dns1;
     }
 
@@ -364,7 +348,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return iPv6Dns2;
     }
 
-    public void setIPv6Dns2(String ipv6Dns2) {
+    public void setIPv6Dns2(final String ipv6Dns2) {
         this.iPv6Dns2 = ipv6Dns2;
     }
 
@@ -372,7 +356,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         return requestedIPv6;
     }
 
-    public void setRequestedIPv6(String requestedIPv6) {
+    public void setRequestedIPv6(final String requestedIPv6) {
         this.requestedIPv6 = requestedIPv6;
     }
 
@@ -404,20 +388,19 @@ public class NicProfile implements InternalIdentity, Serializable {
         deviceId = null;
         broadcastUri = null;
         isolationUri = null;
-
     }
 
     @Override
     public String toString() {
         return new StringBuilder("NicProfile[").append(id)
-                .append("-")
-                .append(vmId)
-                .append("-")
-                .append(reservationId)
-                .append("-")
-                .append(iPv4Address)
-                .append("-")
-                .append(broadcastUri)
-                .toString();
+                                               .append("-")
+                                               .append(vmId)
+                                               .append("-")
+                                               .append(reservationId)
+                                               .append("-")
+                                               .append(iPv4Address)
+                                               .append("-")
+                                               .append(broadcastUri)
+                                               .toString();
     }
 }

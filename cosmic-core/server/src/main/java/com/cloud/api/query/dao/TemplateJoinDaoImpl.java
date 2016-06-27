@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.query.dao;
 
 import com.cloud.api.ApiDBUtils;
@@ -37,9 +21,6 @@ import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import org.apache.cloudstack.engine.subsystem.api.storage.TemplateState;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -47,24 +28,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 @Component
 public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> implements TemplateJoinDao {
 
     public static final Logger s_logger = LoggerFactory.getLogger(TemplateJoinDaoImpl.class);
-
+    private final SearchBuilder<TemplateJoinVO> tmpltIdPairSearch;
+    private final SearchBuilder<TemplateJoinVO> tmpltIdSearch;
+    private final SearchBuilder<TemplateJoinVO> tmpltZoneSearch;
+    private final SearchBuilder<TemplateJoinVO> activeTmpltSearch;
     @Inject
     private ConfigurationDao _configDao;
     @Inject
     private AccountService _accountService;
-
-    private final SearchBuilder<TemplateJoinVO> tmpltIdPairSearch;
-
-    private final SearchBuilder<TemplateJoinVO> tmpltIdSearch;
-
-    private final SearchBuilder<TemplateJoinVO> tmpltZoneSearch;
-
-    private final SearchBuilder<TemplateJoinVO> activeTmpltSearch;
 
     protected TemplateJoinDaoImpl() {
 
@@ -91,27 +70,6 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
 
         // select distinct pair (template_id, zone_id)
         _count = "select count(distinct temp_zone_pair) from template_view WHERE ";
-    }
-
-    private String getTemplateStatus(final TemplateJoinVO template) {
-        String templateStatus = null;
-        if (template.getDownloadState() != Status.DOWNLOADED) {
-            templateStatus = "Processing";
-            if (template.getDownloadState() == VMTemplateHostVO.Status.DOWNLOAD_IN_PROGRESS) {
-                if (template.getDownloadPercent() == 100) {
-                    templateStatus = "Installing Template";
-                } else {
-                    templateStatus = template.getDownloadPercent() + "% Downloaded";
-                }
-            } else {
-                templateStatus = template.getErrorString();
-            }
-        } else if (template.getDownloadState() == VMTemplateHostVO.Status.DOWNLOADED) {
-            templateStatus = "Download Complete";
-        } else {
-            templateStatus = "Successfully Installed";
-        }
-        return templateStatus;
     }
 
     @Override
@@ -190,72 +148,25 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
         return templateResponse;
     }
 
-    //TODO: This is to keep compatibility with 4.1 API, where updateTemplateCmd and updateIsoCmd will return a simpler TemplateResponse
-    // compared to listTemplates and listIsos.
-    @Override
-    public TemplateResponse newUpdateResponse(final TemplateJoinVO result) {
-        final TemplateResponse response = new TemplateResponse();
-        response.setId(result.getUuid());
-        response.setName(result.getName());
-        response.setDisplayText(result.getDisplayText());
-        response.setPublic(result.isPublicTemplate());
-        response.setCreated(result.getCreated());
-        response.setFormat(result.getFormat());
-        response.setOsTypeId(result.getGuestOSUuid());
-        response.setOsTypeName(result.getGuestOSName());
-        response.setBootable(result.isBootable());
-        response.setHypervisor(result.getHypervisorType().toString());
-
-        // populate owner.
-        ApiResponseHelper.populateOwner(response, result);
-
-        // populate domain
-        response.setDomainId(result.getDomainUuid());
-        response.setDomainName(result.getDomainName());
-
-        // set details map
-        if (result.getDetailName() != null) {
-            final Map<String, String> details = new HashMap<>();
-            details.put(result.getDetailName(), result.getDetailValue());
-            response.setDetails(details);
-        }
-
-        // update tag information
-        final long tag_id = result.getTagId();
-        if (tag_id > 0) {
-            final ResourceTagJoinVO vtag = ApiDBUtils.findResourceTagViewById(tag_id);
-            if (vtag != null) {
-                response.addTag(ApiDBUtils.newResourceTagResponse(vtag, false));
+    private String getTemplateStatus(final TemplateJoinVO template) {
+        String templateStatus = null;
+        if (template.getDownloadState() != Status.DOWNLOADED) {
+            templateStatus = "Processing";
+            if (template.getDownloadState() == VMTemplateHostVO.Status.DOWNLOAD_IN_PROGRESS) {
+                if (template.getDownloadPercent() == 100) {
+                    templateStatus = "Installing Template";
+                } else {
+                    templateStatus = template.getDownloadPercent() + "% Downloaded";
+                }
+            } else {
+                templateStatus = template.getErrorString();
             }
+        } else if (template.getDownloadState() == VMTemplateHostVO.Status.DOWNLOADED) {
+            templateStatus = "Download Complete";
+        } else {
+            templateStatus = "Successfully Installed";
         }
-
-        response.setObjectName("iso");
-        return response;
-    }
-
-    @Override
-    public TemplateResponse setTemplateResponse(final ResponseView view, final TemplateResponse templateResponse, final TemplateJoinVO template) {
-
-        // update details map
-        if (template.getDetailName() != null) {
-            Map<String, String> details = templateResponse.getDetails();
-            if (details == null) {
-                details = new HashMap<>();
-            }
-            details.put(template.getDetailName(), template.getDetailValue());
-            templateResponse.setDetails(details);
-        }
-
-        // update tag information
-        final long tag_id = template.getTagId();
-        if (tag_id > 0) {
-            final ResourceTagJoinVO vtag = ApiDBUtils.findResourceTagViewById(tag_id);
-            if (vtag != null) {
-                templateResponse.addTag(ApiDBUtils.newResourceTagResponse(vtag, false));
-            }
-        }
-
-        return templateResponse;
+        return templateStatus;
     }
 
     @Override
@@ -340,7 +251,74 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
 
         isoResponse.setObjectName("iso");
         return isoResponse;
+    }
 
+    //TODO: This is to keep compatibility with 4.1 API, where updateTemplateCmd and updateIsoCmd will return a simpler TemplateResponse
+    // compared to listTemplates and listIsos.
+    @Override
+    public TemplateResponse newUpdateResponse(final TemplateJoinVO result) {
+        final TemplateResponse response = new TemplateResponse();
+        response.setId(result.getUuid());
+        response.setName(result.getName());
+        response.setDisplayText(result.getDisplayText());
+        response.setPublic(result.isPublicTemplate());
+        response.setCreated(result.getCreated());
+        response.setFormat(result.getFormat());
+        response.setOsTypeId(result.getGuestOSUuid());
+        response.setOsTypeName(result.getGuestOSName());
+        response.setBootable(result.isBootable());
+        response.setHypervisor(result.getHypervisorType().toString());
+
+        // populate owner.
+        ApiResponseHelper.populateOwner(response, result);
+
+        // populate domain
+        response.setDomainId(result.getDomainUuid());
+        response.setDomainName(result.getDomainName());
+
+        // set details map
+        if (result.getDetailName() != null) {
+            final Map<String, String> details = new HashMap<>();
+            details.put(result.getDetailName(), result.getDetailValue());
+            response.setDetails(details);
+        }
+
+        // update tag information
+        final long tag_id = result.getTagId();
+        if (tag_id > 0) {
+            final ResourceTagJoinVO vtag = ApiDBUtils.findResourceTagViewById(tag_id);
+            if (vtag != null) {
+                response.addTag(ApiDBUtils.newResourceTagResponse(vtag, false));
+            }
+        }
+
+        response.setObjectName("iso");
+        return response;
+    }
+
+    @Override
+    public TemplateResponse setTemplateResponse(final ResponseView view, final TemplateResponse templateResponse, final TemplateJoinVO template) {
+
+        // update details map
+        if (template.getDetailName() != null) {
+            Map<String, String> details = templateResponse.getDetails();
+            if (details == null) {
+                details = new HashMap<>();
+            }
+            details.put(template.getDetailName(), template.getDetailValue());
+            templateResponse.setDetails(details);
+        }
+
+        // update tag information
+        final long tag_id = template.getTagId();
+        if (tag_id > 0) {
+            final ResourceTagJoinVO vtag = ApiDBUtils.findResourceTagViewById(tag_id);
+            if (vtag != null) {
+                templateResponse.addTag(ApiDBUtils.newResourceTagResponse(vtag, false));
+            }
+        }
+
+        return templateResponse;
     }
 
     @Override
@@ -429,5 +407,4 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
         final Integer count = getCount(sc);
         return new Pair<>(objects, count);
     }
-
 }

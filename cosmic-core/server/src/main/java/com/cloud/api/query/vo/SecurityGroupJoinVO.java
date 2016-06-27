@@ -1,20 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.query.vo;
+
+import com.cloud.network.security.SecurityGroup;
+import com.cloud.network.security.SecurityRule.SecurityRuleType;
+import com.cloud.server.ResourceTag.ResourceObjectType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,10 +10,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.network.security.SecurityGroup;
-import com.cloud.network.security.SecurityRule.SecurityRuleType;
-import com.cloud.server.ResourceTag.ResourceObjectType;
 
 @Entity
 @Table(name = "security_group_view")
@@ -144,6 +128,150 @@ public class SecurityGroupJoinVO extends BaseViewVO implements ControlledViewEnt
     public SecurityGroupJoinVO() {
     }
 
+    public void setId(final long id) {
+        this.id = id;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
+    }
+
+    public void setAccountId(final long accountId) {
+        this.accountId = accountId;
+    }
+
+    public void setAccountUuid(final String accountUuid) {
+        this.accountUuid = accountUuid;
+    }
+
+    public void setAccountName(final String accountName) {
+        this.accountName = accountName;
+    }
+
+    public void setAccountType(final short accountType) {
+        this.accountType = accountType;
+    }
+
+    public void setDomainId(final long domainId) {
+        this.domainId = domainId;
+    }
+
+    public void setDomainUuid(final String domainUuid) {
+        this.domainUuid = domainUuid;
+    }
+
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setDomainPath(final String domainPath) {
+        this.domainPath = domainPath;
+    }
+
+    public void setProjectId(final long projectId) {
+        this.projectId = projectId;
+    }
+
+    public void setProjectUuid(final String projectUuid) {
+        this.projectUuid = projectUuid;
+    }
+
+    public void setProjectName(final String projectName) {
+        this.projectName = projectName;
+    }
+
+    public void setJobId(final Long jobId) {
+        this.jobId = jobId;
+    }
+
+    public void setJobUuid(final String jobUuid) {
+        this.jobUuid = jobUuid;
+    }
+
+    public void setJobStatus(final int jobStatus) {
+        this.jobStatus = jobStatus;
+    }
+
+    public void setRuleId(final Long ruleId) {
+        this.ruleId = ruleId;
+    }
+
+    public void setRuleUuid(final String ruleUuid) {
+        this.ruleUuid = ruleUuid;
+    }
+
+    public void setRuleStartPort(final int ruleStartPort) {
+        this.ruleStartPort = ruleStartPort;
+    }
+
+    public void setRuleEndPort(final int ruleEndPort) {
+        this.ruleEndPort = ruleEndPort;
+    }
+
+    public void setRuleProtocol(final String ruleProtocol) {
+        this.ruleProtocol = ruleProtocol;
+    }
+
+    public void setRuleType(final String ruleType) {
+        this.ruleType = ruleType;
+    }
+
+    public void setRuleAllowedNetworkId(final Long ruleAllowedNetworkId) {
+        this.ruleAllowedNetworkId = ruleAllowedNetworkId;
+    }
+
+    public void setRuleAllowedSourceIpCidr(final String ruleAllowedSourceIpCidr) {
+        this.ruleAllowedSourceIpCidr = ruleAllowedSourceIpCidr;
+    }
+
+    public void setTagId(final long tagId) {
+        this.tagId = tagId;
+    }
+
+    public void setTagUuid(final String tagUuid) {
+        this.tagUuid = tagUuid;
+    }
+
+    public void setTagKey(final String tagKey) {
+        this.tagKey = tagKey;
+    }
+
+    public void setTagValue(final String tagValue) {
+        this.tagValue = tagValue;
+    }
+
+    public void setTagDomainId(final long tagDomainId) {
+        this.tagDomainId = tagDomainId;
+    }
+
+    public void setTagAccountId(final long tagAccountId) {
+        this.tagAccountId = tagAccountId;
+    }
+
+    public void setTagResourceId(final long tagResourceId) {
+        this.tagResourceId = tagResourceId;
+    }
+
+    public void setTagResourceUuid(final String tagResourceUuid) {
+        this.tagResourceUuid = tagResourceUuid;
+    }
+
+    public void setTagResourceType(final ResourceObjectType tagResourceType) {
+        this.tagResourceType = tagResourceType;
+    }
+
+    public void setTagCustomer(final String tagCustomer) {
+        this.tagCustomer = tagCustomer;
+    }
+
     @Override
     public long getId() {
         return id;
@@ -164,13 +292,13 @@ public class SecurityGroupJoinVO extends BaseViewVO implements ControlledViewEnt
     }
 
     @Override
-    public String getAccountUuid() {
-        return accountUuid;
+    public long getDomainId() {
+        return domainId;
     }
 
     @Override
-    public String getAccountName() {
-        return accountName;
+    public String getDomainPath() {
+        return domainPath;
     }
 
     @Override
@@ -179,8 +307,13 @@ public class SecurityGroupJoinVO extends BaseViewVO implements ControlledViewEnt
     }
 
     @Override
-    public long getDomainId() {
-        return domainId;
+    public String getAccountUuid() {
+        return accountUuid;
+    }
+
+    @Override
+    public String getAccountName() {
+        return accountName;
     }
 
     @Override
@@ -194,15 +327,6 @@ public class SecurityGroupJoinVO extends BaseViewVO implements ControlledViewEnt
     }
 
     @Override
-    public String getDomainPath() {
-        return domainPath;
-    }
-
-    public long getProjectId() {
-        return projectId;
-    }
-
-    @Override
     public String getProjectUuid() {
         return projectUuid;
     }
@@ -210,6 +334,10 @@ public class SecurityGroupJoinVO extends BaseViewVO implements ControlledViewEnt
     @Override
     public String getProjectName() {
         return projectName;
+    }
+
+    public long getProjectId() {
+        return projectId;
     }
 
     public Long getJobId() {

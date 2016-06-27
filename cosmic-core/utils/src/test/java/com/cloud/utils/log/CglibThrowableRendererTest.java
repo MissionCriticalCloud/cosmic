@@ -1,33 +1,17 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils.log;
 
 import java.lang.reflect.Method;
 
-import org.apache.commons.lang.StringUtils;
-import org.junit.Assert;
-import org.junit.Test;
-
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import org.apache.commons.lang.StringUtils;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class CglibThrowableRendererTest {
 
@@ -35,22 +19,22 @@ public class CglibThrowableRendererTest {
 
     @Test
     public void testDoRendere() {
-        SampleClass sampleClass = (SampleClass)Enhancer.create(SampleClass.class, new MyInvocationHandler());
+        final SampleClass sampleClass = (SampleClass) Enhancer.create(SampleClass.class, new MyInvocationHandler());
         try {
             sampleClass.theFirstMethodThatCapturesAnException();
-        } catch (Exception e) {
-            String[] exceptions = cglibThrowableRenderer.doRender(e);
+        } catch (final Exception e) {
+            final String[] exceptions = cglibThrowableRenderer.doRender(e);
             assertThatTheTraceListDoesNotContainsCgLibLogs(exceptions);
         }
     }
 
-    private void assertThatTheTraceListDoesNotContainsCgLibLogs(String[] exceptions) {
-        for (String s : exceptions) {
+    private void assertThatTheTraceListDoesNotContainsCgLibLogs(final String[] exceptions) {
+        for (final String s : exceptions) {
             Assert.assertEquals(false, isCgLibLogTrace(s));
         }
     }
 
-    private boolean isCgLibLogTrace(String s) {
+    private boolean isCgLibLogTrace(final String s) {
         return StringUtils.contains(s, "net.sf.cglib.proxy");
     }
 
@@ -58,7 +42,7 @@ public class CglibThrowableRendererTest {
         public void theFirstMethodThatCapturesAnException() {
             try {
                 methodThatCapturesAndThrowsException();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 throw new RuntimeException(e);
             }
         }
@@ -66,7 +50,7 @@ public class CglibThrowableRendererTest {
         private void methodThatCapturesAndThrowsException() throws Exception {
             try {
                 methodThatThrowsAnError();
-            } catch (Error e) {
+            } catch (final Error e) {
                 throw new Exception("Throws an exception", e);
             }
         }
@@ -78,7 +62,7 @@ public class CglibThrowableRendererTest {
 
     static class MyInvocationHandler implements MethodInterceptor {
         @Override
-        public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+        public Object intercept(final Object obj, final Method method, final Object[] args, final MethodProxy proxy) throws Throwable {
             return proxy.invoke(new SampleClass(), args);
         }
     }

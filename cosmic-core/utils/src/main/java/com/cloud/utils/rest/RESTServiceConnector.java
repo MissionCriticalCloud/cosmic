@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils.rest;
@@ -29,7 +14,6 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -40,7 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This abstraction encapsulates client side code for REST service communication. It encapsulates access in a REST client. There can be different implementations of that client
  * implementing {@link RestClient}, and any of them should mention the needed data to work.
- *
+ * <p>
  * This connector allows the use of {@link JsonDeserializer} for specific classes. You can provide in the constructor a map of classes to deserializers for these classes.
  */
 public class RESTServiceConnector {
@@ -69,49 +53,23 @@ public class RESTServiceConnector {
         return new Builder();
     }
 
+    public <T> void executeUpdateObject(final T newObject, final String path) throws CloudstackRESTException {
+        executeUpdateObject(newObject, path, new HashMap<>());
+    }
+
     public <T> void executeUpdateObject(final T newObject, final String path, final Map<String, String> parameters) throws CloudstackRESTException {
         s_logger.debug("Executing update object on " + path);
         client.closeResponse(createAndExecuteRequest(HttpMethods.PUT, path, parameters, Optional.fromNullable(gson.toJson(newObject))));
     }
 
-    public <T> void executeUpdateObject(final T newObject, final String path) throws CloudstackRESTException {
-        executeUpdateObject(newObject, path, new HashMap<String, String>());
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T executeCreateObject(final T newObject, final String path, final Map<String, String> parameters) throws CloudstackRESTException {
-        s_logger.debug("Executing create object on " + path);
-        final CloseableHttpResponse response = createAndExecuteRequest(HttpMethods.POST, path, parameters, Optional.fromNullable(gson.toJson(newObject)));
-        return (T) readResponseBody(response, newObject.getClass());
-    }
-
-    public <T> T executeCreateObject(final T newObject, final String uri) throws CloudstackRESTException {
-        return executeCreateObject(newObject, uri, new HashMap<String, String>());
-    }
-
-    public void executeDeleteObject(final String path) throws CloudstackRESTException {
-        s_logger.debug("Executing delete object on " + path);
-        client.closeResponse(createAndExecuteRequest(HttpMethods.DELETE, path, new HashMap<String, String>(), ABSENT));
-    }
-
-    public <T> T executeRetrieveObject(final Type returnObjectType, final String path, final Map<String, String> parameters) throws CloudstackRESTException {
-        s_logger.debug("Executing retrieve object on " + path);
-        final CloseableHttpResponse response = createAndExecuteRequest(HttpMethods.GET, path, parameters, ABSENT);
-        return readResponseBody(response, returnObjectType);
-    }
-
-    public <T> T executeRetrieveObject(final Type returnObjectType, final String path) throws CloudstackRESTException {
-        return executeRetrieveObject(returnObjectType, path, new HashMap<String, String>());
-    }
-
     private CloseableHttpResponse createAndExecuteRequest(final HttpMethods method, final String path, final Map<String, String> parameters, final Optional<String> jsonPayLoad)
-                    throws CloudstackRESTException {
+            throws CloudstackRESTException {
         final HttpUriRequest httpRequest = HttpUriRequestBuilder.create()
-            .path(path)
-            .parameters(parameters)
-            .jsonPayload(jsonPayLoad)
-            .method(method)
-            .build();
+                                                                .path(path)
+                                                                .parameters(parameters)
+                                                                .jsonPayload(jsonPayLoad)
+                                                                .method(method)
+                                                                .build();
         if (jsonPayLoad.isPresent()) {
             s_logger.debug("Built request '" + httpRequest + "' with payload: " + jsonPayLoad);
         }
@@ -122,6 +80,16 @@ public class RESTServiceConnector {
         final CloseableHttpResponse response = client.execute(httpRequest);
         s_logger.debug("Executed request: " + httpRequest + " status was " + response.getStatusLine().toString());
         return response;
+    }
+
+    public <T> T executeCreateObject(final T newObject, final String uri) throws CloudstackRESTException {
+        return executeCreateObject(newObject, uri, new HashMap<>());
+    }
+
+    public <T> T executeCreateObject(final T newObject, final String path, final Map<String, String> parameters) throws CloudstackRESTException {
+        s_logger.debug("Executing create object on " + path);
+        final CloseableHttpResponse response = createAndExecuteRequest(HttpMethods.POST, path, parameters, Optional.fromNullable(gson.toJson(newObject)));
+        return (T) readResponseBody(response, newObject.getClass());
     }
 
     private <T> T readResponseBody(final CloseableHttpResponse response, final Type type) throws CloudstackRESTException {
@@ -136,12 +104,26 @@ public class RESTServiceConnector {
         } finally {
             client.closeResponse(response);
         }
+    }
 
+    public void executeDeleteObject(final String path) throws CloudstackRESTException {
+        s_logger.debug("Executing delete object on " + path);
+        client.closeResponse(createAndExecuteRequest(HttpMethods.DELETE, path, new HashMap<>(), ABSENT));
+    }
+
+    public <T> T executeRetrieveObject(final Type returnObjectType, final String path) throws CloudstackRESTException {
+        return executeRetrieveObject(returnObjectType, path, new HashMap<>());
+    }
+
+    public <T> T executeRetrieveObject(final Type returnObjectType, final String path, final Map<String, String> parameters) throws CloudstackRESTException {
+        s_logger.debug("Executing retrieve object on " + path);
+        final CloseableHttpResponse response = createAndExecuteRequest(HttpMethods.GET, path, parameters, ABSENT);
+        return readResponseBody(response, returnObjectType);
     }
 
     public static class Builder {
+        final private Map<Class<?>, JsonDeserializer<?>> classToDeserializerMap = new HashMap<>();
         private RestClient client;
-        final private Map<Class<?>, JsonDeserializer<?>> classToDeserializerMap = new HashMap<Class<?>, JsonDeserializer<?>>();
 
         public Builder client(final RestClient client) {
             this.client = client;
@@ -163,5 +145,4 @@ public class RESTServiceConnector {
             return new RESTServiceConnector(this);
         }
     }
-
 }

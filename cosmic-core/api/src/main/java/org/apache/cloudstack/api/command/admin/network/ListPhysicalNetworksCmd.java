@@ -1,28 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.network;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -32,6 +12,10 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,9 +43,37 @@ public class ListPhysicalNetworksCmd extends BaseListCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
+    @Override
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
+    }
+
+    @Override
+    public void execute() {
+        final Pair<List<? extends PhysicalNetwork>, Integer> result =
+                _networkService.searchPhysicalNetworks(getId(), getZoneId(), this.getKeyword(), this.getStartIndex(), this.getPageSizeVal(), getNetworkName());
+        if (result != null) {
+            final ListResponse<PhysicalNetworkResponse> response = new ListResponse<>();
+            final List<PhysicalNetworkResponse> networkResponses = new ArrayList<>();
+            for (final PhysicalNetwork network : result.first()) {
+                final PhysicalNetworkResponse networkResponse = _responseGenerator.createPhysicalNetworkResponse(network);
+                networkResponses.add(networkResponse);
+            }
+            response.setResponses(networkResponses, result.second());
+            response.setResponseName(getCommandName());
+            this.setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to search for physical networks");
+        }
+    }
+
     public Long getId() {
         return id;
     }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
 
     public Long getZoneId() {
         return zoneId;
@@ -71,36 +83,8 @@ public class ListPhysicalNetworksCmd extends BaseListCmd {
         return networkName;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
     @Override
     public String getCommandName() {
         return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
-    public void execute() {
-        Pair<List<? extends PhysicalNetwork>, Integer> result =
-            _networkService.searchPhysicalNetworks(getId(), getZoneId(), this.getKeyword(), this.getStartIndex(), this.getPageSizeVal(), getNetworkName());
-        if (result != null) {
-            ListResponse<PhysicalNetworkResponse> response = new ListResponse<PhysicalNetworkResponse>();
-            List<PhysicalNetworkResponse> networkResponses = new ArrayList<PhysicalNetworkResponse>();
-            for (PhysicalNetwork network : result.first()) {
-                PhysicalNetworkResponse networkResponse = _responseGenerator.createPhysicalNetworkResponse(network);
-                networkResponses.add(networkResponse);
-            }
-            response.setResponses(networkResponses, result.second());
-            response.setResponseName(getCommandName());
-            this.setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to search for physical networks");
-        }
     }
 }

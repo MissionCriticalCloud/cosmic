@@ -1,20 +1,5 @@
 # -- coding: utf-8 --
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+
 # -------------------------------------------------------------------- #
 # Notes
 # -------------------------------------------------------------------- #
@@ -30,20 +15,21 @@
 # eth1 public ip
 # eth2+ Guest networks
 # -------------------------------------------------------------------- #
-import os
 import logging
-import CsHelper
-from CsFile import CsFile
-from CsProcess import CsProcess
-from CsApp import CsPasswdSvc
-from CsAddress import CsDevice
-from CsRoute import CsRoute
-from CsStaticRoutes import CsStaticRoutes
+import os
 import socket
 from time import sleep
 
-class CsRedundant(object):
+import CsHelper
+from CsAddress import CsDevice
+from CsApp import CsPasswdSvc
+from CsFile import CsFile
+from CsProcess import CsProcess
+from CsRoute import CsRoute
+from CsStaticRoutes import CsStaticRoutes
 
+
+class CsRedundant(object):
     CS_RAMDISK_DIR = "/ramdisk"
     CS_PRIO_UP = 1
     CS_PRIO_DOWN = -1
@@ -103,7 +89,7 @@ class CsRedundant(object):
                 if devUp:
                     logging.info("Device %s is present, let's start keepalive now." % dev)
                     isDeviceReady = True
-        
+
         if not isDeviceReady:
             logging.info("Guest network not configured yet, let's stop router redundancy for now.")
             CsHelper.service("conntrackd", "stop")
@@ -143,25 +129,25 @@ class CsRedundant(object):
 
         keepalived_conf.greplace("[RROUTER_BIN_PATH]", self.CS_ROUTER_DIR)
         keepalived_conf.section("authentication {", "}", [
-                                "        auth_type AH \n", "        auth_pass %s\n" % self.cl.get_router_password()])
+            "        auth_type AH \n", "        auth_pass %s\n" % self.cl.get_router_password()])
         keepalived_conf.section(
             "virtual_ipaddress {", "}", self._collect_ips())
 
         # conntrackd configuration
         conntrackd_template_conf = "%s/%s" % (self.CS_TEMPLATES_DIR, "conntrackd.conf.templ")
         conntrackd_temp_bkp = "%s/%s" % (self.CS_TEMPLATES_DIR, "conntrackd.conf.templ.bkp")
-        
+
         CsHelper.copy(conntrackd_template_conf, conntrackd_temp_bkp)
 
         conntrackd_tmpl = CsFile(conntrackd_template_conf)
         conntrackd_tmpl.section("Multicast {", "}", [
-                      "IPv4_address 225.0.0.50\n",
-                      "Group 3780\n",
-                      "IPv4_interface %s\n" % guest.get_ip(),
-                      "Interface %s\n" % guest.get_device(),
-                      "SndSocketBuffer 1249280\n",
-                      "RcvSocketBuffer 1249280\n",
-                      "Checksum on\n"])
+            "IPv4_address 225.0.0.50\n",
+            "Group 3780\n",
+            "IPv4_interface %s\n" % guest.get_ip(),
+            "Interface %s\n" % guest.get_device(),
+            "SndSocketBuffer 1249280\n",
+            "RcvSocketBuffer 1249280\n",
+            "Checksum on\n"])
         conntrackd_tmpl.section("Address Ignore {", "}", self._collect_ignore_ips())
         conntrackd_tmpl.commit()
 
@@ -373,10 +359,10 @@ class CsRedundant(object):
         lines = []
         for interface in self.address.get_interfaces():
             if interface.needs_vrrp():
-                cmdline=self.config.get_cmdline_instance()
+                cmdline = self.config.get_cmdline_instance()
                 if not interface.is_added():
                     continue
-                if(cmdline.get_type()=='router'):
+                if (cmdline.get_type() == 'router'):
                     str = "        %s brd %s dev %s\n" % (cmdline.get_guest_gw(), interface.get_broadcast(), interface.get_device())
                 else:
                     str = "        %s brd %s dev %s\n" % (interface.get_gateway_cidr(), interface.get_broadcast(), interface.get_device())

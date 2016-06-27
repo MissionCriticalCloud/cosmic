@@ -1,30 +1,13 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.usage;
 
-import java.util.Date;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
 
 @Entity
 @Table(name = "usage_vmsnapshot")
@@ -63,7 +46,8 @@ public class UsageVMSnapshotVO implements InternalIdentity {
     protected UsageVMSnapshotVO() {
     }
 
-    public UsageVMSnapshotVO(long id, long zoneId, long accountId, long domainId, long vmId, Long diskOfferingId, long size, Date created, Date processed) {
+    public UsageVMSnapshotVO(final long id, final long zoneId, final long accountId, final long domainId, final long vmId, final Long diskOfferingId, final long size, final Date
+            created, final Date processed) {
         this.zoneId = zoneId;
         this.accountId = accountId;
         this.domainId = domainId;
@@ -99,7 +83,7 @@ public class UsageVMSnapshotVO implements InternalIdentity {
         return processed;
     }
 
-    public void setProcessed(Date processed) {
+    public void setProcessed(final Date processed) {
         this.processed = processed;
     }
 
@@ -107,7 +91,7 @@ public class UsageVMSnapshotVO implements InternalIdentity {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 
@@ -119,5 +103,4 @@ public class UsageVMSnapshotVO implements InternalIdentity {
     public long getId() {
         return this.id;
     }
-
 }

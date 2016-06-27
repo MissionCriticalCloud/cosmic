@@ -1,25 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network;
-
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
 
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
@@ -34,13 +13,22 @@ import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
-
 import org.apache.cloudstack.api.command.user.firewall.IListFirewallRulesCmd;
+
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
 
 public class MockFirewallManagerImpl extends ManagerBase implements FirewallManager, FirewallService {
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         return true;
     }
 
@@ -56,155 +44,149 @@ public class MockFirewallManagerImpl extends ManagerBase implements FirewallMana
     }
 
     @Override
-    public String getName() {
+    public void detectRulesConflict(final FirewallRule newRule) throws NetworkRuleConflictException {
         // TODO Auto-generated method stub
-        return null;
+
     }
 
     @Override
-    public Pair<List<? extends FirewallRule>, Integer> listFirewallRules(IListFirewallRulesCmd cmd) {
+    public void validateFirewallRule(final Account caller, final IPAddressVO ipAddress, final Integer portStart, final Integer portEnd, final String proto, final Purpose
+            purpose, final FirewallRuleType type,
+                                     final Long networkid, final TrafficType trafficType) {
         // TODO Auto-generated method stub
-        return null;
+
     }
 
     @Override
-    public boolean revokeIngressFirewallRule(long ruleId, boolean apply) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean revokeEgressFirewallRule(long ruleId, boolean apply) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public FirewallRule getFirewallRule(long ruleId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean revokeRelatedFirewallRule(long ruleId, boolean apply) {
+    public boolean applyRules(final List<? extends FirewallRule> rules, final boolean continueOnError, final boolean updateRulesInDB) throws ResourceUnavailableException {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public FirewallRule updateIngressFirewallRule(long ruleId, String customId, Boolean forDisplay) {
+    public boolean applyFirewallRules(final List<FirewallRuleVO> rules, final boolean continueOnError, final Account caller) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void revokeRule(final FirewallRuleVO rule, final Account caller, final long userId, final boolean needUsageEvent) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public boolean revokeFirewallRulesForIp(final long ipId, final long userId, final Account caller) throws ResourceUnavailableException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public FirewallRule createRuleForAllCidrs(final long ipAddrId, final Account caller, final Integer startPort, final Integer endPort, final String protocol, final Integer
+            icmpCode, final Integer icmpType,
+                                              final Long relatedRuleId, final long networkId) throws NetworkRuleConflictException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean revokeAllFirewallRulesForNetwork(final long networkId, final long userId, final Account caller) throws ResourceUnavailableException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean revokeFirewallRulesForVm(final long vmId) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean addSystemFirewallRules(final IPAddressVO ip, final Account acct) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void removeRule(final FirewallRule rule) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public boolean applyDefaultEgressFirewallRule(final Long networkId, final boolean defaultPolicy, final boolean add) throws ResourceUnavailableException {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public FirewallRule createIngressFirewallRule(final FirewallRule rule) throws NetworkRuleConflictException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public FirewallRule createEgressFirewallRule(final FirewallRule rule) throws NetworkRuleConflictException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Pair<List<? extends FirewallRule>, Integer> listFirewallRules(final IListFirewallRulesCmd cmd) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean revokeIngressFirewallRule(final long ruleId, final boolean apply) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean revokeEgressFirewallRule(final long ruleId, final boolean apply) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean applyEgressFirewallRules(final FirewallRule rule, final Account caller) throws ResourceUnavailableException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean applyIngressFirewallRules(final long ipId, final Account caller) throws ResourceUnavailableException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public FirewallRule getFirewallRule(final long ruleId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean revokeRelatedFirewallRule(final long ruleId, final boolean apply) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public FirewallRule updateIngressFirewallRule(final long ruleId, final String customId, final Boolean forDisplay) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public FirewallRule updateEgressFirewallRule(long ruleId, String customId, Boolean forDisplay) {
+    public FirewallRule updateEgressFirewallRule(final long ruleId, final String customId, final Boolean forDisplay) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public boolean applyIngressFwRules(long ipId, Account caller) throws ResourceUnavailableException {
+    public boolean applyIngressFwRules(final long ipId, final Account caller) throws ResourceUnavailableException {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public boolean revokeIngressFwRule(long ruleId, boolean apply) {
+    public boolean revokeIngressFwRule(final long ruleId, final boolean apply) {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
-
-    @Override
-    public void detectRulesConflict(FirewallRule newRule) throws NetworkRuleConflictException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public boolean applyRules(List<? extends FirewallRule> rules, boolean continueOnError, boolean updateRulesInDB) throws ResourceUnavailableException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean applyFirewallRules(List<FirewallRuleVO> rules, boolean continueOnError, Account caller) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void revokeRule(FirewallRuleVO rule, Account caller, long userId, boolean needUsageEvent) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public boolean revokeFirewallRulesForIp(long ipId, long userId, Account caller) throws ResourceUnavailableException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public FirewallRule createRuleForAllCidrs(long ipAddrId, Account caller, Integer startPort, Integer endPort, String protocol, Integer icmpCode, Integer icmpType,
-        Long relatedRuleId, long networkId) throws NetworkRuleConflictException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean revokeAllFirewallRulesForNetwork(long networkId, long userId, Account caller) throws ResourceUnavailableException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean revokeFirewallRulesForVm(long vmId) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean addSystemFirewallRules(IPAddressVO ip, Account acct) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void removeRule(FirewallRule rule) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public boolean applyDefaultEgressFirewallRule(Long networkId, boolean defaultPolicy, boolean add) throws ResourceUnavailableException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void validateFirewallRule(Account caller, IPAddressVO ipAddress, Integer portStart, Integer portEnd, String proto, Purpose purpose, FirewallRuleType type,
-        Long networkid, TrafficType trafficType) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public boolean applyEgressFirewallRules(FirewallRule rule, Account caller) throws ResourceUnavailableException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean applyIngressFirewallRules(long ipId, Account caller) throws ResourceUnavailableException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public FirewallRule createEgressFirewallRule(FirewallRule rule) throws NetworkRuleConflictException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public FirewallRule createIngressFirewallRule(FirewallRule rule) throws NetworkRuleConflictException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
 }

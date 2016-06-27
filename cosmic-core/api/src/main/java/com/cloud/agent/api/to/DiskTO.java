@@ -1,26 +1,8 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package com.cloud.agent.api.to;
 
-import java.util.Map;
-
 import com.cloud.storage.Volume;
+
+import java.util.Map;
 
 public class DiskTO {
     public static final String CHAP_INITIATOR_USERNAME = "chapInitiatorUsername";
@@ -47,7 +29,7 @@ public class DiskTO {
 
     }
 
-    public DiskTO(DataTO data, Long diskSeq, String path, Volume.Type type) {
+    public DiskTO(final DataTO data, final Long diskSeq, final String path, final Volume.Type type) {
         this.data = data;
         this.diskSeq = diskSeq;
         this.path = path;
@@ -58,7 +40,7 @@ public class DiskTO {
         return data;
     }
 
-    public void setData(DataTO data) {
+    public void setData(final DataTO data) {
         this.data = data;
     }
 
@@ -66,7 +48,7 @@ public class DiskTO {
         return diskSeq;
     }
 
-    public void setDiskSeq(Long diskSeq) {
+    public void setDiskSeq(final Long diskSeq) {
         this.diskSeq = diskSeq;
     }
 
@@ -74,7 +56,7 @@ public class DiskTO {
         return path;
     }
 
-    public void setPath(String path) {
+    public void setPath(final String path) {
         this.path = path;
     }
 
@@ -82,15 +64,15 @@ public class DiskTO {
         return type;
     }
 
-    public void setType(Volume.Type type) {
+    public void setType(final Volume.Type type) {
         this.type = type;
-    }
-
-    public void setDetails(Map<String, String> details) {
-        _details = details;
     }
 
     public Map<String, String> getDetails() {
         return _details;
+    }
+
+    public void setDetails(final Map<String, String> details) {
+        _details = details;
     }
 }

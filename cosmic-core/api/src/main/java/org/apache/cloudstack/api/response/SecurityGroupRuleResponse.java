@@ -1,30 +1,14 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.Set;
 
 import com.cloud.network.security.SecurityRule;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.Set;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = SecurityRule.class)
 public class SecurityGroupRuleResponse extends BaseResponse {
@@ -68,19 +52,11 @@ public class SecurityGroupRuleResponse extends BaseResponse {
     @Param(description = "the list of resource tags associated with the rule", responseObject = ResourceTagResponse.class)
     private java.util.Set<ResourceTagResponse> tags;
 
-    public String getRuleId() {
-        return ruleId;
-    }
-
-    public void setRuleId(String ruleId) {
-        this.ruleId = ruleId;
-    }
-
     public String getProtocol() {
         return protocol;
     }
 
-    public void setProtocol(String protocol) {
+    public void setProtocol(final String protocol) {
         this.protocol = protocol;
     }
 
@@ -88,7 +64,7 @@ public class SecurityGroupRuleResponse extends BaseResponse {
         return icmpType;
     }
 
-    public void setIcmpType(Integer icmpType) {
+    public void setIcmpType(final Integer icmpType) {
         this.icmpType = icmpType;
     }
 
@@ -96,7 +72,7 @@ public class SecurityGroupRuleResponse extends BaseResponse {
         return icmpCode;
     }
 
-    public void setIcmpCode(Integer icmpCode) {
+    public void setIcmpCode(final Integer icmpCode) {
         this.icmpCode = icmpCode;
     }
 
@@ -104,7 +80,7 @@ public class SecurityGroupRuleResponse extends BaseResponse {
         return startPort;
     }
 
-    public void setStartPort(Integer startPort) {
+    public void setStartPort(final Integer startPort) {
         this.startPort = startPort;
     }
 
@@ -112,7 +88,7 @@ public class SecurityGroupRuleResponse extends BaseResponse {
         return endPort;
     }
 
-    public void setEndPort(Integer endPort) {
+    public void setEndPort(final Integer endPort) {
         this.endPort = endPort;
     }
 
@@ -120,7 +96,7 @@ public class SecurityGroupRuleResponse extends BaseResponse {
         return securityGroupName;
     }
 
-    public void setSecurityGroupName(String securityGroupName) {
+    public void setSecurityGroupName(final String securityGroupName) {
         this.securityGroupName = securityGroupName;
     }
 
@@ -128,7 +104,7 @@ public class SecurityGroupRuleResponse extends BaseResponse {
         return accountName;
     }
 
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
@@ -136,7 +112,7 @@ public class SecurityGroupRuleResponse extends BaseResponse {
         return cidr;
     }
 
-    public void setCidr(String cidr) {
+    public void setCidr(final String cidr) {
         this.cidr = cidr;
     }
 
@@ -144,34 +120,47 @@ public class SecurityGroupRuleResponse extends BaseResponse {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        String oid = this.getRuleId();
+        final String oid = this.getRuleId();
         result = prime * result + ((oid == null) ? 0 : oid.hashCode());
         return result;
     }
 
+    public String getRuleId() {
+        return ruleId;
+    }
+
+    public void setRuleId(final String ruleId) {
+        this.ruleId = ruleId;
+    }
+
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        SecurityGroupRuleResponse other = (SecurityGroupRuleResponse)obj;
-        String oid = this.getRuleId();
+        }
+        final SecurityGroupRuleResponse other = (SecurityGroupRuleResponse) obj;
+        final String oid = this.getRuleId();
         if (oid == null) {
-            if (other.getRuleId() != null)
+            if (other.getRuleId() != null) {
                 return false;
-        } else if (!oid.equals(other.getRuleId()))
+            }
+        } else if (!oid.equals(other.getRuleId())) {
             return false;
+        }
         return true;
     }
 
-    public void setTags(Set<ResourceTagResponse> tags) {
+    public void setTags(final Set<ResourceTagResponse> tags) {
         this.tags = tags;
     }
 
-    public void addTag(ResourceTagResponse tag) {
+    public void addTag(final ResourceTagResponse tag) {
         this.tags.add(tag);
     }
 }

@@ -1,31 +1,13 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.api.response;
+
+import com.cloud.serializer.Param;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
 
 import java.net.URL;
 import java.util.UUID;
 
-import com.cloud.serializer.Param;
 import com.google.gson.annotations.SerializedName;
-
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
 
 public class GetUploadParamsResponse extends BaseResponse {
 
@@ -49,7 +31,7 @@ public class GetUploadParamsResponse extends BaseResponse {
     @Param(description = "signature to be sent in the POST request.")
     private String signature;
 
-    public GetUploadParamsResponse(UUID id, URL postURL, String metadata, String expires, String signature) {
+    public GetUploadParamsResponse(final UUID id, final URL postURL, final String metadata, final String expires, final String signature) {
         this.id = id;
         this.postURL = postURL;
         this.metadata = metadata;
@@ -62,23 +44,23 @@ public class GetUploadParamsResponse extends BaseResponse {
         setObjectName("getuploadparams");
     }
 
-    public void setId(UUID id) {
+    public void setId(final UUID id) {
         this.id = id;
     }
 
-    public void setPostURL(URL postURL) {
+    public void setPostURL(final URL postURL) {
         this.postURL = postURL;
     }
 
-    public void setMetadata(String metadata) {
+    public void setMetadata(final String metadata) {
         this.metadata = metadata;
     }
 
-    public void setTimeout(String expires) {
+    public void setTimeout(final String expires) {
         this.expires = expires;
     }
 
-    public void setSignature(String signature) {
+    public void setSignature(final String signature) {
         this.signature = signature;
     }
 }

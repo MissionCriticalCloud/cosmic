@@ -1,29 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.engine.datacenter.entity.api.db.dao;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-import javax.persistence.TableGenerator;
 
 import com.cloud.org.Grouping;
 import com.cloud.utils.NumbersUtil;
@@ -35,21 +10,28 @@ import com.cloud.utils.db.SequenceFetcher;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
 import com.cloud.utils.net.NetUtils;
-
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity;
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State;
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineDataCenterVO;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import javax.persistence.TableGenerator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * @config
- * {@table
- *    || Param Name | Description | Values | Default ||
- *    || mac.address.prefix | prefix to attach to all public and private mac addresses | number | 06 ||
- *  }
+ * @config {@table
+ * || Param Name | Description | Values | Default ||
+ * || mac.address.prefix | prefix to attach to all public and private mac addresses | number | 06 ||
+ * }
  **/
 @Component(value = "EngineDataCenterDao")
 public class EngineDataCenterDaoImpl extends GenericDaoBase<EngineDataCenterVO, Long> implements EngineDataCenterDao {
@@ -70,105 +52,6 @@ public class EngineDataCenterDaoImpl extends GenericDaoBase<EngineDataCenterVO, 
 
     @Inject
     protected DcDetailsDao _detailsDao;
-
-    @Override
-    public EngineDataCenterVO findByName(String name) {
-        SearchCriteria<EngineDataCenterVO> sc = NameSearch.create();
-        sc.setParameters("name", name);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public EngineDataCenterVO findByToken(String zoneToken) {
-        SearchCriteria<EngineDataCenterVO> sc = TokenSearch.create();
-        sc.setParameters("zoneToken", zoneToken);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public List<EngineDataCenterVO> findZonesByDomainId(Long domainId) {
-        SearchCriteria<EngineDataCenterVO> sc = ListZonesByDomainIdSearch.create();
-        sc.setParameters("domainId", domainId);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<EngineDataCenterVO> findZonesByDomainId(Long domainId, String keyword) {
-        SearchCriteria<EngineDataCenterVO> sc = ListZonesByDomainIdSearch.create();
-        sc.setParameters("domainId", domainId);
-        if (keyword != null) {
-            SearchCriteria<EngineDataCenterVO> ssc = createSearchCriteria();
-            ssc.addOr("name", SearchCriteria.Op.LIKE, "%" + keyword + "%");
-            ssc.addOr("description", SearchCriteria.Op.LIKE, "%" + keyword + "%");
-            sc.addAnd("name", SearchCriteria.Op.SC, ssc);
-        }
-        return listBy(sc);
-    }
-
-    @Override
-    public List<EngineDataCenterVO> findChildZones(Object[] ids, String keyword) {
-        SearchCriteria<EngineDataCenterVO> sc = ChildZonesSearch.create();
-        sc.setParameters("domainid", ids);
-        if (keyword != null) {
-            SearchCriteria<EngineDataCenterVO> ssc = createSearchCriteria();
-            ssc.addOr("name", SearchCriteria.Op.LIKE, "%" + keyword + "%");
-            ssc.addOr("description", SearchCriteria.Op.LIKE, "%" + keyword + "%");
-            sc.addAnd("name", SearchCriteria.Op.SC, ssc);
-        }
-        return listBy(sc);
-    }
-
-    @Override
-    public List<EngineDataCenterVO> listPublicZones(String keyword) {
-        SearchCriteria<EngineDataCenterVO> sc = PublicZonesSearch.create();
-        if (keyword != null) {
-            SearchCriteria<EngineDataCenterVO> ssc = createSearchCriteria();
-            ssc.addOr("name", SearchCriteria.Op.LIKE, "%" + keyword + "%");
-            ssc.addOr("description", SearchCriteria.Op.LIKE, "%" + keyword + "%");
-            sc.addAnd("name", SearchCriteria.Op.SC, ssc);
-        }
-        //sc.setParameters("domainId", domainId);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<EngineDataCenterVO> findByKeyword(String keyword) {
-        SearchCriteria<EngineDataCenterVO> ssc = createSearchCriteria();
-        ssc.addOr("name", SearchCriteria.Op.LIKE, "%" + keyword + "%");
-        ssc.addOr("description", SearchCriteria.Op.LIKE, "%" + keyword + "%");
-        return listBy(ssc);
-    }
-
-    @Override
-    public String[] getNextAvailableMacAddressPair(long id) {
-        return getNextAvailableMacAddressPair(id, 0);
-    }
-
-    @Override
-    public String[] getNextAvailableMacAddressPair(long id, long mask) {
-        SequenceFetcher fetch = SequenceFetcher.getInstance();
-
-        long seq = fetch.getNextSequence(Long.class, _tgMacAddress, id);
-        seq = seq | _prefix | ((id & 0x7f) << 32);
-        seq |= mask;
-        seq |= ((_rand.nextInt(Short.MAX_VALUE) << 16) & 0x00000000ffff0000l);
-        String[] pair = new String[2];
-        pair[0] = NetUtils.long2Mac(seq);
-        pair[1] = NetUtils.long2Mac(seq | 0x1l << 39);
-        return pair;
-    }
-
-    @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
-        if (!super.configure(name, params)) {
-            return false;
-        }
-
-        String value = (String)params.get("mac.address.prefix");
-        _prefix = (long)NumbersUtil.parseInt(value, 06) << 40;
-
-        return true;
-    }
 
     protected EngineDataCenterDaoImpl() {
         super();
@@ -210,11 +93,30 @@ public class EngineDataCenterDaoImpl extends GenericDaoBase<EngineDataCenterVO, 
     }
 
     @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+        if (!super.configure(name, params)) {
+            return false;
+        }
+
+        final String value = (String) params.get("mac.address.prefix");
+        _prefix = (long) NumbersUtil.parseInt(value, 06) << 40;
+
+        return true;
+    }
+
+    @Override
+    public EngineDataCenterVO findByName(final String name) {
+        final SearchCriteria<EngineDataCenterVO> sc = NameSearch.create();
+        sc.setParameters("name", name);
+        return findOneBy(sc);
+    }
+
+    @Override
     @DB
-    public boolean update(Long zoneId, EngineDataCenterVO zone) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public boolean update(final Long zoneId, final EngineDataCenterVO zone) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
-        boolean persisted = super.update(zoneId, zone);
+        final boolean persisted = super.update(zoneId, zone);
         if (!persisted) {
             return persisted;
         }
@@ -224,14 +126,153 @@ public class EngineDataCenterDaoImpl extends GenericDaoBase<EngineDataCenterVO, 
     }
 
     @Override
-    public void loadDetails(EngineDataCenterVO zone) {
-        Map<String, String> details = _detailsDao.findDetails(zone.getId());
+    public boolean remove(final Long id) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        txn.start();
+        final EngineDataCenterVO zone = createForUpdate();
+        zone.setName(null);
+
+        update(id, zone);
+
+        final boolean result = super.remove(id);
+        txn.commit();
+        return result;
+    }
+
+    @Override
+    public EngineDataCenterVO findByToken(final String zoneToken) {
+        final SearchCriteria<EngineDataCenterVO> sc = TokenSearch.create();
+        sc.setParameters("zoneToken", zoneToken);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public boolean updateState(final State currentState, final Event event, final State nextState, final DataCenterResourceEntity zoneEntity, final Object data) {
+
+        final EngineDataCenterVO vo = findById(zoneEntity.getId());
+
+        final Date oldUpdatedTime = vo.getLastUpdated();
+
+        final SearchCriteria<EngineDataCenterVO> sc = StateChangeSearch.create();
+        sc.setParameters("id", vo.getId());
+        sc.setParameters("state", currentState);
+
+        final UpdateBuilder builder = getUpdateBuilder(vo);
+        builder.set(vo, "state", nextState);
+        builder.set(vo, "lastUpdated", new Date());
+
+        final int rows = update(vo, sc);
+
+        if (rows == 0 && s_logger.isDebugEnabled()) {
+            final EngineDataCenterVO dbDC = findByIdIncludingRemoved(vo.getId());
+            if (dbDC != null) {
+                final StringBuilder str = new StringBuilder("Unable to update ").append(vo.toString());
+                str.append(": DB Data={id=").append(dbDC.getId()).append("; state=").append(dbDC.getState()).append(";updatedTime=").append(dbDC.getLastUpdated());
+                str.append(": New Data={id=")
+                   .append(vo.getId())
+                   .append("; state=")
+                   .append(nextState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatedTime=")
+                   .append(vo.getLastUpdated());
+                str.append(": stale Data={id=")
+                   .append(vo.getId())
+                   .append("; state=")
+                   .append(currentState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatedTime=")
+                   .append(oldUpdatedTime);
+            } else {
+                s_logger.debug("Unable to update dataCenter: id=" + vo.getId() + ", as there is no such dataCenter exists in the database anymore");
+            }
+        }
+        return rows > 0;
+    }
+
+    @Override
+    public List<EngineDataCenterVO> findZonesByDomainId(final Long domainId) {
+        final SearchCriteria<EngineDataCenterVO> sc = ListZonesByDomainIdSearch.create();
+        sc.setParameters("domainId", domainId);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<EngineDataCenterVO> findZonesByDomainId(final Long domainId, final String keyword) {
+        final SearchCriteria<EngineDataCenterVO> sc = ListZonesByDomainIdSearch.create();
+        sc.setParameters("domainId", domainId);
+        if (keyword != null) {
+            final SearchCriteria<EngineDataCenterVO> ssc = createSearchCriteria();
+            ssc.addOr("name", SearchCriteria.Op.LIKE, "%" + keyword + "%");
+            ssc.addOr("description", SearchCriteria.Op.LIKE, "%" + keyword + "%");
+            sc.addAnd("name", SearchCriteria.Op.SC, ssc);
+        }
+        return listBy(sc);
+    }
+
+    @Override
+    public List<EngineDataCenterVO> findChildZones(final Object[] ids, final String keyword) {
+        final SearchCriteria<EngineDataCenterVO> sc = ChildZonesSearch.create();
+        sc.setParameters("domainid", ids);
+        if (keyword != null) {
+            final SearchCriteria<EngineDataCenterVO> ssc = createSearchCriteria();
+            ssc.addOr("name", SearchCriteria.Op.LIKE, "%" + keyword + "%");
+            ssc.addOr("description", SearchCriteria.Op.LIKE, "%" + keyword + "%");
+            sc.addAnd("name", SearchCriteria.Op.SC, ssc);
+        }
+        return listBy(sc);
+    }
+
+    @Override
+    public List<EngineDataCenterVO> listPublicZones(final String keyword) {
+        final SearchCriteria<EngineDataCenterVO> sc = PublicZonesSearch.create();
+        if (keyword != null) {
+            final SearchCriteria<EngineDataCenterVO> ssc = createSearchCriteria();
+            ssc.addOr("name", SearchCriteria.Op.LIKE, "%" + keyword + "%");
+            ssc.addOr("description", SearchCriteria.Op.LIKE, "%" + keyword + "%");
+            sc.addAnd("name", SearchCriteria.Op.SC, ssc);
+        }
+        //sc.setParameters("domainId", domainId);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<EngineDataCenterVO> findByKeyword(final String keyword) {
+        final SearchCriteria<EngineDataCenterVO> ssc = createSearchCriteria();
+        ssc.addOr("name", SearchCriteria.Op.LIKE, "%" + keyword + "%");
+        ssc.addOr("description", SearchCriteria.Op.LIKE, "%" + keyword + "%");
+        return listBy(ssc);
+    }
+
+    @Override
+    public String[] getNextAvailableMacAddressPair(final long id) {
+        return getNextAvailableMacAddressPair(id, 0);
+    }
+
+    @Override
+    public String[] getNextAvailableMacAddressPair(final long id, final long mask) {
+        final SequenceFetcher fetch = SequenceFetcher.getInstance();
+
+        long seq = fetch.getNextSequence(Long.class, _tgMacAddress, id);
+        seq = seq | _prefix | ((id & 0x7f) << 32);
+        seq |= mask;
+        seq |= ((_rand.nextInt(Short.MAX_VALUE) << 16) & 0x00000000ffff0000l);
+        final String[] pair = new String[2];
+        pair[0] = NetUtils.long2Mac(seq);
+        pair[1] = NetUtils.long2Mac(seq | 0x1l << 39);
+        return pair;
+    }
+
+    @Override
+    public void loadDetails(final EngineDataCenterVO zone) {
+        final Map<String, String> details = _detailsDao.findDetails(zone.getId());
         zone.setDetails(details);
     }
 
     @Override
-    public void saveDetails(EngineDataCenterVO zone) {
-        Map<String, String> details = zone.getDetails();
+    public void saveDetails(final EngineDataCenterVO zone) {
+        final Map<String, String> details = zone.getDetails();
         if (details == null) {
             return;
         }
@@ -240,99 +281,38 @@ public class EngineDataCenterDaoImpl extends GenericDaoBase<EngineDataCenterVO, 
 
     @Override
     public List<EngineDataCenterVO> listDisabledZones() {
-        SearchCriteria<EngineDataCenterVO> sc = DisabledZonesSearch.create();
+        final SearchCriteria<EngineDataCenterVO> sc = DisabledZonesSearch.create();
         sc.setParameters("allocationState", Grouping.AllocationState.Disabled);
 
-        List<EngineDataCenterVO> dcs = listBy(sc);
+        final List<EngineDataCenterVO> dcs = listBy(sc);
 
         return dcs;
     }
 
     @Override
     public List<EngineDataCenterVO> listEnabledZones() {
-        SearchCriteria<EngineDataCenterVO> sc = DisabledZonesSearch.create();
+        final SearchCriteria<EngineDataCenterVO> sc = DisabledZonesSearch.create();
         sc.setParameters("allocationState", Grouping.AllocationState.Enabled);
 
-        List<EngineDataCenterVO> dcs = listBy(sc);
+        final List<EngineDataCenterVO> dcs = listBy(sc);
 
         return dcs;
     }
 
     @Override
-    public EngineDataCenterVO findByTokenOrIdOrName(String tokenOrIdOrName) {
+    public EngineDataCenterVO findByTokenOrIdOrName(final String tokenOrIdOrName) {
         EngineDataCenterVO result = findByToken(tokenOrIdOrName);
         if (result == null) {
             result = findByName(tokenOrIdOrName);
             if (result == null) {
                 try {
-                    Long dcId = Long.parseLong(tokenOrIdOrName);
+                    final Long dcId = Long.parseLong(tokenOrIdOrName);
                     return findById(dcId);
-                } catch (NumberFormatException nfe) {
+                } catch (final NumberFormatException nfe) {
                     s_logger.debug("Cannot parse " + tokenOrIdOrName + " into long. " + nfe);
                 }
             }
         }
         return result;
     }
-
-    @Override
-    public boolean remove(Long id) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        EngineDataCenterVO zone = createForUpdate();
-        zone.setName(null);
-
-        update(id, zone);
-
-        boolean result = super.remove(id);
-        txn.commit();
-        return result;
-    }
-
-    @Override
-    public boolean updateState(State currentState, Event event, State nextState, DataCenterResourceEntity zoneEntity, Object data) {
-
-        EngineDataCenterVO vo = findById(zoneEntity.getId());
-
-        Date oldUpdatedTime = vo.getLastUpdated();
-
-        SearchCriteria<EngineDataCenterVO> sc = StateChangeSearch.create();
-        sc.setParameters("id", vo.getId());
-        sc.setParameters("state", currentState);
-
-        UpdateBuilder builder = getUpdateBuilder(vo);
-        builder.set(vo, "state", nextState);
-        builder.set(vo, "lastUpdated", new Date());
-
-        int rows = update(vo, sc);
-
-        if (rows == 0 && s_logger.isDebugEnabled()) {
-            EngineDataCenterVO dbDC = findByIdIncludingRemoved(vo.getId());
-            if (dbDC != null) {
-                StringBuilder str = new StringBuilder("Unable to update ").append(vo.toString());
-                str.append(": DB Data={id=").append(dbDC.getId()).append("; state=").append(dbDC.getState()).append(";updatedTime=").append(dbDC.getLastUpdated());
-                str.append(": New Data={id=")
-                    .append(vo.getId())
-                    .append("; state=")
-                    .append(nextState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatedTime=")
-                    .append(vo.getLastUpdated());
-                str.append(": stale Data={id=")
-                    .append(vo.getId())
-                    .append("; state=")
-                    .append(currentState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatedTime=")
-                    .append(oldUpdatedTime);
-            } else {
-                s_logger.debug("Unable to update dataCenter: id=" + vo.getId() + ", as there is no such dataCenter exists in the database anymore");
-            }
-        }
-        return rows > 0;
-
-    }
-
 }

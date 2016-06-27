@@ -1,20 +1,5 @@
 #!/usr/bin/env bash
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+
 
 source /root/func.sh
 source /opt/cloud/bin/vpc_func.sh
@@ -35,19 +20,19 @@ usage() {
 create_usage_rules () {
   iptables-save|grep "NETWORK_STATS_$ethDev" > /dev/null
   if [ $? -gt 0 ]
-  then 
+  then
     iptables -N NETWORK_STATS_$ethDev > /dev/null;
     iptables -I FORWARD -j NETWORK_STATS_$ethDev > /dev/null;
     iptables -A NETWORK_STATS_$ethDev -o $ethDev -s $vcidr > /dev/null;
     iptables -A NETWORK_STATS_$ethDev -i $ethDev -d $vcidr > /dev/null;
-  fi  
+  fi
   return $?
 }
 
 create_vpn_usage_rules () {
   iptables-save|grep "VPN_STATS_$ethDev" > /dev/null
   if [ $? -gt 0 ]
-  then 
+  then
     iptables -t mangle -N VPN_STATS_$ethDev > /dev/null;
     iptables -t mangle -I FORWARD -j VPN_STATS_$ethDev > /dev/null;
     iptables -t mangle -A VPN_STATS_$ethDev -o $ethDev -m mark --mark $vpnoutmark > /dev/null;
@@ -110,7 +95,7 @@ do
   n)	nflag=1
 	;;
   d)	dflag=1
-	;;	        
+	;;
   i)    #Do nothing, since it's parameter for host script
         ;;
   ?)	usage
@@ -120,37 +105,37 @@ do
 done
 
 ethDev=$(getEthByIp $publicIp)
-if [ "$cflag" == "1" ] 
+if [ "$cflag" == "1" ]
 then
   if [ "$ethDev" != "" ]
   then
     create_usage_rules
     create_vpn_usage_rules
     unlock_exit 0 $lock $locked
-   fi 
+   fi
 fi
 
-if [ "$gflag" == "1" ] 
+if [ "$gflag" == "1" ]
 then
-  get_usage 
+  get_usage
   unlock_exit $? $lock $locked
 fi
 
-if [ "$nflag" == "1" ] 
+if [ "$nflag" == "1" ]
 then
-  #get_vpn_usage 
+  #get_vpn_usage
   unlock_exit $? $lock $locked
 fi
 
-if [ "$dflag" == "1" ] 
+if [ "$dflag" == "1" ]
 then
   #remove_usage_rules
   unlock_exit 0 $lock $locked
 fi
 
-if [ "$rflag" == "1" ] 
+if [ "$rflag" == "1" ]
 then
-  reset_usage  
+  reset_usage
   unlock_exit $? $lock $locked
 fi
 

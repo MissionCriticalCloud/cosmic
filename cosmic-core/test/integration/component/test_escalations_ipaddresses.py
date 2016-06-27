@@ -1,28 +1,9 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 # Import Local Modules
-from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import PASS
 from marvin.lib.base import (PublicIPAddress,
                              NetworkOffering,
-                             Autoscale,
                              Network,
-                             NetworkServiceProvider,
-                             Template,
                              VirtualMachine,
                              VPC,
                              VpcOffering,
@@ -33,18 +14,15 @@ from marvin.lib.base import (PublicIPAddress,
                              VpnUser,
                              LoadBalancerRule,
                              Account,
-                             ServiceOffering,
-                             PhysicalNetwork,
-                             User)
+                             ServiceOffering)
 from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template)
 from marvin.lib.utils import validateList, cleanup_resources
-from marvin.codes import PASS
 from nose.plugins.attrib import attr
 
-class TestIpAddresses(cloudstackTestCase):
 
+class TestIpAddresses(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         try:
@@ -477,23 +455,23 @@ class TestIpAddresses(cloudstackTestCase):
         expected_dict = {
             "id": associated_ipaddress.ipaddress.id,
             "associatednetworkid":
-            associated_ipaddress.ipaddress.associatednetworkid,
+                associated_ipaddress.ipaddress.associatednetworkid,
             "associatednetworkname":
-            associated_ipaddress.ipaddress.associatednetworkname,
+                associated_ipaddress.ipaddress.associatednetworkname,
             "ipaddress": associated_ipaddress.ipaddress.ipaddress,
             "issourcenat": associated_ipaddress.ipaddress.issourcenat,
             "isstaticnat": associated_ipaddress.ipaddress.isstaticnat,
-            "networkid": associated_ipaddress.ipaddress.networkid}
+            "networkid": associated_ipaddress.ipaddress.networkid }
         actual_dict = {
             "id": list_ipaddress_byid[0].id,
             "associatednetworkid":
-            list_ipaddress_byid[0].associatednetworkid,
+                list_ipaddress_byid[0].associatednetworkid,
             "associatednetworkname":
-            list_ipaddress_byid[0].associatednetworkname,
+                list_ipaddress_byid[0].associatednetworkname,
             "ipaddress": list_ipaddress_byid[0].ipaddress,
             "issourcenat": list_ipaddress_byid[0].issourcenat,
             "isstaticnat": list_ipaddress_byid[0].isstaticnat,
-            "networkid": list_ipaddress_byid[0].networkid}
+            "networkid": list_ipaddress_byid[0].networkid }
         ipaddress_status = self.__verify_values(
             expected_dict,
             actual_dict
@@ -623,25 +601,25 @@ class TestIpAddresses(cloudstackTestCase):
         expected_dict = {
             "id": associated_ipaddress.ipaddress.id,
             "associatednetworkid":
-            associated_ipaddress.ipaddress.associatednetworkid,
+                associated_ipaddress.ipaddress.associatednetworkid,
             "associatednetworkname":
-            associated_ipaddress.ipaddress.associatednetworkname,
+                associated_ipaddress.ipaddress.associatednetworkname,
             "ipaddress": associated_ipaddress.ipaddress.ipaddress,
             "issourcenat": associated_ipaddress.ipaddress.issourcenat,
             "isstaticnat": associated_ipaddress.ipaddress.isstaticnat,
             "networkid": associated_ipaddress.ipaddress.networkid,
-            "vpcid": associated_ipaddress.ipaddress.vpcid}
+            "vpcid": associated_ipaddress.ipaddress.vpcid }
         actual_dict = {
             "id": list_ipaddress_byid[0].id,
             "associatednetworkid":
-            list_ipaddress_byid[0].associatednetworkid,
+                list_ipaddress_byid[0].associatednetworkid,
             "associatednetworkname":
-            list_ipaddress_byid[0].associatednetworkname,
+                list_ipaddress_byid[0].associatednetworkname,
             "ipaddress": list_ipaddress_byid[0].ipaddress,
             "issourcenat": list_ipaddress_byid[0].issourcenat,
             "isstaticnat": list_ipaddress_byid[0].isstaticnat,
             "networkid": list_ipaddress_byid[0].networkid,
-            "vpcid": list_ipaddress_byid[0].vpcid}
+            "vpcid": list_ipaddress_byid[0].vpcid }
         ipaddress_status = self.__verify_values(
             expected_dict,
             actual_dict
@@ -1210,13 +1188,13 @@ class TestIpAddresses(cloudstackTestCase):
             "id": lb_rule.id,
             "account": lb_rule.account,
             "algorithm": "source",
-                         "domainid": lb_rule.domainid,
-                         "name": "NewLBRuleName",
-                         "networkid": lb_rule.networkid,
-                         "zoneid": lb_rule.zoneid,
-                         "privateport": lb_rule.privateport,
-                         "publicip": lb_rule.publicip,
-                         "publicport": lb_rule.publicport,
+            "domainid": lb_rule.domainid,
+            "name": "NewLBRuleName",
+            "networkid": lb_rule.networkid,
+            "zoneid": lb_rule.zoneid,
+            "privateport": lb_rule.privateport,
+            "publicip": lb_rule.publicip,
+            "publicport": lb_rule.publicport,
         }
         actual_dict = {
             "id": updated_lb_rule.id,
@@ -1440,7 +1418,7 @@ class TestIpAddresses(cloudstackTestCase):
             "Load Balancer Rule creation Failed"
         )
         # Listing Load Balancer Rule Instances for applied as true
-        list_lbruleinstance_applied_true =\
+        list_lbruleinstance_applied_true = \
             LoadBalancerRule.listLoadBalancerRuleInstances(
                 self.userapiclient,
                 id=lb_rule.id,
@@ -1452,7 +1430,7 @@ class TestIpAddresses(cloudstackTestCase):
             "Instances are assigned to Newly created Load Balancer Rule"
         )
         # Listing Load Balancer Rule Instances for applied as false
-        list_lbruleinstance_applied_false =\
+        list_lbruleinstance_applied_false = \
             LoadBalancerRule.listLoadBalancerRuleInstances(
                 self.userapiclient,
                 id=lb_rule.id,
@@ -1483,7 +1461,7 @@ class TestIpAddresses(cloudstackTestCase):
             vms=[vm_created]
         )
         # Listing Load Balancer Rule Instances for applied as true
-        list_lbruleinstance_applied_true =\
+        list_lbruleinstance_applied_true = \
             LoadBalancerRule.listLoadBalancerRuleInstances(
                 self.userapiclient,
                 id=lb_rule.id,
@@ -1508,7 +1486,7 @@ class TestIpAddresses(cloudstackTestCase):
             "Failed to assign Load Balancer Rule to given Instance"
         )
         # Listing Load Balancer Rule Instances for applied as false
-        list_lbruleinstance_applied_false =\
+        list_lbruleinstance_applied_false = \
             LoadBalancerRule.listLoadBalancerRuleInstances(
                 self.userapiclient,
                 id=lb_rule.id,
@@ -1526,7 +1504,7 @@ class TestIpAddresses(cloudstackTestCase):
             vms=[vm_created]
         )
         # Listing Load Balancer Rule Instances for applied as true
-        list_lbruleinstance_applied_true =\
+        list_lbruleinstance_applied_true = \
             LoadBalancerRule.listLoadBalancerRuleInstances(
                 self.userapiclient,
                 id=lb_rule.id,
@@ -1539,7 +1517,7 @@ class TestIpAddresses(cloudstackTestCase):
             "Instances is assigned to Load balancer Rule"
         )
         # Listing Load Balancer Rule Instances for applied as false
-        list_lbruleinstance_applied_false =\
+        list_lbruleinstance_applied_false = \
             LoadBalancerRule.listLoadBalancerRuleInstances(
                 self.userapiclient,
                 id=lb_rule.id,
@@ -2391,9 +2369,9 @@ class TestIpAddresses(cloudstackTestCase):
         expected_dict = {
             "ipaddressid": associated_ipaddress.ipaddress.id,
             "startport": "22",
-                         "endport": "2222",
-                         "protocol": "tcp",
-                         "cidrlist": "10.1.1.1/16"
+            "endport": "2222",
+            "protocol": "tcp",
+            "cidrlist": "10.1.1.1/16"
         }
         actual_dict = {
             "ipaddressid": firewall_rule.ipaddressid,

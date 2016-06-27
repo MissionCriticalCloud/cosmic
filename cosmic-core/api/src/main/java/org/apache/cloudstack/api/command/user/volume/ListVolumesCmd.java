@@ -1,23 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.volume;
 
 import com.cloud.storage.Volume;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
@@ -33,6 +16,7 @@ import org.apache.cloudstack.api.response.StoragePoolResponse;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.api.response.VolumeResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,11 +53,11 @@ public class ListVolumesCmd extends BaseListTaggedResourcesCmd {
     private Long zoneId;
 
     @Parameter(name = ApiConstants.STORAGE_ID,
-               type = CommandType.UUID,
-               entityType = StoragePoolResponse.class,
-               description = "the ID of the storage pool, available to ROOT admin only",
-               since = "4.3",
-               authorized = {RoleType.Admin})
+            type = CommandType.UUID,
+            entityType = StoragePoolResponse.class,
+            description = "the ID of the storage pool, available to ROOT admin only",
+            since = "4.3",
+            authorized = {RoleType.Admin})
     private Long storageId;
 
     @Parameter(name = ApiConstants.DISK_OFFERING_ID,
@@ -83,7 +67,8 @@ public class ListVolumesCmd extends BaseListTaggedResourcesCmd {
             since = "4.4")
     private Long diskOfferingId;
 
-    @Parameter(name = ApiConstants.DISPLAY_VOLUME, type = CommandType.BOOLEAN, description = "list resources by display flag; only ROOT admin is eligible to pass this parameter", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.DISPLAY_VOLUME, type = CommandType.BOOLEAN, description = "list resources by display flag; only ROOT admin is eligible to pass this " +
+            "parameter", since = "4.4", authorized = {RoleType.Admin})
     private Boolean display;
 
     /////////////////////////////////////////////////////
@@ -138,19 +123,19 @@ public class ListVolumesCmd extends BaseListTaggedResourcesCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public ApiCommandJobType getInstanceType() {
         return ApiCommandJobType.Volume;
     }
 
     @Override
     public void execute() {
-        ListResponse<VolumeResponse> response = _queryService.searchForVolumes(this);
+        final ListResponse<VolumeResponse> response = _queryService.searchForVolumes(this);
         response.setResponseName(getCommandName());
         setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

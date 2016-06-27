@@ -1,22 +1,7 @@
 #!/usr/bin/env bash
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 
- 
+
+
 
 # $Id: ipassoc.sh 9804 2010-06-22 18:36:49Z alex $ $HeadURL: svn://svn.lab.vmops.com/repos/vmdev/java/scripts/network/domr/ipassoc.sh $
 # ipassoc.sh -- associate/disassociate a public ip with an instance
@@ -73,7 +58,7 @@ del_fw_chain_for_ip () {
     logger -t cloud "$(basename $0): destroying firewall chain for $pubIp"
     sudo iptables -t mangle -D PREROUTING  -d $pubIp -j FIREWALL_$pubIp
     sudo iptables -t mangle -F FIREWALL_$pubIp
-    sudo iptables -t mangle -X FIREWALL_$pubIp 
+    sudo iptables -t mangle -X FIREWALL_$pubIp
     return $?
   fi
   # firewall chain got created as a result of testing for the chain, cleanup
@@ -89,7 +74,7 @@ del_vpn_chain_for_ip () {
     logger -t cloud "$(basename $0): destroying vpn chain for $pubIp"
     sudo iptables -t mangle -D PREROUTING  -d $pubIp -j VPN_$pubIp
     sudo iptables -t mangle -F VPN_$pubIp
-    sudo iptables -t mangle -X VPN_$pubIp 
+    sudo iptables -t mangle -X VPN_$pubIp
     return $?
   fi
   # vpn chain got created as a result of testing for the chain, cleanup
@@ -112,7 +97,7 @@ remove_routing() {
 # rules and routes will be deleted for the last ip of the interface.
      sudo ip rule delete fwmark $tableNo table $tableName
      sudo ip rule delete table $tableName
-     sudo ip route flush  table $tableName 
+     sudo ip route flush  table $tableName
      sudo ip route flush cache
      logger -t cloud "$(basename $0):Remove routing $pubIp - routes and rules deleted"
   fi
@@ -127,10 +112,10 @@ copy_routes_from_main() {
   local eth1Mask=$(ip route list scope link dev eth1 | awk '{print $1}')
   local ethMask=$(getcidr $ethDev)
 
-# eth0,eth1 and other know routes will be skipped, so as main routing table will decide the route. This will be useful if the interface is down and up.  
-  sudo ip route add throw $eth0Mask table $tableName proto static 
-  sudo ip route add throw $eth1Mask table $tableName proto static 
-  sudo ip route add throw $ethMask  table $tableName proto static 
+# eth0,eth1 and other know routes will be skipped, so as main routing table will decide the route. This will be useful if the interface is down and up.
+  sudo ip route add throw $eth0Mask table $tableName proto static
+  sudo ip route add throw $eth1Mask table $tableName proto static
+  sudo ip route add throw $ethMask  table $tableName proto static
   return 0;
 }
 
@@ -168,7 +153,7 @@ add_routing() {
   local rulePresent=$(ip rule show | grep $ethMask)
   if [ "$rulePresent" == "" ]
   then
-# rules will be added while adding the first ip of the interface 
+# rules will be added while adding the first ip of the interface
      sudo ip rule add from $ethMask table $tableName
      sudo ip rule add fwmark $tableNo table $tableName
      logger -t cloud "$(basename $0):Add routing $pubIp rules added"
@@ -209,7 +194,7 @@ add_first_ip() {
   local mask=$(echo $1 | awk -F'/' '{print $2}')
   sudo ip link show $ethDev | grep "state DOWN" > /dev/null
   local old_state=$?
-  
+
   ip_addr_add $ethDev $pubIp
 
   sudo iptables -D FORWARD -i $ethDev -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT
@@ -255,7 +240,7 @@ remove_first_ip() {
   sudo iptables -D FORWARD -i $ethDev -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT
   sudo iptables -D FORWARD -i eth0 -o $ethDev  -j FW_OUTBOUND
   remove_snat $1
-  
+
   sudo ip addr del dev $ethDev "$ipNoMask/$mask"
   if [ $? -gt 0  -a $? -ne 2 ]
   then
@@ -297,7 +282,7 @@ add_an_ip () {
   fi
   add_routing $1
   return $?
-   
+
 }
 
 remove_an_ip () {
@@ -414,7 +399,7 @@ then
     unlock_exit 2 $lock $locked
 fi
 
-if [ "$lflag$cflag" != "11" ] 
+if [ "$lflag$cflag" != "11" ]
 then
     usage
     unlock_exit 2 $lock $locked
@@ -432,14 +417,14 @@ if [ "$fflag" == "1" ] && [ "$Aflag" == "1" ]
 then
   add_first_ip  $publicIp  &&
   add_vpn_chain_for_ip $publicIp &&
-  add_fw_chain_for_ip $publicIp 
+  add_fw_chain_for_ip $publicIp
   unlock_exit $? $lock $locked
 fi
 
 if [ "$Aflag" == "1" ]
-then  
+then
   add_an_ip  $publicIp  &&
-  add_fw_chain_for_ip $publicIp 
+  add_fw_chain_for_ip $publicIp
   unlock_exit $? $lock $locked
 fi
 
@@ -454,7 +439,7 @@ fi
 if [ "$Dflag" == "1" ]
 then
   remove_an_ip  $publicIp &&
-  del_fw_chain_for_ip $publicIp 
+  del_fw_chain_for_ip $publicIp
   unlock_exit $? $lock $locked
 fi
 

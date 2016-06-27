@@ -1,24 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.offerings.dao;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Detail;
@@ -29,6 +9,10 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class NetworkOfferingDetailsDaoImpl extends GenericDaoBase<NetworkOfferingDetailsVO, Long> implements NetworkOfferingDetailsDao {
     protected final SearchBuilder<NetworkOfferingDetailsVO> DetailSearch;
@@ -49,13 +33,13 @@ public class NetworkOfferingDetailsDaoImpl extends GenericDaoBase<NetworkOfferin
     }
 
     @Override
-    public Map<NetworkOffering.Detail, String> getNtwkOffDetails(long offeringId) {
-        SearchCriteria<NetworkOfferingDetailsVO> sc = DetailSearch.create();
+    public Map<NetworkOffering.Detail, String> getNtwkOffDetails(final long offeringId) {
+        final SearchCriteria<NetworkOfferingDetailsVO> sc = DetailSearch.create();
         sc.setParameters("offeringId", offeringId);
 
-        List<NetworkOfferingDetailsVO> results = search(sc, null);
-        Map<NetworkOffering.Detail, String> details = new HashMap<NetworkOffering.Detail, String>(results.size());
-        for (NetworkOfferingDetailsVO result : results) {
+        final List<NetworkOfferingDetailsVO> results = search(sc, null);
+        final Map<NetworkOffering.Detail, String> details = new HashMap<>(results.size());
+        for (final NetworkOfferingDetailsVO result : results) {
             details.put(result.getName(), result.getValue());
         }
 
@@ -63,16 +47,15 @@ public class NetworkOfferingDetailsDaoImpl extends GenericDaoBase<NetworkOfferin
     }
 
     @Override
-    public String getDetail(long offeringId, Detail detailName) {
-        SearchCriteria<String> sc = ValueSearch.create();
+    public String getDetail(final long offeringId, final Detail detailName) {
+        final SearchCriteria<String> sc = ValueSearch.create();
         sc.setParameters("name", detailName);
         sc.setParameters("offeringId", offeringId);
-        List<String> results = customSearch(sc, null);
+        final List<String> results = customSearch(sc, null);
         if (results.isEmpty()) {
             return null;
         } else {
             return results.get(0);
         }
     }
-
 }

@@ -1,28 +1,9 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.network;
-
-import java.util.List;
 
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.vpc.NetworkACLItem;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -32,6 +13,9 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.NetworkACLItemResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,15 +31,15 @@ public class UpdateNetworkACLItemCmd extends BaseAsyncCustomIdCmd {
     // ///////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.ID,
-               type = CommandType.UUID,
-               entityType = NetworkACLItemResponse.class,
-               required = true,
-               description = "the ID of the network ACL item")
+            type = CommandType.UUID,
+            entityType = NetworkACLItemResponse.class,
+            required = true,
+            description = "the ID of the network ACL item")
     private Long id;
 
     @Parameter(name = ApiConstants.PROTOCOL,
-               type = CommandType.STRING,
-               description = "the protocol for the ACL rule. Valid values are TCP/UDP/ICMP/ALL or valid protocol number")
+            type = CommandType.STRING,
+            description = "the protocol for the ACL rule. Valid values are TCP/UDP/ICMP/ALL or valid protocol number")
     private String protocol;
 
     @Parameter(name = ApiConstants.START_PORT, type = CommandType.INTEGER, description = "the starting port of ACL")
@@ -74,7 +58,7 @@ public class UpdateNetworkACLItemCmd extends BaseAsyncCustomIdCmd {
     private Integer icmpCode;
 
     @Parameter(name = ApiConstants.TRAFFIC_TYPE, type = CommandType.STRING, description = "the traffic type for the ACL,"
-        + "can be Ingress or Egress, defaulted to Ingress if not specified")
+            + "can be Ingress or Egress, defaulted to Ingress if not specified")
     private String trafficType;
 
     @Parameter(name = ApiConstants.NUMBER, type = CommandType.INTEGER, description = "The network of the vm the ACL will be created for")
@@ -83,7 +67,8 @@ public class UpdateNetworkACLItemCmd extends BaseAsyncCustomIdCmd {
     @Parameter(name = ApiConstants.ACTION, type = CommandType.STRING, description = "scl entry action, allow or deny")
     private String action;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4" +
+            ".4", authorized = {RoleType.Admin})
     private Boolean display;
 
     // ///////////////////////////////////////////////////
@@ -91,12 +76,27 @@ public class UpdateNetworkACLItemCmd extends BaseAsyncCustomIdCmd {
     // ///////////////////////////////////////////////////
 
     @Override
-    public boolean isDisplay() {
-        if (display != null) {
-            return display;
-        } else {
-            return true;
+    public String getEventType() {
+        return EventTypes.EVENT_NETWORK_ACL_ITEM_UPDATE;
+    }
+
+    @Override
+    public String getEventDescription() {
+        return "Updating network ACL item";
+    }
+
+    @Override
+    public void execute() throws ResourceUnavailableException {
+        CallContext.current().setEventDetails("Rule Id: " + getId());
+        final NetworkACLItem aclItem =
+                _networkACLService.updateNetworkACLItem(getId(), getProtocol(), getSourceCidrList(), getTrafficType(), getAction(), getNumber(), getSourcePortStart(),
+                        getSourcePortEnd(), getIcmpCode(), getIcmpType(), this.getCustomId(), this.isDisplay());
+        if (aclItem == null) {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update network ACL item");
         }
+        final NetworkACLItemResponse aclResponse = _responseGenerator.createNetworkACLItemResponse(aclItem);
+        setResponseObject(aclResponse);
+        aclResponse.setResponseName(getCommandName());
     }
 
     public Long getId() {
@@ -106,9 +106,14 @@ public class UpdateNetworkACLItemCmd extends BaseAsyncCustomIdCmd {
     public String getProtocol() {
         if (protocol != null) {
             return protocol.trim();
-        } else
+        } else {
             return null;
+        }
     }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
 
     public List<String> getSourceCidrList() {
         return cidrlist;
@@ -116,22 +121,13 @@ public class UpdateNetworkACLItemCmd extends BaseAsyncCustomIdCmd {
 
     public NetworkACLItem.TrafficType getTrafficType() {
         if (trafficType != null) {
-            for (NetworkACLItem.TrafficType type : NetworkACLItem.TrafficType.values()) {
+            for (final NetworkACLItem.TrafficType type : NetworkACLItem.TrafficType.values()) {
                 if (type.toString().equalsIgnoreCase(trafficType)) {
                     return type;
                 }
             }
         }
         return null;
-    }
-
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
     }
 
     public String getAction() {
@@ -150,22 +146,6 @@ public class UpdateNetworkACLItemCmd extends BaseAsyncCustomIdCmd {
         return publicEndPort;
     }
 
-    @Override
-    public long getEntityOwnerId() {
-        Account caller = CallContext.current().getCallingAccount();
-        return caller.getAccountId();
-    }
-
-    @Override
-    public String getEventType() {
-        return EventTypes.EVENT_NETWORK_ACL_ITEM_UPDATE;
-    }
-
-    @Override
-    public String getEventDescription() {
-        return "Updating network ACL item";
-    }
-
     public Integer getIcmpCode() {
         return icmpCode;
     }
@@ -175,17 +155,23 @@ public class UpdateNetworkACLItemCmd extends BaseAsyncCustomIdCmd {
     }
 
     @Override
-    public void execute() throws ResourceUnavailableException {
-        CallContext.current().setEventDetails("Rule Id: " + getId());
-        NetworkACLItem aclItem =
-            _networkACLService.updateNetworkACLItem(getId(), getProtocol(), getSourceCidrList(), getTrafficType(), getAction(), getNumber(), getSourcePortStart(),
-                getSourcePortEnd(), getIcmpCode(), getIcmpType(), this.getCustomId(), this.isDisplay());
-        if (aclItem == null) {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update network ACL item");
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final Account caller = CallContext.current().getCallingAccount();
+        return caller.getAccountId();
+    }
+
+    @Override
+    public boolean isDisplay() {
+        if (display != null) {
+            return display;
+        } else {
+            return true;
         }
-        NetworkACLItemResponse aclResponse = _responseGenerator.createNetworkACLItemResponse(aclItem);
-        setResponseObject(aclResponse);
-        aclResponse.setResponseName(getCommandName());
     }
 
     @Override
@@ -194,5 +180,4 @@ public class UpdateNetworkACLItemCmd extends BaseAsyncCustomIdCmd {
             _uuidMgr.checkUuid(this.getCustomId(), NetworkACLItem.class);
         }
     }
-
 }

@@ -1,24 +1,31 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.vm;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.*;
+import com.cloud.agent.api.CheckVirtualMachineAnswer;
+import com.cloud.agent.api.CheckVirtualMachineCommand;
+import com.cloud.agent.api.Command;
+import com.cloud.agent.api.MigrateWithStorageAnswer;
+import com.cloud.agent.api.MigrateWithStorageCommand;
+import com.cloud.agent.api.MigrateWithStorageCompleteAnswer;
+import com.cloud.agent.api.MigrateWithStorageCompleteCommand;
+import com.cloud.agent.api.MigrateWithStorageReceiveAnswer;
+import com.cloud.agent.api.MigrateWithStorageReceiveCommand;
+import com.cloud.agent.api.MigrateWithStorageSendAnswer;
+import com.cloud.agent.api.MigrateWithStorageSendCommand;
+import com.cloud.agent.api.PrepareForMigrationAnswer;
+import com.cloud.agent.api.PrepareForMigrationCommand;
+import com.cloud.agent.api.ScaleVmAnswer;
+import com.cloud.agent.api.ScaleVmCommand;
+import com.cloud.agent.api.StopAnswer;
+import com.cloud.agent.api.StopCommand;
 import com.cloud.capacity.CapacityManager;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.dao.ClusterDao;
@@ -26,7 +33,11 @@ import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlanner;
-import com.cloud.exception.*;
+import com.cloud.exception.ConcurrentOperationException;
+import com.cloud.exception.ManagementServerException;
+import com.cloud.exception.OperationTimedoutException;
+import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.exception.VirtualMachineMigrationException;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
@@ -57,7 +68,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotManager;
-import junit.framework.Assert;
 import org.apache.cloudstack.api.command.user.vm.RestoreVMCmd;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.engine.orchestration.service.VolumeOrchestrationService;
@@ -65,22 +75,19 @@ import org.apache.cloudstack.framework.config.ConfigDepot;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Matchers;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.*;
+import junit.framework.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 public class VirtualMachineManagerImplTest {
 
@@ -221,6 +228,22 @@ public class VirtualMachineManagerImplTest {
 
     }
 
+    private ServiceOfferingVO getSvcoffering(final int ramSize) {
+
+        final String name = "name";
+        final String displayText = "displayText";
+        final int cpu = 1;
+        //int ramSize = 256;
+        final int speed = 128;
+
+        final boolean ha = false;
+        final boolean useLocalStorage = false;
+
+        final ServiceOfferingVO serviceOffering =
+                new ServiceOfferingVO(name, cpu, ramSize, speed, null, null, ha, displayText, ProvisioningType.THIN, useLocalStorage, false, null, false, null, false);
+        return serviceOffering;
+    }
+
     @Test(expected = CloudRuntimeException.class)
     public void testScaleVM1() throws Exception {
 
@@ -229,7 +252,6 @@ public class VirtualMachineManagerImplTest {
 
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
         _vmMgr.migrateForScale(_vmInstance.getUuid(), l, dest, l);
-
     }
 
     @Test(expected = CloudRuntimeException.class)
@@ -250,7 +272,6 @@ public class VirtualMachineManagerImplTest {
         new ScaleVmAnswer(reconfigureCmd, true, "details");
         when(_agentMgr.send(2l, reconfigureCmd)).thenReturn(null);
         _vmMgr.reConfigureVm(_vmInstance.getUuid(), getSvcoffering(256), false);
-
     }
 
     @Test(expected = CloudRuntimeException.class)
@@ -269,23 +290,18 @@ public class VirtualMachineManagerImplTest {
         when(_vmInstanceDao.findByUuid(any(String.class))).thenReturn(_vmInstance);
         final DeploymentPlanner.ExcludeList excludeHostList = new DeploymentPlanner.ExcludeList();
         _vmMgr.findHostAndMigrate(_vmInstance.getUuid(), 2l, excludeHostList);
-
     }
 
-    private ServiceOfferingVO getSvcoffering(final int ramSize) {
+    // Check migration of a vm with its volumes within a cluster.
+    @Test
+    public void testMigrateWithVolumeWithinCluster() throws ResourceUnavailableException, ConcurrentOperationException, ManagementServerException,
+            VirtualMachineMigrationException, OperationTimedoutException {
 
-        final String name = "name";
-        final String displayText = "displayText";
-        final int cpu = 1;
-        //int ramSize = 256;
-        final int speed = 128;
+        initializeMockConfigForMigratingVmWithVolumes();
+        when(_srcHostMock.getClusterId()).thenReturn(3L);
+        when(_destHostMock.getClusterId()).thenReturn(3L);
 
-        final boolean ha = false;
-        final boolean useLocalStorage = false;
-
-        final ServiceOfferingVO serviceOffering =
-                new ServiceOfferingVO(name, cpu, ramSize, speed, null, null, ha, displayText, ProvisioningType.THIN, useLocalStorage, false, null, false, null, false);
-        return serviceOffering;
+        _vmMgr.migrateWithStorage(_vmInstance.getUuid(), _srcHostMock.getId(), _destHostMock.getId(), _volumeToPoolMock);
     }
 
     private void initializeMockConfigForMigratingVmWithVolumes() throws OperationTimedoutException, ResourceUnavailableException {
@@ -316,8 +332,8 @@ public class VirtualMachineManagerImplTest {
 
         // Mock the vm guru and the user vm object that gets returned.
         _vmMgr._vmGurus = new HashMap<>();
-//        UserVmManagerImpl userVmManager = mock(UserVmManagerImpl.class);
-//        _vmMgr.registerGuru(VirtualMachine.Type.User, userVmManager);
+        //        UserVmManagerImpl userVmManager = mock(UserVmManagerImpl.class);
+        //        _vmMgr.registerGuru(VirtualMachine.Type.User, userVmManager);
 
         // Mock the iteration over all the volumes of an instance.
         final Iterator<VolumeVO> volumeIterator = mock(Iterator.class);
@@ -380,18 +396,6 @@ public class VirtualMachineManagerImplTest {
         when(_vmSnapshotMgr.hasActiveVMSnapshotTasks(anyLong())).thenReturn(false);
         when(_vmInstanceDao.updateState(State.Running, Event.MigrationRequested, State.Migrating, _vmMock, opaqueMock)).thenReturn(true);
         when(_vmInstanceDao.updateState(State.Migrating, Event.OperationSucceeded, State.Running, _vmMock, opaqueMock)).thenReturn(true);
-    }
-
-    // Check migration of a vm with its volumes within a cluster.
-    @Test
-    public void testMigrateWithVolumeWithinCluster() throws ResourceUnavailableException, ConcurrentOperationException, ManagementServerException,
-            VirtualMachineMigrationException, OperationTimedoutException {
-
-        initializeMockConfigForMigratingVmWithVolumes();
-        when(_srcHostMock.getClusterId()).thenReturn(3L);
-        when(_destHostMock.getClusterId()).thenReturn(3L);
-
-        _vmMgr.migrateWithStorage(_vmInstance.getUuid(), _srcHostMock.getId(), _destHostMock.getId(), _volumeToPoolMock);
     }
 
     // Check migration of a vm with its volumes across a cluster.

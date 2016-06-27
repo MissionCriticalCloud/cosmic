@@ -1,23 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.lb;
-
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.NetworkRuleConflictException;
@@ -29,7 +10,6 @@ import com.cloud.network.rules.StickinessPolicy;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.Pair;
 import com.cloud.utils.net.Ip;
-
 import org.apache.cloudstack.api.command.user.loadbalancer.CreateLBHealthCheckPolicyCmd;
 import org.apache.cloudstack.api.command.user.loadbalancer.CreateLBStickinessPolicyCmd;
 import org.apache.cloudstack.api.command.user.loadbalancer.ListLBHealthCheckPoliciesCmd;
@@ -38,21 +18,23 @@ import org.apache.cloudstack.api.command.user.loadbalancer.ListLoadBalancerRuleI
 import org.apache.cloudstack.api.command.user.loadbalancer.ListLoadBalancerRulesCmd;
 import org.apache.cloudstack.api.command.user.loadbalancer.UpdateLoadBalancerRuleCmd;
 
+import java.util.List;
+import java.util.Map;
+
 public interface LoadBalancingRulesService {
     /**
      * Create a load balancer rule from the given ipAddress/port to the given private port
-     * @param openFirewall
-     *            TODO
-     * @param forDisplay TODO
-     * @param cmd
-     *            the command specifying the ip address, public port, protocol, private port, and algorithm
      *
+     * @param openFirewall TODO
+     * @param forDisplay   TODO
+     * @param cmd          the command specifying the ip address, public port, protocol, private port, and algorithm
      * @return the newly created LoadBalancerVO if successful, null otherwise
      * @throws InsufficientAddressCapacityException
      */
     LoadBalancer createPublicLoadBalancerRule(String xId, String name, String description, int srcPortStart, int srcPortEnd, int defPortStart, int defPortEnd,
-        Long ipAddrId, String protocol, String algorithm, long networkId, long lbOwnerId, boolean openFirewall, String lbProtocol, Boolean forDisplay) throws NetworkRuleConflictException,
-        InsufficientAddressCapacityException;
+                                              Long ipAddrId, String protocol, String algorithm, long networkId, long lbOwnerId, boolean openFirewall, String lbProtocol, Boolean
+                                                      forDisplay) throws NetworkRuleConflictException,
+            InsufficientAddressCapacityException;
 
     LoadBalancer updateLoadBalancerRule(UpdateLoadBalancerRuleCmd cmd);
 
@@ -62,8 +44,7 @@ public interface LoadBalancingRulesService {
      * Create a stickiness policy to a load balancer from the given stickiness method name and parameters in
      * (name,value) pairs.
      *
-     * @param cmd
-     *            the command specifying the stickiness method name, params (name,value pairs), policy name and
+     * @param cmd the command specifying the stickiness method name, params (name,value pairs), policy name and
      *            description.
      * @return the newly created stickiness policy if successfull, null otherwise
      * @thows NetworkRuleConflictException
@@ -78,11 +59,10 @@ public interface LoadBalancingRulesService {
      * Create a healthcheck policy to a load balancer from the given healthcheck
      * parameters in (name,value) pairs.
      *
-     * @param cmd
-     *            the command specifying the stickiness method name, params
+     * @param cmd the command specifying the stickiness method name, params
      *            (name,value pairs), policy name and description.
      * @return the newly created stickiness policy if successfull, null
-     *         otherwise
+     * otherwise
      * @thows NetworkRuleConflictException
      */
     public HealthCheckPolicy createLBHealthCheckPolicy(CreateLBHealthCheckPolicyCmd cmd);
@@ -98,7 +78,7 @@ public interface LoadBalancingRulesService {
 
     boolean assignSSLCertToLoadBalancerRule(Long lbRuleId, String certName, String publicCert, String privateKey);
 
-    boolean removeFromLoadBalancer(long lbRuleId, List<Long> vmIds,   Map<Long, List<String>> vmIdIpMap);
+    boolean removeFromLoadBalancer(long lbRuleId, List<Long> vmIds, Map<Long, List<String>> vmIdIpMap);
 
     boolean applyLoadBalancerConfig(long lbRuleId) throws ResourceUnavailableException;
 
@@ -119,8 +99,7 @@ public interface LoadBalancingRulesService {
     /**
      * List load balancer rules based on the given criteria
      *
-     * @param cmd
-     *            the command that specifies the criteria to use for listing load balancers. Load balancers can be
+     * @param cmd the command that specifies the criteria to use for listing load balancers. Load balancers can be
      *            listed
      *            by id, name, public ip, and vm instance id
      * @return list of load balancers that match the criteria
@@ -130,8 +109,7 @@ public interface LoadBalancingRulesService {
     /**
      * List stickiness policies based on the given criteria
      *
-     * @param cmd
-     *            the command specifies the load balancing rule id.
+     * @param cmd the command specifies the load balancing rule id.
      * @return list of stickiness policies that match the criteria.
      */
     List<? extends StickinessPolicy> searchForLBStickinessPolicies(ListLBStickinessPoliciesCmd cmd);
@@ -139,8 +117,7 @@ public interface LoadBalancingRulesService {
     /**
      * List healthcheck policies based on the given criteria
      *
-     * @param cmd
-     *            the command specifies the load balancing rule id.
+     * @param cmd the command specifies the load balancing rule id.
      * @return list of healthcheck policies that match the criteria.
      */
 

@@ -1,24 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.storage.listener;
-
-import java.util.List;
-
-import javax.inject.Inject;
 
 import com.cloud.agent.Listener;
 import com.cloud.agent.api.AgentControlAnswer;
@@ -36,9 +16,12 @@ import com.cloud.storage.ScopeType;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StorageManagerImpl;
 import com.cloud.storage.StoragePoolStatus;
-
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import javax.inject.Inject;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,12 +36,6 @@ public class StoragePoolMonitor implements Listener {
     public StoragePoolMonitor(final StorageManagerImpl mgr, final PrimaryDataStoreDao poolDao) {
         _storageManager = mgr;
         _poolDao = poolDao;
-
-    }
-
-    @Override
-    public boolean isRecurring() {
-        return false;
     }
 
     @Override
@@ -67,8 +44,13 @@ public class StoragePoolMonitor implements Listener {
     }
 
     @Override
-    public synchronized boolean processDisconnect(final long agentId, final Status state) {
-        return true;
+    public boolean processCommands(final long agentId, final long seq, final Command[] req) {
+        return false;
+    }
+
+    @Override
+    public AgentControlAnswer processControlCommand(final long agentId, final AgentControlCommand cmd) {
+        return null;
     }
 
     @Override
@@ -110,22 +92,22 @@ public class StoragePoolMonitor implements Listener {
     }
 
     @Override
-    public boolean processCommands(final long agentId, final long seq, final Command[] req) {
-        return false;
-    }
-
-    @Override
-    public AgentControlAnswer processControlCommand(final long agentId, final AgentControlCommand cmd) {
-        return null;
-    }
-
-    @Override
-    public boolean processTimeout(final long agentId, final long seq) {
+    public synchronized boolean processDisconnect(final long agentId, final Status state) {
         return true;
+    }
+
+    @Override
+    public boolean isRecurring() {
+        return false;
     }
 
     @Override
     public int getTimeout() {
         return -1;
+    }
+
+    @Override
+    public boolean processTimeout(final long agentId, final long seq) {
+        return true;
     }
 }

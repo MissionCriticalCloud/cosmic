@@ -1,31 +1,14 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
 
 import com.cloud.dc.Vlan;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
 
+import com.google.gson.annotations.SerializedName;
+
 @EntityReference(value = Vlan.class)
-@SuppressWarnings("unused")
 public class VlanIpRangeResponse extends BaseResponse implements ControlledEntityResponse {
     @SerializedName(ApiConstants.ID)
     @Param(description = "the ID of the VLAN IP range")
@@ -115,80 +98,80 @@ public class VlanIpRangeResponse extends BaseResponse implements ControlledEntit
     @Param(description = "the cidr of IPv6 network")
     private String ip6Cidr;
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
-    public void setForVirtualNetwork(Boolean forVirtualNetwork) {
+    public void setForVirtualNetwork(final Boolean forVirtualNetwork) {
         this.forVirtualNetwork = forVirtualNetwork;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
-    public void setVlan(String vlan) {
+    public void setVlan(final String vlan) {
         this.vlan = vlan;
     }
 
     @Override
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
     @Override
-    public void setDomainId(String domainId) {
-        this.domainId = domainId;
-    }
-
-    @Override
-    public void setDomainName(String domainName) {
-        this.domainName = domainName;
-    }
-
-    public void setPodId(String podId) {
-        this.podId = podId;
-    }
-
-    public void setPodName(String podName) {
-        this.podName = podName;
-    }
-
-    public void setGateway(String gateway) {
-        this.gateway = gateway;
-    }
-
-    public void setNetmask(String netmask) {
-        this.netmask = netmask;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setStartIp(String startIp) {
-        this.startIp = startIp;
-    }
-
-    public void setEndIp(String endIp) {
-        this.endIp = endIp;
-    }
-
-    public void setNetworkId(String networkId) {
-        this.networkId = networkId;
-    }
-
-    @Override
-    public void setProjectId(String projectId) {
+    public void setProjectId(final String projectId) {
         this.projectId = projectId;
     }
 
     @Override
-    public void setProjectName(String projectName) {
+    public void setProjectName(final String projectName) {
         this.projectName = projectName;
     }
 
-    public void setPhysicalNetworkId(String physicalNetworkId) {
+    @Override
+    public void setDomainId(final String domainId) {
+        this.domainId = domainId;
+    }
+
+    @Override
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setPodId(final String podId) {
+        this.podId = podId;
+    }
+
+    public void setPodName(final String podName) {
+        this.podName = podName;
+    }
+
+    public void setGateway(final String gateway) {
+        this.gateway = gateway;
+    }
+
+    public void setNetmask(final String netmask) {
+        this.netmask = netmask;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    public void setStartIp(final String startIp) {
+        this.startIp = startIp;
+    }
+
+    public void setEndIp(final String endIp) {
+        this.endIp = endIp;
+    }
+
+    public void setNetworkId(final String networkId) {
+        this.networkId = networkId;
+    }
+
+    public void setPhysicalNetworkId(final String physicalNetworkId) {
         this.physicalNetworkId = physicalNetworkId;
     }
 
@@ -200,19 +183,19 @@ public class VlanIpRangeResponse extends BaseResponse implements ControlledEntit
         return startIpv6;
     }
 
-    public void setStartIpv6(String startIpv6) {
+    public void setStartIpv6(final String startIpv6) {
         this.startIpv6 = startIpv6;
     }
 
-    public void setEndIpv6(String endIpv6) {
+    public void setEndIpv6(final String endIpv6) {
         this.endIpv6 = endIpv6;
     }
 
-    public void setIp6Gateway(String ip6Gateway) {
+    public void setIp6Gateway(final String ip6Gateway) {
         this.ip6Gateway = ip6Gateway;
     }
 
-    public void setIp6Cidr(String ip6Cidr) {
+    public void setIp6Cidr(final String ip6Cidr) {
         this.ip6Cidr = ip6Cidr;
     }
 }

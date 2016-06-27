@@ -1,20 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 var g_sessionKey = null;
 var g_role = null; // roles - root, domain-admin, ro-admin, user
 var g_username = null;
@@ -27,7 +10,7 @@ var g_enableLogging = false;
 var g_timezoneoffset = null;
 var g_timezone = null;
 var g_supportELB = null;
-var g_kvmsnapshotenabled =  null;
+var g_kvmsnapshotenabled = null;
 var g_regionsecondaryenabled = null;
 var g_userPublicTemplateEnabled = "true";
 var g_allowUserExpungeRecoverVm = "false";
@@ -57,12 +40,12 @@ function to_json_array(str) {
     var simple_array = str.split(",");
     var json_array = [];
 
-    $.each(simple_array, function(index, value) {
+    $.each(simple_array, function (index, value) {
         if ($.trim(value).length > 0) {
             var obj = {
-                          id: value,
-                          name: value
-                      };
+                id: value,
+                name: value
+            };
 
             json_array.push(obj);
         }
@@ -75,26 +58,20 @@ function _tag_equals(tag1, tag2) {
     return (tag1.name == tag2.name) && (tag1.id == tag2.id);
 }
 
-function _tag_array_contains(tag, tags)
-{
-    for (var i = 0; i < tags.length; i++)
-    {
+function _tag_array_contains(tag, tags) {
+    for (var i = 0; i < tags.length; i++) {
         if (_tag_equals(tags[i], tag)) return true;
     }
 
     return false;
 }
 
-function unique_tags(tags)
-{
+function unique_tags(tags) {
     var unique = [];
 
-    if (tags != null)
-    {
-        for (var i = 0; i < tags.length; i++)
-        {
-            if (!_tag_array_contains(tags[i], unique))
-            {
+    if (tags != null) {
+        for (var i = 0; i < tags.length; i++) {
+            if (!_tag_array_contains(tags[i], unique)) {
                 unique.push(tags[i]);
             }
         }
@@ -104,12 +81,12 @@ function unique_tags(tags)
 }
 
 //async action
-var pollAsyncJobResult = function(args) {
+var pollAsyncJobResult = function (args) {
     $.ajax({
         url: createURL("queryAsyncJobResult&jobId=" + args._custom.jobId),
         dataType: "json",
         async: false,
-        success: function(json) {
+        success: function (json) {
             var result = json.queryasyncjobresultresponse;
             if (result.jobstatus == 0) {
                 return; //Job has not completed
@@ -131,7 +108,7 @@ var pollAsyncJobResult = function(args) {
                     }
 
                     if (args._custom.fullRefreshAfterComplete == true) {
-                        setTimeout(function() {
+                        setTimeout(function () {
                             $(window).trigger('cloudStack.fullRefresh');
                         }, 500);
                     }
@@ -160,7 +137,7 @@ var pollAsyncJobResult = function(args) {
                 }
             }
         },
-        error: function(XMLHttpResponse) {
+        error: function (XMLHttpResponse) {
             args.error({
                 message: parseXMLHttpResponse(XMLHttpResponse)
             });
@@ -170,25 +147,25 @@ var pollAsyncJobResult = function(args) {
 
 //API calls
 
-    function createURL(apiName, options) {
-        if (!options) options = {};
-        var urlString = clientApiUrl + "?" + "command=" + apiName + "&response=json";
-        if (g_sessionKey) {
-            urlString += "&sessionkey=" + g_sessionKey;
-        }
-
-        if (cloudStack.context && cloudStack.context.projects && !options.ignoreProject) {
-            urlString = urlString + '&projectid=' + cloudStack.context.projects[0].id;
-        }
-
-        return urlString;
+function createURL(apiName, options) {
+    if (!options) options = {};
+    var urlString = clientApiUrl + "?" + "command=" + apiName + "&response=json";
+    if (g_sessionKey) {
+        urlString += "&sessionkey=" + g_sessionKey;
     }
 
-    function todb(val) {
-        return encodeURIComponent(val);
+    if (cloudStack.context && cloudStack.context.projects && !options.ignoreProject) {
+        urlString = urlString + '&projectid=' + cloudStack.context.projects[0].id;
     }
 
-    //LB provider map
+    return urlString;
+}
+
+function todb(val) {
+    return encodeURIComponent(val);
+}
+
+//LB provider map
 var lbProviderMap = {
     "publicLb": {
         "non-vpc": ["VirtualRouter"],
@@ -209,12 +186,12 @@ var addGuestNetworkDialog = {
         label: 'label.add.guest.network',
 
         messages: {
-            notification: function(args) {
+            notification: function (args) {
                 return 'label.add.guest.network';
             }
         },
 
-        preFilter: function(args) {
+        preFilter: function (args) {
             if (isAdmin())
                 return true;
             else
@@ -224,7 +201,7 @@ var addGuestNetworkDialog = {
         createForm: {
             title: 'label.add.guest.network', //Add Shared Network in advanced zone
 
-            preFilter: function(args) {
+            preFilter: function (args) {
                 if ('zones' in args.context) { //Infrastructure menu > zone detail > guest traffic type > network tab (only shown in advanced zone) > add guest network dialog
                     args.$form.find('.form-item[rel=zoneId]').hide();
                     args.$form.find('.form-item[rel=physicalNetworkId]').hide();
@@ -256,14 +233,14 @@ var addGuestNetworkDialog = {
                         required: true
                     },
                     docID: 'helpGuestNetworkZone',
-                    select: function(args) {
+                    select: function (args) {
                         if ('zones' in args.context) { //Infrastructure menu > zone detail > guest traffic type > network tab (only shown in advanced zone) > add guest network dialog
                             addGuestNetworkDialog.zoneObjs = args.context.zones; //i.e. only one zone entry
                         } else { //Network menu > guest network section > add guest network dialog
                             $.ajax({
                                 url: createURL('listZones'),
                                 async: false,
-                                success: function(json) {
+                                success: function (json) {
                                     addGuestNetworkDialog.zoneObjs = []; //reset
                                     var items = json.listzonesresponse.zone;
                                     if (items != null) {
@@ -277,7 +254,7 @@ var addGuestNetworkDialog = {
                             });
                         }
                         args.response.success({
-                            data: $.map(addGuestNetworkDialog.zoneObjs, function(zone) {
+                            data: $.map(addGuestNetworkDialog.zoneObjs, function (zone) {
                                 return {
                                     id: zone.id,
                                     description: zone.name
@@ -291,7 +268,7 @@ var addGuestNetworkDialog = {
                 physicalNetworkId: {
                     label: 'label.physical.network',
                     dependsOn: 'zoneId',
-                    select: function(args) {
+                    select: function (args) {
                         if ('physicalNetworks' in args.context) { //Infrastructure menu > zone detail > guest traffic type > network tab (only shown in advanced zone) > add guest network dialog
                             addGuestNetworkDialog.physicalNetworkObjs = args.context.physicalNetworks;
                         } else { //Network menu > guest network section > add guest network dialog
@@ -303,7 +280,7 @@ var addGuestNetworkDialog = {
                                         zoneid: selectedZoneId
                                     },
                                     async: false,
-                                    success: function(json) {
+                                    success: function (json) {
                                         var items = [];
                                         var physicalnetworks = json.listphysicalnetworksresponse.physicalnetwork;
                                         if (physicalnetworks != null) {
@@ -314,7 +291,7 @@ var addGuestNetworkDialog = {
                                                         physicalnetworkid: physicalnetworks[i].id
                                                     },
                                                     async: false,
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         var traffictypes = json.listtraffictypesresponse.traffictype;
                                                         if (traffictypes != null) {
                                                             for (var k = 0; k < traffictypes.length; k++) {
@@ -361,7 +338,7 @@ var addGuestNetworkDialog = {
                 scope: {
                     label: 'label.scope',
                     docID: 'helpGuestNetworkZoneScope',
-                    select: function(args) {
+                    select: function (args) {
                         var selectedZoneId = args.$form.find('.form-item[rel=zoneId]').find('select').val();
                         var selectedZoneObj = {};
                         if (addGuestNetworkDialog.zoneObjs != null && selectedZoneId != "") {
@@ -401,7 +378,7 @@ var addGuestNetworkDialog = {
                             data: array1
                         });
 
-                        args.$select.change(function() {
+                        args.$select.change(function () {
                             var $form = $(this).closest('form');
                             if ($(this).val() == "zone-wide") {
                                 $form.find('.form-item[rel=domainId]').hide();
@@ -432,7 +409,7 @@ var addGuestNetworkDialog = {
                     validation: {
                         required: true
                     },
-                    select: function(args) {
+                    select: function (args) {
                         var items = [];
                         var selectedZoneId = args.$form.find('.form-item[rel=zoneId]').find('select').val();
                         var selectedZoneObj = {};
@@ -449,9 +426,9 @@ var addGuestNetworkDialog = {
                                 url: createURL("listDomainChildren&id=" + selectedZoneObj.domainid + "&isrecursive=true"),
                                 dataType: "json",
                                 async: false,
-                                success: function(json) {
+                                success: function (json) {
                                     var domainObjs = json.listdomainchildrenresponse.domain;
-                                    $(domainObjs).each(function() {
+                                    $(domainObjs).each(function () {
                                         items.push({
                                             id: this.id,
                                             description: this.path
@@ -463,9 +440,9 @@ var addGuestNetworkDialog = {
                                 url: createURL("listDomains&id=" + selectedZoneObj.domainid),
                                 dataType: "json",
                                 async: false,
-                                success: function(json) {
+                                success: function (json) {
                                     var domainObjs = json.listdomainsresponse.domain;
-                                    $(domainObjs).each(function() {
+                                    $(domainObjs).each(function () {
                                         items.push({
                                             id: this.id,
                                             description: this.path
@@ -478,9 +455,9 @@ var addGuestNetworkDialog = {
                                 url: createURL("listDomains&listAll=true"),
                                 dataType: "json",
                                 async: false,
-                                success: function(json) {
+                                success: function (json) {
                                     var domainObjs = json.listdomainsresponse.domain;
-                                    $(domainObjs).each(function() {
+                                    $(domainObjs).each(function () {
                                         items.push({
                                             id: this.id,
                                             description: this.path
@@ -489,7 +466,7 @@ var addGuestNetworkDialog = {
                                 }
                             });
                         }
-                        items.sort(function(a, b) {
+                        items.sort(function (a, b) {
                             return a.description.localeCompare(b.description);
                         });
                         args.response.success({
@@ -511,15 +488,15 @@ var addGuestNetworkDialog = {
                     validation: {
                         required: true
                     },
-                    select: function(args) {
+                    select: function (args) {
                         var items = [];
                         $.ajax({
                             url: createURL("listProjects&listAll=true"),
                             dataType: "json",
                             async: false,
-                            success: function(json) {
+                            success: function (json) {
                                 projectObjs = json.listprojectsresponse.project;
-                                $(projectObjs).each(function() {
+                                $(projectObjs).each(function () {
                                     items.push({
                                         id: this.id,
                                         description: this.name
@@ -537,8 +514,8 @@ var addGuestNetworkDialog = {
                     label: 'label.network.offering',
                     docID: 'helpGuestNetworkZoneNetworkOffering',
                     dependsOn: ['zoneId', 'physicalNetworkId', 'scope'],
-                    select: function(args) {
-                        if(args.$form.find('.form-item[rel=zoneId]').find('select').val() == null || args.$form.find('.form-item[rel=zoneId]').find('select').val().length == 0) {
+                    select: function (args) {
+                        if (args.$form.find('.form-item[rel=zoneId]').find('select').val() == null || args.$form.find('.form-item[rel=zoneId]').find('select').val().length == 0) {
                             args.response.success({
                                 data: null
                             });
@@ -579,7 +556,7 @@ var addGuestNetworkDialog = {
                             url: createURL('listNetworkOfferings'),
                             data: data,
                             async: false,
-                            success: function(json) {
+                            success: function (json) {
                                 addGuestNetworkDialog.networkOfferingObjs = json.listnetworkofferingsresponse.networkoffering;
                                 if (addGuestNetworkDialog.networkOfferingObjs != null && addGuestNetworkDialog.networkOfferingObjs.length > 0) {
                                     var selectedZoneId = args.$form.find('.form-item[rel=zoneId]').find('select').val();
@@ -620,10 +597,10 @@ var addGuestNetworkDialog = {
                             data: items
                         });
 
-                        args.$select.change(function() {
+                        args.$select.change(function () {
                             var $form = $(this).closest("form");
                             var selectedNetworkOfferingId = $(this).val();
-                            $(addGuestNetworkDialog.networkOfferingObjs).each(function() {
+                            $(addGuestNetworkDialog.networkOfferingObjs).each(function () {
                                 if (this.id == selectedNetworkOfferingId) {
                                     if (this.specifyvlan == false) {
                                         $form.find('.form-item[rel=vlanId]').hide();
@@ -701,7 +678,7 @@ var addGuestNetworkDialog = {
                     validation: {
                         ipv6: true
                     }
-               },
+                },
                 //IPv6 (end)
 
                 networkdomain: {
@@ -711,7 +688,7 @@ var addGuestNetworkDialog = {
             }
         },
 
-        action: function(args) { //Add guest network in advanced zone
+        action: function (args) { //Add guest network in advanced zone
             if (
                 ((args.data.ip4gateway.length == 0) && (args.data.ip4Netmask.length == 0) && (args.data.startipv4.length == 0) && (args.data.endipv4.length == 0)) &&
                 ((args.data.ip6gateway.length == 0) && (args.data.ip6cidr.length == 0) && (args.data.startipv6.length == 0) && (args.data.endipv6.length == 0))
@@ -798,20 +775,20 @@ var addGuestNetworkDialog = {
             $.ajax({
                 url: createURL("createNetwork" + array1.join("")),
                 dataType: "json",
-                success: function(json) {
+                success: function (json) {
                     var item = json.createnetworkresponse.network;
                     args.response.success({
                         data: item
                     });
                 },
-                error: function(XMLHttpResponse) {
+                error: function (XMLHttpResponse) {
                     var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
                     args.response.error(errorMsg);
                 }
             });
         },
         notification: {
-            poll: function(args) {
+            poll: function (args) {
                 args.complete();
             }
         }
@@ -819,92 +796,92 @@ var addGuestNetworkDialog = {
 }
 
 
-    function isLdapEnabled() {
-        var result;
-        $.ajax({
-            url: createURL("listLdapConfigurations"),
-            dataType: "json",
-            async: false,
-            success: function(json) {
-                result = (json.ldapconfigurationresponse.count > 0);
-            },
-            error: function(json) {
-                result = false;
+function isLdapEnabled() {
+    var result;
+    $.ajax({
+        url: createURL("listLdapConfigurations"),
+        dataType: "json",
+        async: false,
+        success: function (json) {
+            result = (json.ldapconfigurationresponse.count > 0);
+        },
+        error: function (json) {
+            result = false;
+        }
+    });
+    return result;
+}
+
+// Role Functions
+
+function isAdmin() {
+    return (g_role == 1);
+}
+
+function isDomainAdmin() {
+    return (g_role == 2);
+}
+
+function isUser() {
+    return (g_role == 0);
+}
+
+// FUNCTION: Handles AJAX error callbacks.  You can pass in an optional function to
+// handle errors that are not already handled by this method.
+
+function handleError(XMLHttpResponse, handleErrorCallback) {
+    // User Not authenticated
+    if (XMLHttpResponse.status == ERROR_ACCESS_DENIED_DUE_TO_UNAUTHORIZED) {
+        $("#dialog_session_expired").dialog("open");
+    } else if (XMLHttpResponse.status == ERROR_INTERNET_NAME_NOT_RESOLVED) {
+        $("#dialog_error_internet_not_resolved").dialog("open");
+    } else if (XMLHttpResponse.status == ERROR_INTERNET_CANNOT_CONNECT) {
+        $("#dialog_error_management_server_not_accessible").dialog("open");
+    } else if (XMLHttpResponse.status == ERROR_VMOPS_ACCOUNT_ERROR && handleErrorCallback != undefined) {
+        handleErrorCallback();
+    } else if (handleErrorCallback != undefined) {
+        handleErrorCallback();
+    } else {
+        var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
+        $("#dialog_error").text(_s(errorMsg)).dialog("open");
+    }
+}
+
+function parseXMLHttpResponse(XMLHttpResponse) {
+    if (isValidJsonString(XMLHttpResponse.responseText) == false) {
+        return "";
+    }
+
+    //var json = jQuery.parseJSON(XMLHttpResponse.responseText);
+    var json = JSON.parse(XMLHttpResponse.responseText);
+    if (json != null) {
+        var property;
+        for (property in json) {
+            var errorObj = json[property];
+            if (errorObj.errorcode == 401 && errorObj.errortext == "unable to verify user credentials and/or request signature") {
+                $('#container').hide();
+
+                return _l('label.session.expired');
+            } else {
+                return _s(errorObj.errortext);
             }
-        });
-        return result;
-    }
-
-    // Role Functions
-
-    function isAdmin() {
-        return (g_role == 1);
-    }
-
-    function isDomainAdmin() {
-        return (g_role == 2);
-    }
-
-    function isUser() {
-        return (g_role == 0);
-    }
-
-    // FUNCTION: Handles AJAX error callbacks.  You can pass in an optional function to
-    // handle errors that are not already handled by this method.
-
-    function handleError(XMLHttpResponse, handleErrorCallback) {
-        // User Not authenticated
-        if (XMLHttpResponse.status == ERROR_ACCESS_DENIED_DUE_TO_UNAUTHORIZED) {
-            $("#dialog_session_expired").dialog("open");
-        } else if (XMLHttpResponse.status == ERROR_INTERNET_NAME_NOT_RESOLVED) {
-            $("#dialog_error_internet_not_resolved").dialog("open");
-        } else if (XMLHttpResponse.status == ERROR_INTERNET_CANNOT_CONNECT) {
-            $("#dialog_error_management_server_not_accessible").dialog("open");
-        } else if (XMLHttpResponse.status == ERROR_VMOPS_ACCOUNT_ERROR && handleErrorCallback != undefined) {
-            handleErrorCallback();
-        } else if (handleErrorCallback != undefined) {
-            handleErrorCallback();
-        } else {
-            var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
-            $("#dialog_error").text(_s(errorMsg)).dialog("open");
         }
+    } else {
+        return "";
     }
+}
 
-    function parseXMLHttpResponse(XMLHttpResponse) {
-        if (isValidJsonString(XMLHttpResponse.responseText) == false) {
-            return "";
-        }
-
-        //var json = jQuery.parseJSON(XMLHttpResponse.responseText);
-        var json = JSON.parse(XMLHttpResponse.responseText);
-        if (json != null) {
-            var property;
-            for (property in json) {
-                var errorObj = json[property];
-                if (errorObj.errorcode == 401 && errorObj.errortext == "unable to verify user credentials and/or request signature") {
-                    $('#container').hide();
-
-                    return _l('label.session.expired');
-                } else {
-                    return _s(errorObj.errortext);
-                }
-            }
-        } else {
-            return "";
-        }
+function isValidJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
     }
-
-    function isValidJsonString(str) {
-        try {
-            JSON.parse(str);
-        } catch (e) {
-            return false;
-        }
-        return true;
-    }
+    return true;
+}
 
 cloudStack.validate = {
-    vmHostName: function(args) {
+    vmHostName: function (args) {
         // 1 ~ 63 characters long
         // ASCII letters 'a' through 'z', 'A' through 'Z', digits '0' through '9', hyphen ('-')
         // must start with a letter
@@ -920,7 +897,7 @@ cloudStack.validate = {
 }
 
 cloudStack.preFilter = {
-    createTemplate: function(args) {
+    createTemplate: function (args) {
         if (isAdmin()) {
             args.$form.find('.form-item[rel=isPublic]').css('display', 'inline-block');
             args.$form.find('.form-item[rel=isFeatured]').css('display', 'inline-block');
@@ -938,7 +915,7 @@ cloudStack.preFilter = {
 }
 
 cloudStack.actionFilter = {
-    guestNetwork: function(args) {
+    guestNetwork: function (args) {
         var jsonObj = args.context.item;
         var allowedActions = [];
         allowedActions.push('replaceacllist');
@@ -961,7 +938,7 @@ var roleTypeAdmin = "1";
 var roleTypeDomainAdmin = "2";
 
 cloudStack.converters = {
-    convertBytes: function(bytes) {
+    convertBytes: function (bytes) {
         if (bytes == undefined)
             return '';
 
@@ -975,7 +952,7 @@ cloudStack.converters = {
             return (bytes / 1024 / 1024 / 1024 / 1024).toFixed(2) + " TB";
         }
     },
-    toBytes: function(str) {
+    toBytes: function (str) {
         if (str === undefined) {
             return "0";
         }
@@ -1009,7 +986,7 @@ cloudStack.converters = {
         // assume GB
         return parseInt(res[0], 10) * 1024 * 1024 * 1024;
     },
-    toLocalDate: function(UtcDate) {
+    toLocalDate: function (UtcDate) {
         var localDate = "";
         if (UtcDate != null && UtcDate.length > 0) {
             var disconnected = new Date();
@@ -1020,17 +997,17 @@ cloudStack.converters = {
             } else {
                 var browserDate = new Date();
                 var browserTimezoneoffset = browserDate.getTimezoneOffset();
-                if (browserTimezoneoffset == undefined || isNaN(browserTimezoneoffset) ) {
+                if (browserTimezoneoffset == undefined || isNaN(browserTimezoneoffset)) {
                     localDate = disconnected.toUTCString();
                 } else {
-                    g_timezoneoffset = (browserTimezoneoffset/60) * (-1);
+                    g_timezoneoffset = (browserTimezoneoffset / 60) * (-1);
                     localDate = disconnected.getTimePlusTimezoneOffset(g_timezoneoffset);
                 }
             }
         }
         return localDate;
     },
-    toBooleanText: function(booleanValue) {
+    toBooleanText: function (booleanValue) {
         var text1;
         if (booleanValue == true) {
             text1 = "Yes";
@@ -1041,7 +1018,7 @@ cloudStack.converters = {
         }
         return text1;
     },
-    convertHz: function(hz) {
+    convertHz: function (hz) {
         if (hz == null)
             return "";
 
@@ -1051,7 +1028,7 @@ cloudStack.converters = {
             return (hz / 1000).toFixed(2) + " GHz";
         }
     },
-    toDayOfWeekDesp: function(dayOfWeek) {
+    toDayOfWeekDesp: function (dayOfWeek) {
         if (dayOfWeek == "1")
             return "Sunday";
         else if (dayOfWeek == "2")
@@ -1067,7 +1044,7 @@ cloudStack.converters = {
         else if (dayOfWeek == "7")
             return "Saturday";
     },
-    toDayOfWeekDesp: function(dayOfWeek) {
+    toDayOfWeekDesp: function (dayOfWeek) {
         if (dayOfWeek == "1")
             return "Sunday";
         else if (dayOfWeek == "2")
@@ -1083,13 +1060,13 @@ cloudStack.converters = {
         else if (dayOfWeek == "7")
             return "Saturday";
     },
-    toNetworkType: function(usevirtualnetwork) {
+    toNetworkType: function (usevirtualnetwork) {
         if (usevirtualnetwork == true || usevirtualnetwork == "true")
             return "Public";
         else
             return "Direct";
     },
-    toRole: function(type) {
+    toRole: function (type) {
         if (type == roleTypeUser) {
             return "User";
         } else if (type == roleTypeAdmin) {
@@ -1098,7 +1075,7 @@ cloudStack.converters = {
             return "Domain-Admin";
         }
     },
-    toAlertType: function(alertCode) {
+    toAlertType: function (alertCode) {
         switch (alertCode) {
             case 0:
                 return _l('label.memory');
@@ -1121,7 +1098,7 @@ cloudStack.converters = {
             case 10:
                 return _l('label.console.proxy');
 
-                // These are old values -- can be removed in the future
+            // These are old values -- can be removed in the future
             case 8:
                 return _l('label.user.vm');
             case 11:
@@ -1159,7 +1136,7 @@ cloudStack.converters = {
         }
     },
 
-    toCapacityCountType: function(capacityCode) {
+    toCapacityCountType: function (capacityCode) {
         switch (capacityCode) {
             case 0:
                 return _l('label.memory');
@@ -1204,7 +1181,7 @@ cloudStack.converters = {
         }
     },
 
-    convertByType: function(alertCode, value) {
+    convertByType: function (alertCode, value) {
         switch (alertCode) {
             case 0:
                 return cloudStack.converters.convertBytes(value);
@@ -1227,7 +1204,7 @@ cloudStack.converters = {
 }
 
 function isModuleIncluded(moduleName) {
-    for(var moduleIndex = 0; moduleIndex < cloudStack.modules.length; moduleIndex++) {
+    for (var moduleIndex = 0; moduleIndex < cloudStack.modules.length; moduleIndex++) {
         if (cloudStack.modules[moduleIndex] == moduleName) {
             return true;
             break;
@@ -1283,7 +1260,7 @@ function listViewDataProvider(args, data, options) {
 }
 
 //used by infrastructure page and network page
-var addExtraPropertiesToGuestNetworkObject = function(jsonObj) {
+var addExtraPropertiesToGuestNetworkObject = function (jsonObj) {
     jsonObj.networkdomaintext = jsonObj.networkdomain;
     jsonObj.networkofferingidText = jsonObj.networkofferingid;
 
@@ -1296,15 +1273,15 @@ var addExtraPropertiesToGuestNetworkObject = function(jsonObj) {
             jsonObj.scope = "Account (" + jsonObj.domain + ", " + jsonObj.account + ")";
     }
 
-    if (jsonObj.vlan == null && jsonObj.broadcasturi != null && jsonObj.broadcasturi.substring(0,7) == "vlan://") {
+    if (jsonObj.vlan == null && jsonObj.broadcasturi != null && jsonObj.broadcasturi.substring(0, 7) == "vlan://") {
         jsonObj.vlan = jsonObj.broadcasturi.replace("vlan://", "");
     }
-    if(jsonObj.vxlan == null && jsonObj.broadcasturi != null && jsonObj.broadcasturi.substring(0,8) == "vxlan://") {
+    if (jsonObj.vxlan == null && jsonObj.broadcasturi != null && jsonObj.broadcasturi.substring(0, 8) == "vxlan://") {
         jsonObj.vxlan = jsonObj.broadcasturi.replace("vxlan://", "");
     }
 }
 
-var processPropertiesInImagestoreObject = function(jsonObj) {
+var processPropertiesInImagestoreObject = function (jsonObj) {
     if (jsonObj.url != undefined) {
         var url = jsonObj.url; //e.g. 'cifs://10.1.1.1/aaa/aaa2/aaa3?user=bbb&password=ccc&domain=ddd'
         var passwordIndex = url.indexOf('&password='); //38
@@ -1317,168 +1294,168 @@ var processPropertiesInImagestoreObject = function(jsonObj) {
 
 //find service object in network object
 
-    function ipFindNetworkServiceByName(pName, networkObj) {
-        if (networkObj == null)
-            return null;
-        if (networkObj.service != null) {
-            for (var i = 0; i < networkObj.service.length; i++) {
-                var networkServiceObj = networkObj.service[i];
-                if (networkServiceObj.name == pName)
-                    return networkServiceObj;
-            }
-        }
+function ipFindNetworkServiceByName(pName, networkObj) {
+    if (networkObj == null)
         return null;
-    }
-    //find capability object in service object in network object
-
-    function ipFindCapabilityByName(pName, networkServiceObj) {
-        if (networkServiceObj == null)
-            return null;
-        if (networkServiceObj.capability != null) {
-            for (var i = 0; i < networkServiceObj.capability.length; i++) {
-                var capabilityObj = networkServiceObj.capability[i];
-                if (capabilityObj.name == pName)
-                    return capabilityObj;
-            }
+    if (networkObj.service != null) {
+        for (var i = 0; i < networkObj.service.length; i++) {
+            var networkServiceObj = networkObj.service[i];
+            if (networkServiceObj.name == pName)
+                return networkServiceObj;
         }
+    }
+    return null;
+}
+//find capability object in service object in network object
+
+function ipFindCapabilityByName(pName, networkServiceObj) {
+    if (networkServiceObj == null)
         return null;
-    }
-
-    //compose URL for adding primary storage
-
-    function nfsURL(server, path) {
-        var url;
-
-        if (path.substring(0, 1) != "/") {
-            path = "/" + path;
+    if (networkServiceObj.capability != null) {
+        for (var i = 0; i < networkServiceObj.capability.length; i++) {
+            var capabilityObj = networkServiceObj.capability[i];
+            if (capabilityObj.name == pName)
+                return capabilityObj;
         }
+    }
+    return null;
+}
 
-        if (server.indexOf("://") == -1)
-            url = "nfs://" + server + path;
-        else
-            url = server + path;
-        return url;
+//compose URL for adding primary storage
+
+function nfsURL(server, path) {
+    var url;
+
+    if (path.substring(0, 1) != "/") {
+        path = "/" + path;
     }
 
-    function smbURL(server, path, smbUsername, smbPassword, smbDomain) {
-        var url = '';
+    if (server.indexOf("://") == -1)
+        url = "nfs://" + server + path;
+    else
+        url = server + path;
+    return url;
+}
 
-        if (path.substring(0, 1) != "/") {
-            path = "/" + path;
-        }
+function smbURL(server, path, smbUsername, smbPassword, smbDomain) {
+    var url = '';
 
-        if (server.indexOf('://') == -1) {
-            url += 'cifs://';
-        }
-
-        url += (server + path);
-
-        return url;
+    if (path.substring(0, 1) != "/") {
+        path = "/" + path;
     }
 
-    function presetupURL(server, path) {
-        var url;
-        if (server.indexOf("://") == -1)
-            url = "presetup://" + server + path;
-        else
-            url = server + path;
-        return url;
+    if (server.indexOf('://') == -1) {
+        url += 'cifs://';
     }
 
-    function ocfs2URL(server, path) {
-        var url;
-        if (server.indexOf("://") == -1)
-            url = "ocfs2://" + server + path;
-        else
-            url = server + path;
-        return url;
+    url += (server + path);
+
+    return url;
+}
+
+function presetupURL(server, path) {
+    var url;
+    if (server.indexOf("://") == -1)
+        url = "presetup://" + server + path;
+    else
+        url = server + path;
+    return url;
+}
+
+function ocfs2URL(server, path) {
+    var url;
+    if (server.indexOf("://") == -1)
+        url = "ocfs2://" + server + path;
+    else
+        url = server + path;
+    return url;
+}
+
+function SharedMountPointURL(server, path) {
+    var url;
+    if (server.indexOf("://") == -1)
+        url = "SharedMountPoint://" + server + path;
+    else
+        url = server + path;
+    return url;
+}
+
+function rbdURL(monitor, pool, id, secret) {
+    var url;
+
+    /*
+     Replace the + and / symbols by - and _ to have URL-safe base64 going to the API
+     It's hacky, but otherwise we'll confuse java.net.URI which splits the incoming URI
+     */
+    secret = secret.replace("+", "-");
+    secret = secret.replace("/", "_");
+
+    if (id != null && secret != null) {
+        monitor = id + ":" + secret + "@" + monitor;
     }
 
-    function SharedMountPointURL(server, path) {
-        var url;
-        if (server.indexOf("://") == -1)
-            url = "SharedMountPoint://" + server + path;
-        else
-            url = server + path;
-        return url;
+    if (pool.substring(0, 1) != "/")
+        pool = "/" + pool;
+
+    if (monitor.indexOf("://") == -1)
+        url = "rbd://" + monitor + pool;
+    else
+        url = monitor + pool;
+
+    return url;
+}
+
+function clvmURL(vgname) {
+    var url;
+    if (vgname.indexOf("://") == -1)
+        url = "clvm://localhost/" + vgname;
+    else
+        url = vgname;
+    return url;
+}
+
+function vmfsURL(server, path) {
+    var url;
+    if (server.indexOf("://") == -1)
+        url = "vmfs://" + server + path;
+    else
+        url = server + path;
+    return url;
+}
+
+function iscsiURL(server, iqn, lun) {
+    var url;
+    if (server.indexOf("://") == -1)
+        url = "iscsi://" + server + iqn + "/" + lun;
+    else
+        url = server + iqn + "/" + lun;
+    return url;
+}
+
+function glusterURL(server, path) {
+    var url;
+    if (server.indexOf("://") == -1)
+        url = "gluster://" + server + path;
+    else
+        url = server + path;
+    return url;
+}
+
+
+//VM Instance
+
+function getVmName(p_vmName, p_vmDisplayname) {
+    if (p_vmDisplayname == null)
+        return _s(p_vmName);
+
+    var vmName = null;
+    if (p_vmDisplayname != p_vmName) {
+        vmName = _s(p_vmName) + " (" + _s(p_vmDisplayname) + ")";
+    } else {
+        vmName = _s(p_vmName);
     }
-
-    function rbdURL(monitor, pool, id, secret) {
-        var url;
-
-        /*
-    Replace the + and / symbols by - and _ to have URL-safe base64 going to the API
-    It's hacky, but otherwise we'll confuse java.net.URI which splits the incoming URI
-    */
-        secret = secret.replace("+", "-");
-        secret = secret.replace("/", "_");
-
-        if (id != null && secret != null) {
-            monitor = id + ":" + secret + "@" + monitor;
-        }
-
-        if (pool.substring(0, 1) != "/")
-            pool = "/" + pool;
-
-        if (monitor.indexOf("://") == -1)
-            url = "rbd://" + monitor + pool;
-        else
-            url = monitor + pool;
-
-        return url;
-    }
-
-    function clvmURL(vgname) {
-        var url;
-        if (vgname.indexOf("://") == -1)
-            url = "clvm://localhost/" + vgname;
-        else
-            url = vgname;
-        return url;
-    }
-
-    function vmfsURL(server, path) {
-        var url;
-        if (server.indexOf("://") == -1)
-            url = "vmfs://" + server + path;
-        else
-            url = server + path;
-        return url;
-    }
-
-    function iscsiURL(server, iqn, lun) {
-        var url;
-        if (server.indexOf("://") == -1)
-            url = "iscsi://" + server + iqn + "/" + lun;
-        else
-            url = server + iqn + "/" + lun;
-        return url;
-    }
-
-    function glusterURL(server, path) {
-        var url;
-        if (server.indexOf("://") == -1)
-            url = "gluster://" + server + path;
-        else
-            url = server + path;
-        return url;
-    }
-
-
-    //VM Instance
-
-    function getVmName(p_vmName, p_vmDisplayname) {
-        if (p_vmDisplayname == null)
-            return _s(p_vmName);
-
-        var vmName = null;
-        if (p_vmDisplayname != p_vmName) {
-            vmName = _s(p_vmName) + " (" + _s(p_vmDisplayname) + ")";
-        } else {
-            vmName = _s(p_vmName);
-        }
-        return vmName;
-    }
+    return vmName;
+}
 
 var timezoneMap = new Object();
 timezoneMap["Etc/GMT+12"] = "Etc/GMT+12 [GMT-12:00]";
@@ -2104,18 +2081,18 @@ timezoneMap["Pacific/Kiritimati"] = "Pacific/Kiritimati [Line Is. Time]";
 // CloudStack common API helpers
 cloudStack.api = {
     actions: {
-        sort: function(updateCommand, objType) {
-            var action = function(args) {
+        sort: function (updateCommand, objType) {
+            var action = function (args) {
                 $.ajax({
                     url: createURL(updateCommand),
                     data: {
                         id: args.context[objType].id,
                         sortKey: args.index
                     },
-                    success: function(json) {
+                    success: function (json) {
                         args.response.success();
                     },
-                    error: function(json) {
+                    error: function (json) {
                         args.response.error(parseXMLHttpResponse(json));
                     }
                 });
@@ -2142,13 +2119,13 @@ cloudStack.api = {
         }
     },
 
-    tags: function(args) {
+    tags: function (args) {
         var resourceType = args.resourceType;
         var contextId = args.contextId;
 
         return {
             actions: {
-                add: function(args) {
+                add: function (args) {
                     var data = args.data;
                     var resourceId = args.context[contextId][0].id;
 
@@ -2160,7 +2137,7 @@ cloudStack.api = {
                             resourceIds: resourceId,
                             resourceType: resourceType
                         },
-                        success: function(json) {
+                        success: function (json) {
                             args.response.success({
                                 _custom: {
                                     jobId: json.createtagsresponse.jobid
@@ -2174,7 +2151,7 @@ cloudStack.api = {
                     });
                 },
 
-                remove: function(args) {
+                remove: function (args) {
                     var data = args.context.tagItems[0];
                     var resourceId = args.context[contextId][0].id;
 
@@ -2186,7 +2163,7 @@ cloudStack.api = {
                             resourceIds: resourceId,
                             resourceType: resourceType
                         },
-                        success: function(json) {
+                        success: function (json) {
                             args.response.success({
                                 _custom: {
                                     jobId: json.deletetagsresponse.jobid
@@ -2200,7 +2177,7 @@ cloudStack.api = {
                     });
                 }
             },
-            dataProvider: function(args) {
+            dataProvider: function (args) {
                 if (args.jsonObj != undefined) {
                     args.response.success({
                         data: args.jsonObj.tags
@@ -2227,12 +2204,12 @@ cloudStack.api = {
                     $.ajax({
                         url: createURL('listTags'),
                         data: data,
-                        success: function(json) {
+                        success: function (json) {
                             args.response.success({
                                 data: json.listtagsresponse ? json.listtagsresponse.tag : []
                             });
                         },
-                        error: function(json) {
+                        error: function (json) {
                             args.response.error(parseXMLHttpResponse(json));
                         }
                     });
@@ -2248,11 +2225,11 @@ function strOrFunc(arg, args) {
     return arg;
 }
 
-$.validator.addMethod("netmask", function(value, element) {
+$.validator.addMethod("netmask", function (value, element) {
     if (this.optional(element) && value.length == 0)
         return true;
 
-    var valid = [ 255, 254, 252, 248, 240, 224, 192, 128, 0 ];
+    var valid = [255, 254, 252, 248, 240, 224, 192, 128, 0];
     var octets = value.split('.');
     if (typeof octets == 'undefined' || octets.length != 4) {
         return false;
@@ -2271,7 +2248,7 @@ $.validator.addMethod("netmask", function(value, element) {
     return true;
 }, "The specified netmask is invalid.");
 
-$.validator.addMethod("ipv6cidr", function(value, element) {
+$.validator.addMethod("ipv6cidr", function (value, element) {
     if (this.optional(element) && value.length == 0)
         return true;
 
@@ -2292,7 +2269,7 @@ $.validator.addMethod("ipv6cidr", function(value, element) {
     return true;
 }, "The specified IPv6 CIDR is invalid.");
 
-$.validator.addMethod("ipv4cidr", function(value, element) {
+$.validator.addMethod("ipv4cidr", function (value, element) {
     if (this.optional(element) && value.length == 0)
         return true;
 

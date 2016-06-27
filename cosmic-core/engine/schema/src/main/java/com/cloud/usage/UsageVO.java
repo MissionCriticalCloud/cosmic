@@ -1,22 +1,7 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.usage;
 
-import java.util.Date;
+import org.apache.cloudstack.api.InternalIdentity;
+import org.apache.cloudstack.usage.Usage;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,9 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.cloudstack.api.InternalIdentity;
-import org.apache.cloudstack.usage.Usage;
+import java.util.Date;
 
 @Entity
 @Table(name = "cloud_usage")
@@ -106,19 +89,12 @@ public class UsageVO implements Usage, InternalIdentity {
     @Column(name = "quota_calculated")
     private Integer quotaCalculated = 0;
 
-    public Integer getQuotaCalculated() {
-        return quotaCalculated;
-    }
-
-    public void setQuotaCalculated(Integer quotaCalculated) {
-        this.quotaCalculated = quotaCalculated;
-    }
-
     public UsageVO() {
     }
 
-    public UsageVO(Long zoneId, Long accountId, Long domainId, String description, String usageDisplay, int usageType, Double rawUsage, Long vmId, String vmName,
-            Long offeringId, Long templateId, Long usageId, Long size, Date startDate, Date endDate) {
+    public UsageVO(final Long zoneId, final Long accountId, final Long domainId, final String description, final String usageDisplay, final int usageType, final Double rawUsage,
+                   final Long vmId, final String vmName,
+                   final Long offeringId, final Long templateId, final Long usageId, final Long size, final Date startDate, final Date endDate) {
         this.zoneId = zoneId;
         this.accountId = accountId;
         this.domainId = domainId;
@@ -132,12 +108,13 @@ public class UsageVO implements Usage, InternalIdentity {
         this.templateId = templateId;
         this.usageId = usageId;
         this.size = size;
-        this.startDate = startDate  == null ? null : new Date(startDate.getTime());
-        this.endDate = endDate  == null ? null : new Date(endDate.getTime());
+        this.startDate = startDate == null ? null : new Date(startDate.getTime());
+        this.endDate = endDate == null ? null : new Date(endDate.getTime());
     }
 
-    public UsageVO(Long zoneId, Long accountId, Long domainId, String description, String usageDisplay, int usageType, Double rawUsage, Long vmId, String vmName,
-            Long offeringId, Long templateId, Long usageId, Long size, Long virtualSize, Date startDate, Date endDate) {
+    public UsageVO(final Long zoneId, final Long accountId, final Long domainId, final String description, final String usageDisplay, final int usageType, final Double rawUsage,
+                   final Long vmId, final String vmName,
+                   final Long offeringId, final Long templateId, final Long usageId, final Long size, final Long virtualSize, final Date startDate, final Date endDate) {
         this.zoneId = zoneId;
         this.accountId = accountId;
         this.domainId = domainId;
@@ -152,12 +129,13 @@ public class UsageVO implements Usage, InternalIdentity {
         this.usageId = usageId;
         this.size = size;
         this.virtualSize = virtualSize;
-        this.startDate = startDate  == null ? null : new Date(startDate.getTime());
-        this.endDate = endDate  == null ? null : new Date(endDate.getTime());
+        this.startDate = startDate == null ? null : new Date(startDate.getTime());
+        this.endDate = endDate == null ? null : new Date(endDate.getTime());
     }
 
-    public UsageVO(Long zoneId, Long accountId, Long domainId, String description, String usageDisplay, int usageType, Double rawUsage, Long usageId, String type,
-            Long networkId, Date startDate, Date endDate) {
+    public UsageVO(final Long zoneId, final Long accountId, final Long domainId, final String description, final String usageDisplay, final int usageType, final Double rawUsage,
+                   final Long usageId, final String type,
+                   final Long networkId, final Date startDate, final Date endDate) {
         this.zoneId = zoneId;
         this.accountId = accountId;
         this.domainId = domainId;
@@ -168,12 +146,13 @@ public class UsageVO implements Usage, InternalIdentity {
         this.usageId = usageId;
         this.type = type;
         this.networkId = networkId;
-        this.startDate = startDate  == null ? null : new Date(startDate.getTime());
-        this.endDate = endDate  == null ? null : new Date(endDate.getTime());
+        this.startDate = startDate == null ? null : new Date(startDate.getTime());
+        this.endDate = endDate == null ? null : new Date(endDate.getTime());
     }
 
-    public UsageVO(Long zoneId, Long accountId, Long domainId, String description, String usageDisplay, int usageType, Double rawUsage, Long vmId, String vmName,
-            Long offeringId, Long templateId, Long usageId, Date startDate, Date endDate, String type) {
+    public UsageVO(final Long zoneId, final Long accountId, final Long domainId, final String description, final String usageDisplay, final int usageType, final Double rawUsage,
+                   final Long vmId, final String vmName,
+                   final Long offeringId, final Long templateId, final Long usageId, final Date startDate, final Date endDate, final String type) {
         this.zoneId = zoneId;
         this.accountId = accountId;
         this.domainId = domainId;
@@ -187,12 +166,14 @@ public class UsageVO implements Usage, InternalIdentity {
         this.templateId = templateId;
         this.usageId = usageId;
         this.type = type;
-        this.startDate = startDate  == null ? null : new Date(startDate.getTime());
-        this.endDate = endDate  == null ? null : new Date(endDate.getTime());
+        this.startDate = startDate == null ? null : new Date(startDate.getTime());
+        this.endDate = endDate == null ? null : new Date(endDate.getTime());
     }
 
-    public UsageVO(Long zoneId, Long accountId, Long domainId, String description, String usageDisplay, int usageType, Double rawUsage, Long vmId, String vmName,
-            Long cpuCores, Long cpuSpeed, Long memory, Long offeringId, Long templateId, Long usageId, Date startDate, Date endDate, String type) {
+    public UsageVO(final Long zoneId, final Long accountId, final Long domainId, final String description, final String usageDisplay, final int usageType, final Double rawUsage,
+                   final Long vmId, final String vmName,
+                   final Long cpuCores, final Long cpuSpeed, final Long memory, final Long offeringId, final Long templateId, final Long usageId, final Date startDate, final
+                   Date endDate, final String type) {
         this.zoneId = zoneId;
         this.accountId = accountId;
         this.domainId = domainId;
@@ -209,13 +190,14 @@ public class UsageVO implements Usage, InternalIdentity {
         this.templateId = templateId;
         this.usageId = usageId;
         this.type = type;
-        this.startDate = startDate  == null ? null : new Date(startDate.getTime());
-        this.endDate = endDate  == null ? null : new Date(endDate.getTime());
+        this.startDate = startDate == null ? null : new Date(startDate.getTime());
+        this.endDate = endDate == null ? null : new Date(endDate.getTime());
     }
 
     //IPAddress Usage
-    public UsageVO(Long zoneId, Long accountId, Long domainId, String description, String usageDisplay, int usageType, Double rawUsage, Long usageId, long size,
-            String type, Date startDate, Date endDate) {
+    public UsageVO(final Long zoneId, final Long accountId, final Long domainId, final String description, final String usageDisplay, final int usageType, final Double rawUsage,
+                   final Long usageId, final long size,
+                   final String type, final Date startDate, final Date endDate) {
         this.zoneId = zoneId;
         this.accountId = accountId;
         this.domainId = domainId;
@@ -226,8 +208,16 @@ public class UsageVO implements Usage, InternalIdentity {
         this.usageId = usageId;
         this.size = size;
         this.type = type;
-        this.startDate = startDate  == null ? null : new Date(startDate.getTime());
-        this.endDate = endDate  == null ? null : new Date(endDate.getTime());
+        this.startDate = startDate == null ? null : new Date(startDate.getTime());
+        this.endDate = endDate == null ? null : new Date(endDate.getTime());
+    }
+
+    public Integer getQuotaCalculated() {
+        return quotaCalculated;
+    }
+
+    public void setQuotaCalculated(final Integer quotaCalculated) {
+        this.quotaCalculated = quotaCalculated;
     }
 
     @Override
@@ -326,61 +316,61 @@ public class UsageVO implements Usage, InternalIdentity {
     }
 
     @Override
-    public Long getVirtualSize() {
-        return virtualSize;
-    }
-
-    @Override
     public Date getStartDate() {
-        return startDate  == null ? null : new Date(startDate.getTime());
+        return startDate == null ? null : new Date(startDate.getTime());
     }
 
     @Override
     public Date getEndDate() {
-        return endDate  == null ? null : new Date(endDate.getTime());
+        return endDate == null ? null : new Date(endDate.getTime());
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    @Override
+    public Long getVirtualSize() {
+        return virtualSize;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setVirtualSize(final Long virtualSize) {
+        this.virtualSize = virtualSize;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate  == null ? null : new Date(startDate.getTime());
+    public void setEndDate(final Date endDate) {
+        this.endDate = endDate == null ? null : new Date(endDate.getTime());
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate  == null ? null : new Date(endDate.getTime());
+    public void setStartDate(final Date startDate) {
+        this.startDate = startDate == null ? null : new Date(startDate.getTime());
     }
 
-    public void setDomainId(Long domainId) {
-        this.domainId = domainId;
-    }
-
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
-    }
-
-    public void setZoneId(Long zoneId) {
-        this.zoneId = zoneId;
-    }
-
-    public void setUsageType(int usageType) {
-        this.usageType = usageType;
-    }
-
-    public void setRawUsage(Double rawUsage) {
-        this.rawUsage = rawUsage;
-    }
-
-    public void setSize(Long size) {
+    public void setSize(final Long size) {
         this.size = size;
     }
 
-    public void setVirtualSize(Long virtualSize) {
-        this.virtualSize = virtualSize;
+    public void setType(final String type) {
+        this.type = type;
+    }
+
+    public void setRawUsage(final Double rawUsage) {
+        this.rawUsage = rawUsage;
+    }
+
+    public void setUsageType(final int usageType) {
+        this.usageType = usageType;
+    }
+
+    public void setDomainId(final Long domainId) {
+        this.domainId = domainId;
+    }
+
+    public void setAccountId(final Long accountId) {
+        this.accountId = accountId;
+    }
+
+    public void setZoneId(final Long zoneId) {
+        this.zoneId = zoneId;
+    }
+
+    public void setId(final Long id) {
+        this.id = id;
     }
 }

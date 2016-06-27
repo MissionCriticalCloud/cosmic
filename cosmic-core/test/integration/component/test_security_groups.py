@@ -1,27 +1,9 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 """ P1 for Security groups
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import cleanup_resources, validateList
 from marvin.cloudstackAPI import authorizeSecurityGroupIngress, revokeSecurityGroupIngress
+from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import PASS
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              VirtualMachine,
@@ -33,8 +15,9 @@ from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template,
                                get_process_status)
+from marvin.lib.utils import cleanup_resources, validateList
 from marvin.sshClient import SshClient
-from marvin.codes import PASS
+from nose.plugins.attrib import attr
 
 # Import System modules
 import time
@@ -44,7 +27,6 @@ import platform
 
 
 class TestDefaultSecurityGroup(cloudstackTestCase):
-
     def setUp(self):
 
         self.apiclient = self.testClient.getApiClient()
@@ -320,7 +302,6 @@ class TestDefaultSecurityGroup(cloudstackTestCase):
 
 
 class TestAuthorizeIngressRule(cloudstackTestCase):
-
     def setUp(self):
 
         self.apiclient = self.testClient.getApiClient()
@@ -462,7 +443,6 @@ class TestAuthorizeIngressRule(cloudstackTestCase):
 
 
 class TestRevokeIngressRule(cloudstackTestCase):
-
     def setUp(self):
 
         self.apiclient = self.testClient.getApiClient()
@@ -641,7 +621,6 @@ class TestRevokeIngressRule(cloudstackTestCase):
 
 
 class TestDhcpOnlyRouter(cloudstackTestCase):
-
     def setUp(self):
 
         self.apiclient = self.testClient.getApiClient()
@@ -781,7 +760,6 @@ class TestDhcpOnlyRouter(cloudstackTestCase):
 
 
 class TestdeployVMWithUserData(cloudstackTestCase):
-
     def setUp(self):
 
         self.apiclient = self.testClient.getApiClient()
@@ -961,7 +939,6 @@ class TestdeployVMWithUserData(cloudstackTestCase):
 
 
 class TestDeleteSecurityGroup(cloudstackTestCase):
-
     def setUp(self):
 
         self.apiclient = self.testClient.getApiClient()
@@ -1191,7 +1168,6 @@ class TestDeleteSecurityGroup(cloudstackTestCase):
 
 
 class TestIngressRule(cloudstackTestCase):
-
     def setUp(self):
 
         self.apiclient = self.testClient.getApiClient()
@@ -1508,7 +1484,7 @@ class TestIngressRule(cloudstackTestCase):
                 security_group.id,
                 self.account.name
             ))
-        #skip revoke and ping tests in case of EIP/ELB zone
+        # skip revoke and ping tests in case of EIP/ELB zone
         vm_res = VirtualMachine.list(
             self.apiclient,
             id=self.virtual_machine.id
@@ -1649,8 +1625,8 @@ class TestIngressRule(cloudstackTestCase):
                       )
         return
 
-class TestIngressRuleSpecificIpSet(cloudstackTestCase):
 
+class TestIngressRuleSpecificIpSet(cloudstackTestCase):
     def setUp(self):
 
         self.apiclient = self.testClient.getApiClient()
@@ -1729,8 +1705,8 @@ class TestIngressRuleSpecificIpSet(cloudstackTestCase):
         ingress rules """
 
         hosts = Host.list(self.apiclient,
-                type="Routing",
-                listall=True)
+                          type="Routing",
+                          listall=True)
 
         for host in hosts:
             sshClient = SshClient(
@@ -1741,13 +1717,13 @@ class TestIngressRuleSpecificIpSet(cloudstackTestCase):
             )
 
             qresultset = self.dbclient.execute(
-                        "select guid from host where uuid = '%s';" %
-                            host.id, db="cloud")
+                "select guid from host where uuid = '%s';" %
+                host.id, db="cloud")
             self.assertNotEqual(
-                        len(qresultset),
-                            0,
-                                "Check DB Query result set"
-                                )
+                len(qresultset),
+                0,
+                "Check DB Query result set"
+            )
             hostguid = qresultset[-1][0]
 
             commands = ["echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables",
@@ -1865,7 +1841,7 @@ class TestIngressRuleSpecificIpSet(cloudstackTestCase):
             self.revokeSGRule(ingress_rule.ingressrule[0].ruleid)
             self.fail("SSH Access failed for %s: %s" %
                       (virtual_machine_1.ipaddress, e)
-            )
+                      )
 
         try:
             SshClient(
@@ -1878,7 +1854,7 @@ class TestIngressRuleSpecificIpSet(cloudstackTestCase):
             self.revokeSGRule(ingress_rule.ingressrule[0].ruleid)
             self.fail("SSH Access failed for %s: %s" %
                       (virtual_machine_2.ipaddress, e)
-            )
+                      )
         try:
             sshClient = SshClient(
                 self.mgtSvrDetails["mgtSvrIp"],
@@ -1890,7 +1866,7 @@ class TestIngressRuleSpecificIpSet(cloudstackTestCase):
             self.revokeSGRule(ingress_rule.ingressrule[0].ruleid)
             self.fail("SSH Access failed for %s: %s" %
                       (self.mgtSvrDetails["mgtSvrIp"], e)
-            )
+                      )
         response = sshClient.execute("ssh %s@%s -v" %
                                      (virtual_machine_1.username,
                                       virtual_machine_1.ssh_ip))
@@ -1963,7 +1939,7 @@ class TestIngressRuleSpecificIpSet(cloudstackTestCase):
         except Exception as e:
             self.fail("SSH Access failed for %s: %s" %
                       (virtual_machine_3.ssh_ip, e)
-            )
+                      )
 
         sshClient = SshClient(
             self.mgtSvrDetails["mgtSvrIp"],
@@ -2071,31 +2047,31 @@ class TestIngressRuleSpecificIpSet(cloudstackTestCase):
                       )
 
         sshClient = SshClient(
-               self.mgtSvrDetails["mgtSvrIp"],
-               22,
-               self.mgtSvrDetails["user"],
-               self.mgtSvrDetails["passwd"]
+            self.mgtSvrDetails["mgtSvrIp"],
+            22,
+            self.mgtSvrDetails["user"],
+            self.mgtSvrDetails["passwd"]
         )
 
         response = sshClient.execute("ssh %s@%s -v" %
-                    (virtual_machine_1.username,
-                        virtual_machine_1.ssh_ip))
+                                     (virtual_machine_1.username,
+                                      virtual_machine_1.ssh_ip))
         self.debug("Response is :%s" % response)
 
         self.assertTrue("connection established" in str(response).lower(),
-                    "SSH to VM at %s failed from external machine ip %s other than test machine" %
-                    (virtual_machine_1.ssh_ip,
-                        self.mgtSvrDetails["mgtSvrIp"]))
+                        "SSH to VM at %s failed from external machine ip %s other than test machine" %
+                        (virtual_machine_1.ssh_ip,
+                         self.mgtSvrDetails["mgtSvrIp"]))
 
         response = sshClient.execute("ssh %s@%s -v" %
-                    (virtual_machine_2.username,
-                        virtual_machine_2.ssh_ip))
+                                     (virtual_machine_2.username,
+                                      virtual_machine_2.ssh_ip))
         self.debug("Response is :%s" % response)
 
         self.assertTrue("connection established" in str(response).lower(),
-                    "SSH to VM at %s failed from external machine ip %s other than test machine" %
-                    (virtual_machine_2.ssh_ip,
-                        self.mgtSvrDetails["mgtSvrIp"]))
+                        "SSH to VM at %s failed from external machine ip %s other than test machine" %
+                        (virtual_machine_2.ssh_ip,
+                         self.mgtSvrDetails["mgtSvrIp"]))
 
         localMachineIpAddress = self.getLocalMachineIpAddress()
         cidr = localMachineIpAddress + "/32"
@@ -2139,7 +2115,7 @@ class TestIngressRuleSpecificIpSet(cloudstackTestCase):
                 virtual_machine_3.ssh_port,
                 virtual_machine_3.username,
                 virtual_machine_3.password
-        )
+            )
         except Exception as e:
             self.fail("SSH Access failed for %s: %s" %
                       (virtual_machine_3.ssh_ip, e)
@@ -2160,19 +2136,19 @@ class TestIngressRuleSpecificIpSet(cloudstackTestCase):
                 continue
             self.revokeSGRule(sg.ingressrule[0].ruleid)
         sshClient = SshClient(
-               self.mgtSvrDetails["mgtSvrIp"],
-               22,
-               self.mgtSvrDetails["user"],
-               self.mgtSvrDetails["passwd"]
+            self.mgtSvrDetails["mgtSvrIp"],
+            22,
+            self.mgtSvrDetails["user"],
+            self.mgtSvrDetails["passwd"]
         )
 
         response = sshClient.execute("ssh %s@%s -v" %
-                    (virtual_machine_3.username,
-                        virtual_machine_3.ssh_ip))
+                                     (virtual_machine_3.username,
+                                      virtual_machine_3.ssh_ip))
         self.debug("Response is :%s" % response)
 
         self.assertFalse("connection established" in str(response).lower(),
-                    "SSH to VM at %s succeeded from external machine ip %s other than test machine" %
-                    (virtual_machine_3.ssh_ip,
-                        self.mgtSvrDetails["mgtSvrIp"]))
+                         "SSH to VM at %s succeeded from external machine ip %s other than test machine" %
+                         (virtual_machine_3.ssh_ip,
+                          self.mgtSvrDetails["mgtSvrIp"]))
         return

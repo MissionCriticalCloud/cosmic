@@ -1,27 +1,12 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.api.routing;
 
-import java.util.List;
-
 import com.cloud.agent.api.Command;
+
+import java.util.List;
 
 /**
  * GlobalLoadBalancerConfigCommand used for sending the GSLB configuration to GSLB service provider
@@ -49,7 +34,8 @@ public class GlobalLoadBalancerConfigCommand extends Command {
     // list of the site details that are participating in the GSLB service
     List<SiteLoadBalancerConfig> siteLoadBalancers;
 
-    public GlobalLoadBalancerConfigCommand(String domainName, String lbMethod, String persistenceType, String serviceType, long gslbId, boolean revoked) {
+    public GlobalLoadBalancerConfigCommand(final String domainName, final String lbMethod, final String persistenceType, final String serviceType, final long gslbId, final
+    boolean revoked) {
         this.domainName = domainName;
         this.serviceType = serviceType;
         this.lbMethod = lbMethod;
@@ -62,7 +48,7 @@ public class GlobalLoadBalancerConfigCommand extends Command {
         return siteLoadBalancers;
     }
 
-    public void setSiteLoadBalancers(List<SiteLoadBalancerConfig> siteLoadBalancers) {
+    public void setSiteLoadBalancers(final List<SiteLoadBalancerConfig> siteLoadBalancers) {
         this.siteLoadBalancers = siteLoadBalancers;
     }
 
@@ -90,7 +76,7 @@ public class GlobalLoadBalancerConfigCommand extends Command {
         return revoked;
     }
 
-    public void setForRevoke(boolean revoke) {
+    public void setForRevoke(final boolean revoke) {
         this.revoked = revoke;
     }
 

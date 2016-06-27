@@ -1,29 +1,8 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package com.cloud.storage;
-
-import java.net.MalformedURLException;
 
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.command.user.volume.AttachVolumeCmd;
 import org.apache.cloudstack.api.command.user.volume.CreateVolumeCmd;
 import org.apache.cloudstack.api.command.user.volume.DetachVolumeCmd;
@@ -34,12 +13,13 @@ import org.apache.cloudstack.api.command.user.volume.ResizeVolumeCmd;
 import org.apache.cloudstack.api.command.user.volume.UploadVolumeCmd;
 import org.apache.cloudstack.api.response.GetUploadParamsResponse;
 
+import java.net.MalformedURLException;
+
 public interface VolumeApiService {
     /**
      * Creates the database object for a volume based on the given criteria
      *
-     * @param cmd
-     *            the API command wrapping the criteria (account/domainId [admin only], zone, diskOffering, snapshot,
+     * @param cmd the API command wrapping the criteria (account/domainId [admin only], zone, diskOffering, snapshot,
      *            name)
      * @return the volume object
      */
@@ -48,8 +28,7 @@ public interface VolumeApiService {
     /**
      * Creates the volume based on the given criteria
      *
-     * @param cmd
-     *            the API command wrapping the criteria (account/domainId [admin only], zone, diskOffering, snapshot,
+     * @param cmd the API command wrapping the criteria (account/domainId [admin only], zone, diskOffering, snapshot,
      *            name)
      * @return the volume object
      */
@@ -58,8 +37,7 @@ public interface VolumeApiService {
     /**
      * Resizes the volume based on the given criteria
      *
-     * @param cmd
-     *            the API command wrapping the criteria
+     * @param cmd the API command wrapping the criteria
      * @return the volume object
      * @throws ResourceAllocationException
      */
@@ -71,10 +49,9 @@ public interface VolumeApiService {
      * Uploads the volume to secondary storage
      *
      * @param UploadVolumeCmdByAdmin cmd
-     *
      * @return Volume object
      */
-    Volume uploadVolume(UploadVolumeCmd cmd)    throws ResourceAllocationException;
+    Volume uploadVolume(UploadVolumeCmd cmd) throws ResourceAllocationException;
 
     GetUploadParamsResponse uploadVolume(GetUploadParamsForVolumeCmd cmd) throws ResourceAllocationException, MalformedURLException;
 
@@ -93,11 +70,9 @@ public interface VolumeApiService {
     /**
      * Extracts the volume to a particular location.
      *
-     * @param cmd
-     *            the command specifying url (where the volume needs to be extracted to), zoneId (zone where the volume
+     * @param cmd the command specifying url (where the volume needs to be extracted to), zoneId (zone where the volume
      *            exists),
      *            id (the id of the volume)
-     *
      */
     String extractVolume(ExtractVolumeCmd cmd);
 

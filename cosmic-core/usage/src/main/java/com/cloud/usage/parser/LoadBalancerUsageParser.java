@@ -1,29 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// the License.  You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.usage.parser;
-
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 import com.cloud.usage.UsageLoadBalancerPolicyVO;
 import com.cloud.usage.UsageVO;
@@ -31,8 +6,16 @@ import com.cloud.usage.dao.UsageDao;
 import com.cloud.usage.dao.UsageLoadBalancerPolicyDao;
 import com.cloud.user.AccountVO;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.usage.UsageTypes;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.text.DecimalFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -49,13 +32,7 @@ public class LoadBalancerUsageParser {
     @Inject
     private UsageLoadBalancerPolicyDao _usageLoadBalancerPolicyDao;
 
-    @PostConstruct
-    void init() {
-        s_usageDao = _usageDao;
-        s_usageLoadBalancerPolicyDao = _usageLoadBalancerPolicyDao;
-    }
-
-    public static boolean parse(AccountVO account, Date startDate, Date endDate) {
+    public static boolean parse(final AccountVO account, final Date startDate, Date endDate) {
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Parsing all LoadBalancerPolicy usage events for account: " + account.getId());
         }
@@ -68,7 +45,7 @@ public class LoadBalancerUsageParser {
         //     - look for an entry for accountId with end date in the given range
         //     - look for an entry for accountId with end date null (currently running vm or owned IP)
         //     - look for an entry for accountId with start date before given range *and* end date after given range
-        List<UsageLoadBalancerPolicyVO> usageLBs = s_usageLoadBalancerPolicyDao.getUsageRecords(account.getId(), account.getDomainId(), startDate, endDate, false, 0);
+        final List<UsageLoadBalancerPolicyVO> usageLBs = s_usageLoadBalancerPolicyDao.getUsageRecords(account.getId(), account.getDomainId(), startDate, endDate, false, 0);
 
         if (usageLBs.isEmpty()) {
             s_logger.debug("No load balancer usage events for this period");
@@ -76,13 +53,13 @@ public class LoadBalancerUsageParser {
         }
 
         // This map has both the running time *and* the usage amount.
-        Map<String, Pair<Long, Long>> usageMap = new HashMap<String, Pair<Long, Long>>();
-        Map<String, LBInfo> lbMap = new HashMap<String, LBInfo>();
+        final Map<String, Pair<Long, Long>> usageMap = new HashMap<>();
+        final Map<String, LBInfo> lbMap = new HashMap<>();
 
         // loop through all the load balancer policies, create a usage record for each
-        for (UsageLoadBalancerPolicyVO usageLB : usageLBs) {
-            long lbId = usageLB.getId();
-            String key = "" + lbId;
+        for (final UsageLoadBalancerPolicyVO usageLB : usageLBs) {
+            final long lbId = usageLB.getId();
+            final String key = "" + lbId;
 
             lbMap.put(key, new LBInfo(lbId, usageLB.getZoneId()));
 
@@ -103,18 +80,19 @@ public class LoadBalancerUsageParser {
                 continue;
             }
 
-            long currentDuration = (lbDeleteDate.getTime() - lbCreateDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to find total number of millis to charge)
+            final long currentDuration = (lbDeleteDate.getTime() - lbCreateDate.getTime()) + 1; // make sure this is an inclusive check for milliseconds (i.e. use n - m + 1 to find
+            // total number of millis to charge)
 
             updateLBUsageData(usageMap, key, usageLB.getId(), currentDuration);
         }
 
-        for (String lbIdKey : usageMap.keySet()) {
-            Pair<Long, Long> sgtimeInfo = usageMap.get(lbIdKey);
-            long useTime = sgtimeInfo.second().longValue();
+        for (final String lbIdKey : usageMap.keySet()) {
+            final Pair<Long, Long> sgtimeInfo = usageMap.get(lbIdKey);
+            final long useTime = sgtimeInfo.second().longValue();
 
             // Only create a usage record if we have a runningTime of bigger than zero.
             if (useTime > 0L) {
-                LBInfo info = lbMap.get(lbIdKey);
+                final LBInfo info = lbMap.get(lbIdKey);
                 createUsageRecord(UsageTypes.LOAD_BALANCER_POLICY, useTime, startDate, endDate, account, info.getId(), info.getZoneId());
             }
         }
@@ -122,49 +100,56 @@ public class LoadBalancerUsageParser {
         return true;
     }
 
-    private static void updateLBUsageData(Map<String, Pair<Long, Long>> usageDataMap, String key, long lbId, long duration) {
+    private static void updateLBUsageData(final Map<String, Pair<Long, Long>> usageDataMap, final String key, final long lbId, final long duration) {
         Pair<Long, Long> lbUsageInfo = usageDataMap.get(key);
         if (lbUsageInfo == null) {
-            lbUsageInfo = new Pair<Long, Long>(new Long(lbId), new Long(duration));
+            lbUsageInfo = new Pair<>(new Long(lbId), new Long(duration));
         } else {
             Long runningTime = lbUsageInfo.second();
             runningTime = new Long(runningTime.longValue() + duration);
-            lbUsageInfo = new Pair<Long, Long>(lbUsageInfo.first(), runningTime);
+            lbUsageInfo = new Pair<>(lbUsageInfo.first(), runningTime);
         }
         usageDataMap.put(key, lbUsageInfo);
     }
 
-    private static void createUsageRecord(int type, long runningTime, Date startDate, Date endDate, AccountVO account, long lbId, long zoneId) {
+    private static void createUsageRecord(final int type, final long runningTime, final Date startDate, final Date endDate, final AccountVO account, final long lbId, final long
+            zoneId) {
         // Our smallest increment is hourly for now
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Total running time " + runningTime + "ms");
         }
 
-        float usage = runningTime / 1000f / 60f / 60f;
+        final float usage = runningTime / 1000f / 60f / 60f;
 
-        DecimalFormat dFormat = new DecimalFormat("#.######");
-        String usageDisplay = dFormat.format(usage);
+        final DecimalFormat dFormat = new DecimalFormat("#.######");
+        final String usageDisplay = dFormat.format(usage);
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Creating Volume usage record for load balancer: " + lbId + ", usage: " + usageDisplay + ", startDate: " + startDate + ", endDate: " +
-                endDate + ", for account: " + account.getId());
+                    endDate + ", for account: " + account.getId());
         }
 
         // Create the usage record
-        String usageDesc = "Load Balancing Policy: " + lbId + " usage time";
+        final String usageDesc = "Load Balancing Policy: " + lbId + " usage time";
 
         //ToDo: get zone id
-        UsageVO usageRecord =
-            new UsageVO(zoneId, account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", type, new Double(usage), null, null, null, null, lbId, null,
-                startDate, endDate);
+        final UsageVO usageRecord =
+                new UsageVO(zoneId, account.getId(), account.getDomainId(), usageDesc, usageDisplay + " Hrs", type, new Double(usage), null, null, null, null, lbId, null,
+                        startDate, endDate);
         s_usageDao.persist(usageRecord);
     }
 
-    private static class LBInfo {
-        private long id;
-        private long zoneId;
+    @PostConstruct
+    void init() {
+        s_usageDao = _usageDao;
+        s_usageLoadBalancerPolicyDao = _usageLoadBalancerPolicyDao;
+    }
 
-        public LBInfo(long id, long zoneId) {
+    private static class LBInfo {
+        private final long id;
+        private final long zoneId;
+
+        public LBInfo(final long id, final long zoneId) {
             this.id = id;
             this.zoneId = zoneId;
         }
@@ -177,5 +162,4 @@ public class LoadBalancerUsageParser {
             return id;
         }
     }
-
 }

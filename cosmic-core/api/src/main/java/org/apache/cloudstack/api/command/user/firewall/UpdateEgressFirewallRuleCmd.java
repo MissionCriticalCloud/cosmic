@@ -1,20 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.package org.apache.cloudstack.api.command.user.firewall;
-
 package org.apache.cloudstack.api.command.user.firewall;
 
 import com.cloud.event.EventTypes;
@@ -22,7 +5,6 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.TrafficType;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -32,6 +14,7 @@ import org.apache.cloudstack.api.response.AccountResponse;
 import org.apache.cloudstack.api.response.FirewallResponse;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +36,8 @@ public class UpdateEgressFirewallRuleCmd extends BaseAsyncCustomIdCmd {
     @Parameter(name = ApiConstants.ACCOUNT_ID, type = CommandType.UUID, entityType = AccountResponse.class, expose = false)
     private Long ownerId;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the rule to the end user or not", since = "4" +
+            ".4", authorized = {RoleType.Admin})
     private Boolean display;
 
     // ///////////////////////////////////////////////////
@@ -64,22 +48,10 @@ public class UpdateEgressFirewallRuleCmd extends BaseAsyncCustomIdCmd {
         return id;
     }
 
-    public Boolean getDisplay() {
-        return display;
-    }
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
     @Override
     public void execute() throws ResourceUnavailableException {
         CallContext.current().setEventDetails("Rule Id: " + id);
-        FirewallRule rule = _firewallService.updateEgressFirewallRule(id, this.getCustomId(), getDisplay());
+        final FirewallRule rule = _firewallService.updateEgressFirewallRule(id, this.getCustomId(), getDisplay());
 
         FirewallResponse fwResponse = new FirewallResponse();
         if (rule != null) {
@@ -87,6 +59,31 @@ public class UpdateEgressFirewallRuleCmd extends BaseAsyncCustomIdCmd {
             setResponseObject(fwResponse);
         }
         fwResponse.setResponseName(getCommandName());
+    }
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
+
+    public Boolean getDisplay() {
+        return display;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        if (ownerId == null) {
+            final FirewallRule rule = _entityMgr.findById(FirewallRule.class, id);
+            if (rule == null || rule.getTrafficType() != TrafficType.Egress) {
+                throw new InvalidParameterValueException("Unable to find egress firewall rule by ID");
+            } else {
+                ownerId = _entityMgr.findById(FirewallRule.class, id).getAccountId();
+            }
+        }
+        return ownerId;
     }
 
     @Override
@@ -99,25 +96,10 @@ public class UpdateEgressFirewallRuleCmd extends BaseAsyncCustomIdCmd {
     @Override
     public String getEventType() {
         return EventTypes.EVENT_FIREWALL_EGRESS_UPDATE;
-
     }
 
     @Override
     public String getEventDescription() {
         return ("Updating egress firewall rule id=" + id);
-
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        if (ownerId == null) {
-            FirewallRule rule = _entityMgr.findById(FirewallRule.class, id);
-            if (rule == null || rule.getTrafficType() != TrafficType.Egress) {
-                throw new InvalidParameterValueException("Unable to find egress firewall rule by ID");
-            } else {
-                ownerId = _entityMgr.findById(FirewallRule.class, id).getAccountId();
-            }
-        }
-        return ownerId;
     }
 }

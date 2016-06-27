@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.user;
 
 import javax.persistence.Column;
@@ -56,9 +40,17 @@ public class SSHKeyPairVO implements SSHKeyPair {
         return id;
     }
 
+    public void setId(final Long id) {
+        this.id = id;
+    }
+
     @Override
     public long getAccountId() {
         return accountId;
+    }
+
+    public void setAccountId(final long accountId) {
+        this.accountId = accountId;
     }
 
     @Override
@@ -66,14 +58,18 @@ public class SSHKeyPairVO implements SSHKeyPair {
         return domainId;
     }
 
-    @Override
-    public String getFingerprint() {
-        return fingerprint;
+    public void setDomainId(final long domainId) {
+        this.domainId = domainId;
     }
 
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getFingerprint() {
+        return fingerprint;
     }
 
     @Override
@@ -86,32 +82,20 @@ public class SSHKeyPairVO implements SSHKeyPair {
         return privateKey;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPrivateKey(final String privateKey) {
+        this.privateKey = privateKey;
     }
 
-    public void setAccountId(long accountId) {
-        this.accountId = accountId;
-    }
-
-    public void setDomainId(long domainId) {
-        this.domainId = domainId;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setFingerprint(String fingerprint) {
-        this.fingerprint = fingerprint;
-    }
-
-    public void setPublicKey(String publicKey) {
+    public void setPublicKey(final String publicKey) {
         this.publicKey = publicKey;
     }
 
-    public void setPrivateKey(String privateKey) {
-        this.privateKey = privateKey;
+    public void setFingerprint(final String fingerprint) {
+        this.fingerprint = fingerprint;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
     }
 
     @Override

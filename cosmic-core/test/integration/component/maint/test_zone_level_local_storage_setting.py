@@ -1,33 +1,16 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """
 Test cases for zone level settings "system.vm.use.local.storage"
 """
 # Import Local Modules
+import time
+from ddt import ddt, data
 from marvin.cloudstackTestCase import *
-from marvin.lib.utils import *
+from marvin.codes import PASS
 from marvin.lib.base import *
 from marvin.lib.common import *
-from marvin.codes import FAILED, PASS
-from requests.exceptions import ConnectionError
-
-import time
+from marvin.lib.utils import *
 from nose.plugins.attrib import attr
-from ddt import ddt, data
+from requests.exceptions import ConnectionError
 
 
 def destroy_systemvm(self, type):
@@ -254,7 +237,6 @@ def str_to_bool(s):
 
 @ddt
 class TestSystemVmLocalStorage(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestSystemVmLocalStorage, cls).getClsTestClient()
@@ -298,11 +280,11 @@ class TestSystemVmLocalStorage(cloudstackTestCase):
             if validateList(ms_restart_response)[0] != PASS:
                 raise Exception("Check the MS restart response")
             if ms_restart_response[
-                    0] != 'Stopping cloudstack-management:[  OK  ]':
+                0] != 'Stopping cloudstack-management:[  OK  ]':
                 raise Exception("MS i not stopped")
 
             if ms_restart_response[
-                    1] != 'Starting cloudstack-management: [  OK  ]':
+                1] != 'Starting cloudstack-management: [  OK  ]':
                 raise Exception("MS not started")
 
             timeout = cls.testdata["timeout"]
@@ -378,7 +360,7 @@ class TestSystemVmLocalStorage(cloudstackTestCase):
 
         local_custom_so = []
         for item in list_custom_so:
-            if(str(item.defaultuse) == 'True'):
+            if (str(item.defaultuse) == 'True'):
                 local_custom_so.append(item.storagetype)
 
         self.assertEqual(
@@ -430,13 +412,13 @@ class TestSystemVmLocalStorage(cloudstackTestCase):
         val = str_to_bool(list_conf[0].value)
         # 2 update the zone level config with service offering uuid
         update_global_settings(self,
-                               value=((str(not(val)).lower())),
+                               value=((str(not (val)).lower())),
                                name='system.vm.use.local.storage',
                                zoneid=self.zone.id)
 
         # 3,4 for cpvm
         destroy_systemvm(self, value)
-        storage_check(self, value, int(not(val)))
+        storage_check(self, value, int(not (val)))
 
         # 2 update the zone level config with service offering uuid
         update_global_settings(

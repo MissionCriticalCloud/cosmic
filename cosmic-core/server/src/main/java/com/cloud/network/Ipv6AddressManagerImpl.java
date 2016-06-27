@@ -1,27 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.network;
-
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.configuration.Config;
 import com.cloud.dc.DataCenter;
@@ -38,8 +15,13 @@ import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,20 +45,21 @@ public class Ipv6AddressManagerImpl extends ManagerBase implements Ipv6AddressMa
     ConfigurationDao _configDao;
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         _name = name;
-        Map<String, String> configs = _configDao.getConfiguration(params);
+        final Map<String, String> configs = _configDao.getConfiguration(params);
         _ipv6RetryMax = NumbersUtil.parseInt(configs.get(Config.NetworkIPv6SearchRetryMax.key()), 10000);
         return true;
     }
 
     @Override
-    public UserIpv6Address assignDirectIp6Address(long dcId, Account owner, Long networkId, String requestedIp6) throws InsufficientAddressCapacityException {
-        Network network = _networkDao.findById(networkId);
+    public UserIpv6Address assignDirectIp6Address(final long dcId, final Account owner, final Long networkId, final String requestedIp6) throws
+            InsufficientAddressCapacityException {
+        final Network network = _networkDao.findById(networkId);
         if (network == null) {
             return null;
         }
-        List<VlanVO> vlans = _vlanDao.listVlansByNetworkId(networkId);
+        final List<VlanVO> vlans = _vlanDao.listVlansByNetworkId(networkId);
         if (vlans == null) {
             s_logger.debug("Cannot find related vlan attached to network " + networkId);
             return null;
@@ -86,9 +69,9 @@ public class Ipv6AddressManagerImpl extends ManagerBase implements Ipv6AddressMa
         if (requestedIp6 == null) {
             if (!_networkModel.isIP6AddressAvailableInNetwork(networkId)) {
                 throw new InsufficientAddressCapacityException("There is no more address available in the network " + network.getName(), DataCenter.class,
-                    network.getDataCenterId());
+                        network.getDataCenterId());
             }
-            for (Vlan vlan : vlans) {
+            for (final Vlan vlan : vlans) {
                 if (!_networkModel.isIP6AddressAvailableInVlan(vlan.getId())) {
                     continue;
                 }
@@ -109,10 +92,10 @@ public class Ipv6AddressManagerImpl extends ManagerBase implements Ipv6AddressMa
             }
             if (ip == null) {
                 throw new InsufficientAddressCapacityException("Cannot find a usable IP in the network " + network.getName() + " after " + _ipv6RetryMax +
-                    "(network.ipv6.search.retry.max) times retry!", DataCenter.class, network.getDataCenterId());
+                        "(network.ipv6.search.retry.max) times retry!", DataCenter.class, network.getDataCenterId());
             }
         } else {
-            for (Vlan vlan : vlans) {
+            for (final Vlan vlan : vlans) {
                 if (NetUtils.isIp6InRange(requestedIp6, vlan.getIp6Range())) {
                     ipVlan = vlan;
                     break;
@@ -126,14 +109,14 @@ public class Ipv6AddressManagerImpl extends ManagerBase implements Ipv6AddressMa
                 throw new CloudRuntimeException("The requested IP is already taken!");
             }
         }
-        DataCenterVO dc = _dcDao.findById(dcId);
-        Long mac = dc.getMacAddress();
-        Long nextMac = mac + 1;
+        final DataCenterVO dc = _dcDao.findById(dcId);
+        final Long mac = dc.getMacAddress();
+        final Long nextMac = mac + 1;
         dc.setMacAddress(nextMac);
         _dcDao.update(dc.getId(), dc);
 
-        String macAddress = NetUtils.long2Mac(NetUtils.createSequenceBasedMacAddress(mac));
-        UserIpv6AddressVO ipVO = new UserIpv6AddressVO(ip, dcId, macAddress, ipVlan.getId());
+        final String macAddress = NetUtils.long2Mac(NetUtils.createSequenceBasedMacAddress(mac));
+        final UserIpv6AddressVO ipVO = new UserIpv6AddressVO(ip, dcId, macAddress, ipVlan.getId());
         ipVO.setPhysicalNetworkId(network.getPhysicalNetworkId());
         ipVO.setSourceNetworkId(networkId);
         ipVO.setState(UserIpv6Address.State.Allocated);
@@ -144,8 +127,8 @@ public class Ipv6AddressManagerImpl extends ManagerBase implements Ipv6AddressMa
     }
 
     @Override
-    public void revokeDirectIpv6Address(long networkId, String ip6Address) {
-        UserIpv6AddressVO ip = _ipv6Dao.findByNetworkIdAndIp(networkId, ip6Address);
+    public void revokeDirectIpv6Address(final long networkId, final String ip6Address) {
+        final UserIpv6AddressVO ip = _ipv6Dao.findByNetworkIdAndIp(networkId, ip6Address);
         if (ip != null) {
             _ipv6Dao.remove(ip.getId());
         }

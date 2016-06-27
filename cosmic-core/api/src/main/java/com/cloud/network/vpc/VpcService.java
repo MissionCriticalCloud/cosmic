@@ -1,23 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.vpc;
-
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
@@ -27,9 +8,11 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.IpAddress;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.command.user.vpc.ListPrivateGatewaysCmd;
 import org.apache.cloudstack.api.command.user.vpc.ListStaticRoutesCmd;
+
+import java.util.List;
+import java.util.Map;
 
 public interface VpcService {
 
@@ -43,7 +26,7 @@ public interface VpcService {
      * @param displayText
      * @param cidr
      * @param networkDomain TODO
-     * @param displayVpc TODO
+     * @param displayVpc    TODO
      * @return
      * @throws ResourceAllocationException TODO
      */
@@ -67,8 +50,8 @@ public interface VpcService {
      * @param vpcId
      * @param vpcName
      * @param displayText
-     * @param customId TODO
-     * @param displayVpc TODO
+     * @param customId    TODO
+     * @param displayVpc  TODO
      * @return
      */
     public Vpc updateVpc(long vpcId, String vpcName, String displayText, String customId, Boolean displayVpc);
@@ -81,25 +64,26 @@ public interface VpcService {
      * @param displayText
      * @param supportedServicesStr
      * @param cidr
-     * @param state TODO
+     * @param state                TODO
      * @param accountName
      * @param domainId
      * @param keyword
      * @param startIndex
      * @param pageSizeVal
-     * @param zoneId TODO
-     * @param isRecursive TODO
-     * @param listAll TODO
-     * @param restartRequired TODO
-     * @param tags TODO
-     * @param projectId TODO
-     * @param display TODO
+     * @param zoneId               TODO
+     * @param isRecursive          TODO
+     * @param listAll              TODO
+     * @param restartRequired      TODO
+     * @param tags                 TODO
+     * @param projectId            TODO
+     * @param display              TODO
      * @param vpc
      * @return
      */
     public Pair<List<? extends Vpc>, Integer> listVpcs(Long id, String vpcName, String displayText, List<String> supportedServicesStr, String cidr, Long vpcOffId, String state,
-            String accountName, Long domainId, String keyword, Long startIndex, Long pageSizeVal, Long zoneId, Boolean isRecursive, Boolean listAll, Boolean restartRequired,
-            Map<String, String> tags, Long projectId, Boolean display);
+                                                       String accountName, Long domainId, String keyword, Long startIndex, Long pageSizeVal, Long zoneId, Boolean isRecursive,
+                                                       Boolean listAll, Boolean restartRequired,
+                                                       Map<String, String> tags, Long projectId, Boolean display);
 
     /**
      * Starts VPC which includes starting VPC provider and applying all the neworking rules on the backend
@@ -145,8 +129,7 @@ public interface VpcService {
     /**
      * Persists VPC private gateway in the Database.
      *
-     *
-     * @param vpcId TODO
+     * @param vpcId             TODO
      * @param physicalNetworkId
      * @param vlan
      * @param ipAddress
@@ -162,7 +145,8 @@ public interface VpcService {
      * @throws ResourceAllocationException
      */
     public PrivateGateway createVpcPrivateGateway(long vpcId, Long physicalNetworkId, String vlan, String ipAddress, String gateway, String netmask, long gatewayOwnerId,
-            Long networkOfferingId, Boolean isSoruceNat, Long aclId) throws ResourceAllocationException, ConcurrentOperationException, InsufficientCapacityException;
+                                                  Long networkOfferingId, Boolean isSoruceNat, Long aclId) throws ResourceAllocationException, ConcurrentOperationException,
+            InsufficientCapacityException;
 
     /**
      * Applies VPC private gateway on the backend, so it becomes functional
@@ -248,12 +232,11 @@ public interface VpcService {
      * @throws ConcurrentOperationException
      */
     IpAddress associateIPToVpc(long ipId, long vpcId) throws ResourceAllocationException, ResourceUnavailableException, InsufficientAddressCapacityException,
-    ConcurrentOperationException;
+            ConcurrentOperationException;
 
     /**
      * @param routeId
      * @return
      */
     public boolean applyStaticRoute(long routeId) throws ResourceUnavailableException;
-
 }

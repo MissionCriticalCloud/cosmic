@@ -1,30 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.commands;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
 
 import com.cloud.dc.DedicatedResources;
 import com.cloud.event.EventTypes;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -36,6 +14,11 @@ import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.dedicated.DedicatedService;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,10 +39,10 @@ public class DedicateZoneCmd extends BaseAsyncCmd {
     private Long zoneId;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               required = true,
-               description = "the ID of the containing domain")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            required = true,
+            description = "the ID of the containing domain")
     private Long domainId;
 
     @Parameter(name = ApiConstants.ACCOUNT, type = CommandType.STRING, description = "the name of the account which needs dedication. Must be used with domainId.")
@@ -69,6 +52,24 @@ public class DedicateZoneCmd extends BaseAsyncCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
+    @Override
+    public void execute() {
+        final List<? extends DedicatedResources> result = dedicatedService.dedicateZone(getZoneId(), getDomainId(), getAccountName());
+        final ListResponse<DedicateZoneResponse> response = new ListResponse<>();
+        final List<DedicateZoneResponse> zoneResponseList = new ArrayList<>();
+        if (result != null) {
+            for (final DedicatedResources resource : result) {
+                final DedicateZoneResponse zoneresponse = dedicatedService.createDedicateZoneResponse(resource);
+                zoneResponseList.add(zoneresponse);
+            }
+            response.setResponses(zoneResponseList);
+            response.setResponseName(getCommandName());
+            this.setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to dedicate zone");
+        }
+    }
+
     public Long getZoneId() {
         return zoneId;
     }
@@ -77,13 +78,13 @@ public class DedicateZoneCmd extends BaseAsyncCmd {
         return domainId;
     }
 
-    public String getAccountName() {
-        return accountName;
-    }
-
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
+
+    public String getAccountName() {
+        return accountName;
+    }
 
     @Override
     public String getCommandName() {
@@ -93,24 +94,6 @@ public class DedicateZoneCmd extends BaseAsyncCmd {
     @Override
     public long getEntityOwnerId() {
         return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
-    public void execute() {
-        List<? extends DedicatedResources> result = dedicatedService.dedicateZone(getZoneId(), getDomainId(), getAccountName());
-        ListResponse<DedicateZoneResponse> response = new ListResponse<DedicateZoneResponse>();
-        List<DedicateZoneResponse> zoneResponseList = new ArrayList<DedicateZoneResponse>();
-        if (result != null) {
-            for (DedicatedResources resource : result) {
-                DedicateZoneResponse zoneresponse = dedicatedService.createDedicateZoneResponse(resource);
-                zoneResponseList.add(zoneresponse);
-            }
-            response.setResponses(zoneResponseList);
-            response.setResponseName(getCommandName());
-            this.setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to dedicate zone");
-        }
     }
 
     @Override

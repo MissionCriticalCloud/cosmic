@@ -1,31 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// the License.  You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.utils.db;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import com.cloud.utils.Pair;
+import com.cloud.utils.Ternary;
+import com.cloud.utils.db.Attribute.Flag;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.CollectionTable;
@@ -41,10 +18,16 @@ import javax.persistence.FetchType;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
 import javax.persistence.TableGenerator;
-
-import com.cloud.utils.Pair;
-import com.cloud.utils.Ternary;
-import com.cloud.utils.db.Attribute.Flag;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SqlGenerator {
     Class<?> _clazz;
@@ -70,6 +53,33 @@ public class SqlGenerator {
         findEcAttributes();
     }
 
+    public static StringBuilder buildMysqlUpdateSql(final String joins, final Collection<Ternary<Attribute, Boolean, Object>> setters) {
+        if (setters.size() == 0) {
+            return null;
+        }
+
+        final StringBuilder sql = new StringBuilder("UPDATE ");
+
+        sql.append(joins);
+
+        sql.append(" SET ");
+
+        for (final Ternary<Attribute, Boolean, Object> setter : setters) {
+            final Attribute attr = setter.first();
+            sql.append(attr.table).append(".").append(attr.columnName).append("=");
+            if (setter.second() != null) {
+                sql.append(attr.table).append(".").append(attr.columnName).append(setter.second() ? "+" : "-");
+            }
+            sql.append("?, ");
+        }
+
+        sql.delete(sql.length() - 2, sql.length());
+
+        sql.append(" WHERE ");
+
+        return sql;
+    }
+
     protected boolean checkMethods(final Class<?> clazz, final Map<String, Attribute> attrs) {
         final Method[] methods = clazz.getMethods();
         for (final Method method : methods) {
@@ -86,7 +96,6 @@ public class SqlGenerator {
             }
         }
         return true;
-
     }
 
     protected void buildAttributes(final Class<?> clazz, final String tableName, final AttributeOverride[] overrides, final boolean embedded, final boolean isId) {
@@ -101,7 +110,7 @@ public class SqlGenerator {
 
         if (!embedded) {
             _tables.add(clazz);
-            _ids.put(tableName, new ArrayList<Attribute>());
+            _ids.put(tableName, new ArrayList<>());
         }
 
         final Field[] fields = clazz.getDeclaredFields();
@@ -276,32 +285,6 @@ public class SqlGenerator {
         return _ecAttrs;
     }
 
-    public Attribute findAttribute(final String name) {
-        for (final Attribute attr : _attributes) {
-
-            if (attr.columnName.equalsIgnoreCase(name)) {
-                if (attr.columnName.equalsIgnoreCase(GenericDao.REMOVED_COLUMN) && attr.isUpdatable()) {
-                    return null;
-                }
-                return attr;
-            }
-        }
-
-        return null;
-    }
-
-    public static StringBuilder buildUpdateSql(final String tableName, final List<Attribute> attrs) {
-        final StringBuilder sql = new StringBuilder("UPDATE ");
-        sql.append(tableName).append(" SET ");
-        for (final Attribute attr : attrs) {
-            sql.append(attr.columnName).append(" = ?, ");
-        }
-        sql.delete(sql.length() - 2, sql.length());
-        sql.append(" WHERE ");
-
-        return sql;
-    }
-
     public List<Pair<StringBuilder, Attribute[]>> buildUpdateSqls() {
         final ArrayList<Pair<StringBuilder, Attribute[]>> sqls = new ArrayList<>(_tables.size());
         for (final Class<?> table : _tables) {
@@ -321,28 +304,13 @@ public class SqlGenerator {
         return sqls;
     }
 
-    public static StringBuilder buildMysqlUpdateSql(final String joins, final Collection<Ternary<Attribute, Boolean, Object>> setters) {
-        if (setters.size() == 0) {
-            return null;
-        }
-
+    public static StringBuilder buildUpdateSql(final String tableName, final List<Attribute> attrs) {
         final StringBuilder sql = new StringBuilder("UPDATE ");
-
-        sql.append(joins);
-
-        sql.append(" SET ");
-
-        for (final Ternary<Attribute, Boolean, Object> setter : setters) {
-            final Attribute attr = setter.first();
-            sql.append(attr.table).append(".").append(attr.columnName).append("=");
-            if (setter.second() != null) {
-                sql.append(attr.table).append(".").append(attr.columnName).append(setter.second() ? "+" : "-");
-            }
-            sql.append("?, ");
+        sql.append(tableName).append(" SET ");
+        for (final Attribute attr : attrs) {
+            sql.append(attr.columnName).append(" = ?, ");
         }
-
         sql.delete(sql.length() - 2, sql.length());
-
         sql.append(" WHERE ");
 
         return sql;
@@ -351,7 +319,7 @@ public class SqlGenerator {
     public List<Pair<String, Attribute[]>> buildInsertSqls() {
         final LinkedHashMap<String, ArrayList<Attribute>> tableAttributeMap = new LinkedHashMap<>();
         for (final Class<?> table : _tables) {
-            tableAttributeMap.put(DbUtil.getTableName(table), new ArrayList<Attribute>());
+            tableAttributeMap.put(DbUtil.getTableName(table), new ArrayList<>());
         }
 
         for (final Attribute attr : _attributes) {
@@ -400,7 +368,7 @@ public class SqlGenerator {
     protected List<Pair<String, Attribute[]>> buildDeleteSqls() {
         final LinkedHashMap<String, ArrayList<Attribute>> map = new LinkedHashMap<>();
         for (final Class<?> table : _tables) {
-            map.put(DbUtil.getTableName(table), new ArrayList<Attribute>());
+            map.put(DbUtil.getTableName(table), new ArrayList<>());
         }
 
         for (final Attribute attr : _attributes) {
@@ -466,6 +434,20 @@ public class SqlGenerator {
         return new Pair<>(sql.toString(), attrs);
     }
 
+    public Attribute findAttribute(final String name) {
+        for (final Attribute attr : _attributes) {
+
+            if (attr.columnName.equalsIgnoreCase(name)) {
+                if (attr.columnName.equalsIgnoreCase(GenericDao.REMOVED_COLUMN) && attr.isUpdatable()) {
+                    return null;
+                }
+                return attr;
+            }
+        }
+
+        return null;
+    }
+
     public Map<String, Attribute[]> getIdAttributes() {
         final LinkedHashMap<String, Attribute[]> ids = new LinkedHashMap<>(_ids.size());
 
@@ -501,21 +483,6 @@ public class SqlGenerator {
         return attrs;
     }
 
-    protected static void addPrimaryKeyJoinColumns(final StringBuilder sql, final String fromTable, final String toTable, final String joinType, final PrimaryKeyJoinColumn[] pkjcs) {
-        if ("right".equalsIgnoreCase(joinType)) {
-            sql.append(" RIGHT JOIN ").append(toTable).append(" ON ");
-        } else if ("left".equalsIgnoreCase(joinType)) {
-            sql.append(" LEFT JOIN ").append(toTable).append(" ON ");
-        } else {
-            sql.append(" INNER JOIN ").append(toTable).append(" ON ");
-        }
-        for (final PrimaryKeyJoinColumn pkjc : pkjcs) {
-            sql.append(fromTable).append(".").append(pkjc.name());
-            final String refColumn = DbUtil.getReferenceColumn(pkjc);
-            sql.append("=").append(toTable).append(".").append(refColumn).append(" ");
-        }
-    }
-
     public Pair<String, Attribute> getRemovedAttribute() {
         final Attribute removed = findAttribute(GenericDao.REMOVED_COLUMN);
         if (removed == null) {
@@ -530,41 +497,6 @@ public class SqlGenerator {
         sql.append(removed.table).append(".").append(removed.columnName).append(" IS NULL ");
 
         return new Pair<>(sql.toString(), removed);
-    }
-
-    protected static void buildJoins(final StringBuilder innerJoin, final Class<?> clazz) {
-        final String tableName = DbUtil.getTableName(clazz);
-
-        final SecondaryTable[] sts = DbUtil.getSecondaryTables(clazz);
-        final ArrayList<String> secondaryTables = new ArrayList<>();
-        for (final SecondaryTable st : sts) {
-            final JoinType jt = clazz.getAnnotation(JoinType.class);
-            String join = null;
-            if (jt != null) {
-                join = jt.type();
-            }
-            addPrimaryKeyJoinColumns(innerJoin, tableName, st.name(), join, st.pkJoinColumns());
-            secondaryTables.add(st.name());
-        }
-
-        final Class<?> parent = clazz.getSuperclass();
-        if (parent.getAnnotation(Entity.class) != null) {
-            final String table = DbUtil.getTableName(parent);
-            final PrimaryKeyJoinColumn[] pkjcs = DbUtil.getPrimaryKeyJoinColumns(clazz);
-            assert (pkjcs != null) : "No Join columns specified for the super class";
-            addPrimaryKeyJoinColumns(innerJoin, tableName, table, null, pkjcs);
-        }
-    }
-
-    public String buildTableReferences() {
-        final StringBuilder sql = new StringBuilder();
-        sql.append(DbUtil.getTableName(_tables.get(_tables.size() - 1)));
-
-        for (final Class<?> table : _tables) {
-            buildJoins(sql, table);
-        }
-
-        return sql.toString();
     }
 
     public Pair<StringBuilder, Attribute[]> buildSelectSql(final boolean enableQueryCache) {
@@ -594,24 +526,15 @@ public class SqlGenerator {
         return new Pair<>(sql, attrs.toArray(new Attribute[attrs.size()]));
     }
 
-    public Pair<StringBuilder, Attribute[]> buildSelectSql(final Attribute[] attrs) {
-        final StringBuilder sql = new StringBuilder("SELECT ");
+    public String buildTableReferences() {
+        final StringBuilder sql = new StringBuilder();
+        sql.append(DbUtil.getTableName(_tables.get(_tables.size() - 1)));
 
-        for (final Attribute attr : attrs) {
-            sql.append(attr.table).append(".").append(attr.columnName).append(", ");
+        for (final Class<?> table : _tables) {
+            buildJoins(sql, table);
         }
 
-        if (attrs.length > 0) {
-            sql.delete(sql.length() - 2, sql.length());
-        }
-
-        sql.append(" FROM ").append(buildTableReferences());
-
-        sql.append(" WHERE ");
-
-        sql.append(buildDiscriminatorClause().first());
-
-        return new Pair<>(sql, attrs);
+        return sql.toString();
     }
 
     /**
@@ -652,6 +575,66 @@ public class SqlGenerator {
         }
 
         return new Pair<>(sql, values);
+    }
+
+    protected static void buildJoins(final StringBuilder innerJoin, final Class<?> clazz) {
+        final String tableName = DbUtil.getTableName(clazz);
+
+        final SecondaryTable[] sts = DbUtil.getSecondaryTables(clazz);
+        final ArrayList<String> secondaryTables = new ArrayList<>();
+        for (final SecondaryTable st : sts) {
+            final JoinType jt = clazz.getAnnotation(JoinType.class);
+            String join = null;
+            if (jt != null) {
+                join = jt.type();
+            }
+            addPrimaryKeyJoinColumns(innerJoin, tableName, st.name(), join, st.pkJoinColumns());
+            secondaryTables.add(st.name());
+        }
+
+        final Class<?> parent = clazz.getSuperclass();
+        if (parent.getAnnotation(Entity.class) != null) {
+            final String table = DbUtil.getTableName(parent);
+            final PrimaryKeyJoinColumn[] pkjcs = DbUtil.getPrimaryKeyJoinColumns(clazz);
+            assert (pkjcs != null) : "No Join columns specified for the super class";
+            addPrimaryKeyJoinColumns(innerJoin, tableName, table, null, pkjcs);
+        }
+    }
+
+    protected static void addPrimaryKeyJoinColumns(final StringBuilder sql, final String fromTable, final String toTable, final String joinType, final PrimaryKeyJoinColumn[]
+            pkjcs) {
+        if ("right".equalsIgnoreCase(joinType)) {
+            sql.append(" RIGHT JOIN ").append(toTable).append(" ON ");
+        } else if ("left".equalsIgnoreCase(joinType)) {
+            sql.append(" LEFT JOIN ").append(toTable).append(" ON ");
+        } else {
+            sql.append(" INNER JOIN ").append(toTable).append(" ON ");
+        }
+        for (final PrimaryKeyJoinColumn pkjc : pkjcs) {
+            sql.append(fromTable).append(".").append(pkjc.name());
+            final String refColumn = DbUtil.getReferenceColumn(pkjc);
+            sql.append("=").append(toTable).append(".").append(refColumn).append(" ");
+        }
+    }
+
+    public Pair<StringBuilder, Attribute[]> buildSelectSql(final Attribute[] attrs) {
+        final StringBuilder sql = new StringBuilder("SELECT ");
+
+        for (final Attribute attr : attrs) {
+            sql.append(attr.table).append(".").append(attr.columnName).append(", ");
+        }
+
+        if (attrs.length > 0) {
+            sql.delete(sql.length() - 2, sql.length());
+        }
+
+        sql.append(" FROM ").append(buildTableReferences());
+
+        sql.append(" WHERE ");
+
+        sql.append(buildDiscriminatorClause().first());
+
+        return new Pair<>(sql, attrs);
     }
 
     public Field[] getEmbeddedFields() {

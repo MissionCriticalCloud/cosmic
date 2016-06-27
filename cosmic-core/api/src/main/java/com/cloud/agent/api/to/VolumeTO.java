@@ -1,31 +1,11 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.agent.api.to;
 
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.Volume;
-
 import org.apache.cloudstack.api.InternalIdentity;
 
 public class VolumeTO implements InternalIdentity {
-    protected VolumeTO() {
-    }
-
     private long id;
     private String name;
     private String mountPoint;
@@ -44,7 +24,11 @@ public class VolumeTO implements InternalIdentity {
     private String cacheMode;
     private Long chainSize;
 
-    public VolumeTO(long id, Volume.Type type, StoragePoolType poolType, String poolUuid, String name, String mountPoint, String path, long size, String chainInfo) {
+    protected VolumeTO() {
+    }
+
+    public VolumeTO(final long id, final Volume.Type type, final StoragePoolType poolType, final String poolUuid, final String name, final String mountPoint, final String path,
+                    final long size, final String chainInfo) {
         this.id = id;
         this.name = name;
         this.path = path;
@@ -56,8 +40,9 @@ public class VolumeTO implements InternalIdentity {
         this.chainInfo = chainInfo;
     }
 
-    public VolumeTO(long id, Volume.Type type, StoragePoolType poolType, String poolUuid, String name, String mountPoint, String path, long size, String chainInfo,
-            String guestOsType) {
+    public VolumeTO(final long id, final Volume.Type type, final StoragePoolType poolType, final String poolUuid, final String name, final String mountPoint, final String path,
+                    final long size, final String chainInfo,
+                    final String guestOsType) {
         this.id = id;
         this.name = name;
         this.path = path;
@@ -70,7 +55,7 @@ public class VolumeTO implements InternalIdentity {
         this.guestOsType = guestOsType;
     }
 
-    public VolumeTO(Volume volume, StoragePool pool) {
+    public VolumeTO(final Volume volume, final StoragePool pool) {
         this.id = volume.getId();
         this.name = volume.getName();
         this.path = volume.getPath();
@@ -81,15 +66,16 @@ public class VolumeTO implements InternalIdentity {
         this.mountPoint = volume.getFolder();
         this.chainInfo = volume.getChainInfo();
         this.chainSize = volume.getVmSnapshotChainSize();
-        if (volume.getDeviceId() != null)
+        if (volume.getDeviceId() != null) {
             this.deviceId = volume.getDeviceId();
+        }
     }
 
     public long getDeviceId() {
         return deviceId;
     }
 
-    public void setDeviceId(long id) {
+    public void setDeviceId(final long id) {
         this.deviceId = id;
     }
 
@@ -100,6 +86,10 @@ public class VolumeTO implements InternalIdentity {
 
     public String getPath() {
         return path;
+    }
+
+    public void setPath(final String path) {
+        this.path = path;
     }
 
     public long getSize() {
@@ -130,7 +120,7 @@ public class VolumeTO implements InternalIdentity {
         return chainInfo;
     }
 
-    public void setChainInfo(String chainInfo) {
+    public void setChainInfo(final String chainInfo) {
         this.chainInfo = chainInfo;
     }
 
@@ -138,60 +128,56 @@ public class VolumeTO implements InternalIdentity {
         return guestOsType;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     @Override
     public String toString() {
         return new StringBuilder("Vol[").append(id).append("|").append(type).append("|").append(path).append("|").append(size).append("]").toString();
-    }
-
-    public void setBytesReadRate(Long bytesReadRate) {
-        this.bytesReadRate = bytesReadRate;
     }
 
     public Long getBytesReadRate() {
         return bytesReadRate;
     }
 
-    public void setBytesWriteRate(Long bytesWriteRate) {
-        this.bytesWriteRate = bytesWriteRate;
+    public void setBytesReadRate(final Long bytesReadRate) {
+        this.bytesReadRate = bytesReadRate;
     }
 
     public Long getBytesWriteRate() {
         return bytesWriteRate;
     }
 
-    public void setIopsReadRate(Long iopsReadRate) {
-        this.iopsReadRate = iopsReadRate;
+    public void setBytesWriteRate(final Long bytesWriteRate) {
+        this.bytesWriteRate = bytesWriteRate;
     }
 
     public Long getIopsReadRate() {
         return iopsReadRate;
     }
 
-    public void setIopsWriteRate(Long iopsWriteRate) {
-        this.iopsWriteRate = iopsWriteRate;
+    public void setIopsReadRate(final Long iopsReadRate) {
+        this.iopsReadRate = iopsReadRate;
     }
 
     public Long getIopsWriteRate() {
         return iopsWriteRate;
     }
 
-    public void setCacheMode(String cacheMode) {
-        this.cacheMode = cacheMode;
+    public void setIopsWriteRate(final Long iopsWriteRate) {
+        this.iopsWriteRate = iopsWriteRate;
     }
 
     public String getCacheMode() {
         return cacheMode;
     }
 
+    public void setCacheMode(final String cacheMode) {
+        this.cacheMode = cacheMode;
+    }
+
     public Long getChainSize() {
         return chainSize;
     }
 
-    public void setChainSize(Long chainSize) {
+    public void setChainSize(final Long chainSize) {
         this.chainSize = chainSize;
     }
 }

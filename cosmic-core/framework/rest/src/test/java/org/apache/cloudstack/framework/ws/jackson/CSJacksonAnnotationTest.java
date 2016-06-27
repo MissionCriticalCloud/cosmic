@@ -1,21 +1,7 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.framework.ws.jackson;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -23,15 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule.Priority;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -45,19 +27,19 @@ public class CSJacksonAnnotationTest {
     @Test
     @Ignore
     public void test() {
-        ObjectMapper mapper = new ObjectMapper();
-        JaxbAnnotationModule jaxbModule = new JaxbAnnotationModule();
+        final ObjectMapper mapper = new ObjectMapper();
+        final JaxbAnnotationModule jaxbModule = new JaxbAnnotationModule();
         jaxbModule.setPriority(Priority.SECONDARY);
         mapper.registerModule(jaxbModule);
         mapper.registerModule(new CSJacksonAnnotationModule());
 
-        StringWriter writer = new StringWriter();
+        final StringWriter writer = new StringWriter();
 
-        TestVO vo = new TestVO(1000, "name");
-        vo.names = new ArrayList<String>();
+        final TestVO vo = new TestVO(1000, "name");
+        vo.names = new ArrayList<>();
         vo.names.add("name1");
         vo.names.add("name2");
-        vo.values = new HashMap<String, Long>();
+        vo.values = new HashMap<>();
         vo.values.put("key1", 1000l);
         vo.values.put("key2", 2000l);
         vo.vo2.name = "testvoname2";
@@ -65,16 +47,15 @@ public class CSJacksonAnnotationTest {
 
         try {
             mapper.writeValue(writer, vo);
-        } catch (JsonGenerationException e) {
+        } catch (final JsonGenerationException e) {
             e.printStackTrace();
-        } catch (JsonMappingException e) {
+        } catch (final JsonMappingException e) {
             e.printStackTrace();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
 
         System.out.print(writer.getBuffer().toString());
-
     }
 
     @XmlRootElement(name = "xml-test2")
@@ -97,7 +78,7 @@ public class CSJacksonAnnotationTest {
         @XmlElement(name = "test2")
         public Test2VO vo2 = new Test2VO();
 
-        public TestVO(int id, String name) {
+        public TestVO(final int id, final String name) {
             this.id = id;
             this.name = name;
         }
@@ -111,7 +92,5 @@ public class CSJacksonAnnotationTest {
         public List<String> getNames() {
             return names;
         }
-
     }
-
 }

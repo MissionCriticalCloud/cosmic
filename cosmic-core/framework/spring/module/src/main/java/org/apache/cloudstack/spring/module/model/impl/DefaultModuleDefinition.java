@@ -1,22 +1,7 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.spring.module.model.impl;
+
+import org.apache.cloudstack.spring.module.model.ModuleDefinition;
+import org.apache.cloudstack.spring.module.util.ModuleLocationUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,8 +12,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
-import org.apache.cloudstack.spring.module.model.ModuleDefinition;
-import org.apache.cloudstack.spring.module.util.ModuleLocationUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -50,9 +33,9 @@ public class DefaultModuleDefinition implements ModuleDefinition {
     List<Resource> contextLocations;
     List<Resource> inheritableContextLocations;
     List<Resource> overrideContextLocations;
-    Map<String, ModuleDefinition> children = new TreeMap<String, ModuleDefinition>();
+    Map<String, ModuleDefinition> children = new TreeMap<>();
 
-    public DefaultModuleDefinition(String baseDir, Resource moduleProperties, ResourcePatternResolver resolver) {
+    public DefaultModuleDefinition(final String baseDir, final Resource moduleProperties, final ResourcePatternResolver resolver) {
         this.baseDir = baseDir;
         this.resolver = resolver;
         this.moduleProperties = moduleProperties;
@@ -79,7 +62,7 @@ public class DefaultModuleDefinition implements ModuleDefinition {
 
         try {
             is = moduleProperties.getInputStream();
-            Properties props = new Properties();
+            final Properties props = new Properties();
             props.load(is);
 
             name = props.getProperty(NAME);
@@ -99,35 +82,30 @@ public class DefaultModuleDefinition implements ModuleDefinition {
         }
     }
 
+    private String location() throws IOException {
+        return moduleProperties.getURL().toString();
+    }
+
     protected void checkNameMatchesSelf() throws IOException {
-        String expectedLocation = ModuleLocationUtils.getModuleLocation(baseDir, name);
-        Resource self = resolver.getResource(expectedLocation);
+        final String expectedLocation = ModuleLocationUtils.getModuleLocation(baseDir, name);
+        final Resource self = resolver.getResource(expectedLocation);
 
         if (!self.exists()) {
             throw new IOException("Resource [" + location() + "] is expected to exist at [" + expectedLocation + "] please ensure the name property is correct");
         }
 
-        String moduleUrl = moduleProperties.getURL().toExternalForm();
-        String selfUrl = self.getURL().toExternalForm();
+        final String moduleUrl = moduleProperties.getURL().toExternalForm();
+        final String selfUrl = self.getURL().toExternalForm();
 
         if (!moduleUrl.equals(selfUrl)) {
             throw new IOException("Resource [" + location() + "] and [" + self.getURL() + "] do not appear to be the same resource, " +
-                "please ensure the name property is correct or that the " + "module is not defined twice");
+                    "please ensure the name property is correct or that the " + "module is not defined twice");
         }
     }
 
-    private String location() throws IOException {
-        return moduleProperties.getURL().toString();
-    }
-
     @Override
-    public void addChild(ModuleDefinition def) {
-        children.put(def.getName(), def);
-    }
-
-    @Override
-    public Collection<ModuleDefinition> getChildren() {
-        return children.values();
+    public ClassLoader getClassLoader() {
+        return resolver.getClassLoader();
     }
 
     @Override
@@ -166,8 +144,12 @@ public class DefaultModuleDefinition implements ModuleDefinition {
     }
 
     @Override
-    public ClassLoader getClassLoader() {
-        return resolver.getClassLoader();
+    public Collection<ModuleDefinition> getChildren() {
+        return children.values();
     }
 
+    @Override
+    public void addChild(final ModuleDefinition def) {
+        children.put(def.getName(), def);
+    }
 }

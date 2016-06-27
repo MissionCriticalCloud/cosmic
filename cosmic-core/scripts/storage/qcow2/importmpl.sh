@@ -1,20 +1,4 @@
-#!/bin/bash
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+#! /bin/bash
 
 
 # $Id: importmpl.sh 9132 2010-06-04 20:17:43Z manuel $ $HeadURL: svn://svn.lab.vmops.com/repos/vmdev/java/scripts/storage/qcow2/importmtpl.sh $
@@ -49,7 +33,7 @@ setTmplMetaFile() {
   local fileName=$5
   virtualsize=$(qemu-img info $tmplfile|grep virtual |awk '{print $4}'|cut -d \( -f 2)
   disksize=$(ls -l $tmplfile|awk '{print $5}')
-  
+
   echo "qcow2=true" >> $metaFile
   echo "id=$id" >> $metaFile
   echo "public=true" >> $metaFile
@@ -91,31 +75,31 @@ then
   exit 2
 fi
 
-if [[ "$uflag" != "1" && "$rflag" == "1" && ! -f $rttmplt ]] 
+if [[ "$uflag" != "1" && "$rflag" == "1" && ! -f $rttmplt ]]
 then
   echo "template image file $rttmplt doesn't exist"
   exit 3
 fi
 
-if [[ "$uflag" != "1" && "$vflag" == "1" && ! -f $vmtmplt ]] 
+if [[ "$uflag" != "1" && "$vflag" == "1" && ! -f $vmtmplt ]]
 then
   echo "template image file $vmtmplt doesn't exist"
   exit 3
 fi
 
-if [[ "$uflag" == "1" && "$rflag" != "1" ]] 
+if [[ "$uflag" == "1" && "$rflag" != "1" ]]
 then
   rttmplt=http://download.cloud.com/templates/builtin/a88232bf-6a18-38e7-aeee-c1702725079f.qcow2.bz2
   echo "download routing template from $rttmplt"
 fi
 
-if [[ "$uflag" == "1" && "$vflag" != "1" ]] 
+if [[ "$uflag" == "1" && "$vflag" != "1" ]]
 then
   vmtmplt=http://download.cloud.com/templates/builtin/eec2209b-9875-3c8d-92be-c001bd8a0faf.qcow2.bz2
   echo "download cnetos template from $vmtmplt"
 fi
 
-if [ ! -d $mntpoint ] 
+if [ ! -d $mntpoint ]
 then
   echo "mount point $mntpoint doesn't exist\n"
   exit 4
@@ -182,7 +166,7 @@ fi
 tmpfilert=$(dirname $0)/$localfilert
 tmpfilevm=$(dirname $0)/$localfilevm
 if [ "$uflag" == "1" ]
-then 
+then
 downloadImage $tmpfilert $rttmplt
 downloadImage $tmpfilevm $vmtmplt
 fi
@@ -195,7 +179,7 @@ then
     printf "Failed to create temporary file in directory $(dirname $0) -- is it read-only or full?\n"
     exit 6
   fi
-  cp $vmtmplt $tmpfilevm 
+  cp $vmtmplt $tmpfilevm
   if [ $? -ne 0 ]
   then
     printf "Failed to create temporary file in directory $(dirname $0) -- is it read-only or full?\n"

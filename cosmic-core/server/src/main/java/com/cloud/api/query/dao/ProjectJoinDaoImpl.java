@@ -1,25 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.query.dao;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
 
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.vo.AccountJoinVO;
@@ -31,9 +10,13 @@ import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -41,17 +24,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProjectJoinDaoImpl extends GenericDaoBase<ProjectJoinVO, Long> implements ProjectJoinDao {
     public static final Logger s_logger = LoggerFactory.getLogger(ProjectJoinDaoImpl.class);
-
+    private final SearchBuilder<ProjectJoinVO> prjSearch;
+    private final SearchBuilder<ProjectJoinVO> prjIdSearch;
     @Inject
     private ConfigurationDao _configDao;
     @Inject
     private AccountJoinDao _accountJoinDao;
     @Inject
     private AccountDao _accountDao;
-
-    private final SearchBuilder<ProjectJoinVO> prjSearch;
-
-    private final SearchBuilder<ProjectJoinVO> prjIdSearch;
 
     protected ProjectJoinDaoImpl() {
 
@@ -67,8 +47,8 @@ public class ProjectJoinDaoImpl extends GenericDaoBase<ProjectJoinVO, Long> impl
     }
 
     @Override
-    public ProjectResponse newProjectResponse(ProjectJoinVO proj) {
-        ProjectResponse response = new ProjectResponse();
+    public ProjectResponse newProjectResponse(final ProjectJoinVO proj) {
+        final ProjectResponse response = new ProjectResponse();
         response.setId(proj.getUuid());
         response.setName(proj.getName());
         response.setDisplaytext(proj.getDisplayText());
@@ -81,17 +61,17 @@ public class ProjectJoinDaoImpl extends GenericDaoBase<ProjectJoinVO, Long> impl
         response.setOwner(proj.getOwner());
 
         // update tag information
-        Long tag_id = proj.getTagId();
+        final Long tag_id = proj.getTagId();
         if (tag_id != null && tag_id.longValue() > 0) {
-            ResourceTagJoinVO vtag = ApiDBUtils.findResourceTagViewById(tag_id);
+            final ResourceTagJoinVO vtag = ApiDBUtils.findResourceTagViewById(tag_id);
             if (vtag != null) {
                 response.addTag(ApiDBUtils.newResourceTagResponse(vtag, false));
             }
         }
 
         //set resource limit/count information for the project (by getting the info of the project's account)
-        Account account = _accountDao.findByIdIncludingRemoved(proj.getProjectAccountId());
-        AccountJoinVO accountJn = ApiDBUtils.newAccountView(account);
+        final Account account = _accountDao.findByIdIncludingRemoved(proj.getProjectAccountId());
+        final AccountJoinVO accountJn = ApiDBUtils.newAccountView(account);
         _accountJoinDao.setResourceLimits(accountJn, false, response);
 
         response.setObjectName("project");
@@ -99,11 +79,11 @@ public class ProjectJoinDaoImpl extends GenericDaoBase<ProjectJoinVO, Long> impl
     }
 
     @Override
-    public ProjectResponse setProjectResponse(ProjectResponse rsp, ProjectJoinVO proj) {
+    public ProjectResponse setProjectResponse(final ProjectResponse rsp, final ProjectJoinVO proj) {
         // update tag information
-        Long tag_id = proj.getTagId();
+        final Long tag_id = proj.getTagId();
         if (tag_id != null && tag_id.longValue() > 0) {
-            ResourceTagJoinVO vtag = ApiDBUtils.findResourceTagViewById(tag_id);
+            final ResourceTagJoinVO vtag = ApiDBUtils.findResourceTagViewById(tag_id);
             if (vtag != null) {
                 rsp.addTag(ApiDBUtils.newResourceTagResponse(vtag, false));
             }
@@ -112,33 +92,33 @@ public class ProjectJoinDaoImpl extends GenericDaoBase<ProjectJoinVO, Long> impl
     }
 
     @Override
-    public List<ProjectJoinVO> newProjectView(Project proj) {
-        SearchCriteria<ProjectJoinVO> sc = prjIdSearch.create();
+    public List<ProjectJoinVO> newProjectView(final Project proj) {
+        final SearchCriteria<ProjectJoinVO> sc = prjIdSearch.create();
         sc.setParameters("id", proj.getId());
         return searchIncludingRemoved(sc, null, null, false);
     }
 
     @Override
-    public List<ProjectJoinVO> searchByIds(Long... prjIds) {
+    public List<ProjectJoinVO> searchByIds(final Long... prjIds) {
         // set detail batch query size
         int DETAILS_BATCH_SIZE = 2000;
-        String batchCfg = _configDao.getValue("detail.batch.query.size");
+        final String batchCfg = _configDao.getValue("detail.batch.query.size");
         if (batchCfg != null) {
             DETAILS_BATCH_SIZE = Integer.parseInt(batchCfg);
         }
         // query details by batches
-        List<ProjectJoinVO> uvList = new ArrayList<ProjectJoinVO>();
+        final List<ProjectJoinVO> uvList = new ArrayList<>();
         // query details by batches
         int curr_index = 0;
         if (prjIds.length > DETAILS_BATCH_SIZE) {
             while ((curr_index + DETAILS_BATCH_SIZE) <= prjIds.length) {
-                Long[] ids = new Long[DETAILS_BATCH_SIZE];
+                final Long[] ids = new Long[DETAILS_BATCH_SIZE];
                 for (int k = 0, j = curr_index; j < curr_index + DETAILS_BATCH_SIZE; j++, k++) {
                     ids[k] = prjIds[j];
                 }
-                SearchCriteria<ProjectJoinVO> sc = prjSearch.create();
+                final SearchCriteria<ProjectJoinVO> sc = prjSearch.create();
                 sc.setParameters("idIN", ids);
-                List<ProjectJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
+                final List<ProjectJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
                 if (vms != null) {
                     uvList.addAll(vms);
                 }
@@ -146,20 +126,19 @@ public class ProjectJoinDaoImpl extends GenericDaoBase<ProjectJoinVO, Long> impl
             }
         }
         if (curr_index < prjIds.length) {
-            int batch_size = (prjIds.length - curr_index);
+            final int batch_size = (prjIds.length - curr_index);
             // set the ids value
-            Long[] ids = new Long[batch_size];
+            final Long[] ids = new Long[batch_size];
             for (int k = 0, j = curr_index; j < curr_index + batch_size; j++, k++) {
                 ids[k] = prjIds[j];
             }
-            SearchCriteria<ProjectJoinVO> sc = prjSearch.create();
+            final SearchCriteria<ProjectJoinVO> sc = prjSearch.create();
             sc.setParameters("idIN", ids);
-            List<ProjectJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
+            final List<ProjectJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
             if (vms != null) {
                 uvList.addAll(vms);
             }
         }
         return uvList;
     }
-
 }

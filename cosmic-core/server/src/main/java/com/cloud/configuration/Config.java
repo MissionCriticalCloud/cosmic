@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.configuration;
 
 import com.cloud.agent.AgentManager;
@@ -339,7 +323,8 @@ public enum Config {
             Integer.class,
             "network.securitygroups.work.per.agent.queue.size",
             "100",
-            "The number of outstanding security group work items that can be queued to a host. If exceeded, work items will get dropped to conserve memory. Security Group Sync will take care of ensuring that the host gets updated eventually",
+            "The number of outstanding security group work items that can be queued to a host. If exceeded, work items will get dropped to conserve memory. Security Group Sync " +
+                    "will take care of ensuring that the host gets updated eventually",
             null),
 
     SecurityGroupDefaultAdding(
@@ -357,7 +342,8 @@ public enum Config {
             String.class,
             "network.dhcp.nondefaultnetwork.setgateway.guestos",
             "Windows",
-            "The guest OS's name start with this fields would result in DHCP server response gateway information even when the network it's on is not default network. Names are separated by comma.",
+            "The guest OS's name start with this fields would result in DHCP server response gateway information even when the network it's on is not default network. Names are " +
+                    "separated by comma.",
             null),
 
     //VPN
@@ -402,7 +388,6 @@ public enum Config {
             "Network", ManagementServer.class, Boolean.class,
             "network.router.enableserviceMonitoring", "false",
             "service monitoring in router enable/disable option, default false", null),
-
 
     // Console Proxy
     ConsoleProxyCapacityStandby(
@@ -936,7 +921,8 @@ public enum Config {
             Float.class,
             "vm.user.dispersion.weight",
             "1",
-            "Weight for user dispersion heuristic (as a value between 0 and 1) applied to resource allocation during vm deployment. Weight for capacity heuristic will be (1 - weight of user dispersion)",
+            "Weight for user dispersion heuristic (as a value between 0 and 1) applied to resource allocation during vm deployment. Weight for capacity heuristic will be (1 - " +
+                    "weight of user dispersion)",
             null),
     VmAllocationAlgorithm(
             "Advanced",
@@ -944,7 +930,8 @@ public enum Config {
             String.class,
             "vm.allocation.algorithm",
             "random",
-            "'random', 'firstfit', 'userdispersing', 'userconcentratedpod_random', 'userconcentratedpod_firstfit', 'firstfitleastconsumed' : Order in which hosts within a cluster will be considered for VM/volume allocation.",
+            "'random', 'firstfit', 'userdispersing', 'userconcentratedpod_random', 'userconcentratedpod_firstfit', 'firstfitleastconsumed' : Order in which hosts within a " +
+                    "cluster will be considered for VM/volume allocation.",
             null),
     VmDeploymentPlanner(
             "Advanced",
@@ -1057,7 +1044,6 @@ public enum Config {
             "1",
             "interval used to check primary storage availability.",
             null),
-
 
     // XenServer
     XenServerPublicNetwork(
@@ -1355,7 +1341,8 @@ public enum Config {
             String.class,
             "network.dns.basiczone.updates",
             "all",
-            "This parameter can take 2 values: all (default) and pod. It defines if DHCP/DNS requests have to be send to all dhcp servers in cloudstack, or only to the one in the same pod",
+            "This parameter can take 2 values: all (default) and pod. It defines if DHCP/DNS requests have to be send to all dhcp servers in cloudstack, or only to the one in " +
+                    "the same pod",
             "all,pod"),
 
     ClusterMessageTimeOutSeconds(
@@ -1393,17 +1380,28 @@ public enum Config {
             "Session cookie's secure flag is enabled if true. Use this only when using HTTPS",
             null),
 
-    DefaultMaxDomainUserVms("Domain Defaults", ManagementServer.class, Long.class, "max.domain.user.vms", "40", "The default maximum number of user VMs that can be deployed for a domain", null),
-    DefaultMaxDomainPublicIPs("Domain Defaults", ManagementServer.class, Long.class, "max.domain.public.ips", "40", "The default maximum number of public IPs that can be consumed by a domain", null),
-    DefaultMaxDomainTemplates("Domain Defaults", ManagementServer.class, Long.class, "max.domain.templates", "40", "The default maximum number of templates that can be deployed for a domain", null),
-    DefaultMaxDomainSnapshots("Domain Defaults", ManagementServer.class, Long.class, "max.domain.snapshots", "40", "The default maximum number of snapshots that can be created for a domain", null),
-    DefaultMaxDomainVolumes("Domain Defaults", ManagementServer.class, Long.class, "max.domain.volumes", "40", "The default maximum number of volumes that can be created for a domain", null),
-    DefaultMaxDomainNetworks("Domain Defaults", ManagementServer.class, Long.class, "max.domain.networks", "40", "The default maximum number of networks that can be created for a domain", null),
-    DefaultMaxDomainVpcs("Domain Defaults", ManagementServer.class, Long.class, "max.domain.vpcs", "40", "The default maximum number of vpcs that can be created for a domain", null),
-    DefaultMaxDomainCpus("Domain Defaults", ManagementServer.class, Long.class, "max.domain.cpus", "80", "The default maximum number of cpu cores that can be used for a domain", null),
-    DefaultMaxDomainMemory("Domain Defaults", ManagementServer.class, Long.class, "max.domain.memory", "81920", "The default maximum memory (in MB) that can be used for a domain", null),
-    DefaultMaxDomainPrimaryStorage("Domain Defaults", ManagementServer.class, Long.class, "max.domain.primary.storage", "400", "The default maximum primary storage space (in GiB) that can be used for a domain", null),
-    DefaultMaxDomainSecondaryStorage("Domain Defaults", ManagementServer.class, Long.class, "max.domain.secondary.storage", "800", "The default maximum secondary storage space (in GiB) that can be used for a domain", null),
+    DefaultMaxDomainUserVms("Domain Defaults", ManagementServer.class, Long.class, "max.domain.user.vms", "40", "The default maximum number of user VMs that can be deployed for " +
+            "a domain", null),
+    DefaultMaxDomainPublicIPs("Domain Defaults", ManagementServer.class, Long.class, "max.domain.public.ips", "40", "The default maximum number of public IPs that can be " +
+            "consumed by a domain", null),
+    DefaultMaxDomainTemplates("Domain Defaults", ManagementServer.class, Long.class, "max.domain.templates", "40", "The default maximum number of templates that can be deployed " +
+            "for a domain", null),
+    DefaultMaxDomainSnapshots("Domain Defaults", ManagementServer.class, Long.class, "max.domain.snapshots", "40", "The default maximum number of snapshots that can be created " +
+            "for a domain", null),
+    DefaultMaxDomainVolumes("Domain Defaults", ManagementServer.class, Long.class, "max.domain.volumes", "40", "The default maximum number of volumes that can be created for a " +
+            "domain", null),
+    DefaultMaxDomainNetworks("Domain Defaults", ManagementServer.class, Long.class, "max.domain.networks", "40", "The default maximum number of networks that can be created for " +
+            "a domain", null),
+    DefaultMaxDomainVpcs("Domain Defaults", ManagementServer.class, Long.class, "max.domain.vpcs", "40", "The default maximum number of vpcs that can be created for a domain",
+            null),
+    DefaultMaxDomainCpus("Domain Defaults", ManagementServer.class, Long.class, "max.domain.cpus", "80", "The default maximum number of cpu cores that can be used for a domain",
+            null),
+    DefaultMaxDomainMemory("Domain Defaults", ManagementServer.class, Long.class, "max.domain.memory", "81920", "The default maximum memory (in MB) that can be used for a " +
+            "domain", null),
+    DefaultMaxDomainPrimaryStorage("Domain Defaults", ManagementServer.class, Long.class, "max.domain.primary.storage", "400", "The default maximum primary storage space (in " +
+            "GiB) that can be used for a domain", null),
+    DefaultMaxDomainSecondaryStorage("Domain Defaults", ManagementServer.class, Long.class, "max.domain.secondary.storage", "800", "The default maximum secondary storage space " +
+            "(in GiB) that can be used for a domain", null),
 
     DefaultMaxProjectUserVms(
             "Project Defaults",
@@ -1726,25 +1724,19 @@ public enum Config {
     ManagementServerVendor("Advanced", ManagementServer.class, String.class, "mgt.server.vendor", "ACS", "the vendor of management server", null),
     PublishActionEvent("Advanced", ManagementServer.class, Boolean.class, "publish.action.events", "true", "enable or disable publishing of action events on the event bus", null),
     PublishAlertEvent("Advanced", ManagementServer.class, Boolean.class, "publish.alert.events", "true", "enable or disable publishing of alert events on the event bus", null),
-    PublishResourceStateEvent("Advanced", ManagementServer.class, Boolean.class, "publish.resource.state.events", "true", "enable or disable publishing of alert events on the event bus", null),
+    PublishResourceStateEvent("Advanced", ManagementServer.class, Boolean.class, "publish.resource.state.events", "true", "enable or disable publishing of alert events on the " +
+            "event bus", null),
     PublishUsageEvent("Advanced", ManagementServer.class, Boolean.class, "publish.usage.events", "true", "enable or disable publishing of usage events on the event bus", null),
-    PublishAsynJobEvent("Advanced", ManagementServer.class, Boolean.class, "publish.async.job.events", "true", "enable or disable publishing of usage events on the event bus", null),
+    PublishAsynJobEvent("Advanced", ManagementServer.class, Boolean.class, "publish.async.job.events", "true", "enable or disable publishing of usage events on the event bus",
+            null),
 
     // StatsCollector
     StatsOutPutGraphiteHost("Advanced", ManagementServer.class, String.class, "stats.output.uri", "", "URI to additionally send StatsCollector statistics to", null),
 
     SSVMPSK("Hidden", ManagementServer.class, String.class, "upload.post.secret.key", "", "PSK with SSVM", null);
 
-    private final String _category;
-    private final Class<?> _componentClass;
-    private final Class<?> _type;
-    private final String _name;
-    private final String _defaultValue;
-    private final String _description;
-    private final String _range;
-    private final String _scope; // Parameter can be at different levels (Zone/cluster/pool/account), by default every parameter is at global
-
     private static final HashMap<String, List<Config>> s_scopeLevelConfigsMap = new HashMap<>();
+    private static final HashMap<String, List<Config>> Configs = new HashMap<>();
 
     static {
         s_scopeLevelConfigsMap.put(ConfigKey.Scope.Zone.toString(), new ArrayList<>());
@@ -1764,8 +1756,6 @@ public enum Config {
             }
         }
     }
-
-    private static final HashMap<String, List<Config>> Configs = new HashMap<>();
 
     static {
         // Add categories
@@ -1793,7 +1783,17 @@ public enum Config {
         }
     }
 
-    private Config(final String category, final Class<?> componentClass, final Class<?> type, final String name, final String defaultValue, final String description, final String range) {
+    private final String _category;
+    private final Class<?> _componentClass;
+    private final Class<?> _type;
+    private final String _name;
+    private final String _defaultValue;
+    private final String _description;
+    private final String _range;
+    private final String _scope; // Parameter can be at different levels (Zone/cluster/pool/account), by default every parameter is at global
+
+    private Config(final String category, final Class<?> componentClass, final Class<?> type, final String name, final String defaultValue, final String description, final
+    String range) {
         _category = category;
         _componentClass = componentClass;
         _type = type;
@@ -1804,7 +1804,8 @@ public enum Config {
         _scope = ConfigKey.Scope.Global.toString();
     }
 
-    private Config(final String category, final Class<?> componentClass, final Class<?> type, final String name, final String defaultValue, final String description, final String range, final String scope) {
+    private Config(final String category, final Class<?> componentClass, final Class<?> type, final String name, final String defaultValue, final String description, final
+    String range, final String scope) {
         _category = category;
         _componentClass = componentClass;
         _type = type;
@@ -1815,12 +1816,43 @@ public enum Config {
         _scope = scope;
     }
 
-    public String getCategory() {
-        return _category;
+    public static Config getConfig(final String name) {
+        final List<String> categories = getCategories();
+        for (final String category : categories) {
+            final List<Config> currentList = getConfigs(category);
+            for (final Config c : currentList) {
+                if (c.key().equals(name)) {
+                    return c;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static List<String> getCategories() {
+        final Object[] keys = Configs.keySet().toArray();
+        final List<String> categories = new ArrayList<>();
+        for (final Object key : keys) {
+            categories.add((String) key);
+        }
+        return categories;
+    }
+
+    public static List<Config> getConfigs(final String category) {
+        return Configs.get(category);
     }
 
     public String key() {
         return _name;
+    }
+
+    public static List<Config> getConfigListByScope(final String scope) {
+        return s_scopeLevelConfigsMap.get(scope);
+    }
+
+    public String getCategory() {
+        return _category;
     }
 
     public String getDescription() {
@@ -1878,36 +1910,5 @@ public enum Config {
     @Override
     public String toString() {
         return _name;
-    }
-
-    public static List<Config> getConfigs(final String category) {
-        return Configs.get(category);
-    }
-
-    public static Config getConfig(final String name) {
-        final List<String> categories = getCategories();
-        for (final String category : categories) {
-            final List<Config> currentList = getConfigs(category);
-            for (final Config c : currentList) {
-                if (c.key().equals(name)) {
-                    return c;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public static List<String> getCategories() {
-        final Object[] keys = Configs.keySet().toArray();
-        final List<String> categories = new ArrayList<>();
-        for (final Object key : keys) {
-            categories.add((String) key);
-        }
-        return categories;
-    }
-
-    public static List<Config> getConfigListByScope(final String scope) {
-        return s_scopeLevelConfigsMap.get(scope);
     }
 }

@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.doc;
 
 import java.io.Serializable;
@@ -29,17 +13,17 @@ public class Argument implements Comparable<Object>, Serializable {
     private List<Argument> arguments;
     private String dataType;
 
-    public Argument(String name) {
+    public Argument(final String name) {
         this.name = name;
     }
 
-    public Argument(String name, String description, boolean required) {
+    public Argument(final String name, final String description, final boolean required) {
         this.name = name;
         this.description = description;
         this.required = required;
     }
 
-    public Argument(String name, String description) {
+    public Argument(final String name, final String description) {
         this.name = name;
         this.description = description;
     }
@@ -48,31 +32,23 @@ public class Argument implements Comparable<Object>, Serializable {
         return this.type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
-    }
-
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
     }
 
     public String getDataType() {
         return this.dataType;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setDataType(final String dataType) {
+        this.dataType = dataType;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
@@ -80,7 +56,7 @@ public class Argument implements Comparable<Object>, Serializable {
         return required;
     }
 
-    public void setRequired(Boolean required) {
+    public void setRequired(final Boolean required) {
         this.required = required;
     }
 
@@ -88,7 +64,7 @@ public class Argument implements Comparable<Object>, Serializable {
         return arguments;
     }
 
-    public void setArguments(List<Argument> arguments) {
+    public void setArguments(final List<Argument> arguments) {
         this.arguments = arguments;
     }
 
@@ -96,16 +72,25 @@ public class Argument implements Comparable<Object>, Serializable {
         return sinceVersion;
     }
 
-    public void setSinceVersion(String sinceVersion) {
+    public void setSinceVersion(final String sinceVersion) {
         this.sinceVersion = sinceVersion;
     }
 
     @Override
-    public int compareTo(Object anotherAgrument) throws ClassCastException {
-        if (!(anotherAgrument instanceof Argument))
+    public int compareTo(final Object anotherAgrument) throws ClassCastException {
+        if (!(anotherAgrument instanceof Argument)) {
             throw new ClassCastException("An Argument object expected.");
-        Argument argument = (Argument)anotherAgrument;
+        }
+        final Argument argument = (Argument) anotherAgrument;
         return this.getName().compareToIgnoreCase(argument.getName());
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
     }
 
     public boolean hasArguments() {
@@ -114,6 +99,7 @@ public class Argument implements Comparable<Object>, Serializable {
 
     @Override
     public String toString() {
-        return "name=" + this.name + ", description=" + description + ", required=" + required + ", type=" + this.type + ", sinceVersion=" + this.sinceVersion + ", arguments=" + this.arguments + ", dataType=" + this.dataType;
+        return "name=" + this.name + ", description=" + description + ", required=" + required + ", type=" + this.type + ", sinceVersion=" + this.sinceVersion + ", arguments=" +
+                this.arguments + ", dataType=" + this.dataType;
     }
 }

@@ -1,24 +1,11 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ Test cases for Test Paths Storage Migration
 """
-from nose.plugins.attrib import attr
+import time
+from marvin.cloudstackAPI import (deleteVolume)
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import (cleanup_resources)
+from marvin.codes import (PASS,
+                          ZONETAG1,
+                          CLUSTERTAG1)
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              DiskOffering,
@@ -40,14 +27,9 @@ from marvin.lib.common import (get_domain,
                                list_hosts,
                                validateList
                                )
-from marvin.codes import (PASS,
-                          ZONETAG1,
-                          CLUSTERTAG1)
-
-from marvin.cloudstackAPI import (deleteVolume)
+from marvin.lib.utils import (cleanup_resources)
 from marvin.sshClient import SshClient
-
-import time
+from nose.plugins.attrib import attr
 from threading import Thread
 
 
@@ -201,7 +183,6 @@ def MigrateDataVolume(self,
 
 
 class TestStorageMigration(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestStorageMigration, cls).getClsTestClient()
@@ -220,10 +201,10 @@ class TestStorageMigration(cloudstackTestCase):
 
         cls._cleanup = []
         if cls.hypervisor.lower() not in [
-                "vmware",
-                "kvm",
-                "xenserver",
-                "hyper-v"]:
+            "vmware",
+            "kvm",
+            "xenserver",
+            "hyper-v"]:
             raise unittest.SkipTest(
                 "Storage migration not supported on %s" %
                 cls.hypervisor)
@@ -374,11 +355,11 @@ class TestStorageMigration(cloudstackTestCase):
         try:
             self.pools = StoragePool.list(self.apiclient, zoneid=self.zone.id)
             assert len(list(storagePool for storagePool in self.pools
-                            if storagePool.scope == "ZONE")) >= 2,\
+                            if storagePool.scope == "ZONE")) >= 2, \
                 "There must be at least two zone wide\
                 storage pools available in the setup"
             assert len(list(storagePool for storagePool in self.pools
-                            if storagePool.scope == "CLUSTER")) >= 2,\
+                            if storagePool.scope == "CLUSTER")) >= 2, \
                 "There must be at least two cluster wide\
                 storage pools available in the setup"
         except Exception as e:
@@ -1116,7 +1097,7 @@ class TestStorageMigration(cloudstackTestCase):
         try:
             self.pools = StoragePool.list(self.apiclient, zoneid=self.zone.id)
             assert len(list(storagePool for storagePool in self.pools
-                            if storagePool.scope == "CLUSTER")) >= 2,\
+                            if storagePool.scope == "CLUSTER")) >= 2, \
                 "There must be at least two cluster wide\
                 storage pools available in the setup"
         except Exception as e:
@@ -1574,7 +1555,7 @@ class TestStorageMigration(cloudstackTestCase):
         try:
             self.pools = StoragePool.list(self.apiclient, zoneid=self.zone.id)
             assert len(list(storagePool for storagePool in self.pools
-                            if storagePool.scope == "CLUSTER")) >= 2,\
+                            if storagePool.scope == "CLUSTER")) >= 2, \
                 "There must be at least two cluster wide\
                 storage pools available in the setup"
         except Exception as e:
@@ -2032,7 +2013,7 @@ class TestStorageMigration(cloudstackTestCase):
         try:
             self.pools = StoragePool.list(self.apiclient, zoneid=self.zone.id)
             assert len(list(storagePool for storagePool in self.pools
-                            if storagePool.scope == "ZONE")) >= 2,\
+                            if storagePool.scope == "ZONE")) >= 2, \
                 "There must be at least two zone wide\
                 storage pools available in the setup"
         except Exception as e:
@@ -2180,7 +2161,6 @@ class TestStorageMigration(cloudstackTestCase):
 
 
 class NegativeTestStorageMigration(cloudstackTestCase):
-
     exceptionList = []
 
     @classmethod
@@ -2204,10 +2184,10 @@ class NegativeTestStorageMigration(cloudstackTestCase):
         cls._cleanup = []
 
         if cls.hypervisor.lower() not in [
-                "vmware",
-                "kvm",
-                "xenserver",
-                "hyper-v"]:
+            "vmware",
+            "kvm",
+            "xenserver",
+            "hyper-v"]:
             raise unittest.SkipTest(
                 "Storage migration not supported on %s" %
                 cls.hypervisor)
@@ -2215,11 +2195,11 @@ class NegativeTestStorageMigration(cloudstackTestCase):
         try:
             cls.pools = StoragePool.list(cls.apiclient, zoneid=cls.zone.id)
             assert len(list(storagePool for storagePool in cls.pools
-                            if storagePool.scope == "ZONE")) >= 2,\
+                            if storagePool.scope == "ZONE")) >= 2, \
                 "There must be at least two zone wide\
                 storage pools available in the setup"
             assert len(list(storagePool for storagePool in cls.pools
-                            if storagePool.scope == "CLUSTER")) >= 2,\
+                            if storagePool.scope == "CLUSTER")) >= 2, \
                 "There must be at least two cluster wide\
                 storage pools available in the setup"
         except Exception as e:
@@ -2337,9 +2317,9 @@ class NegativeTestStorageMigration(cloudstackTestCase):
 
     def createTemplateJob(self, virtual_machine, root_volume):
         try:
-            services = {"displaytext": "templ",
-                        "name": "vol_template",
-                        "ostypeid": virtual_machine.ostypeid}
+            services = { "displaytext": "templ",
+                         "name": "vol_template",
+                         "ostypeid": virtual_machine.ostypeid }
             with self.assertRaises(Exception):
                 Template.create(self.apiclient,
                                 services,
@@ -2590,14 +2570,13 @@ class NegativeTestStorageMigration(cloudstackTestCase):
         # Raise exception if there was any exception raised from the threads
         if self.exceptionList:
             for i in self.exceptionList:
-                raise(i)
+                raise (i)
 
         vm_cluster.delete(self.apiclient)
         return
 
 
 class TestLiveStorageMigration(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestLiveStorageMigration, cls).getClsTestClient()
@@ -2730,7 +2709,7 @@ class TestLiveStorageMigration(cloudstackTestCase):
         try:
             self.pools = StoragePool.list(self.apiclient, zoneid=self.zone.id)
             assert len(list(storagePool for storagePool in self.pools
-                            if storagePool.scope == "CLUSTER")) >= 3,\
+                            if storagePool.scope == "CLUSTER")) >= 3, \
                 "There must be at least three cluster wide\
                 storage pools available in the setup"
         except Exception as e:
@@ -2930,12 +2909,12 @@ class TestLiveStorageMigration(cloudstackTestCase):
         try:
             self.pools = StoragePool.list(self.apiclient, zoneid=self.zone.id)
             assert len(list(storagePool for storagePool in self.pools
-                            if storagePool.scope == "ZONE")) >= 2,\
+                            if storagePool.scope == "ZONE")) >= 2, \
                 "There must be at least two zone wide\
                  storage pools available in the setup"
 
             assert len(list(storagePool for storagePool in self.pools
-                            if storagePool.scope == "CLUSTER")) >= 3,\
+                            if storagePool.scope == "CLUSTER")) >= 3, \
                 "There must be at least two cluster wide\
                 storage pools available in the setup"
         except Exception as e:
@@ -3408,9 +3387,9 @@ def MigrateVmWithVolume(self, vm, destinationHost, volumes, pools):
                3. volumes -> list of volumes which are to be migrated
                4. pools -> list of destination pools
     """
-    vol_pool_map = {}
+    vol_pool_map = { }
     for vol, pool in zip(volumes, pools):
-        vol_pool_map.update({vol.id: pool.id})
+        vol_pool_map.update({ vol.id: pool.id })
 
     vm.migrate_vm_with_volume(
         self.apiclient,
@@ -3558,7 +3537,7 @@ def check_files(self, vm, destinationHost):
             "/" +
             vm.instancename +
             "| grep vmx")
-        if(pool_data_vmx):
+        if (pool_data_vmx):
             vmx_file = vm.instancename + ".vmx"
             if vol.type == "ROOT":
                 self.assertIn(
@@ -3566,7 +3545,7 @@ def check_files(self, vm, destinationHost):
                     pool_data_vmx,
                     "The VMX files are missing"
                 )
-        if(pool_data_vmdk):
+        if (pool_data_vmdk):
             vmdk_file1 = vol.path + ".vmdk"
             vmdk_file2 = vol.path + "-flat.vmdk"
 
@@ -3584,7 +3563,6 @@ def check_files(self, vm, destinationHost):
 
 
 class TestStorageLiveMigrationVmware(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(
@@ -3607,7 +3585,7 @@ class TestStorageLiveMigrationVmware(cloudstackTestCase):
         cls.unsupportedHypervisor = False
         cls.NoResource = False
         if cls.hypervisor.lower() not in [
-                "vmware"]:
+            "vmware"]:
             cls.unsupportedHypervisor = True
             return
         # Get Hosts in the cluster and iscsi/vmfs storages for that cluster

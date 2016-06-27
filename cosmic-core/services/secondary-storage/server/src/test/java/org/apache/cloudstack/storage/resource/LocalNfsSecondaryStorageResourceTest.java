@@ -1,32 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.storage.resource;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
-
-import javax.naming.ConfigurationException;
 
 import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.agent.api.storage.ListTemplateAnswer;
@@ -38,25 +10,31 @@ import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.Storage;
 import com.cloud.utils.PropertiesUtil;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.storage.command.CopyCmdAnswer;
 import org.apache.cloudstack.storage.command.CopyCommand;
 import org.apache.cloudstack.storage.command.DownloadCommand;
 import org.apache.cloudstack.storage.to.TemplateObjectTO;
+
+import javax.naming.ConfigurationException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
+
+import junit.framework.Assert;
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 public class LocalNfsSecondaryStorageResourceTest extends TestCase {
-    private static Map<String, Object> testParams;
-
     private static final Logger s_logger = LoggerFactory.getLogger(LocalNfsSecondaryStorageResourceTest.class.getName());
-
+    private static Map<String, Object> testParams;
     LocalNfsSecondaryStorageResource resource;
 
     @Before
@@ -67,23 +45,42 @@ public class LocalNfsSecondaryStorageResourceTest extends TestCase {
 
         testParams = PropertiesUtil.toMap(loadProperties());
         resource.configureStorageLayerClass(testParams);
-        Object testLocalRoot = testParams.get("testLocalRoot");
+        final Object testLocalRoot = testParams.get("testLocalRoot");
         resource.setParentPath("/mnt");
 
         if (testLocalRoot != null) {
-            resource.setParentPath((String)testLocalRoot);
+            resource.setParentPath((String) testLocalRoot);
         }
 
         System.setProperty("paths.script", "/Users/edison/develop/asf-master/script");
         //resource.configure("test", new HashMap<String, Object>());
     }
 
+    public static Properties loadProperties() throws ConfigurationException {
+        final Properties properties = new Properties();
+        final File file = PropertiesUtil.findConfigFile("agent.properties");
+        if (file == null) {
+            throw new ConfigurationException("Unable to find agent.properties.");
+        }
+
+        s_logger.info("agent.properties found at " + file.getAbsolutePath());
+
+        try (FileInputStream fs = new FileInputStream(file)) {
+            properties.load(fs);
+        } catch (final FileNotFoundException ex) {
+            throw new CloudRuntimeException("Cannot find the file: " + file.getAbsolutePath(), ex);
+        } catch (final IOException ex) {
+            throw new CloudRuntimeException("IOException in reading " + file.getAbsolutePath(), ex);
+        }
+        return properties;
+    }
+
     @Test
     public void testExecuteRequest() throws Exception {
-        TemplateObjectTO template = Mockito.mock(TemplateObjectTO.class);
-        NfsTO cacheStore = Mockito.mock(NfsTO.class);
+        final TemplateObjectTO template = Mockito.mock(TemplateObjectTO.class);
+        final NfsTO cacheStore = Mockito.mock(NfsTO.class);
         Mockito.when(cacheStore.getUrl()).thenReturn("nfs://nfs2.lab.vmops.com/export/home/edison/");
-        SwiftTO swift = Mockito.mock(SwiftTO.class);
+        final SwiftTO swift = Mockito.mock(SwiftTO.class);
         Mockito.when(swift.getEndPoint()).thenReturn("https://objects.dreamhost.com/auth");
         Mockito.when(swift.getAccount()).thenReturn("cloudstack");
         Mockito.when(swift.getUserName()).thenReturn("images");
@@ -98,46 +95,27 @@ public class LocalNfsSecondaryStorageResourceTest extends TestCase {
         Mockito.when(template.getName()).thenReturn(UUID.randomUUID().toString());
         Mockito.when(template.getObjectType()).thenReturn(DataObjectType.TEMPLATE);
 
-        DownloadCommand cmd = new DownloadCommand(template, 100000L);
+        final DownloadCommand cmd = new DownloadCommand(template, 100000L);
         cmd.setCacheStore(cacheStore);
-        DownloadAnswer answer = (DownloadAnswer)resource.executeRequest(cmd);
+        final DownloadAnswer answer = (DownloadAnswer) resource.executeRequest(cmd);
         Assert.assertTrue(answer.getResult());
 
         Mockito.when(template.getPath()).thenReturn(answer.getInstallPath());
         Mockito.when(template.getDataStore()).thenReturn(swift);
         //download swift:
         Mockito.when(cacheStore.getRole()).thenReturn(DataStoreRole.ImageCache);
-        TemplateObjectTO destTemplate = Mockito.mock(TemplateObjectTO.class);
+        final TemplateObjectTO destTemplate = Mockito.mock(TemplateObjectTO.class);
         Mockito.when(destTemplate.getPath()).thenReturn("template/1/2");
         Mockito.when(destTemplate.getDataStore()).thenReturn(cacheStore);
         Mockito.when(destTemplate.getObjectType()).thenReturn(DataObjectType.TEMPLATE);
-        CopyCommand cpyCmd = new CopyCommand(template, destTemplate, 10000, true);
-        CopyCmdAnswer copyCmdAnswer = (CopyCmdAnswer)resource.executeRequest(cpyCmd);
+        final CopyCommand cpyCmd = new CopyCommand(template, destTemplate, 10000, true);
+        final CopyCmdAnswer copyCmdAnswer = (CopyCmdAnswer) resource.executeRequest(cpyCmd);
         Assert.assertTrue(copyCmdAnswer.getResult());
 
         //list template
-        ListTemplateCommand listCmd = new ListTemplateCommand(swift);
-        ListTemplateAnswer listAnswer = (ListTemplateAnswer)resource.executeRequest(listCmd);
+        final ListTemplateCommand listCmd = new ListTemplateCommand(swift);
+        final ListTemplateAnswer listAnswer = (ListTemplateAnswer) resource.executeRequest(listCmd);
 
         Assert.assertTrue(listAnswer.getTemplateInfo().size() > 0);
-    }
-
-    public static Properties loadProperties() throws ConfigurationException {
-        Properties properties = new Properties();
-        final File file = PropertiesUtil.findConfigFile("agent.properties");
-        if (file == null) {
-            throw new ConfigurationException("Unable to find agent.properties.");
-        }
-
-        s_logger.info("agent.properties found at " + file.getAbsolutePath());
-
-        try(FileInputStream fs = new FileInputStream(file);) {
-            properties.load(fs);
-        } catch (final FileNotFoundException ex) {
-            throw new CloudRuntimeException("Cannot find the file: " + file.getAbsolutePath(), ex);
-        } catch (final IOException ex) {
-            throw new CloudRuntimeException("IOException in reading " + file.getAbsolutePath(), ex);
-        }
-        return properties;
     }
 }

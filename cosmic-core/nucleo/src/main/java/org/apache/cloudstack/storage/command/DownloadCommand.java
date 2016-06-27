@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package org.apache.cloudstack.storage.command;
@@ -25,16 +10,11 @@ import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.NfsTO;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.utils.net.Proxy;
-
 import org.apache.cloudstack.api.InternalIdentity;
 import org.apache.cloudstack.storage.to.TemplateObjectTO;
 import org.apache.cloudstack.storage.to.VolumeObjectTO;
 
 public class DownloadCommand extends AbstractDownloadCommand implements InternalIdentity {
-
-    public static enum ResourceType {
-        VOLUME, TEMPLATE
-    }
 
     private boolean hvm;
     private String description;
@@ -51,7 +31,7 @@ public class DownloadCommand extends AbstractDownloadCommand implements Internal
     protected DownloadCommand() {
     }
 
-    public DownloadCommand(DownloadCommand that) {
+    public DownloadCommand(final DownloadCommand that) {
         super(that);
         hvm = that.hvm;
         checksum = that.checksum;
@@ -66,7 +46,20 @@ public class DownloadCommand extends AbstractDownloadCommand implements Internal
         _proxy = that._proxy;
     }
 
-    public DownloadCommand(TemplateObjectTO template, Long maxDownloadSizeInBytes) {
+    public PasswordAuth getAuth() {
+        return auth;
+    }
+
+    public Long getMaxDownloadSizeInBytes() {
+        return maxDownloadSizeInBytes;
+    }
+
+    public DownloadCommand(final TemplateObjectTO template, final String user, final String passwd, final Long maxDownloadSizeInBytes) {
+        this(template, maxDownloadSizeInBytes);
+        auth = new PasswordAuth(user, passwd);
+    }
+
+    public DownloadCommand(final TemplateObjectTO template, final Long maxDownloadSizeInBytes) {
 
         super(template.getName(), template.getOrigUrl(), template.getFormat(), template.getAccountId());
         _store = template.getDataStore();
@@ -76,17 +69,12 @@ public class DownloadCommand extends AbstractDownloadCommand implements Internal
         id = template.getId();
         description = template.getDescription();
         if (_store instanceof NfsTO) {
-            setSecUrl(((NfsTO)_store).getUrl());
+            setSecUrl(((NfsTO) _store).getUrl());
         }
         this.maxDownloadSizeInBytes = maxDownloadSizeInBytes;
     }
 
-    public DownloadCommand(TemplateObjectTO template, String user, String passwd, Long maxDownloadSizeInBytes) {
-        this(template, maxDownloadSizeInBytes);
-        auth = new PasswordAuth(user, passwd);
-    }
-
-    public DownloadCommand(VolumeObjectTO volume, Long maxDownloadSizeInBytes, String checkSum, String url, ImageFormat format) {
+    public DownloadCommand(final VolumeObjectTO volume, final Long maxDownloadSizeInBytes, final String checkSum, final String url, final ImageFormat format) {
         super(volume.getName(), url, format, volume.getAccountId());
         checksum = checkSum;
         id = volume.getVolumeId();
@@ -101,27 +89,27 @@ public class DownloadCommand extends AbstractDownloadCommand implements Internal
         return id;
     }
 
-    public void setHvm(boolean hvm) {
-        this.hvm = hvm;
-    }
-
     public boolean isHvm() {
         return hvm;
+    }
+
+    public void setHvm(final boolean hvm) {
+        this.hvm = hvm;
     }
 
     public String getDescription() {
         return description;
     }
 
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
     public String getChecksum() {
         return checksum;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setChecksum(String checksum) {
+    public void setChecksum(final String checksum) {
         this.checksum = checksum;
     }
 
@@ -130,11 +118,7 @@ public class DownloadCommand extends AbstractDownloadCommand implements Internal
         return false;
     }
 
-    public PasswordAuth getAuth() {
-        return auth;
-    }
-
-    public void setCreds(String userName, String passwd) {
+    public void setCreds(final String userName, final String passwd) {
         auth = new PasswordAuth(userName, passwd);
     }
 
@@ -142,19 +126,15 @@ public class DownloadCommand extends AbstractDownloadCommand implements Internal
         return _proxy;
     }
 
-    public void setProxy(Proxy proxy) {
+    public void setProxy(final Proxy proxy) {
         _proxy = proxy;
-    }
-
-    public Long getMaxDownloadSizeInBytes() {
-        return maxDownloadSizeInBytes;
     }
 
     public ResourceType getResourceType() {
         return resourceType;
     }
 
-    public void setResourceType(ResourceType resourceType) {
+    public void setResourceType(final ResourceType resourceType) {
         this.resourceType = resourceType;
     }
 
@@ -162,7 +142,7 @@ public class DownloadCommand extends AbstractDownloadCommand implements Internal
         return _store;
     }
 
-    public void setDataStore(DataStoreTO store) {
+    public void setDataStore(final DataStoreTO store) {
         this._store = store;
     }
 
@@ -170,15 +150,19 @@ public class DownloadCommand extends AbstractDownloadCommand implements Internal
         return installPath;
     }
 
-    public void setInstallPath(String installPath) {
+    public void setInstallPath(final String installPath) {
         this.installPath = installPath;
-    }
-
-    public void setCacheStore(DataStoreTO cacheStore) {
-        this.cacheStore = cacheStore;
     }
 
     public DataStoreTO getCacheStore() {
         return cacheStore;
+    }
+
+    public void setCacheStore(final DataStoreTO cacheStore) {
+        this.cacheStore = cacheStore;
+    }
+
+    public static enum ResourceType {
+        VOLUME, TEMPLATE
     }
 }

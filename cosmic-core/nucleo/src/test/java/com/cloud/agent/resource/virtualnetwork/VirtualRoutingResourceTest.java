@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.resource.virtualnetwork;
@@ -22,14 +7,6 @@ package com.cloud.agent.resource.virtualnetwork;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-
-import javax.naming.ConfigurationException;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.BumpUpPriorityCommand;
@@ -73,6 +50,13 @@ import com.cloud.network.vpc.NetworkACLItem.TrafficType;
 import com.cloud.network.vpc.VpcGateway;
 import com.cloud.utils.ExecutionResult;
 import com.cloud.utils.net.NetUtils;
+
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -119,15 +103,15 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
         cmd.setRouterAccessIp(ROUTERIP);
         _currentCmd = cmd;
         if (cmd instanceof IpAssocVpcCommand) {
-            return prepareNetworkElementCommand((IpAssocVpcCommand)cmd);
+            return prepareNetworkElementCommand((IpAssocVpcCommand) cmd);
         } else if (cmd instanceof IpAssocCommand) {
-            return prepareNetworkElementCommand((IpAssocCommand)cmd);
+            return prepareNetworkElementCommand((IpAssocCommand) cmd);
         } else if (cmd instanceof SetupGuestNetworkCommand) {
-            return prepareNetworkElementCommand((SetupGuestNetworkCommand)cmd);
+            return prepareNetworkElementCommand((SetupGuestNetworkCommand) cmd);
         } else if (cmd instanceof SetSourceNatCommand) {
-            return prepareNetworkElementCommand((SetSourceNatCommand)cmd);
+            return prepareNetworkElementCommand((SetSourceNatCommand) cmd);
         } else if (cmd instanceof SetNetworkACLCommand) {
-            return prepareNetworkElementCommand((SetNetworkACLCommand)cmd);
+            return prepareNetworkElementCommand((SetNetworkACLCommand) cmd);
         }
         return new ExecutionResult(true, null);
     }
@@ -137,22 +121,38 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
         return new ExecutionResult(true, null);
     }
 
-    @Before
-    public void setup() {
-        _resource = new VirtualRoutingResource(this);
-        try {
-            _resource.configure("VRResource", new HashMap<String, Object>());
-        } catch (final ConfigurationException e) {
-            e.printStackTrace();
+    private ExecutionResult prepareNetworkElementCommand(final IpAssocVpcCommand cmd) {
+        final IpAddressTO[] ips = cmd.getIpAddresses();
+        for (final IpAddressTO ip : ips) {
+            ip.setNicDevId(2);
         }
+        return new ExecutionResult(true, null);
     }
 
-    private void verifyFile(final NetworkElementCommand cmd, final String path, final String filename, final String content) {
-        if (cmd instanceof AggregationControlCommand) {
-            verifyFile(cmd, path, filename, content);
-        } else if (cmd instanceof LoadBalancerConfigCommand) {
-            verifyFile((LoadBalancerConfigCommand)cmd, path, filename, content);
+    private ExecutionResult prepareNetworkElementCommand(final IpAssocCommand cmd) {
+        final IpAddressTO[] ips = cmd.getIpAddresses();
+        for (final IpAddressTO ip : ips) {
+            ip.setNicDevId(2);
         }
+        return new ExecutionResult(true, null);
+    }
+
+    private ExecutionResult prepareNetworkElementCommand(final SetupGuestNetworkCommand cmd) {
+        final NicTO nic = cmd.getNic();
+        nic.setDeviceId(4);
+        return new ExecutionResult(true, null);
+    }
+
+    private ExecutionResult prepareNetworkElementCommand(final SetSourceNatCommand cmd) {
+        final IpAddressTO ip = cmd.getIpAddress();
+        ip.setNicDevId(1);
+        return new ExecutionResult(true, null);
+    }
+
+    private ExecutionResult prepareNetworkElementCommand(final SetNetworkACLCommand cmd) {
+        final NicTO nic = cmd.getNic();
+        nic.setDeviceId(3);
+        return new ExecutionResult(true, null);
     }
 
     protected void verifyCommand(final NetworkElementCommand cmd, final String script, final String args) {
@@ -163,38 +163,34 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
         } else if (cmd instanceof LoadBalancerConfigCommand) {
             verifyArgs((LoadBalancerConfigCommand) cmd, script, args);
         } else if (cmd instanceof SavePasswordCommand) {
-            verifyArgs((SavePasswordCommand)cmd, script, args);
+            verifyArgs((SavePasswordCommand) cmd, script, args);
         } else if (cmd instanceof DhcpEntryCommand) {
-            verifyArgs((DhcpEntryCommand)cmd, script, args);
+            verifyArgs((DhcpEntryCommand) cmd, script, args);
         } else if (cmd instanceof DnsMasqConfigCommand) {
-            verifyArgs((DnsMasqConfigCommand)cmd, script, args);
+            verifyArgs((DnsMasqConfigCommand) cmd, script, args);
         } else if (cmd instanceof VmDataCommand) {
-            verifyArgs((VmDataCommand)cmd, script, args);
+            verifyArgs((VmDataCommand) cmd, script, args);
         } else if (cmd instanceof RemoteAccessVpnCfgCommand) {
-            verifyArgs((RemoteAccessVpnCfgCommand)cmd, script, args);
+            verifyArgs((RemoteAccessVpnCfgCommand) cmd, script, args);
         } else if (cmd instanceof VpnUsersCfgCommand) {
-            verifyArgs((VpnUsersCfgCommand)cmd, script, args);
+            verifyArgs((VpnUsersCfgCommand) cmd, script, args);
         } else if (cmd instanceof Site2SiteVpnCfgCommand) {
-            verifyArgs((Site2SiteVpnCfgCommand)cmd, script, args);
+            verifyArgs((Site2SiteVpnCfgCommand) cmd, script, args);
         } else if (cmd instanceof SetMonitorServiceCommand) {
-            verifyArgs((SetMonitorServiceCommand)cmd, script, args);
+            verifyArgs((SetMonitorServiceCommand) cmd, script, args);
         } else if (cmd instanceof SetupGuestNetworkCommand) {
-            verifyArgs((SetupGuestNetworkCommand)cmd, script, args);
+            verifyArgs((SetupGuestNetworkCommand) cmd, script, args);
         } else if (cmd instanceof SetNetworkACLCommand) {
-            verifyArgs((SetNetworkACLCommand)cmd, script, args);
+            verifyArgs((SetNetworkACLCommand) cmd, script, args);
         } else if (cmd instanceof SetSourceNatCommand) {
-            verifyArgs((SetSourceNatCommand)cmd, script, args);
+            verifyArgs((SetSourceNatCommand) cmd, script, args);
         } else if (cmd instanceof IpAssocCommand) {
-            verifyArgs((IpAssocCommand)cmd, script, args);
+            verifyArgs((IpAssocCommand) cmd, script, args);
         }
 
         if (cmd instanceof AggregationControlCommand) {
-            verifyArgs((AggregationControlCommand)cmd, script, args);
+            verifyArgs((AggregationControlCommand) cmd, script, args);
         }
-    }
-
-    private void verifyArgs(final VpnUsersCfgCommand cmd, final String script, final String args) {
-        //To change body of created methods use File | Settings | File Templates.
     }
 
     private void verifyArgs(final SetStaticRouteCommand cmd, final String script, final String args) {
@@ -203,6 +199,184 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
 
     private void verifyArgs(final SetStaticNatRulesCommand cmd, final String script, final String args) {
         //To change body of created methods use File | Settings | File Templates.
+    }
+
+    private void verifyArgs(final LoadBalancerConfigCommand cmd, final String script, final String args) {
+        _count++;
+        switch (_count) {
+            case 2:
+                assertEquals(script, VRScripts.LB);
+                assertEquals(args, " -i 10.1.10.2 -f " + _file + " -a 64.10.1.10:80:, -s 10.1.10.2:8081:0/0:,,");
+                break;
+            default:
+                fail();
+        }
+    }
+
+    private void verifyArgs(final SavePasswordCommand cmd, final String script, final String args) {
+        assertEquals(script, VRScripts.PASSWORD);
+        assertEquals(args, "-v 10.1.10.4 -p 123pass");
+    }
+
+    private void verifyArgs(final DhcpEntryCommand cmd, final String script, final String args) {
+        _count++;
+        assertEquals(script, VRScripts.DHCP);
+        switch (_count) {
+            case 1:
+                assertEquals(args, " -m 12:34:56:78:90:AB -4 10.1.10.2 -h vm1");
+                break;
+            case 2:
+                assertEquals(args, " -m 12:34:56:78:90:AB -h vm1 -6 2001:db8:0:0:0:ff00:42:8329 -u 00:03:00:01:12:34:56:78:90:AB");
+                break;
+            case 3:
+                assertEquals(args, " -m 12:34:56:78:90:AB -4 10.1.10.2 -h vm1 -6 2001:db8:0:0:0:ff00:42:8329 -u 00:03:00:01:12:34:56:78:90:AB");
+                break;
+            default:
+                fail();
+        }
+    }
+
+    private void verifyArgs(final DnsMasqConfigCommand cmd, final String script, final String args) {
+        assertEquals(script, VRScripts.DNSMASQ_CONFIG);
+        assertEquals(args, "10.1.20.2:10.1.20.1:255.255.255.0:10.1.20.5-10.1.21.2:10.1.21.1:255.255.255.0:10.1.21.5-");
+    }
+
+    private void verifyArgs(final VmDataCommand cmd, final String script, final String args) {
+        assertEquals(script, VRScripts.UPDATE_CONFIG);
+        assertEquals(args, VRScripts.VM_METADATA_CONFIG);
+    }
+
+    private void verifyArgs(final RemoteAccessVpnCfgCommand cmd, final String script, final String args) {
+        _count++;
+
+        assertEquals(script, VRScripts.VPN_L2TP);
+        switch (_count) {
+            case 1:
+                assertEquals(args, "-r 10.10.1.10-10.10.1.20 -p sharedkey -s 124.10.10.10 -l 10.10.1.1 -c  -C 10.1.1.1/24 -i eth2");
+                break;
+            case 2:
+                assertEquals(args, "-d  -s 124.10.10.10 -C 10.1.1.1/24 -i eth2");
+                break;
+            case 3:
+                assertEquals(args, "-r 10.10.1.10-10.10.1.20 -p sharedkey -s 124.10.10.10 -l 10.10.1.1 -c  -C 10.1.1.1/24 -i eth1");
+                break;
+            default:
+                fail();
+        }
+    }
+
+    private void verifyArgs(final VpnUsersCfgCommand cmd, final String script, final String args) {
+        //To change body of created methods use File | Settings | File Templates.
+    }
+
+    private void verifyArgs(final Site2SiteVpnCfgCommand cmd, final String script, final String args) {
+        _count++;
+
+        assertEquals(script, VRScripts.S2SVPN_IPSEC);
+        switch (_count) {
+            case 1:
+                assertEquals(args, "-A -l 64.10.1.10 -n 192.168.1.1/16 -g 64.10.1.1 -r 124.10.1.10 -N 192.168.100.1/24 -e \"3des-sha1,aes128-md5\" -i \"3des-sha1,aes128-sha1;" +
+                        "modp1536\" -t 1800 -T 1800 -s \"psk\" -d 1");
+                break;
+            case 2:
+                assertEquals(args, "-A -l 64.10.1.10 -n 192.168.1.1/16 -g 64.10.1.1 -r 124.10.1.10 -N 192.168.100.1/24 -e \"3des-sha1,aes128-md5\" -i \"3des-sha1,aes128-sha1;" +
+                        "modp1536\" -t 1800 -T 1800 -s \"psk\" -d 0 -p ");
+                break;
+            case 3:
+                assertEquals(args, "-D -r 124.10.1.10 -n 192.168.1.1/16 -N 192.168.100.1/24");
+                break;
+            default:
+                fail();
+        }
+    }
+
+    private void verifyArgs(final SetMonitorServiceCommand cmd, final String script, final String args) {
+        assertEquals(script, VRScripts.MONITOR_SERVICE);
+        assertEquals(args, " -c [service]:processname=process:servicename=name:pidfile=file:,[service_2]:processname=process_2:servicename=name_2:pidfile=file_2:,");
+    }
+
+    private void verifyArgs(final SetupGuestNetworkCommand cmd, final String script, final String args) {
+        // TODO Check the contents of the json file
+        //assertEquals(script, VRScripts.VPC_GUEST_NETWORK);
+        //assertEquals(args, " -C -M 01:23:45:67:89:AB -d eth4 -i 10.1.1.2 -g 10.1.1.1 -m 24 -n 10.1.1.0 -s 8.8.8.8,8.8.4.4 -e cloud.test");
+    }
+
+    private void verifyArgs(final SetNetworkACLCommand cmd, final String script, final String args) {
+        _count++;
+        switch (_count) {
+            case 1:
+                // FIXME Check the json content
+                assertEquals(VRScripts.UPDATE_CONFIG, script);
+                assertEquals(VRScripts.NETWORK_ACL_CONFIG, args);
+                // assertEquals(args, " -d eth3 -M 01:23:45:67:89:AB -i 192.168.1.1 -m 24 -a Egress:ALL:0:0:192.168.0.1/24-192.168.0.2/24:ACCEPT:," +
+                //        "Ingress:ICMP:0:0:192.168.0.1/24-192.168.0.2/24:DROP:,Ingress:TCP:20:80:192.168.0.1/24-192.168.0.2/24:ACCEPT:,");
+                break;
+            case 2:
+                assertEquals(VRScripts.UPDATE_CONFIG, script);
+                assertEquals(VRScripts.NETWORK_ACL_CONFIG, args);
+                break;
+            default:
+                fail();
+        }
+    }
+
+    private void verifyArgs(final SetSourceNatCommand cmd, final String script, final String args) {
+        assertEquals(script, VRScripts.VPC_SOURCE_NAT);
+        assertEquals(args, "-A -l 64.1.1.10 -c eth1");
+    }
+
+    private void verifyArgs(final IpAssocCommand cmd, final String script, final String args) {
+        if (cmd instanceof IpAssocVpcCommand) {
+            _count++;
+            switch (_count) {
+                case 1:
+                    assertEquals(VRScripts.UPDATE_CONFIG, script);
+                    assertEquals(VRScripts.IP_ASSOCIATION_CONFIG, args);
+                    break;
+                default:
+                    fail("Failed to recongize the match!");
+            }
+        } else {
+            assertEquals(script, VRScripts.UPDATE_CONFIG);
+            _count++;
+            switch (_count) {
+                case 1:
+                    assertEquals(VRScripts.IP_ASSOCIATION_CONFIG, args);
+                    break;
+                case 2:
+                    assertEquals(VRScripts.IP_ASSOCIATION_CONFIG, args);
+                    break;
+                case 3:
+                    assertEquals(VRScripts.IP_ASSOCIATION_CONFIG, args);
+                    break;
+                default:
+                    fail("Failed to recongize the match!");
+            }
+        }
+    }
+
+    private void verifyArgs(final AggregationControlCommand cmd, final String script, final String args) {
+        assertEquals(script, VRScripts.VR_CFG);
+        assertTrue(args.startsWith("-c /var/cache/cloud/VR-"));
+        assertTrue(args.endsWith(".cfg"));
+    }
+
+    @Before
+    public void setup() {
+        _resource = new VirtualRoutingResource(this);
+        try {
+            _resource.configure("VRResource", new HashMap<>());
+        } catch (final ConfigurationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void verifyFile(final NetworkElementCommand cmd, final String path, final String filename, final String content) {
+        if (cmd instanceof AggregationControlCommand) {
+            verifyFile(cmd, path, filename, content);
+        } else if (cmd instanceof LoadBalancerConfigCommand) {
+            verifyFile((LoadBalancerConfigCommand) cmd, path, filename, content);
+        }
     }
 
     @Test
@@ -264,17 +438,8 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
 
         final Answer answer = _resource.executeRequest(cmd);
         assertTrue(answer instanceof GroupAnswer);
-        assertEquals(2, ((GroupAnswer)answer).getResults().length);
+        assertEquals(2, ((GroupAnswer) answer).getResults().length);
         assertTrue(answer.getResult());
-
-    }
-
-    private ExecutionResult prepareNetworkElementCommand(final IpAssocCommand cmd) {
-        final IpAddressTO[] ips = cmd.getIpAddresses();
-        for (final IpAddressTO ip : ips) {
-            ip.setNicDevId(2);
-        }
-        return new ExecutionResult(true, null);
     }
 
     protected IpAssocCommand generateIpAssocCommand() {
@@ -297,21 +462,12 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
 
         final Answer answer = _resource.executeRequest(cmd);
         assertTrue(answer instanceof GroupAnswer);
-        assertEquals(2, ((GroupAnswer)answer).getResults().length);
+        assertEquals(2, ((GroupAnswer) answer).getResults().length);
         assertTrue(answer.getResult());
-
-    }
-
-    private ExecutionResult prepareNetworkElementCommand(final IpAssocVpcCommand cmd) {
-        final IpAddressTO[] ips = cmd.getIpAddresses();
-        for (final IpAddressTO ip : ips) {
-            ip.setNicDevId(2);
-        }
-        return new ExecutionResult(true, null);
     }
 
     protected IpAssocVpcCommand generateIpAssocVpcCommand() {
-        final List<IpAddressTO> ips = new ArrayList<IpAddressTO>();
+        final List<IpAddressTO> ips = new ArrayList<>();
         ips.add(new IpAddressTO(1, "64.1.1.10", true, true, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false));
         ips.add(new IpAddressTO(2, "64.1.1.11", false, false, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false));
         ips.add(new IpAddressTO(3, "65.1.1.11", true, false, false, "vlan://65", "65.1.1.1", "255.255.255.0", "11:23:45:67:89:AB", 1000, false));
@@ -323,36 +479,6 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
         return cmd;
     }
 
-    private void verifyArgs(final IpAssocCommand cmd, final String script, final String args) {
-        if (cmd instanceof IpAssocVpcCommand) {
-            _count ++;
-            switch (_count) {
-            case 1:
-                assertEquals(VRScripts.UPDATE_CONFIG, script);
-                assertEquals(VRScripts.IP_ASSOCIATION_CONFIG, args);
-                break;
-            default:
-                fail("Failed to recongize the match!");
-            }
-        } else {
-            assertEquals(script, VRScripts.UPDATE_CONFIG);
-            _count ++;
-            switch (_count) {
-            case 1:
-                assertEquals(VRScripts.IP_ASSOCIATION_CONFIG, args);
-                break;
-            case 2:
-                assertEquals(VRScripts.IP_ASSOCIATION_CONFIG, args);
-                break;
-            case 3:
-                assertEquals(VRScripts.IP_ASSOCIATION_CONFIG, args);
-                break;
-            default:
-                fail("Failed to recongize the match!");
-            }
-        }
-    }
-
     @Test
     public void testSourceNatCommand() {
         final SetSourceNatCommand cmd = generateSetSourceNatCommand();
@@ -360,22 +486,11 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
         assertTrue(answer.getResult());
     }
 
-    private ExecutionResult prepareNetworkElementCommand(final SetSourceNatCommand cmd) {
-        final IpAddressTO ip = cmd.getIpAddress();
-        ip.setNicDevId(1);
-        return new ExecutionResult(true, null);
-    }
-
     protected SetSourceNatCommand generateSetSourceNatCommand() {
         final IpAddressTO ip = new IpAddressTO(1, "64.1.1.10", true, true, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false);
         final SetSourceNatCommand cmd = new SetSourceNatCommand(ip, true);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
         return cmd;
-    }
-
-    private void verifyArgs(final SetSourceNatCommand cmd, final String script, final String args) {
-        assertEquals(script, VRScripts.VPC_SOURCE_NAT);
-        assertEquals(args, "-A -l 64.1.1.10 -c eth1");
     }
 
     @Test
@@ -409,42 +524,11 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
         return cmd;
     }
 
-    private void verifyArgs(final SetNetworkACLCommand cmd, final String script, final String args) {
-        _count ++;
-        switch (_count) {
-        case 1:
-            // FIXME Check the json content
-            assertEquals(VRScripts.UPDATE_CONFIG, script);
-            assertEquals(VRScripts.NETWORK_ACL_CONFIG, args);
-            // assertEquals(args, " -d eth3 -M 01:23:45:67:89:AB -i 192.168.1.1 -m 24 -a Egress:ALL:0:0:192.168.0.1/24-192.168.0.2/24:ACCEPT:," +
-            //        "Ingress:ICMP:0:0:192.168.0.1/24-192.168.0.2/24:DROP:,Ingress:TCP:20:80:192.168.0.1/24-192.168.0.2/24:ACCEPT:,");
-            break;
-        case 2:
-            assertEquals(VRScripts.UPDATE_CONFIG, script);
-            assertEquals(VRScripts.NETWORK_ACL_CONFIG, args);
-            break;
-        default:
-            fail();
-        }
-    }
-
-    private ExecutionResult prepareNetworkElementCommand(final SetNetworkACLCommand cmd) {
-        final NicTO nic = cmd.getNic();
-        nic.setDeviceId(3);
-        return new ExecutionResult(true, null);
-    }
-
     @Test
     public void testSetupGuestNetworkCommand() {
         final SetupGuestNetworkCommand cmd = generateSetupGuestNetworkCommand();
         final Answer answer = _resource.executeRequest(cmd);
         assertTrue(answer.getResult());
-    }
-
-    private ExecutionResult prepareNetworkElementCommand(final SetupGuestNetworkCommand cmd) {
-        final NicTO nic = cmd.getNic();
-        nic.setDeviceId(4);
-        return new ExecutionResult(true, null);
     }
 
     protected SetupGuestNetworkCommand generateSetupGuestNetworkCommand() {
@@ -459,12 +543,6 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
 
         return cmd;
-    }
-
-    private void verifyArgs(final SetupGuestNetworkCommand cmd, final String script, final String args) {
-        // TODO Check the contents of the json file
-        //assertEquals(script, VRScripts.VPC_GUEST_NETWORK);
-        //assertEquals(args, " -C -M 01:23:45:67:89:AB -d eth4 -i 10.1.1.2 -g 10.1.1.1 -m 24 -n 10.1.1.0 -s 8.8.8.8,8.8.4.4 -e cloud.test");
     }
 
     @Test
@@ -485,48 +563,27 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
         return cmd;
     }
 
-    private void verifyArgs(final SetMonitorServiceCommand cmd, final String script, final String args) {
-        assertEquals(script, VRScripts.MONITOR_SERVICE);
-        assertEquals(args, " -c [service]:processname=process:servicename=name:pidfile=file:,[service_2]:processname=process_2:servicename=name_2:pidfile=file_2:,");
-    }
-
     @Test
     public void testSite2SiteVpnCfgCommand() {
         _count = 0;
 
-        Site2SiteVpnCfgCommand cmd = new Site2SiteVpnCfgCommand(true, "64.10.1.10", "64.10.1.1", "192.168.1.1/16", "124.10.1.10", "192.168.100.1/24", "3des-sha1,aes128-sha1;modp1536", "3des-sha1,aes128-md5", "psk", Long.valueOf(1800), Long.valueOf(1800), true, false, false);
+        Site2SiteVpnCfgCommand cmd = new Site2SiteVpnCfgCommand(true, "64.10.1.10", "64.10.1.1", "192.168.1.1/16", "124.10.1.10", "192.168.100.1/24", "3des-sha1,aes128-sha1;" +
+                "modp1536", "3des-sha1,aes128-md5", "psk", Long.valueOf(1800), Long.valueOf(1800), true, false, false);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
         Answer answer = _resource.executeRequest(cmd);
         assertTrue(answer.getResult());
 
-        cmd = new Site2SiteVpnCfgCommand(true, "64.10.1.10", "64.10.1.1", "192.168.1.1/16", "124.10.1.10", "192.168.100.1/24", "3des-sha1,aes128-sha1;modp1536", "3des-sha1,aes128-md5", "psk", Long.valueOf(1800), Long.valueOf(1800), false, true, false);
+        cmd = new Site2SiteVpnCfgCommand(true, "64.10.1.10", "64.10.1.1", "192.168.1.1/16", "124.10.1.10", "192.168.100.1/24", "3des-sha1,aes128-sha1;modp1536", "3des-sha1," +
+                "aes128-md5", "psk", Long.valueOf(1800), Long.valueOf(1800), false, true, false);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
         answer = _resource.executeRequest(cmd);
         assertTrue(answer.getResult());
 
-        cmd = new Site2SiteVpnCfgCommand(false, "64.10.1.10", "64.10.1.1", "192.168.1.1/16", "124.10.1.10", "192.168.100.1/24", "3des-sha1,aes128-sha1;modp1536", "3des-sha1,aes128-md5", "psk", Long.valueOf(1800), Long.valueOf(1800), false, true, false);
+        cmd = new Site2SiteVpnCfgCommand(false, "64.10.1.10", "64.10.1.1", "192.168.1.1/16", "124.10.1.10", "192.168.100.1/24", "3des-sha1,aes128-sha1;modp1536", "3des-sha1," +
+                "aes128-md5", "psk", Long.valueOf(1800), Long.valueOf(1800), false, true, false);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
         answer = _resource.executeRequest(cmd);
         assertTrue(answer.getResult());
-    }
-
-    private void verifyArgs(final Site2SiteVpnCfgCommand cmd, final String script, final String args) {
-        _count ++;
-
-        assertEquals(script, VRScripts.S2SVPN_IPSEC);
-        switch (_count) {
-        case 1:
-            assertEquals(args, "-A -l 64.10.1.10 -n 192.168.1.1/16 -g 64.10.1.1 -r 124.10.1.10 -N 192.168.100.1/24 -e \"3des-sha1,aes128-md5\" -i \"3des-sha1,aes128-sha1;modp1536\" -t 1800 -T 1800 -s \"psk\" -d 1");
-            break;
-        case 2:
-            assertEquals(args, "-A -l 64.10.1.10 -n 192.168.1.1/16 -g 64.10.1.1 -r 124.10.1.10 -N 192.168.100.1/24 -e \"3des-sha1,aes128-md5\" -i \"3des-sha1,aes128-sha1;modp1536\" -t 1800 -T 1800 -s \"psk\" -d 0 -p ");
-            break;
-        case 3:
-            assertEquals(args, "-D -r 124.10.1.10 -n 192.168.1.1/16 -N 192.168.100.1/24");
-            break;
-        default:
-            fail();
-        }
     }
 
     @Test
@@ -562,26 +619,6 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
         cmd.setLocalCidr("10.1.1.1/24");
         return cmd;
-    }
-
-    private void verifyArgs(final RemoteAccessVpnCfgCommand cmd, final String script, final String args) {
-        _count ++;
-
-        assertEquals(script, VRScripts.VPN_L2TP);
-        switch (_count) {
-        case 1:
-            assertEquals(args, "-r 10.10.1.10-10.10.1.20 -p sharedkey -s 124.10.10.10 -l 10.10.1.1 -c  -C 10.1.1.1/24 -i eth2");
-            break;
-        case 2:
-            assertEquals(args, "-d  -s 124.10.10.10 -C 10.1.1.1/24 -i eth2");
-            break;
-        case 3:
-            assertEquals(args, "-r 10.10.1.10-10.10.1.20 -p sharedkey -s 124.10.10.10 -l 10.10.1.1 -c  -C 10.1.1.1/24 -i eth1");
-            break;
-        default:
-            fail();
-
-        }
     }
 
     @Test
@@ -634,11 +671,6 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
         return cmd;
     }
 
-    private void verifyArgs(final VmDataCommand cmd, final String script, final String args) {
-        assertEquals(script, VRScripts.UPDATE_CONFIG);
-        assertEquals(args, VRScripts.VM_METADATA_CONFIG);
-    }
-
     @Test
     public void testSavePasswordCommand() {
         final Answer answer = _resource.executeRequest(generateSavePasswordCommand());
@@ -649,11 +681,6 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
         final SavePasswordCommand cmd = new SavePasswordCommand("123pass", "10.1.10.4", "i-4-VM", true);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
         return cmd;
-    }
-
-    private void verifyArgs(final SavePasswordCommand cmd, final String script, final String args) {
-        assertEquals(script, VRScripts.PASSWORD);
-        assertEquals(args, "-v 10.1.10.4 -p 123pass");
     }
 
     @Test
@@ -688,24 +715,6 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
         cmd.setDuid(NetUtils.getDuidLL(cmd.getVmMac()));
         return cmd;
-    }
-
-    private void verifyArgs(final DhcpEntryCommand cmd, final String script, final String args) {
-        _count ++;
-        assertEquals(script, VRScripts.DHCP);
-        switch (_count) {
-        case 1:
-            assertEquals(args, " -m 12:34:56:78:90:AB -4 10.1.10.2 -h vm1");
-            break;
-        case 2:
-            assertEquals(args, " -m 12:34:56:78:90:AB -h vm1 -6 2001:db8:0:0:0:ff00:42:8329 -u 00:03:00:01:12:34:56:78:90:AB");
-            break;
-        case 3:
-            assertEquals(args, " -m 12:34:56:78:90:AB -4 10.1.10.2 -h vm1 -6 2001:db8:0:0:0:ff00:42:8329 -u 00:03:00:01:12:34:56:78:90:AB");
-            break;
-        default:
-            fail();
-        }
     }
 
     @Test
@@ -756,11 +765,6 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
         return cmd;
     }
 
-    private void verifyArgs(final DnsMasqConfigCommand cmd, final String script, final String args) {
-        assertEquals(script, VRScripts.DNSMASQ_CONFIG);
-        assertEquals(args, "10.1.20.2:10.1.20.1:255.255.255.0:10.1.20.5-10.1.21.2:10.1.21.1:255.255.255.0:10.1.21.5-");
-    }
-
     @Test
     public void testLoadBalancerConfigCommand() {
         _count = 0;
@@ -805,65 +809,53 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
     }
 
     protected void verifyFile(final LoadBalancerConfigCommand cmd, final String path, final String filename, final String content) {
-        _count ++;
+        _count++;
         switch (_count) {
-        case 1:
-        case 3:
-            _file = path + filename;
-            assertEquals(path, "/etc/haproxy/");
-            assertTrue(filename.startsWith("haproxy.cfg.new"));
-            assertEquals(content, "global\n" +
-                    "\tlog 127.0.0.1:3914   local0 warning\n" +
-                    "\tmaxconn 1000\n" +
-                    "\tmaxpipes 250\n" +
-                    "\tchroot /var/lib/haproxy\n" +
-                    "\tuser haproxy\n" +
-                    "\tgroup haproxy\n" +
-                    "\tdaemon\n" +
-                    "\t \n" +
-                    "defaults\n" +
-                    "\tlog     global\n" +
-                    "\tmode    tcp\n" +
-                    "\toption  dontlognull\n" +
-                    "\tretries 3\n" +
-                    "\toption redispatch\n" +
-                    "\toption forwardfor\n" +
-                    "\toption forceclose\n" +
-                    "\ttimeout connect    5000\n" +
-                    "\ttimeout client     50000\n" +
-                    "\ttimeout server     50000\n" +
-                    "\n" +
-                    "listen stats_on_guest 10.1.10.2:8081\n" +
-                    "\tmode http\n" +
-                    "\toption httpclose\n" +
-                    "\tstats enable\n" +
-                    "\tstats uri     /admin?stats\n" +
-                    "\tstats realm   Haproxy\\ Statistics\n" +
-                    "\tstats auth    admin1:AdMiN123\n" +
-                    "\n" +
-                    "\t \n" +
-                    "listen 64_10_1_10-80 64.10.1.10:80\n" +
-                    "\tbalance algo\n" +
-                    "\tserver 64_10_1_10-80_0 10.1.10.2:80 check\n" +
-                    "\tmode http\n" +
-                    "\toption httpclose\n" +
-                    "\t \n" +
-                    "\t \n");
-            break;
-        default:
-            fail();
-        }
-    }
-
-    private void verifyArgs(final LoadBalancerConfigCommand cmd, final String script, final String args) {
-        _count ++;
-        switch (_count) {
-        case 2:
-            assertEquals(script, VRScripts.LB);
-            assertEquals(args, " -i 10.1.10.2 -f " + _file + " -a 64.10.1.10:80:, -s 10.1.10.2:8081:0/0:,,");
-            break;
-        default:
-            fail();
+            case 1:
+            case 3:
+                _file = path + filename;
+                assertEquals(path, "/etc/haproxy/");
+                assertTrue(filename.startsWith("haproxy.cfg.new"));
+                assertEquals(content, "global\n" +
+                        "\tlog 127.0.0.1:3914   local0 warning\n" +
+                        "\tmaxconn 1000\n" +
+                        "\tmaxpipes 250\n" +
+                        "\tchroot /var/lib/haproxy\n" +
+                        "\tuser haproxy\n" +
+                        "\tgroup haproxy\n" +
+                        "\tdaemon\n" +
+                        "\t \n" +
+                        "defaults\n" +
+                        "\tlog     global\n" +
+                        "\tmode    tcp\n" +
+                        "\toption  dontlognull\n" +
+                        "\tretries 3\n" +
+                        "\toption redispatch\n" +
+                        "\toption forwardfor\n" +
+                        "\toption forceclose\n" +
+                        "\ttimeout connect    5000\n" +
+                        "\ttimeout client     50000\n" +
+                        "\ttimeout server     50000\n" +
+                        "\n" +
+                        "listen stats_on_guest 10.1.10.2:8081\n" +
+                        "\tmode http\n" +
+                        "\toption httpclose\n" +
+                        "\tstats enable\n" +
+                        "\tstats uri     /admin?stats\n" +
+                        "\tstats realm   Haproxy\\ Statistics\n" +
+                        "\tstats auth    admin1:AdMiN123\n" +
+                        "\n" +
+                        "\t \n" +
+                        "listen 64_10_1_10-80 64.10.1.10:80\n" +
+                        "\tbalance algo\n" +
+                        "\tserver 64_10_1_10-80_0 10.1.10.2:80 check\n" +
+                        "\tmode http\n" +
+                        "\toption httpclose\n" +
+                        "\t \n" +
+                        "\t \n");
+                break;
+            default:
+                fail();
         }
     }
 
@@ -909,11 +901,5 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
             final Answer answer = _resource.executeRequest(cmd);
             assertTrue(answer.getResult());
         }
-    }
-
-    private void verifyArgs(final AggregationControlCommand cmd, final String script, final String args) {
-        assertEquals(script, VRScripts.VR_CFG);
-        assertTrue(args.startsWith("-c /var/cache/cloud/VR-"));
-        assertTrue(args.endsWith(".cfg"));
     }
 }

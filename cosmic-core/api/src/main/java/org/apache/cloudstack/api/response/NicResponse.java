@@ -1,32 +1,15 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.List;
 
 import com.cloud.serializer.Param;
 import com.cloud.vm.Nic;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
 
-@SuppressWarnings("unused")
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
+
 @EntityReference(value = Nic.class)
 public class NicResponse extends BaseResponse {
 
@@ -102,75 +85,67 @@ public class NicResponse extends BaseResponse {
     @Param(description = "Id of the vm to which the nic belongs")
     private String vmId;
 
-    public void setVmId(String vmId) {
+    public void setVmId(final String vmId) {
         this.vmId = vmId;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setNetworkid(String networkid) {
+    public void setNetworkid(final String networkid) {
         this.networkId = networkid;
     }
 
-    public void setNetworkName(String networkname) {
+    public void setNetworkName(final String networkname) {
         this.networkName = networkname;
     }
 
-    public void setNetmask(String netmask) {
+    public void setNetmask(final String netmask) {
         this.netmask = netmask;
     }
 
-    public void setGateway(String gateway) {
+    public void setGateway(final String gateway) {
         this.gateway = gateway;
     }
 
-    public void setIpaddress(String ipaddress) {
+    public void setIpaddress(final String ipaddress) {
         this.ipaddress = ipaddress;
     }
 
-    public void setIsolationUri(String isolationUri) {
+    public void setIsolationUri(final String isolationUri) {
         this.isolationUri = isolationUri;
     }
 
-    public void setBroadcastUri(String broadcastUri) {
+    public void setBroadcastUri(final String broadcastUri) {
         this.broadcastUri = broadcastUri;
     }
 
-    public void setTrafficType(String trafficType) {
+    public void setTrafficType(final String trafficType) {
         this.trafficType = trafficType;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
-    public void setIsDefault(Boolean isDefault) {
+    public void setIsDefault(final Boolean isDefault) {
         this.isDefault = isDefault;
     }
 
-    public void setMacAddress(String macAddress) {
+    public void setMacAddress(final String macAddress) {
         this.macAddress = macAddress;
     }
 
-    public void setIp6Gateway(String ip6Gateway) {
+    public void setIp6Gateway(final String ip6Gateway) {
         this.ip6Gateway = ip6Gateway;
     }
 
-    public void setIp6Cidr(String ip6Cidr) {
+    public void setIp6Cidr(final String ip6Cidr) {
         this.ip6Cidr = ip6Cidr;
     }
 
-    public void setIp6Address(String ip6Address) {
+    public void setIp6Address(final String ip6Address) {
         this.ip6Address = ip6Address;
     }
 
-    public void setDeviceId(String deviceId) {
+    public void setDeviceId(final String deviceId) {
         this.deviceId = deviceId;
     }
 
@@ -178,31 +153,43 @@ public class NicResponse extends BaseResponse {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        String oid = this.getId();
+        final String oid = this.getId();
         result = prime * result + ((oid == null) ? 0 : oid.hashCode());
         return result;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(final String id) {
+        this.id = id;
+    }
+
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        NicResponse other = (NicResponse)obj;
-        String oid = this.getId();
+        }
+        final NicResponse other = (NicResponse) obj;
+        final String oid = this.getId();
         if (oid == null) {
-            if (other.getId() != null)
+            if (other.getId() != null) {
                 return false;
-        } else if (!oid.equals(other.getId()))
+            }
+        } else if (!oid.equals(other.getId())) {
             return false;
+        }
         return true;
     }
 
-    public void setSecondaryIps(List<NicSecondaryIpResponse> ipList) {
+    public void setSecondaryIps(final List<NicSecondaryIpResponse> ipList) {
         this.secondaryIps = ipList;
     }
-
 }

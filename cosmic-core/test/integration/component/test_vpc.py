@@ -1,28 +1,10 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 """ Component tests for VPC functionality
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.cloudstackException import CloudstackAPIException
+import time
 from marvin.cloudstackAPI import updateZone
-from marvin.lib.utils import cleanup_resources
+from marvin.cloudstackException import CloudstackAPIException
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (Account,
                              VPC,
                              VpcOffering,
@@ -41,11 +23,11 @@ from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template,
                                list_configurations)
-import time
+from marvin.lib.utils import cleanup_resources
+from nose.plugins.attrib import attr
 
 
 class Services:
-
     """Test VPC services
     """
 
@@ -191,7 +173,6 @@ class Services:
 
 
 class TestVPC(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestVPC, cls).getClsTestClient()
@@ -574,7 +555,7 @@ class TestVPC(cloudstackTestCase):
         self.network_offering_no_lb.update(self.apiclient, state='Enabled')
         self.cleanup.append(self.network_offering_no_lb)
 
-        gateway = '10.1.2.1'    # New network -> different gateway
+        gateway = '10.1.2.1'  # New network -> different gateway
         self.debug("Creating network with network offering: %s" %
                    self.network_offering_no_lb.id)
         network_2 = Network.create(
@@ -701,7 +682,7 @@ class TestVPC(cloudstackTestCase):
         self.network_offering_no_lb.update(self.apiclient, state='Enabled')
         self.cleanup.append(self.network_offering_no_lb)
 
-        gateway = '10.1.2.1'    # New network -> different gateway
+        gateway = '10.1.2.1'  # New network -> different gateway
         self.debug("Creating network with network offering: %s" %
                    self.network_offering_no_lb.id)
         network_2 = Network.create(
@@ -1658,7 +1639,7 @@ class TestVPC(cloudstackTestCase):
             self.debug("%s" % e)
             pass
         else:
-            assert("VPC created with overlapping CIDR")
+            assert ("VPC created with overlapping CIDR")
         return
 
     @attr(tags=["advanced", "intervlan"], required_hardware="true")
@@ -2340,9 +2321,9 @@ class TestVPC(cloudstackTestCase):
                 domainid=self.account.domainid
             )
 
-        vpc_wo_cidr = {"name": "TestVPC_WO_CIDR",
-                       "displaytext": "TestVPC_WO_CIDR"
-                       }
+        vpc_wo_cidr = { "name": "TestVPC_WO_CIDR",
+                        "displaytext": "TestVPC_WO_CIDR"
+                        }
 
         # Create VPC without CIDR
         with self.assertRaises(Exception):
@@ -2455,7 +2436,7 @@ class TestVPC(cloudstackTestCase):
         # Enable Network offering
         self.network_offering.update(self.apiclient, state='Enabled')
         self.cleanup.append(self.network_offering)
-        #Instead of first ip, assigning last ip in the CIDR as the gateway ip
+        # Instead of first ip, assigning last ip in the CIDR as the gateway ip
         gateway = "192.168.1.2"
         self.services["network"]["netmask"] = "255.255.255.252"
         # Split the cidr to retrieve gateway

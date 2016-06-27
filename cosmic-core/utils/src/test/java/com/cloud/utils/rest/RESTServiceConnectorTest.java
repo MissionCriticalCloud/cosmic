@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils.rest;
@@ -43,7 +28,6 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.http.HttpEntity;
@@ -60,7 +44,8 @@ import org.junit.Test;
 public class RESTServiceConnectorTest {
     private static final BasicStatusLine HTTP_200_STATUS_LINE = new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 200, "OK");
     private static final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-    private static final Map<String, String> DEFAULT_TEST_PARAMETERS = new HashMap<String, String>();
+    private static final Map<String, String> DEFAULT_TEST_PARAMETERS = new HashMap<>();
+
     static {
         DEFAULT_TEST_PARAMETERS.put("arg1", "val1");
         DEFAULT_TEST_PARAMETERS.put("arg2", "val2");
@@ -221,9 +206,9 @@ public class RESTServiceConnectorTest {
         when(httpClient.execute(any(HttpHost.class), any(HttpRequest.class), any(HttpClientContext.class))).thenReturn(response);
         final RestClient restClient = new BasicRestClient(httpClient, HttpClientContext.create(), "localhost");
         final RESTServiceConnector connector = new RESTServiceConnector.Builder()
-            .client(restClient)
-            .classToDeserializerEntry(TestPojo.class, new TestPojoDeserializer())
-            .build();
+                .client(restClient)
+                .classToDeserializerEntry(TestPojo.class, new TestPojoDeserializer())
+                .build();
 
         connector.executeRetrieveObject(TestPojo.class, "/somepath");
     }
@@ -238,9 +223,9 @@ public class RESTServiceConnectorTest {
         final RestClient restClient = new BasicRestClient(httpClient, HttpClientContext.create(), "localhost");
         final Class<? extends CollectionType> clazzListOfTestPojo = new ObjectMapper().getTypeFactory().constructCollectionType(List.class, TestPojo.class).getClass();
         final RESTServiceConnector connector = new RESTServiceConnector.Builder()
-            .client(restClient)
-            .classToDeserializerEntry(clazzListOfTestPojo, new CustomListDeserializer<TestPojoDeserializer>())
-            .build();
+                .client(restClient)
+                .classToDeserializerEntry(clazzListOfTestPojo, new CustomListDeserializer<TestPojoDeserializer>())
+                .build();
 
         connector.executeRetrieveObject(TestPojo.class, "/somepath");
     }
@@ -264,7 +249,6 @@ public class RESTServiceConnectorTest {
         public void setResultCount(final int resultCount) {
             this.resultCount = resultCount;
         }
-
     }
 
     class TestPojo {
@@ -287,7 +271,6 @@ public class RESTServiceConnectorTest {
         public boolean equals(final Object obj) {
             return EqualsBuilder.reflectionEquals(this, obj);
         }
-
     }
 
     private final class TestPojoDeserializer implements JsonDeserializer<TestPojo> {

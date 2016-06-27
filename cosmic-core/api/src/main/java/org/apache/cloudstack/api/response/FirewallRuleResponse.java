@@ -1,34 +1,17 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.List;
 
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
 
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
+
 @EntityReference(value = FirewallRule.class)
-@SuppressWarnings("unused")
 public class FirewallRuleResponse extends BaseResponse {
     @SerializedName(ApiConstants.ID)
     @Param(description = "the ID of the port forwarding rule")
@@ -102,7 +85,7 @@ public class FirewallRuleResponse extends BaseResponse {
         return destNatVmIp;
     }
 
-    public void setDestNatVmIp(String destNatVmIp) {
+    public void setDestNatVmIp(final String destNatVmIp) {
         this.destNatVmIp = destNatVmIp;
     }
 
@@ -115,7 +98,7 @@ public class FirewallRuleResponse extends BaseResponse {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -123,15 +106,15 @@ public class FirewallRuleResponse extends BaseResponse {
         return privateStartPort;
     }
 
+    public void setPrivateStartPort(final String privatePort) {
+        this.privateStartPort = privatePort;
+    }
+
     public String getPrivateEndPort() {
         return privateEndPort;
     }
 
-    public void setPrivateStartPort(String privatePort) {
-        this.privateStartPort = privatePort;
-    }
-
-    public void setPrivateEndPort(String privatePort) {
+    public void setPrivateEndPort(final String privatePort) {
         this.privateEndPort = privatePort;
     }
 
@@ -139,7 +122,7 @@ public class FirewallRuleResponse extends BaseResponse {
         return protocol;
     }
 
-    public void setProtocol(String protocol) {
+    public void setProtocol(final String protocol) {
         this.protocol = protocol;
     }
 
@@ -147,15 +130,15 @@ public class FirewallRuleResponse extends BaseResponse {
         return publicStartPort;
     }
 
+    public void setPublicStartPort(final String publicPort) {
+        this.publicStartPort = publicPort;
+    }
+
     public String getPublicEndPort() {
         return publicEndPort;
     }
 
-    public void setPublicStartPort(String publicPort) {
-        this.publicStartPort = publicPort;
-    }
-
-    public void setPublicEndPort(String publicPort) {
+    public void setPublicEndPort(final String publicPort) {
         this.publicEndPort = publicPort;
     }
 
@@ -163,7 +146,7 @@ public class FirewallRuleResponse extends BaseResponse {
         return virtualMachineId;
     }
 
-    public void setVirtualMachineId(String virtualMachineId) {
+    public void setVirtualMachineId(final String virtualMachineId) {
         this.virtualMachineId = virtualMachineId;
     }
 
@@ -171,7 +154,7 @@ public class FirewallRuleResponse extends BaseResponse {
         return virtualMachineName;
     }
 
-    public void setVirtualMachineName(String virtualMachineName) {
+    public void setVirtualMachineName(final String virtualMachineName) {
         this.virtualMachineName = virtualMachineName;
     }
 
@@ -179,7 +162,7 @@ public class FirewallRuleResponse extends BaseResponse {
         return virtualMachineDisplayName;
     }
 
-    public void setVirtualMachineDisplayName(String virtualMachineDisplayName) {
+    public void setVirtualMachineDisplayName(final String virtualMachineDisplayName) {
         this.virtualMachineDisplayName = virtualMachineDisplayName;
     }
 
@@ -187,7 +170,7 @@ public class FirewallRuleResponse extends BaseResponse {
         return publicIpAddress;
     }
 
-    public void setPublicIpAddress(String publicIpAddress) {
+    public void setPublicIpAddress(final String publicIpAddress) {
         this.publicIpAddress = publicIpAddress;
     }
 
@@ -195,7 +178,7 @@ public class FirewallRuleResponse extends BaseResponse {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
@@ -203,7 +186,7 @@ public class FirewallRuleResponse extends BaseResponse {
         return publicIpAddressId;
     }
 
-    public void setPublicIpAddressId(String publicIpAddressId) {
+    public void setPublicIpAddressId(final String publicIpAddressId) {
         this.publicIpAddressId = publicIpAddressId;
     }
 
@@ -211,19 +194,19 @@ public class FirewallRuleResponse extends BaseResponse {
         return cidrList;
     }
 
-    public void setCidrList(String cidrs) {
+    public void setCidrList(final String cidrs) {
         this.cidrList = cidrs;
     }
 
-    public void setTags(List<ResourceTagResponse> tags) {
+    public void setTags(final List<ResourceTagResponse> tags) {
         this.tags = tags;
     }
 
-    public void setNetworkId(String networkId) {
+    public void setNetworkId(final String networkId) {
         this.networkId = networkId;
     }
 
-    public void setForDisplay(Boolean forDisplay) {
+    public void setForDisplay(final Boolean forDisplay) {
         this.forDisplay = forDisplay;
     }
 }

@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.tags.dao;
-
-import java.util.List;
 
 import com.cloud.server.ResourceTag;
 import com.cloud.server.ResourceTag.ResourceObjectType;
@@ -25,6 +7,8 @@ import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -41,8 +25,8 @@ public class ResourceTagsDaoImpl extends GenericDaoBase<ResourceTagVO, Long> imp
     }
 
     @Override
-    public boolean removeByIdAndType(long resourceId, ResourceTag.ResourceObjectType resourceType) {
-        SearchCriteria<ResourceTagVO> sc = AllFieldsSearch.create();
+    public boolean removeByIdAndType(final long resourceId, final ResourceTag.ResourceObjectType resourceType) {
+        final SearchCriteria<ResourceTagVO> sc = AllFieldsSearch.create();
         sc.setParameters("resourceId", resourceId);
         sc.setParameters("resourceType", resourceType);
         remove(sc);
@@ -50,18 +34,19 @@ public class ResourceTagsDaoImpl extends GenericDaoBase<ResourceTagVO, Long> imp
     }
 
     @Override
-    public List<? extends ResourceTag> listBy(long resourceId, ResourceObjectType resourceType) {
-        SearchCriteria<ResourceTagVO> sc = AllFieldsSearch.create();
+    public List<? extends ResourceTag> listBy(final long resourceId, final ResourceObjectType resourceType) {
+        final SearchCriteria<ResourceTagVO> sc = AllFieldsSearch.create();
         sc.setParameters("resourceId", resourceId);
         sc.setParameters("resourceType", resourceType);
         return listBy(sc);
     }
 
-    @Override public void updateResourceId(long srcId, long destId, ResourceObjectType resourceType) {
-        SearchCriteria<ResourceTagVO> sc = AllFieldsSearch.create();
+    @Override
+    public void updateResourceId(final long srcId, final long destId, final ResourceObjectType resourceType) {
+        final SearchCriteria<ResourceTagVO> sc = AllFieldsSearch.create();
         sc.setParameters("resourceId", srcId);
         sc.setParameters("resourceType", resourceType);
-        for( ResourceTagVO tag : listBy(sc)) {
+        for (final ResourceTagVO tag : listBy(sc)) {
             tag.setResourceId(destId);
             update(tag.getId(), tag);
         }

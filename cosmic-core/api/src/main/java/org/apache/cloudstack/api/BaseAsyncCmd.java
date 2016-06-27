@@ -1,21 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +20,7 @@ public abstract class BaseAsyncCmd extends BaseCmd {
     @Parameter(name = "starteventid", type = CommandType.LONG)
     private Long startEventId;
 
-    @Parameter(name = ApiConstants.CUSTOM_JOB_ID , type = CommandType.STRING)
+    @Parameter(name = ApiConstants.CUSTOM_JOB_ID, type = CommandType.STRING)
     private String injectedJobId;
 
     public String getInjectedJobId() {
@@ -62,22 +45,18 @@ public abstract class BaseAsyncCmd extends BaseCmd {
      */
     public abstract String getEventDescription();
 
-    public void setJob(Object job) {
-        this.job = job;
-    }
-
     public Long getStartEventId() {
         return startEventId;
     }
 
-    public void setStartEventId(Long startEventId) {
+    public void setStartEventId(final Long startEventId) {
         this.startEventId = startEventId;
     }
 
     /**
      * Async commands that want to be tracked as part of the listXXX commands need to
      * provide implementations of the two following methods, getInstanceId() and getInstanceType()
-     *
+     * <p>
      * getObjectId() should return the id of the object the async command is executing on
      * getObjectType() should return a type from the AsyncJob.Type enumeration
      */
@@ -101,4 +80,7 @@ public abstract class BaseAsyncCmd extends BaseCmd {
         return job;
     }
 
+    public void setJob(final Object job) {
+        this.job = job;
+    }
 }

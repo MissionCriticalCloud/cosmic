@@ -1,27 +1,7 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.cluster;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.org.Cluster;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
@@ -31,6 +11,10 @@ import org.apache.cloudstack.api.response.ClusterResponse;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.PodResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,7 +92,7 @@ public class ListClustersCmd extends BaseListCmd {
         return managedState;
     }
 
-    public void setManagedstate(String managedstate) {
+    public void setManagedstate(final String managedstate) {
         this.managedState = managedstate;
     }
 
@@ -121,17 +105,12 @@ public class ListClustersCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
-        Pair<List<? extends Cluster>, Integer> result = _mgr.searchForClusters(this);
-        ListResponse<ClusterResponse> response = new ListResponse<ClusterResponse>();
-        List<ClusterResponse> clusterResponses = new ArrayList<ClusterResponse>();
-        for (Cluster cluster : result.first()) {
-            ClusterResponse clusterResponse = _responseGenerator.createClusterResponse(cluster, showCapacities);
+        final Pair<List<? extends Cluster>, Integer> result = _mgr.searchForClusters(this);
+        final ListResponse<ClusterResponse> response = new ListResponse<>();
+        final List<ClusterResponse> clusterResponses = new ArrayList<>();
+        for (final Cluster cluster : result.first()) {
+            final ClusterResponse clusterResponse = _responseGenerator.createClusterResponse(cluster, showCapacities);
             clusterResponse.setObjectName("cluster");
             clusterResponses.add(clusterResponse);
         }
@@ -139,5 +118,10 @@ public class ListClustersCmd extends BaseListCmd {
         response.setResponses(clusterResponses, result.second());
         response.setResponseName(getCommandName());
         this.setResponseObject(response);
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

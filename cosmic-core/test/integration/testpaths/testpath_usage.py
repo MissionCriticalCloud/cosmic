@@ -1,28 +1,8 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ Test cases for Usage Test Path
 """
-from nose.plugins.attrib import attr
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (
-    cleanup_resources,
-    validateList,
-    get_process_status
-)
+from marvin.codes import (PASS, FAIL, ERROR_NO_HOST_FOR_MIGRATION)
 from marvin.lib.base import (
     Account,
     ServiceOffering,
@@ -61,22 +41,25 @@ from marvin.lib.common import (
     list_routers,
     verifyRouterState
 )
-from marvin.codes import (PASS, FAIL, ERROR_NO_HOST_FOR_MIGRATION)
+from marvin.lib.utils import (
+    cleanup_resources,
+    validateList,
+    get_process_status
+)
 from marvin.sshClient import SshClient
-import time
+from nose.plugins.attrib import attr
 
 
 def CreateEnabledNetworkOffering(apiclient, networkServices):
     """Create network offering of given services and enable it"""
 
     result = createEnabledNetworkOffering(apiclient, networkServices)
-    assert result[0] == PASS,\
+    assert result[0] == PASS, \
         "Network offering creation/enabling failed due to %s" % result[2]
     return result[1]
 
 
 class TestUsage(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestUsage, cls).getClsTestClient()
@@ -97,7 +80,7 @@ class TestUsage(cloudstackTestCase):
             return
 
         if cls.testdata["configurableData"][
-                "setUsageConfigurationThroughTestCase"]:
+            "setUsageConfigurationThroughTestCase"]:
             cls.setUsageConfiguration()
             cls.RestartServers()
         else:
@@ -179,7 +162,7 @@ class TestUsage(cloudstackTestCase):
             # Set the value for one more minute than
             # actual range to be on safer side
             cls.usageJobAggregationRange = (
-                int(configs[0].value) + 1) * 60  # in seconds
+                                               int(configs[0].value) + 1) * 60  # in seconds
         except Exception as e:
             cls.tearDownClass()
             raise e
@@ -1040,8 +1023,8 @@ class TestUsage(cloudstackTestCase):
 
         volumeRawUsageBeforeDetach = sum(float(record.rawusage) for
                                          record in [
-            record for record in volumeUsageRecords
-            if volume.id == record.usageid])
+                                             record for record in volumeUsageRecords
+                                             if volume.id == record.usageid])
 
         # Getting last usage job execution time
         response = self.getLatestUsageJobExecutionTime()
@@ -1082,8 +1065,8 @@ class TestUsage(cloudstackTestCase):
 
         volumeRawUsageAfterDetach_time_1 = sum(float(record.rawusage) for
                                                record in [
-            record for record in volumeUsageRecords
-            if volume.id == record.usageid])
+                                                   record for record in volumeUsageRecords
+                                                   if volume.id == record.usageid])
 
         response = self.listUsageRecords(usagetype=6)
         self.assertEqual(response[0], PASS, response[1])
@@ -1091,8 +1074,8 @@ class TestUsage(cloudstackTestCase):
 
         volumeRawUsageAfterDetach_time_2 = sum(float(record.rawusage) for
                                                record in [
-            record for record in volumeUsageRecords
-            if volume.id == record.usageid])
+                                                   record for record in volumeUsageRecords
+                                                   if volume.id == record.usageid])
 
         self.debug(volumeRawUsageAfterDetach_time_1)
         self.debug(volumeRawUsageAfterDetach_time_2)
@@ -2940,7 +2923,6 @@ class TestUsage(cloudstackTestCase):
 
 
 class TestUsageDataAggregatior(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestUsageDataAggregatior, cls).getClsTestClient()
@@ -2977,18 +2959,18 @@ class TestUsageDataAggregatior(cloudstackTestCase):
         """
         usageTypes = [
             {
-                "usagetypeid": 1, "description": u'Running Vm Usage'}, {
-                "usagetypeid": 2, "description": u'Allocated Vm Usage'}, {
-                "usagetypeid": 3, "description": u'IP Address Usage'}, {
-                "usagetypeid": 4, "description": u'Network Usage (Bytes Sent)'}, {
-                "usagetypeid": 5, "description": u'Network Usage (Bytes Received)'}, {
-                "usagetypeid": 6, "description": u'Volume Usage'}, {
-                "usagetypeid": 7, "description": u'Template Usage'}, {
-                "usagetypeid": 8, "description": u'ISO Usage'}, {
-                "usagetypeid": 9, "description": u'Snapshot Usage'}, {
-                "usagetypeid": 11, "description": u'Load Balancer Usage'}, {
-                "usagetypeid": 12, "description": u'Port Forwarding Usage'}, {
-                "usagetypeid": 13, "description": u'Network Offering Usage'}, {
+                "usagetypeid": 1, "description": u'Running Vm Usage' }, {
+                "usagetypeid": 2, "description": u'Allocated Vm Usage' }, {
+                "usagetypeid": 3, "description": u'IP Address Usage' }, {
+                "usagetypeid": 4, "description": u'Network Usage (Bytes Sent)' }, {
+                "usagetypeid": 5, "description": u'Network Usage (Bytes Received)' }, {
+                "usagetypeid": 6, "description": u'Volume Usage' }, {
+                "usagetypeid": 7, "description": u'Template Usage' }, {
+                "usagetypeid": 8, "description": u'ISO Usage' }, {
+                "usagetypeid": 9, "description": u'Snapshot Usage' }, {
+                "usagetypeid": 11, "description": u'Load Balancer Usage' }, {
+                "usagetypeid": 12, "description": u'Port Forwarding Usage' }, {
+                "usagetypeid": 13, "description": u'Network Offering Usage' }, {
                 "usagetypeid": 14, "description": u'VPN users usage'
             }
         ]
@@ -2999,7 +2981,7 @@ class TestUsageDataAggregatior(cloudstackTestCase):
         for res in respTypes:
             dictTypes = {
                 "usagetypeid": res.usagetypeid,
-                "description": res.description}
+                "description": res.description }
             listTypes.append(dictTypes)
 
         for type in usageTypes:
@@ -3010,7 +2992,6 @@ class TestUsageDataAggregatior(cloudstackTestCase):
 
 
 class TestUsageDirectMeteringBasicZone(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(
@@ -3032,7 +3013,7 @@ class TestUsageDirectMeteringBasicZone(cloudstackTestCase):
             return
 
         if cls.testdata["configurableData"][
-                "setUsageConfigurationThroughTestCase"]:
+            "setUsageConfigurationThroughTestCase"]:
             cls.setUsageConfiguration()
             cls.RestartServers()
         else:
@@ -3072,7 +3053,7 @@ class TestUsageDirectMeteringBasicZone(cloudstackTestCase):
             # Set the value for one more minute than
             # actual range to be on safer side
             cls.usageJobAggregationRange = (
-                int(configs[0].value) + 1) * 60  # in seconds
+                                               int(configs[0].value) + 1) * 60  # in seconds
         except Exception as e:
             cls.tearDownClass()
             raise e

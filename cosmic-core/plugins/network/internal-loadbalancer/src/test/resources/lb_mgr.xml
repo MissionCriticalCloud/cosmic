@@ -1,0 +1,39 @@
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+
+
+
+
+                      http://www.springframework.org/schema/context
+                      http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <context:annotation-config />
+
+    <!-- @DB support -->
+
+    <bean id="componentContext" class="com.cloud.utils.component.ComponentContext" />
+
+    <bean id="transactionContextBuilder" class="com.cloud.utils.db.TransactionContextBuilder" />
+    <bean id="actionEventInterceptor" class="com.cloud.event.ActionEventInterceptor" />
+    <bean id="instantiatePostProcessor" class="com.cloud.utils.component.ComponentInstantiationPostProcessor">
+        <property name="Interceptors">
+            <list>
+                <ref bean="transactionContextBuilder" />
+                <ref bean="actionEventInterceptor" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="InternalLoadBalancerVMManager" class="org.apache.cloudstack.network.lb.InternalLoadBalancerVMManagerImpl">
+        <property name="name" value="InternalLoadBalancerVMManager" />
+    </bean>
+
+    <bean id="UserDao" class="com.cloud.user.dao.UserDaoImpl">
+        <property name="name" value="UserDao" />
+    </bean>
+
+    <bean class="org.apache.cloudstack.internallbvmmgr.LbChildTestConfiguration" />
+
+</beans>

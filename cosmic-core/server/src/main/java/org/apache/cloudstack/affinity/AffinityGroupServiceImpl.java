@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.affinity;
 
 import com.cloud.dao.EntityManager;
@@ -30,7 +14,13 @@ import com.cloud.uservm.UserVm;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.Manager;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.db.*;
+import com.cloud.utils.db.DB;
+import com.cloud.utils.db.SearchBuilder;
+import com.cloud.utils.db.SearchCriteria;
+import com.cloud.utils.db.Transaction;
+import com.cloud.utils.db.TransactionCallback;
+import com.cloud.utils.db.TransactionCallbackNoReturn;
+import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.fsm.StateListener;
 import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.vm.UserVmVO;
@@ -48,18 +38,22 @@ import org.apache.cloudstack.api.command.user.affinitygroup.CreateAffinityGroupC
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
 import org.apache.cloudstack.framework.messagebus.PublishScope;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGroupService, Manager, StateListener<State, VirtualMachine.Event, VirtualMachine> {
 
     public static final Logger s_logger = LoggerFactory.getLogger(AffinityGroupServiceImpl.class);
-    private String _name;
-
+    protected List<AffinityGroupProcessor> _affinityProcessors;
     @Inject
     AccountManager _accountMgr;
 
@@ -71,20 +65,15 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
 
     @Inject
     AffinityGroupDomainMapDao _affinityGroupDomainMapDao;
-
-    @Inject
-    private UserVmDao _userVmDao;
-
     @Inject
     DomainDao _domainDao;
-
     @Inject
     DomainManager _domainMgr;
-
     @Inject
     MessageBus _messageBus;
-
-    protected List<AffinityGroupProcessor> _affinityProcessors;
+    private String _name;
+    @Inject
+    private UserVmDao _userVmDao;
 
     public List<AffinityGroupProcessor> getAffinityGroupProcessors() {
         return _affinityProcessors;
@@ -94,11 +83,34 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
         _affinityProcessors = affinityProcessors;
     }
 
+    @Override
+    public String getName() {
+        return _name;
+    }
+
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+        _name = name;
+        VirtualMachine.State.getStateMachine().registerListener(this);
+        return true;
+    }
+
     @DB
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_AFFINITY_GROUP_CREATE, eventDescription = "Creating Affinity Group", create = true)
     public AffinityGroup createAffinityGroup(final CreateAffinityGroupCmd createAffinityGroupCmd) {
-        return createAffinityGroup(createAffinityGroupCmd.getAccountName(), createAffinityGroupCmd.getProjectId(), createAffinityGroupCmd.getDomainId(), createAffinityGroupCmd.getAffinityGroupName(), createAffinityGroupCmd.getAffinityGroupType(), createAffinityGroupCmd.getDescription());
+        return createAffinityGroup(createAffinityGroupCmd.getAccountName(), createAffinityGroupCmd.getProjectId(), createAffinityGroupCmd.getDomainId(), createAffinityGroupCmd
+                .getAffinityGroupName(), createAffinityGroupCmd.getAffinityGroupType(), createAffinityGroupCmd.getDescription());
+    }
+
+    @Override
+    public boolean start() {
+        return true;
+    }
+
+    @Override
+    public boolean stop() {
+        return true;
     }
 
     @DB
@@ -154,16 +166,38 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
         return group;
     }
 
+    @Override
+    public boolean preStateTransitionEvent(final State oldState, final Event event, final State newState, final VirtualMachine vo, final boolean status, final Object opaque) {
+        return true;
+    }
+
+    @Override
+    public boolean postStateTransitionEvent(final StateMachine2.Transition<State, Event> transition, final VirtualMachine vo, final boolean status, final Object opaque) {
+        if (!status) {
+            return false;
+        }
+        final State newState = transition.getToState();
+        if ((newState == State.Expunging) || (newState == State.Error)) {
+            // cleanup all affinity groups associations of the Expunged VM
+            final SearchCriteria<AffinityGroupVMMapVO> sc = _affinityGroupVMMapDao.createSearchCriteria();
+            sc.addAnd("instanceId", SearchCriteria.Op.EQ, vo.getId());
+            _affinityGroupVMMapDao.expunge(sc);
+        }
+        return true;
+    }
+
     private void verifyAccessToDomainWideProcessor(final Account caller, final AffinityGroupProcessor processor) {
         if (!_accountMgr.isRootAdmin(caller.getId())) {
             throw new InvalidParameterValueException("Unable to create affinity group, account name must be passed with the domainId");
         }
         if (!processor.canBeSharedDomainWide()) {
-            throw new InvalidParameterValueException("Unable to create affinity group, account name is needed. Affinity group type " + processor.getType() + " cannot be shared domain wide");
+            throw new InvalidParameterValueException("Unable to create affinity group, account name is needed. Affinity group type " + processor.getType() + " cannot be shared " +
+                    "domain wide");
         }
     }
 
-    private AffinityGroupVO createAffinityGroup(final AffinityGroupProcessor processor, final Account owner, final ACLType aclType, final String affinityGroupName, final String affinityGroupType, final String description) {
+    private AffinityGroupVO createAffinityGroup(final AffinityGroupProcessor processor, final Account owner, final ACLType aclType, final String affinityGroupName, final String
+            affinityGroupType, final String description) {
         return Transaction.execute(new TransactionCallback<AffinityGroupVO>() {
             @Override
             public AffinityGroupVO doInTransaction(final TransactionStatus status) {
@@ -328,54 +362,11 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
             }
         }
         return false;
-
-    }
-
-    @Override
-    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _name = name;
-        VirtualMachine.State.getStateMachine().registerListener(this);
-        return true;
-    }
-
-    @Override
-    public boolean start() {
-        return true;
-    }
-
-    @Override
-    public boolean stop() {
-        return true;
-    }
-
-    @Override
-    public String getName() {
-        return _name;
     }
 
     @Override
     public AffinityGroup getAffinityGroup(final Long groupId) {
         return _affinityGroupDao.findById(groupId);
-    }
-
-    @Override
-    public boolean preStateTransitionEvent(final State oldState, final Event event, final State newState, final VirtualMachine vo, final boolean status, final Object opaque) {
-        return true;
-    }
-
-    @Override
-    public boolean postStateTransitionEvent(final StateMachine2.Transition<State, Event> transition, final VirtualMachine vo, final boolean status, final Object opaque) {
-        if (!status) {
-            return false;
-        }
-        final State newState = transition.getToState();
-        if ((newState == State.Expunging) || (newState == State.Error)) {
-            // cleanup all affinity groups associations of the Expunged VM
-            final SearchCriteria<AffinityGroupVMMapVO> sc = _affinityGroupVMMapDao.createSearchCriteria();
-            sc.addAnd("instanceId", SearchCriteria.Op.EQ, vo.getId());
-            _affinityGroupVMMapDao.expunge(sc);
-        }
-        return true;
     }
 
     @Override
@@ -419,7 +410,6 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
         }
         // APIResponseHelper will pull out the updated affinitygroups.
         return vmInstance;
-
     }
 
     @Override
@@ -465,5 +455,4 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
 
         return false;
     }
-
 }

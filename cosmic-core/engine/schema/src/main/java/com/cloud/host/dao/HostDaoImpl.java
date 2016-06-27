@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.host.dao;
 
 import com.cloud.agent.api.VgpuTypesInfo;
@@ -33,14 +17,20 @@ import com.cloud.info.RunningHostCountInfo;
 import com.cloud.org.Managed;
 import com.cloud.resource.ResourceState;
 import com.cloud.utils.DateUtil;
-import com.cloud.utils.db.*;
+import com.cloud.utils.db.Attribute;
+import com.cloud.utils.db.DB;
+import com.cloud.utils.db.Filter;
+import com.cloud.utils.db.GenericDaoBase;
+import com.cloud.utils.db.GenericSearchBuilder;
+import com.cloud.utils.db.JoinBuilder;
 import com.cloud.utils.db.JoinBuilder.JoinType;
+import com.cloud.utils.db.SearchBuilder;
+import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
+import com.cloud.utils.db.TransactionLegacy;
+import com.cloud.utils.db.UpdateBuilder;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Local;
@@ -49,7 +39,16 @@ import javax.persistence.TableGenerator;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 @Component
 @Local(value = {HostDao.class})
@@ -282,7 +281,8 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
         ClusterManagedSearch = _clusterDao.createSearchBuilder();
         ClusterManagedSearch.and("managed", ClusterManagedSearch.entity().getManagedState(), SearchCriteria.Op.EQ);
         UnmanagedDirectConnectSearch.join("ClusterManagedSearch", ClusterManagedSearch, ClusterManagedSearch.entity().getId(), UnmanagedDirectConnectSearch.entity()
-                .getClusterId(), JoinType.INNER);
+                                                                                                                                                           .getClusterId(),
+                JoinType.INNER);
         UnmanagedDirectConnectSearch.done();
 
         DirectConnectSearch = createSearchBuilder();
@@ -396,92 +396,51 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
     }
 
     @Override
-    public List<HostVO> listByDataCenterId(final long id) {
-        final SearchCriteria<HostVO> sc = DcSearch.create();
-        sc.setParameters("dc", id);
-        sc.setParameters("status", Status.Up);
-        sc.setParameters("type", Host.Type.Routing);
-        sc.setParameters("resourceState", ResourceState.Enabled);
+    public void markHostsAsDisconnected(final long msId, final long lastPing) {
+        SearchCriteria<HostVO> sc = MsStatusSearch.create();
+        sc.setParameters("ms", msId);
 
-        return listBy(sc);
+        HostVO host = createForUpdate();
+        host.setLastPinged(lastPing);
+        host.setDisconnectedOn(new Date());
+        UpdateBuilder ub = getUpdateBuilder(host);
+        ub.set(host, "status", Status.Disconnected);
+
+        update(ub, sc, null);
+
+        sc = MsStatusSearch.create();
+        sc.setParameters("ms", msId);
+
+        host = createForUpdate();
+        host.setManagementServerId(null);
+        host.setLastPinged(lastPing);
+        host.setDisconnectedOn(new Date());
+        ub = getUpdateBuilder(host);
+        update(ub, sc, null);
     }
 
+    @DB
     @Override
-    public HostVO findByGuid(final String guid) {
-        final SearchCriteria<HostVO> sc = GuidSearch.create("guid", guid);
-        return findOneBy(sc);
-    }
-
-    /*
-     * Find hosts which is in Disconnected, Down, Alert and ping timeout and server is not null, set server to null
-     */
-    private void resetHosts(final long managementServerId, final long lastPingSecondsAfter) {
-        final SearchCriteria<HostVO> sc = HostsForReconnectSearch.create();
-        sc.setParameters("server", managementServerId);
-        sc.setParameters("lastPinged", lastPingSecondsAfter);
-        sc.setParameters("status", Status.Disconnected, Status.Down, Status.Alert);
-
-        final StringBuilder sb = new StringBuilder();
-        final List<HostVO> hosts = lockRows(sc, null, true); // exclusive lock
-        for (final HostVO host : hosts) {
-            host.setManagementServerId(null);
-            update(host.getId(), host);
-            sb.append(host.getId());
-            sb.append(" ");
+    public List<HostVO> findLostHosts(final long timeout) {
+        final List<HostVO> result = new ArrayList<>();
+        final String sql =
+                "select h.id from host h left join  cluster c on h.cluster_id=c.id where h.mgmt_server_id is not null and h.last_ping < ? and h.status in ('Up', 'Updating', " +
+                        "'Disconnected', 'Connecting') and h.type not in ('ExternalFirewall', 'ExternalLoadBalancer', 'TrafficMonitor', 'SecondaryStorage', " +
+                        "'LocalSecondaryStorage', 'L2Networking') and (h.cluster_id is null or c.managed_state = 'Managed') ;";
+        try (
+                TransactionLegacy txn = TransactionLegacy.currentTxn();
+                PreparedStatement pstmt = txn.prepareStatement(sql)) {
+            pstmt.setLong(1, timeout);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    final long id = rs.getLong(1); //ID column
+                    result.add(findById(id));
+                }
+            }
+        } catch (final SQLException e) {
+            s_logger.warn("Exception: ", e);
         }
-
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("Following hosts got reset: " + sb.toString());
-        }
-    }
-
-    /*
-     * Returns a list of cluster owned by @managementServerId
-     */
-    private List<Long> findClustersOwnedByManagementServer(final long managementServerId) {
-        final SearchCriteria<Long> sc = ClustersOwnedByMSSearch.create();
-        sc.setParameters("server", managementServerId);
-
-        final List<Long> clusters = customSearch(sc, null);
-        return clusters;
-    }
-
-    /*
-     * Returns clusters based on the list of hosts not owned by any MS
-     */
-    private List<Long> findClustersForHostsNotOwnedByAnyManagementServer() {
-        final SearchCriteria<Long> sc = ClustersForHostsNotOwnedByAnyMSSearch.create();
-
-        final List<Long> clusters = customSearch(sc, null);
-        return clusters;
-    }
-
-    /*
-     * Returns a list of all cluster Ids
-     */
-    private List<Long> listAllClusters() {
-        final SearchCriteria<Long> sc = AllClustersSearch.create();
-        sc.setParameters("managed", Managed.ManagedState.Managed);
-
-        final List<Long> clusters = _clusterDao.customSearch(sc, null);
-        return clusters;
-    }
-
-    /*
-     * This determines if hosts belonging to cluster(@clusterId) are up for grabs
-     *
-     * This is used for handling following cases:
-     * 1. First host added in cluster
-     * 2. During MS restart all hosts in a cluster are without any MS
-     */
-    private boolean canOwnCluster(final long clusterId) {
-        final SearchCriteria<HostVO> sc = HostsInClusterSearch.create();
-        sc.setParameters("cluster", clusterId);
-
-        final List<HostVO> hosts = search(sc, null);
-        final boolean ownCluster = (hosts == null || hosts.size() == 0);
-
-        return ownCluster;
+        return result;
     }
 
     @Override
@@ -585,48 +544,69 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
 
     @Override
     @DB
-    public List<HostVO> findAndUpdateApplianceToLoad(final long lastPingSecondsAfter, final long managementServerId) {
+    public List<RunningHostCountInfo> getRunningHostCounts(final Date cutTime) {
+        final String sql =
+                "select * from (" + "select h.data_center_id, h.type, count(*) as count from host as h INNER JOIN mshost as m ON h.mgmt_server_id=m.msid "
+                        + "where h.status='Up' and h.type='SecondaryStorage' and m.last_update > ? " + "group by h.data_center_id, h.type " + "UNION ALL "
+                        + "select h.data_center_id, h.type, count(*) as count from host as h INNER JOIN mshost as m ON h.mgmt_server_id=m.msid "
+                        + "where h.status='Up' and h.type='Routing' and m.last_update > ? " + "group by h.data_center_id, h.type) as t " + "ORDER by t.data_center_id, t.type";
+
+        final ArrayList<RunningHostCountInfo> l = new ArrayList<>();
+
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = txn.prepareAutoCloseStatement(sql);
+            final String gmtCutTime = DateUtil.getDateDisplayString(TimeZone.getTimeZone("GMT"), cutTime);
+            pstmt.setString(1, gmtCutTime);
+            pstmt.setString(2, gmtCutTime);
 
-        txn.start();
-        final SearchCriteria<HostVO> sc = UnmanagedApplianceSearch.create();
-        sc.setParameters("lastPinged", lastPingSecondsAfter);
-        sc.setParameters("types", Type.ExternalDhcp, Type.ExternalFirewall, Type.ExternalLoadBalancer, Type.TrafficMonitor,
-                Type.L2Networking);
-        final List<HostVO> hosts = lockRows(sc, null, true);
+            final ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                final RunningHostCountInfo info = new RunningHostCountInfo();
+                info.setDcId(rs.getLong(1));
+                info.setHostType(rs.getString(2));
+                info.setCount(rs.getInt(3));
 
-        for (final HostVO host : hosts) {
-            host.setManagementServerId(managementServerId);
-            update(host.getId(), host);
+                l.add(info);
+            }
+        } catch (final SQLException e) {
+            s_logger.debug("SQLException caught", e);
         }
-
-        txn.commit();
-
-        return hosts;
+        return l;
     }
 
     @Override
-    public void markHostsAsDisconnected(final long msId, final long lastPing) {
-        SearchCriteria<HostVO> sc = MsStatusSearch.create();
-        sc.setParameters("ms", msId);
+    public long getNextSequence(final long hostId) {
+        if (s_logger.isTraceEnabled()) {
+            s_logger.trace("getNextSequence(), hostId: " + hostId);
+        }
 
-        HostVO host = createForUpdate();
-        host.setLastPinged(lastPing);
-        host.setDisconnectedOn(new Date());
-        UpdateBuilder ub = getUpdateBuilder(host);
-        ub.set(host, "status", Status.Disconnected);
+        final TableGenerator tg = _tgs.get("host_req_sq");
+        assert tg != null : "how can this be wrong!";
 
-        update(ub, sc, null);
+        return s_seqFetcher.getNextSequence(Long.class, tg, hostId);
+    }
 
-        sc = MsStatusSearch.create();
-        sc.setParameters("ms", msId);
+    @Override
+    public void loadDetails(final HostVO host) {
+        final Map<String, String> details = _detailsDao.findDetails(host.getId());
+        host.setDetails(details);
+    }
 
-        host = createForUpdate();
-        host.setManagementServerId(null);
-        host.setLastPinged(lastPing);
-        host.setDisconnectedOn(new Date());
-        ub = getUpdateBuilder(host);
-        update(ub, sc, null);
+    @Override
+    public void saveDetails(final HostVO host) {
+        final Map<String, String> details = host.getDetails();
+        if (details == null) {
+            return;
+        }
+        _detailsDao.persist(host.getId(), details);
+    }
+
+    @Override
+    public void loadHostTags(final HostVO host) {
+        final List<String> hostTags = _hostTagsDao.gethostTags(host.getId());
+        host.setHostTags(hostTags);
     }
 
     @Override
@@ -658,6 +638,173 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
         sc.setParameters("dc", dcId);
         sc.setParameters("status", Status.Up.toString());
         sc.setParameters("resourceState", ResourceState.Enabled.toString());
+
+        return listBy(sc);
+    }
+
+    /*TODO: this is used by mycloud, check if it needs resource state Enabled */
+    @Override
+    public long countRoutingHostsByDataCenter(final long dcId) {
+        final SearchCriteria<Long> sc = CountRoutingByDc.create();
+        sc.setParameters("dc", dcId);
+        sc.setParameters("type", Host.Type.Routing);
+        sc.setParameters("status", Status.Up.toString());
+        return customSearch(sc, null).get(0);
+    }
+
+    @Override
+    @DB
+    public List<HostVO> findAndUpdateApplianceToLoad(final long lastPingSecondsAfter, final long managementServerId) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+
+        txn.start();
+        final SearchCriteria<HostVO> sc = UnmanagedApplianceSearch.create();
+        sc.setParameters("lastPinged", lastPingSecondsAfter);
+        sc.setParameters("types", Type.ExternalDhcp, Type.ExternalFirewall, Type.ExternalLoadBalancer, Type.TrafficMonitor,
+                Type.L2Networking);
+        final List<HostVO> hosts = lockRows(sc, null, true);
+
+        for (final HostVO host : hosts) {
+            host.setManagementServerId(managementServerId);
+            update(host.getId(), host);
+        }
+
+        txn.commit();
+
+        return hosts;
+    }
+
+    @Override
+    @DB
+    public boolean update(final Long hostId, final HostVO host) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        txn.start();
+
+        final boolean persisted = super.update(hostId, host);
+        if (!persisted) {
+            return persisted;
+        }
+
+        saveDetails(host);
+        saveHostTags(host);
+        saveGpuRecords(host);
+
+        txn.commit();
+
+        return persisted;
+    }
+
+    protected void saveHostTags(final HostVO host) {
+        final List<String> hostTags = host.getHostTags();
+        if (hostTags == null || (hostTags != null && hostTags.isEmpty())) {
+            return;
+        }
+        _hostTagsDao.persist(host.getId(), hostTags);
+    }
+
+    protected void saveGpuRecords(final HostVO host) {
+        final HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails = host.getGpuGroupDetails();
+        if (groupDetails != null) {
+            // Create/Update GPU group entries
+            _hostGpuGroupsDao.persist(host.getId(), new ArrayList<>(groupDetails.keySet()));
+            // Create/Update VGPU types entries
+            _vgpuTypesDao.persist(host.getId(), groupDetails);
+        }
+    }
+
+    @Override
+    @DB
+    public HostVO persist(final HostVO host) {
+        final String InsertSequenceSql = "INSERT INTO op_host(id) VALUES(?)";
+
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        txn.start();
+
+        final HostVO dbHost = super.persist(host);
+
+        try {
+            final PreparedStatement pstmt = txn.prepareAutoCloseStatement(InsertSequenceSql);
+            pstmt.setLong(1, dbHost.getId());
+            pstmt.executeUpdate();
+        } catch (final SQLException e) {
+            throw new CloudRuntimeException("Unable to persist the sequence number for this host");
+        }
+
+        saveDetails(host);
+        loadDetails(dbHost);
+        saveHostTags(host);
+        loadHostTags(dbHost);
+        saveGpuRecords(host);
+
+        txn.commit();
+
+        return dbHost;
+    }
+
+    @Override
+    public boolean updateResourceState(final ResourceState oldState, final ResourceState.Event event, final ResourceState newState, final Host vo) {
+        final HostVO host = (HostVO) vo;
+        final SearchBuilder<HostVO> sb = createSearchBuilder();
+        sb.and("resource_state", sb.entity().getResourceState(), SearchCriteria.Op.EQ);
+        sb.and("id", sb.entity().getId(), SearchCriteria.Op.EQ);
+        sb.done();
+
+        final SearchCriteria<HostVO> sc = sb.create();
+
+        sc.setParameters("resource_state", oldState);
+        sc.setParameters("id", host.getId());
+
+        final UpdateBuilder ub = getUpdateBuilder(host);
+        ub.set(host, _resourceStateAttr, newState);
+        final int result = update(ub, sc, null);
+        assert result <= 1 : "How can this update " + result + " rows? ";
+
+        if (state_logger.isDebugEnabled() && result == 0) {
+            final HostVO ho = findById(host.getId());
+            assert ho != null : "How how how? : " + host.getId();
+
+            final StringBuilder str = new StringBuilder("Unable to update resource state: [");
+            str.append("m = " + host.getId());
+            str.append("; name = " + host.getName());
+            str.append("; old state = " + oldState);
+            str.append("; event = " + event);
+            str.append("; new state = " + newState + "]");
+            state_logger.debug(str.toString());
+        } else {
+            final StringBuilder msg = new StringBuilder("Resource state update: [");
+            msg.append("id = " + host.getId());
+            msg.append("; name = " + host.getName());
+            msg.append("; old state = " + oldState);
+            msg.append("; event = " + event);
+            msg.append("; new state = " + newState + "]");
+            state_logger.debug(msg.toString());
+        }
+
+        return result > 0;
+    }
+
+    @Override
+    public HostVO findByGuid(final String guid) {
+        final SearchCriteria<HostVO> sc = GuidSearch.create("guid", guid);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public HostVO findByTypeNameAndZoneId(final long zoneId, final String name, final Host.Type type) {
+        final SearchCriteria<HostVO> sc = TypeNameZoneSearch.create();
+        sc.setParameters("type", type);
+        sc.setParameters("name", name);
+        sc.setParameters("zoneId", zoneId);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public List<HostVO> findHypervisorHostInCluster(final long clusterId) {
+        final SearchCriteria<HostVO> sc = TypeClusterStatusSearch.create();
+        sc.setParameters("type", Host.Type.Routing);
+        sc.setParameters("cluster", clusterId);
+        sc.setParameters("status", Status.Up);
+        sc.setParameters("resourceState", ResourceState.Enabled);
 
         return listBy(sc);
     }
@@ -711,169 +858,121 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
     }
 
     @Override
-    public void loadDetails(final HostVO host) {
-        final Map<String, String> details = _detailsDao.findDetails(host.getId());
-        host.setDetails(details);
+    public List<HostVO> findByPodId(final Long podId) {
+        final SearchCriteria<HostVO> sc = PodSearch.create();
+        sc.setParameters("podId", podId);
+        return listBy(sc);
     }
 
     @Override
-    public void loadHostTags(final HostVO host) {
-        final List<String> hostTags = _hostTagsDao.gethostTags(host.getId());
-        host.setHostTags(hostTags);
-    }
-
-    @DB
-    @Override
-    public List<HostVO> findLostHosts(final long timeout) {
-        final List<HostVO> result = new ArrayList<>();
-        final String sql =
-                "select h.id from host h left join  cluster c on h.cluster_id=c.id where h.mgmt_server_id is not null and h.last_ping < ? and h.status in ('Up', 'Updating', 'Disconnected', 'Connecting') and h.type not in ('ExternalFirewall', 'ExternalLoadBalancer', 'TrafficMonitor', 'SecondaryStorage', 'LocalSecondaryStorage', 'L2Networking') and (h.cluster_id is null or c.managed_state = 'Managed') ;";
-        try (
-                TransactionLegacy txn = TransactionLegacy.currentTxn();
-                PreparedStatement pstmt = txn.prepareStatement(sql)) {
-            pstmt.setLong(1, timeout);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    final long id = rs.getLong(1); //ID column
-                    result.add(findById(id));
-                }
-            }
-        } catch (final SQLException e) {
-            s_logger.warn("Exception: ", e);
-        }
-        return result;
+    public List<HostVO> findByClusterId(final Long clusterId) {
+        final SearchCriteria<HostVO> sc = ClusterSearch.create();
+        sc.setParameters("clusterId", clusterId);
+        return listBy(sc);
     }
 
     @Override
-    public void saveDetails(final HostVO host) {
-        final Map<String, String> details = host.getDetails();
-        if (details == null) {
-            return;
-        }
-        _detailsDao.persist(host.getId(), details);
-    }
-
-    protected void saveHostTags(final HostVO host) {
-        final List<String> hostTags = host.getHostTags();
-        if (hostTags == null || (hostTags != null && hostTags.isEmpty())) {
-            return;
-        }
-        _hostTagsDao.persist(host.getId(), hostTags);
-    }
-
-    protected void saveGpuRecords(final HostVO host) {
-        final HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails = host.getGpuGroupDetails();
-        if (groupDetails != null) {
-            // Create/Update GPU group entries
-            _hostGpuGroupsDao.persist(host.getId(), new ArrayList<>(groupDetails.keySet()));
-            // Create/Update VGPU types entries
-            _vgpuTypesDao.persist(host.getId(), groupDetails);
-        }
-    }
-
-    @Override
-    @DB
-    public HostVO persist(final HostVO host) {
-        final String InsertSequenceSql = "INSERT INTO op_host(id) VALUES(?)";
-
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-
-        final HostVO dbHost = super.persist(host);
-
-        try {
-            final PreparedStatement pstmt = txn.prepareAutoCloseStatement(InsertSequenceSql);
-            pstmt.setLong(1, dbHost.getId());
-            pstmt.executeUpdate();
-        } catch (final SQLException e) {
-            throw new CloudRuntimeException("Unable to persist the sequence number for this host");
-        }
-
-        saveDetails(host);
-        loadDetails(dbHost);
-        saveHostTags(host);
-        loadHostTags(dbHost);
-        saveGpuRecords(host);
-
-        txn.commit();
-
-        return dbHost;
-    }
-
-    @Override
-    @DB
-    public boolean update(final Long hostId, final HostVO host) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-
-        final boolean persisted = super.update(hostId, host);
-        if (!persisted) {
-            return persisted;
-        }
-
-        saveDetails(host);
-        saveHostTags(host);
-        saveGpuRecords(host);
-
-        txn.commit();
-
-        return persisted;
-    }
-
-    @Override
-    @DB
-    public List<RunningHostCountInfo> getRunningHostCounts(final Date cutTime) {
-        final String sql =
-                "select * from (" + "select h.data_center_id, h.type, count(*) as count from host as h INNER JOIN mshost as m ON h.mgmt_server_id=m.msid "
-                        + "where h.status='Up' and h.type='SecondaryStorage' and m.last_update > ? " + "group by h.data_center_id, h.type " + "UNION ALL "
-                        + "select h.data_center_id, h.type, count(*) as count from host as h INNER JOIN mshost as m ON h.mgmt_server_id=m.msid "
-                        + "where h.status='Up' and h.type='Routing' and m.last_update > ? " + "group by h.data_center_id, h.type) as t " + "ORDER by t.data_center_id, t.type";
-
-        final ArrayList<RunningHostCountInfo> l = new ArrayList<>();
-
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
-            pstmt = txn.prepareAutoCloseStatement(sql);
-            final String gmtCutTime = DateUtil.getDateDisplayString(TimeZone.getTimeZone("GMT"), cutTime);
-            pstmt.setString(1, gmtCutTime);
-            pstmt.setString(2, gmtCutTime);
-
-            final ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                final RunningHostCountInfo info = new RunningHostCountInfo();
-                info.setDcId(rs.getLong(1));
-                info.setHostType(rs.getString(2));
-                info.setCount(rs.getInt(3));
-
-                l.add(info);
-            }
-        } catch (final SQLException e) {
-            s_logger.debug("SQLException caught", e);
-        }
-        return l;
-    }
-
-    @Override
-    public long getNextSequence(final long hostId) {
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("getNextSequence(), hostId: " + hostId);
-        }
-
-        final TableGenerator tg = _tgs.get("host_req_sq");
-        assert tg != null : "how can this be wrong!";
-
-        return s_seqFetcher.getNextSequence(Long.class, tg, hostId);
-    }
-
-    /*TODO: this is used by mycloud, check if it needs resource state Enabled */
-    @Override
-    public long countRoutingHostsByDataCenter(final long dcId) {
-        final SearchCriteria<Long> sc = CountRoutingByDc.create();
-        sc.setParameters("dc", dcId);
+    public List<HostVO> listByDataCenterId(final long id) {
+        final SearchCriteria<HostVO> sc = DcSearch.create();
+        sc.setParameters("dc", id);
+        sc.setParameters("status", Status.Up);
         sc.setParameters("type", Host.Type.Routing);
-        sc.setParameters("status", Status.Up.toString());
-        return customSearch(sc, null).get(0);
+        sc.setParameters("resourceState", ResourceState.Enabled);
+
+        return listBy(sc);
+    }
+
+    @Override
+    public List<Long> listAllHosts(final long zoneId) {
+        final SearchCriteria<Long> sc = HostIdSearch.create();
+        sc.addAnd("dataCenterId", SearchCriteria.Op.EQ, zoneId);
+        return customSearch(sc, null);
+    }
+
+    @Override
+    public HostVO findByPublicIp(final String publicIp) {
+        final SearchCriteria<HostVO> sc = PublicIpAddressSearch.create();
+        sc.setParameters("publicIpAddress", publicIp);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public List<HostVO> listByType(final Host.Type type) {
+        final SearchCriteria<HostVO> sc = TypeSearch.create();
+        sc.setParameters("type", type);
+        return listBy(sc);
+    }
+
+    /*
+     * Find hosts which is in Disconnected, Down, Alert and ping timeout and server is not null, set server to null
+     */
+    private void resetHosts(final long managementServerId, final long lastPingSecondsAfter) {
+        final SearchCriteria<HostVO> sc = HostsForReconnectSearch.create();
+        sc.setParameters("server", managementServerId);
+        sc.setParameters("lastPinged", lastPingSecondsAfter);
+        sc.setParameters("status", Status.Disconnected, Status.Down, Status.Alert);
+
+        final StringBuilder sb = new StringBuilder();
+        final List<HostVO> hosts = lockRows(sc, null, true); // exclusive lock
+        for (final HostVO host : hosts) {
+            host.setManagementServerId(null);
+            update(host.getId(), host);
+            sb.append(host.getId());
+            sb.append(" ");
+        }
+
+        if (s_logger.isTraceEnabled()) {
+            s_logger.trace("Following hosts got reset: " + sb.toString());
+        }
+    }
+
+    /*
+     * Returns a list of cluster owned by @managementServerId
+     */
+    private List<Long> findClustersOwnedByManagementServer(final long managementServerId) {
+        final SearchCriteria<Long> sc = ClustersOwnedByMSSearch.create();
+        sc.setParameters("server", managementServerId);
+
+        final List<Long> clusters = customSearch(sc, null);
+        return clusters;
+    }
+
+    /*
+     * Returns clusters based on the list of hosts not owned by any MS
+     */
+    private List<Long> findClustersForHostsNotOwnedByAnyManagementServer() {
+        final SearchCriteria<Long> sc = ClustersForHostsNotOwnedByAnyMSSearch.create();
+
+        final List<Long> clusters = customSearch(sc, null);
+        return clusters;
+    }
+
+    /*
+     * Returns a list of all cluster Ids
+     */
+    private List<Long> listAllClusters() {
+        final SearchCriteria<Long> sc = AllClustersSearch.create();
+        sc.setParameters("managed", Managed.ManagedState.Managed);
+
+        final List<Long> clusters = _clusterDao.customSearch(sc, null);
+        return clusters;
+    }
+
+    /*
+     * This determines if hosts belonging to cluster(@clusterId) are up for grabs
+     *
+     * This is used for handling following cases:
+     * 1. First host added in cluster
+     * 2. During MS restart all hosts in a cluster are without any MS
+     */
+    private boolean canOwnCluster(final long clusterId) {
+        final SearchCriteria<HostVO> sc = HostsInClusterSearch.create();
+        sc.setParameters("cluster", clusterId);
+
+        final List<HostVO> hosts = search(sc, null);
+        final boolean ownCluster = (hosts == null || hosts.size() == 0);
+
+        return ownCluster;
     }
 
     @Override
@@ -942,23 +1041,23 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
                 final StringBuilder str = new StringBuilder("Unable to update host for event:").append(event.toString());
                 str.append(". Name=").append(host.getName());
                 str.append("; New=[status=")
-                        .append(newStatus.toString())
-                        .append(":msid=")
-                        .append(newStatus.lostConnection() ? "null" : host.getManagementServerId())
-                        .append(":lastpinged=")
-                        .append(host.getLastPinged())
-                        .append("]");
+                   .append(newStatus.toString())
+                   .append(":msid=")
+                   .append(newStatus.lostConnection() ? "null" : host.getManagementServerId())
+                   .append(":lastpinged=")
+                   .append(host.getLastPinged())
+                   .append("]");
                 str.append("; Old=[status=").append(oldStatus.toString()).append(":msid=").append(host.getManagementServerId()).append(":lastpinged=").append(oldPingTime)
-                        .append("]");
+                   .append("]");
                 str.append("; DB=[status=")
-                        .append(vo.getStatus().toString())
-                        .append(":msid=")
-                        .append(vo.getManagementServerId())
-                        .append(":lastpinged=")
-                        .append(vo.getLastPinged())
-                        .append(":old update count=")
-                        .append(oldUpdateCount)
-                        .append("]");
+                   .append(vo.getStatus().toString())
+                   .append(":msid=")
+                   .append(vo.getManagementServerId())
+                   .append(":lastpinged=")
+                   .append(vo.getLastPinged())
+                   .append(":old update count=")
+                   .append(oldUpdateCount)
+                   .append("]");
                 status_logger.debug(str.toString());
             } else {
                 final StringBuilder msg = new StringBuilder("Agent status update: [");
@@ -979,103 +1078,5 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
         }
 
         return result > 0;
-    }
-
-    @Override
-    public boolean updateResourceState(final ResourceState oldState, final ResourceState.Event event, final ResourceState newState, final Host vo) {
-        final HostVO host = (HostVO) vo;
-        final SearchBuilder<HostVO> sb = createSearchBuilder();
-        sb.and("resource_state", sb.entity().getResourceState(), SearchCriteria.Op.EQ);
-        sb.and("id", sb.entity().getId(), SearchCriteria.Op.EQ);
-        sb.done();
-
-        final SearchCriteria<HostVO> sc = sb.create();
-
-        sc.setParameters("resource_state", oldState);
-        sc.setParameters("id", host.getId());
-
-        final UpdateBuilder ub = getUpdateBuilder(host);
-        ub.set(host, _resourceStateAttr, newState);
-        final int result = update(ub, sc, null);
-        assert result <= 1 : "How can this update " + result + " rows? ";
-
-        if (state_logger.isDebugEnabled() && result == 0) {
-            final HostVO ho = findById(host.getId());
-            assert ho != null : "How how how? : " + host.getId();
-
-            final StringBuilder str = new StringBuilder("Unable to update resource state: [");
-            str.append("m = " + host.getId());
-            str.append("; name = " + host.getName());
-            str.append("; old state = " + oldState);
-            str.append("; event = " + event);
-            str.append("; new state = " + newState + "]");
-            state_logger.debug(str.toString());
-        } else {
-            final StringBuilder msg = new StringBuilder("Resource state update: [");
-            msg.append("id = " + host.getId());
-            msg.append("; name = " + host.getName());
-            msg.append("; old state = " + oldState);
-            msg.append("; event = " + event);
-            msg.append("; new state = " + newState + "]");
-            state_logger.debug(msg.toString());
-        }
-
-        return result > 0;
-    }
-
-    @Override
-    public HostVO findByTypeNameAndZoneId(final long zoneId, final String name, final Host.Type type) {
-        final SearchCriteria<HostVO> sc = TypeNameZoneSearch.create();
-        sc.setParameters("type", type);
-        sc.setParameters("name", name);
-        sc.setParameters("zoneId", zoneId);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public List<HostVO> findByPodId(final Long podId) {
-        final SearchCriteria<HostVO> sc = PodSearch.create();
-        sc.setParameters("podId", podId);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<HostVO> findByClusterId(final Long clusterId) {
-        final SearchCriteria<HostVO> sc = ClusterSearch.create();
-        sc.setParameters("clusterId", clusterId);
-        return listBy(sc);
-    }
-
-    @Override
-    public HostVO findByPublicIp(final String publicIp) {
-        final SearchCriteria<HostVO> sc = PublicIpAddressSearch.create();
-        sc.setParameters("publicIpAddress", publicIp);
-        return findOneBy(sc);
-    }
-
-
-    @Override
-    public List<HostVO> findHypervisorHostInCluster(final long clusterId) {
-        final SearchCriteria<HostVO> sc = TypeClusterStatusSearch.create();
-        sc.setParameters("type", Host.Type.Routing);
-        sc.setParameters("cluster", clusterId);
-        sc.setParameters("status", Status.Up);
-        sc.setParameters("resourceState", ResourceState.Enabled);
-
-        return listBy(sc);
-    }
-
-    @Override
-    public List<Long> listAllHosts(final long zoneId) {
-        final SearchCriteria<Long> sc = HostIdSearch.create();
-        sc.addAnd("dataCenterId", SearchCriteria.Op.EQ, zoneId);
-        return customSearch(sc, null);
-    }
-
-    @Override
-    public List<HostVO> listByType(final Host.Type type) {
-        final SearchCriteria<HostVO> sc = TypeSearch.create();
-        sc.setParameters("type", type);
-        return listBy(sc);
     }
 }

@@ -1,24 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.engine.orchestration.service;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
@@ -50,210 +30,212 @@ import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.VirtualMachineProfile;
-
 import org.apache.cloudstack.acl.ControlledEntity.ACLType;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.ConfigKey.Scope;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * NetworkManager manages the network for the different end users.
- *
  */
 public interface NetworkOrchestrationService {
-  static final String NetworkLockTimeoutCK = "network.lock.timeout";
-  static final String GuestDomainSuffixCK = "guest.domain.suffix";
-  static final String BlacklistedRoutesCK = "blacklisted.routes";
-  static final String NetworkThrottlingRateCK = "network.throttling.rate";
-  static final String MinVRVersionCK = "minreq.sysvmtemplate.version";
+    static final String NetworkLockTimeoutCK = "network.lock.timeout";
+    static final String GuestDomainSuffixCK = "guest.domain.suffix";
+    static final String BlacklistedRoutesCK = "blacklisted.routes";
+    static final String NetworkThrottlingRateCK = "network.throttling.rate";
+    static final String MinVRVersionCK = "minreq.sysvmtemplate.version";
 
-  static final ConfigKey<String> MinVRVersion = new ConfigKey<String>(String.class, MinVRVersionCK, "Advanced", "4.6.0",
-      "What version should the Virtual Routers report", true, ConfigKey.Scope.Zone, null);
+    static final ConfigKey<String> MinVRVersion = new ConfigKey<>(String.class, MinVRVersionCK, "Advanced", "4.6.0",
+            "What version should the Virtual Routers report", true, ConfigKey.Scope.Zone, null);
 
-  static final ConfigKey<Integer> NetworkLockTimeout = new ConfigKey<Integer>(Integer.class, NetworkLockTimeoutCK,
-      "Network", "600",
-      "Lock wait timeout (seconds) while implementing network", true, Scope.Global, null);
-  static final ConfigKey<String> GuestDomainSuffix = new ConfigKey<String>(String.class, GuestDomainSuffixCK, "Network",
-      "cloud.internal",
-      "Default domain name for vms inside virtualized networks fronted by router", true, ConfigKey.Scope.Zone, null);
-  static final ConfigKey<String> BlacklistedRoutes = new ConfigKey<String>(String.class, BlacklistedRoutesCK,
-      "Advanced", "",
-      "Routes that are blacklisted, can not be used for Static Routes creation for the VPC Private Gateway", true,
-      ConfigKey.Scope.Zone,
-      null);
-  static final ConfigKey<Integer> NetworkThrottlingRate = new ConfigKey<Integer>("Network", Integer.class,
-      NetworkThrottlingRateCK, "200",
-      "Default data transfer rate in megabits per second allowed in network.", true, ConfigKey.Scope.Zone);
+    static final ConfigKey<Integer> NetworkLockTimeout = new ConfigKey<>(Integer.class, NetworkLockTimeoutCK,
+            "Network", "600",
+            "Lock wait timeout (seconds) while implementing network", true, Scope.Global, null);
+    static final ConfigKey<String> GuestDomainSuffix = new ConfigKey<>(String.class, GuestDomainSuffixCK, "Network",
+            "cloud.internal",
+            "Default domain name for vms inside virtualized networks fronted by router", true, ConfigKey.Scope.Zone, null);
+    static final ConfigKey<String> BlacklistedRoutes = new ConfigKey<>(String.class, BlacklistedRoutesCK,
+            "Advanced", "",
+            "Routes that are blacklisted, can not be used for Static Routes creation for the VPC Private Gateway", true,
+            ConfigKey.Scope.Zone,
+            null);
+    static final ConfigKey<Integer> NetworkThrottlingRate = new ConfigKey<>("Network", Integer.class,
+            NetworkThrottlingRateCK, "200",
+            "Default data transfer rate in megabits per second allowed in network.", true, ConfigKey.Scope.Zone);
 
-  List<? extends Network> setupNetwork(Account owner, NetworkOffering offering, DeploymentPlan plan, String name,
-      String displayText, boolean isDefault)
-          throws ConcurrentOperationException;
+    List<? extends Network> setupNetwork(Account owner, NetworkOffering offering, DeploymentPlan plan, String name,
+                                         String displayText, boolean isDefault)
+            throws ConcurrentOperationException;
 
-  List<? extends Network> setupNetwork(Account owner, NetworkOffering offering, Network predefined, DeploymentPlan plan,
-      String name, String displayText,
-      boolean errorIfAlreadySetup, Long domainId, ACLType aclType, Boolean subdomainAccess, Long vpcId,
-      Boolean isDisplayNetworkEnabled)
-          throws ConcurrentOperationException;
+    List<? extends Network> setupNetwork(Account owner, NetworkOffering offering, Network predefined, DeploymentPlan plan,
+                                         String name, String displayText,
+                                         boolean errorIfAlreadySetup, Long domainId, ACLType aclType, Boolean subdomainAccess, Long vpcId,
+                                         Boolean isDisplayNetworkEnabled)
+            throws ConcurrentOperationException;
 
-  void allocate(VirtualMachineProfile vm, LinkedHashMap<? extends Network, List<? extends NicProfile>> networks)
-      throws InsufficientCapacityException,
-      ConcurrentOperationException;
+    void allocate(VirtualMachineProfile vm, LinkedHashMap<? extends Network, List<? extends NicProfile>> networks)
+            throws InsufficientCapacityException,
+            ConcurrentOperationException;
 
-  void prepare(VirtualMachineProfile profile, DeployDestination dest, ReservationContext context)
-      throws InsufficientCapacityException, ConcurrentOperationException,
-      ResourceUnavailableException;
+    void prepare(VirtualMachineProfile profile, DeployDestination dest, ReservationContext context)
+            throws InsufficientCapacityException, ConcurrentOperationException,
+            ResourceUnavailableException;
 
-  void release(VirtualMachineProfile vmProfile, boolean forced)
-      throws ConcurrentOperationException, ResourceUnavailableException;
+    void release(VirtualMachineProfile vmProfile, boolean forced)
+            throws ConcurrentOperationException, ResourceUnavailableException;
 
-  void cleanupNics(VirtualMachineProfile vm);
+    void cleanupNics(VirtualMachineProfile vm);
 
-  void expungeNics(VirtualMachineProfile vm);
+    void expungeNics(VirtualMachineProfile vm);
 
-  List<NicProfile> getNicProfiles(VirtualMachine vm);
+    List<NicProfile> getNicProfiles(VirtualMachine vm);
 
-  Pair<? extends NetworkGuru, ? extends Network> implementNetwork(long networkId, DeployDestination dest,
-      ReservationContext context)
-          throws ConcurrentOperationException, ResourceUnavailableException, InsufficientCapacityException;
+    Pair<? extends NetworkGuru, ? extends Network> implementNetwork(long networkId, DeployDestination dest,
+                                                                    ReservationContext context)
+            throws ConcurrentOperationException, ResourceUnavailableException, InsufficientCapacityException;
 
-  /**
-   * prepares vm nic change for migration
-   *
-   * This method will be called in migration transaction before the vm migration.
-   *
-   * @param vm
-   * @param dest
-   */
-  void prepareNicForMigration(VirtualMachineProfile vm, DeployDestination dest);
+    /**
+     * prepares vm nic change for migration
+     * <p>
+     * This method will be called in migration transaction before the vm migration.
+     *
+     * @param vm
+     * @param dest
+     */
+    void prepareNicForMigration(VirtualMachineProfile vm, DeployDestination dest);
 
-  /**
-   * commit vm nic change for migration
-   *
-   * This method will be called in migration transaction after the successful vm migration.
-   *
-   * @param src
-   * @param dst
-   */
-  void commitNicForMigration(VirtualMachineProfile src, VirtualMachineProfile dst);
+    /**
+     * commit vm nic change for migration
+     * <p>
+     * This method will be called in migration transaction after the successful vm migration.
+     *
+     * @param src
+     * @param dst
+     */
+    void commitNicForMigration(VirtualMachineProfile src, VirtualMachineProfile dst);
 
-  /**
-   * rollback vm nic change for migration
-   *
-   * This method will be called in migaration transaction after vm migration failure.
-   *
-   * @param src
-   * @param dst
-   */
-  void rollbackNicForMigration(VirtualMachineProfile src, VirtualMachineProfile dst);
+    /**
+     * rollback vm nic change for migration
+     * <p>
+     * This method will be called in migaration transaction after vm migration failure.
+     *
+     * @param src
+     * @param dst
+     */
+    void rollbackNicForMigration(VirtualMachineProfile src, VirtualMachineProfile dst);
 
-  boolean shutdownNetwork(long networkId, ReservationContext context, boolean cleanupElements);
+    boolean shutdownNetwork(long networkId, ReservationContext context, boolean cleanupElements);
 
-  boolean destroyNetwork(long networkId, ReservationContext context, boolean forced);
+    boolean destroyNetwork(long networkId, ReservationContext context, boolean forced);
 
-  Network createGuestNetwork(long networkOfferingId, String name, String displayText, String gateway, String cidr,
-      String vlanId, String networkDomain, Account owner,
-      Long domainId, PhysicalNetwork physicalNetwork, long zoneId, ACLType aclType, Boolean subdomainAccess, Long vpcId,
-      String ip6Gateway, String ip6Cidr,
-      Boolean displayNetworkEnabled, String isolatedPvlan)
-          throws ConcurrentOperationException, InsufficientCapacityException, ResourceAllocationException;
+    Network createGuestNetwork(long networkOfferingId, String name, String displayText, String gateway, String cidr,
+                               String vlanId, String networkDomain, Account owner,
+                               Long domainId, PhysicalNetwork physicalNetwork, long zoneId, ACLType aclType, Boolean subdomainAccess, Long vpcId,
+                               String ip6Gateway, String ip6Cidr,
+                               Boolean displayNetworkEnabled, String isolatedPvlan)
+            throws ConcurrentOperationException, InsufficientCapacityException, ResourceAllocationException;
 
-  UserDataServiceProvider getPasswordResetProvider(Network network);
+    UserDataServiceProvider getPasswordResetProvider(Network network);
 
-  UserDataServiceProvider getSSHKeyResetProvider(Network network);
+    UserDataServiceProvider getSSHKeyResetProvider(Network network);
 
-  boolean startNetwork(long networkId, DeployDestination dest, ReservationContext context)
-      throws ConcurrentOperationException, ResourceUnavailableException,
-      InsufficientCapacityException;
+    boolean startNetwork(long networkId, DeployDestination dest, ReservationContext context)
+            throws ConcurrentOperationException, ResourceUnavailableException,
+            InsufficientCapacityException;
 
-  boolean reallocate(VirtualMachineProfile vm, DataCenterDeployment dest)
-      throws InsufficientCapacityException, ConcurrentOperationException;
+    boolean reallocate(VirtualMachineProfile vm, DataCenterDeployment dest)
+            throws InsufficientCapacityException, ConcurrentOperationException;
 
-  /**
-   * @param requested
-   * @param network
-   * @param isDefaultNic
-   * @param deviceId
-   * @param vm
-   * @return
-   * @throws InsufficientVirtualNetworkCapacityException
-   * @throws InsufficientAddressCapacityException
-   * @throws ConcurrentOperationException
-   */
-  Pair<NicProfile, Integer> allocateNic(NicProfile requested, Network network, Boolean isDefaultNic, int deviceId,
-      VirtualMachineProfile vm)
-          throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException,
-          ConcurrentOperationException;
+    /**
+     * @param requested
+     * @param network
+     * @param isDefaultNic
+     * @param deviceId
+     * @param vm
+     * @return
+     * @throws InsufficientVirtualNetworkCapacityException
+     * @throws InsufficientAddressCapacityException
+     * @throws ConcurrentOperationException
+     */
+    Pair<NicProfile, Integer> allocateNic(NicProfile requested, Network network, Boolean isDefaultNic, int deviceId,
+                                          VirtualMachineProfile vm)
+            throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException,
+            ConcurrentOperationException;
 
-  /**
-   * @param vmProfile
-   * @param dest
-   * @param context
-   * @param nicId
-   * @param network
-   * @return
-   * @throws InsufficientVirtualNetworkCapacityException
-   * @throws InsufficientAddressCapacityException
-   * @throws ConcurrentOperationException
-   * @throws InsufficientCapacityException
-   * @throws ResourceUnavailableException
-   */
-  NicProfile prepareNic(VirtualMachineProfile vmProfile, DeployDestination dest, ReservationContext context, long nicId,
-      Network network)
-          throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException,
-          ConcurrentOperationException, InsufficientCapacityException,
-          ResourceUnavailableException;
+    /**
+     * @param vmProfile
+     * @param dest
+     * @param context
+     * @param nicId
+     * @param network
+     * @return
+     * @throws InsufficientVirtualNetworkCapacityException
+     * @throws InsufficientAddressCapacityException
+     * @throws ConcurrentOperationException
+     * @throws InsufficientCapacityException
+     * @throws ResourceUnavailableException
+     */
+    NicProfile prepareNic(VirtualMachineProfile vmProfile, DeployDestination dest, ReservationContext context, long nicId,
+                          Network network)
+            throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException,
+            ConcurrentOperationException, InsufficientCapacityException,
+            ResourceUnavailableException;
 
-  void removeNic(VirtualMachineProfile vm, Nic nic);
+    void removeNic(VirtualMachineProfile vm, Nic nic);
 
-  /**
-   * @param network
-   * @param provider
-   * @return
-   */
-  boolean setupDns(Network network, Provider provider);
+    /**
+     * @param network
+     * @param provider
+     * @return
+     */
+    boolean setupDns(Network network, Provider provider);
 
-  void releaseNic(VirtualMachineProfile vmProfile, Nic nic)
-      throws ConcurrentOperationException, ResourceUnavailableException;
+    void releaseNic(VirtualMachineProfile vmProfile, Nic nic)
+            throws ConcurrentOperationException, ResourceUnavailableException;
 
-  NicProfile createNicForVm(Network network, NicProfile requested, ReservationContext context,
-      VirtualMachineProfile vmProfile, boolean prepare)
-          throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException,
-          ConcurrentOperationException, InsufficientCapacityException,
-          ResourceUnavailableException;
+    NicProfile createNicForVm(Network network, NicProfile requested, ReservationContext context,
+                              VirtualMachineProfile vmProfile, boolean prepare)
+            throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException,
+            ConcurrentOperationException, InsufficientCapacityException,
+            ResourceUnavailableException;
 
-  NetworkProfile convertNetworkToNetworkProfile(long networkId);
+    NetworkProfile convertNetworkToNetworkProfile(long networkId);
 
-  boolean restartNetwork(Long networkId, Account callerAccount, User callerUser, boolean cleanup)
-      throws ConcurrentOperationException, ResourceUnavailableException,
-      InsufficientCapacityException;
+    boolean restartNetwork(Long networkId, Account callerAccount, User callerUser, boolean cleanup)
+            throws ConcurrentOperationException, ResourceUnavailableException,
+            InsufficientCapacityException;
 
-  boolean shutdownNetworkElementsAndResources(ReservationContext context, boolean b, Network network);
+    boolean shutdownNetworkElementsAndResources(ReservationContext context, boolean b, Network network);
 
-  void implementNetworkElementsAndResources(DeployDestination dest, ReservationContext context, Network network,
-      NetworkOffering findById)
-          throws ConcurrentOperationException, InsufficientAddressCapacityException, ResourceUnavailableException,
-          InsufficientCapacityException;
+    void implementNetworkElementsAndResources(DeployDestination dest, ReservationContext context, Network network,
+                                              NetworkOffering findById)
+            throws ConcurrentOperationException, InsufficientAddressCapacityException, ResourceUnavailableException,
+            InsufficientCapacityException;
 
-  Map<String, String> finalizeServicesAndProvidersForNetwork(NetworkOffering offering, Long physicalNetworkId);
+    Map<String, String> finalizeServicesAndProvidersForNetwork(NetworkOffering offering, Long physicalNetworkId);
 
-  List<Provider> getProvidersForServiceInNetwork(Network network, Service service);
+    List<Provider> getProvidersForServiceInNetwork(Network network, Service service);
 
-  StaticNatServiceProvider getStaticNatProviderForNetwork(Network network);
+    StaticNatServiceProvider getStaticNatProviderForNetwork(Network network);
 
-  boolean isNetworkInlineMode(Network network);
+    boolean isNetworkInlineMode(Network network);
 
-  LoadBalancingServiceProvider getLoadBalancingProviderForNetwork(Network network, Scheme lbScheme);
+    LoadBalancingServiceProvider getLoadBalancingProviderForNetwork(Network network, Scheme lbScheme);
 
-  boolean isSecondaryIpSetForNic(long nicId);
+    boolean isSecondaryIpSetForNic(long nicId);
 
-  List<? extends Nic> listVmNics(long vmId, Long nicId, Long networkId);
+    List<? extends Nic> listVmNics(long vmId, Long nicId, Long networkId);
 
-  Nic savePlaceholderNic(Network network, String ip4Address, String ip6Address, Type vmType);
+    Nic savePlaceholderNic(Network network, String ip4Address, String ip6Address, Type vmType);
 
-  DhcpServiceProvider getDhcpServiceProvider(Network network);
+    DhcpServiceProvider getDhcpServiceProvider(Network network);
 
-  void removeDhcpServiceInSubnet(Nic nic);
+    void removeDhcpServiceInSubnet(Nic nic);
 
-  boolean resourceCountNeedsUpdate(NetworkOffering ntwkOff, ACLType aclType);
+    boolean resourceCountNeedsUpdate(NetworkOffering ntwkOff, ACLType aclType);
 
-  void prepareAllNicsForMigration(VirtualMachineProfile vm, DeployDestination dest);
+    void prepareAllNicsForMigration(VirtualMachineProfile vm, DeployDestination dest);
 }

@@ -1,38 +1,21 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 // number of items to display on dashboards
 dashboardItemsToDisplay = 3;
 
-(function($, cloudStack) {
+(function ($, cloudStack) {
     // Admin dashboard
     cloudStack.sections.dashboard = {
         title: 'label.menu.dashboard',
         show: cloudStack.uiCustom.dashboard,
 
-        adminCheck: function(args) {
+        adminCheck: function (args) {
             return isAdmin() ? true : false;
         },
 
         // User dashboard
         user: {
-            dataProvider: function(args) {
+            dataProvider: function (args) {
                 var dataFns = {
-                    instances: function(data) {
+                    instances: function (data) {
                         var totalInstanceCount = 0;
                         $.ajax({
                             url: createURL("listVirtualMachines"),
@@ -42,7 +25,7 @@ dashboardItemsToDisplay = 3;
                                 pageSize: 1
                             },
                             async: false,
-                            success: function(json) {
+                            success: function (json) {
                                 if (json.listvirtualmachinesresponse.count != undefined) {
                                     totalInstanceCount = json.listvirtualmachinesresponse.count;
                                 }
@@ -59,7 +42,7 @@ dashboardItemsToDisplay = 3;
                                 state: "Running"
                             },
                             async: false,
-                            success: function(json) {
+                            success: function (json) {
                                 if (json.listvirtualmachinesresponse.count != undefined) {
                                     RunningInstanceCount = json.listvirtualmachinesresponse.count;
                                 }
@@ -76,7 +59,7 @@ dashboardItemsToDisplay = 3;
                                 state: "Stopped"
                             },
                             async: false,
-                            success: function(json) {
+                            success: function (json) {
                                 if (json.listvirtualmachinesresponse.count != undefined) {
                                     stoppedInstanceCount = json.listvirtualmachinesresponse.count;
                                 }
@@ -90,7 +73,7 @@ dashboardItemsToDisplay = 3;
                         }));
                     },
 
-                    account: function(data) {
+                    account: function (data) {
                         var user = cloudStack.context.users[0];
                         dataFns.events($.extend(data, {
                             accountID: user.userid,
@@ -101,16 +84,16 @@ dashboardItemsToDisplay = 3;
                         }));
                     },
 
-                    events: function(data) {
+                    events: function (data) {
                         $.ajax({
                             url: createURL('listEvents'),
                             data: {
                                 listAll: true,
                                 page: 1,
-                                pageSize: (pageSize > dashboardItemsToDisplay? dashboardItemsToDisplay: pageSize) //if default.page.size > dashboardItemsToDisplay, show dashboardItemsToDisplay items only (since space on dashboard is limited)
+                                pageSize: (pageSize > dashboardItemsToDisplay ? dashboardItemsToDisplay : pageSize) //if default.page.size > dashboardItemsToDisplay, show dashboardItemsToDisplay items only (since space on dashboard is limited)
                                 //pageSize: 1 //for testing only
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 dataFns.ipAddresses($.extend(data, {
                                     events: json.listeventsresponse.event ? json.listeventsresponse.event : []
                                 }));
@@ -118,7 +101,7 @@ dashboardItemsToDisplay = 3;
                         });
                     },
 
-                    ipAddresses: function(data) {
+                    ipAddresses: function (data) {
                         $.ajax({
                             url: createURL('listNetworks'),
                             data: {
@@ -128,7 +111,7 @@ dashboardItemsToDisplay = 3;
                                 type: 'isolated',
                                 supportedServices: 'SourceNat'
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 var netTotal = json.listnetworksresponse.count ?
                                     json.listnetworksresponse.count : 0;
 
@@ -138,7 +121,7 @@ dashboardItemsToDisplay = 3;
                                         page: 1,
                                         pageSize: 1
                                     },
-                                    success: function(json) {
+                                    success: function (json) {
                                         var ipTotal = json.listpublicipaddressesresponse.count ?
                                             json.listpublicipaddressesresponse.count : 0;
 
@@ -153,7 +136,7 @@ dashboardItemsToDisplay = 3;
                     }
                 };
 
-                var complete = function(data) {
+                var complete = function (data) {
                     args.response.success({
                         data: data
                     });
@@ -174,19 +157,19 @@ dashboardItemsToDisplay = 3;
                 }
             },
 
-            dataProvider: function(args) {
+            dataProvider: function (args) {
                 var dataFns = {
-                    zones: function(data) {
+                    zones: function (data) {
                         $.ajax({
                             url: createURL('listZones'),
-                            success: function(json) {
+                            success: function (json) {
                                 dataFns.capacity({
                                     zones: json.listzonesresponse.zone
                                 });
                             }
                         });
                     },
-                    capacity: function(data) {
+                    capacity: function (data) {
                         if (window.fetchLatestflag == 1) {
                             data.fetchLatest = true;
                         } else {
@@ -196,19 +179,19 @@ dashboardItemsToDisplay = 3;
                         dataFns.alerts(data);
                     },
 
-                    alerts: function(data) {
+                    alerts: function (data) {
                         $.ajax({
                             url: createURL('listAlerts'),
                             data: {
                                 page: 1,
-                                pageSize: (pageSize > dashboardItemsToDisplay? dashboardItemsToDisplay: pageSize) //if default.page.size > dashboardItemsToDisplay, show dashboardItemsToDisplay items only (since space on dashboard is limited)
+                                pageSize: (pageSize > dashboardItemsToDisplay ? dashboardItemsToDisplay : pageSize) //if default.page.size > dashboardItemsToDisplay, show dashboardItemsToDisplay items only (since space on dashboard is limited)
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 var alerts = json.listalertsresponse.alert ?
                                     json.listalertsresponse.alert : [];
 
                                 dataFns.hostAlerts($.extend(data, {
-                                    alerts: $.map(alerts, function(alert) {
+                                    alerts: $.map(alerts, function (alert) {
                                         return {
                                             name: cloudStack.converters.toAlertType(alert.type),
                                             description: alert.description,
@@ -220,20 +203,20 @@ dashboardItemsToDisplay = 3;
                         });
                     },
 
-                    hostAlerts: function(data) {
+                    hostAlerts: function (data) {
                         $.ajax({
                             url: createURL('listHosts'),
                             data: {
                                 state: 'Alert',
                                 page: 1,
-                                pageSize: (pageSize > dashboardItemsToDisplay? dashboardItemsToDisplay: pageSize) //if default.page.size > dashboardItemsToDisplay, show dashboardItemsToDisplay items only (since space on dashboard is limited)
+                                pageSize: (pageSize > dashboardItemsToDisplay ? dashboardItemsToDisplay : pageSize) //if default.page.size > dashboardItemsToDisplay, show dashboardItemsToDisplay items only (since space on dashboard is limited)
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 var hosts = json.listhostsresponse.host ?
                                     json.listhostsresponse.host : [];
 
                                 dataFns.zoneCapacity($.extend(data, {
-                                    hostAlerts: $.map(hosts, function(host) {
+                                    hostAlerts: $.map(hosts, function (host) {
                                         return {
                                             name: host.name,
                                             description: 'message.alert.state.detected'
@@ -244,21 +227,21 @@ dashboardItemsToDisplay = 3;
                         });
                     },
 
-                    zoneCapacity: function(data) {
+                    zoneCapacity: function (data) {
                         $.ajax({
                             url: createURL('listCapacity'),
                             data: {
                                 fetchLatest: data.fetchLatest,
                                 sortBy: 'usage',
                                 page: 0,
-                                pageSize: (pageSize > 8? 8: pageSize)
+                                pageSize: (pageSize > 8 ? 8 : pageSize)
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 var capacities = json.listcapacityresponse.capacity ?
                                     json.listcapacityresponse.capacity : [];
 
                                 complete($.extend(data, {
-                                    zoneCapacities: $.map(capacities, function(capacity) {
+                                    zoneCapacities: $.map(capacities, function (capacity) {
                                         if (capacity.podname) {
                                             capacity.zonename = capacity.zonename.concat(', ' + _l('label.pod') + ': ' + capacity.podname);
                                         }
@@ -284,7 +267,7 @@ dashboardItemsToDisplay = 3;
                     }
                 };
 
-                var complete = function(data) {
+                var complete = function (data) {
                     args.response.success({
                         data: data
                     });

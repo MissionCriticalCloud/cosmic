@@ -1,14 +1,13 @@
 """ Tests for Port Forwarding Rules Removing
 """
-from marvin.cloudstackTestCase import *
+import logging
 from marvin.cloudstackAPI import *
-from marvin.lib.utils import *
+from marvin.cloudstackTestCase import *
 from marvin.lib.base import *
 from marvin.lib.common import *
+from marvin.lib.utils import *
 from nose.plugins.attrib import attr
 
-import time
-import logging
 
 class Services:
     """Test network services - Port Forwarding Rules Remove Test Data Class.
@@ -156,8 +155,8 @@ class Services:
             "timeout": 10,
         }
 
-class TestPortforwardRemove(cloudstackTestCase):
 
+class TestPortforwardRemove(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
 
@@ -252,12 +251,12 @@ class TestPortforwardRemove(cloudstackTestCase):
             network_1 = self.createIsolatedNetwork()
         else:
             self.logger.debug("Creating VPC with offering ID %s" % vpc_off.id)
-            vpc_1 = self.createVPC(vpc_off, cidr = '10.0.0.0/16')
+            vpc_1 = self.createVPC(vpc_off, cidr='10.0.0.0/16')
             self.cleanup += [vpc_1, vpc_off, self.account]
             self.logger.debug("Creating network inside VPC")
-            network_1 = self.createNetwork(vpc_1, gateway = '10.0.0.1')
+            network_1 = self.createNetwork(vpc_1, gateway='10.0.0.1')
             acl1 = self.createACL(vpc_1)
-            self.createACLItem(acl1.id, cidr = "0.0.0.0/0")
+            self.createACLItem(acl1.id, cidr="0.0.0.0/0")
             self.replaceNetworkAcl(acl1.id, network_1)
 
         self.logger.debug("Deploying VM and create port forwarding")
@@ -291,25 +290,25 @@ class TestPortforwardRemove(cloudstackTestCase):
         for router in routers:
             self._perform_health_tests(router)
 
-        # We should also survive a restart with cleanup
-        #if vpc_off is None:
-        #    self.restart_network_with_cleanup(network_1, True)
-        #else:
-        #    self.restart_vpc_with_cleanup(vpc_1, True)
-        #self.logger.debug("Give router 30 seconds to reconfigure properly..")
-        #time.sleep(30)
+            # We should also survive a restart with cleanup
+            # if vpc_off is None:
+            #    self.restart_network_with_cleanup(network_1, True)
+            # else:
+            #    self.restart_vpc_with_cleanup(vpc_1, True)
+            # self.logger.debug("Give router 30 seconds to reconfigure properly..")
+            # time.sleep(30)
 
-        #self.logger.debug("Getting the router info again after the cleanup (router names / ip addresses changed)")
-        #routers = list_routers(self.apiclient, account=self.account.name, domainid=self.account.domainid)
+            # self.logger.debug("Getting the router info again after the cleanup (router names / ip addresses changed)")
+            # routers = list_routers(self.apiclient, account=self.account.name, domainid=self.account.domainid)
 
-        #self.assertEqual(isinstance(routers, list), True,
-        #                 "Check for list routers response return valid data")
-        #self.logger.debug("Check whether routers are happy")
-        #self.check_routers_state(routers)
+            # self.assertEqual(isinstance(routers, list), True,
+            #                 "Check for list routers response return valid data")
+            # self.logger.debug("Check whether routers are happy")
+            # self.check_routers_state(routers)
 
-        #self.logger.debug("Test health a final time after restart with cleanup)")
-        #for router in routers:
-        #    self._perform_health_tests(router)
+            # self.logger.debug("Test health a final time after restart with cleanup)")
+            # for router in routers:
+            #    self._perform_health_tests(router)
 
     def _perform_health_tests(self, router):
         self.logger.debug("Checking health of router %s, state %s", router.linklocalip, router.redundantstate)
@@ -346,7 +345,8 @@ class TestPortforwardRemove(cloudstackTestCase):
         except KeyError:
             self.skipTest("Provide a marvin config file with host credentials to run %s" % self._testMethodName)
 
-        self.logger.debug("Result from the Router on IP '%s' is: State of interface '%s' is '%s', expected state is '%s'" % (router.linklocalip, public_nic, interface_state_result[0], expected_public_state))
+        self.logger.debug("Result from the Router on IP '%s' is: State of interface '%s' is '%s', expected state is '%s'" % (
+            router.linklocalip, public_nic, interface_state_result[0], expected_public_state))
         self.assertEqual(interface_state_result[0], expected_public_state, msg="Router should have public nic in the correct state!")
 
     def test_default_route_present(self, router):
@@ -381,7 +381,6 @@ class TestPortforwardRemove(cloudstackTestCase):
 
         self.logger.debug("Result from the Router on IP '%s' is: Interface of default gateway is '%s', expected '%s'" % (router.linklocalip, default_gw_interface[0], public_nic))
         self.assertEqual(default_gw_interface[0], public_nic, msg="Router should have public nic in the correct state!")
-
 
     def destroy_virtual_machine(self, vm):
         try:
@@ -450,7 +449,7 @@ class TestPortforwardRemove(cloudstackTestCase):
 
         return public_ip
 
-    def createVPC(self, vpc_offering, cidr = '10.1.1.1/16'):
+    def createVPC(self, vpc_offering, cidr='10.1.1.1/16'):
         try:
             self.logger.debug("Creating a VPC in the account: %s" % self.account.name)
             self.services["vpc"]["cidr"] = cidr
@@ -501,7 +500,7 @@ class TestPortforwardRemove(cloudstackTestCase):
 
         return acl
 
-    def createACLItem(self, aclId, cidr = "0.0.0.0/0"):
+    def createACLItem(self, aclId, cidr="0.0.0.0/0"):
         createAclItemCmd = createNetworkACL.createNetworkACLCmd()
         createAclItemCmd.cidr = cidr
         createAclItemCmd.protocol = "All"
@@ -516,7 +515,7 @@ class TestPortforwardRemove(cloudstackTestCase):
         except Exception, e:
             self.fail('Unable to create ACL Item due to %s ' % e)
 
-    def createNetwork(self, vpc, net_offering = "network_offering", gateway = '10.1.1.1'):
+    def createNetwork(self, vpc, net_offering="network_offering", gateway='10.1.1.1'):
         try:
             self.logger.debug('Create NetworkOffering')
             net_offerring = self.services[net_offering]
@@ -593,7 +592,7 @@ class TestPortforwardRemove(cloudstackTestCase):
 
         self.assertTrue(successResponse.success, "Failed to replace ACL list.")
 
-    def restart_vpc_with_cleanup(self, vpc, cleanup = True):
+    def restart_vpc_with_cleanup(self, vpc, cleanup=True):
         try:
             self.logger.debug("Restarting VPC %s with cleanup" % vpc.id)
             cmd = restartVPC.restartVPCCmd()
@@ -604,7 +603,7 @@ class TestPortforwardRemove(cloudstackTestCase):
         except Exception, e:
             self.fail('Unable to restart VPC with cleanup due to %s ' % e)
 
-    def restart_network_with_cleanup(self, network, cleanup = True):
+    def restart_network_with_cleanup(self, network, cleanup=True):
         try:
             self.logger.debug("Restarting network %s with cleanup" % network.id)
             cmd = restartNetwork.restartNetworkCmd()

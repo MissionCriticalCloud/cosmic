@@ -1,27 +1,9 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.package org.apache.cloudstack.api.command.user.firewall;
-
 package org.apache.cloudstack.api.command.user.firewall;
 
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.rules.FirewallRule;
-
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
@@ -35,6 +17,7 @@ import org.apache.cloudstack.api.response.AccountResponse;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,14 +47,6 @@ public class DeleteEgressFirewallRuleCmd extends BaseAsyncCmd {
         return id;
     }
 
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
     @Override
     public String getEventType() {
         return EventTypes.EVENT_FIREWALL_EGRESS_CLOSE;
@@ -83,29 +58,8 @@ public class DeleteEgressFirewallRuleCmd extends BaseAsyncCmd {
     }
 
     @Override
-    public long getEntityOwnerId() {
-        if (ownerId == null) {
-            FirewallRule rule = _entityMgr.findById(FirewallRule.class, id);
-            if (rule == null) {
-                throw new InvalidParameterValueException("Unable to find egress firewall rule by id");
-            } else {
-                ownerId = _entityMgr.findById(FirewallRule.class, id).getAccountId();
-            }
-        }
-        return ownerId;
-    }
-
-    @Override
-    public void execute() throws ResourceUnavailableException {
-        CallContext.current().setEventDetails("Rule Id: " + id);
-        boolean result = _firewallService.revokeEgressFirewallRule(id, true);
-
-        if (result) {
-            SuccessResponse response = new SuccessResponse(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete egress firewall rule");
-        }
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.FirewallRule;
     }
 
     @Override
@@ -115,14 +69,44 @@ public class DeleteEgressFirewallRuleCmd extends BaseAsyncCmd {
 
     @Override
     public Long getSyncObjId() {
-        FirewallRule fw = _firewallService.getFirewallRule(id);
-        if (fw != null)
+        final FirewallRule fw = _firewallService.getFirewallRule(id);
+        if (fw != null) {
             return fw.getNetworkId();
+        }
         return null;
-     }
+    }
 
     @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.FirewallRule;
+    public void execute() throws ResourceUnavailableException {
+        CallContext.current().setEventDetails("Rule Id: " + id);
+        final boolean result = _firewallService.revokeEgressFirewallRule(id, true);
+
+        if (result) {
+            final SuccessResponse response = new SuccessResponse(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to delete egress firewall rule");
+        }
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        if (ownerId == null) {
+            final FirewallRule rule = _entityMgr.findById(FirewallRule.class, id);
+            if (rule == null) {
+                throw new InvalidParameterValueException("Unable to find egress firewall rule by id");
+            } else {
+                ownerId = _entityMgr.findById(FirewallRule.class, id).getAccountId();
+            }
+        }
+        return ownerId;
     }
 }

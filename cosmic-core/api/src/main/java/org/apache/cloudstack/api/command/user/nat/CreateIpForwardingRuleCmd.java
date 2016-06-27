@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.nat;
-
-import java.util.List;
 
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
@@ -26,7 +8,6 @@ import com.cloud.network.IpAddress;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.StaticNatRule;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -39,6 +20,9 @@ import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.api.response.IPAddressResponse;
 import org.apache.cloudstack.api.response.IpForwardingRuleResponse;
 import org.apache.cloudstack.context.CallContext;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,10 +38,10 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.IP_ADDRESS_ID,
-               type = CommandType.UUID,
-               entityType = IPAddressResponse.class,
-               required = true,
-               description = "the public IP address ID of the forwarding rule, already associated via associateIp")
+            type = CommandType.UUID,
+            entityType = IPAddressResponse.class,
+            required = true,
+            description = "the public IP address ID of the forwarding rule, already associated via associateIp")
     private Long ipAddressId;
 
     @Parameter(name = ApiConstants.START_PORT, type = CommandType.INTEGER, required = true, description = "the start port for the rule")
@@ -70,8 +54,9 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
     private String protocol;
 
     @Parameter(name = ApiConstants.OPEN_FIREWALL,
-               type = CommandType.BOOLEAN,
-               description = "if true, firewall rule for source/end public port is automatically created; if false - firewall rule has to be created explicitly. Has value true by default")
+            type = CommandType.BOOLEAN,
+            description = "if true, firewall rule for source/end public port is automatically created; if false - firewall rule has to be created explicitly. Has value true by " +
+                    "default")
     private Boolean openFirewall;
 
     @Parameter(name = ApiConstants.CIDR_LIST, type = CommandType.LIST, collectionType = CommandType.STRING, description = "the CIDR list to forward traffic from")
@@ -93,23 +78,6 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
         return endPort;
     }
 
-    public Boolean getOpenFirewall() {
-        if (openFirewall != null) {
-            return openFirewall;
-        } else {
-            return true;
-        }
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
     @Override
     public void execute() throws ResourceUnavailableException {
 
@@ -124,8 +92,8 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
 
             result = result && _rulesService.applyStaticNatRules(ipAddressId, CallContext.current().getCallingAccount());
             rule = _entityMgr.findById(FirewallRule.class, getEntityId());
-            StaticNatRule staticNatRule = _rulesService.buildStaticNatRule(rule, false);
-            IpForwardingRuleResponse fwResponse = _responseGenerator.createIpForwardingRuleResponse(staticNatRule);
+            final StaticNatRule staticNatRule = _rulesService.buildStaticNatRule(rule, false);
+            final IpForwardingRuleResponse fwResponse = _responseGenerator.createIpForwardingRuleResponse(staticNatRule);
             fwResponse.setResponseName(getCommandName());
             setResponseObject(fwResponse);
         } finally {
@@ -142,28 +110,26 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
         }
     }
 
-    @Override
-    public void create() {
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
 
-        //cidr list parameter is deprecated
-        if (cidrlist != null) {
-            throw new InvalidParameterValueException(
-                "Parameter cidrList is deprecated; if you need to open firewall rule for the specific CIDR, please refer to createFirewallRule command");
-        }
-
-        try {
-            StaticNatRule rule = _rulesService.createStaticNatRule(this, getOpenFirewall());
-            setEntityId(rule.getId());
-            setEntityUuid(rule.getUuid());
-        } catch (NetworkRuleConflictException e) {
-            s_logger.info("Unable to create static NAT rule due to ", e);
-            throw new ServerApiException(ApiErrorCode.NETWORK_RULE_CONFLICT_ERROR, e.getMessage());
+    public Boolean getOpenFirewall() {
+        if (openFirewall != null) {
+            return openFirewall;
+        } else {
+            return true;
         }
     }
 
     @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
     public long getEntityOwnerId() {
-        Account account = CallContext.current().getCallingAccount();
+        final Account account = CallContext.current().getCallingAccount();
 
         if (account != null) {
             return account.getId();
@@ -173,23 +139,70 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
     }
 
     @Override
+    public boolean isDisplay() {
+        return true;
+    }
+
+    @Override
+    public void create() {
+
+        //cidr list parameter is deprecated
+        if (cidrlist != null) {
+            throw new InvalidParameterValueException(
+                    "Parameter cidrList is deprecated; if you need to open firewall rule for the specific CIDR, please refer to createFirewallRule command");
+        }
+
+        try {
+            final StaticNatRule rule = _rulesService.createStaticNatRule(this, getOpenFirewall());
+            setEntityId(rule.getId());
+            setEntityUuid(rule.getUuid());
+        } catch (final NetworkRuleConflictException e) {
+            s_logger.info("Unable to create static NAT rule due to ", e);
+            throw new ServerApiException(ApiErrorCode.NETWORK_RULE_CONFLICT_ERROR, e.getMessage());
+        }
+    }
+
+    @Override
     public String getEventType() {
         return EventTypes.EVENT_NET_RULE_ADD;
     }
 
     @Override
     public String getEventDescription() {
-        IpAddress ip = _networkService.getIp(ipAddressId);
+        final IpAddress ip = _networkService.getIp(ipAddressId);
         return ("Applying an ipforwarding 1:1 NAT rule for IP: " + ip.getAddress() + " with virtual machine:" + getVirtualMachineId());
     }
 
     private long getVirtualMachineId() {
-        Long vmId = _networkService.getIp(ipAddressId).getAssociatedWithVmId();
+        final Long vmId = _networkService.getIp(ipAddressId).getAssociatedWithVmId();
 
         if (vmId == null) {
             throw new InvalidParameterValueException("IP address is not associated with any network, unable to create static NAT rule");
         }
         return vmId;
+    }
+
+    @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.FirewallRule;
+    }
+
+    @Override
+    public String getSyncObjType() {
+        return BaseAsyncCmd.networkSyncObject;
+    }
+
+    @Override
+    public Long getSyncObjId() {
+        return getIp().getAssociatedWithNetworkId();
+    }
+
+    private IpAddress getIp() {
+        final IpAddress ip = _networkService.getIp(ipAddressId);
+        if (ip == null) {
+            throw new InvalidParameterValueException("Unable to find IP address by ID " + ipAddressId);
+        }
+        return ip;
     }
 
     @Override
@@ -203,8 +216,21 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
     }
 
     @Override
-    public Long getSourceIpAddressId() {
-        return ipAddressId;
+    public long getDomainId() {
+        final IpAddress ip = _networkService.getIp(ipAddressId);
+        return ip.getDomainId();
+    }
+
+    @Override
+    public long getAccountId() {
+        final IpAddress ip = _networkService.getIp(ipAddressId);
+        return ip.getAccountId();
+    }
+
+    @Override
+    public String getXid() {
+        // FIXME: We should allow for end user to specify Xid.
+        return null;
     }
 
     @Override
@@ -242,45 +268,8 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
     }
 
     @Override
-    public long getDomainId() {
-        IpAddress ip = _networkService.getIp(ipAddressId);
-        return ip.getDomainId();
-    }
-
-    @Override
-    public long getAccountId() {
-        IpAddress ip = _networkService.getIp(ipAddressId);
-        return ip.getAccountId();
-    }
-
-    @Override
-    public String getXid() {
-        // FIXME: We should allow for end user to specify Xid.
-        return null;
-    }
-
-    @Override
-    public String getUuid() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getSyncObjType() {
-        return BaseAsyncCmd.networkSyncObject;
-    }
-
-    @Override
-    public Long getSyncObjId() {
-        return getIp().getAssociatedWithNetworkId();
-    }
-
-    private IpAddress getIp() {
-        IpAddress ip = _networkService.getIp(ipAddressId);
-        if (ip == null) {
-            throw new InvalidParameterValueException("Unable to find IP address by ID " + ipAddressId);
-        }
-        return ip;
+    public Long getSourceIpAddressId() {
+        return ipAddressId;
     }
 
     @Override
@@ -309,23 +298,18 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
     }
 
     @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.FirewallRule;
-    }
-
-    @Override
     public TrafficType getTrafficType() {
         return null;
     }
 
     @Override
-    public boolean isDisplay() {
-        return true;
+    public String getUuid() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
     public Class<?> getEntityType() {
         return FirewallRule.class;
     }
-
 }

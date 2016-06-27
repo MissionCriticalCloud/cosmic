@@ -1,25 +1,4 @@
-
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.resource;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
@@ -39,6 +18,10 @@ import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.resource.ResourceState.Event;
 import com.cloud.utils.fsm.NoTransitionException;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * ResourceManager manages how physical resources are organized within the
  * CloudStack. It also manages the life cycle of the physical resources.
@@ -48,7 +31,7 @@ public interface ResourceManager extends ResourceService {
      * Register a listener for different types of resource life cycle events.
      * There can only be one type of listener per type of host.
      *
-     * @param Event type see ResourceListener.java, allow combination of multiple events.
+     * @param Event    type see ResourceListener.java, allow combination of multiple events.
      * @param listener the listener to notify.
      */
     public void registerResourceEvent(Integer event, ResourceListener listener);
@@ -56,11 +39,10 @@ public interface ResourceManager extends ResourceService {
     public void unregisterResourceEvent(ResourceListener listener);
 
     /**
-     *
-     * @param name of adapter
+     * @param name    of adapter
      * @param adapter
-     * @param hates, a list of names which will be eliminated by this adapter. Especially for the case where
-     * can be only one adapter responds to an event, e.g. startupCommand
+     * @param hates,  a list of names which will be eliminated by this adapter. Especially for the case where
+     *                can be only one adapter responds to an event, e.g. startupCommand
      */
     public void registerResourceStateAdapter(String name, ResourceStateAdapter adapter);
 
@@ -146,6 +128,7 @@ public interface ResourceManager extends ResourceService {
 
     /**
      * Check if host is GPU enabled
+     *
      * @param hostId the host to be checked
      * @return true if host contains GPU card else false
      */
@@ -153,40 +136,45 @@ public interface ResourceManager extends ResourceService {
 
     /**
      * Check if host has GPU devices available
-     * @param hostId the host to be checked
+     *
+     * @param hostId     the host to be checked
      * @param groupName: gpuCard name
-     * @param vgpuType the VGPU type
+     * @param vgpuType   the VGPU type
      * @return true when the host has the capacity with given VGPU type
      */
     boolean isGPUDeviceAvailable(long hostId, String groupName, String vgpuType);
 
     /**
      * Get available GPU device
-     * @param hostId the host to be checked
+     *
+     * @param hostId     the host to be checked
      * @param groupName: gpuCard name
-     * @param vgpuType the VGPU type
+     * @param vgpuType   the VGPU type
      * @return GPUDeviceTO[]
      */
     GPUDeviceTO getGPUDevice(long hostId, String groupName, String vgpuType);
 
     /**
      * Return listof available GPU devices
-     * @param hostId, the host to be checked
+     *
+     * @param hostId,    the host to be checked
      * @param groupName: gpuCard name
-     * @param vgpuType the VGPU type
+     * @param vgpuType   the VGPU type
      * @return List of HostGpuGroupsVO.
      */
     List<HostGpuGroupsVO> listAvailableGPUDevice(long hostId, String groupName, String vgpuType);
 
     /**
      * Update GPU device details (post VM deployment)
-     * @param hostId, the dest host Id
+     *
+     * @param hostId,       the dest host Id
      * @param groupDetails, capacity of GPU group.
      */
     void updateGPUDetails(long hostId, HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails);
 
     /**
      * Get GPU details for a host
+     *
      * @param host, the Host object
      * @return Details of groupNames and enabled VGPU type with remaining capacity.
      */

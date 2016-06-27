@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.tags;
 
 import com.cloud.api.query.dao.ResourceTagJoinDao;
@@ -27,7 +11,14 @@ import com.cloud.exception.PermissionDeniedException;
 import com.cloud.network.LBHealthCheckPolicyVO;
 import com.cloud.network.as.AutoScaleVmGroupVO;
 import com.cloud.network.as.AutoScaleVmProfileVO;
-import com.cloud.network.dao.*;
+import com.cloud.network.dao.IPAddressVO;
+import com.cloud.network.dao.LBStickinessPolicyVO;
+import com.cloud.network.dao.LoadBalancerVO;
+import com.cloud.network.dao.NetworkVO;
+import com.cloud.network.dao.RemoteAccessVpnVO;
+import com.cloud.network.dao.Site2SiteCustomerGatewayVO;
+import com.cloud.network.dao.Site2SiteVpnConnectionVO;
+import com.cloud.network.dao.Site2SiteVpnGatewayVO;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.PortForwardingRuleVO;
 import com.cloud.network.security.SecurityGroupRuleVO;
@@ -41,13 +32,26 @@ import com.cloud.server.ResourceTag;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.server.TaggedResourceService;
 import com.cloud.service.ServiceOfferingVO;
-import com.cloud.storage.*;
+import com.cloud.storage.DiskOfferingVO;
+import com.cloud.storage.SnapshotPolicyVO;
+import com.cloud.storage.SnapshotVO;
+import com.cloud.storage.VMTemplateVO;
+import com.cloud.storage.VolumeVO;
 import com.cloud.tags.dao.ResourceTagDao;
-import com.cloud.user.*;
+import com.cloud.user.Account;
+import com.cloud.user.AccountManager;
+import com.cloud.user.DomainManager;
+import com.cloud.user.OwnedBy;
+import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.db.*;
+import com.cloud.utils.db.DB;
+import com.cloud.utils.db.SearchBuilder;
+import com.cloud.utils.db.SearchCriteria;
+import com.cloud.utils.db.Transaction;
+import com.cloud.utils.db.TransactionCallbackNoReturn;
+import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.UserVmVO;
@@ -56,9 +60,6 @@ import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -66,6 +67,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TaggedResourceManagerImpl extends ManagerBase implements TaggedResourceService {
     public static final Logger s_logger = LoggerFactory.getLogger(TaggedResourceManagerImpl.class);
@@ -107,7 +112,6 @@ public class TaggedResourceManagerImpl extends ManagerBase implements TaggedReso
         s_typeMap.put(ResourceObjectType.LBStickinessPolicy, LBStickinessPolicyVO.class);
         s_typeMap.put(ResourceObjectType.LBHealthCheckPolicy, LBHealthCheckPolicyVO.class);
         s_typeMap.put(ResourceObjectType.SnapshotPolicy, SnapshotPolicyVO.class);
-
     }
 
     @Inject
@@ -123,7 +127,6 @@ public class TaggedResourceManagerImpl extends ManagerBase implements TaggedReso
     @Inject
     AccountDao _accountDao;
 
-
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         return true;
@@ -137,68 +140,6 @@ public class TaggedResourceManagerImpl extends ManagerBase implements TaggedReso
     @Override
     public boolean stop() {
         return true;
-    }
-
-    @Override
-    public long getResourceId(final String resourceId, final ResourceObjectType resourceType) {
-        final Class<?> clazz = s_typeMap.get(resourceType);
-        Object entity = _entityMgr.findByUuid(clazz, resourceId);
-        if (entity != null) {
-            return ((InternalIdentity) entity).getId();
-        }
-        if (!StringUtils.isNumeric(resourceId)) {
-            throw new InvalidParameterValueException("Unable to find resource by uuid " + resourceId + " and type " + resourceType);
-        }
-        entity = _entityMgr.findById(clazz, resourceId);
-        if (entity != null) {
-            return ((InternalIdentity) entity).getId();
-        }
-        throw new InvalidParameterValueException("Unable to find resource by id " + resourceId + " and type " + resourceType);
-    }
-
-    private Pair<Long, Long> getAccountDomain(final long resourceId, final ResourceObjectType resourceType) {
-        final Class<?> clazz = s_typeMap.get(resourceType);
-
-        final Object entity = _entityMgr.findById(clazz, resourceId);
-        Long accountId = null;
-        Long domainId = null;
-
-        // if the resource type is a security group rule, get the accountId and domainId from the security group itself
-        if (resourceType == ResourceObjectType.SecurityGroupRule) {
-            final SecurityGroupRuleVO rule = (SecurityGroupRuleVO) entity;
-            final Object SecurityGroup = _entityMgr.findById(s_typeMap.get(ResourceObjectType.SecurityGroup), rule.getSecurityGroupId());
-
-            accountId = ((SecurityGroupVO) SecurityGroup).getAccountId();
-            domainId = ((SecurityGroupVO) SecurityGroup).getDomainId();
-        }
-
-        if (entity instanceof OwnedBy) {
-            accountId = ((OwnedBy) entity).getAccountId();
-        }
-
-        if (entity instanceof PartOf) {
-            domainId = ((PartOf) entity).getDomainId();
-        }
-
-        if (accountId == null) {
-            accountId = Account.ACCOUNT_ID_SYSTEM;
-        }
-
-        if ((domainId == null) || ((accountId != null) && (domainId.longValue() == -1))) {
-            domainId = _accountDao.getDomainIdForGivenAccountId(accountId);
-        }
-        return new Pair<>(accountId, domainId);
-    }
-
-    @Override
-    public ResourceObjectType getResourceType(final String resourceTypeStr) {
-
-        for (final ResourceObjectType type : ResourceTag.ResourceObjectType.values()) {
-            if (type.toString().equalsIgnoreCase(resourceTypeStr)) {
-                return type;
-            }
-        }
-        throw new InvalidParameterValueException("Invalid resource type " + resourceTypeStr);
     }
 
     @Override
@@ -254,20 +195,38 @@ public class TaggedResourceManagerImpl extends ManagerBase implements TaggedReso
         return resourceTags;
     }
 
-    @Override
-    public String getUuid(final String resourceId, final ResourceObjectType resourceType) {
-        if (!StringUtils.isNumeric(resourceId)) {
-            return resourceId;
-        }
-
+    private Pair<Long, Long> getAccountDomain(final long resourceId, final ResourceObjectType resourceType) {
         final Class<?> clazz = s_typeMap.get(resourceType);
 
         final Object entity = _entityMgr.findById(clazz, resourceId);
-        if (entity != null && entity instanceof Identity) {
-            return ((Identity) entity).getUuid();
+        Long accountId = null;
+        Long domainId = null;
+
+        // if the resource type is a security group rule, get the accountId and domainId from the security group itself
+        if (resourceType == ResourceObjectType.SecurityGroupRule) {
+            final SecurityGroupRuleVO rule = (SecurityGroupRuleVO) entity;
+            final Object SecurityGroup = _entityMgr.findById(s_typeMap.get(ResourceObjectType.SecurityGroup), rule.getSecurityGroupId());
+
+            accountId = ((SecurityGroupVO) SecurityGroup).getAccountId();
+            domainId = ((SecurityGroupVO) SecurityGroup).getDomainId();
         }
 
-        return resourceId;
+        if (entity instanceof OwnedBy) {
+            accountId = ((OwnedBy) entity).getAccountId();
+        }
+
+        if (entity instanceof PartOf) {
+            domainId = ((PartOf) entity).getDomainId();
+        }
+
+        if (accountId == null) {
+            accountId = Account.ACCOUNT_ID_SYSTEM;
+        }
+
+        if ((domainId == null) || ((accountId != null) && (domainId.longValue() == -1))) {
+            domainId = _accountDao.getDomainIdForGivenAccountId(accountId);
+        }
+        return new Pair<>(accountId, domainId);
     }
 
     @Override
@@ -340,5 +299,49 @@ public class TaggedResourceManagerImpl extends ManagerBase implements TaggedReso
     @Override
     public List<? extends ResourceTag> listByResourceTypeAndId(final ResourceObjectType type, final long resourceId) {
         return _resourceTagDao.listBy(resourceId, type);
+    }
+
+    @Override
+    public ResourceObjectType getResourceType(final String resourceTypeStr) {
+
+        for (final ResourceObjectType type : ResourceTag.ResourceObjectType.values()) {
+            if (type.toString().equalsIgnoreCase(resourceTypeStr)) {
+                return type;
+            }
+        }
+        throw new InvalidParameterValueException("Invalid resource type " + resourceTypeStr);
+    }
+
+    @Override
+    public String getUuid(final String resourceId, final ResourceObjectType resourceType) {
+        if (!StringUtils.isNumeric(resourceId)) {
+            return resourceId;
+        }
+
+        final Class<?> clazz = s_typeMap.get(resourceType);
+
+        final Object entity = _entityMgr.findById(clazz, resourceId);
+        if (entity != null && entity instanceof Identity) {
+            return ((Identity) entity).getUuid();
+        }
+
+        return resourceId;
+    }
+
+    @Override
+    public long getResourceId(final String resourceId, final ResourceObjectType resourceType) {
+        final Class<?> clazz = s_typeMap.get(resourceType);
+        Object entity = _entityMgr.findByUuid(clazz, resourceId);
+        if (entity != null) {
+            return ((InternalIdentity) entity).getId();
+        }
+        if (!StringUtils.isNumeric(resourceId)) {
+            throw new InvalidParameterValueException("Unable to find resource by uuid " + resourceId + " and type " + resourceType);
+        }
+        entity = _entityMgr.findById(clazz, resourceId);
+        if (entity != null) {
+            return ((InternalIdentity) entity).getId();
+        }
+        throw new InvalidParameterValueException("Unable to find resource by id " + resourceId + " and type " + resourceType);
     }
 }

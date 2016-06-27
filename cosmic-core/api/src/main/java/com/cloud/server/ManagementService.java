@@ -1,24 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.server;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.alert.Alert;
 import com.cloud.capacity.Capacity;
@@ -44,7 +24,6 @@ import com.cloud.utils.Ternary;
 import com.cloud.vm.InstanceGroup;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.Type;
-
 import org.apache.cloudstack.api.command.admin.cluster.ListClustersCmd;
 import org.apache.cloudstack.api.command.admin.config.ListCfgsByCmd;
 import org.apache.cloudstack.api.command.admin.domain.UpdateDomainCmd;
@@ -84,9 +63,12 @@ import org.apache.cloudstack.api.command.user.vm.GetVMPasswordCmd;
 import org.apache.cloudstack.api.command.user.vmgroup.UpdateVMGroupCmd;
 import org.apache.cloudstack.config.Configuration;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Hopefully this is temporary.
- *
  */
 public interface ManagementService {
     static final String Name = "management-server";
@@ -108,6 +90,7 @@ public interface ManagementService {
 
     /**
      * Searches for Clusters by the specified zone Id.
+     *
      * @param zoneId
      * @return
      */
@@ -134,8 +117,7 @@ public interface ManagementService {
      * Obtains a list of IP Addresses by the specified search criteria. Can search by: "userId", "dataCenterId",
      * "address"
      *
-     * @param cmd
-     *            the command that wraps the search criteria
+     * @param cmd the command that wraps the search criteria
      * @return List of IPAddresses
      */
     Pair<List<? extends IpAddress>, Integer> searchForIPAddresses(ListPublicIpAddressesCmd cmd);
@@ -230,8 +212,7 @@ public interface ManagementService {
     /**
      * update an existing domain
      *
-     * @param cmd
-     *            - the command containing domainId and new domainName
+     * @param cmd - the command containing domainId and new domainName
      * @return Domain object if the command succeeded
      */
     Domain updateDomain(UpdateDomainCmd cmd);
@@ -246,6 +227,7 @@ public interface ManagementService {
 
     /**
      * Archive alerts
+     *
      * @param cmd
      * @return True on success. False otherwise.
      */
@@ -253,6 +235,7 @@ public interface ManagementService {
 
     /**
      * Delete alerts
+     *
      * @param cmd
      * @return True on success. False otherwise.
      */
@@ -260,6 +243,7 @@ public interface ManagementService {
 
     /**
      * Archive events
+     *
      * @param cmd
      * @return True on success. False otherwise.
      */
@@ -267,6 +251,7 @@ public interface ManagementService {
 
     /**
      * Delete events
+     *
      * @param cmd
      * @return True on success. False otherwise.
      */
@@ -283,8 +268,7 @@ public interface ManagementService {
     /**
      * List system VMs by the given search criteria
      *
-     * @param cmd
-     *            the command that wraps the search criteria (host, name, state, type, zone, pod, and/or id)
+     * @param cmd the command that wraps the search criteria (host, name, state, type, zone, pod, and/or id)
      * @return the list of system vms that match the given criteria
      */
     Pair<List<? extends VirtualMachine>, Integer> searchForSystemVm(ListSystemVMsCmd cmd);
@@ -292,8 +276,7 @@ public interface ManagementService {
     /**
      * Returns back a SHA1 signed response
      *
-     * @param userId
-     *            -- id for the user
+     * @param userId -- id for the user
      * @return -- ArrayList of <CloudId+Signature>
      */
     ArrayList<String> getCloudIdentifierResponse(long userId);
@@ -309,9 +292,7 @@ public interface ManagementService {
     /**
      * return an array of available hypervisors
      *
-     * @param zoneId
-     *            TODO
-     *
+     * @param zoneId TODO
      * @return an array of available hypervisors in the cloud
      */
     List<String> getHypervisors(Long zoneId);
@@ -319,8 +300,7 @@ public interface ManagementService {
     /**
      * This method uploads a custom cert to the db, and patches every cpvm with it on the current ms
      *
-     * @param cmd
-     *            -- upload certificate cmd
+     * @param cmd -- upload certificate cmd
      * @return -- returns a string on success
      */
     String uploadCertificate(UploadCustomCertificateCmd cmd);
@@ -345,8 +325,7 @@ public interface ManagementService {
     /**
      * Search registered key pairs for the logged in user.
      *
-     * @param cmd
-     *            The api command class.
+     * @param cmd The api command class.
      * @return The list of key pairs found.
      */
     Pair<List<? extends SSHKeyPair>, Integer> listSSHKeyPairs(ListSSHKeyPairsCmd cmd);
@@ -354,8 +333,7 @@ public interface ManagementService {
     /**
      * Registers a key pair for a given public key.
      *
-     * @param cmd
-     *            The api command class.
+     * @param cmd The api command class.
      * @return A VO with the key pair name and a finger print for the public key.
      */
     SSHKeyPair registerSSHKeyPair(RegisterSSHKeyPairCmd cmd);
@@ -363,18 +341,16 @@ public interface ManagementService {
     /**
      * Creates a new
      *
-     * @param cmd
-     *            The api command class.
+     * @param cmd The api command class.
      * @return A VO containing the key pair name, finger print for the public key and the private key material of the
-     *         key pair.
+     * key pair.
      */
     SSHKeyPair createSSHKeyPair(CreateSSHKeyPairCmd cmd);
 
     /**
      * Deletes a key pair by name.
      *
-     * @param cmd
-     *            The api command class.
+     * @param cmd The api command class.
      * @return True on success. False otherwise.
      */
     boolean deleteSSHKeyPair(DeleteSSHKeyPairCmd cmd);
@@ -382,8 +358,7 @@ public interface ManagementService {
     /**
      * Finds and returns an encrypted password for a VM.
      *
-     * @param cmd
-     *            The api command class.
+     * @param cmd The api command class.
      * @return The encrypted password.
      */
     String getVMPassword(GetVMPasswordCmd cmd);
@@ -395,11 +370,10 @@ public interface ManagementService {
      * host and
      * also a list of hosts that seem to have enough CPU and RAM capacity to host this VM.
      *
-     * @param Long
-     *            vmId
-     *            Id of The VM to migrate
+     * @param Long vmId
+     *             Id of The VM to migrate
      * @return Ternary<List<? extends Host>, List<? extends Host>, Map<Host, Boolean>> List of all Hosts to which a VM
-     *         can be migrated, list of Hosts with enough capacity and hosts requiring storage motion for migration.
+     * can be migrated, list of Hosts with enough capacity and hosts requiring storage motion for migration.
      */
     Ternary<Pair<List<? extends Host>, Integer>, List<? extends Host>, Map<Host, Boolean>> listHostsForMigrationOfVM(Long vmId, Long startIndex, Long pageSize);
 
@@ -409,14 +383,14 @@ public interface ManagementService {
      *
      * @param Long volumeId
      * @return Pair<List<? extends StoragePool>, List<? extends StoragePool>> List of storage pools in cluster and list
-     *         of pools with enough capacity.
+     * of pools with enough capacity.
      */
     Pair<List<? extends StoragePool>, List<? extends StoragePool>> listStoragePoolsForMigrationOfVolume(Long volumeId);
 
     String[] listEventTypes();
 
     Pair<List<? extends HypervisorCapabilities>, Integer> listHypervisorCapabilities(Long id, HypervisorType hypervisorType, String keyword, Long startIndex,
-            Long pageSizeVal);
+                                                                                     Long pageSizeVal);
 
     HypervisorCapabilities updateHypervisorCapabilities(Long id, Long maxGuestsLimit, Boolean securityGroupEnabled);
 
@@ -431,9 +405,7 @@ public interface ManagementService {
     List<String> listDeploymentPlanners();
 
     VirtualMachine upgradeSystemVM(ScaleSystemVMCmd cmd) throws ResourceUnavailableException, ManagementServerException, VirtualMachineMigrationException,
-    ConcurrentOperationException;
+            ConcurrentOperationException;
 
     void cleanupVMReservations();
-
-
 }

@@ -1,20 +1,3 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 """ P1 tests for secondary storage limits
 
     Test Plan: https://cwiki.apache.org/confluence/display/CLOUDSTACK/Limit+Resources+to+domain+or+accounts
@@ -24,8 +7,15 @@
     Feature Specifications: https://cwiki.apache.org/confluence/display/CLOUDSTACK/Limit+Resources+to+domains+and+accounts
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
+import time
+from ddt import ddt, data
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+from marvin.codes import (PASS,
+                          FAIL,
+                          FAILED,
+                          RESOURCE_SECONDARY_STORAGE,
+                          CHILD_DOMAIN_ADMIN,
+                          ROOT_DOMAIN_ADMIN)
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              VirtualMachine,
@@ -41,22 +31,15 @@ from marvin.lib.common import (get_domain,
                                get_builtin_template_info)
 from marvin.lib.utils import (cleanup_resources,
                               validateList)
-from marvin.codes import (PASS,
-                          FAIL,
-                          FAILED,
-                          RESOURCE_SECONDARY_STORAGE,
-                          CHILD_DOMAIN_ADMIN,
-                          ROOT_DOMAIN_ADMIN)
-from ddt import ddt, data
-import time
+from nose.plugins.attrib import attr
+
 
 @ddt
 class TestSecondaryStorageLimits(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cloudstackTestClient = super(TestSecondaryStorageLimits,
-                               cls).getClsTestClient()
+                                     cls).getClsTestClient()
         cls.api_client = cloudstackTestClient.getApiClient()
         cls.hypervisor = cloudstackTestClient.getHypervisorInfo()
         # Fill services from the external config file
@@ -68,10 +51,10 @@ class TestSecondaryStorageLimits(cloudstackTestCase):
         cls.hypervisor = cloudstackTestClient.getHypervisorInfo()
 
         cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.services["ostype"]
-                            )
+            cls.api_client,
+            cls.zone.id,
+            cls.services["ostype"]
+        )
 
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
@@ -116,20 +99,20 @@ class TestSecondaryStorageLimits(cloudstackTestCase):
         try:
             if accountType == CHILD_DOMAIN_ADMIN:
                 self.domain = Domain.create(self.apiclient,
-                                        services=self.services["domain"],
-                                        parentdomainid=self.domain.id)
+                                            services=self.services["domain"],
+                                            parentdomainid=self.domain.id)
 
             self.account = Account.create(self.apiclient, self.services["account"],
-                                      domainid=self.domain.id, admin=True)
+                                          domainid=self.domain.id, admin=True)
             self.cleanup.append(self.account)
             if accountType == CHILD_DOMAIN_ADMIN:
                 self.cleanup.append(self.domain)
         except Exception as e:
             return [FAIL, e]
         return [PASS, None]
- 
+
     @data(ROOT_DOMAIN_ADMIN, CHILD_DOMAIN_ADMIN)
-    @attr(tags = ["advanced"], required_hardware="true")
+    @attr(tags=["advanced"], required_hardware="true")
     def test_01_register_template(self, value):
         """Test register template
         # Validate the following:
@@ -145,8 +128,8 @@ class TestSecondaryStorageLimits(cloudstackTestCase):
         self.assertEqual(response[0], PASS, response[1])
 
         apiclient = self.testClient.getUserApiClient(
-                                UserName=self.account.name,
-                                DomainName=self.account.domain)
+            UserName=self.account.name,
+            DomainName=self.account.domain)
 
         builtin_info = get_builtin_template_info(self.apiclient, self.zone.id)
         self.services["template_2"]["url"] = builtin_info[0]
@@ -155,29 +138,29 @@ class TestSecondaryStorageLimits(cloudstackTestCase):
 
         try:
             template = Template.register(apiclient,
-                                     self.services["template_2"],
-                                     zoneid=self.zone.id,
-                                     account=self.account.name,
-                                     domainid=self.account.domainid,
-                                     hypervisor=self.hypervisor)
+                                         self.services["template_2"],
+                                         zoneid=self.zone.id,
+                                         account=self.account.name,
+                                         domainid=self.account.domainid,
+                                         hypervisor=self.hypervisor)
 
             template.download(apiclient)
         except Exception as e:
             self.fail("Failed to register template: %s" % e)
 
         templates = Template.list(apiclient,
-                                      templatefilter=\
+                                  templatefilter= \
                                       self.services["template_2"]["templatefilter"],
-                                      id=template.id)
-        self.assertEqual(validateList(templates)[0],PASS,\
-                        "templates list validation failed")
+                                  id=template.id)
+        self.assertEqual(validateList(templates)[0], PASS, \
+                         "templates list validation failed")
 
-        templateSize = (templates[0].size / (1024**3))
+        templateSize = (templates[0].size / (1024 ** 3))
         expectedCount = templateSize
         response = matchResourceCount(
-                        apiclient, expectedCount,
-                        RESOURCE_SECONDARY_STORAGE,
-                        accountid=self.account.id)
+            apiclient, expectedCount,
+            RESOURCE_SECONDARY_STORAGE,
+            accountid=self.account.id)
         self.assertEqual(response[0], PASS, response[1])
 
         try:
@@ -187,9 +170,9 @@ class TestSecondaryStorageLimits(cloudstackTestCase):
 
         expectedCount = 0
         response = matchResourceCount(
-                        apiclient, expectedCount,
-                        RESOURCE_SECONDARY_STORAGE,
-                        accountid=self.account.id)
+            apiclient, expectedCount,
+            RESOURCE_SECONDARY_STORAGE,
+            accountid=self.account.id)
         self.assertEqual(response[0], PASS, response[1])
         return
 
@@ -210,16 +193,16 @@ class TestSecondaryStorageLimits(cloudstackTestCase):
         self.assertEqual(response[0], PASS, response[1])
 
         self.virtualMachine = VirtualMachine.create(self.api_client, self.services["virtual_machine"],
-                            accountid=self.account.name, domainid=self.account.domainid,
-                            serviceofferingid=self.service_offering.id)
+                                                    accountid=self.account.name, domainid=self.account.domainid,
+                                                    serviceofferingid=self.service_offering.id)
 
         self.assertNotEqual(self.virtualMachine, FAILED, "VM deployment failed")
 
         apiclient = self.testClient.getUserApiClient(
-                                UserName=self.account.name,
-                                DomainName=self.account.domain)
-        self.assertNotEqual(apiclient, FAILED,\
-            "Failed to create api client for account: %s" % self.account.name)
+            UserName=self.account.name,
+            DomainName=self.account.domain)
+        self.assertNotEqual(apiclient, FAILED, \
+                            "Failed to create api client for account: %s" % self.account.name)
 
         try:
             self.virtualMachine.stop(apiclient)
@@ -235,19 +218,19 @@ class TestSecondaryStorageLimits(cloudstackTestCase):
 
         try:
             template = Template.create_from_snapshot(apiclient,
-                                        snapshot=snapshot,
-                                        services=self.services["template_2"])
+                                                     snapshot=snapshot,
+                                                     services=self.services["template_2"])
         except Exception as e:
             self.fail("Failed to create template: %s" % e)
 
         templates = Template.list(apiclient,
-                                  templatefilter=\
-                                  self.services["template_2"]["templatefilter"],
+                                  templatefilter= \
+                                      self.services["template_2"]["templatefilter"],
                                   id=template.id)
-        self.assertEqual(validateList(templates)[0],PASS,\
-                        "templates list validation failed")
+        self.assertEqual(validateList(templates)[0], PASS, \
+                         "templates list validation failed")
 
-        templateSize = (templates[0].size / (1024**3))
+        templateSize = (templates[0].size / (1024 ** 3))
 
         expectedSecondaryStorageCount = int(templateSize + snapshotSize)
         response = matchResourceCount(self.apiclient, expectedSecondaryStorageCount,
@@ -257,7 +240,7 @@ class TestSecondaryStorageLimits(cloudstackTestCase):
         return
 
     @data(ROOT_DOMAIN_ADMIN, CHILD_DOMAIN_ADMIN)
-    @attr(tags = ["advanced"], required_hardware="true")
+    @attr(tags=["advanced"], required_hardware="true")
     def test_03_register_iso(self, value):
         """Test register iso
         Steps and validations:
@@ -275,11 +258,11 @@ class TestSecondaryStorageLimits(cloudstackTestCase):
         self.services["iso"]["zoneid"] = self.zone.id
         try:
             iso = Iso.create(
-                         self.apiclient,
-                         self.services["iso"],
-                         account=self.account.name,
-                         domainid=self.account.domainid
-                         )
+                self.apiclient,
+                self.services["iso"],
+                account=self.account.name,
+                domainid=self.account.domainid
+            )
         except Exception as e:
             self.fail("Failed to create Iso: %s" % e)
 
@@ -287,19 +270,19 @@ class TestSecondaryStorageLimits(cloudstackTestCase):
         isoList = None
         while timeout >= 0:
             isoList = Iso.list(self.apiclient,
-                                      isofilter="self",
-                                      id=iso.id)
-            self.assertEqual(validateList(isoList)[0],PASS,\
-                            "iso list validation failed")
+                               isofilter="self",
+                               id=iso.id)
+            self.assertEqual(validateList(isoList)[0], PASS, \
+                             "iso list validation failed")
             if isoList[0].isready:
                 break
             time.sleep(60)
             timeout -= 60
 
-        self.assertNotEqual(timeout, 0,\
-                "template not downloaded completely")
+        self.assertNotEqual(timeout, 0, \
+                            "template not downloaded completely")
 
-        isoSize = (isoList[0].size / (1024**3))
+        isoSize = (isoList[0].size / (1024 ** 3))
         expectedCount = isoSize
         response = matchResourceCount(self.apiclient, expectedCount,
                                       resourceType=RESOURCE_SECONDARY_STORAGE,
@@ -319,7 +302,7 @@ class TestSecondaryStorageLimits(cloudstackTestCase):
         return
 
     @data(ROOT_DOMAIN_ADMIN, CHILD_DOMAIN_ADMIN)
-    @attr(tags = ["advanced"], required_hardware="true")
+    @attr(tags=["advanced"], required_hardware="true")
     def test_04_copy_template(self, value):
         """Test copy template between zones
 
@@ -350,44 +333,44 @@ class TestSecondaryStorageLimits(cloudstackTestCase):
 
         try:
             template = Template.register(self.apiclient,
-                                     self.services["template_2"],
-                                     zoneid=self.zone.id,
-                                     account=self.account.name,
-                                     domainid=self.account.domainid,
-                                     hypervisor=self.hypervisor)
+                                         self.services["template_2"],
+                                         zoneid=self.zone.id,
+                                         account=self.account.name,
+                                         domainid=self.account.domainid,
+                                         hypervisor=self.hypervisor)
 
             template.download(self.apiclient)
         except Exception as e:
             self.fail("Failed to register template: %s" % e)
 
         templates = Template.list(self.apiclient,
-                                      templatefilter=\
+                                  templatefilter= \
                                       self.services["template_2"]["templatefilter"],
-                                      id=template.id)
-        self.assertEqual(validateList(templates)[0],PASS,\
+                                  id=template.id)
+        self.assertEqual(validateList(templates)[0], PASS, \
                          "templates list validation failed")
 
-        templateSize = (templates[0].size / (1024**3))
+        templateSize = (templates[0].size / (1024 ** 3))
         expectedCount = templateSize
         response = matchResourceCount(
-                        self.apiclient, expectedCount,
-                        RESOURCE_SECONDARY_STORAGE,
-                        accountid=self.account.id)
+            self.apiclient, expectedCount,
+            RESOURCE_SECONDARY_STORAGE,
+            accountid=self.account.id)
         self.assertEqual(response[0], PASS, response[1])
 
         templateDestinationZoneId = None
         for zone in zones:
-            if template.zoneid != zone.id :
+            if template.zoneid != zone.id:
                 templateDestinationZoneId = zone.id
                 break
 
         template.copy(self.apiclient, destzoneid=templateDestinationZoneId,
-                      sourcezoneid = template.zoneid)
+                      sourcezoneid=template.zoneid)
 
         expectedCount = (templateSize * 2)
         response = matchResourceCount(
-                        self.apiclient, expectedCount,
-                        RESOURCE_SECONDARY_STORAGE,
-                        accountid=self.account.id)
+            self.apiclient, expectedCount,
+            RESOURCE_SECONDARY_STORAGE,
+            accountid=self.account.id)
         self.assertEqual(response[0], PASS, response[1])
         return

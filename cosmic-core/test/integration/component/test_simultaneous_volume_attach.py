@@ -1,35 +1,7 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
-#Import Local Modules
+# Import Local Modules
+import time
 from marvin.cloudstackAPI import *
-from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import (cleanup_resources,
-                              validateList)
-from marvin.lib.base import (ServiceOffering,
-                             VirtualMachine,
-                             Account,
-                             Volume,
-                             DiskOffering,
-                             )
-from marvin.lib.common import (get_domain,
-                                get_zone,
-                                get_template,
-                                find_storage_pool_type)
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.codes import (
     PASS,
     FAILED,
@@ -37,12 +9,21 @@ from marvin.codes import (
     JOB_CANCELLED,
     JOB_SUCCEEDED
 )
+from marvin.lib.base import (ServiceOffering,
+                             VirtualMachine,
+                             Account,
+                             Volume,
+                             DiskOffering,
+                             )
+from marvin.lib.common import (get_domain,
+                               get_zone,
+                               get_template)
+from marvin.lib.utils import (cleanup_resources,
+                              validateList)
 from nose.plugins.attrib import attr
-import time
 
 
 class TestMultipleVolumeAttach(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestMultipleVolumeAttach, cls).getClsTestClient()
@@ -57,15 +38,15 @@ class TestMultipleVolumeAttach(cloudstackTestCase):
         cls.invalidStoragePoolType = False
 
         cls.disk_offering = DiskOffering.create(
-                                    cls.apiclient,
-                                    cls.services["disk_offering"]
-                                    )
+            cls.apiclient,
+            cls.services["disk_offering"]
+        )
 
         template = get_template(
-                            cls.apiclient,
-                            cls.zone.id,
-                            cls.services["ostype"]
-                            )
+            cls.apiclient,
+            cls.zone.id,
+            cls.services["ostype"]
+        )
         if template == FAILED:
             assert False, "get_template() failed to return template with description %s" % cls.services["ostype"]
 
@@ -76,56 +57,56 @@ class TestMultipleVolumeAttach(cloudstackTestCase):
 
         # Create VMs, VMs etc
         cls.account = Account.create(
-                            cls.apiclient,
-                            cls.services["account"],
-                            domainid=cls.domain.id
-                            )
+            cls.apiclient,
+            cls.services["account"],
+            domainid=cls.domain.id
+        )
         cls.service_offering = ServiceOffering.create(
-                                            cls.apiclient,
-                                            cls.services["service_offering"]
-                                        )
+            cls.apiclient,
+            cls.services["service_offering"]
+        )
         cls.virtual_machine = VirtualMachine.create(
-                                    cls.apiclient,
-                                    cls.services,
-                                    accountid=cls.account.name,
-                                    domainid=cls.account.domainid,
-                                    serviceofferingid=cls.service_offering.id,
-                                    mode=cls.services["mode"]
-                                )
+            cls.apiclient,
+            cls.services,
+            accountid=cls.account.name,
+            domainid=cls.account.domainid,
+            serviceofferingid=cls.service_offering.id,
+            mode=cls.services["mode"]
+        )
 
-        #Create volumes (data disks)
+        # Create volumes (data disks)
         cls.volume1 = Volume.create(
-                                   cls.apiclient,
-                                   cls.services,
-                                   account=cls.account.name,
-                                   domainid=cls.account.domainid
-                                   )
+            cls.apiclient,
+            cls.services,
+            account=cls.account.name,
+            domainid=cls.account.domainid
+        )
 
         cls.volume2 = Volume.create(
-                                   cls.apiclient,
-                                   cls.services,
-                                   account=cls.account.name,
-                                   domainid=cls.account.domainid
-                                   )
+            cls.apiclient,
+            cls.services,
+            account=cls.account.name,
+            domainid=cls.account.domainid
+        )
 
         cls.volume3 = Volume.create(
-                                   cls.apiclient,
-                                   cls.services,
-                                   account=cls.account.name,
-                                   domainid=cls.account.domainid
-                                   )
+            cls.apiclient,
+            cls.services,
+            account=cls.account.name,
+            domainid=cls.account.domainid
+        )
 
         cls.volume4 = Volume.create(
-                                   cls.apiclient,
-                                   cls.services,
-                                   account=cls.account.name,
-                                   domainid=cls.account.domainid
-                                   )
+            cls.apiclient,
+            cls.services,
+            account=cls.account.name,
+            domainid=cls.account.domainid
+        )
         cls._cleanup = [
-                        cls.service_offering,
-                        cls.disk_offering,
-                        cls.account
-                        ]
+            cls.service_offering,
+            cls.disk_offering,
+            cls.account
+        ]
 
     @classmethod
     def tearDownClass(cls):
@@ -148,7 +129,7 @@ class TestMultipleVolumeAttach(cloudstackTestCase):
         return
 
     # Method to attach volume but will return immediately as an asynchronous task does.
-    def attach_volume(self, apiclient,virtualmachineid, volume):
+    def attach_volume(self, apiclient, virtualmachineid, volume):
         """Attach volume to instance"""
         cmd = attachVolume.attachVolumeCmd()
         cmd.isAsync = "false"
@@ -170,23 +151,23 @@ class TestMultipleVolumeAttach(cloudstackTestCase):
                 if async_response != FAILED:
                     job_status = async_response.jobstatus
                     if job_status in [JOB_CANCELLED,
-                                  JOB_SUCCEEDED]:
+                                      JOB_SUCCEEDED]:
                         break
                     elif job_status == JOB_FAILED:
                         raise Exception("Job failed: %s" \
-                                    % async_response)
+                                        % async_response)
                 time.sleep(5)
                 timeout -= 5
                 self.debug("=== JobId: %s is Still Processing, "
-                              "Will TimeOut in: %s ====" % (str(jobid),
-                                                           str(timeout)))
+                           "Will TimeOut in: %s ====" % (str(jobid),
+                                                         str(timeout)))
             return async_response
         except Exception as e:
             self.debug("==== Exception Occurred for Job: %s ====" %
-                  str(e))
+                       str(e))
             return FAILED
 
-    @attr(tags = ["advanced", "advancedns", "basic"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "basic"], required_hardware="true")
     def test_attach_multiple_volumes(self):
         """Attach multiple Volumes simultaneously to a Running VM
         """
@@ -194,46 +175,46 @@ class TestMultipleVolumeAttach(cloudstackTestCase):
         # 1. All data disks attached successfully without any exception
 
         self.debug(
-                "Attaching volume (ID: %s) to VM (ID: %s)" % (
-                                                    self.volume1.id,
-                                                    self.virtual_machine.id
-                                                    ))
-        vol1_jobId = self.attach_volume(self.apiClient, self.virtual_machine.id,self.volume1)
+            "Attaching volume (ID: %s) to VM (ID: %s)" % (
+                self.volume1.id,
+                self.virtual_machine.id
+            ))
+        vol1_jobId = self.attach_volume(self.apiClient, self.virtual_machine.id, self.volume1)
 
         self.debug(
-                "Attaching volume (ID: %s) to VM (ID: %s)" % (
-                                                    self.volume2.id,
-                                                    self.virtual_machine.id
-                                                    ))
-        vol2_jobId = self.attach_volume(self.apiClient,self.virtual_machine.id, self.volume2)
+            "Attaching volume (ID: %s) to VM (ID: %s)" % (
+                self.volume2.id,
+                self.virtual_machine.id
+            ))
+        vol2_jobId = self.attach_volume(self.apiClient, self.virtual_machine.id, self.volume2)
 
         self.debug(
-                "Attaching volume (ID: %s) to VM (ID: %s)" % (
-                                                    self.volume3.id,
-                                                    self.virtual_machine.id
-                                                    ))
-        vol3_jobId = self.attach_volume(self.apiClient,self.virtual_machine.id, self.volume3)
+            "Attaching volume (ID: %s) to VM (ID: %s)" % (
+                self.volume3.id,
+                self.virtual_machine.id
+            ))
+        vol3_jobId = self.attach_volume(self.apiClient, self.virtual_machine.id, self.volume3)
 
         self.debug(
-                "Attaching volume (ID: %s) to VM (ID: %s)" % (
-                                                    self.volume4.id,
-                                                    self.virtual_machine.id
-                                                    ))
-        vol4_jobId = self.attach_volume(self.apiClient,self.virtual_machine.id, self.volume4)
+            "Attaching volume (ID: %s) to VM (ID: %s)" % (
+                self.volume4.id,
+                self.virtual_machine.id
+            ))
+        vol4_jobId = self.attach_volume(self.apiClient, self.virtual_machine.id, self.volume4)
 
-        self.query_async_job(self.apiClient,vol1_jobId.jobid)
-        self.query_async_job(self.apiClient,vol2_jobId.jobid)
-        self.query_async_job(self.apiClient,vol3_jobId.jobid)
-        self.query_async_job(self.apiClient,vol4_jobId.jobid)
+        self.query_async_job(self.apiClient, vol1_jobId.jobid)
+        self.query_async_job(self.apiClient, vol2_jobId.jobid)
+        self.query_async_job(self.apiClient, vol3_jobId.jobid)
+        self.query_async_job(self.apiClient, vol4_jobId.jobid)
 
         # List all the volumes attached to the instance. Includes even the Root disk.
         list_volume_response = Volume.list(
-                                            self.apiClient,
-                                            virtualmachineid=self.virtual_machine.id,
-                                            type="DATADISK",
-                                            account=self.account.name,
-                                            domainid=self.account.domainid
-                                          )
+            self.apiClient,
+            virtualmachineid=self.virtual_machine.id,
+            type="DATADISK",
+            account=self.account.name,
+            domainid=self.account.domainid
+        )
         self.assertEqual(
             validateList(list_volume_response)[0],
             PASS,
@@ -241,9 +222,9 @@ class TestMultipleVolumeAttach(cloudstackTestCase):
         )
 
         self.assertEqual(
-                            len(list_volume_response),
-                            4,
-                            "All 4 data disks are not attached to VM Successfully"
-                            )
+            len(list_volume_response),
+            4,
+            "All 4 data disks are not attached to VM Successfully"
+        )
 
         return

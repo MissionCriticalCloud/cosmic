@@ -1,27 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.storage.allocator;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
@@ -31,10 +8,16 @@ import com.cloud.storage.StoragePool;
 import com.cloud.user.Account;
 import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachineProfile;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -47,9 +30,8 @@ public class ZoneWideStoragePoolAllocator extends AbstractStoragePoolAllocator {
     @Inject
     DataStoreManager dataStoreMgr;
 
-
     @Override
-    protected List<StoragePool> select(DiskProfile dskCh, VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoid, int returnUpTo) {
+    protected List<StoragePool> select(final DiskProfile dskCh, final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid, final int returnUpTo) {
         s_logger.debug("ZoneWideStoragePoolAllocator to find storage pool");
 
         if (dskCh.useLocalStorage()) {
@@ -58,45 +40,44 @@ public class ZoneWideStoragePoolAllocator extends AbstractStoragePoolAllocator {
 
         if (s_logger.isTraceEnabled()) {
             // Log the pools details that are ignored because they are in disabled state
-            List<StoragePoolVO> disabledPools = _storagePoolDao.findDisabledPoolsByScope(plan.getDataCenterId(), null, null, ScopeType.ZONE);
+            final List<StoragePoolVO> disabledPools = _storagePoolDao.findDisabledPoolsByScope(plan.getDataCenterId(), null, null, ScopeType.ZONE);
             if (disabledPools != null && !disabledPools.isEmpty()) {
-                for (StoragePoolVO pool : disabledPools) {
+                for (final StoragePoolVO pool : disabledPools) {
                     s_logger.trace("Ignoring pool " + pool + " as it is in disabled state.");
                 }
             }
         }
 
-        List<StoragePool> suitablePools = new ArrayList<StoragePool>();
+        final List<StoragePool> suitablePools = new ArrayList<>();
 
         List<StoragePoolVO> storagePools = _storagePoolDao.findZoneWideStoragePoolsByTags(plan.getDataCenterId(), dskCh.getTags());
         if (storagePools == null) {
-            storagePools = new ArrayList<StoragePoolVO>();
+            storagePools = new ArrayList<>();
         }
 
-        List<StoragePoolVO> anyHypervisorStoragePools = new ArrayList<StoragePoolVO>();
-        for (StoragePoolVO storagePool : storagePools) {
+        final List<StoragePoolVO> anyHypervisorStoragePools = new ArrayList<>();
+        for (final StoragePoolVO storagePool : storagePools) {
             if (HypervisorType.Any.equals(storagePool.getHypervisor())) {
                 anyHypervisorStoragePools.add(storagePool);
             }
         }
 
-        List<StoragePoolVO> storagePoolsByHypervisor = _storagePoolDao.findZoneWideStoragePoolsByHypervisor(plan.getDataCenterId(), dskCh.getHypervisorType());
+        final List<StoragePoolVO> storagePoolsByHypervisor = _storagePoolDao.findZoneWideStoragePoolsByHypervisor(plan.getDataCenterId(), dskCh.getHypervisorType());
         storagePools.retainAll(storagePoolsByHypervisor);
         storagePools.addAll(anyHypervisorStoragePools);
 
         // add remaining pools in zone, that did not match tags, to avoid set
-        List<StoragePoolVO> allPools = _storagePoolDao.findZoneWideStoragePoolsByTags(plan.getDataCenterId(), null);
+        final List<StoragePoolVO> allPools = _storagePoolDao.findZoneWideStoragePoolsByTags(plan.getDataCenterId(), null);
         allPools.removeAll(storagePools);
-        for (StoragePoolVO pool : allPools) {
+        for (final StoragePoolVO pool : allPools) {
             avoid.addPool(pool.getId());
         }
 
-
-        for (StoragePoolVO storage : storagePools) {
+        for (final StoragePoolVO storage : storagePools) {
             if (suitablePools.size() == returnUpTo) {
                 break;
             }
-            StoragePool storagePool = (StoragePool)this.dataStoreMgr.getPrimaryDataStore(storage.getId());
+            final StoragePool storagePool = (StoragePool) this.dataStoreMgr.getPrimaryDataStore(storage.getId());
             if (filter(avoid, storagePool, dskCh, plan)) {
                 suitablePools.add(storagePool);
             } else {
@@ -107,28 +88,28 @@ public class ZoneWideStoragePoolAllocator extends AbstractStoragePoolAllocator {
     }
 
     @Override
-    protected List<StoragePool> reorderPoolsByNumberOfVolumes(DeploymentPlan plan, List<StoragePool> pools, Account account) {
+    protected List<StoragePool> reorderPoolsByNumberOfVolumes(final DeploymentPlan plan, final List<StoragePool> pools, final Account account) {
         if (account == null) {
             return pools;
         }
-        long dcId = plan.getDataCenterId();
+        final long dcId = plan.getDataCenterId();
 
-        List<Long> poolIdsByVolCount = _volumeDao.listZoneWidePoolIdsByVolumeCount(dcId, account.getAccountId());
+        final List<Long> poolIdsByVolCount = _volumeDao.listZoneWidePoolIdsByVolumeCount(dcId, account.getAccountId());
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("List of pools in ascending order of number of volumes for account id: " + account.getAccountId() + " is: " + poolIdsByVolCount);
         }
 
         // now filter the given list of Pools by this ordered list
-        Map<Long, StoragePool> poolMap = new HashMap<Long, StoragePool>();
-        for (StoragePool pool : pools) {
+        final Map<Long, StoragePool> poolMap = new HashMap<>();
+        for (final StoragePool pool : pools) {
             poolMap.put(pool.getId(), pool);
         }
-        List<Long> matchingPoolIds = new ArrayList<Long>(poolMap.keySet());
+        final List<Long> matchingPoolIds = new ArrayList<>(poolMap.keySet());
 
         poolIdsByVolCount.retainAll(matchingPoolIds);
 
-        List<StoragePool> reorderedPools = new ArrayList<StoragePool>();
-        for (Long id : poolIdsByVolCount) {
+        final List<StoragePool> reorderedPools = new ArrayList<>();
+        for (final Long id : poolIdsByVolCount) {
             reorderedPools.add(poolMap.get(id));
         }
 

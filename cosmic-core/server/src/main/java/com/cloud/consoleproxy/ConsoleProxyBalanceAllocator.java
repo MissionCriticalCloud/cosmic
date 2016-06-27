@@ -1,55 +1,40 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.consoleproxy;
 
+import com.cloud.utils.component.AdapterBase;
+import com.cloud.vm.ConsoleProxy;
+
+import javax.naming.ConfigurationException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.ConfigurationException;
-
-import com.cloud.utils.component.AdapterBase;
-import com.cloud.vm.ConsoleProxy;
-
 public class ConsoleProxyBalanceAllocator extends AdapterBase implements ConsoleProxyAllocator {
 
     @Override
-    public Long allocProxy(List<? extends ConsoleProxy> candidates, final Map<Long, Integer> loadInfo, long dataCenterId) {
-        List<ConsoleProxy> allocationList = new ArrayList<ConsoleProxy>(candidates);
+    public Long allocProxy(final List<? extends ConsoleProxy> candidates, final Map<Long, Integer> loadInfo, final long dataCenterId) {
+        final List<ConsoleProxy> allocationList = new ArrayList<>(candidates);
 
         Collections.sort(candidates, new Comparator<ConsoleProxy>() {
             @Override
-            public int compare(ConsoleProxy x, ConsoleProxy y) {
-                Integer loadOfX = loadInfo.get(x.getId());
-                Integer loadOfY = loadInfo.get(y.getId());
+            public int compare(final ConsoleProxy x, final ConsoleProxy y) {
+                final Integer loadOfX = loadInfo.get(x.getId());
+                final Integer loadOfY = loadInfo.get(y.getId());
 
                 if (loadOfX != null && loadOfY != null) {
-                    if (loadOfX < loadOfY)
+                    if (loadOfX < loadOfY) {
                         return -1;
-                    else if (loadOfX > loadOfY)
+                    } else if (loadOfX > loadOfY) {
                         return 1;
+                    }
                     return 0;
                 } else if (loadOfX == null && loadOfY == null) {
                     return 0;
                 } else {
-                    if (loadOfX == null)
+                    if (loadOfX == null) {
                         return -1;
+                    }
                     return 1;
                 }
             }
@@ -59,7 +44,7 @@ public class ConsoleProxyBalanceAllocator extends AdapterBase implements Console
     }
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         return true;
     }
 

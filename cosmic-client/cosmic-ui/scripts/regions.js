@@ -1,34 +1,18 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function(cloudStack) {
+(function (cloudStack) {
     cloudStack.sections.regions = {
         title: 'label.menu.regions',
         id: 'regions',
         sectionSelect: {
             label: 'label.select-view',
-            preFilter: function() {
+            preFilter: function () {
                 return ['regions'];
             }
         },
         regionSelector: {
-            dataProvider: function(args) {
+            dataProvider: function (args) {
                 $.ajax({
                     url: createURL('listRegions'),
-                    success: function(json) {
+                    success: function (json) {
                         var regions = json.listregionsresponse.region;
 
                         args.response.success({
@@ -64,14 +48,14 @@
                     actions: {
                         add: {
                             label: 'label.add.region',
-                            preFilter: function(args) {
+                            preFilter: function (args) {
                                 if (isAdmin())
                                     return true;
                                 else
                                     return false;
                             },
                             messages: {
-                                notification: function() {
+                                notification: function () {
                                     return 'label.add.region';
                                 }
                             },
@@ -99,7 +83,7 @@
                                     }
                                 }
                             },
-                            action: function(args) {
+                            action: function (args) {
                                 var data = {
                                     id: args.data.id,
                                     name: args.data.name,
@@ -109,35 +93,35 @@
                                 $.ajax({
                                     url: createURL('addRegion'),
                                     data: data,
-                                    success: function(json) {
+                                    success: function (json) {
                                         var item = json.addregionresponse.region;
                                         args.response.success({
                                             data: item
                                         });
                                         $(window).trigger('cloudStack.refreshRegions');
                                     },
-                                    error: function(json) {
+                                    error: function (json) {
                                         args.response.error(parseXMLHttpResponse(json));
                                     }
                                 });
                             },
                             notification: {
-                                poll: function(args) {
+                                poll: function (args) {
                                     args.complete();
                                 }
                             }
                         }
                     },
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         $.ajax({
                             url: createURL('listRegions'),
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listregionsresponse.region;
                                 args.response.success({
                                     data: items
                                 });
                             },
-                            error: function(json) {
+                            error: function (json) {
                                 args.response.error(parseXMLHttpResponse(json));
                             }
                         });
@@ -153,7 +137,7 @@
                         }, {
                             path: 'regions.portableIpRanges',
                             label: 'label.portable.ip',
-                            preFilter: function(args) {
+                            preFilter: function (args) {
                                 if (isAdmin())
                                     return true;
 
@@ -163,7 +147,7 @@
                         actions: {
                             edit: {
                                 label: 'label.edit.region',
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.regions[0].id,
                                         name: args.data.name,
@@ -173,11 +157,11 @@
                                     $.ajax({
                                         url: createURL('updateRegion'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success();
                                             $(window).trigger('cloudStack.refreshRegions');
                                         },
-                                        error: function(json) {
+                                        error: function (json) {
                                             args.response.error(parseXMLHttpResponse(json));
                                         }
                                     });
@@ -186,19 +170,19 @@
                             remove: {
                                 label: 'label.remove.region',
                                 messages: {
-                                    notification: function() {
+                                    notification: function () {
                                         return 'label.remove.region';
                                     },
-                                    confirm: function() {
+                                    confirm: function () {
                                         return 'message.remove.region';
                                     }
                                 },
-                                preAction: function(args) {
+                                preAction: function (args) {
                                     var region = args.context.regions[0];
 
                                     return true;
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var region = args.context.regions[0];
 
                                     $.ajax({
@@ -206,11 +190,11 @@
                                         data: {
                                             id: region.id
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success();
                                             $(window).trigger('cloudStack.refreshRegions');
                                         },
-                                        error: function(json) {
+                                        error: function (json) {
                                             args.response.error(parseXMLHttpResponse(json));
                                         }
                                     });
@@ -234,13 +218,13 @@
                                         isEditable: true
                                     }
                                 }],
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     $.ajax({
                                         url: createURL('listRegions'),
                                         data: {
                                             id: args.context.regions[0].id
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             var region = json.listregionsresponse.region
 
                                             args.response.success({
@@ -248,7 +232,7 @@
                                                 data: region ? region[0] : {}
                                             });
                                         },
-                                        error: function(json) {
+                                        error: function (json) {
                                             args.response.error(parseXMLHttpResponse(json));
                                         }
                                     });
@@ -281,10 +265,10 @@
                             label: 'label.add.gslb',
 
                             messages: {
-                                confirm: function(args) {
+                                confirm: function (args) {
                                     return 'label.add.gslb';
                                 },
-                                notification: function(args) {
+                                notification: function (args) {
                                     return 'label.add.gslb';
                                 }
                             },
@@ -309,7 +293,7 @@
                                     },
                                     gslblbmethod: {
                                         label: 'label.algorithm',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var array1 = [{
                                                 id: 'roundrobin',
                                                 description: 'roundrobin'
@@ -327,7 +311,7 @@
                                     },
                                     gslbservicetype: {
                                         label: 'label.gslb.servicetype',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var array1 = [{
                                                 id: 'tcp',
                                                 description: 'tcp'
@@ -345,7 +329,7 @@
                                     },
                                     domainid: {
                                         label: 'label.domain',
-                                        select: function(args) {
+                                        select: function (args) {
                                             if (isAdmin() || isDomainAdmin()) {
                                                 $.ajax({
                                                     url: createURL('listDomains'),
@@ -353,7 +337,7 @@
                                                         listAll: true,
                                                         details: 'min'
                                                     },
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         var array1 = [{
                                                             id: '',
                                                             description: ''
@@ -367,7 +351,7 @@
                                                                 });
                                                             }
                                                         }
-                                                        array1.sort(function(a, b) {
+                                                        array1.sort(function (a, b) {
                                                             return a.description.localeCompare(b.description);
                                                         });
                                                         args.response.success({
@@ -381,7 +365,7 @@
                                                 });
                                             }
                                         },
-                                        isHidden: function(args) {
+                                        isHidden: function (args) {
                                             if (isAdmin() || isDomainAdmin())
                                                 return false;
                                             else
@@ -390,7 +374,7 @@
                                     },
                                     account: {
                                         label: 'label.account',
-                                        isHidden: function(args) {
+                                        isHidden: function (args) {
                                             if (isAdmin() || isDomainAdmin())
                                                 return false;
                                             else
@@ -399,7 +383,7 @@
                                     }
                                 }
                             },
-                            action: function(args) {
+                            action: function (args) {
                                 var data = {
                                     name: args.data.name,
                                     regionid: args.context.regions[0].id,
@@ -424,12 +408,12 @@
                                 $.ajax({
                                     url: createURL('createGlobalLoadBalancerRule'),
                                     data: data,
-                                    success: function(json) {
+                                    success: function (json) {
                                         var jid = json.creategloballoadbalancerruleresponse.jobid;
                                         args.response.success({
                                             _custom: {
                                                 jobId: jid,
-                                                getUpdatedItem: function(json) {
+                                                getUpdatedItem: function (json) {
                                                     return json.queryasyncjobresultresponse.jobresult.globalloadbalancer;
                                                 }
                                             }
@@ -443,7 +427,7 @@
                         }
                     },
 
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         if ('regions' in args.context) {
                             var data = {
                                 regionid: args.context.regions[0].id
@@ -451,7 +435,7 @@
                             $.ajax({
                                 url: createURL('listGlobalLoadBalancerRules'),
                                 data: data,
-                                success: function(json) {
+                                success: function (json) {
                                     var items = json.listgloballoadbalancerrulesresponse.globalloadbalancerrule;
                                     args.response.success({
                                         data: items
@@ -474,7 +458,7 @@
                         actions: {
                             edit: {
                                 label: 'label.edit',
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.GSLB[0].id,
                                         description: args.data.description,
@@ -483,7 +467,7 @@
                                     $.ajax({
                                         url: createURL('updateGlobalLoadBalancerRule'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.updategloballoadbalancerruleresponse.jobid;
                                             args.response.success({
                                                 _custom: {
@@ -500,21 +484,21 @@
                             remove: {
                                 label: 'label.gslb.delete',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.gslb.delete.confirm';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.gslb.delete';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.GSLB[0].id
                                     };
                                     $.ajax({
                                         url: createURL("deleteGlobalLoadBalancerRule"),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.deletegloballoadbalancerruleresponse.jobid;
                                             args.response.success({
                                                 _custom: {
@@ -547,7 +531,7 @@
                                     gslblbmethod: {
                                         label: 'label.algorithm',
                                         isEditable: true,
-                                        select: function(args) {
+                                        select: function (args) {
                                             var array1 = [{
                                                 id: 'roundrobin',
                                                 description: 'roundrobin'
@@ -570,14 +554,14 @@
                                         label: 'label.id'
                                     }
                                 }],
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     var data = {
                                         id: args.context.GSLB[0].id
                                     };
                                     $.ajax({
                                         url: createURL('listGlobalLoadBalancerRules'),
                                         data: data,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.listgloballoadbalancerrulesresponse.globalloadbalancerrule[0];
                                             args.response.success({
                                                 data: item
@@ -615,19 +599,19 @@
                             label: 'label.vlan'
                         }
                     },
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         $.ajax({
                             url: createURL('listPortableIpRanges'),
                             data: {
                                 regionid: args.context.regions[0].id
                             },
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listportableipresponse.portableiprange;
                                 args.response.success({
                                     data: items
                                 });
                             },
-                            error: function(json) {
+                            error: function (json) {
                                 args.response.error(parseXMLHttpResponse(json));
                             }
                         });
@@ -636,7 +620,7 @@
                         add: {
                             label: 'label.add.portable.ip.range',
                             messages: {
-                                notification: function(args) {
+                                notification: function (args) {
                                     return 'label.add.portable.ip.range';
                                 }
                             },
@@ -675,7 +659,7 @@
                                     }
                                 }
                             },
-                            action: function(args) {
+                            action: function (args) {
                                 var data = {
                                     regionid: args.context.regions[0].id,
                                     startip: args.data.startip,
@@ -691,18 +675,18 @@
                                 $.ajax({
                                     url: createURL('createPortableIpRange'),
                                     data: data,
-                                    success: function(json) {
+                                    success: function (json) {
                                         var jid = json.createportableiprangeresponse.jobid;
                                         args.response.success({
                                             _custom: {
                                                 jobId: jid,
-                                                getUpdatedItem: function(json) {
+                                                getUpdatedItem: function (json) {
                                                     return json.queryasyncjobresultresponse.jobresult.portableiprange;
                                                 }
                                             }
                                         });
                                     },
-                                    error: function(data) {
+                                    error: function (data) {
                                         args.response.error(parseXMLHttpResponse(data));
                                     }
                                 });
@@ -719,14 +703,14 @@
                             remove: {
                                 label: 'label.delete.portable.ip.range',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.portable.ip.delete.confirm';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.delete.portable.ip.range';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         id: args.context.portableIpRanges[0].id
                                     };
@@ -734,7 +718,7 @@
                                         url: createURL('deletePortableIpRange'),
                                         data: data,
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.deleteportablepublicipresponse.jobid;
                                             args.response.success({
                                                 _custom: {
@@ -742,7 +726,7 @@
                                                 }
                                             });
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             args.response.error(parseXMLHttpResponse(data));
                                         }
                                     });
@@ -777,7 +761,7 @@
                                     },
                                     portableipaddress: {
                                         label: 'label.portable.ips',
-                                        converter: function(args) {
+                                        converter: function (args) {
                                             var text1 = '';
                                             if (args != null) {
                                                 for (var i = 0; i < args.length; i++) {
@@ -791,19 +775,19 @@
                                         }
                                     }
                                 }],
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     $.ajax({
                                         url: createURL('listPortableIpRanges'),
                                         data: {
                                             id: args.context.portableIpRanges[0].id
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.listportableipresponse.portableiprange[0];
                                             args.response.success({
                                                 data: item
                                             });
                                         },
-                                        error: function(json) {
+                                        error: function (json) {
                                             args.response.error(parseXMLHttpResponse(json));
                                         }
                                     });
@@ -836,14 +820,14 @@
                             label: 'label.algorithm'
                         }
                     },
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var data = {
                             id: args.context.GSLB[0].id
                         };
                         $.ajax({
                             url: createURL('listGlobalLoadBalancerRules'),
                             data: data,
-                            success: function(json) {
+                            success: function (json) {
                                 var items = json.listgloballoadbalancerrulesresponse.globalloadbalancerrule[0].loadbalancerrule;
                                 args.response.success({
                                     data: items
@@ -855,7 +839,7 @@
                         add: {
                             label: 'label.gslb.assigned.lb.more',
                             messages: {
-                                notification: function(args) {
+                                notification: function (args) {
                                     return 'label.gslb.assigned.lb.more';
                                 }
                             },
@@ -864,7 +848,7 @@
                                 fields: {
                                     loadbalancerrule: {
                                         label: 'label.gslb.lb.rule',
-                                        select: function(args) {
+                                        select: function (args) {
                                             var data = {
                                                 globalloadbalancerruleid: args.context.GSLB[0].id,
                                                 listAll: true
@@ -872,7 +856,7 @@
                                             $.ajax({
                                                 url: createURL('listLoadBalancerRules'),
                                                 data: data,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var allLbRules = json.listloadbalancerrulesresponse.loadbalancerrule;
                                                     var assignedLbRules = args.context.GSLB[0].loadbalancerrule;
                                                     var items = [];
@@ -902,7 +886,7 @@
                                     }
                                 }
                             },
-                            action: function(args) {
+                            action: function (args) {
                                 var data = {
                                     id: args.context.GSLB[0].id,
                                     loadbalancerrulelist: args.data.loadbalancerrule
@@ -910,12 +894,12 @@
                                 $.ajax({
                                     url: createURL('assignToGlobalLoadBalancerRule'),
                                     data: data,
-                                    success: function(json) {
+                                    success: function (json) {
                                         var jid = json.assigntogloballoadbalancerruleresponse.jobid;
                                         args.response.success({
                                             _custom: {
                                                 jobId: jid,
-                                                getUpdatedItem: function(json) {
+                                                getUpdatedItem: function (json) {
                                                     return json.queryasyncjobresultresponse.jobresult.loadbalancerrule;
                                                 }
                                             }
@@ -935,21 +919,21 @@
                             remove: {
                                 label: 'label.gslb.lb.remove',
                                 messages: {
-                                    notification: function() {
+                                    notification: function () {
                                         return 'label.gslb.lb.remove';
                                     },
-                                    confirm: function() {
+                                    confirm: function () {
                                         return 'message.gslb.lb.remove.confirm';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL('removeFromGlobalLoadBalancerRule'),
                                         data: {
                                             id: args.context.GSLB[0].id,
                                             loadbalancerrulelist: args.context.lbUnderGSLB[0].id
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.removefromloadbalancerruleresponse.jobid;
                                             args.response.success({
                                                 _custom: {
@@ -1000,13 +984,13 @@
                                         label: 'label.account'
                                     }
                                 }],
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     $.ajax({
                                         url: createURL('listLoadBalancerRules'),
                                         data: {
                                             id: args.context.lbUnderGSLB[0].id
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             var item = json.listloadbalancerrulesresponse.loadbalancerrule[0];
                                             args.response.success({
                                                 data: item
@@ -1022,7 +1006,7 @@
         }
     };
 
-    var regionActionfilter = function(args) {
+    var regionActionfilter = function (args) {
         var allowedActions = [];
         if (isAdmin()) {
             allowedActions.push("edit");

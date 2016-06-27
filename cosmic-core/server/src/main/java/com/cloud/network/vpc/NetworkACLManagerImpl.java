@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.vpc;
 
 import com.cloud.configuration.ConfigurationManager;
@@ -44,12 +28,13 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
 import org.apache.cloudstack.framework.messagebus.PublishScope;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLManager {
     private static final Logger s_logger = LoggerFactory.getLogger(NetworkACLManagerImpl.class);
@@ -94,6 +79,11 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
     }
 
     @Override
+    public NetworkACL getNetworkACL(final long id) {
+        return _networkACLDao.findById(id);
+    }
+
+    @Override
     public boolean applyNetworkACL(final long aclId) throws ResourceUnavailableException {
         boolean handled = true;
         boolean aclApplyStatus = true;
@@ -134,11 +124,6 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
     }
 
     @Override
-    public NetworkACL getNetworkACL(final long id) {
-        return _networkACLDao.findById(id);
-    }
-
-    @Override
     public boolean deleteNetworkACL(final NetworkACL acl) {
         final long aclId = acl.getId();
         final List<NetworkVO> networks = _networkDao.listByAclId(aclId);
@@ -158,27 +143,6 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
         }
 
         return _networkACLDao.remove(aclId);
-    }
-
-    @Override
-    public boolean replaceNetworkACLForPrivateGw(final NetworkACL acl, final PrivateGateway gateway) throws ResourceUnavailableException {
-        final VpcGatewayVO vpcGatewayVo = _vpcGatewayDao.findById(gateway.getId());
-        final List<NetworkACLItemVO> aclItems = _networkACLItemDao.listByACL(acl.getId());
-        if (aclItems == null || aclItems.isEmpty()) {
-            //Revoke ACL Items of the existing ACL if the new network acl is empty
-            //Other wise existing rules will not be removed on the router elelment
-            s_logger.debug("New network ACL is empty. Revoke existing rules before applying ACL");
-            if (!revokeACLItemsForPrivateGw(gateway)) {
-                throw new CloudRuntimeException("Failed to replace network ACL. Error while removing existing ACL " + "items for privatewa gateway: " + gateway.getId());
-            }
-        }
-
-        vpcGatewayVo.setNetworkACLId(acl.getId());
-        if (_vpcGatewayDao.update(vpcGatewayVo.getId(), vpcGatewayVo)) {
-            return applyACLToPrivateGw(gateway);
-
-        }
-        return false;
     }
 
     @Override
@@ -227,7 +191,8 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
     @DB
     @ActionEvent(eventType = EventTypes.EVENT_NETWORK_ACL_ITEM_CREATE, eventDescription = "creating network ACL Item", create = true)
     public NetworkACLItem createNetworkACLItem(final Integer portStart, final Integer portEnd, final String protocol, final List<String> sourceCidrList, final Integer icmpCode,
-                                               final Integer icmpType, final NetworkACLItem.TrafficType trafficType, final Long aclId, final String action, Integer number, final Boolean forDisplay) {
+                                               final Integer icmpType, final NetworkACLItem.TrafficType trafficType, final Long aclId, final String action, Integer number, final
+                                               Boolean forDisplay) {
         // If number is null, set it to currentMax + 1 (for backward compatibility)
         if (number == null) {
             number = _networkACLItemDao.getMaxNumberByACL(aclId) + 1;
@@ -287,19 +252,6 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
         return success;
     }
 
-    @DB
-    private void revokeRule(final NetworkACLItemVO rule) {
-        if (rule.getState() == State.Staged) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Found a rule that is still in stage state so just removing it: " + rule);
-            }
-            _networkACLItemDao.remove(rule.getId());
-        } else if (rule.getState() == State.Add || rule.getState() == State.Active) {
-            rule.setState(State.Revoke);
-            _networkACLItemDao.update(rule.getId(), rule);
-        }
-    }
-
     @Override
     public boolean revokeACLItemsForNetwork(final long networkId) throws ResourceUnavailableException {
         final Network network = _networkDao.findById(networkId);
@@ -333,72 +285,12 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
     }
 
     @Override
-    public boolean revokeACLItemsForPrivateGw(final PrivateGateway gateway) throws ResourceUnavailableException {
-        final long networkACLId = gateway.getNetworkACLId();
-        final List<NetworkACLItemVO> aclItems = _networkACLItemDao.listByACL(networkACLId);
-        if (aclItems.isEmpty()) {
-            s_logger.debug("Found no network ACL Items for private gateway 'id=" + gateway.getId() + "'");
-            return true;
-        }
-
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Releasing " + aclItems.size() + " Network ACL Items for private gateway  id=" + gateway.getId());
-        }
-
-        for (final NetworkACLItemVO aclItem : aclItems) {
-            // Mark all Network ACLs rules as Revoke, but don't update in DB
-            if (aclItem.getState() == State.Add || aclItem.getState() == State.Active) {
-                aclItem.setState(State.Revoke);
-            }
-        }
-
-        final boolean success = applyACLToPrivateGw(gateway, aclItems);
-
-        if (s_logger.isDebugEnabled() && success) {
-            s_logger.debug("Successfully released Network ACLs for private gateway id=" + gateway.getId() + " and # of rules now = " + aclItems.size());
-        }
-
-        return success;
-    }
-
-    @Override
     public List<NetworkACLItemVO> listNetworkACLItems(final long guestNtwkId) {
         final Network network = _networkMgr.getNetwork(guestNtwkId);
         if (network.getNetworkACLId() == null) {
             return null;
         }
         return _networkACLItemDao.listByACL(network.getNetworkACLId());
-    }
-
-    private void removeRule(final NetworkACLItem rule) {
-        //remove the rule
-        _networkACLItemDao.remove(rule.getId());
-    }
-
-    @Override
-    public boolean applyACLToPrivateGw(final PrivateGateway gateway) throws ResourceUnavailableException {
-        final VpcGatewayVO vpcGatewayVO = _vpcGatewayDao.findById(gateway.getId());
-        final List<? extends NetworkACLItem> rules = _networkACLItemDao.listByACL(vpcGatewayVO.getNetworkACLId());
-        return applyACLToPrivateGw(gateway, rules);
-    }
-
-    private boolean applyACLToPrivateGw(final PrivateGateway gateway, final List<? extends NetworkACLItem> rules) throws ResourceUnavailableException {
-        List<VpcProvider> vpcElements = null;
-        vpcElements = new ArrayList<>();
-        vpcElements.add((VpcProvider) _ntwkModel.getElementImplementingProvider(Network.Provider.VPCVirtualRouter.getName()));
-
-        if (vpcElements == null) {
-            throw new CloudRuntimeException("Failed to initialize vpc elements");
-        }
-
-        try {
-            for (final VpcProvider provider : vpcElements) {
-                return provider.applyACLItemsToPrivateGw(gateway, rules);
-            }
-        } catch (final Exception ex) {
-            s_logger.debug("Failed to apply acl to private gateway " + gateway);
-        }
-        return false;
     }
 
     @Override
@@ -412,8 +304,10 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
     }
 
     @Override
-    public NetworkACLItem updateNetworkACLItem(final Long id, final String protocol, final List<String> sourceCidrList, final NetworkACLItem.TrafficType trafficType, final String action,
-                                               final Integer number, final Integer sourcePortStart, final Integer sourcePortEnd, final Integer icmpCode, final Integer icmpType, final String customId, final Boolean forDisplay) throws ResourceUnavailableException {
+    public NetworkACLItem updateNetworkACLItem(final Long id, final String protocol, final List<String> sourceCidrList, final NetworkACLItem.TrafficType trafficType, final
+    String action,
+                                               final Integer number, final Integer sourcePortStart, final Integer sourcePortEnd, final Integer icmpCode, final Integer icmpType,
+                                               final String customId, final Boolean forDisplay) throws ResourceUnavailableException {
         final NetworkACLItemVO aclItem = _networkACLItemDao.findById(id);
         aclItem.setState(State.Add);
 
@@ -475,6 +369,75 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
         return null;
     }
 
+    @Override
+    public boolean replaceNetworkACLForPrivateGw(final NetworkACL acl, final PrivateGateway gateway) throws ResourceUnavailableException {
+        final VpcGatewayVO vpcGatewayVo = _vpcGatewayDao.findById(gateway.getId());
+        final List<NetworkACLItemVO> aclItems = _networkACLItemDao.listByACL(acl.getId());
+        if (aclItems == null || aclItems.isEmpty()) {
+            //Revoke ACL Items of the existing ACL if the new network acl is empty
+            //Other wise existing rules will not be removed on the router elelment
+            s_logger.debug("New network ACL is empty. Revoke existing rules before applying ACL");
+            if (!revokeACLItemsForPrivateGw(gateway)) {
+                throw new CloudRuntimeException("Failed to replace network ACL. Error while removing existing ACL " + "items for privatewa gateway: " + gateway.getId());
+            }
+        }
+
+        vpcGatewayVo.setNetworkACLId(acl.getId());
+        if (_vpcGatewayDao.update(vpcGatewayVo.getId(), vpcGatewayVo)) {
+            return applyACLToPrivateGw(gateway);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean revokeACLItemsForPrivateGw(final PrivateGateway gateway) throws ResourceUnavailableException {
+        final long networkACLId = gateway.getNetworkACLId();
+        final List<NetworkACLItemVO> aclItems = _networkACLItemDao.listByACL(networkACLId);
+        if (aclItems.isEmpty()) {
+            s_logger.debug("Found no network ACL Items for private gateway 'id=" + gateway.getId() + "'");
+            return true;
+        }
+
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("Releasing " + aclItems.size() + " Network ACL Items for private gateway  id=" + gateway.getId());
+        }
+
+        for (final NetworkACLItemVO aclItem : aclItems) {
+            // Mark all Network ACLs rules as Revoke, but don't update in DB
+            if (aclItem.getState() == State.Add || aclItem.getState() == State.Active) {
+                aclItem.setState(State.Revoke);
+            }
+        }
+
+        final boolean success = applyACLToPrivateGw(gateway, aclItems);
+
+        if (s_logger.isDebugEnabled() && success) {
+            s_logger.debug("Successfully released Network ACLs for private gateway id=" + gateway.getId() + " and # of rules now = " + aclItems.size());
+        }
+
+        return success;
+    }
+
+    @Override
+    public boolean applyACLToPrivateGw(final PrivateGateway gateway) throws ResourceUnavailableException {
+        final VpcGatewayVO vpcGatewayVO = _vpcGatewayDao.findById(gateway.getId());
+        final List<? extends NetworkACLItem> rules = _networkACLItemDao.listByACL(vpcGatewayVO.getNetworkACLId());
+        return applyACLToPrivateGw(gateway, rules);
+    }
+
+    @DB
+    private void revokeRule(final NetworkACLItemVO rule) {
+        if (rule.getState() == State.Staged) {
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("Found a rule that is still in stage state so just removing it: " + rule);
+            }
+            _networkACLItemDao.remove(rule.getId());
+        } else if (rule.getState() == State.Add || rule.getState() == State.Active) {
+            rule.setState(State.Revoke);
+            _networkACLItemDao.update(rule.getId(), rule);
+        }
+    }
+
     public boolean applyACLItemsToNetwork(final long networkId, final List<NetworkACLItemVO> rules) throws ResourceUnavailableException {
         final Network network = _networkDao.findById(networkId);
         boolean handled = false;
@@ -501,6 +464,30 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
         return handled;
     }
 
+    private void removeRule(final NetworkACLItem rule) {
+        //remove the rule
+        _networkACLItemDao.remove(rule.getId());
+    }
+
+    private boolean applyACLToPrivateGw(final PrivateGateway gateway, final List<? extends NetworkACLItem> rules) throws ResourceUnavailableException {
+        List<VpcProvider> vpcElements = null;
+        vpcElements = new ArrayList<>();
+        vpcElements.add((VpcProvider) _ntwkModel.getElementImplementingProvider(Network.Provider.VPCVirtualRouter.getName()));
+
+        if (vpcElements == null) {
+            throw new CloudRuntimeException("Failed to initialize vpc elements");
+        }
+
+        try {
+            for (final VpcProvider provider : vpcElements) {
+                return provider.applyACLItemsToPrivateGw(gateway, rules);
+            }
+        } catch (final Exception ex) {
+            s_logger.debug("Failed to apply acl to private gateway " + gateway);
+        }
+        return false;
+    }
+
     public List<NetworkACLServiceProvider> getNetworkAclElements() {
         return _networkAclElements;
     }
@@ -509,5 +496,4 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
     public void setNetworkAclElements(final List<NetworkACLServiceProvider> networkAclElements) {
         _networkAclElements = networkAclElements;
     }
-
 }

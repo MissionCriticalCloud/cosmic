@@ -1,25 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.vpc;
-
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.ConfigurationException;
 
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.configuration.ResourceCount;
@@ -30,6 +9,10 @@ import com.cloud.user.Account;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.utils.component.ManagerBase;
 
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -39,7 +22,7 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
      * @see com.cloud.user.ResourceLimitService#updateResourceLimit(java.lang.Long, java.lang.Long, java.lang.Integer, java.lang.Long)
      */
     @Override
-    public ResourceLimit updateResourceLimit(Long accountId, Long domainId, Integer resourceType, Long max) {
+    public ResourceLimit updateResourceLimit(final Long accountId, final Long domainId, final Integer resourceType, final Long max) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -48,7 +31,7 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
      * @see com.cloud.user.ResourceLimitService#recalculateResourceCount(java.lang.Long, java.lang.Long, java.lang.Integer)
      */
     @Override
-    public List<? extends ResourceCount> recalculateResourceCount(Long accountId, Long domainId, Integer typeId) {
+    public List<? extends ResourceCount> recalculateResourceCount(final Long accountId, final Long domainId, final Integer typeId) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -57,7 +40,8 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
      * @see com.cloud.user.ResourceLimitService#searchForLimits(java.lang.Long, java.lang.Long, java.lang.Long, java.lang.Integer, java.lang.Long, java.lang.Long)
      */
     @Override
-    public List<? extends ResourceLimit> searchForLimits(Long id, Long accountId, Long domainId, Integer type, Long startIndex, Long pageSizeVal) {
+    public List<? extends ResourceLimit> searchForLimits(final Long id, final Long accountId, final Long domainId, final Integer type, final Long startIndex, final Long
+            pageSizeVal) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -66,13 +50,13 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
      * @see com.cloud.user.ResourceLimitService#findCorrectResourceLimitForAccount(com.cloud.user.Account, com.cloud.configuration.Resource.ResourceType)
      */
     @Override
-    public long findCorrectResourceLimitForAccount(Account account, ResourceType type) {
+    public long findCorrectResourceLimitForAccount(final Account account, final ResourceType type) {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    public long findCorrectResourceLimitForAccount(long accountId, Long limit, ResourceType type) {
+    public long findCorrectResourceLimitForAccount(final long accountId, final Long limit, final ResourceType type) {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -81,7 +65,7 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
      * @see com.cloud.user.ResourceLimitService#findCorrectResourceLimitForDomain(com.cloud.domain.Domain, com.cloud.configuration.Resource.ResourceType)
      */
     @Override
-    public long findCorrectResourceLimitForDomain(Domain domain, ResourceType type) {
+    public long findCorrectResourceLimitForDomain(final Domain domain, final ResourceType type) {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -90,7 +74,7 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
      * @see com.cloud.user.ResourceLimitService#incrementResourceCount(long, com.cloud.configuration.Resource.ResourceType, java.lang.Long[])
      */
     @Override
-    public void incrementResourceCount(long accountId, ResourceType type, Long... delta) {
+    public void incrementResourceCount(final long accountId, final ResourceType type, final Long... delta) {
         // TODO Auto-generated method stub
 
     }
@@ -99,7 +83,7 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
      * @see com.cloud.user.ResourceLimitService#decrementResourceCount(long, com.cloud.configuration.Resource.ResourceType, java.lang.Long[])
      */
     @Override
-    public void decrementResourceCount(long accountId, ResourceType type, Long... delta) {
+    public void decrementResourceCount(final long accountId, final ResourceType type, final Long... delta) {
         // TODO Auto-generated method stub
 
     }
@@ -108,15 +92,44 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
      * @see com.cloud.user.ResourceLimitService#checkResourceLimit(com.cloud.user.Account, com.cloud.configuration.Resource.ResourceType, long[])
      */
     @Override
-    public void checkResourceLimit(Account account, ResourceType type, long... count) throws ResourceAllocationException {
+    public void checkResourceLimit(final Account account, final ResourceType type, final long... count) throws ResourceAllocationException {
         // TODO Auto-generated method stub
 
     }
 
     /* (non-Javadoc)
+     * @see com.cloud.user.ResourceLimitService#getResourceCount(com.cloud.user.Account, com.cloud.configuration.Resource.ResourceType)
+     */
+    @Override
+    public long getResourceCount(final Account account, final ResourceType type) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void checkResourceLimit(final Account account, final ResourceType type, final Boolean displayResource, final long... count) throws ResourceAllocationException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void incrementResourceCount(final long accountId, final ResourceType type, final Boolean displayResource, final Long... delta) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void changeResourceCount(final long accountId, final ResourceType type, final Boolean displayResource, final Long... delta) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void decrementResourceCount(final long accountId, final ResourceType type, final Boolean displayResource, final Long... delta) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    /* (non-Javadoc)
      * @see com.cloud.user.ResourceLimitService#countCpusForAccount(long)
      */
-    public long countCpusForAccount(long accountId) {
+    public long countCpusForAccount(final long accountId) {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -124,7 +137,7 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
     /* (non-Javadoc)
      * @see com.cloud.user.ResourceLimitService#calculateRAMForAccount(long)
      */
-    public long calculateMemoryForAccount(long accountId) {
+    public long calculateMemoryForAccount(final long accountId) {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -132,45 +145,25 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
     /* (non-Javadoc)
      * @see com.cloud.user.ResourceLimitService#calculateSecondaryStorageForAccount(long)
      */
-    public long calculateSecondaryStorageForAccount(long accountId) {
+    public long calculateSecondaryStorageForAccount(final long accountId) {
         // TODO Auto-generated method stub
         return 0;
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.user.ResourceLimitService#getResourceCount(com.cloud.user.Account, com.cloud.configuration.Resource.ResourceType)
+     * @see com.cloud.utils.component.Manager#getName()
      */
     @Override
-    public long getResourceCount(Account account, ResourceType type) {
+    public String getName() {
         // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public void checkResourceLimit(Account account, ResourceType type, Boolean displayResource, long... count) throws ResourceAllocationException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void incrementResourceCount(long accountId, ResourceType type, Boolean displayResource, Long... delta) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void changeResourceCount(long accountId, ResourceType type, Boolean displayResource, Long... delta) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void decrementResourceCount(long accountId, ResourceType type, Boolean displayResource, Long... delta) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     /* (non-Javadoc)
      * @see com.cloud.utils.component.Manager#configure(java.lang.String, java.util.Map)
      */
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         // TODO Auto-generated method stub
         return true;
     }
@@ -192,14 +185,4 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
         // TODO Auto-generated method stub
         return true;
     }
-
-    /* (non-Javadoc)
-     * @see com.cloud.utils.component.Manager#getName()
-     */
-    @Override
-    public String getName() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

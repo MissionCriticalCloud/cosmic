@@ -1,20 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function($, cloudStack) {
+(function ($, cloudStack) {
     $.extend(cloudStack, {
         ui: {
             widgets: {} // Defines API methods for UI widgets
@@ -27,18 +11,18 @@
      *
      * @param args cloudStack data args
      */
-    var makeNavigation = function(args) {
+    var makeNavigation = function (args) {
         var $navList = $('<ul>');
         var preFilter = cloudStack.sectionPreFilter ?
             cloudStack.sectionPreFilter({
                 context: $.extend(true, {}, args.context, {
-                    sections: $.map(cloudStack.sections, function(value, key) {
+                    sections: $.map(cloudStack.sections, function (value, key) {
                         return key;
                     })
                 })
             }) : null;
 
-        $.each(args.sections, function(sectionID, args) {
+        $.each(args.sections, function (sectionID, args) {
             if (preFilter && $.inArray(sectionID, preFilter) == -1) {
                 if (!(args.preFilter && args.preFilter())) {
                     return true;
@@ -83,8 +67,8 @@
      * @param sectionID Section's ID to show
      * @param args CloudStack3 configuration
      */
-    var showSection = function(sectionID, args, $browser) {
-        var $navItem = $('#navigation').find('li').filter(function() {
+    var showSection = function (sectionID, args, $browser) {
+        var $navItem = $('#navigation').find('li').filter(function () {
             return $(this).hasClass(sectionID);
         });
         var data = args.sections[sectionID];
@@ -102,8 +86,8 @@
         $browser.cloudBrowser('addPanel', {
             title: '<span class="section">' + _l(data.title) + '</span>' + '<span class="subsection"></span>',
             data: '',
-            complete: function($panel, $breadcrumb) {
-                if(!isPlugin) {
+            complete: function ($panel, $breadcrumb) {
+                if (!isPlugin) {
                     $breadcrumb.attr('title', _l(data.title));
                 }
 
@@ -133,14 +117,14 @@
 
     // Define page element generation fns
     var pageElems = {
-        header: function(args) {
+        header: function (args) {
             // Make notification area
             var $notificationArea = $('<div>').addClass('button notifications')
                 .append(
                     $('<div>').addClass('total')
                     // Total notifications
-                    .append($('<span>').html(0))
-            )
+                        .append($('<span>').html(0))
+                )
                 .append($('<span>').html(_l('label.notifications')))
                 .notifications();
 
@@ -149,22 +133,20 @@
                 .append(
                     // Default View
                     $('<div>').addClass('select default-view active')
-                    .html(_l('label.default.view'))
-                    .prepend(
-                        $('<span>').addClass('icon').html('&nbsp;')
-
-
-                    )
-            )
+                        .html(_l('label.default.view'))
+                        .prepend(
+                            $('<span>').addClass('icon').html('&nbsp;')
+                        )
+                )
                 .append(
                     // Project View
                     $('<div>').addClass('select project-view')
-                    .html(_l('label.project.view'))
-                    .prepend(
-                        $('<span>').addClass('icon').html('&nbsp;')
-                    )
-            )
-                .click(function(event) {
+                        .html(_l('label.project.view'))
+                        .prepend(
+                            $('<span>').addClass('icon').html('&nbsp;')
+                        )
+                )
+                .click(function (event) {
                     var $target = $(event.target);
                     var $projectSwitcher = $(this);
                     var $container = $('html body');
@@ -176,7 +158,7 @@
                             'system',
                             'global-settings',
                             'configuration'
-                        ], function(id) {
+                        ], function (id) {
                             return '#navigation li.' + id;
                         }).join(',')
                     );
@@ -225,28 +207,28 @@
                 .append(
                     $('<div>').addClass('name').text(
                         args.context && args.context.users ?
-                        cloudStack.concat(userLabel, 21) : 'Invalid User'
+                            cloudStack.concat(userLabel, 21) : 'Invalid User'
                     )
-            )
+                )
                 .append(
                     $('<div>').addClass('icon options')
-                    .append(
-                        $('<div>').addClass('icon arrow')
-                    )
-            );
+                        .append(
+                            $('<div>').addClass('icon arrow')
+                        )
+                );
             $userInfo.attr('title', userLabel);
 
             return [
                 $('<div>').addClass('logo'),
                 $('<div>').addClass('controls')
-                .append($notificationArea)
-                .append($viewSwitcher)
-                .append($projectSelect)
-                .append($userInfo)
+                    .append($notificationArea)
+                    .append($viewSwitcher)
+                    .append($projectSelect)
+                    .append($userInfo)
             ];
         },
 
-        'main-area': function(args) {
+        'main-area': function (args) {
             var $navigation = $('<div>').attr({
                 id: 'navigation'
             });
@@ -258,14 +240,14 @@
                     $('<div>').attr({
                         id: 'breadcrumbs'
                     })
-                    .append($('<div>').addClass('home').text(_l('label.home')))
-                    .append($('<div>').addClass('end'))
-            )
+                        .append($('<div>').addClass('home').text(_l('label.home')))
+                        .append($('<div>').addClass('end'))
+                )
 
-            .append(
-                // Panel container
-                $('<div>').addClass('container')
-            );
+                .append(
+                    // Panel container
+                    $('<div>').addClass('container')
+                );
 
             makeNavigation(args).appendTo($navigation);
 
@@ -275,7 +257,7 @@
         }
     };
 
-    $.fn.cloudStack = function(args) {
+    $.fn.cloudStack = function (args) {
         var $container = $('<div>')
             .attr({
                 id: 'container',
@@ -289,12 +271,12 @@
         $('.login').remove();
 
         // Create pageElems
-        $.each(pageElems, function(id, fn) {
+        $.each(pageElems, function (id, fn) {
             var $elem = $('<div>').attr({
                 id: id
             });
 
-            $(fn(args)).each(function() {
+            $(fn(args)).each(function () {
                 $elem.append($(this));
             });
 
@@ -307,7 +289,7 @@
         })
             .appendTo($('#user'));
 
-        $(['label.logout', 'label.help', 'label.about']).each(function() {
+        $(['label.logout', 'label.help', 'label.about']).each(function () {
             var $link = $('<a>')
                 .attr({
                     href: '#'
@@ -316,7 +298,7 @@
                 .appendTo($options);
 
             if (this == 'label.help') {
-                $link.addClass('help').click(function() {
+                $link.addClass('help').click(function () {
                     var helpURL = 'https://github.com/MissionCriticalCloud/cosmic/issues';
 
                     window.open(helpURL, '_blank');
@@ -325,7 +307,7 @@
                 });
             }
             if (this == 'label.about') {
-                $link.addClass('about').click(function() {
+                $link.addClass('about').click(function () {
                     var $logo = $('<div>').addClass('logo').text(_l('label.app.name')),
                         $version = $('<div>').addClass('version').text(g_cloudstackversion),
                         $about = $('<div>').addClass('about').append($logo).append($version);
@@ -336,7 +318,7 @@
                         closeOnEscape: false,
                         dialogClass: 'dialog-about',
                         buttons: {
-                            'Close': function() {
+                            'Close': function () {
                                 $(this).dialog("close");
                                 $(':ui-dialog, .overlay').remove();
                             }
@@ -351,7 +333,7 @@
         // Initialize browser
         $container.find('#browser div.container').cloudBrowser();
         $container.find('#navigation li')
-            .filter(function() {
+            .filter(function () {
                 return $(this).hasClass(args.home);
             })
             .click();
@@ -363,7 +345,7 @@
 
         $.validator.addMethod(
             "disallowSpecialCharacters",
-            function(value, element) {
+            function (value, element) {
                 return (value.indexOf("<") == -1 && value.indexOf(">") == -1);
             },
             jQuery.validator.format('message.disallowed.characters')
@@ -374,10 +356,10 @@
             args.projects.invitationCheck({
                 context: cloudStack.context,
                 response: {
-                    success: function(args) {
+                    success: function (args) {
                         if (!args.data.length) return;
 
-                        var projectList = $.map(args.data, function(invitation) {
+                        var projectList = $.map(args.data, function (invitation) {
                             return '<li>' + invitation.project + '</li>';
                         }).join('');
 
@@ -398,7 +380,7 @@
     };
 
     // Events
-    $(function() {
+    $(function () {
         // Check if target should be hovered
         function checkHoveredLabel($target) {
             var $multiWizard = $('div.ui-dialog div.multi-wizard');
@@ -413,7 +395,7 @@
         }
 
         // Rollover behavior for user options
-        $(document).bind('mouseover', function(event) {
+        $(document).bind('mouseover', function (event) {
             var $target = $(event.target);
             if (checkHoveredLabel($target)) {
                 $target.addClass('label-hovered');
@@ -425,14 +407,14 @@
             return false;
         });
 
-        $(document).bind('mouseout', function(event) {
+        $(document).bind('mouseout', function (event) {
             var $target = $(event.target);
             if (checkHoveredLabel($target)) {
                 $target.removeClass('label-hovered');
             }
         });
 
-        $(document).bind('click', function(event) {
+        $(document).bind('click', function (event) {
             var $target = $(event.target);
             var $container = $target.closest('[cloudStack-container]');
             var args = $container.data('cloudStack-args');

@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.api;
@@ -31,42 +16,42 @@ public class GetStorageStatsCommand extends Command {
     private String secUrl;
     private DataStoreTO store;
 
+    public GetStorageStatsCommand() {
+    }
+
+    public GetStorageStatsCommand(final DataStoreTO store) {
+        this.store = store;
+    }
+
+    public GetStorageStatsCommand(final String secUrl) {
+        this.secUrl = secUrl;
+    }
+
+    public GetStorageStatsCommand(final String id, final StoragePoolType pooltype) {
+        this.id = id;
+        this.pooltype = pooltype;
+    }
+
+    public GetStorageStatsCommand(final String id, final StoragePoolType pooltype, final String localPath) {
+        this.id = id;
+        this.pooltype = pooltype;
+        this.localPath = localPath;
+    }
+
     public String getSecUrl() {
         return secUrl;
     }
 
-    public void setSecUrl(String secUrl) {
+    public void setSecUrl(final String secUrl) {
         this.secUrl = secUrl;
-    }
-
-    public GetStorageStatsCommand() {
     }
 
     public StoragePoolType getPooltype() {
         return pooltype;
     }
 
-    public void setPooltype(StoragePoolType pooltype) {
+    public void setPooltype(final StoragePoolType pooltype) {
         this.pooltype = pooltype;
-    }
-
-    public GetStorageStatsCommand(DataStoreTO store) {
-        this.store = store;
-    }
-
-    public GetStorageStatsCommand(String secUrl) {
-        this.secUrl = secUrl;
-    }
-
-    public GetStorageStatsCommand(String id, StoragePoolType pooltype) {
-        this.id = id;
-        this.pooltype = pooltype;
-    }
-
-    public GetStorageStatsCommand(String id, StoragePoolType pooltype, String localPath) {
-        this.id = id;
-        this.pooltype = pooltype;
-        this.localPath = localPath;
     }
 
     public String getStorageId() {

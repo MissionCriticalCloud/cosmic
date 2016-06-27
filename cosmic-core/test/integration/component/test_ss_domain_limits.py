@@ -1,20 +1,3 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 """ P1 tests for secondary storage domain limits
 
     Test Plan: https://cwiki.apache.org/confluence/display/CLOUDSTACK/Limit+Resources+to+domain+or+accounts
@@ -24,8 +7,10 @@
     Feature Specifications: https://cwiki.apache.org/confluence/display/CLOUDSTACK/Limit+Resources+to+domains+and+accounts
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import (PASS,
+                          FAIL,
+                          RESOURCE_SECONDARY_STORAGE)
 from marvin.lib.base import (Account,
                              Resources,
                              Domain,
@@ -37,16 +22,14 @@ from marvin.lib.common import (get_domain,
                                list_zones,
                                isDomainResourceCountEqualToExpectedCount)
 from marvin.lib.utils import (cleanup_resources, validateList)
-from marvin.codes import (PASS,
-                          FAIL,
-                          RESOURCE_SECONDARY_STORAGE)
+from nose.plugins.attrib import attr
+
 
 class TestMultipleChildDomain(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cloudstackTestClient = super(TestMultipleChildDomain,
-                               cls).getClsTestClient()
+                                     cls).getClsTestClient()
         cls.api_client = cloudstackTestClient.getApiClient()
         # Fill services from the external config file
         cls.services = cloudstackTestClient.getParsedTestDataConfig()
@@ -56,10 +39,10 @@ class TestMultipleChildDomain(cloudstackTestCase):
         cls.services["mode"] = cls.zone.networktype
 
         cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.services["ostype"]
-                            )
+            cls.api_client,
+            cls.zone.id,
+            cls.services["ostype"]
+        )
 
         cls._cleanup = []
         return
@@ -93,19 +76,19 @@ class TestMultipleChildDomain(cloudstackTestCase):
         child domains"""
 
         try:
-            #Update resource limit for domain
+            # Update resource limit for domain
             Resources.updateLimit(self.apiclient, resourcetype=11,
-                              max=parentdomainlimit,
-                              domainid=self.parent_domain.id)
+                                  max=parentdomainlimit,
+                                  domainid=self.parent_domain.id)
 
             # Update Resource limit for sub-domains
             Resources.updateLimit(self.apiclient, resourcetype=11,
-                              max=subdomainlimit,
-                              domainid=self.cadmin_1.domainid)
+                                  max=subdomainlimit,
+                                  domainid=self.cadmin_1.domainid)
 
             Resources.updateLimit(self.apiclient, resourcetype=11,
-                              max=subdomainlimit,
-                              domainid=self.cadmin_2.domainid)
+                                  max=subdomainlimit,
+                                  domainid=self.cadmin_2.domainid)
         except Exception as e:
             return [FAIL, e]
         return [PASS, None]
@@ -113,24 +96,24 @@ class TestMultipleChildDomain(cloudstackTestCase):
     def setupAccounts(self):
         try:
             self.parent_domain = Domain.create(self.apiclient,
-                                        services=self.services["domain"],
-                                        parentdomainid=self.domain.id)
+                                               services=self.services["domain"],
+                                               parentdomainid=self.domain.id)
             self.parentd_admin = Account.create(self.apiclient, self.services["account"],
-                                            admin=True, domainid=self.parent_domain.id)
+                                                admin=True, domainid=self.parent_domain.id)
 
             # Create sub-domains and their admin accounts
             self.cdomain_1 = Domain.create(self.apiclient,
-                                       services=self.services["domain"],
-                                       parentdomainid=self.parent_domain.id)
+                                           services=self.services["domain"],
+                                           parentdomainid=self.parent_domain.id)
             self.cdomain_2 = Domain.create(self.apiclient,
-                                        services=self.services["domain"],
-                                        parentdomainid=self.parent_domain.id)
+                                           services=self.services["domain"],
+                                           parentdomainid=self.parent_domain.id)
 
             self.cadmin_1 = Account.create(self.apiclient, self.services["account"],
-                                       admin=True, domainid=self.cdomain_1.id)
+                                           admin=True, domainid=self.cdomain_1.id)
 
             self.cadmin_2 = Account.create(self.apiclient, self.services["account"],
-                                       admin=True, domainid=self.cdomain_2.id)
+                                           admin=True, domainid=self.cdomain_2.id)
 
             # Cleanup the resources created at end of test
             self.cleanup.append(self.cadmin_1)
@@ -141,9 +124,9 @@ class TestMultipleChildDomain(cloudstackTestCase):
             self.cleanup.append(self.parent_domain)
 
             users = {
-                 self.cdomain_1: self.cadmin_1,
-                 self.cdomain_2: self.cadmin_2
-                 }
+                self.cdomain_1: self.cadmin_1,
+                self.cdomain_2: self.cadmin_2
+            }
         except Exception as e:
             return [FAIL, e, None]
         return [PASS, None, users]
@@ -186,66 +169,66 @@ class TestMultipleChildDomain(cloudstackTestCase):
             self.services["template_2"]["format"] = builtin_info[2]
 
             templateChildAccount1 = Template.register(self.apiclient,
-                                     self.services["template_2"],
-                                     zoneid=self.zone.id,
-                                     account=self.cadmin_1.name,
-                                     domainid=self.cadmin_1.domainid)
+                                                      self.services["template_2"],
+                                                      zoneid=self.zone.id,
+                                                      account=self.cadmin_1.name,
+                                                      domainid=self.cadmin_1.domainid)
 
             templateChildAccount1.download(self.apiclient)
 
             templates = Template.list(self.apiclient,
-                                      templatefilter=\
-                                      self.services["template_2"]["templatefilter"],
+                                      templatefilter= \
+                                          self.services["template_2"]["templatefilter"],
                                       id=templateChildAccount1.id)
             if validateList(templates)[0] == FAIL:
                 raise Exception("templates list validation failed")
 
-            self.templateSize = int(int(templates[0].size) / (1024**3))
+            self.templateSize = int(int(templates[0].size) / (1024 ** 3))
         except Exception as e:
             self.fail("Failed with exception as ee: %s" % e)
 
         subdomainlimit = (self.templateSize)
 
-        result = self.updateDomainResourceLimits(((subdomainlimit*2)), subdomainlimit)
+        result = self.updateDomainResourceLimits(((subdomainlimit * 2)), subdomainlimit)
         self.assertEqual(result[0], PASS, result[1])
 
         # Checking Primary Storage count of Parent domain admin before deleting child domain user account
         result = isDomainResourceCountEqualToExpectedCount(
-                        self.apiclient, self.cadmin_1.domainid,
-                        self.templateSize, RESOURCE_SECONDARY_STORAGE)
+            self.apiclient, self.cadmin_1.domainid,
+            self.templateSize, RESOURCE_SECONDARY_STORAGE)
         self.assertFalse(result[0], result[1])
         self.assertTrue(result[2], "Resource count does not match")
 
         try:
             templateChildAccount2 = Template.register(self.apiclient,
-                                     self.services["template_2"],
-                                     zoneid=self.zone.id,
-                                     account=self.cadmin_2.name,
-                                     domainid=self.cadmin_2.domainid)
+                                                      self.services["template_2"],
+                                                      zoneid=self.zone.id,
+                                                      account=self.cadmin_2.name,
+                                                      domainid=self.cadmin_2.domainid)
 
             templateChildAccount2.download(self.apiclient)
         except Exception as e:
             self.fail("Failed while registering/downloading template: %s" % e)
 
         result = isDomainResourceCountEqualToExpectedCount(
-                        self.apiclient, self.cadmin_2.domainid,
-                        self.templateSize, RESOURCE_SECONDARY_STORAGE)
+            self.apiclient, self.cadmin_2.domainid,
+            self.templateSize, RESOURCE_SECONDARY_STORAGE)
         self.assertFalse(result[0], result[1])
         self.assertTrue(result[2], "Resource count does not match")
 
         with self.assertRaises(Exception):
             Template.register(self.apiclient,
-                                     self.services["template_2"],
-                                     zoneid=self.zone.id,
-                                     account=self.parentd_admin.name,
-                                     domainid=self.parentd_admin.domainid)
+                              self.services["template_2"],
+                              zoneid=self.zone.id,
+                              account=self.parentd_admin.name,
+                              domainid=self.parentd_admin.domainid)
 
         self.cadmin_1.delete(self.apiclient)
         self.cleanup.remove(self.cadmin_1)
 
         result = isDomainResourceCountEqualToExpectedCount(
-                        self.apiclient, self.parent_domain.id,
-                        self.templateSize, RESOURCE_SECONDARY_STORAGE)
+            self.apiclient, self.parent_domain.id,
+            self.templateSize, RESOURCE_SECONDARY_STORAGE)
         self.assertFalse(result[0], result[1])
         self.assertTrue(result[2], "Resource count does not match")
 
@@ -255,8 +238,8 @@ class TestMultipleChildDomain(cloudstackTestCase):
             self.fail("Failed to delete template: %s" % e)
 
         result = isDomainResourceCountEqualToExpectedCount(
-                        self.apiclient, self.parent_domain.id,
-                        0, RESOURCE_SECONDARY_STORAGE)
+            self.apiclient, self.parent_domain.id,
+            0, RESOURCE_SECONDARY_STORAGE)
         self.assertFalse(result[0], result[1])
         self.assertTrue(result[2], "Resource count does not match")
         return
@@ -291,25 +274,25 @@ class TestMultipleChildDomain(cloudstackTestCase):
                 self.services["template_2"]["format"] = builtin_info[2]
 
                 template = Template.register(self.apiclient,
-                                     self.services["template_2"],
-                                     zoneid=self.zone.id,
-                                     account=self.account.name,
-                                     domainid=self.account.domainid)
+                                             self.services["template_2"],
+                                             zoneid=self.zone.id,
+                                             account=self.account.name,
+                                             domainid=self.account.domainid)
 
                 template.download(self.apiclient)
 
                 templates = Template.list(self.apiclient,
-                                      templatefilter=\
-                                      self.services["template_2"]["templatefilter"],
-                                      id=template.id)
+                                          templatefilter= \
+                                              self.services["template_2"]["templatefilter"],
+                                          id=template.id)
                 if validateList(templates)[0] == FAIL:
                     raise Exception("templates list validation failed")
 
-                templateSize = int(int(templates[0].size) / (1024**3))
+                templateSize = int(int(templates[0].size) / (1024 ** 3))
                 expectedCount = templateSize
                 result = isDomainResourceCountEqualToExpectedCount(
-                                    self.apiclient, self.domain.id,
-                                    expectedCount, RESOURCE_SECONDARY_STORAGE)
+                    self.apiclient, self.domain.id,
+                    expectedCount, RESOURCE_SECONDARY_STORAGE)
                 self.assertFalse(result[0], result[1])
                 self.assertTrue(result[2], "Resource count does not match")
 
@@ -317,13 +300,13 @@ class TestMultipleChildDomain(cloudstackTestCase):
 
                 expectedCount = 0
                 result = isDomainResourceCountEqualToExpectedCount(
-                                    self.apiclient, self.domain.id,
-                                    expectedCount, RESOURCE_SECONDARY_STORAGE)
+                    self.apiclient, self.domain.id,
+                    expectedCount, RESOURCE_SECONDARY_STORAGE)
                 self.assertFalse(result[0], result[1])
                 self.assertTrue(result[2], "Resource count does not match")
             except Exception as e:
                 self.fail("Failed to get zone list: %s" % e)
-	    return
+            return
 
     @attr(tags=["advanced"], required_hardware="true")
     def test_03_copy_template(self):
@@ -362,53 +345,53 @@ class TestMultipleChildDomain(cloudstackTestCase):
                 self.services["template_2"]["format"] = builtin_info[2]
 
                 template = Template.register(self.apiclient,
-                                     self.services["template_2"],
-                                     zoneid=self.zone.id,
-                                     account=self.account.name,
-                                     domainid=self.account.domainid)
+                                             self.services["template_2"],
+                                             zoneid=self.zone.id,
+                                             account=self.account.name,
+                                             domainid=self.account.domainid)
 
                 template.download(self.apiclient)
 
                 templates = Template.list(self.apiclient,
-                                      templatefilter=\
-                                      self.services["template_2"]["templatefilter"],
-                                      id=template.id)
+                                          templatefilter= \
+                                              self.services["template_2"]["templatefilter"],
+                                          id=template.id)
                 if validateList(templates)[0] == FAIL:
                     raise Exception("templates list validation failed")
 
-                templateSize = int(int(templates[0].size) / (1024**3))
+                templateSize = int(int(templates[0].size) / (1024 ** 3))
                 expectedCount = templateSize
                 result = isDomainResourceCountEqualToExpectedCount(
-                                    self.apiclient, self.domain.id,
-                                    expectedCount, RESOURCE_SECONDARY_STORAGE)
+                    self.apiclient, self.domain.id,
+                    expectedCount, RESOURCE_SECONDARY_STORAGE)
                 self.assertFalse(result[0], result[1])
                 self.assertTrue(result[2], "Resource count does not match")
 
                 templateDestinationZoneId = None
                 for zone in zones:
-                    if template.zoneid != zone.id :
+                    if template.zoneid != zone.id:
                         templateDestinationZoneId = zone.id
                         break
 
                 template.copy(self.apiclient, destzoneid=templateDestinationZoneId,
-                              sourcezoneid = template.zoneid)
+                              sourcezoneid=template.zoneid)
 
                 expectedCount *= 2
                 result = isDomainResourceCountEqualToExpectedCount(
-                                    self.apiclient, self.domain.id,
-                                    expectedCount, RESOURCE_SECONDARY_STORAGE)
+                    self.apiclient, self.domain.id,
+                    expectedCount, RESOURCE_SECONDARY_STORAGE)
                 self.assertFalse(result[0], result[1])
                 self.assertTrue(result[2], "Resource count does not match")
             except Exception as e:
                 self.fail("Failed to get zone list: %s" % e)
-	    return
+            return
+
 
 class TestDeleteAccount(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cloudstackTestClient = super(TestDeleteAccount,
-                               cls).getClsTestClient()
+                                     cls).getClsTestClient()
         cls.api_client = cloudstackTestClient.getApiClient()
         # Fill services from the external config file
         cls.services = cloudstackTestClient.getParsedTestDataConfig()
@@ -417,10 +400,10 @@ class TestDeleteAccount(cloudstackTestCase):
         cls.zone = get_zone(cls.api_client)
         cls.services["mode"] = cls.zone.networktype
         cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.services["ostype"]
-                            )
+            cls.api_client,
+            cls.zone.id,
+            cls.services["ostype"]
+        )
         cls._cleanup = []
         return
 
@@ -451,24 +434,24 @@ class TestDeleteAccount(cloudstackTestCase):
     def setupAccounts(self):
         try:
             self.parent_domain = Domain.create(self.apiclient,
-                                        services=self.services["domain"],
-                                        parentdomainid=self.domain.id)
+                                               services=self.services["domain"],
+                                               parentdomainid=self.domain.id)
             self.parentd_admin = Account.create(self.apiclient, self.services["account"],
-                                            admin=True, domainid=self.parent_domain.id)
+                                                admin=True, domainid=self.parent_domain.id)
 
             # Create sub-domains and their admin accounts
             self.cdomain_1 = Domain.create(self.apiclient,
-                                       services=self.services["domain"],
-                                       parentdomainid=self.parent_domain.id)
+                                           services=self.services["domain"],
+                                           parentdomainid=self.parent_domain.id)
             self.cdomain_2 = Domain.create(self.apiclient,
-                                        services=self.services["domain"],
-                                        parentdomainid=self.parent_domain.id)
+                                           services=self.services["domain"],
+                                           parentdomainid=self.parent_domain.id)
 
             self.cadmin_1 = Account.create(self.apiclient, self.services["account"],
-                                       admin=True, domainid=self.cdomain_1.id)
+                                           admin=True, domainid=self.cdomain_1.id)
 
             self.cadmin_2 = Account.create(self.apiclient, self.services["account"],
-                                       admin=True, domainid=self.cdomain_2.id)
+                                           admin=True, domainid=self.cdomain_2.id)
 
             # Cleanup the resources created at end of test
             self.cleanup.append(self.cadmin_2)
@@ -478,9 +461,9 @@ class TestDeleteAccount(cloudstackTestCase):
             self.cleanup.append(self.parent_domain)
 
             users = {
-                 self.cdomain_1: self.cadmin_1,
-                 self.cdomain_2: self.cadmin_2
-                 }
+                self.cdomain_1: self.cadmin_1,
+                self.cdomain_2: self.cadmin_2
+            }
         except Exception as e:
             return [FAIL, e, None]
         return [PASS, None, users]
@@ -516,55 +499,55 @@ class TestDeleteAccount(cloudstackTestCase):
             self.services["template_2"]["format"] = builtin_info[2]
 
             template = Template.register(self.apiclient,
-                                     self.services["template_2"],
-                                     zoneid=self.zone.id,
-                                     account=self.cadmin_1.name,
-                                     domainid=self.cadmin_1.domainid)
+                                         self.services["template_2"],
+                                         zoneid=self.zone.id,
+                                         account=self.cadmin_1.name,
+                                         domainid=self.cadmin_1.domainid)
 
             template.download(self.apiclient)
 
             templates = Template.list(self.apiclient,
-                                      templatefilter=\
-                                      self.services["template_2"]["templatefilter"],
+                                      templatefilter= \
+                                          self.services["template_2"]["templatefilter"],
                                       id=template.id)
             if validateList(templates)[0] == FAIL:
                 raise Exception("templates list validation failed")
 
-            self.templateSize = int(int(templates[0].size) / (1024**3))
+            self.templateSize = int(int(templates[0].size) / (1024 ** 3))
         except Exception as e:
             self.fail("Failed with exception as ee: %s" % e)
 
         # Checking Primary Storage count of Parent domain admin before deleting child domain user account
         expectedCount = self.templateSize
         result = isDomainResourceCountEqualToExpectedCount(
-                                    self.apiclient, self.cadmin_1.domainid,
-                                    expectedCount, RESOURCE_SECONDARY_STORAGE)
+            self.apiclient, self.cadmin_1.domainid,
+            expectedCount, RESOURCE_SECONDARY_STORAGE)
         self.assertFalse(result[0], result[1])
         self.assertTrue(result[2], "Resource count does not match")
 
         try:
             template = Template.register(self.apiclient,
-                                     self.services["template_2"],
-                                     zoneid=self.zone.id,
-                                     account=self.cadmin_2.name,
-                                     domainid=self.cadmin_2.domainid)
+                                         self.services["template_2"],
+                                         zoneid=self.zone.id,
+                                         account=self.cadmin_2.name,
+                                         domainid=self.cadmin_2.domainid)
 
             template.download(self.apiclient)
         except Exception as e:
             self.fail("Failed while registering/downloading template: %s" % e)
 
         result = isDomainResourceCountEqualToExpectedCount(
-                                    self.apiclient, self.cadmin_2.domainid,
-                                    expectedCount, RESOURCE_SECONDARY_STORAGE)
+            self.apiclient, self.cadmin_2.domainid,
+            expectedCount, RESOURCE_SECONDARY_STORAGE)
         self.assertFalse(result[0], result[1])
         self.assertTrue(result[2], "Resource count does not match")
 
-        self.templateSize = int((int(templates[0].size)*2) / (1024**3))
+        self.templateSize = int((int(templates[0].size) * 2) / (1024 ** 3))
 
         expectedCount = self.templateSize
         result = isDomainResourceCountEqualToExpectedCount(
-                                    self.apiclient, self.parent_domain.id,
-                                    expectedCount, RESOURCE_SECONDARY_STORAGE)
+            self.apiclient, self.parent_domain.id,
+            expectedCount, RESOURCE_SECONDARY_STORAGE)
         self.assertFalse(result[0], result[1])
         self.assertTrue(result[2], "Resource count does not match")
 
@@ -575,8 +558,8 @@ class TestDeleteAccount(cloudstackTestCase):
 
         expectedCount /= 2
         result = isDomainResourceCountEqualToExpectedCount(
-                                    self.apiclient, self.parent_domain.id,
-                                    expectedCount, RESOURCE_SECONDARY_STORAGE)
+            self.apiclient, self.parent_domain.id,
+            expectedCount, RESOURCE_SECONDARY_STORAGE)
         self.assertFalse(result[0], result[1])
         self.assertTrue(result[2], "Resource count does not match")
         return

@@ -1,0 +1,120 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cloud-plugin-user-authenticator-ldap</artifactId>
+    <name>Cosmic Plugin - User Authenticator LDAP</name>
+    <version>5.1.0.1-SNAPSHOT</version>
+
+    <parent>
+        <groupId>cloud.cosmic</groupId>
+        <artifactId>cosmic-core</artifactId>
+        <version>5.1.0.1-SNAPSHOT</version>
+        <relativePath>../../../</relativePath>
+    </parent>
+
+    <distributionManagement>
+        <repository>
+            <id>beta-nexus</id>
+            <name>MCC Nexus</name>
+            <url>https://beta-nexus.mcc.schubergphilis.com/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>beta-nexus</id>
+            <name>MCC Nexus</name>
+            <url>https://beta-nexus.mcc.schubergphilis.com/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <dependencies>
+        <!-- Mandatory dependencies for using Spock -->
+        <dependency>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-core</artifactId>
+            <version>0.7-groovy-2.0</version>
+        </dependency>
+
+        <!-- Optional dependencies for using Spock -->
+        <dependency> <!-- enables mocking of classes (in addition to interfaces) -->
+            <groupId>cglib</groupId>
+            <artifactId>cglib-nodep</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-server</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <version>1.3</version>
+                <configuration>
+                    <providerSelection>1.7</providerSelection>
+                    <source />
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <fileset>
+                                    <directory>test/groovy</directory>
+                                    <includes>
+                                        <include>**/*.groovy</include>
+                                    </includes>
+                                </fileset>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.gmaven.runtime</groupId>
+                        <artifactId>gmaven-runtime-1.7</artifactId>
+                        <version>1.3</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.codehaus.groovy</groupId>
+                                <artifactId>groovy-all</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-all</artifactId>
+                        <version>2.0.5</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*Spec*</include>
+                        <include>**/*Test.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.btmatthews.maven.plugins</groupId>
+                <artifactId>ldap-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+                    <monitorPort>11389</monitorPort>
+                    <monitorKey>ldap</monitorKey>
+                    <daemon>false</daemon>
+                    <rootDn>dc=cosmic,dc=org</rootDn>
+                    <ldapPort>10389</ldapPort>
+                    <ldifFile>test/resources/cosmic.cloud.ldif</ldifFile>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

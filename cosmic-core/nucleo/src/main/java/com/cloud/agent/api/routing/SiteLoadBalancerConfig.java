@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.api.routing;
@@ -50,7 +35,16 @@ public class SiteLoadBalancerConfig {
     // wight corresponding to this site
     long weight = 1;
 
-    public SiteLoadBalancerConfig(boolean revoked, String serviceType, String servicePublicIp, String servicePort, long dataCenterId) {
+    public SiteLoadBalancerConfig(final String gslbProviderPublicIP, final String gslbProviderPrivateIp, final boolean local, final boolean revoked, final String serviceType,
+                                  final String servicePublicIp,
+                                  final String port, final long dataCenterId) {
+        this(revoked, serviceType, servicePublicIp, port, dataCenterId);
+        this.gslbProviderPrivateIp = gslbProviderPrivateIp;
+        this.gslbProviderPublicIp = gslbProviderPublicIP;
+        this.local = local;
+    }
+
+    public SiteLoadBalancerConfig(final boolean revoked, final String serviceType, final String servicePublicIp, final String servicePort, final long dataCenterId) {
         this.revoked = revoked;
         this.serviceType = serviceType;
         this.servicePublicIp = servicePublicIp;
@@ -58,19 +52,11 @@ public class SiteLoadBalancerConfig {
         this.dataCenterId = dataCenterId;
     }
 
-    public SiteLoadBalancerConfig(String gslbProviderPublicIP, String gslbProviderPrivateIp, boolean local, boolean revoked, String serviceType, String servicePublicIp,
-            String port, long dataCenterId) {
-        this(revoked, serviceType, servicePublicIp, port, dataCenterId);
-        this.gslbProviderPrivateIp = gslbProviderPrivateIp;
-        this.gslbProviderPublicIp = gslbProviderPublicIP;
-        this.local = local;
-    }
-
     public String getServiceType() {
         return serviceType;
     }
 
-    public void setServiceType(String serviceType) {
+    public void setServiceType(final String serviceType) {
         this.serviceType = serviceType;
     }
 
@@ -78,7 +64,7 @@ public class SiteLoadBalancerConfig {
         return servicePublicIp;
     }
 
-    public void SetServicePublicIp(String servicePublicIp) {
+    public void SetServicePublicIp(final String servicePublicIp) {
         this.servicePublicIp = servicePublicIp;
     }
 
@@ -86,7 +72,7 @@ public class SiteLoadBalancerConfig {
         return servicePort;
     }
 
-    public void setServicePort(String port) {
+    public void setServicePort(final String port) {
         this.servicePort = port;
     }
 
@@ -94,7 +80,7 @@ public class SiteLoadBalancerConfig {
         return gslbProviderPrivateIp;
     }
 
-    public void setGslbProviderPrivateIp(String privateIp) {
+    public void setGslbProviderPrivateIp(final String privateIp) {
         this.gslbProviderPrivateIp = privateIp;
     }
 
@@ -102,19 +88,19 @@ public class SiteLoadBalancerConfig {
         return gslbProviderPublicIp;
     }
 
-    public long getDataCenterId() {
-        return dataCenterId;
+    public void setGslbProviderPublicIp(final String publicIp) {
+        this.gslbProviderPublicIp = publicIp;
     }
 
-    public void setGslbProviderPublicIp(String publicIp) {
-        this.gslbProviderPublicIp = publicIp;
+    public long getDataCenterId() {
+        return dataCenterId;
     }
 
     public boolean isLocal() {
         return local;
     }
 
-    public void setLocal(boolean local) {
+    public void setLocal(final boolean local) {
         this.local = local;
     }
 
@@ -122,13 +108,12 @@ public class SiteLoadBalancerConfig {
         return revoked;
     }
 
-    public void setWeight(long weight) {
-        assert (weight >= 1 && weight <= 100);
-        this.weight = weight;
-    }
-
     public long getWeight() {
         return weight;
     }
 
+    public void setWeight(final long weight) {
+        assert (weight >= 1 && weight <= 100);
+        this.weight = weight;
+    }
 }

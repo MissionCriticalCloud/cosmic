@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network;
 
 import static org.junit.Assert.assertEquals;
@@ -23,9 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.DataCenterVnetDao;
@@ -33,30 +14,25 @@ import com.cloud.network.dao.PhysicalNetworkDao;
 import com.cloud.network.dao.PhysicalNetworkVO;
 import com.cloud.utils.db.TransactionLegacy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 public class UpdatePhysicalNetworkTest {
-    private PhysicalNetworkDao _physicalNetworkDao = mock(PhysicalNetworkDao.class);
-    private DataCenterVnetDao _datacenterVnetDao = mock(DataCenterVnetDao.class);
-    private DataCenterDao _datacenterDao = mock(DataCenterDao.class);
-    private DataCenterVO datacentervo = mock(DataCenterVO.class);
-    private PhysicalNetworkVO physicalNetworkVO = mock(PhysicalNetworkVO.class);
-    List<String> existingRange = new ArrayList<String>();
+    private final PhysicalNetworkDao _physicalNetworkDao = mock(PhysicalNetworkDao.class);
+    private final DataCenterVnetDao _datacenterVnetDao = mock(DataCenterVnetDao.class);
+    private final DataCenterDao _datacenterDao = mock(DataCenterDao.class);
+    private final DataCenterVO datacentervo = mock(DataCenterVO.class);
+    private final PhysicalNetworkVO physicalNetworkVO = mock(PhysicalNetworkVO.class);
+    List<String> existingRange = new ArrayList<>();
     ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
-
-    public NetworkServiceImpl setUp() {
-        NetworkServiceImpl networkService = new NetworkServiceImpl();
-        networkService._dcDao = _datacenterDao;
-        networkService._physicalNetworkDao = _physicalNetworkDao;
-        networkService._datacneterVnet = _datacenterVnetDao;
-        return networkService;
-    }
 
     @Test
     public void updatePhysicalNetworkTest() {
-        TransactionLegacy txn = TransactionLegacy.open("updatePhysicalNetworkTest");
-        NetworkServiceImpl networkService = setUp();
+        final TransactionLegacy txn = TransactionLegacy.open("updatePhysicalNetworkTest");
+        final NetworkServiceImpl networkService = setUp();
         existingRange.add("524");
         when(_physicalNetworkDao.findById(anyLong())).thenReturn(physicalNetworkVO);
         when(_datacenterDao.findById(anyLong())).thenReturn(datacentervo);
@@ -68,4 +44,11 @@ public class UpdatePhysicalNetworkTest {
         assertEquals("524-530", argumentCaptor.getValue());
     }
 
+    public NetworkServiceImpl setUp() {
+        final NetworkServiceImpl networkService = new NetworkServiceImpl();
+        networkService._dcDao = _datacenterDao;
+        networkService._physicalNetworkDao = _physicalNetworkDao;
+        networkService._datacneterVnet = _datacenterVnetDao;
+        return networkService;
+    }
 }

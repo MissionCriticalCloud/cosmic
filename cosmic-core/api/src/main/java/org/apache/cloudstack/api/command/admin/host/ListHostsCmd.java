@@ -1,32 +1,10 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.host;
-
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.host.Host;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.utils.Pair;
 import com.cloud.utils.Ternary;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -39,6 +17,12 @@ import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.PodResponse;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +67,8 @@ public class ListHostsCmd extends BaseListCmd {
 
     @Parameter(name = ApiConstants.RESOURCE_STATE,
             type = CommandType.STRING,
-            description = "list hosts by resource state. Resource state represents current state determined by admin of host, valule can be one of [Enabled, Disabled, Unmanaged, PrepareForMaintenance, ErrorInMaintenance, Maintenance, Error]")
+            description = "list hosts by resource state. Resource state represents current state determined by admin of host, valule can be one of [Enabled, Disabled, Unmanaged," +
+                    " PrepareForMaintenance, ErrorInMaintenance, Maintenance, Error]")
     private String resourceState;
 
     @Parameter(name = ApiConstants.DETAILS,
@@ -134,44 +119,12 @@ public class ListHostsCmd extends BaseListCmd {
         return zoneId;
     }
 
-    public Long getVirtualMachineId() {
-        return virtualMachineId;
-    }
-
     public HypervisorType getHypervisor() {
         return HypervisorType.getType(hypervisor);
     }
 
-    public EnumSet<HostDetails> getDetails() throws InvalidParameterValueException {
-        final EnumSet<HostDetails> dv;
-        if (viewDetails == null || viewDetails.size() <= 0) {
-            dv = EnumSet.of(HostDetails.all);
-        } else {
-            try {
-                final ArrayList<HostDetails> dc = new ArrayList<>();
-                for (final String detail : viewDetails) {
-                    dc.add(HostDetails.valueOf(detail));
-                }
-                dv = EnumSet.copyOf(dc);
-            } catch (final IllegalArgumentException e) {
-                throw new InvalidParameterValueException("The details parameter contains a non permitted value. The allowed values are " +
-                        EnumSet.allOf(HostDetails.class));
-            }
-        }
-        return dv;
-    }
-
     public String getResourceState() {
         return resourceState;
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////// API Implementation///////////////////
-    /////////////////////////////////////////////////////
-
-    @Override
-    public String getCommandName() {
-        return s_name;
     }
 
     @Override
@@ -208,5 +161,37 @@ public class ListHostsCmd extends BaseListCmd {
         }
         response.setResponseName(getCommandName());
         setResponseObject(response);
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////// API Implementation///////////////////
+    /////////////////////////////////////////////////////
+
+    public Long getVirtualMachineId() {
+        return virtualMachineId;
+    }
+
+    public EnumSet<HostDetails> getDetails() throws InvalidParameterValueException {
+        final EnumSet<HostDetails> dv;
+        if (viewDetails == null || viewDetails.size() <= 0) {
+            dv = EnumSet.of(HostDetails.all);
+        } else {
+            try {
+                final ArrayList<HostDetails> dc = new ArrayList<>();
+                for (final String detail : viewDetails) {
+                    dc.add(HostDetails.valueOf(detail));
+                }
+                dv = EnumSet.copyOf(dc);
+            } catch (final IllegalArgumentException e) {
+                throw new InvalidParameterValueException("The details parameter contains a non permitted value. The allowed values are " +
+                        EnumSet.allOf(HostDetails.class));
+            }
+        }
+        return dv;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 }

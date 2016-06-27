@@ -1,36 +1,20 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.network.as.AutoScaleVmProfile;
 import com.cloud.serializer.Param;
 import com.cloud.utils.Pair;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd.CommandType;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
 import org.apache.cloudstack.api.Parameter;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = AutoScaleVmProfile.class)
 public class AutoScaleVmProfileResponse extends BaseResponse implements ControlledEntityResponse {
@@ -64,8 +48,8 @@ public class AutoScaleVmProfileResponse extends BaseResponse implements Controll
     /* Parameters related to a running virtual machine - monitoring aspects */
     @SerializedName(ApiConstants.COUNTERPARAM_LIST)
     @Parameter(name = ApiConstants.COUNTERPARAM_LIST,
-               type = CommandType.MAP,
-               description = "counterparam list. Example: counterparam[0].name=snmpcommunity&counterparam[0].value=public&counterparam[1].name=snmpport&counterparam[1].value=161")
+            type = CommandType.MAP,
+            description = "counterparam list. Example: counterparam[0].name=snmpcommunity&counterparam[0].value=public&counterparam[1].name=snmpport&counterparam[1].value=161")
     private Map<String, String> counterParams;
 
     @SerializedName(ApiConstants.AUTOSCALE_USER_ID)
@@ -73,8 +57,8 @@ public class AutoScaleVmProfileResponse extends BaseResponse implements Controll
     private String autoscaleUserId;
 
     @Parameter(name = ApiConstants.CS_URL,
-               type = CommandType.STRING,
-               description = "the API URL including port of the CloudStack Management Server example: http://server.cloud.com:8080/client/api?")
+            type = CommandType.STRING,
+            description = "the API URL including port of the CloudStack Management Server example: http://server.cloud.com:8080/client/api?")
     private String csUrl;
 
     @SerializedName(ApiConstants.ACCOUNT)
@@ -109,73 +93,73 @@ public class AutoScaleVmProfileResponse extends BaseResponse implements Controll
         return this.id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
-    public void setServiceOfferingId(String serviceOfferingId) {
+    public void setServiceOfferingId(final String serviceOfferingId) {
         this.serviceOfferingId = serviceOfferingId;
     }
 
-    public void setTemplateId(String templateId) {
+    public void setTemplateId(final String templateId) {
         this.templateId = templateId;
     }
 
-    public void setOtherDeployParams(String otherDeployParams) {
+    public void setOtherDeployParams(final String otherDeployParams) {
         this.otherDeployParams = otherDeployParams;
     }
 
-    public void setCounterParams(List<Pair<String, String>> counterParams) {
-        this.counterParams = new HashMap<String, String>();
-        for (Pair<String, String> paramKV : counterParams) {
-            String key = paramKV.first();
-            String value = paramKV.second();
+    public void setCounterParams(final List<Pair<String, String>> counterParams) {
+        this.counterParams = new HashMap<>();
+        for (final Pair<String, String> paramKV : counterParams) {
+            final String key = paramKV.first();
+            final String value = paramKV.second();
             this.counterParams.put(key, value);
         }
     }
 
     @Override
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
     @Override
-    public void setDomainId(String domainId) {
-        this.domainId = domainId;
-    }
-
-    @Override
-    public void setDomainName(String domainName) {
-        this.domainName = domainName;
-    }
-
-    @Override
-    public void setProjectId(String projectId) {
+    public void setProjectId(final String projectId) {
         this.projectId = projectId;
     }
 
     @Override
-    public void setProjectName(String projectName) {
+    public void setProjectName(final String projectName) {
         this.projectName = projectName;
     }
 
-    public void setAutoscaleUserId(String autoscaleUserId) {
+    @Override
+    public void setDomainId(final String domainId) {
+        this.domainId = domainId;
+    }
+
+    @Override
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setAutoscaleUserId(final String autoscaleUserId) {
         this.autoscaleUserId = autoscaleUserId;
     }
 
-    public void setDestroyVmGraceperiod(Integer destroyVmGraceperiod) {
+    public void setDestroyVmGraceperiod(final Integer destroyVmGraceperiod) {
         this.destroyVmGraceperiod = destroyVmGraceperiod;
     }
 
-    public void setCsUrl(String csUrl) {
+    public void setCsUrl(final String csUrl) {
         this.csUrl = csUrl;
     }
 
-    public void setForDisplay(Boolean forDisplay) {
+    public void setForDisplay(final Boolean forDisplay) {
         this.forDisplay = forDisplay;
     }
 }

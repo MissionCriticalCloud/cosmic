@@ -1,28 +1,14 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ Test cases for VM/Volume snapshot Test Path
 """
 
-from nose.plugins.attrib import attr
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import (
-    cleanup_resources,
-    validateList
-)
+from marvin.codes import (
+    CLUSTERTAG1,
+    CLUSTERTAG2,
+    PASS,
+    BACKED_UP,
+    UP)
 from marvin.lib.base import (
     Account,
     Cluster,
@@ -48,16 +34,12 @@ from marvin.lib.common import (
     compareChecksum,
     is_snapshot_on_nfs
 )
+from marvin.lib.utils import (
+    cleanup_resources,
+    validateList
+)
 from marvin.sshClient import SshClient
-import time
-
-from marvin.codes import (
-    CLUSTERTAG1,
-    CLUSTERTAG2,
-    PASS,
-    BACKED_UP,
-    UP)
-
+from nose.plugins.attrib import attr
 from threading import Thread
 
 
@@ -66,7 +48,6 @@ def checkIntegrityOfSnapshot(
         snapshotsToRestore,
         checksumToCompare,
         disk_type="root"):
-
     if disk_type == "root":
         # Create template from snapshot
         template_from_snapshot = Template.create_from_snapshot(
@@ -237,7 +218,6 @@ def MigrateRootVolume(self,
 
 
 class TestSnapshotsHardning(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestSnapshotsHardning, cls).getClsTestClient()
@@ -1304,7 +1284,7 @@ class TestSnapshotsHardning(cloudstackTestCase):
 
         # Step 1
         if not self.testdata["configurableData"][
-                "restartManagementServerThroughTestCase"]:
+            "restartManagementServerThroughTestCase"]:
             self.skipTest(
                 "Skip test if restartManagementServerThroughTestCase\
                         is not provided")
@@ -1366,7 +1346,6 @@ class TestSnapshotsHardning(cloudstackTestCase):
 
 
 class TestHardening(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
 
@@ -1391,14 +1370,14 @@ class TestHardening(cloudstackTestCase):
             name="snapshot.delta.max")
         cls.delta_max = configs[0].value
 
-        clusterid_tag_mapping = {}
+        clusterid_tag_mapping = { }
         cwps_no = 0
         cls.unsupportedHypervisor = False
         if cls.hypervisor.lower() not in [
-                "vmware",
-                "kvm",
-                "xenserver",
-                "hyper-v"]:
+            "vmware",
+            "kvm",
+            "xenserver",
+            "hyper-v"]:
             cls.unsupportedHypervisor = True
             return
 
@@ -1440,9 +1419,9 @@ class TestHardening(cloudstackTestCase):
             # Check clusterid count is 2
             # Check each clusterid has two Storage Pool Tags
             # which indicate two Storage Pools exist.
-            assert (len(clusterid_tag_mapping)) >= 2 and\
-                (len(tags) for tags in clusterid_tag_mapping.itervalues(
-                )) >= 2, "There must be atleast two Clusters and\
+            assert (len(clusterid_tag_mapping)) >= 2 and \
+                   (len(tags) for tags in clusterid_tag_mapping.itervalues(
+                   )) >= 2, "There must be atleast two Clusters and\
                 each must have atleast two cluster wide storage pools in\
                 Up state in the setup"
 

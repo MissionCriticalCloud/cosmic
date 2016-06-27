@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.resource;
@@ -38,6 +23,7 @@ public interface ServerResource extends Manager {
 
     /**
      * Generate a startup command containing information regarding the resource.
+     *
      * @return StartupCommand ready to be sent to the management server.
      */
     StartupCommand[] initialize();
@@ -50,6 +36,7 @@ public interface ServerResource extends Manager {
 
     /**
      * Execute the request coming from the computing server.
+     *
      * @param cmd Command to execute.
      * @return Answer
      */
@@ -64,10 +51,10 @@ public interface ServerResource extends Manager {
 
     /**
      * This is added to allow calling agent control service from within the resource
+     *
      * @return
      */
     IAgentControl getAgentControl();
 
     void setAgentControl(IAgentControl agentControl);
-
 }

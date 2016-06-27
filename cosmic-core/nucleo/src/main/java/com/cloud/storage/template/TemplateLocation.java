@@ -1,23 +1,14 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.storage.template;
+
+import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.storage.StorageLayer;
+import com.cloud.storage.template.Processor.FormatInfo;
+import com.cloud.utils.NumbersUtil;
+import org.apache.cloudstack.storage.command.DownloadCommand.ResourceType;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,19 +18,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
 
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.StorageLayer;
-import com.cloud.storage.template.Processor.FormatInfo;
-import com.cloud.utils.NumbersUtil;
-
-import org.apache.cloudstack.storage.command.DownloadCommand.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TemplateLocation {
-    private static final Logger s_logger = LoggerFactory.getLogger(TemplateLocation.class);
     public final static String Filename = "template.properties";
-
+    private static final Logger s_logger = LoggerFactory.getLogger(TemplateLocation.class);
     StorageLayer _storage;
     String _templatePath;
     boolean _isCorrupted;
@@ -50,13 +34,13 @@ public class TemplateLocation {
 
     ArrayList<FormatInfo> _formats;
 
-    public TemplateLocation(StorageLayer storage, String templatePath) {
+    public TemplateLocation(final StorageLayer storage, final String templatePath) {
         _storage = storage;
         _templatePath = templatePath;
         if (!_templatePath.endsWith(File.separator)) {
             _templatePath += File.separator;
         }
-        _formats = new ArrayList<FormatInfo>(5);
+        _formats = new ArrayList<>(5);
         _props = new Properties();
         //TO DO - remove this hack
         if (_templatePath.matches(".*" + "volumes" + ".*")) {
@@ -68,8 +52,8 @@ public class TemplateLocation {
         _isCorrupted = false;
     }
 
-    public boolean create(long id, boolean isPublic, String uniqueName) throws IOException {
-        boolean result = load();
+    public boolean create(final long id, final boolean isPublic, final String uniqueName) throws IOException {
+        final boolean result = load();
         _props.setProperty("id", Long.toString(id));
         _props.setProperty("public", Boolean.toString(isPublic));
         _props.setProperty("uniquename", uniqueName);
@@ -77,33 +61,17 @@ public class TemplateLocation {
         return result;
     }
 
-    public boolean purge() {
-        boolean purged = true;
-        String[] files = _storage.listFiles(_templatePath);
-        for (String file : files) {
-            boolean r = _storage.delete(file);
-            if (!r) {
-                purged = false;
-            }
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug((r ? "R" : "Unable to r") + "emove " + file);
-            }
-        }
-
-        return purged;
-    }
-
     public boolean load() throws IOException {
-        try (FileInputStream strm = new FileInputStream(_file);) {
+        try (FileInputStream strm = new FileInputStream(_file)) {
             _props.load(strm);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             s_logger.warn("Unable to load the template properties", e);
         }
 
-        for (ImageFormat format : ImageFormat.values()) {
-            String ext = _props.getProperty(format.getFileExtension());
+        for (final ImageFormat format : ImageFormat.values()) {
+            final String ext = _props.getProperty(format.getFileExtension());
             if (ext != null) {
-                FormatInfo info = new FormatInfo();
+                final FormatInfo info = new FormatInfo();
                 info.format = format;
                 info.filename = _props.getProperty(format.getFileExtension() + ".filename");
                 if (info.filename == null) {
@@ -128,16 +96,36 @@ public class TemplateLocation {
         return (_formats.size() > 0);
     }
 
+    protected boolean checkFormatValidity(final FormatInfo info) {
+        return (info.format != null && info.size > 0 && info.virtualSize > 0 && info.filename != null);
+    }
+
+    public boolean purge() {
+        boolean purged = true;
+        final String[] files = _storage.listFiles(_templatePath);
+        for (final String file : files) {
+            final boolean r = _storage.delete(file);
+            if (!r) {
+                purged = false;
+            }
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug((r ? "R" : "Unable to r") + "emove " + file);
+            }
+        }
+
+        return purged;
+    }
+
     public boolean save() {
-        for (FormatInfo info : _formats) {
+        for (final FormatInfo info : _formats) {
             _props.setProperty(info.format.getFileExtension(), "true");
             _props.setProperty(info.format.getFileExtension() + ".filename", info.filename);
             _props.setProperty(info.format.getFileExtension() + ".size", Long.toString(info.size));
             _props.setProperty(info.format.getFileExtension() + ".virtualsize", Long.toString(info.virtualSize));
         }
-        try (FileOutputStream strm =  new FileOutputStream(_file);) {
+        try (FileOutputStream strm = new FileOutputStream(_file)) {
             _props.store(strm, "");
-        } catch (IOException e) {
+        } catch (final IOException e) {
             s_logger.warn("Unable to save the template properties ", e);
             return false;
         }
@@ -145,7 +133,7 @@ public class TemplateLocation {
     }
 
     public TemplateProp getTemplateInfo() {
-        TemplateProp tmplInfo = new TemplateProp();
+        final TemplateProp tmplInfo = new TemplateProp();
         tmplInfo.id = Long.parseLong(_props.getProperty("id"));
         tmplInfo.installPath = _templatePath + _props.getProperty("filename"); // _templatePath endsWith /
         if (_resourceType == ResourceType.VOLUME) {
@@ -166,8 +154,8 @@ public class TemplateLocation {
         return tmplInfo;
     }
 
-    public FormatInfo getFormat(ImageFormat format) {
-        for (FormatInfo info : _formats) {
+    public FormatInfo getFormat(final ImageFormat format) {
+        for (final FormatInfo info : _formats) {
             if (info.format == format) {
                 return info;
             }
@@ -176,7 +164,7 @@ public class TemplateLocation {
         return null;
     }
 
-    public boolean addFormat(FormatInfo newInfo) {
+    public boolean addFormat(final FormatInfo newInfo) {
         deleteFormat(newInfo.format);
 
         if (!checkFormatValidity(newInfo)) {
@@ -191,18 +179,10 @@ public class TemplateLocation {
         return true;
     }
 
-    public void updateVirtualSize(long virtualSize) {
-        _props.setProperty("virtualsize", Long.toString(virtualSize));
-    }
-
-    protected boolean checkFormatValidity(FormatInfo info) {
-        return (info.format != null && info.size > 0 && info.virtualSize > 0 && info.filename != null);
-    }
-
-    protected FormatInfo deleteFormat(ImageFormat format) {
-        Iterator<FormatInfo> it = _formats.iterator();
+    protected FormatInfo deleteFormat(final ImageFormat format) {
+        final Iterator<FormatInfo> it = _formats.iterator();
         while (it.hasNext()) {
-            FormatInfo info = it.next();
+            final FormatInfo info = it.next();
             if (info.format == format) {
                 it.remove();
                 _props.remove(format.getFileExtension());
@@ -214,5 +194,9 @@ public class TemplateLocation {
         }
 
         return null;
+    }
+
+    public void updateVirtualSize(final long virtualSize) {
+        _props.setProperty("virtualsize", Long.toString(virtualSize));
     }
 }

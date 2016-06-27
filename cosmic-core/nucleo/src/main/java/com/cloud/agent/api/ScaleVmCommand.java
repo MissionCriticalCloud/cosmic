@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.api;
@@ -31,19 +16,7 @@ public class ScaleVmCommand extends Command {
     long minRam;
     long maxRam;
 
-    public VirtualMachineTO getVm() {
-        return vm;
-    }
-
-    public void setVm(VirtualMachineTO vm) {
-        this.vm = vm;
-    }
-
-    public int getCpus() {
-        return cpus;
-    }
-
-    public ScaleVmCommand(String vmName, int cpus, Integer minSpeed, Integer maxSpeed, long minRam, long maxRam, boolean limitCpuUse) {
+    public ScaleVmCommand(final String vmName, final int cpus, final Integer minSpeed, final Integer maxSpeed, final long minRam, final long maxRam, final boolean limitCpuUse) {
         super();
         this.vmName = vmName;
         this.cpus = cpus;
@@ -57,7 +30,26 @@ public class ScaleVmCommand extends Command {
         vm.setRam(minRam, maxRam);*/
     }
 
-    public void setCpus(int cpus) {
+    protected ScaleVmCommand() {
+    }
+
+    public ScaleVmCommand(final VirtualMachineTO vm) {
+        this.vm = vm;
+    }
+
+    public VirtualMachineTO getVm() {
+        return vm;
+    }
+
+    public void setVm(final VirtualMachineTO vm) {
+        this.vm = vm;
+    }
+
+    public int getCpus() {
+        return cpus;
+    }
+
+    public void setCpus(final int cpus) {
         this.cpus = cpus;
     }
 
@@ -65,7 +57,7 @@ public class ScaleVmCommand extends Command {
         return minSpeed;
     }
 
-    public void setMinSpeed(Integer minSpeed) {
+    public void setMinSpeed(final Integer minSpeed) {
         this.minSpeed = minSpeed;
     }
 
@@ -73,7 +65,7 @@ public class ScaleVmCommand extends Command {
         return minSpeed;
     }
 
-    public void setMaxSpeed(Integer maxSpeed) {
+    public void setMaxSpeed(final Integer maxSpeed) {
         this.maxSpeed = maxSpeed;
     }
 
@@ -81,7 +73,7 @@ public class ScaleVmCommand extends Command {
         return minRam;
     }
 
-    public void setMinRam(long minRam) {
+    public void setMinRam(final long minRam) {
         this.minRam = minRam;
     }
 
@@ -89,7 +81,7 @@ public class ScaleVmCommand extends Command {
         return maxRam;
     }
 
-    public void setMaxRam(long maxRam) {
+    public void setMaxRam(final long maxRam) {
         this.maxRam = maxRam;
     }
 
@@ -97,7 +89,7 @@ public class ScaleVmCommand extends Command {
         return vmName;
     }
 
-    public void setVmName(String vmName) {
+    public void setVmName(final String vmName) {
         this.vmName = vmName;
     }
 
@@ -110,16 +102,8 @@ public class ScaleVmCommand extends Command {
         return true;
     }
 
-    protected ScaleVmCommand() {
-    }
-
-    public ScaleVmCommand(VirtualMachineTO vm) {
-        this.vm = vm;
-    }
-
     public boolean getLimitCpuUse() {
         // TODO Auto-generated method stub
         return false;
     }
-
 }

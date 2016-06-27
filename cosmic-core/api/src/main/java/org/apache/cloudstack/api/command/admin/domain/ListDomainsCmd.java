@@ -1,23 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.domain;
 
 import com.cloud.domain.Domain;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
@@ -25,10 +8,12 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.ListResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listDomains", description = "Lists domains and provides detailed information for listed domains", responseObject = DomainResponse.class, responseView = ResponseView.Restricted, entityType = {Domain.class},
+@APICommand(name = "listDomains", description = "Lists domains and provides detailed information for listed domains", responseObject = DomainResponse.class, responseView =
+        ResponseView.Restricted, entityType = {Domain.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListDomainsCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListDomainsCmd.class.getName());
@@ -49,8 +34,9 @@ public class ListDomainsCmd extends BaseListCmd {
     private String domainName;
 
     @Parameter(name = ApiConstants.LIST_ALL,
-               type = CommandType.BOOLEAN,
-               description = "If set to false, list only resources belonging to the command's caller; if set to true - list resources that the caller is authorized to see. Default value is false")
+            type = CommandType.BOOLEAN,
+            description = "If set to false, list only resources belonging to the command's caller; if set to true - list resources that the caller is authorized to see. Default " +
+                    "value is false")
     private Boolean listAll;
 
     /////////////////////////////////////////////////////
@@ -78,14 +64,14 @@ public class ListDomainsCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
+    public void execute() {
+        final ListResponse<DomainResponse> response = _queryService.searchForDomains(this);
+        response.setResponseName(getCommandName());
+        this.setResponseObject(response);
     }
 
     @Override
-    public void execute() {
-        ListResponse<DomainResponse> response = _queryService.searchForDomains(this);
-        response.setResponseName(getCommandName());
-        this.setResponseObject(response);
+    public String getCommandName() {
+        return s_name;
     }
 }

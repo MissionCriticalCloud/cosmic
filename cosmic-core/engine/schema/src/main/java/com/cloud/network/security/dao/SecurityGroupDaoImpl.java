@@ -1,24 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.security.dao;
-
-import java.util.List;
-
-import javax.inject.Inject;
 
 import com.cloud.network.security.SecurityGroupVO;
 import com.cloud.server.ResourceTag.ResourceObjectType;
@@ -29,15 +9,18 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 
+import javax.inject.Inject;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class SecurityGroupDaoImpl extends GenericDaoBase<SecurityGroupVO, Long> implements SecurityGroupDao {
-    private SearchBuilder<SecurityGroupVO> AccountIdSearch;
-    private SearchBuilder<SecurityGroupVO> AccountIdNameSearch;
-    private SearchBuilder<SecurityGroupVO> AccountIdNamesSearch;
     @Inject
     ResourceTagDao _tagsDao;
+    private final SearchBuilder<SecurityGroupVO> AccountIdSearch;
+    private final SearchBuilder<SecurityGroupVO> AccountIdNameSearch;
+    private final SearchBuilder<SecurityGroupVO> AccountIdNamesSearch;
 
     protected SecurityGroupDaoImpl() {
         AccountIdSearch = createSearchBuilder();
@@ -55,15 +38,15 @@ public class SecurityGroupDaoImpl extends GenericDaoBase<SecurityGroupVO, Long> 
     }
 
     @Override
-    public List<SecurityGroupVO> listByAccountId(long accountId) {
-        SearchCriteria<SecurityGroupVO> sc = AccountIdSearch.create();
+    public List<SecurityGroupVO> listByAccountId(final long accountId) {
+        final SearchCriteria<SecurityGroupVO> sc = AccountIdSearch.create();
         sc.setParameters("accountId", accountId);
         return listBy(sc);
     }
 
     @Override
-    public boolean isNameInUse(Long accountId, Long domainId, String name) {
-        SearchCriteria<SecurityGroupVO> sc = createSearchCriteria();
+    public boolean isNameInUse(final Long accountId, final Long domainId, final String name) {
+        final SearchCriteria<SecurityGroupVO> sc = createSearchCriteria();
         sc.addAnd("name", SearchCriteria.Op.EQ, name);
         if (accountId != null) {
             sc.addAnd("accountId", SearchCriteria.Op.EQ, accountId);
@@ -72,13 +55,13 @@ public class SecurityGroupDaoImpl extends GenericDaoBase<SecurityGroupVO, Long> 
             sc.addAnd("accountId", SearchCriteria.Op.NULL);
         }
 
-        List<SecurityGroupVO> securityGroups = listBy(sc);
+        final List<SecurityGroupVO> securityGroups = listBy(sc);
         return ((securityGroups != null) && !securityGroups.isEmpty());
     }
 
     @Override
-    public SecurityGroupVO findByAccountAndName(Long accountId, String name) {
-        SearchCriteria<SecurityGroupVO> sc = AccountIdNameSearch.create();
+    public SecurityGroupVO findByAccountAndName(final Long accountId, final String name) {
+        final SearchCriteria<SecurityGroupVO> sc = AccountIdNameSearch.create();
         sc.setParameters("accountId", accountId);
         sc.setParameters("name", name);
 
@@ -86,46 +69,46 @@ public class SecurityGroupDaoImpl extends GenericDaoBase<SecurityGroupVO, Long> 
     }
 
     @Override
-    public List<SecurityGroupVO> findByAccountAndNames(Long accountId, String... names) {
-        SearchCriteria<SecurityGroupVO> sc = AccountIdNamesSearch.create();
+    public List<SecurityGroupVO> findByAccountAndNames(final Long accountId, final String... names) {
+        final SearchCriteria<SecurityGroupVO> sc = AccountIdNamesSearch.create();
         sc.setParameters("accountId", accountId);
 
-        sc.setParameters("groupNames", (Object[])names);
+        sc.setParameters("groupNames", (Object[]) names);
 
         return listBy(sc);
     }
 
     @Override
-    public int removeByAccountId(long accountId) {
-        SearchCriteria<SecurityGroupVO> sc = AccountIdSearch.create();
+    public int removeByAccountId(final long accountId) {
+        final SearchCriteria<SecurityGroupVO> sc = AccountIdSearch.create();
         sc.setParameters("accountId", accountId);
         return expunge(sc);
     }
 
     @Override
     @DB
-    public boolean remove(Long id) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public boolean expunge(final Long id) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
-        SecurityGroupVO entry = findById(id);
+        final SecurityGroupVO entry = findById(id);
         if (entry != null) {
             _tagsDao.removeByIdAndType(id, ResourceObjectType.SecurityGroup);
         }
-        boolean result = super.remove(id);
+        final boolean result = super.expunge(id);
         txn.commit();
         return result;
     }
 
     @Override
     @DB
-    public boolean expunge(Long id) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public boolean remove(final Long id) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
-        SecurityGroupVO entry = findById(id);
+        final SecurityGroupVO entry = findById(id);
         if (entry != null) {
             _tagsDao.removeByIdAndType(id, ResourceObjectType.SecurityGroup);
         }
-        boolean result = super.expunge(id);
+        final boolean result = super.remove(id);
         txn.commit();
         return result;
     }

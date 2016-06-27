@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.engine.orchestration;
 
 import static org.mockito.Mockito.mock;
@@ -21,11 +5,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
@@ -46,13 +25,17 @@ import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicIpAliasDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import junit.framework.TestCase;
 
 /**
  * NetworkManagerImpl implements NetworkManager.
@@ -76,11 +59,11 @@ public class NetworkOrchestratorTest extends TestCase {
         testOrchastrator._nicSecondaryIpDao = mock(NicSecondaryIpDao.class);
         testOrchastrator._ntwkSrvcDao = mock(NetworkServiceMapDao.class);
         testOrchastrator._nicIpAliasDao = mock(NicIpAliasDao.class);
-        DhcpServiceProvider provider = mock(DhcpServiceProvider.class);
+        final DhcpServiceProvider provider = mock(DhcpServiceProvider.class);
 
-        Map<Network.Capability, String> capabilities = new HashMap<Network.Capability, String>();
-        Map<Network.Service,Map<Network.Capability, String>> services = new HashMap<Network.Service,Map<Network.Capability, String>>();
-        services.put(Network.Service.Dhcp,capabilities);
+        final Map<Network.Capability, String> capabilities = new HashMap<>();
+        final Map<Network.Service, Map<Network.Capability, String>> services = new HashMap<>();
+        services.put(Network.Service.Dhcp, capabilities);
         when(provider.getCapabilities()).thenReturn(services);
         capabilities.put(Network.Capability.DhcpAccrossMultipleSubnets, "true");
 
@@ -88,7 +71,7 @@ public class NetworkOrchestratorTest extends TestCase {
         when(testOrchastrator._networkModel.getElementImplementingProvider(dhcpProvider)).thenReturn(provider);
 
         when(guru.getName()).thenReturn(guruName);
-        List<NetworkGuru> networkGurus = new ArrayList<NetworkGuru>();
+        final List<NetworkGuru> networkGurus = new ArrayList<>();
         networkGurus.add(guru);
         testOrchastrator.networkGurus = networkGurus;
     }
@@ -96,18 +79,17 @@ public class NetworkOrchestratorTest extends TestCase {
     @Test
     public void testRemoveDhcpServiceWithNic() {
         // make local mocks
-        VirtualMachineProfile vm =  mock(VirtualMachineProfile.class);
-        NicVO nic = mock(NicVO.class);
-        NetworkVO network = mock(NetworkVO.class);
+        final VirtualMachineProfile vm = mock(VirtualMachineProfile.class);
+        final NicVO nic = mock(NicVO.class);
+        final NetworkVO network = mock(NetworkVO.class);
 
         // make sure that release dhcp will be called
         when(vm.getType()).thenReturn(Type.User);
         when(testOrchastrator._networkModel.areServicesSupportedInNetwork(network.getId(), Service.Dhcp)).thenReturn(true);
         when(network.getTrafficType()).thenReturn(TrafficType.Guest);
         when(network.getGuestType()).thenReturn(GuestType.Shared);
-        when(testOrchastrator._nicDao.listByNetworkIdTypeAndGatewayAndBroadcastUri(nic.getNetworkId(), VirtualMachine.Type.User, nic.getIPv4Gateway(), nic.getBroadcastUri())).thenReturn(new ArrayList<NicVO>());
-
-
+        when(testOrchastrator._nicDao.listByNetworkIdTypeAndGatewayAndBroadcastUri(nic.getNetworkId(), VirtualMachine.Type.User, nic.getIPv4Gateway(), nic.getBroadcastUri()))
+                .thenReturn(new ArrayList<>());
 
         when(network.getGuruName()).thenReturn(guruName);
         when(testOrchastrator._networksDao.findById(nic.getNetworkId())).thenReturn(network);
@@ -119,12 +101,13 @@ public class NetworkOrchestratorTest extends TestCase {
         verify(testOrchastrator._ntwkSrvcDao, times(2)).getProviderForServiceInNetwork(network.getId(), Service.Dhcp);
         verify(testOrchastrator._networksDao, times(2)).findById(nic.getNetworkId());
     }
+
     @Test
     public void testDontRemoveDhcpServiceFromDomainRouter() {
         // make local mocks
-        VirtualMachineProfile vm =  mock(VirtualMachineProfile.class);
-        NicVO nic = mock(NicVO.class);
-        NetworkVO network = mock(NetworkVO.class);
+        final VirtualMachineProfile vm = mock(VirtualMachineProfile.class);
+        final NicVO nic = mock(NicVO.class);
+        final NetworkVO network = mock(NetworkVO.class);
 
         // make sure that release dhcp won't be called
         when(vm.getType()).thenReturn(Type.DomainRouter);
@@ -139,12 +122,13 @@ public class NetworkOrchestratorTest extends TestCase {
         verify(testOrchastrator._ntwkSrvcDao, never()).getProviderForServiceInNetwork(network.getId(), Service.Dhcp);
         verify(testOrchastrator._networksDao, times(1)).findById(nic.getNetworkId());
     }
+
     @Test
     public void testDontRemoveDhcpServiceWhenNotProvided() {
         // make local mocks
-        VirtualMachineProfile vm =  mock(VirtualMachineProfile.class);
-        NicVO nic = mock(NicVO.class);
-        NetworkVO network = mock(NetworkVO.class);
+        final VirtualMachineProfile vm = mock(VirtualMachineProfile.class);
+        final NicVO nic = mock(NicVO.class);
+        final NetworkVO network = mock(NetworkVO.class);
 
         // make sure that release dhcp will *not* be called
         when(vm.getType()).thenReturn(Type.User);

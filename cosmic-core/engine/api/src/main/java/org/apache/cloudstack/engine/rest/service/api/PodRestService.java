@@ -1,22 +1,7 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.engine.rest.service.api;
+
+import org.apache.cloudstack.engine.datacenter.entity.api.PodEntity;
+import org.apache.cloudstack.engine.service.api.ProvisioningService;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -26,53 +11,50 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import org.apache.cloudstack.engine.datacenter.entity.api.PodEntity;
-import org.apache.cloudstack.engine.service.api.ProvisioningService;
-
 @Produces({"application/json"})
 public class PodRestService {
-//  @Inject
+    //  @Inject
     ProvisioningService _provisioningService;
 
     @GET
     @Path("/pod/{pod-id}")
-    public PodEntity getPod(@PathParam("pod-id") String podId) {
+    public PodEntity getPod(@PathParam("pod-id") final String podId) {
         return null;
     }
 
     @POST
     @Path("/pod/{pod-id}/enable")
-    public String enable(@PathParam("pod-id") String podId) {
+    public String enable(@PathParam("pod-id") final String podId) {
         return null;
     }
 
     @POST
     @Path("/pod/{pod-id}/disable")
-    public String disable(@PathParam("pod-id") String podId) {
+    public String disable(@PathParam("pod-id") final String podId) {
         return null;
     }
 
     @POST
     @Path("/pod/{pod-id}/deactivate")
-    public String deactivate(@PathParam("pod-id") String podId) {
+    public String deactivate(@PathParam("pod-id") final String podId) {
         return null;
     }
 
     @POST
     @Path("/pod/{pod-id}/reactivate")
-    public String reactivate(@PathParam("pod-id") String podId) {
+    public String reactivate(@PathParam("pod-id") final String podId) {
         return null;
     }
 
     @PUT
     @Path("/pod/create")
-    public PodEntity create(@QueryParam("xid") String xid, @QueryParam("display-name") String displayName) {
+    public PodEntity create(@QueryParam("xid") final String xid, @QueryParam("display-name") final String displayName) {
         return null;
     }
 
     @PUT
     @Path("/pod/{pod-id}")
-    public PodEntity update(@PathParam("pod-id") String podId, @QueryParam("display-name") String displayName) {
+    public PodEntity update(@PathParam("pod-id") final String podId, @QueryParam("display-name") final String displayName) {
         return null;
     }
 }

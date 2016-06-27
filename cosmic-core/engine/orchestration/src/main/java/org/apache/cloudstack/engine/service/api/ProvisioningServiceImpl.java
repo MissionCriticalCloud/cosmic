@@ -1,34 +1,8 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.engine.service.api;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.ws.rs.Path;
 
 import com.cloud.host.Host;
 import com.cloud.host.Status;
 import com.cloud.storage.StoragePool;
-
 import org.apache.cloudstack.engine.datacenter.entity.api.ClusterEntity;
 import org.apache.cloudstack.engine.datacenter.entity.api.ClusterEntityImpl;
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceManager;
@@ -39,6 +13,13 @@ import org.apache.cloudstack.engine.datacenter.entity.api.PodEntityImpl;
 import org.apache.cloudstack.engine.datacenter.entity.api.StorageEntity;
 import org.apache.cloudstack.engine.datacenter.entity.api.ZoneEntity;
 import org.apache.cloudstack.engine.datacenter.entity.api.ZoneEntityImpl;
+
+import javax.inject.Inject;
+import javax.ws.rs.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +39,7 @@ public class ProvisioningServiceImpl implements ProvisioningService {
 
     @Override
     public ZoneEntity registerZone(final String zoneUuid, final String name, final String owner, final List<String> tags, final Map<String, String> details) {
-        ZoneEntityImpl zoneEntity = new ZoneEntityImpl(zoneUuid, manager);
+        final ZoneEntityImpl zoneEntity = new ZoneEntityImpl(zoneUuid, manager);
         zoneEntity.setName(name);
         zoneEntity.setOwner(owner);
         zoneEntity.setDetails(details);
@@ -68,7 +49,7 @@ public class ProvisioningServiceImpl implements ProvisioningService {
 
     @Override
     public PodEntity registerPod(final String podUuid, final String name, final String owner, final String zoneUuid, final List<String> tags, final Map<String, String> details) {
-        PodEntityImpl podEntity = new PodEntityImpl(podUuid, manager);
+        final PodEntityImpl podEntity = new PodEntityImpl(podUuid, manager);
         podEntity.setOwner(owner);
         podEntity.setName(name);
         podEntity.persist();
@@ -77,7 +58,7 @@ public class ProvisioningServiceImpl implements ProvisioningService {
 
     @Override
     public ClusterEntity registerCluster(final String clusterUuid, final String name, final String owner, final List<String> tags, final Map<String, String> details) {
-        ClusterEntityImpl clusterEntity = new ClusterEntityImpl(clusterUuid, manager);
+        final ClusterEntityImpl clusterEntity = new ClusterEntityImpl(clusterUuid, manager);
         clusterEntity.setOwner(owner);
         clusterEntity.setName(name);
         clusterEntity.persist();
@@ -86,7 +67,7 @@ public class ProvisioningServiceImpl implements ProvisioningService {
 
     @Override
     public HostEntity registerHost(final String hostUuid, final String name, final String owner, final List<String> tags, final Map<String, String> details) {
-        HostEntityImpl hostEntity = new HostEntityImpl(hostUuid, manager);
+        final HostEntityImpl hostEntity = new HostEntityImpl(hostUuid, manager);
         hostEntity.setOwner(owner);
         hostEntity.setName(name);
         hostEntity.setDetails(details);
@@ -103,26 +84,25 @@ public class ProvisioningServiceImpl implements ProvisioningService {
 
     @Override
     public void deregisterZone(final String uuid) {
-        ZoneEntityImpl zoneEntity = new ZoneEntityImpl(uuid, manager);
+        final ZoneEntityImpl zoneEntity = new ZoneEntityImpl(uuid, manager);
         zoneEntity.disable();
     }
 
     @Override
     public void deregisterPod(final String uuid) {
-        PodEntityImpl podEntity = new PodEntityImpl(uuid, manager);
+        final PodEntityImpl podEntity = new PodEntityImpl(uuid, manager);
         podEntity.disable();
     }
 
     @Override
     public void deregisterCluster(final String uuid) {
-        ClusterEntityImpl clusterEntity = new ClusterEntityImpl(uuid, manager);
+        final ClusterEntityImpl clusterEntity = new ClusterEntityImpl(uuid, manager);
         clusterEntity.disable();
-
     }
 
     @Override
     public void deregisterHost(final String uuid) {
-        HostEntityImpl hostEntity = new HostEntityImpl(uuid, manager);
+        final HostEntityImpl hostEntity = new HostEntityImpl(uuid, manager);
         hostEntity.disable();
     }
 
@@ -151,7 +131,7 @@ public class ProvisioningServiceImpl implements ProvisioningService {
 
     @Override
     public List<ZoneEntity> listZones() {
-        List<ZoneEntity> zones = new ArrayList<ZoneEntity>();
+        final List<ZoneEntity> zones = new ArrayList<>();
         //zones.add(new ZoneEntityImpl("zone-uuid-1"));
         //zones.add(new ZoneEntityImpl("zone-uuid-2"));
         return zones;
@@ -165,8 +145,7 @@ public class ProvisioningServiceImpl implements ProvisioningService {
 
     @Override
     public ZoneEntity getZone(final String uuid) {
-        ZoneEntityImpl impl = new ZoneEntityImpl(uuid, manager);
+        final ZoneEntityImpl impl = new ZoneEntityImpl(uuid, manager);
         return impl;
     }
-
 }

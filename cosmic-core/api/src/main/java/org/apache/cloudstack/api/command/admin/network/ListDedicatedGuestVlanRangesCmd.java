@@ -1,28 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.network;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.network.GuestVlan;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
@@ -33,6 +13,10 @@ import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,26 +35,27 @@ public class ListDedicatedGuestVlanRangesCmd extends BaseListCmd {
     private Long id;
 
     @Parameter(name = ApiConstants.ACCOUNT,
-               type = CommandType.STRING,
-               description = "the account with which the guest VLAN range is associated. Must be used with the domainId parameter.")
+            type = CommandType.STRING,
+            description = "the account with which the guest VLAN range is associated. Must be used with the domainId parameter.")
     private String accountName;
 
     @Parameter(name = ApiConstants.PROJECT_ID, type = CommandType.UUID, entityType = ProjectResponse.class, description = "project who will own the guest VLAN range")
     private Long projectId;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               description = "the domain ID with which the guest VLAN range is associated.  If used with the account parameter, returns all guest VLAN ranges for that account in the specified domain.")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            description = "the domain ID with which the guest VLAN range is associated.  If used with the account parameter, returns all guest VLAN ranges for that account in " +
+                    "the specified domain.")
     private Long domainId;
 
     @Parameter(name = ApiConstants.GUEST_VLAN_RANGE, type = CommandType.STRING, description = "the dedicated guest vlan range")
     private String guestVlanRange;
 
     @Parameter(name = ApiConstants.PHYSICAL_NETWORK_ID,
-               type = CommandType.UUID,
-               entityType = PhysicalNetworkResponse.class,
-               description = "physical network id of the guest VLAN range")
+            type = CommandType.UUID,
+            entityType = PhysicalNetworkResponse.class,
+            description = "physical network id of the guest VLAN range")
     private Long physicalNetworkId;
 
     @Parameter(name = ApiConstants.ZONE_ID, type = CommandType.UUID, entityType = ZoneResponse.class, description = "zone of the guest VLAN range")
@@ -113,22 +98,17 @@ public class ListDedicatedGuestVlanRangesCmd extends BaseListCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public long getEntityOwnerId() {
         return Account.ACCOUNT_ID_SYSTEM;
     }
 
     @Override
     public void execute() {
-        Pair<List<? extends GuestVlan>, Integer> vlans = _networkService.listDedicatedGuestVlanRanges(this);
-        ListResponse<GuestVlanRangeResponse> response = new ListResponse<GuestVlanRangeResponse>();
-        List<GuestVlanRangeResponse> guestVlanResponses = new ArrayList<GuestVlanRangeResponse>();
-        for (GuestVlan vlan : vlans.first()) {
-            GuestVlanRangeResponse guestVlanResponse = _responseGenerator.createDedicatedGuestVlanRangeResponse(vlan);
+        final Pair<List<? extends GuestVlan>, Integer> vlans = _networkService.listDedicatedGuestVlanRanges(this);
+        final ListResponse<GuestVlanRangeResponse> response = new ListResponse<>();
+        final List<GuestVlanRangeResponse> guestVlanResponses = new ArrayList<>();
+        for (final GuestVlan vlan : vlans.first()) {
+            final GuestVlanRangeResponse guestVlanResponse = _responseGenerator.createDedicatedGuestVlanRangeResponse(vlan);
             guestVlanResponse.setObjectName("dedicatedguestvlanrange");
             guestVlanResponses.add(guestVlanResponse);
         }
@@ -138,4 +118,8 @@ public class ListDedicatedGuestVlanRangesCmd extends BaseListCmd {
         this.setResponseObject(response);
     }
 
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
 }

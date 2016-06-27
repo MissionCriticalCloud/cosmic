@@ -1,32 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.router;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.ejb.Local;
-import javax.inject.Inject;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
@@ -89,10 +61,21 @@ import com.cloud.vm.VirtualMachineName;
 import com.cloud.vm.VirtualMachineProfile.Param;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.ConfigKey;
+
+import javax.annotation.PostConstruct;
+import javax.ejb.Local;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.cloud.network.router.deployment.RouterDeploymentDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +87,7 @@ public class NetworkHelperImpl implements NetworkHelper {
 
     protected static Account s_systemAccount;
     protected static String s_vmInstanceName;
-
+    protected final Map<HypervisorType, ConfigKey<String>> hypervisorsMap = new HashMap<>();
     @Inject
     protected NicDao _nicDao;
     @Inject
@@ -112,11 +95,21 @@ public class NetworkHelperImpl implements NetworkHelper {
     @Inject
     protected DomainRouterDao _routerDao;
     @Inject
+    protected NetworkModel _networkModel;
+    @Inject
+    protected IPAddressDao _ipAddressDao;
+    @Inject
+    protected NetworkOrchestrationService _networkMgr;
+    @Inject
+    protected ServiceOfferingDao _serviceOfferingDao;
+    @Inject
+    protected VirtualMachineManager _itMgr;
+    @Inject
+    protected IpAddressManager _ipAddrMgr;
+    @Inject
     private AgentManager _agentMgr;
     @Inject
     private AlertManager _alertMgr;
-    @Inject
-    protected NetworkModel _networkModel;
     @Inject
     private AccountManager _accountMgr;
     @Inject
@@ -130,21 +123,17 @@ public class NetworkHelperImpl implements NetworkHelper {
     @Inject
     private ResourceManager _resourceMgr;
     @Inject
-    protected IPAddressDao _ipAddressDao;
-    @Inject
     private UserIpv6AddressDao _ipv6Dao;
     @Inject
-    protected NetworkOrchestrationService _networkMgr;
-    @Inject
     private UserDao _userDao;
-    @Inject
-    protected ServiceOfferingDao _serviceOfferingDao;
-    @Inject
-    protected VirtualMachineManager _itMgr;
-    @Inject
-    protected IpAddressManager _ipAddrMgr;
 
-    protected final Map<HypervisorType, ConfigKey<String>> hypervisorsMap = new HashMap<>();
+    public static void setSystemAccount(final Account systemAccount) {
+        s_systemAccount = systemAccount;
+    }
+
+    public static void setVMInstanceName(final String vmInstanceName) {
+        s_vmInstanceName = vmInstanceName;
+    }
 
     @PostConstruct
     protected void setupHypervisorsMap() {
@@ -256,6 +245,33 @@ public class NetworkHelperImpl implements NetworkHelper {
         return Version.compare(trimmedVersion, NetworkOrchestrationService.MinVRVersion.valueIn(dcid)) >= 0;
     }
 
+    @Override
+    public List<DomainRouterVO> startRouters(final RouterDeploymentDefinition routerDeploymentDefinition) throws StorageUnavailableException, InsufficientCapacityException,
+            ConcurrentOperationException, ResourceUnavailableException {
+
+        final List<DomainRouterVO> runningRouters = new ArrayList<>();
+
+        for (DomainRouterVO router : routerDeploymentDefinition.getRouters()) {
+            boolean skip = false;
+            final State state = router.getState();
+            if (router.getHostId() != null && state != State.Running) {
+                final HostVO host = _hostDao.findById(router.getHostId());
+                if (host == null || host.getState() != Status.Up) {
+                    skip = true;
+                }
+            }
+            if (!skip) {
+                if (state != State.Running) {
+                    router = startVirtualRouter(router, _accountMgr.getSystemUser(), _accountMgr.getSystemAccount(), routerDeploymentDefinition.getParams());
+                }
+                if (router != null) {
+                    runningRouters.add(router);
+                }
+            }
+        }
+        return runningRouters;
+    }
+
     protected DomainRouterVO start(DomainRouterVO router, final User user, final Account caller, final Map<Param, Object> params, final DeploymentPlan planToDeploy)
             throws StorageUnavailableException, InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException {
         s_logger.debug("Starting router " + router);
@@ -305,33 +321,6 @@ public class NetworkHelperImpl implements NetworkHelper {
 
         s_logger.warn("Router " + router.getInstanceName() + " failed to start. current state: " + vm.getState());
         return null;
-    }
-
-    @Override
-    public List<DomainRouterVO> startRouters(final RouterDeploymentDefinition routerDeploymentDefinition) throws StorageUnavailableException, InsufficientCapacityException,
-            ConcurrentOperationException, ResourceUnavailableException {
-
-        final List<DomainRouterVO> runningRouters = new ArrayList<>();
-
-        for (DomainRouterVO router : routerDeploymentDefinition.getRouters()) {
-            boolean skip = false;
-            final State state = router.getState();
-            if (router.getHostId() != null && state != State.Running) {
-                final HostVO host = _hostDao.findById(router.getHostId());
-                if (host == null || host.getState() != Status.Up) {
-                    skip = true;
-                }
-            }
-            if (!skip) {
-                if (state != State.Running) {
-                    router = startVirtualRouter(router, _accountMgr.getSystemUser(), _accountMgr.getSystemAccount(), routerDeploymentDefinition.getParams());
-                }
-                if (router != null) {
-                    runningRouters.add(router);
-                }
-            }
-        }
-        return runningRouters;
     }
 
     @Override
@@ -413,21 +402,10 @@ public class NetworkHelperImpl implements NetworkHelper {
         return result;
     }
 
-    protected String retrieveTemplateName(final HypervisorType hType, final long datacenterId) {
-        String templateName = null;
-
-        final ConfigKey<String> hypervisorConfigKey = hypervisorsMap.get(hType);
-
-        if (hypervisorConfigKey != null) {
-            templateName = hypervisorConfigKey.valueIn(datacenterId);
-        }
-
-        return templateName;
-    }
-
     @Override
     public DomainRouterVO deployRouter(final RouterDeploymentDefinition routerDeploymentDefinition, final boolean startRouter)
-            throws InsufficientAddressCapacityException, InsufficientServerCapacityException, InsufficientCapacityException, StorageUnavailableException, ResourceUnavailableException {
+            throws InsufficientAddressCapacityException, InsufficientServerCapacityException, InsufficientCapacityException, StorageUnavailableException,
+            ResourceUnavailableException {
 
         final ServiceOfferingVO routerOffering = _serviceOfferingDao.findById(routerDeploymentDefinition.getServiceOfferingId());
         _serviceOfferingDao.loadDetails(routerOffering);
@@ -458,7 +436,7 @@ public class NetworkHelperImpl implements NetworkHelper {
                 }
 
                 s_logger.debug(String.format("Allocating the VR with id=%s in datacenter %s with the hypervisor type %s", id, routerDeploymentDefinition.getDest()
-                        .getDataCenter(), hType));
+                                                                                                                                                        .getDataCenter(), hType));
 
                 final String templateName = retrieveTemplateName(hType, routerDeploymentDefinition.getDest().getDataCenter().getId());
                 final VMTemplateVO template = _templateDao.findRoutingTemplate(hType, templateName);
@@ -528,15 +506,6 @@ public class NetworkHelperImpl implements NetworkHelper {
         return router;
     }
 
-    protected void filterSupportedHypervisors(final List<HypervisorType> hypervisors) {
-        // For non vpc we keep them all assuming all types in the list are
-        // supported
-    }
-
-    protected String getNoHypervisorsErrMsgDetails() {
-        return "";
-    }
-
     protected List<HypervisorType> getHypervisors(final RouterDeploymentDefinition routerDeploymentDefinition) throws InsufficientServerCapacityException {
         final DeployDestination dest = routerDeploymentDefinition.getDest();
         List<HypervisorType> hypervisors = new ArrayList<>();
@@ -566,6 +535,26 @@ public class NetworkHelperImpl implements NetworkHelper {
         return hypervisors;
     }
 
+    protected String retrieveTemplateName(final HypervisorType hType, final long datacenterId) {
+        String templateName = null;
+
+        final ConfigKey<String> hypervisorConfigKey = hypervisorsMap.get(hType);
+
+        if (hypervisorConfigKey != null) {
+            templateName = hypervisorConfigKey.valueIn(datacenterId);
+        }
+
+        return templateName;
+    }
+
+    protected void filterSupportedHypervisors(final List<HypervisorType> hypervisors) {
+        // For non vpc we keep them all assuming all types in the list are
+        // supported
+    }
+
+    protected String getNoHypervisorsErrMsgDetails() {
+        return "";
+    }
 
     protected LinkedHashMap<Network, List<? extends NicProfile>> configureControlNic(final RouterDeploymentDefinition routerDeploymentDefinition) {
         final LinkedHashMap<Network, List<? extends NicProfile>> controlConfig = new LinkedHashMap<>(3);
@@ -575,7 +564,7 @@ public class NetworkHelperImpl implements NetworkHelper {
         final NetworkOffering controlOffering = offerings.get(0);
         final Network controlNic = _networkMgr.setupNetwork(s_systemAccount, controlOffering, routerDeploymentDefinition.getPlan(), null, null, false).get(0);
 
-        controlConfig.put(controlNic, new ArrayList<NicProfile>());
+        controlConfig.put(controlNic, new ArrayList<>());
 
         return controlConfig;
     }
@@ -628,7 +617,19 @@ public class NetworkHelperImpl implements NetworkHelper {
     }
 
     @Override
-    public LinkedHashMap<Network, List<? extends NicProfile>> configureDefaultNics(final RouterDeploymentDefinition routerDeploymentDefinition) throws ConcurrentOperationException, InsufficientAddressCapacityException {
+    public void reallocateRouterNetworks(final RouterDeploymentDefinition routerDeploymentDefinition, final VirtualRouter router, final VMTemplateVO template, final
+    HypervisorType hType)
+            throws ConcurrentOperationException, InsufficientCapacityException {
+        final ServiceOfferingVO routerOffering = _serviceOfferingDao.findById(routerDeploymentDefinition.getServiceOfferingId());
+
+        final LinkedHashMap<Network, List<? extends NicProfile>> networks = configureDefaultNics(routerDeploymentDefinition);
+
+        _itMgr.allocate(router.getInstanceName(), template, routerOffering, networks, routerDeploymentDefinition.getPlan(), hType);
+    }
+
+    @Override
+    public LinkedHashMap<Network, List<? extends NicProfile>> configureDefaultNics(final RouterDeploymentDefinition routerDeploymentDefinition) throws
+            ConcurrentOperationException, InsufficientAddressCapacityException {
 
         final LinkedHashMap<Network, List<? extends NicProfile>> networks = new LinkedHashMap<>(3);
 
@@ -715,23 +716,5 @@ public class NetworkHelperImpl implements NetworkHelper {
             networks.put(guestNetwork, new ArrayList<>(Arrays.asList(gatewayNic)));
         }
         return networks;
-    }
-
-    @Override
-    public void reallocateRouterNetworks(final RouterDeploymentDefinition routerDeploymentDefinition, final VirtualRouter router, final VMTemplateVO template, final HypervisorType hType)
-            throws ConcurrentOperationException, InsufficientCapacityException {
-        final ServiceOfferingVO routerOffering = _serviceOfferingDao.findById(routerDeploymentDefinition.getServiceOfferingId());
-
-        final LinkedHashMap<Network, List<? extends NicProfile>> networks = configureDefaultNics(routerDeploymentDefinition);
-
-        _itMgr.allocate(router.getInstanceName(), template, routerOffering, networks, routerDeploymentDefinition.getPlan(), hType);
-    }
-
-    public static void setSystemAccount(final Account systemAccount) {
-        s_systemAccount = systemAccount;
-    }
-
-    public static void setVMInstanceName(final String vmInstanceName) {
-        s_vmInstanceName = vmInstanceName;
     }
 }

@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 //
 
 package com.cloud.template;
@@ -26,20 +10,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.inject.Inject;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.api.query.dao.UserVmJoinDao;
@@ -82,7 +52,6 @@ import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-
 import org.apache.cloudstack.api.command.user.template.CreateTemplateCmd;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.VolumeOrchestrationService;
@@ -104,6 +73,20 @@ import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
 import org.apache.cloudstack.test.utils.SpringUtils;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -162,36 +145,11 @@ public class TemplateManagerImplTest {
     @Inject
     SnapshotDao snapshotDao;
 
-    public class CustomThreadPoolExecutor extends ThreadPoolExecutor {
-        AtomicInteger ai = new AtomicInteger(0);
-        public CustomThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
-                                        BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory) {
-            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
-        }
-
-        @Override
-        protected void beforeExecute(Thread t, Runnable r) {
-            ai.addAndGet(1);
-        }
-
-        public int getCount() {
-            try {
-                // Wait for some time to give before execute to run. Otherwise the tests that
-                // assert and check that template seeding has been scheduled may fail. If tests
-                // are seen to fail, consider increasing the sleep time.
-                Thread.sleep(1000);
-                return ai.get();
-            } catch (Exception e) {
-                return -1;
-            }
-        }
-    }
-
     @Before
     public void setUp() {
         ComponentContext.initComponentsLifeCycle();
-        AccountVO account = new AccountVO("admin", 1L, "networkDomain", Account.ACCOUNT_TYPE_NORMAL, "uuid");
-        UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        final AccountVO account = new AccountVO("admin", 1L, "networkDomain", Account.ACCOUNT_TYPE_NORMAL, "uuid");
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
         CallContext.register(user, account);
     }
 
@@ -211,16 +169,16 @@ public class TemplateManagerImplTest {
 
     @Test
     public void testPrepareTemplateIsSeeded() {
-        VMTemplateVO mockTemplate = mock(VMTemplateVO.class);
+        final VMTemplateVO mockTemplate = mock(VMTemplateVO.class);
         when(mockTemplate.getId()).thenReturn(202l);
 
-        StoragePoolVO mockPool = mock(StoragePoolVO.class);
+        final StoragePoolVO mockPool = mock(StoragePoolVO.class);
         when(mockPool.getId()).thenReturn(2l);
 
-        PrimaryDataStore mockPrimaryDataStore = mock(PrimaryDataStore.class);
+        final PrimaryDataStore mockPrimaryDataStore = mock(PrimaryDataStore.class);
         when(mockPrimaryDataStore.getId()).thenReturn(2l);
 
-        VMTemplateStoragePoolVO mockTemplateStore = mock(VMTemplateStoragePoolVO.class);
+        final VMTemplateStoragePoolVO mockTemplateStore = mock(VMTemplateStoragePoolVO.class);
         when(mockTemplateStore.getDownloadState()).thenReturn(VMTemplateStorageResourceAssoc.Status.DOWNLOADED);
 
         when(dataStoreManager.getPrimaryDataStore(anyLong())).thenReturn(mockPrimaryDataStore);
@@ -229,19 +187,19 @@ public class TemplateManagerImplTest {
 
         doNothing().when(mockTemplateStore).setMarkedForGC(anyBoolean());
 
-        VMTemplateStoragePoolVO returnObject = templateManager.prepareTemplateForCreate(mockTemplate, (StoragePool) mockPrimaryDataStore);
+        final VMTemplateStoragePoolVO returnObject = templateManager.prepareTemplateForCreate(mockTemplate, (StoragePool) mockPrimaryDataStore);
         assertTrue("Test template is already seeded", returnObject == mockTemplateStore);
     }
 
     @Test
     public void testPrepareTemplateNotDownloaded() {
-        VMTemplateVO mockTemplate = mock(VMTemplateVO.class);
+        final VMTemplateVO mockTemplate = mock(VMTemplateVO.class);
         when(mockTemplate.getId()).thenReturn(202l);
 
-        StoragePoolVO mockPool = mock(StoragePoolVO.class);
+        final StoragePoolVO mockPool = mock(StoragePoolVO.class);
         when(mockPool.getId()).thenReturn(2l);
 
-        PrimaryDataStore mockPrimaryDataStore = mock(PrimaryDataStore.class);
+        final PrimaryDataStore mockPrimaryDataStore = mock(PrimaryDataStore.class);
         when(mockPrimaryDataStore.getId()).thenReturn(2l);
         when(mockPrimaryDataStore.getDataCenterId()).thenReturn(1l);
 
@@ -250,23 +208,23 @@ public class TemplateManagerImplTest {
         when(vmTemplatePoolDao.findByPoolTemplate(anyLong(), anyLong())).thenReturn(null);
         when(templateDataStoreDao.findByTemplateZoneDownloadStatus(202l, 1l, VMTemplateStorageResourceAssoc.Status.DOWNLOADED)).thenReturn(null);
 
-        VMTemplateStoragePoolVO returnObject = templateManager.prepareTemplateForCreate(mockTemplate, (StoragePool) mockPrimaryDataStore);
+        final VMTemplateStoragePoolVO returnObject = templateManager.prepareTemplateForCreate(mockTemplate, (StoragePool) mockPrimaryDataStore);
         assertTrue("Test template is not ready", returnObject == null);
     }
 
     @Test(expected = CloudRuntimeException.class)
     public void testPrepareTemplateNoHostConnectedToPool() {
-        VMTemplateVO mockTemplate = mock(VMTemplateVO.class);
+        final VMTemplateVO mockTemplate = mock(VMTemplateVO.class);
         when(mockTemplate.getId()).thenReturn(202l);
 
-        StoragePoolVO mockPool = mock(StoragePoolVO.class);
+        final StoragePoolVO mockPool = mock(StoragePoolVO.class);
         when(mockPool.getId()).thenReturn(2l);
 
-        PrimaryDataStore mockPrimaryDataStore = mock(PrimaryDataStore.class);
+        final PrimaryDataStore mockPrimaryDataStore = mock(PrimaryDataStore.class);
         when(mockPrimaryDataStore.getId()).thenReturn(2l);
         when(mockPrimaryDataStore.getDataCenterId()).thenReturn(1l);
 
-        TemplateDataStoreVO mockTemplateDataStore = mock(TemplateDataStoreVO.class);
+        final TemplateDataStoreVO mockTemplateDataStore = mock(TemplateDataStoreVO.class);
 
         when(dataStoreManager.getPrimaryDataStore(anyLong())).thenReturn(mockPrimaryDataStore);
         when(vmTemplateDao.findById(anyLong(), anyBoolean())).thenReturn(mockTemplate);
@@ -285,10 +243,10 @@ public class TemplateManagerImplTest {
 
     @Test
     public void testTemplateScheduledForDownloadInOnePool() {
-        VMTemplateVO mockTemplate = mock(VMTemplateVO.class);
-        StoragePoolVO mockPool = mock(StoragePoolVO.class);
-        PrimaryDataStore mockPrimaryDataStore = mock(PrimaryDataStore.class);
-        VMTemplateStoragePoolVO mockTemplateStore = mock(VMTemplateStoragePoolVO.class);
+        final VMTemplateVO mockTemplate = mock(VMTemplateVO.class);
+        final StoragePoolVO mockPool = mock(StoragePoolVO.class);
+        final PrimaryDataStore mockPrimaryDataStore = mock(PrimaryDataStore.class);
+        final VMTemplateStoragePoolVO mockTemplateStore = mock(VMTemplateStoragePoolVO.class);
 
         when(mockPrimaryDataStore.getId()).thenReturn(2l);
         when(mockPool.getId()).thenReturn(2l);
@@ -304,20 +262,20 @@ public class TemplateManagerImplTest {
 
         doNothing().when(mockTemplateStore).setMarkedForGC(anyBoolean());
 
-        ExecutorService preloadExecutor = new CustomThreadPoolExecutor(8, 8, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue(),
+        final ExecutorService preloadExecutor = new CustomThreadPoolExecutor(8, 8, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue(),
                 new NamedThreadFactory("Template-Preloader"));
         templateManager._preloadExecutor = preloadExecutor;
 
         templateManager.prepareTemplate(202, 1, 2l);
-        assertTrue("Test template is scheduled for seeding to on pool", ((CustomThreadPoolExecutor)preloadExecutor).getCount() == 1);
+        assertTrue("Test template is scheduled for seeding to on pool", ((CustomThreadPoolExecutor) preloadExecutor).getCount() == 1);
     }
 
     @Test
     public void testTemplateScheduledForDownloadInDisabledPool() {
-        VMTemplateVO mockTemplate = mock(VMTemplateVO.class);
-        StoragePoolVO mockPool = mock(StoragePoolVO.class);
-        PrimaryDataStore mockPrimaryDataStore = mock(PrimaryDataStore.class);
-        VMTemplateStoragePoolVO mockTemplateStore = mock(VMTemplateStoragePoolVO.class);
+        final VMTemplateVO mockTemplate = mock(VMTemplateVO.class);
+        final StoragePoolVO mockPool = mock(StoragePoolVO.class);
+        final PrimaryDataStore mockPrimaryDataStore = mock(PrimaryDataStore.class);
+        final VMTemplateStoragePoolVO mockTemplateStore = mock(VMTemplateStoragePoolVO.class);
 
         when(mockPrimaryDataStore.getId()).thenReturn(2l);
         when(mockPool.getId()).thenReturn(2l);
@@ -333,30 +291,30 @@ public class TemplateManagerImplTest {
 
         doNothing().when(mockTemplateStore).setMarkedForGC(anyBoolean());
 
-        ExecutorService preloadExecutor = new CustomThreadPoolExecutor(8, 8, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue(),
+        final ExecutorService preloadExecutor = new CustomThreadPoolExecutor(8, 8, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue(),
                 new NamedThreadFactory("Template-Preloader"));
         templateManager._preloadExecutor = preloadExecutor;
 
         templateManager.prepareTemplate(202, 1, 2l);
-        assertTrue("Test template is not scheduled for seeding on disabled pool", ((CustomThreadPoolExecutor)preloadExecutor).getCount() == 0);
+        assertTrue("Test template is not scheduled for seeding on disabled pool", ((CustomThreadPoolExecutor) preloadExecutor).getCount() == 0);
     }
 
     @Test
     public void testTemplateScheduledForDownloadInMultiplePool() {
-        VMTemplateVO mockTemplate = mock(VMTemplateVO.class);
-        PrimaryDataStore mockPrimaryDataStore = mock(PrimaryDataStore.class);
-        VMTemplateStoragePoolVO mockTemplateStore = mock(VMTemplateStoragePoolVO.class);
-        List<StoragePoolVO> pools = new ArrayList<StoragePoolVO>();
+        final VMTemplateVO mockTemplate = mock(VMTemplateVO.class);
+        final PrimaryDataStore mockPrimaryDataStore = mock(PrimaryDataStore.class);
+        final VMTemplateStoragePoolVO mockTemplateStore = mock(VMTemplateStoragePoolVO.class);
+        final List<StoragePoolVO> pools = new ArrayList<>();
 
-        StoragePoolVO mockPool1 = mock(StoragePoolVO.class);
+        final StoragePoolVO mockPool1 = mock(StoragePoolVO.class);
         when(mockPool1.getId()).thenReturn(2l);
         when(mockPool1.getStatus()).thenReturn(StoragePoolStatus.Up);
         when(mockPool1.getDataCenterId()).thenReturn(1l);
-        StoragePoolVO mockPool2 = mock(StoragePoolVO.class);
+        final StoragePoolVO mockPool2 = mock(StoragePoolVO.class);
         when(mockPool2.getId()).thenReturn(3l);
         when(mockPool2.getStatus()).thenReturn(StoragePoolStatus.Up);
         when(mockPool2.getDataCenterId()).thenReturn(1l);
-        StoragePoolVO mockPool3 = mock(StoragePoolVO.class);
+        final StoragePoolVO mockPool3 = mock(StoragePoolVO.class);
         when(mockPool3.getId()).thenReturn(4l);
         when(mockPool3.getStatus()).thenReturn(StoragePoolStatus.Up);
         when(mockPool3.getDataCenterId()).thenReturn(2l);
@@ -378,7 +336,7 @@ public class TemplateManagerImplTest {
 
         doNothing().when(mockTemplateStore).setMarkedForGC(anyBoolean());
 
-        ExecutorService preloadExecutor = new CustomThreadPoolExecutor(8, 8, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue(),
+        final ExecutorService preloadExecutor = new CustomThreadPoolExecutor(8, 8, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue(),
                 new NamedThreadFactory("Template-Preloader"));
         templateManager._preloadExecutor = preloadExecutor;
 
@@ -389,7 +347,7 @@ public class TemplateManagerImplTest {
     @Test
     public void testCreatePrivateTemplateRecordForRegionStore() throws ResourceAllocationException {
 
-        CreateTemplateCmd mockCreateCmd = mock(CreateTemplateCmd.class);
+        final CreateTemplateCmd mockCreateCmd = mock(CreateTemplateCmd.class);
         when(mockCreateCmd.getTemplateName()).thenReturn("test");
         when(mockCreateCmd.getTemplateTag()).thenReturn(null);
         when(mockCreateCmd.getBits()).thenReturn(64);
@@ -404,9 +362,9 @@ public class TemplateManagerImplTest {
         when(mockCreateCmd.getEventDescription()).thenReturn("test");
         when(mockCreateCmd.getDetails()).thenReturn(null);
 
-        Account mockTemplateOwner = mock(Account.class);
+        final Account mockTemplateOwner = mock(Account.class);
 
-        SnapshotVO mockSnapshot = mock(SnapshotVO.class);
+        final SnapshotVO mockSnapshot = mock(SnapshotVO.class);
         when(snapshotDao.findById(anyLong())).thenReturn(mockSnapshot);
 
         when(mockSnapshot.getVolumeId()).thenReturn(1L);
@@ -416,25 +374,25 @@ public class TemplateManagerImplTest {
         doNothing().when(resourceLimitMgr).checkResourceLimit(any(Account.class), eq(Resource.ResourceType.template));
         doNothing().when(resourceLimitMgr).checkResourceLimit(any(Account.class), eq(Resource.ResourceType.secondary_storage), anyLong());
 
-        GuestOSVO mockGuestOS = mock(GuestOSVO.class);
+        final GuestOSVO mockGuestOS = mock(GuestOSVO.class);
         when(guestOSDao.findById(anyLong())).thenReturn(mockGuestOS);
 
         when(tmpltDao.getNextInSequence(eq(Long.class), eq("id"))).thenReturn(1L);
 
-        List<ImageStoreVO> mockRegionStores = new ArrayList<>();
-        ImageStoreVO mockRegionStore = mock(ImageStoreVO.class);
+        final List<ImageStoreVO> mockRegionStores = new ArrayList<>();
+        final ImageStoreVO mockRegionStore = mock(ImageStoreVO.class);
         mockRegionStores.add(mockRegionStore);
         when(imgStoreDao.findRegionImageStores()).thenReturn(mockRegionStores);
 
         when(tmpltDao.persist(any(VMTemplateVO.class))).thenAnswer(new Answer<VMTemplateVO>() {
             @Override
-            public VMTemplateVO answer(InvocationOnMock invocationOnMock) throws Throwable {
-                Object[] args = invocationOnMock.getArguments();
-                return (VMTemplateVO)args[0];
+            public VMTemplateVO answer(final InvocationOnMock invocationOnMock) throws Throwable {
+                final Object[] args = invocationOnMock.getArguments();
+                return (VMTemplateVO) args[0];
             }
         });
 
-        VMTemplateVO template = templateManager.createPrivateTemplateRecord(mockCreateCmd, mockTemplateOwner);
+        final VMTemplateVO template = templateManager.createPrivateTemplateRecord(mockCreateCmd, mockTemplateOwner);
         assertTrue("Template in a region store should have cross zones set", template.isCrossZones());
     }
 
@@ -626,9 +584,35 @@ public class TemplateManagerImplTest {
 
         public static class Library implements TypeFilter {
             @Override
-            public boolean match(MetadataReader mdr, MetadataReaderFactory arg1) throws IOException {
-                ComponentScan cs = TestConfiguration.class.getAnnotation(ComponentScan.class);
+            public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) throws IOException {
+                final ComponentScan cs = TestConfiguration.class.getAnnotation(ComponentScan.class);
                 return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);
+            }
+        }
+    }
+
+    public class CustomThreadPoolExecutor extends ThreadPoolExecutor {
+        AtomicInteger ai = new AtomicInteger(0);
+
+        public CustomThreadPoolExecutor(final int corePoolSize, final int maximumPoolSize, final long keepAliveTime, final TimeUnit unit,
+                                        final BlockingQueue<Runnable> workQueue, final ThreadFactory threadFactory) {
+            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
+        }
+
+        @Override
+        protected void beforeExecute(final Thread t, final Runnable r) {
+            ai.addAndGet(1);
+        }
+
+        public int getCount() {
+            try {
+                // Wait for some time to give before execute to run. Otherwise the tests that
+                // assert and check that template seeding has been scheduled may fail. If tests
+                // are seen to fail, consider increasing the sleep time.
+                Thread.sleep(1000);
+                return ai.get();
+            } catch (final Exception e) {
+                return -1;
             }
         }
     }

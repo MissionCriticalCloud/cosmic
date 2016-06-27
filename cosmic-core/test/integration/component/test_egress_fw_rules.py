@@ -1,129 +1,115 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 """
 """
-#Import Local Modules
-from nose.plugins.attrib           import attr
-from marvin.cloudstackTestCase     import cloudstackTestCase, unittest
-from marvin.lib.base   import (Account,
-                                           Domain,
-                                           Router,
-                                           Network,
-                                           ServiceOffering,
-                                           NetworkOffering,
-                                           VirtualMachine,
-                                           FireWallRule,
-                                           NATRule,
-                                           PublicIPAddress)
-from marvin.lib.common import (get_domain,
-                                           get_zone,
-                                           get_template,
-                                           list_routers,
-                                           list_virtual_machines
-                                           )
-from marvin.lib.utils import cleanup_resources, validateList
+# Import Local Modules
+import time
 from marvin.cloudstackAPI import rebootRouter
 from marvin.cloudstackAPI.createEgressFirewallRule import createEgressFirewallRuleCmd
 from marvin.cloudstackAPI.deleteEgressFirewallRule import deleteEgressFirewallRuleCmd
+from marvin.cloudstackTestCase import cloudstackTestCase, unittest
 from marvin.codes import PASS
-import time
+from marvin.lib.base import (Account,
+                             Domain,
+                             Router,
+                             Network,
+                             ServiceOffering,
+                             NetworkOffering,
+                             VirtualMachine,
+                             FireWallRule,
+                             NATRule,
+                             PublicIPAddress)
+from marvin.lib.common import (get_domain,
+                               get_zone,
+                               get_template,
+                               list_routers,
+                               list_virtual_machines
+                               )
+from marvin.lib.utils import cleanup_resources, validateList
+from nose.plugins.attrib import attr
+
 
 class Services:
     """Test service data: Egress Firewall rules Tests for Advance Zone.
     """
+
     def __init__(self):
         self.services = {
-                         "host"             : {"username": 'root', # Credentials for SSH
-                                               "password": 'password',
-                                               "publicport": 22},
-                         "domain"           : {"name": "Domain",},
-                         "account"          : {"email"     : "test@test.com",
-                                               "firstname" : "Test",
-                                               "lastname"  : "User",
-                                               "username"  : "test",
-                                               # Random characters are appended in create account to
-                                               # ensure unique username generated each time
-                                               "password"  : "password",},
-                         "user"             : {"email"    : "user@test.com",
-                                               "firstname": "User",
-                                               "lastname" : "User",
-                                               "username" : "User",
-                                               # Random characters are appended for unique
-                                               # username
-                                               "password" : "password",},
-                         "project"          : {"name"        : "Project",
-                                               "displaytext" : "Test project",},
-                         "volume"           : {"diskname" : "TestDiskServ",
-                                               "max"      : 6,},
-                         "disk_offering"    : {"displaytext" : "Small",
-                                               "name"        : "Small",
-                                               "disksize"    : 1},
-                         "virtual_machine"  : {"displayname" : "testserver",
-                                               "username"    : "root",# VM creds for SSH
-                                               "password"    : "password",
-                                               "ssh_port"    : 22,
-                                               "hypervisor"  : 'XenServer',
-                                               "privateport" : 22,
-                                               "publicport"  : 22,
-                                               "protocol"    : 'TCP',},
-                         "service_offering" : {"name"        : "Medium Instance",
-                                               "displaytext" : "Medium Instance",
-                                               "cpunumber"   : 2,
-                                               "cpuspeed"    : 128,# in MHz
-                                               "memory"      : 256},
-                         "network_offering":  {
-                                               "name": 'Network offering-VR services',
-                                               "displaytext": 'Network offering-VR services',
-                                               "guestiptype": 'Isolated',
-                                               "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,Vpn,Firewall,Lb,UserData,StaticNat',
-                                               "traffictype": 'GUEST',
-                                               "availability": 'Optional',
-                                               "specifyVlan": 'False',
-                                               "serviceProviderList": {
-                                                            "Dhcp": 'VirtualRouter',
-                                                            "Dns": 'VirtualRouter',
-                                                            "SourceNat": 'VirtualRouter',
-                                                            "PortForwarding": 'VirtualRouter',
-                                                            "Vpn": 'VirtualRouter',
-                                                            "Firewall": 'VirtualRouter',
-                                                            "Lb": 'VirtualRouter',
-                                                            "UserData": 'VirtualRouter',
-                                                            "StaticNat": 'VirtualRouter',
-                                                        },
-                                               "serviceCapabilityList": {
-                                                                            "SourceNat": {
-                                                                            "SupportedSourceNatTypes": "peraccount",
-                                                                            }
-                                                                        },
-                                             },
-                          "network"   :   {
-                                          "name": "Test Network",
-                                          "displaytext": "Test Network",
-                                         },
-                          "natrule"   :   {
-                                          "privateport": 22,
-                                          "publicport": 22,
-                                          "protocol": "TCP"
-                                          },
-                         "sleep" :  30,
-                         "ostype":  'CentOS 5.3 (64-bit)',
-                         "host_password": 'password',
-                        }
+            "host": { "username": 'root',  # Credentials for SSH
+                      "password": 'password',
+                      "publicport": 22 },
+            "domain": { "name": "Domain", },
+            "account": { "email": "test@test.com",
+                         "firstname": "Test",
+                         "lastname": "User",
+                         "username": "test",
+                         # Random characters are appended in create account to
+                         # ensure unique username generated each time
+                         "password": "password", },
+            "user": { "email": "user@test.com",
+                      "firstname": "User",
+                      "lastname": "User",
+                      "username": "User",
+                      # Random characters are appended for unique
+                      # username
+                      "password": "password", },
+            "project": { "name": "Project",
+                         "displaytext": "Test project", },
+            "volume": { "diskname": "TestDiskServ",
+                        "max": 6, },
+            "disk_offering": { "displaytext": "Small",
+                               "name": "Small",
+                               "disksize": 1 },
+            "virtual_machine": { "displayname": "testserver",
+                                 "username": "root",  # VM creds for SSH
+                                 "password": "password",
+                                 "ssh_port": 22,
+                                 "hypervisor": 'XenServer',
+                                 "privateport": 22,
+                                 "publicport": 22,
+                                 "protocol": 'TCP', },
+            "service_offering": { "name": "Medium Instance",
+                                  "displaytext": "Medium Instance",
+                                  "cpunumber": 2,
+                                  "cpuspeed": 128,  # in MHz
+                                  "memory": 256 },
+            "network_offering": {
+                "name": 'Network offering-VR services',
+                "displaytext": 'Network offering-VR services',
+                "guestiptype": 'Isolated',
+                "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,Vpn,Firewall,Lb,UserData,StaticNat',
+                "traffictype": 'GUEST',
+                "availability": 'Optional',
+                "specifyVlan": 'False',
+                "serviceProviderList": {
+                    "Dhcp": 'VirtualRouter',
+                    "Dns": 'VirtualRouter',
+                    "SourceNat": 'VirtualRouter',
+                    "PortForwarding": 'VirtualRouter',
+                    "Vpn": 'VirtualRouter',
+                    "Firewall": 'VirtualRouter',
+                    "Lb": 'VirtualRouter',
+                    "UserData": 'VirtualRouter',
+                    "StaticNat": 'VirtualRouter',
+                },
+                "serviceCapabilityList": {
+                    "SourceNat": {
+                        "SupportedSourceNatTypes": "peraccount",
+                    }
+                },
+            },
+            "network": {
+                "name": "Test Network",
+                "displaytext": "Test Network",
+            },
+            "natrule": {
+                "privateport": 22,
+                "publicport": 22,
+                "protocol": "TCP"
+            },
+            "sleep": 30,
+            "ostype": 'CentOS 5.3 (64-bit)',
+            "host_password": 'password',
+        }
+
 
 class TestEgressFWRules(cloudstackTestCase):
     @classmethod
@@ -152,7 +138,6 @@ class TestEgressFWRules(cloudstackTestCase):
         # Cleanup
         cls._cleanup.append(cls.service_offering)
 
-
     @classmethod
     def tearDownClass(cls):
         try:
@@ -164,9 +149,9 @@ class TestEgressFWRules(cloudstackTestCase):
         self.apiclient = self.api_client
         self.dbclient = self.testClient.getDbConnection()
         self.egressruleid = None
-        self.cleanup   = []
-        self.domain  =  Domain.create(self.apiclient,
-                                      self.services["domain"])
+        self.cleanup = []
+        self.domain = Domain.create(self.apiclient,
+                                    self.services["domain"])
         # Create an Account associated with domain
         self.account = Account.create(self.apiclient,
                                       self.services["account"],
@@ -197,9 +182,9 @@ class TestEgressFWRules(cloudstackTestCase):
 
     def create_vm(self, pfrule=False, egress_policy=True, RR=False):
         self.create_network_offering(egress_policy, RR)
-         # Creating network using the network offering created
+        # Creating network using the network offering created
         self.debug("Creating network with network offering: %s" %
-                                                    self.network_offering.id)
+                   self.network_offering.id)
         self.network = Network.create(self.apiclient,
                                       self.services["network"],
                                       accountid=self.account.name,
@@ -211,58 +196,58 @@ class TestEgressFWRules(cloudstackTestCase):
 
         project = None
         self.virtual_machine = VirtualMachine.create(self.apiclient,
-                                                         self.services["virtual_machine"],
-                                                         accountid=self.account.name,
-                                                         domainid=self.domain.id,
-                                                         serviceofferingid=self.service_offering.id,
-                                                         mode=self.zone.networktype if pfrule else 'basic',
-                                                         networkids=[str(self.network.id)],
-                                                         projectid=project.id if project else None)
-        self.debug("Deployed instance %s in account: %s" % (self.virtual_machine.id,self.account.name))
+                                                     self.services["virtual_machine"],
+                                                     accountid=self.account.name,
+                                                     domainid=self.domain.id,
+                                                     serviceofferingid=self.service_offering.id,
+                                                     mode=self.zone.networktype if pfrule else 'basic',
+                                                     networkids=[str(self.network.id)],
+                                                     projectid=project.id if project else None)
+        self.debug("Deployed instance %s in account: %s" % (self.virtual_machine.id, self.account.name))
 
         # Checking if VM is running or not, in case it is deployed in error state, test case fails
         self.vm_list = list_virtual_machines(self.apiclient, id=self.virtual_machine.id)
 
         self.assertEqual(validateList(self.vm_list)[0], PASS, "vm list validation failed, vm list is %s" % self.vm_list)
-        self.assertEqual(str(self.vm_list[0].state).lower(),'running',"VM state should be running, it is %s" % self.vm_list[0].state)
+        self.assertEqual(str(self.vm_list[0].state).lower(), 'running', "VM state should be running, it is %s" % self.vm_list[0].state)
 
         self.public_ip = PublicIPAddress.create(
-                                    self.apiclient,
-                                    accountid=self.account.name,
-                                    zoneid=self.zone.id,
-                                    domainid=self.account.domainid,
-                                    networkid=self.network.id
-                                    )
+            self.apiclient,
+            accountid=self.account.name,
+            zoneid=self.zone.id,
+            domainid=self.account.domainid,
+            networkid=self.network.id
+        )
 
         # Open up firewall port for SSH
         FireWallRule.create(
-                            self.apiclient,
-                            ipaddressid=self.public_ip.ipaddress.id,
-                            protocol=self.services["natrule"]["protocol"],
-                            cidrlist=['0.0.0.0/0'],
-                            startport=self.services["natrule"]["publicport"],
-                            endport=self.services["natrule"]["publicport"]
-                            )
+            self.apiclient,
+            ipaddressid=self.public_ip.ipaddress.id,
+            protocol=self.services["natrule"]["protocol"],
+            cidrlist=['0.0.0.0/0'],
+            startport=self.services["natrule"]["publicport"],
+            endport=self.services["natrule"]["publicport"]
+        )
 
         self.debug("Creating NAT rule for VM ID: %s" % self.virtual_machine.id)
-        #Create NAT rule
+        # Create NAT rule
         NATRule.create(
-                        self.apiclient,
-                        self.virtual_machine,
-                        self.services["natrule"],
-                        self.public_ip.ipaddress.id
-                        )
+            self.apiclient,
+            self.virtual_machine,
+            self.services["natrule"],
+            self.public_ip.ipaddress.id
+        )
         return
 
     def exec_script_on_user_vm(self, script, exec_cmd_params, expected_result, negative_test=False):
         try:
             exec_success = False
 
-            self.debug("getting SSH client for Vm: %s with ip %s" % (self.virtual_machine.id,self.public_ip.ipaddress.ipaddress))
+            self.debug("getting SSH client for Vm: %s with ip %s" % (self.virtual_machine.id, self.public_ip.ipaddress.ipaddress))
             sshClient = self.virtual_machine.get_ssh_client(ipaddress=self.public_ip.ipaddress.ipaddress)
-            result = sshClient.execute(script+exec_cmd_params)
+            result = sshClient.execute(script + exec_cmd_params)
 
-            self.debug("script: %s" % script+exec_cmd_params)
+            self.debug("script: %s" % script + exec_cmd_params)
             self.debug("result: %s" % result)
 
             if isinstance(result, list):
@@ -296,18 +281,18 @@ class TestEgressFWRules(cloudstackTestCase):
                          True,
                          "Check for list routers response return valid data")
         router = list_routers_response[0]
-        #Reboot the router
+        # Reboot the router
         cmd = rebootRouter.rebootRouterCmd()
         cmd.id = router.id
         self.apiclient.rebootRouter(cmd)
 
-        #List routers to check state of router
+        # List routers to check state of router
         router_response = list_routers(self.apiclient,
                                        id=router.id)
         self.assertEqual(isinstance(router_response, list),
                          True,
                          "Check list response returns a valid list")
-        #List router should have router in running state and same public IP
+        # List router should have router in running state and same public IP
         self.assertEqual(router_response[0].state,
                          'Running',
                          "Check list router response for router state")
@@ -317,13 +302,13 @@ class TestEgressFWRules(cloudstackTestCase):
         self.debug('Creating Egress FW rule for networkid=%s networkname=%s' % (nics[0].networkid, nics[0].networkname))
         cmd = createEgressFirewallRuleCmd()
         cmd.networkid = nics[0].networkid
-        cmd.protocol  = protocol
+        cmd.protocol = protocol
         if cidr:
-            cmd.cidrlist  = [cidr]
+            cmd.cidrlist = [cidr]
         if start_port:
             cmd.startport = start_port
         if end_port:
-            cmd.endport   = end_port
+            cmd.endport = end_port
         rule = self.apiclient.createEgressFirewallRule(cmd)
         self.debug('Created rule=%s' % rule.id)
         self.egressruleid = rule.id
@@ -378,7 +363,6 @@ class TestEgressFWRules(cloudstackTestCase):
                                     "['100']",
                                     negative_test=False)
 
-
     @attr(tags=["advanced"], required_hardware="true")
     def test_02_egress_fr2(self):
         """Test Allow Communication using Egress rule with CIDR + Port Range + Protocol.
@@ -428,7 +412,7 @@ class TestEgressFWRules(cloudstackTestCase):
                                     "['0']",
                                     negative_test=False)
         self.createEgressRule(cidr=TestEgressFWRules.zone.guestcidraddress)
-        #Egress rule is set for ICMP other traffic is allowed
+        # Egress rule is set for ICMP other traffic is allowed
         self.exec_script_on_user_vm(' wget -t1 http://apache.claz.org/favicon.ico 2>&1',
                                     "| grep -oP 'failed:'",
                                     "[]",
@@ -449,7 +433,7 @@ class TestEgressFWRules(cloudstackTestCase):
                                     "['100']",
                                     negative_test=False)
         self.createEgressRule(cidr=TestEgressFWRules.zone.guestcidraddress)
-        #Egress rule is set for ICMP other traffic is not allowed
+        # Egress rule is set for ICMP other traffic is not allowed
         self.exec_script_on_user_vm(' wget -t1 http://apache.claz.org/favicon.ico 2>&1',
                                     "| grep -oP 'failed:'",
                                     "['failed:']",
@@ -490,7 +474,6 @@ class TestEgressFWRules(cloudstackTestCase):
         self.assertEqual(qresultset[0][0],
                          1,
                          "DB results not matching, expected: 1, found: %s" % qresultset[0][0])
-
 
     @attr(tags=["advanced"], required_hardware="false")
     def test_04_1_egress_fr4(self):
@@ -544,8 +527,7 @@ class TestEgressFWRules(cloudstackTestCase):
         #  -A FW_EGRESS_RULES -j DROP
         self.create_vm()
         self.createEgressRule(cidr=TestEgressFWRules.zone.guestcidraddress)
-        #TODO: Query VR for expected route rules.
-
+        # TODO: Query VR for expected route rules.
 
     @unittest.skip("Skip")
     @attr(tags=["advanced", "NotRun"])
@@ -563,8 +545,7 @@ class TestEgressFWRules(cloudstackTestCase):
         #  -A FW_EGRESS_RULES -j DROP
         self.create_vm(egress_policy=False)
         self.createEgressRule(cidr=TestEgressFWRules.zone.guestcidraddress)
-        #TODO: Query VR for expected route rules.
-
+        # TODO: Query VR for expected route rules.
 
     @attr(tags=["advanced"], required_hardware="true")
     def test_06_egress_fr6(self):
@@ -654,7 +635,6 @@ class TestEgressFWRules(cloudstackTestCase):
         self.create_vm(pfrule=True, egress_policy=False)
         self.createEgressRule(cidr=TestEgressFWRules.zone.guestcidraddress)
 
-
     @attr(tags=["advanced"], required_hardware="true")
     def test_09_egress_fr9(self):
         """Test Delete Egress rule
@@ -703,7 +683,6 @@ class TestEgressFWRules(cloudstackTestCase):
                                     "['100']",
                                     negative_test=False)
 
-
     @attr(tags=["advanced"], required_hardware="false")
     def test_10_egress_fr10(self):
         """Test Invalid CIDR and Invalid Port ranges
@@ -725,7 +704,6 @@ class TestEgressFWRules(cloudstackTestCase):
         # 3. egress rule creation should fail.
         self.create_vm(egress_policy=False)
         self.assertRaises(Exception, self.createEgressRule, cidr='10.2.2.0/24')
-
 
     @attr(tags=["advanced"], required_hardware="false")
     def test_11_egress_fr11(self):
@@ -790,7 +768,7 @@ class TestEgressFWRules(cloudstackTestCase):
         # 2. create egress rule valid cidr valid port range.
         # 3. redundant router
         # 3. All should work fine.
-        #TODO: setup network with RR
+        # TODO: setup network with RR
         self.create_vm(RR=True)
         self.createEgressRule(cidr=TestEgressFWRules.zone.guestcidraddress)
         vm_network_id = self.virtual_machine.nic[0].networkid
@@ -813,7 +791,7 @@ class TestEgressFWRules(cloudstackTestCase):
             backup_router = routers[0]
 
         self.debug("Redundant states: %s, %s" % (master_router.redundantstate,
-                                                backup_router.redundantstate))
+                                                 backup_router.redundantstate))
         self.debug("Stopping the Master router")
         try:
             Router.stop(self.apiclient, id=master_router.id)
@@ -845,7 +823,7 @@ class TestEgressFWRules(cloudstackTestCase):
         # 2. create egress rule valid cidr valid port range.
         # 3. redundant router
         # 3. All should work fine.
-        #TODO: setup network with RR
+        # TODO: setup network with RR
         self.create_vm(RR=True, egress_policy=False)
         self.createEgressRule(cidr=TestEgressFWRules.zone.guestcidraddress)
         vm_network_id = self.virtual_machine.nic[0].networkid
@@ -868,7 +846,7 @@ class TestEgressFWRules(cloudstackTestCase):
             backup_router = routers[0]
 
         self.debug("Redundant states: %s, %s" % (master_router.redundantstate,
-                                                backup_router.redundantstate))
+                                                 backup_router.redundantstate))
         self.debug("Stopping the Master router")
         try:
             Router.stop(self.apiclient, id=master_router.id)

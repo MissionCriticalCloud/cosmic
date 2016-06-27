@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.storage;
 
 import com.cloud.user.Account;
@@ -28,7 +12,7 @@ public class CreateSnapshotPayload {
         return snapshotPolicyId;
     }
 
-    public void setSnapshotPolicyId(Long snapshotPolicyId) {
+    public void setSnapshotPolicyId(final Long snapshotPolicyId) {
         this.snapshotPolicyId = snapshotPolicyId;
     }
 
@@ -36,7 +20,7 @@ public class CreateSnapshotPayload {
         return snapshotId;
     }
 
-    public void setSnapshotId(Long snapshotId) {
+    public void setSnapshotId(final Long snapshotId) {
         this.snapshotId = snapshotId;
     }
 
@@ -44,16 +28,15 @@ public class CreateSnapshotPayload {
         return account;
     }
 
-    public void setAccount(Account account) {
+    public void setAccount(final Account account) {
         this.account = account;
-    }
-
-    public void setQuiescevm(boolean quiescevm) {
-        this.quiescevm = quiescevm;
     }
 
     public boolean getQuiescevm() {
         return this.quiescevm;
     }
 
+    public void setQuiescevm(final boolean quiescevm) {
+        this.quiescevm = quiescevm;
+    }
 }

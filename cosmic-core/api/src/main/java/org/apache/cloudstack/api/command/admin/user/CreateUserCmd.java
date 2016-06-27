@@ -1,24 +1,7 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.user;
 
 import com.cloud.user.Account;
 import com.cloud.user.User;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -28,6 +11,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.UserResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,15 +28,15 @@ public class CreateUserCmd extends BaseCmd {
     /////////////////////////////////////////////////////
 
     @Parameter(name = ApiConstants.ACCOUNT,
-               type = CommandType.STRING,
-               required = true,
-               description = "Creates the user under the specified account. If no account is specified, the username will be used as the account name.")
+            type = CommandType.STRING,
+            required = true,
+            description = "Creates the user under the specified account. If no account is specified, the username will be used as the account name.")
     private String accountName;
 
     @Parameter(name = ApiConstants.DOMAIN_ID,
-               type = CommandType.UUID,
-               entityType = DomainResponse.class,
-               description = "Creates the user under the specified domain. Has to be accompanied with the account parameter")
+            type = CommandType.UUID,
+            entityType = DomainResponse.class,
+            description = "Creates the user under the specified domain. Has to be accompanied with the account parameter")
     private Long domainId;
 
     @Parameter(name = ApiConstants.EMAIL, type = CommandType.STRING, required = true, description = "email")
@@ -65,14 +49,15 @@ public class CreateUserCmd extends BaseCmd {
     private String lastname;
 
     @Parameter(name = ApiConstants.PASSWORD,
-               type = CommandType.STRING,
-               required = true,
-               description = "Clear text password (Default hashed to SHA256SALT). If you wish to use any other hashing algorithm, you would need to write a custom authentication adapter See Docs section.")
+            type = CommandType.STRING,
+            required = true,
+            description = "Clear text password (Default hashed to SHA256SALT). If you wish to use any other hashing algorithm, you would need to write a custom authentication " +
+                    "adapter See Docs section.")
     private String password;
 
     @Parameter(name = ApiConstants.TIMEZONE,
-               type = CommandType.STRING,
-               description = "Specifies a timezone for this command. For more information on the timezone parameter, see Time Zone Format.")
+            type = CommandType.STRING,
+            description = "Specifies a timezone for this command. For more information on the timezone parameter, see Time Zone Format.")
     private String timezone;
 
     @Parameter(name = ApiConstants.USERNAME, type = CommandType.STRING, required = true, description = "Unique username.")
@@ -85,16 +70,57 @@ public class CreateUserCmd extends BaseCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public String getAccountName() {
-        return accountName;
+    @Override
+    public void execute() {
+        validateParams();
+        CallContext.current().setEventDetails("UserName: " + getUserName() + ", FirstName :" + getFirstName() + ", LastName: " + getLastName());
+        final User user =
+                _accountService.createUser(getUserName(), getPassword(), getFirstName(), getLastName(), getEmail(), getTimezone(), getAccountName(), getDomainId(),
+                        getUserUUID());
+        if (user != null) {
+            final UserResponse response = _responseGenerator.createUserResponse(user);
+            response.setResponseName(getCommandName());
+            this.setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create a user");
+        }
     }
 
-    public Long getDomainId() {
-        return domainId;
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 
-    public String getEmail() {
-        return email;
+    @Override
+    public long getEntityOwnerId() {
+        final Account account = CallContext.current().getCallingAccount();
+        if ((account == null) || _accountService.isAdmin(account.getId())) {
+            if ((domainId != null) && (accountName != null)) {
+                final Account userAccount = _responseGenerator.findAccountByNameDomain(accountName, domainId);
+                if (userAccount != null) {
+                    return userAccount.getId();
+                }
+            }
+        }
+
+        if (account != null) {
+            return account.getId();
+        }
+
+        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
+    }
+
+    /**
+     * TODO: this should be done through a validator. for now replicating the validation logic in create account and user
+     */
+    private void validateParams() {
+        if (StringUtils.isEmpty(getPassword())) {
+            throw new ServerApiException(ApiErrorCode.PARAM_ERROR, "Empty passwords are not allowed");
+        }
+    }
+
+    public String getUserName() {
+        return username;
     }
 
     public String getFirstName() {
@@ -109,68 +135,27 @@ public class CreateUserCmd extends BaseCmd {
         return password;
     }
 
-    public String getTimezone() {
-        return timezone;
-    }
-
-    public String getUserName() {
-        return username;
-    }
-
-    public String getUserUUID() {
-        return userUUID;
+    public String getEmail() {
+        return email;
     }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
 
-    @Override
-    public String getCommandName() {
-        return s_name;
+    public String getTimezone() {
+        return timezone;
     }
 
-    @Override
-    public long getEntityOwnerId() {
-        Account account = CallContext.current().getCallingAccount();
-        if ((account == null) || _accountService.isAdmin(account.getId())) {
-            if ((domainId != null) && (accountName != null)) {
-                Account userAccount = _responseGenerator.findAccountByNameDomain(accountName, domainId);
-                if (userAccount != null) {
-                    return userAccount.getId();
-                }
-            }
-        }
-
-        if (account != null) {
-            return account.getId();
-        }
-
-        return Account.ACCOUNT_ID_SYSTEM; // no account info given, parent this command to SYSTEM so ERROR events are tracked
+    public String getAccountName() {
+        return accountName;
     }
 
-    @Override
-    public void execute() {
-        validateParams();
-        CallContext.current().setEventDetails("UserName: " + getUserName() + ", FirstName :" + getFirstName() + ", LastName: " + getLastName());
-        User user =
-            _accountService.createUser(getUserName(), getPassword(), getFirstName(), getLastName(), getEmail(), getTimezone(), getAccountName(), getDomainId(),
-                getUserUUID());
-        if (user != null) {
-            UserResponse response = _responseGenerator.createUserResponse(user);
-            response.setResponseName(getCommandName());
-            this.setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create a user");
-        }
+    public Long getDomainId() {
+        return domainId;
     }
 
-    /**
-     * TODO: this should be done through a validator. for now replicating the validation logic in create account and user
-     */
-    private void validateParams() {
-        if(StringUtils.isEmpty(getPassword())) {
-            throw new ServerApiException(ApiErrorCode.PARAM_ERROR, "Empty passwords are not allowed");
-        }
+    public String getUserUUID() {
+        return userUUID;
     }
 }

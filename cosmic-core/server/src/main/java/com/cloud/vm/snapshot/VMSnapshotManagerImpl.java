@@ -1,26 +1,13 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.vm.snapshot;
 
 import com.cloud.dao.EntityManager;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.*;
+import com.cloud.exception.ConcurrentOperationException;
+import com.cloud.exception.InsufficientCapacityException;
+import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.exception.ResourceAllocationException;
+import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.gpu.GPU;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
@@ -39,14 +26,27 @@ import com.cloud.user.AccountManager;
 import com.cloud.user.User;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.uservm.UserVm;
-import com.cloud.utils.*;
+import com.cloud.utils.DateUtil;
+import com.cloud.utils.NumbersUtil;
+import com.cloud.utils.Pair;
+import com.cloud.utils.Predicate;
+import com.cloud.utils.ReflectionUse;
+import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.vm.*;
+import com.cloud.vm.UserVmVO;
+import com.cloud.vm.VMInstanceVO;
+import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
+import com.cloud.vm.VirtualMachineManager;
+import com.cloud.vm.VmWork;
+import com.cloud.vm.VmWorkConstants;
+import com.cloud.vm.VmWorkJobHandler;
+import com.cloud.vm.VmWorkJobHandlerProxy;
+import com.cloud.vm.VmWorkSerializer;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
@@ -67,20 +67,26 @@ import org.apache.cloudstack.framework.jobs.impl.OutcomeImpl;
 import org.apache.cloudstack.framework.jobs.impl.VmWorkJobVO;
 import org.apache.cloudstack.jobs.JobInfo;
 import org.apache.cloudstack.utils.identity.ManagementServerNode;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
-import java.util.*;
-
 @Component
 public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotManager, VMSnapshotService, VmWorkJobHandler {
-    private static final Logger s_logger = LoggerFactory.getLogger(VMSnapshotManagerImpl.class);
-
     public static final String VM_WORK_JOB_HANDLER = VMSnapshotManagerImpl.class.getSimpleName();
-
+    static final ConfigKey<Long> VmJobCheckInterval = new ConfigKey<>("Advanced",
+            Long.class, "vm.job.check.interval", "3000",
+            "Interval in milliseconds to check if the job is complete", false);
+    private static final Logger s_logger = LoggerFactory.getLogger(VMSnapshotManagerImpl.class);
     @Inject
     VMInstanceDao _vmInstanceDao;
     @Inject
@@ -107,47 +113,18 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
     HypervisorCapabilitiesDao _hypervisorCapabilitiesDao;
     @Inject
     StorageStrategyFactory storageStrategyFactory;
-
     @Inject
     EntityManager _entityMgr;
     @Inject
     AsyncJobManager _jobMgr;
-
     @Inject
     VmWorkJobDao _workJobDao;
-
     VmWorkJobHandlerProxy _jobHandlerProxy = new VmWorkJobHandlerProxy(this);
-
     int _vmSnapshotMax;
     int _wait;
 
-    static final ConfigKey<Long> VmJobCheckInterval = new ConfigKey<>("Advanced",
-            Long.class, "vm.job.check.interval", "3000",
-            "Interval in milliseconds to check if the job is complete", false);
+    public VMSnapshotManagerImpl() {
 
-    @Override
-    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _name = name;
-        if (_configDao == null) {
-            throw new ConfigurationException("Unable to get the configuration dao.");
-        }
-
-        _vmSnapshotMax = NumbersUtil.parseInt(_configDao.getValue("vmsnapshot.max"), VMSNAPSHOTMAX);
-
-        final String value = _configDao.getValue("vmsnapshot.create.wait");
-        _wait = NumbersUtil.parseInt(value, 1800);
-
-        return true;
-    }
-
-    @Override
-    public boolean start() {
-        return true;
-    }
-
-    @Override
-    public boolean stop() {
-        return true;
     }
 
     @Override
@@ -227,11 +204,64 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         }
 
         return _vmSnapshotDao.search(sc, searchFilter);
-
     }
 
     protected Account getCaller() {
         return CallContext.current().getCallingAccount();
+    }
+
+    @Override
+    public VMSnapshot getVMSnapshotById(final Long id) {
+        final VMSnapshotVO vmSnapshot = _vmSnapshotDao.findById(id);
+        return vmSnapshot;
+    }
+
+    @Override
+    @ActionEvent(eventType = EventTypes.EVENT_VM_SNAPSHOT_CREATE, eventDescription = "creating VM snapshot", async = true)
+    public VMSnapshot creatVMSnapshot(final Long vmId, final Long vmSnapshotId, final Boolean quiescevm) {
+        final UserVmVO userVm = _userVMDao.findById(vmId);
+        if (userVm == null) {
+            throw new InvalidParameterValueException("Create vm to snapshot failed due to vm: " + vmId + " is not found");
+        }
+        final VMSnapshotVO vmSnapshot = _vmSnapshotDao.findById(vmSnapshotId);
+        if (vmSnapshot == null) {
+            throw new CloudRuntimeException("VM snapshot id: " + vmSnapshotId + " can not be found");
+        }
+
+        // serialize VM operation
+        final AsyncJobExecutionContext jobContext = AsyncJobExecutionContext.getCurrentExecutionContext();
+        if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
+            // avoid re-entrance
+            VmWorkJobVO placeHolder = null;
+            placeHolder = createPlaceHolderWork(vmId);
+            try {
+                return orchestrateCreateVMSnapshot(vmId, vmSnapshotId, quiescevm);
+            } finally {
+                _workJobDao.expunge(placeHolder.getId());
+            }
+        } else {
+            final Outcome<VMSnapshot> outcome = createVMSnapshotThroughJobQueue(vmId, vmSnapshotId, quiescevm);
+
+            VMSnapshot result = null;
+            try {
+                result = outcome.get();
+            } catch (final InterruptedException e) {
+                throw new RuntimeException("Operation is interrupted", e);
+            } catch (final java.util.concurrent.ExecutionException e) {
+                throw new RuntimeException("Execution excetion", e);
+            }
+
+            final Object jobResult = _jobMgr.unmarshallResultObject(outcome.getJob());
+            if (jobResult != null) {
+                if (jobResult instanceof ConcurrentOperationException) {
+                    throw (ConcurrentOperationException) jobResult;
+                } else if (jobResult instanceof Throwable) {
+                    throw new RuntimeException("Unexpected exception", (Throwable) jobResult);
+                }
+            }
+
+            return result;
+        }
     }
 
     @Override
@@ -256,14 +286,17 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         }
 
         // check hypervisor capabilities
-        if (!_hypervisorCapabilitiesDao.isVmSnapshotEnabled(userVmVo.getHypervisorType(), "default"))
+        if (!_hypervisorCapabilitiesDao.isVmSnapshotEnabled(userVmVo.getHypervisorType(), "default")) {
             throw new InvalidParameterValueException("VM snapshot is not enabled for hypervisor type: " + userVmVo.getHypervisorType());
+        }
 
         // parameter length check
-        if (vsDisplayName != null && vsDisplayName.length() > 255)
+        if (vsDisplayName != null && vsDisplayName.length() > 255) {
             throw new InvalidParameterValueException("Creating VM snapshot failed due to length of VM snapshot vsDisplayName should not exceed 255");
-        if (vsDescription != null && vsDescription.length() > 255)
+        }
+        if (vsDescription != null && vsDescription.length() > 255) {
             throw new InvalidParameterValueException("Creating VM snapshot failed due to length of VM snapshot vsDescription should not exceed 255");
+        }
 
         // VM snapshot display name must be unique for a VM
         final String timeString = DateUtil.getDateDisplayString(DateUtil.GMT_TIMEZONE, new Date(), DateUtil.YYYYMMDD_FORMAT);
@@ -313,8 +346,9 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         }
 
         VMSnapshot.Type vmSnapshotType = VMSnapshot.Type.Disk;
-        if (snapshotMemory && userVmVo.getState() == VirtualMachine.State.Running)
+        if (snapshotMemory && userVmVo.getState() == VirtualMachine.State.Running) {
             vmSnapshotType = VMSnapshot.Type.DiskAndMemory;
+        }
 
         try {
             final VMSnapshotVO vmSnapshotVo =
@@ -330,113 +364,6 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
             s_logger.error("Create vm snapshot record failed for vm: " + vmId + " due to: " + msg);
         }
         return null;
-    }
-
-    @Override
-    public String getName() {
-        return _name;
-    }
-
-    private VMSnapshotStrategy findVMSnapshotStrategy(final VMSnapshot vmSnapshot) {
-        final VMSnapshotStrategy snapshotStrategy = storageStrategyFactory.getVmSnapshotStrategy(vmSnapshot);
-
-        if (snapshotStrategy == null) {
-            throw new CloudRuntimeException("can't find vm snapshot strategy for vmsnapshot: " + vmSnapshot.getId());
-        }
-
-        return snapshotStrategy;
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_VM_SNAPSHOT_CREATE, eventDescription = "creating VM snapshot", async = true)
-    public VMSnapshot creatVMSnapshot(final Long vmId, final Long vmSnapshotId, final Boolean quiescevm) {
-        final UserVmVO userVm = _userVMDao.findById(vmId);
-        if (userVm == null) {
-            throw new InvalidParameterValueException("Create vm to snapshot failed due to vm: " + vmId + " is not found");
-        }
-        final VMSnapshotVO vmSnapshot = _vmSnapshotDao.findById(vmSnapshotId);
-        if (vmSnapshot == null) {
-            throw new CloudRuntimeException("VM snapshot id: " + vmSnapshotId + " can not be found");
-        }
-
-        // serialize VM operation
-        final AsyncJobExecutionContext jobContext = AsyncJobExecutionContext.getCurrentExecutionContext();
-        if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
-            // avoid re-entrance
-            VmWorkJobVO placeHolder = null;
-            placeHolder = createPlaceHolderWork(vmId);
-            try {
-                return orchestrateCreateVMSnapshot(vmId, vmSnapshotId, quiescevm);
-            } finally {
-                _workJobDao.expunge(placeHolder.getId());
-            }
-
-        } else {
-            final Outcome<VMSnapshot> outcome = createVMSnapshotThroughJobQueue(vmId, vmSnapshotId, quiescevm);
-
-            VMSnapshot result = null;
-            try {
-                result = outcome.get();
-            } catch (final InterruptedException e) {
-                throw new RuntimeException("Operation is interrupted", e);
-            } catch (final java.util.concurrent.ExecutionException e) {
-                throw new RuntimeException("Execution excetion", e);
-            }
-
-            final Object jobResult = _jobMgr.unmarshallResultObject(outcome.getJob());
-            if (jobResult != null) {
-                if (jobResult instanceof ConcurrentOperationException)
-                    throw (ConcurrentOperationException) jobResult;
-                else if (jobResult instanceof Throwable)
-                    throw new RuntimeException("Unexpected exception", (Throwable) jobResult);
-            }
-
-            return result;
-        }
-    }
-
-    private VMSnapshot orchestrateCreateVMSnapshot(final Long vmId, final Long vmSnapshotId, final Boolean quiescevm) {
-        final UserVmVO userVm = _userVMDao.findById(vmId);
-        if (userVm == null) {
-            throw new InvalidParameterValueException("Create vm to snapshot failed due to vm: " + vmId + " is not found");
-        }
-
-        final List<VolumeVO> volumeVos = _volumeDao.findByInstanceAndType(vmId, Type.ROOT);
-        if (volumeVos == null || volumeVos.isEmpty()) {
-            throw new CloudRuntimeException("Create vm to snapshot failed due to no root disk found");
-        }
-
-        final VolumeVO rootVolume = volumeVos.get(0);
-        if (!rootVolume.getState().equals(Volume.State.Ready)) {
-            throw new CloudRuntimeException("Create vm to snapshot failed due to vm: " + vmId + " has root disk in " + rootVolume.getState() + " state");
-        }
-
-        final VMSnapshotVO vmSnapshot = _vmSnapshotDao.findById(vmSnapshotId);
-        if (vmSnapshot == null) {
-            throw new CloudRuntimeException("VM snapshot id: " + vmSnapshotId + " can not be found");
-        }
-
-        final VMSnapshotOptions options = new VMSnapshotOptions(quiescevm);
-        vmSnapshot.setOptions(options);
-        try {
-            final VMSnapshotStrategy strategy = findVMSnapshotStrategy(vmSnapshot);
-            final VMSnapshot snapshot = strategy.takeVMSnapshot(vmSnapshot);
-            return snapshot;
-        } catch (final Exception e) {
-            s_logger.debug("Failed to create vm snapshot: " + vmSnapshotId, e);
-            return null;
-        }
-    }
-
-    public VMSnapshotManagerImpl() {
-
-    }
-
-    @Override
-    public boolean hasActiveVMSnapshotTasks(final Long vmId) {
-        final List<VMSnapshotVO> activeVMSnapshots =
-                _vmSnapshotDao.listByInstanceId(vmId, VMSnapshot.State.Creating, VMSnapshot.State.Expunging, VMSnapshot.State.Reverting, VMSnapshot.State.Allocated);
-        return activeVMSnapshots.size() > 0;
     }
 
     @Override
@@ -459,10 +386,11 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         // check if there are other active VM snapshot tasks
         if (hasActiveVMSnapshotTasks(vmSnapshot.getVmId())) {
             final List<VMSnapshotVO> expungingSnapshots = _vmSnapshotDao.listByInstanceId(vmSnapshot.getVmId(), VMSnapshot.State.Expunging);
-            if (expungingSnapshots.size() > 0 && expungingSnapshots.get(0).getId() == vmSnapshot.getId())
+            if (expungingSnapshots.size() > 0 && expungingSnapshots.get(0).getId() == vmSnapshot.getId()) {
                 s_logger.debug("Target VM snapshot already in expunging state, go on deleting it: " + vmSnapshot.getDisplayName());
-            else
+            } else {
                 throw new InvalidParameterValueException("There is other active vm snapshot tasks on the instance, please try again later");
+            }
         }
 
         // serialize VM operation
@@ -490,14 +418,16 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
 
             final Object jobResult = _jobMgr.unmarshallResultObject(outcome.getJob());
             if (jobResult != null) {
-                if (jobResult instanceof ConcurrentOperationException)
+                if (jobResult instanceof ConcurrentOperationException) {
                     throw (ConcurrentOperationException) jobResult;
-                else if (jobResult instanceof Throwable)
+                } else if (jobResult instanceof Throwable) {
                     throw new RuntimeException("Unexpected exception", (Throwable) jobResult);
+                }
             }
 
-            if (jobResult instanceof Boolean)
+            if (jobResult instanceof Boolean) {
                 return ((Boolean) jobResult).booleanValue();
+            }
 
             return false;
         }
@@ -521,10 +451,11 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         // check if there are other active VM snapshot tasks
         if (hasActiveVMSnapshotTasks(vmSnapshot.getVmId())) {
             final List<VMSnapshotVO> expungingSnapshots = _vmSnapshotDao.listByInstanceId(vmSnapshot.getVmId(), VMSnapshot.State.Expunging);
-            if (expungingSnapshots.size() > 0 && expungingSnapshots.get(0).getId() == vmSnapshot.getId())
+            if (expungingSnapshots.size() > 0 && expungingSnapshots.get(0).getId() == vmSnapshot.getId()) {
                 s_logger.debug("Target VM snapshot already in expunging state, go on deleting it: " + vmSnapshot.getDisplayName());
-            else
+            } else {
                 throw new InvalidParameterValueException("There is other active vm snapshot tasks on the instance, please try again later");
+            }
         }
 
         if (vmSnapshot.getState() == VMSnapshot.State.Allocated) {
@@ -538,6 +469,38 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
                 return false;
             }
         }
+    }
+
+    public Outcome<VMSnapshot> deleteVMSnapshotThroughJobQueue(final Long vmId, final Long vmSnapshotId) {
+
+        final CallContext context = CallContext.current();
+        final User callingUser = context.getCallingUser();
+        final Account callingAccount = context.getCallingAccount();
+
+        final VMInstanceVO vm = _vmInstanceDao.findById(vmId);
+
+        final VmWorkJobVO workJob = new VmWorkJobVO(context.getContextId());
+
+        workJob.setDispatcher(VmWorkConstants.VM_WORK_JOB_DISPATCHER);
+        workJob.setCmd(VmWorkDeleteVMSnapshot.class.getName());
+
+        workJob.setAccountId(callingAccount.getId());
+        workJob.setUserId(callingUser.getId());
+        workJob.setStep(VmWorkJobVO.Step.Starting);
+        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmInstanceId(vm.getId());
+        workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
+
+        // save work context info (there are some duplications)
+        final VmWorkDeleteVMSnapshot workInfo = new VmWorkDeleteVMSnapshot(callingUser.getId(), callingAccount.getId(), vm.getId(),
+                VMSnapshotManagerImpl.VM_WORK_JOB_HANDLER, vmSnapshotId);
+        workJob.setCmdInfo(VmWorkSerializer.serialize(workInfo));
+
+        _jobMgr.submitAsyncJob(workJob, VmWorkConstants.VM_WORK_QUEUE, vm.getId());
+
+        AsyncJobExecutionContext.getCurrentExecutionContext().joinJob(workJob.getId());
+
+        return new VmJobVMSnapshotOutcome(workJob, vmSnapshotId);
     }
 
     @Override
@@ -596,7 +559,6 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
             } finally {
                 _workJobDao.expunge(placeHolder.getId());
             }
-
         } else {
             final Outcome<VMSnapshot> outcome = revertToVMSnapshotThroughJobQueue(vmSnapshotVo.getVmId(), vmSnapshotId);
 
@@ -611,14 +573,15 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
 
             final Object jobResult = _jobMgr.unmarshallResultObject(outcome.getJob());
             if (jobResult != null) {
-                if (jobResult instanceof ConcurrentOperationException)
+                if (jobResult instanceof ConcurrentOperationException) {
                     throw (ConcurrentOperationException) jobResult;
-                else if (jobResult instanceof InsufficientCapacityException)
+                } else if (jobResult instanceof InsufficientCapacityException) {
                     throw (InsufficientCapacityException) jobResult;
-                else if (jobResult instanceof ResourceUnavailableException)
+                } else if (jobResult instanceof ResourceUnavailableException) {
                     throw (ResourceUnavailableException) jobResult;
-                else if (jobResult instanceof Throwable)
+                } else if (jobResult instanceof Throwable) {
                     throw new RuntimeException("Unexpected exception", (Throwable) jobResult);
+                }
             }
 
             return userVm;
@@ -699,10 +662,36 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         }
     }
 
-    @Override
-    public VMSnapshot getVMSnapshotById(final Long id) {
-        final VMSnapshotVO vmSnapshot = _vmSnapshotDao.findById(id);
-        return vmSnapshot;
+    public Outcome<VMSnapshot> revertToVMSnapshotThroughJobQueue(final Long vmId, final Long vmSnapshotId) {
+
+        final CallContext context = CallContext.current();
+        final User callingUser = context.getCallingUser();
+        final Account callingAccount = context.getCallingAccount();
+
+        final VMInstanceVO vm = _vmInstanceDao.findById(vmId);
+
+        final VmWorkJobVO workJob = new VmWorkJobVO(context.getContextId());
+
+        workJob.setDispatcher(VmWorkConstants.VM_WORK_JOB_DISPATCHER);
+        workJob.setCmd(VmWorkRevertToVMSnapshot.class.getName());
+
+        workJob.setAccountId(callingAccount.getId());
+        workJob.setUserId(callingUser.getId());
+        workJob.setStep(VmWorkJobVO.Step.Starting);
+        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmInstanceId(vm.getId());
+        workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
+
+        // save work context info (there are some duplications)
+        final VmWorkRevertToVMSnapshot workInfo = new VmWorkRevertToVMSnapshot(callingUser.getId(), callingAccount.getId(), vm.getId(),
+                VMSnapshotManagerImpl.VM_WORK_JOB_HANDLER, vmSnapshotId);
+        workJob.setCmdInfo(VmWorkSerializer.serialize(workInfo));
+
+        _jobMgr.submitAsyncJob(workJob, VmWorkConstants.VM_WORK_QUEUE, vm.getId());
+
+        AsyncJobExecutionContext.getCurrentExecutionContext().joinJob(workJob.getId());
+
+        return new VmJobVMSnapshotOutcome(workJob, vmSnapshotId);
     }
 
     @Override
@@ -716,141 +705,55 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         return vm;
     }
 
-    @Override
-    public boolean deleteAllVMSnapshots(final long vmId, final VMSnapshot.Type type) {
-        // serialize VM operation
-        final AsyncJobExecutionContext jobContext = AsyncJobExecutionContext.getCurrentExecutionContext();
-        if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
-            // avoid re-entrance
-            VmWorkJobVO placeHolder = null;
-            placeHolder = createPlaceHolderWork(vmId);
-            try {
-                return orchestrateDeleteAllVMSnapshots(vmId, type);
-            } finally {
-                if (placeHolder != null)
-                    _workJobDao.expunge(placeHolder.getId());
-            }
+    private VmWorkJobVO createPlaceHolderWork(final long instanceId) {
+        final VmWorkJobVO workJob = new VmWorkJobVO("");
 
-        } else {
-            final Outcome<VirtualMachine> outcome = deleteAllVMSnapshotsThroughJobQueue(vmId, type);
+        workJob.setDispatcher(VmWorkConstants.VM_WORK_JOB_PLACEHOLDER);
+        workJob.setCmd("");
+        workJob.setCmdInfo("");
 
-            try {
-                outcome.get();
-            } catch (final InterruptedException e) {
-                throw new RuntimeException("Operation is interrupted", e);
-            } catch (final java.util.concurrent.ExecutionException e) {
-                throw new RuntimeException("Execution excetion", e);
-            }
+        workJob.setAccountId(0);
+        workJob.setUserId(0);
+        workJob.setStep(VmWorkJobVO.Step.Starting);
+        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmInstanceId(instanceId);
+        workJob.setInitMsid(ManagementServerNode.getManagementServerId());
 
-            final Object jobResult = _jobMgr.unmarshallResultObject(outcome.getJob());
-            if (jobResult != null) {
-                if (jobResult instanceof ConcurrentOperationException)
-                    throw (ConcurrentOperationException) jobResult;
-                else if (jobResult instanceof InvalidParameterValueException)
-                    throw (InvalidParameterValueException) jobResult;
-                else if (jobResult instanceof Throwable)
-                    throw new RuntimeException("Unexpected exception", (Throwable) jobResult);
-            }
+        _workJobDao.persist(workJob);
 
-            if (jobResult instanceof Boolean)
-                return (Boolean) jobResult;
-
-            return false;
-        }
+        return workJob;
     }
 
-    private boolean orchestrateDeleteAllVMSnapshots(final long vmId, final VMSnapshot.Type type) {
-        boolean result = true;
-        final List<VMSnapshotVO> listVmSnapshots = _vmSnapshotDao.findByVm(vmId);
-        if (listVmSnapshots == null || listVmSnapshots.isEmpty()) {
-            return true;
+    private VMSnapshot orchestrateCreateVMSnapshot(final Long vmId, final Long vmSnapshotId, final Boolean quiescevm) {
+        final UserVmVO userVm = _userVMDao.findById(vmId);
+        if (userVm == null) {
+            throw new InvalidParameterValueException("Create vm to snapshot failed due to vm: " + vmId + " is not found");
         }
-        for (final VMSnapshotVO snapshot : listVmSnapshots) {
-            final VMSnapshotVO target = _vmSnapshotDao.findById(snapshot.getId());
-            if (type != null && target.getType() != type)
-                continue;
-            final VMSnapshotStrategy strategy = findVMSnapshotStrategy(target);
-            if (!strategy.deleteVMSnapshot(target)) {
-                result = false;
-                break;
-            }
-        }
-        return result;
-    }
 
-    @Override
-    public boolean syncVMSnapshot(final VMInstanceVO vm, final Long hostId) {
+        final List<VolumeVO> volumeVos = _volumeDao.findByInstanceAndType(vmId, Type.ROOT);
+        if (volumeVos == null || volumeVos.isEmpty()) {
+            throw new CloudRuntimeException("Create vm to snapshot failed due to no root disk found");
+        }
+
+        final VolumeVO rootVolume = volumeVos.get(0);
+        if (!rootVolume.getState().equals(Volume.State.Ready)) {
+            throw new CloudRuntimeException("Create vm to snapshot failed due to vm: " + vmId + " has root disk in " + rootVolume.getState() + " state");
+        }
+
+        final VMSnapshotVO vmSnapshot = _vmSnapshotDao.findById(vmSnapshotId);
+        if (vmSnapshot == null) {
+            throw new CloudRuntimeException("VM snapshot id: " + vmSnapshotId + " can not be found");
+        }
+
+        final VMSnapshotOptions options = new VMSnapshotOptions(quiescevm);
+        vmSnapshot.setOptions(options);
         try {
-
-            final UserVmVO userVm = _userVMDao.findById(vm.getId());
-            if (userVm == null)
-                return false;
-
-            final List<VMSnapshotVO> vmSnapshotsInExpungingStates = _vmSnapshotDao.listByInstanceId(vm.getId(), VMSnapshot.State.Expunging, VMSnapshot.State.Reverting, VMSnapshot.State.Creating);
-            for (final VMSnapshotVO vmSnapshotVO : vmSnapshotsInExpungingStates) {
-                final VMSnapshotStrategy strategy = findVMSnapshotStrategy(vmSnapshotVO);
-                if (vmSnapshotVO.getState() == VMSnapshot.State.Expunging) {
-                    return strategy.deleteVMSnapshot(vmSnapshotVO);
-                } else if (vmSnapshotVO.getState() == VMSnapshot.State.Creating) {
-                    return strategy.takeVMSnapshot(vmSnapshotVO) != null;
-                } else if (vmSnapshotVO.getState() == VMSnapshot.State.Reverting) {
-                    return strategy.revertVMSnapshot(vmSnapshotVO);
-                }
-            }
+            final VMSnapshotStrategy strategy = findVMSnapshotStrategy(vmSnapshot);
+            final VMSnapshot snapshot = strategy.takeVMSnapshot(vmSnapshot);
+            return snapshot;
         } catch (final Exception e) {
-            s_logger.error(e.getMessage(), e);
-            if (_vmSnapshotDao.listByInstanceId(vm.getId(), VMSnapshot.State.Expunging).size() == 0)
-                return true;
-            else
-                return false;
-        }
-        return false;
-    }
-
-    public class VmJobVMSnapshotOutcome extends OutcomeImpl<VMSnapshot> {
-        private final long _vmSnapshotId;
-
-        public VmJobVMSnapshotOutcome(final AsyncJob job, final long vmSnapshotId) {
-            super(VMSnapshot.class, job, VmJobCheckInterval.value(), new Predicate() {
-                @Override
-                public boolean checkCondition() {
-                    final AsyncJobVO jobVo = _entityMgr.findById(AsyncJobVO.class, job.getId());
-                    assert (jobVo != null);
-                    if (jobVo == null || jobVo.getStatus() != JobInfo.Status.IN_PROGRESS)
-                        return true;
-
-                    return false;
-                }
-            }, AsyncJob.Topics.JOB_STATE);
-            _vmSnapshotId = vmSnapshotId;
-        }
-
-        @Override
-        protected VMSnapshot retrieve() {
-            return _vmSnapshotDao.findById(_vmSnapshotId);
-        }
-    }
-
-    public class VmJobVirtualMachineOutcome extends OutcomeImpl<VirtualMachine> {
-        long vmId;
-
-        public VmJobVirtualMachineOutcome(final AsyncJob job, final long vmId) {
-            super(VirtualMachine.class, job, VmJobCheckInterval.value(), new Predicate() {
-                @Override
-                public boolean checkCondition() {
-                    final AsyncJobVO jobVo = _entityMgr.findById(AsyncJobVO.class, job.getId());
-                    assert (jobVo != null);
-                    if (jobVo == null || jobVo.getStatus() != JobInfo.Status.IN_PROGRESS)
-                        return true;
-
-                    return false;
-                }
-            }, AsyncJob.Topics.JOB_STATE);
-        }
-
-        @Override
-        protected VirtualMachine retrieve() {
-            return _vmInstanceDao.findById(vmId);
+            s_logger.debug("Failed to create vm snapshot: " + vmSnapshotId, e);
+            return null;
         }
     }
 
@@ -886,68 +789,109 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         return new VmJobVMSnapshotOutcome(workJob, vmSnapshotId);
     }
 
-    public Outcome<VMSnapshot> deleteVMSnapshotThroughJobQueue(final Long vmId, final Long vmSnapshotId) {
+    private VMSnapshotStrategy findVMSnapshotStrategy(final VMSnapshot vmSnapshot) {
+        final VMSnapshotStrategy snapshotStrategy = storageStrategyFactory.getVmSnapshotStrategy(vmSnapshot);
 
-        final CallContext context = CallContext.current();
-        final User callingUser = context.getCallingUser();
-        final Account callingAccount = context.getCallingAccount();
+        if (snapshotStrategy == null) {
+            throw new CloudRuntimeException("can't find vm snapshot strategy for vmsnapshot: " + vmSnapshot.getId());
+        }
 
-        final VMInstanceVO vm = _vmInstanceDao.findById(vmId);
-
-        final VmWorkJobVO workJob = new VmWorkJobVO(context.getContextId());
-
-        workJob.setDispatcher(VmWorkConstants.VM_WORK_JOB_DISPATCHER);
-        workJob.setCmd(VmWorkDeleteVMSnapshot.class.getName());
-
-        workJob.setAccountId(callingAccount.getId());
-        workJob.setUserId(callingUser.getId());
-        workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
-        workJob.setVmInstanceId(vm.getId());
-        workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
-
-        // save work context info (there are some duplications)
-        final VmWorkDeleteVMSnapshot workInfo = new VmWorkDeleteVMSnapshot(callingUser.getId(), callingAccount.getId(), vm.getId(),
-                VMSnapshotManagerImpl.VM_WORK_JOB_HANDLER, vmSnapshotId);
-        workJob.setCmdInfo(VmWorkSerializer.serialize(workInfo));
-
-        _jobMgr.submitAsyncJob(workJob, VmWorkConstants.VM_WORK_QUEUE, vm.getId());
-
-        AsyncJobExecutionContext.getCurrentExecutionContext().joinJob(workJob.getId());
-
-        return new VmJobVMSnapshotOutcome(workJob, vmSnapshotId);
+        return snapshotStrategy;
     }
 
-    public Outcome<VMSnapshot> revertToVMSnapshotThroughJobQueue(final Long vmId, final Long vmSnapshotId) {
+    @Override
+    public String getName() {
+        return _name;
+    }
 
-        final CallContext context = CallContext.current();
-        final User callingUser = context.getCallingUser();
-        final Account callingAccount = context.getCallingAccount();
+    @Override
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+        _name = name;
+        if (_configDao == null) {
+            throw new ConfigurationException("Unable to get the configuration dao.");
+        }
 
-        final VMInstanceVO vm = _vmInstanceDao.findById(vmId);
+        _vmSnapshotMax = NumbersUtil.parseInt(_configDao.getValue("vmsnapshot.max"), VMSNAPSHOTMAX);
 
-        final VmWorkJobVO workJob = new VmWorkJobVO(context.getContextId());
+        final String value = _configDao.getValue("vmsnapshot.create.wait");
+        _wait = NumbersUtil.parseInt(value, 1800);
 
-        workJob.setDispatcher(VmWorkConstants.VM_WORK_JOB_DISPATCHER);
-        workJob.setCmd(VmWorkRevertToVMSnapshot.class.getName());
+        return true;
+    }
 
-        workJob.setAccountId(callingAccount.getId());
-        workJob.setUserId(callingUser.getId());
-        workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
-        workJob.setVmInstanceId(vm.getId());
-        workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
+    @Override
+    public boolean start() {
+        return true;
+    }
 
-        // save work context info (there are some duplications)
-        final VmWorkRevertToVMSnapshot workInfo = new VmWorkRevertToVMSnapshot(callingUser.getId(), callingAccount.getId(), vm.getId(),
-                VMSnapshotManagerImpl.VM_WORK_JOB_HANDLER, vmSnapshotId);
-        workJob.setCmdInfo(VmWorkSerializer.serialize(workInfo));
+    @Override
+    public boolean stop() {
+        return true;
+    }
 
-        _jobMgr.submitAsyncJob(workJob, VmWorkConstants.VM_WORK_QUEUE, vm.getId());
+    @Override
+    public boolean deleteAllVMSnapshots(final long vmId, final VMSnapshot.Type type) {
+        // serialize VM operation
+        final AsyncJobExecutionContext jobContext = AsyncJobExecutionContext.getCurrentExecutionContext();
+        if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
+            // avoid re-entrance
+            VmWorkJobVO placeHolder = null;
+            placeHolder = createPlaceHolderWork(vmId);
+            try {
+                return orchestrateDeleteAllVMSnapshots(vmId, type);
+            } finally {
+                if (placeHolder != null) {
+                    _workJobDao.expunge(placeHolder.getId());
+                }
+            }
+        } else {
+            final Outcome<VirtualMachine> outcome = deleteAllVMSnapshotsThroughJobQueue(vmId, type);
 
-        AsyncJobExecutionContext.getCurrentExecutionContext().joinJob(workJob.getId());
+            try {
+                outcome.get();
+            } catch (final InterruptedException e) {
+                throw new RuntimeException("Operation is interrupted", e);
+            } catch (final java.util.concurrent.ExecutionException e) {
+                throw new RuntimeException("Execution excetion", e);
+            }
 
-        return new VmJobVMSnapshotOutcome(workJob, vmSnapshotId);
+            final Object jobResult = _jobMgr.unmarshallResultObject(outcome.getJob());
+            if (jobResult != null) {
+                if (jobResult instanceof ConcurrentOperationException) {
+                    throw (ConcurrentOperationException) jobResult;
+                } else if (jobResult instanceof InvalidParameterValueException) {
+                    throw (InvalidParameterValueException) jobResult;
+                } else if (jobResult instanceof Throwable) {
+                    throw new RuntimeException("Unexpected exception", (Throwable) jobResult);
+                }
+            }
+
+            if (jobResult instanceof Boolean) {
+                return (Boolean) jobResult;
+            }
+
+            return false;
+        }
+    }
+
+    private boolean orchestrateDeleteAllVMSnapshots(final long vmId, final VMSnapshot.Type type) {
+        boolean result = true;
+        final List<VMSnapshotVO> listVmSnapshots = _vmSnapshotDao.findByVm(vmId);
+        if (listVmSnapshots == null || listVmSnapshots.isEmpty()) {
+            return true;
+        }
+        for (final VMSnapshotVO snapshot : listVmSnapshots) {
+            final VMSnapshotVO target = _vmSnapshotDao.findById(snapshot.getId());
+            if (type != null && target.getType() != type) {
+                continue;
+            }
+            final VMSnapshotStrategy strategy = findVMSnapshotStrategy(target);
+            if (!strategy.deleteVMSnapshot(target)) {
+                result = false;
+                break;
+            }
+        }
+        return result;
     }
 
     public Outcome<VirtualMachine> deleteAllVMSnapshotsThroughJobQueue(final Long vmId, final VMSnapshot.Type type) {
@@ -982,6 +926,45 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         return new VmJobVirtualMachineOutcome(workJob, vmId);
     }
 
+    @Override
+    public boolean syncVMSnapshot(final VMInstanceVO vm, final Long hostId) {
+        try {
+
+            final UserVmVO userVm = _userVMDao.findById(vm.getId());
+            if (userVm == null) {
+                return false;
+            }
+
+            final List<VMSnapshotVO> vmSnapshotsInExpungingStates = _vmSnapshotDao.listByInstanceId(vm.getId(), VMSnapshot.State.Expunging, VMSnapshot.State.Reverting,
+                    VMSnapshot.State.Creating);
+            for (final VMSnapshotVO vmSnapshotVO : vmSnapshotsInExpungingStates) {
+                final VMSnapshotStrategy strategy = findVMSnapshotStrategy(vmSnapshotVO);
+                if (vmSnapshotVO.getState() == VMSnapshot.State.Expunging) {
+                    return strategy.deleteVMSnapshot(vmSnapshotVO);
+                } else if (vmSnapshotVO.getState() == VMSnapshot.State.Creating) {
+                    return strategy.takeVMSnapshot(vmSnapshotVO) != null;
+                } else if (vmSnapshotVO.getState() == VMSnapshot.State.Reverting) {
+                    return strategy.revertVMSnapshot(vmSnapshotVO);
+                }
+            }
+        } catch (final Exception e) {
+            s_logger.error(e.getMessage(), e);
+            if (_vmSnapshotDao.listByInstanceId(vm.getId(), VMSnapshot.State.Expunging).size() == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasActiveVMSnapshotTasks(final Long vmId) {
+        final List<VMSnapshotVO> activeVMSnapshots =
+                _vmSnapshotDao.listByInstanceId(vmId, VMSnapshot.State.Creating, VMSnapshot.State.Expunging, VMSnapshot.State.Reverting, VMSnapshot.State.Allocated);
+        return activeVMSnapshots.size() > 0;
+    }
+
     @ReflectionUse
     public Pair<JobInfo.Status, String> orchestrateCreateVMSnapshot(final VmWorkCreateVMSnapshot work) throws Exception {
         final VMSnapshot snapshot = orchestrateCreateVMSnapshot(work.getVmId(), work.getVmSnapshotId(), work.isQuiesceVm());
@@ -1014,22 +997,52 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         return _jobHandlerProxy.handleVmWorkJob(work);
     }
 
-    private VmWorkJobVO createPlaceHolderWork(final long instanceId) {
-        final VmWorkJobVO workJob = new VmWorkJobVO("");
+    public class VmJobVMSnapshotOutcome extends OutcomeImpl<VMSnapshot> {
+        private final long _vmSnapshotId;
 
-        workJob.setDispatcher(VmWorkConstants.VM_WORK_JOB_PLACEHOLDER);
-        workJob.setCmd("");
-        workJob.setCmdInfo("");
+        public VmJobVMSnapshotOutcome(final AsyncJob job, final long vmSnapshotId) {
+            super(VMSnapshot.class, job, VmJobCheckInterval.value(), new Predicate() {
+                @Override
+                public boolean checkCondition() {
+                    final AsyncJobVO jobVo = _entityMgr.findById(AsyncJobVO.class, job.getId());
+                    assert (jobVo != null);
+                    if (jobVo == null || jobVo.getStatus() != JobInfo.Status.IN_PROGRESS) {
+                        return true;
+                    }
 
-        workJob.setAccountId(0);
-        workJob.setUserId(0);
-        workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
-        workJob.setVmInstanceId(instanceId);
-        workJob.setInitMsid(ManagementServerNode.getManagementServerId());
+                    return false;
+                }
+            }, AsyncJob.Topics.JOB_STATE);
+            _vmSnapshotId = vmSnapshotId;
+        }
 
-        _workJobDao.persist(workJob);
+        @Override
+        protected VMSnapshot retrieve() {
+            return _vmSnapshotDao.findById(_vmSnapshotId);
+        }
+    }
 
-        return workJob;
+    public class VmJobVirtualMachineOutcome extends OutcomeImpl<VirtualMachine> {
+        long vmId;
+
+        public VmJobVirtualMachineOutcome(final AsyncJob job, final long vmId) {
+            super(VirtualMachine.class, job, VmJobCheckInterval.value(), new Predicate() {
+                @Override
+                public boolean checkCondition() {
+                    final AsyncJobVO jobVo = _entityMgr.findById(AsyncJobVO.class, job.getId());
+                    assert (jobVo != null);
+                    if (jobVo == null || jobVo.getStatus() != JobInfo.Status.IN_PROGRESS) {
+                        return true;
+                    }
+
+                    return false;
+                }
+            }, AsyncJob.Topics.JOB_STATE);
+        }
+
+        @Override
+        protected VirtualMachine retrieve() {
+            return _vmInstanceDao.findById(vmId);
+        }
     }
 }

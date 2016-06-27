@@ -36,10 +36,8 @@ import org.slf4j.LoggerFactory;
  * Tool to run database scripts
  */
 public class ScriptRunner {
-    private static Logger s_logger = LoggerFactory.getLogger(ScriptRunner.class);
-
     private static final String DEFAULT_DELIMITER = ";";
-
+    private static Logger s_logger = LoggerFactory.getLogger(ScriptRunner.class);
     private Connection connection;
 
     private boolean stopOnError;
@@ -75,8 +73,7 @@ public class ScriptRunner {
     /**
      * Runs an SQL script (read in using the Reader parameter)
      *
-     * @param reader
-     *            - the source of the script
+     * @param reader - the source of the script
      */
     public void runScript(Reader reader) throws IOException, SQLException {
         try {
@@ -102,14 +99,10 @@ public class ScriptRunner {
      * Runs an SQL script (read in using the Reader parameter) using the
      * connection passed in
      *
-     * @param conn
-     *            - the connection to use for the script
-     * @param reader
-     *            - the source of the script
-     * @throws SQLException
-     *             if any SQL errors occur
-     * @throws IOException
-     *             if there is an error reading from the Reader
+     * @param conn   - the connection to use for the script
+     * @param reader - the source of the script
+     * @throws SQLException if any SQL errors occur
+     * @throws IOException  if there is an error reading from the Reader
      */
     private void runScript(Connection conn, Reader reader) throws IOException, SQLException {
         StringBuffer command = null;
@@ -149,7 +142,7 @@ public class ScriptRunner {
                         if (autoCommit && !conn.getAutoCommit()) {
                             conn.commit();
                         }
-                        try(ResultSet rs = statement.getResultSet();) {
+                        try (ResultSet rs = statement.getResultSet();) {
                             if (hasResults && rs != null) {
                                 ResultSetMetaData md = rs.getMetaData();
                                 int cols = md.getColumnCount();
@@ -172,10 +165,11 @@ public class ScriptRunner {
                     }
                 } else {
                     int idx = line.indexOf("--");
-                    if (idx != -1)
+                    if (idx != -1) {
                         command.append(line.substring(0, idx));
-                    else
+                    } else {
                         command.append(line);
+                    }
                     command.append(" ");
                 }
             }
@@ -198,23 +192,24 @@ public class ScriptRunner {
         }
     }
 
+    private void println(Object o) {
+        _logBuffer.append(o);
+        if (verbosity) {
+            s_logger.debug(_logBuffer.toString());
+        }
+        _logBuffer = new StringBuffer();
+    }
+
     private String getDelimiter() {
         return delimiter;
     }
 
-    private void print(Object o) {
-        _logBuffer.append(o);
-    }
-
-    private void println(Object o) {
-        _logBuffer.append(o);
-        if (verbosity)
-            s_logger.debug(_logBuffer.toString());
-        _logBuffer = new StringBuffer();
-    }
-
     private void printlnError(Object o) {
         s_logger.error("" + o);
+    }
+
+    private void print(Object o) {
+        _logBuffer.append(o);
     }
 
     private void flush() {

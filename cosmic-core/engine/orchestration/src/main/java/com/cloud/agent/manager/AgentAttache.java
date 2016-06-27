@@ -1,35 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.agent.manager;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import com.cloud.agent.Listener;
 import com.cloud.agent.api.Answer;
@@ -55,25 +24,39 @@ import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.Status;
 import com.cloud.utils.concurrency.NamedThreadFactory;
-
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *  AgentAttache provides basic commands to be implemented.
+ * AgentAttache provides basic commands to be implemented.
  */
 public abstract class AgentAttache {
-    private static final Logger s_logger = LoggerFactory.getLogger(AgentAttache.class);
-
-    private static final ScheduledExecutorService s_listenerExecutor = Executors.newScheduledThreadPool(10, new NamedThreadFactory("ListenerTimer"));
-    private static final Random s_rand = new Random(System.currentTimeMillis());
-
+    public final static String[] s_commandsAllowedInMaintenanceMode = new String[]{MaintainCommand.class.toString(), MigrateCommand.class.toString(),
+            StopCommand.class.toString(), CheckVirtualMachineCommand.class.toString(), PingTestCommand.class.toString(), CheckHealthCommand.class.toString(),
+            ReadyCommand.class.toString(), ShutdownCommand.class.toString(), SetupCommand.class.toString(),
+            CleanupNetworkRulesCmd.class.toString(), CheckNetworkCommand.class.toString(), PvlanSetupCommand.class.toString(), CheckOnHostCommand.class.toString()};
     protected static final Comparator<Request> s_reqComparator = new Comparator<Request>() {
         @Override
         public int compare(final Request o1, final Request o2) {
-            long seq1 = o1.getSequence();
-            long seq2 = o2.getSequence();
+            final long seq1 = o1.getSequence();
+            final long seq2 = o2.getSequence();
             if (seq1 < seq2) {
                 return -1;
             } else if (seq1 > seq2) {
@@ -83,12 +66,11 @@ public abstract class AgentAttache {
             }
         }
     };
-
     protected static final Comparator<Object> s_seqComparator = new Comparator<Object>() {
         @Override
         public int compare(final Object o1, final Object o2) {
-            long seq1 = ((Request)o1).getSequence();
-            long seq2 = (Long)o2;
+            final long seq1 = ((Request) o1).getSequence();
+            final long seq2 = (Long) o2;
             if (seq1 < seq2) {
                 return -1;
             } else if (seq1 > seq2) {
@@ -98,35 +80,33 @@ public abstract class AgentAttache {
             }
         }
     };
+    protected final static String[] s_commandsNotAllowedInConnectingMode = new String[]{StartCommand.class.toString(), CreateCommand.class.toString()};
+    private static final Logger s_logger = LoggerFactory.getLogger(AgentAttache.class);
+    private static final ScheduledExecutorService s_listenerExecutor = Executors.newScheduledThreadPool(10, new NamedThreadFactory("ListenerTimer"));
+    private static final Random s_rand = new Random(System.currentTimeMillis());
 
-    protected final long _id;
-    protected String _name = null;
-    protected final ConcurrentHashMap<Long, Listener> _waitForList;
-    protected final LinkedList<Request> _requests;
-    protected Long _currentSequence;
-    protected Status _status = Status.Connecting;
-    protected boolean _maintenance;
-    protected long _nextSequence;
-
-    protected AgentManagerImpl _agentMgr;
-
-    public final static String[] s_commandsAllowedInMaintenanceMode = new String[] {MaintainCommand.class.toString(), MigrateCommand.class.toString(),
-        StopCommand.class.toString(), CheckVirtualMachineCommand.class.toString(), PingTestCommand.class.toString(), CheckHealthCommand.class.toString(),
-        ReadyCommand.class.toString(), ShutdownCommand.class.toString(), SetupCommand.class.toString(),
-        CleanupNetworkRulesCmd.class.toString(), CheckNetworkCommand.class.toString(), PvlanSetupCommand.class.toString(), CheckOnHostCommand.class.toString()};
-    protected final static String[] s_commandsNotAllowedInConnectingMode = new String[] {StartCommand.class.toString(), CreateCommand.class.toString()};
     static {
         Arrays.sort(s_commandsAllowedInMaintenanceMode);
         Arrays.sort(s_commandsNotAllowedInConnectingMode);
     }
 
+    protected final long _id;
+    protected final ConcurrentHashMap<Long, Listener> _waitForList;
+    protected final LinkedList<Request> _requests;
+    protected String _name = null;
+    protected Long _currentSequence;
+    protected Status _status = Status.Connecting;
+    protected boolean _maintenance;
+    protected long _nextSequence;
+    protected AgentManagerImpl _agentMgr;
+
     protected AgentAttache(final AgentManagerImpl agentMgr, final long id, final String name, final boolean maintenance) {
         _id = id;
         _name = name;
-        _waitForList = new ConcurrentHashMap<Long, Listener>();
+        _waitForList = new ConcurrentHashMap<>();
         _currentSequence = null;
         _maintenance = maintenance;
-        _requests = new LinkedList<Request>();
+        _requests = new LinkedList<>();
         _agentMgr = agentMgr;
         _nextSequence = new Long(s_rand.nextInt(Short.MAX_VALUE)).longValue() << 48;
     }
@@ -178,13 +158,13 @@ public abstract class AgentAttache {
     }
 
     protected synchronized void addRequest(final Request req) {
-        int index = findRequest(req);
+        final int index = findRequest(req);
         assert (index < 0) : "How can we get index again? " + index + ":" + req.toString();
         _requests.add(-index - 1, req);
     }
 
     protected void cancel(final Request req) {
-        long seq = req.getSequence();
+        final long seq = req.getSequence();
         cancel(seq);
     }
 
@@ -196,22 +176,22 @@ public abstract class AgentAttache {
         if (listener != null) {
             listener.processDisconnect(_id, Status.Disconnected);
         }
-        int index = findRequest(seq);
+        final int index = findRequest(seq);
         if (index >= 0) {
             _requests.remove(index);
         }
     }
 
-    protected synchronized int findRequest(final Request req) {
-        return Collections.binarySearch(_requests, req, s_reqComparator);
+    protected String log(final long seq, final String msg) {
+        return "Seq " + _id + "-" + seq + ": " + msg;
     }
 
     protected synchronized int findRequest(final long seq) {
         return Collections.binarySearch(_requests, seq, s_seqComparator);
     }
 
-    protected String log(final long seq, final String msg) {
-        return "Seq " + _id + "-" + seq + ": " + msg;
+    protected synchronized int findRequest(final Request req) {
+        return Collections.binarySearch(_requests, req, s_reqComparator);
     }
 
     protected void registerListener(final long seq, final Listener listener) {
@@ -222,17 +202,6 @@ public abstract class AgentAttache {
             s_listenerExecutor.schedule(new Alarm(seq), listener.getTimeout(), TimeUnit.SECONDS);
         }
         _waitForList.put(seq, listener);
-    }
-
-    protected Listener unregisterListener(final long sequence) {
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace(log(sequence, "Unregistering listener"));
-        }
-        return _waitForList.remove(sequence);
-    }
-
-    protected Listener getListener(final long sequence) {
-        return _waitForList.get(sequence);
     }
 
     public long getId() {
@@ -248,7 +217,7 @@ public abstract class AgentAttache {
     }
 
     public int getNonRecurringListenersSize() {
-        List<Listener> nonRecurringListenersList = new ArrayList<Listener>();
+        final List<Listener> nonRecurringListenersList = new ArrayList<>();
         if (_waitForList.isEmpty()) {
             return 0;
         } else {
@@ -276,7 +245,7 @@ public abstract class AgentAttache {
         boolean processed = false;
 
         try {
-            Listener monitor = getListener(seq);
+            final Listener monitor = getListener(seq);
 
             if (monitor == null) {
                 if (answers[0] != null && answers[0].getResult()) {
@@ -297,7 +266,6 @@ public abstract class AgentAttache {
             }
 
             _agentMgr.notifyAnswersToMonitors(_id, seq, answers);
-
         } finally {
             // we should always trigger next command execution, even in failure cases - otherwise in exception case all the remaining will be stuck in the sync queue forever
             if (resp.executeInSequence()) {
@@ -306,6 +274,54 @@ public abstract class AgentAttache {
         }
 
         return processed;
+    }
+
+    protected Listener getListener(final long sequence) {
+        return _waitForList.get(sequence);
+    }
+
+    protected Listener unregisterListener(final long sequence) {
+        if (s_logger.isTraceEnabled()) {
+            s_logger.trace(log(sequence, "Unregistering listener"));
+        }
+        return _waitForList.remove(sequence);
+    }
+
+    protected synchronized void sendNext(final long seq) {
+        _currentSequence = null;
+        if (_requests.isEmpty()) {
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug(log(seq, "No more commands found"));
+            }
+            return;
+        }
+
+        final Request req = _requests.pop();
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug(log(req.getSequence(), "Sending now.  is current sequence."));
+        }
+        try {
+            send(req);
+        } catch (final AgentUnavailableException e) {
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug(log(req.getSequence(), "Unable to send the next sequence"));
+            }
+            cancel(req.getSequence());
+        }
+        _currentSequence = req.getSequence();
+    }
+
+    /**
+     * sends the request asynchronously.
+     *
+     * @param req
+     * @throws AgentUnavailableException
+     */
+    public abstract void send(Request req) throws AgentUnavailableException;
+
+    public void cleanup(final Status state) {
+        cancelAllCommands(state, true);
+        _requests.clear();
     }
 
     protected void cancelAllCommands(final Status state, final boolean cancelActive) {
@@ -324,11 +340,6 @@ public abstract class AgentAttache {
         }
     }
 
-    public void cleanup(final Status state) {
-        cancelAllCommands(state, true);
-        _requests.clear();
-    }
-
     @Override
     public boolean equals(final Object obj) {
         // Return false straight away.
@@ -339,14 +350,14 @@ public abstract class AgentAttache {
         if (this.getClass() != obj.getClass()) {
             return false;
         }
-        AgentAttache that = (AgentAttache)obj;
+        final AgentAttache that = (AgentAttache) obj;
         return _id == that._id;
     }
 
     public void send(final Request req, final Listener listener) throws AgentUnavailableException {
         checkAvailability(req.getCommands());
 
-        long seq = req.getSequence();
+        final long seq = req.getSequence();
         if (listener != null) {
             registerListener(seq, listener);
         } else if (s_logger.isDebugEnabled()) {
@@ -377,11 +388,11 @@ public abstract class AgentAttache {
                         s_logger.trace(log(seq, " is current sequence"));
                     }
                 }
-            } catch (AgentUnavailableException e) {
+            } catch (final AgentUnavailableException e) {
                 s_logger.info(log(seq, "Unable to send due to " + e.getMessage()));
                 cancel(seq);
                 throw e;
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 s_logger.warn(log(seq, "Unable to send due to "), e);
                 cancel(seq);
                 throw new AgentUnavailableException("Problem due to other exception " + e.getMessage(), _id);
@@ -390,9 +401,9 @@ public abstract class AgentAttache {
     }
 
     public Answer[] send(final Request req, final int wait) throws AgentUnavailableException, OperationTimedoutException {
-        SynchronousListener sl = new SynchronousListener(null);
+        final SynchronousListener sl = new SynchronousListener(null);
 
-        long seq = req.getSequence();
+        final long seq = req.getSequence();
         send(req, sl);
 
         try {
@@ -435,7 +446,7 @@ public abstract class AgentAttache {
             }
 
             throw new OperationTimedoutException(req.getCommands(), _id, seq, wait * 2, true);
-        } catch (OperationTimedoutException e) {
+        } catch (final OperationTimedoutException e) {
             s_logger.warn(log(seq, "Timed out on " + req.toString()));
             cancel(seq);
             final Long current = _currentSequence;
@@ -443,7 +454,7 @@ public abstract class AgentAttache {
                 sendNext(seq);
             }
             throw e;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             s_logger.warn(log(seq, "Exception while waiting for answer"), e);
             cancel(seq);
             final Long current = _currentSequence;
@@ -456,50 +467,20 @@ public abstract class AgentAttache {
         }
     }
 
-    protected synchronized void sendNext(final long seq) {
-        _currentSequence = null;
-        if (_requests.isEmpty()) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug(log(seq, "No more commands found"));
-            }
-            return;
-        }
-
-        Request req = _requests.pop();
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug(log(req.getSequence(), "Sending now.  is current sequence."));
-        }
-        try {
-            send(req);
-        } catch (AgentUnavailableException e) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug(log(req.getSequence(), "Unable to send the next sequence"));
-            }
-            cancel(req.getSequence());
-        }
-        _currentSequence = req.getSequence();
-    }
-
     public void process(final Answer[] answers) {
         //do nothing
     }
 
     /**
-     * sends the request asynchronously.
-     *
-     * @param req
-     * @throws AgentUnavailableException
-     */
-    public abstract void send(Request req) throws AgentUnavailableException;
-
-    /**
      * Process disconnect.
+     *
      * @param state state of the agent.
      */
     public abstract void disconnect(final Status state);
 
     /**
      * Is the agent closed for more commands?
+     *
      * @return true if unable to reach agent or false if reachable.
      */
     protected abstract boolean isClosed();
@@ -514,12 +495,12 @@ public abstract class AgentAttache {
         @Override
         protected void runInContext() {
             try {
-                Listener listener = unregisterListener(_seq);
+                final Listener listener = unregisterListener(_seq);
                 if (listener != null) {
                     cancel(_seq);
                     listener.processTimeout(_id, _seq);
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 s_logger.warn("Exception ", e);
             }
         }

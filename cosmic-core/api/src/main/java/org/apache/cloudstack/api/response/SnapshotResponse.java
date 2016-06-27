@@ -1,31 +1,15 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
+
+import com.cloud.serializer.Param;
+import com.cloud.storage.Snapshot;
+import org.apache.cloudstack.api.ApiConstants;
+import org.apache.cloudstack.api.BaseResponse;
+import org.apache.cloudstack.api.EntityReference;
 
 import java.util.Date;
 import java.util.List;
 
-import com.cloud.serializer.Param;
-import com.cloud.storage.Snapshot;
 import com.google.gson.annotations.SerializedName;
-
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.EntityReference;
 
 @EntityReference(value = Snapshot.class)
 public class SnapshotResponse extends BaseResponse implements ControlledEntityResponse {
@@ -82,7 +66,8 @@ public class SnapshotResponse extends BaseResponse implements ControlledEntityRe
     private String intervalType;
 
     @SerializedName(ApiConstants.STATE)
-    @Param(description = "the state of the snapshot. BackedUp means that snapshot is ready to be used; Creating - the snapshot is being allocated on the primary storage; BackingUp - the snapshot is being backed up on secondary storage")
+    @Param(description = "the state of the snapshot. BackedUp means that snapshot is ready to be used; Creating - the snapshot is being allocated on the primary storage; " +
+            "BackingUp - the snapshot is being backed up on secondary storage")
     private Snapshot.State state;
 
     @SerializedName(ApiConstants.PHYSICAL_SIZE)
@@ -110,7 +95,7 @@ public class SnapshotResponse extends BaseResponse implements ControlledEntityRe
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -119,8 +104,18 @@ public class SnapshotResponse extends BaseResponse implements ControlledEntityRe
     }
 
     @Override
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
+    }
+
+    @Override
+    public void setProjectId(final String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public void setProjectName(final String projectName) {
+        this.projectName = projectName;
     }
 
     public String getDomainId() {
@@ -128,66 +123,56 @@ public class SnapshotResponse extends BaseResponse implements ControlledEntityRe
     }
 
     @Override
-    public void setDomainId(String domainId) {
+    public void setDomainId(final String domainId) {
         this.domainId = domainId;
     }
 
     @Override
-    public void setDomainName(String domainName) {
+    public void setDomainName(final String domainName) {
         this.domainName = domainName;
     }
 
-    public void setSnapshotType(String snapshotType) {
+    public void setSnapshotType(final String snapshotType) {
         this.snapshotType = snapshotType;
     }
 
-    public void setVolumeId(String volumeId) {
+    public void setVolumeId(final String volumeId) {
         this.volumeId = volumeId;
     }
 
-    public void setVolumeName(String volumeName) {
+    public void setVolumeName(final String volumeName) {
         this.volumeName = volumeName;
     }
 
-    public void setVolumeType(String volumeType) {
+    public void setVolumeType(final String volumeType) {
         this.volumeType = volumeType;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setIntervalType(String intervalType) {
+    public void setIntervalType(final String intervalType) {
         this.intervalType = intervalType;
     }
 
-    public void setState(Snapshot.State state) {
+    public void setState(final Snapshot.State state) {
         this.state = state;
     }
 
-    public void setPhysicaSize(long physicalSize) {
+    public void setPhysicaSize(final long physicalSize) {
         this.physicalSize = physicalSize;
     }
 
-    @Override
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
-    public void setTags(List<ResourceTagResponse> tags) {
+    public void setTags(final List<ResourceTagResponse> tags) {
         this.tags = tags;
     }
 
@@ -195,7 +180,7 @@ public class SnapshotResponse extends BaseResponse implements ControlledEntityRe
         return revertable;
     }
 
-    public void setRevertable(boolean revertable) {
+    public void setRevertable(final boolean revertable) {
         this.revertable = revertable;
     }
 }

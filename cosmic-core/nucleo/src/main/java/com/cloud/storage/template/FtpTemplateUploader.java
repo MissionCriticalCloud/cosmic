@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.storage.template;
@@ -35,28 +20,38 @@ import org.slf4j.LoggerFactory;
 public class FtpTemplateUploader implements TemplateUploader {
 
     public static final Logger s_logger = LoggerFactory.getLogger(FtpTemplateUploader.class.getName());
+    private static final int CHUNK_SIZE = 1024 * 1024; //1M
     public TemplateUploader.Status status = TemplateUploader.Status.NOT_STARTED;
     public String errorString = "";
     public long totalBytes = 0;
     public long entitySizeinBytes;
-    private String sourcePath;
-    private String ftpUrl;
-    private UploadCompleteCallback completionCallback;
+    private final String sourcePath;
+    private final String ftpUrl;
+    private final UploadCompleteCallback completionCallback;
     private BufferedInputStream inputStream = null;
     private BufferedOutputStream outputStream = null;
-    private static final int CHUNK_SIZE = 1024 * 1024; //1M
 
-    public FtpTemplateUploader(String sourcePath, String url, UploadCompleteCallback callback, long entitySizeinBytes) {
+    public FtpTemplateUploader(final String sourcePath, final String url, final UploadCompleteCallback callback, final long entitySizeinBytes) {
 
         this.sourcePath = sourcePath;
         ftpUrl = url;
         completionCallback = callback;
         this.entitySizeinBytes = entitySizeinBytes;
-
     }
 
     @Override
-    public long upload(UploadCompleteCallback callback) {
+    public void run() {
+        try {
+            upload(completionCallback);
+        } catch (final Throwable t) {
+            s_logger.warn("Caught exception during upload " + t.getMessage(), t);
+            errorString = "Failed to install: " + t.getMessage();
+            status = TemplateUploader.Status.UNRECOVERABLE_ERROR;
+        }
+    }
+
+    @Override
+    public long upload(final UploadCompleteCallback callback) {
 
         switch (status) {
             case ABORTED:
@@ -64,12 +59,11 @@ public class FtpTemplateUploader implements TemplateUploader {
             case UPLOAD_FINISHED:
                 return 0;
             default:
-
         }
 
         new Date();
 
-        StringBuffer sb = new StringBuffer(ftpUrl);
+        final StringBuffer sb = new StringBuffer(ftpUrl);
         // check for authentication else assume its anonymous access.
         /* if (user != null && password != null)
                  {
@@ -85,9 +79,9 @@ public class FtpTemplateUploader implements TemplateUploader {
         sb.append(";type=i");
 
         try {
-            URL url = new URL(sb.toString());
-            URLConnection urlc = url.openConnection();
-            File sourceFile = new File(sourcePath);
+            final URL url = new URL(sb.toString());
+            final URLConnection urlc = url.openConnection();
+            final File sourceFile = new File(sourcePath);
             entitySizeinBytes = sourceFile.length();
 
             outputStream = new BufferedOutputStream(urlc.getOutputStream());
@@ -96,7 +90,7 @@ public class FtpTemplateUploader implements TemplateUploader {
             status = TemplateUploader.Status.IN_PROGRESS;
 
             int bytes = 0;
-            byte[] block = new byte[CHUNK_SIZE];
+            final byte[] block = new byte[CHUNK_SIZE];
             boolean done = false;
             while (!done && status != Status.ABORTED) {
                 if ((bytes = inputStream.read(block, 0, CHUNK_SIZE)) > -1) {
@@ -108,11 +102,11 @@ public class FtpTemplateUploader implements TemplateUploader {
             }
             status = TemplateUploader.Status.UPLOAD_FINISHED;
             return totalBytes;
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             status = TemplateUploader.Status.UNRECOVERABLE_ERROR;
             errorString = e.getMessage();
             s_logger.error(errorString);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             status = TemplateUploader.Status.UNRECOVERABLE_ERROR;
             errorString = e.getMessage();
             s_logger.error(errorString);
@@ -124,7 +118,7 @@ public class FtpTemplateUploader implements TemplateUploader {
                 if (outputStream != null) {
                     outputStream.close();
                 }
-            } catch (IOException ioe) {
+            } catch (final IOException ioe) {
                 s_logger.error(" Caught exception while closing the resources");
             }
             if (callback != null) {
@@ -133,67 +127,6 @@ public class FtpTemplateUploader implements TemplateUploader {
         }
 
         return 0;
-    }
-
-    @Override
-    public void run() {
-        try {
-            upload(completionCallback);
-        } catch (Throwable t) {
-            s_logger.warn("Caught exception during upload " + t.getMessage(), t);
-            errorString = "Failed to install: " + t.getMessage();
-            status = TemplateUploader.Status.UNRECOVERABLE_ERROR;
-        }
-
-    }
-
-    @Override
-    public Status getStatus() {
-        return status;
-    }
-
-    @Override
-    public String getUploadError() {
-        return errorString;
-    }
-
-    @Override
-    public String getUploadLocalPath() {
-        return sourcePath;
-    }
-
-    @Override
-    public int getUploadPercent() {
-        if (entitySizeinBytes == 0) {
-            return 0;
-        }
-        return (int)(100.0 * totalBytes / entitySizeinBytes);
-    }
-
-    @Override
-    public long getUploadTime() {
-        // TODO
-        return 0;
-    }
-
-    @Override
-    public long getUploadedBytes() {
-        return totalBytes;
-    }
-
-    @Override
-    public void setResume(boolean resume) {
-
-    }
-
-    @Override
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    @Override
-    public void setUploadError(String string) {
-        errorString = string;
     }
 
     @Override
@@ -207,7 +140,7 @@ public class FtpTemplateUploader implements TemplateUploader {
                     if (inputStream != null) {
                         inputStream.close();
                     }
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     s_logger.error(" Caught exception while closing the resources");
                 }
                 status = TemplateUploader.Status.ABORTED;
@@ -226,4 +159,52 @@ public class FtpTemplateUploader implements TemplateUploader {
         }
     }
 
+    @Override
+    public int getUploadPercent() {
+        if (entitySizeinBytes == 0) {
+            return 0;
+        }
+        return (int) (100.0 * totalBytes / entitySizeinBytes);
+    }
+
+    @Override
+    public Status getStatus() {
+        return status;
+    }
+
+    @Override
+    public void setStatus(final Status status) {
+        this.status = status;
+    }
+
+    @Override
+    public long getUploadTime() {
+        // TODO
+        return 0;
+    }
+
+    @Override
+    public long getUploadedBytes() {
+        return totalBytes;
+    }
+
+    @Override
+    public String getUploadError() {
+        return errorString;
+    }
+
+    @Override
+    public void setUploadError(final String string) {
+        errorString = string;
+    }
+
+    @Override
+    public String getUploadLocalPath() {
+        return sourcePath;
+    }
+
+    @Override
+    public void setResume(final boolean resume) {
+
+    }
 }

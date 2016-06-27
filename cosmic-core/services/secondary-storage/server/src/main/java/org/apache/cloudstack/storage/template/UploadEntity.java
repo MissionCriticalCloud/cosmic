@@ -1,26 +1,9 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package org.apache.cloudstack.storage.template;
-
 
 import com.cloud.storage.Storage;
 
 public class UploadEntity {
+    public static long s_maxTemplateSize = 50L * 1024L * 1024L * 1024L;
     private long downloadedsize;
     private String filename;
     private String installPathPrefix;
@@ -34,42 +17,27 @@ public class UploadEntity {
     private int maxSizeInGB;
     private String description;
     private long contentLength;
-
-    public static enum ResourceType {
-        VOLUME, TEMPLATE
-    }
-
-    public static enum Status {
-        UNKNOWN, IN_PROGRESS, COMPLETED, ERROR
-    }
-
     private Status uploadState;
-    private String errorMessage=null;
+    private String errorMessage = null;
     private ResourceType resourceType;
     private long virtualSize;
     private boolean isMetaDataPopulated;
 
-    public static long s_maxTemplateSize = 50L * 1024L * 1024L * 1024L;
-
-    public UploadEntity(String uuid, long entityId, Status status, String filename, String installPathPrefix){
-        this.uuid=uuid;
-        this.uploadState=status;
-        this.downloadedsize=0l;
-        this.filename=filename;
-        this.installPathPrefix = installPathPrefix;
-        this.entityId=entityId;
-    }
-
-    public UploadEntity(){
-
-    }
-
-    public void setStatus(Status status) {
+    public UploadEntity(final String uuid, final long entityId, final Status status, final String filename, final String installPathPrefix) {
+        this.uuid = uuid;
         this.uploadState = status;
+        this.downloadedsize = 0l;
+        this.filename = filename;
+        this.installPathPrefix = installPathPrefix;
+        this.entityId = entityId;
     }
 
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage=errorMessage;
+    public UploadEntity() {
+
+    }
+
+    public void setStatus(final Status status) {
+        this.uploadState = status;
     }
 
     public long getDownloadedsize() {
@@ -80,26 +48,31 @@ public class UploadEntity {
         return errorMessage;
     }
 
+    public void setErrorMessage(final String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
     public Status getUploadState() {
         return uploadState;
     }
 
-    public void incremetByteCount(long numberOfBytes) {
-           this.downloadedsize+= numberOfBytes;
+    public void incremetByteCount(final long numberOfBytes) {
+        this.downloadedsize += numberOfBytes;
     }
 
     public String getFilename() {
         return filename;
     }
 
-    public void setFilename(String filename) {
+    public void setFilename(final String filename) {
         this.filename = filename;
     }
+
     public String getInstallPathPrefix() {
         return installPathPrefix;
     }
 
-    public void setInstallPathPrefix(String absoluteFilePath) {
+    public void setInstallPathPrefix(final String absoluteFilePath) {
         this.installPathPrefix = absoluteFilePath;
     }
 
@@ -107,15 +80,15 @@ public class UploadEntity {
         return templatePath;
     }
 
-    public void setTemplatePath(String templatePath) {
-        this.templatePath=templatePath;
+    public void setTemplatePath(final String templatePath) {
+        this.templatePath = templatePath;
     }
 
     public ResourceType getResourceType() {
         return resourceType;
     }
 
-    public void setResourceType(ResourceType resourceType) {
+    public void setResourceType(final ResourceType resourceType) {
         this.resourceType = resourceType;
     }
 
@@ -123,7 +96,7 @@ public class UploadEntity {
         return isHvm;
     }
 
-    public void setHvm(boolean isHvm) {
+    public void setHvm(final boolean isHvm) {
         this.isHvm = isHvm;
     }
 
@@ -131,7 +104,7 @@ public class UploadEntity {
         return format;
     }
 
-    public void setFormat(Storage.ImageFormat format) {
+    public void setFormat(final Storage.ImageFormat format) {
         this.format = format;
     }
 
@@ -147,7 +120,7 @@ public class UploadEntity {
         return chksum;
     }
 
-    public void setChksum(String chksum) {
+    public void setChksum(final String chksum) {
         this.chksum = chksum;
     }
 
@@ -155,7 +128,7 @@ public class UploadEntity {
         return virtualSize;
     }
 
-    public void setVirtualSize(long virtualSize) {
+    public void setVirtualSize(final long virtualSize) {
         this.virtualSize = virtualSize;
     }
 
@@ -163,23 +136,23 @@ public class UploadEntity {
         return isMetaDataPopulated;
     }
 
-    public void setMetaDataPopulated(boolean isMetaDataPopulated) {
+    public void setMetaDataPopulated(final boolean isMetaDataPopulated) {
         this.isMetaDataPopulated = isMetaDataPopulated;
-    }
-
-    public void setPhysicalSize(long physicalSize) {
-        this.physicalSize = physicalSize;
     }
 
     public long getPhysicalSize() {
         return physicalSize;
     }
 
+    public void setPhysicalSize(final long physicalSize) {
+        this.physicalSize = physicalSize;
+    }
+
     public int getMaxSizeInGB() {
         return maxSizeInGB;
     }
 
-    public void setMaxSizeInGB(int maxSizeInGB) {
+    public void setMaxSizeInGB(final int maxSizeInGB) {
         this.maxSizeInGB = maxSizeInGB;
     }
 
@@ -187,7 +160,7 @@ public class UploadEntity {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
@@ -195,7 +168,15 @@ public class UploadEntity {
         return contentLength;
     }
 
-    public void setContentLength(long contentLength) {
+    public void setContentLength(final long contentLength) {
         this.contentLength = contentLength;
+    }
+
+    public static enum ResourceType {
+        VOLUME, TEMPLATE
+    }
+
+    public static enum Status {
+        UNKNOWN, IN_PROGRESS, COMPLETED, ERROR
     }
 }

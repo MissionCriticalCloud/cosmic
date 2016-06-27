@@ -1,33 +1,16 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.hypervisor;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 import com.cloud.agent.api.Command;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,17 +24,17 @@ public class HypervisorGuruManagerImpl extends ManagerBase implements Hypervisor
     HostDao _hostDao;
 
     List<HypervisorGuru> _hvGuruList;
-    Map<HypervisorType, HypervisorGuru> _hvGurus = new ConcurrentHashMap<HypervisorType, HypervisorGuru>();
+    Map<HypervisorType, HypervisorGuru> _hvGurus = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
-        for (HypervisorGuru guru : _hvGuruList) {
+        for (final HypervisorGuru guru : _hvGuruList) {
             _hvGurus.put(guru.getHypervisorType(), guru);
         }
     }
 
     @Override
-    public HypervisorGuru getGuru(HypervisorType hypervisorType) {
+    public HypervisorGuru getGuru(final HypervisorType hypervisorType) {
         if (hypervisorType == null) {
             return null;
         }
@@ -59,7 +42,7 @@ public class HypervisorGuruManagerImpl extends ManagerBase implements Hypervisor
         HypervisorGuru result = _hvGurus.get(hypervisorType);
 
         if (result == null) {
-            for (HypervisorGuru guru : _hvGuruList) {
+            for (final HypervisorGuru guru : _hvGuruList) {
                 if (guru.getHypervisorType() == hypervisorType) {
                     _hvGurus.put(hypervisorType, guru);
                     result = guru;
@@ -72,9 +55,9 @@ public class HypervisorGuruManagerImpl extends ManagerBase implements Hypervisor
     }
 
     @Override
-    public long getGuruProcessedCommandTargetHost(long hostId, Command cmd) {
-        for (HypervisorGuru guru : _hvGuruList) {
-            Pair<Boolean, Long> result = guru.getCommandHostDelegation(hostId, cmd);
+    public long getGuruProcessedCommandTargetHost(final long hostId, final Command cmd) {
+        for (final HypervisorGuru guru : _hvGuruList) {
+            final Pair<Boolean, Long> result = guru.getCommandHostDelegation(hostId, cmd);
             if (result.first()) {
                 return result.second();
             }
@@ -87,8 +70,7 @@ public class HypervisorGuruManagerImpl extends ManagerBase implements Hypervisor
     }
 
     @Inject
-    public void setHvGuruList(List<HypervisorGuru> hvGuruList) {
+    public void setHvGuruList(final List<HypervisorGuru> hvGuruList) {
         this._hvGuruList = hvGuruList;
     }
-
 }

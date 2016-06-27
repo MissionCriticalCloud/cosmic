@@ -1,26 +1,7 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.host;
-
-import java.util.List;
 
 import com.cloud.host.Host;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -29,6 +10,9 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.GuestOSCategoryResponse;
 import org.apache.cloudstack.api.response.HostResponse;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,14 +30,14 @@ public class UpdateHostCmd extends BaseCmd {
     private Long id;
 
     @Parameter(name = ApiConstants.OS_CATEGORY_ID,
-               type = CommandType.UUID,
-               entityType = GuestOSCategoryResponse.class,
-               description = "the id of Os category to update the host with")
+            type = CommandType.UUID,
+            entityType = GuestOSCategoryResponse.class,
+            description = "the id of Os category to update the host with")
     private Long osCategoryId;
 
     @Parameter(name = ApiConstants.ALLOCATION_STATE,
-               type = CommandType.STRING,
-               description = "Change resource state of host, valid values are [Enable, Disable]. Operation may failed if host in states not allowing Enable/Disable")
+            type = CommandType.STRING,
+            description = "Change resource state of host, valid values are [Enable, Disable]. Operation may failed if host in states not allowing Enable/Disable")
     private String allocationState;
 
     @Parameter(name = ApiConstants.HOST_TAGS, type = CommandType.LIST, collectionType = CommandType.STRING, description = "list of tags to be added to the host")
@@ -66,8 +50,8 @@ public class UpdateHostCmd extends BaseCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public Long getId() {
-        return id;
+    public static String getResultObjectName() {
+        return "updatehost";
     }
 
     public Long getOsCategoryId() {
@@ -91,30 +75,30 @@ public class UpdateHostCmd extends BaseCmd {
     /////////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
+    public void execute() {
+        final Host result;
+        try {
+            result = _resourceService.updateHost(this);
+            final HostResponse hostResponse = _responseGenerator.createHostResponse(result);
+            hostResponse.setResponseName(getCommandName());
+            this.setResponseObject(hostResponse);
+        } catch (final Exception e) {
+            s_logger.debug("Failed to update host:" + getId(), e);
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update host:" + getId() + "," + e.getMessage());
+        }
     }
 
-    public static String getResultObjectName() {
-        return "updatehost";
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
     }
 
     @Override
     public long getEntityOwnerId() {
         return Account.ACCOUNT_ID_SYSTEM;
-    }
-
-    @Override
-    public void execute() {
-        Host result;
-        try {
-            result = _resourceService.updateHost(this);
-            HostResponse hostResponse = _responseGenerator.createHostResponse(result);
-            hostResponse.setResponseName(getCommandName());
-            this.setResponseObject(hostResponse);
-        } catch (Exception e) {
-            s_logger.debug("Failed to update host:" + getId(), e);
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update host:" + getId() + "," + e.getMessage());
-        }
     }
 }

@@ -1,26 +1,23 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.spring.module.model.impl;
 
 import org.apache.cloudstack.spring.module.context.ResourceApplicationContext;
 import org.apache.cloudstack.spring.module.model.ModuleDefinition;
 import org.apache.cloudstack.spring.module.model.ModuleDefinitionSet;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.EmptyStackException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Stack;
+
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,14 +29,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.*;
-
 public class DefaultModuleDefinitionSet implements ModuleDefinitionSet {
-
-    private static final Logger log = LoggerFactory.getLogger(DefaultModuleDefinitionSet.class);
 
     public static final String DEFAULT_CONFIG_RESOURCES = "DefaultConfigResources";
     public static final String DEFAULT_CONFIG_PROPERTIES = "DefaultConfigProperties";
@@ -47,7 +37,7 @@ public class DefaultModuleDefinitionSet implements ModuleDefinitionSet {
     public static final String MODULES_INCLUDE_PREFIX = "modules.include.";
     public static final String MODULE_PROPERITES = "ModuleProperties";
     public static final String DEFAULT_CONFIG_XML = "defaults-context.xml";
-
+    private static final Logger log = LoggerFactory.getLogger(DefaultModuleDefinitionSet.class);
     String root;
     Map<String, ModuleDefinition> modules;
     Map<String, ApplicationContext> contexts = new HashMap<>();
@@ -62,8 +52,9 @@ public class DefaultModuleDefinitionSet implements ModuleDefinitionSet {
     }
 
     public void load() throws IOException {
-        if (!loadRootContext())
+        if (!loadRootContext()) {
             return;
+        }
 
         printHierarchy();
         loadContexts();
@@ -73,8 +64,9 @@ public class DefaultModuleDefinitionSet implements ModuleDefinitionSet {
     protected boolean loadRootContext() {
         final ModuleDefinition def = modules.get(root);
 
-        if (def == null)
+        if (def == null) {
             return false;
+        }
 
         final ApplicationContext defaultsContext = getDefaultsContext();
 
@@ -216,8 +208,9 @@ public class DefaultModuleDefinitionSet implements ModuleDefinitionSet {
     }
 
     protected void withModule(final ModuleDefinition def, final Stack<ModuleDefinition> parents, final WithModule with) {
-        if (def == null)
+        if (def == null) {
             return;
+        }
 
         if (!shouldLoad(def)) {
             log.info("Excluding context [{}] based on configuration", def.getName());
@@ -233,6 +226,44 @@ public class DefaultModuleDefinitionSet implements ModuleDefinitionSet {
         }
 
         parents.pop();
+    }
+
+    @Override
+    public ModuleDefinition getModuleDefinition(final String name) {
+        return modules.get(name);
+    }
+
+    @Override
+    public ApplicationContext getApplicationContext(final String name) {
+        return contexts.get(name);
+    }
+
+    @Override
+    public Map<String, ApplicationContext> getContextMap() {
+        return contexts;
+    }
+
+    @Override
+    public Resource[] getConfigResources(final String name) {
+        final Set<Resource> resources = new LinkedHashSet<>();
+
+        ModuleDefinition original = null;
+        ModuleDefinition def = original = modules.get(name);
+
+        if (def == null) {
+            return new Resource[]{};
+        }
+
+        resources.addAll(def.getContextLocations());
+
+        while (def != null) {
+            resources.addAll(def.getInheritableContextLocations());
+            def = modules.get(def.getParentName());
+        }
+
+        resources.addAll(original.getOverrideContextLocations());
+
+        return resources.toArray(new Resource[resources.size()]);
     }
 
     private interface WithModule {
@@ -253,42 +284,5 @@ public class DefaultModuleDefinitionSet implements ModuleDefinitionSet {
         public List<Resource> defaultConfigResources() {
             return new ArrayList<>();
         }
-    }
-
-    @Override
-    public ApplicationContext getApplicationContext(final String name) {
-        return contexts.get(name);
-    }
-
-    @Override
-    public Map<String, ApplicationContext> getContextMap() {
-        return contexts;
-    }
-
-    @Override
-    public Resource[] getConfigResources(final String name) {
-        final Set<Resource> resources = new LinkedHashSet<>();
-
-        ModuleDefinition original = null;
-        ModuleDefinition def = original = modules.get(name);
-
-        if (def == null)
-            return new Resource[]{};
-
-        resources.addAll(def.getContextLocations());
-
-        while (def != null) {
-            resources.addAll(def.getInheritableContextLocations());
-            def = modules.get(def.getParentName());
-        }
-
-        resources.addAll(original.getOverrideContextLocations());
-
-        return resources.toArray(new Resource[resources.size()]);
-    }
-
-    @Override
-    public ModuleDefinition getModuleDefinition(final String name) {
-        return modules.get(name);
     }
 }

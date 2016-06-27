@@ -1,22 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 package org.apache.cloudstack.storage.command;
 
 public class TemplateOrVolumePostUploadCommand {
@@ -53,8 +34,9 @@ public class TemplateOrVolumePostUploadCommand {
 
     private long accountId;
 
-    public TemplateOrVolumePostUploadCommand(long entityId, String entityUUID, String absolutePath, String checksum, String type, String name, String imageFormat, String dataTo,
-            String dataToRole) {
+    public TemplateOrVolumePostUploadCommand(final long entityId, final String entityUUID, final String absolutePath, final String checksum, final String type, final String
+            name, final String imageFormat, final String dataTo,
+                                             final String dataToRole) {
         this.entityId = entityId;
         this.entityUUID = entityUUID;
         this.absolutePath = absolutePath;
@@ -73,7 +55,7 @@ public class TemplateOrVolumePostUploadCommand {
         return remoteEndPoint;
     }
 
-    public void setRemoteEndPoint(String remoteEndPoint) {
+    public void setRemoteEndPoint(final String remoteEndPoint) {
         this.remoteEndPoint = remoteEndPoint;
     }
 
@@ -81,7 +63,7 @@ public class TemplateOrVolumePostUploadCommand {
         return dataTo;
     }
 
-    public void setDataTo(String dataTo) {
+    public void setDataTo(final String dataTo) {
         this.dataTo = dataTo;
     }
 
@@ -89,7 +71,7 @@ public class TemplateOrVolumePostUploadCommand {
         return dataToRole;
     }
 
-    public void setDataToRole(String dataToRole) {
+    public void setDataToRole(final String dataToRole) {
         this.dataToRole = dataToRole;
     }
 
@@ -97,7 +79,7 @@ public class TemplateOrVolumePostUploadCommand {
         return localPath;
     }
 
-    public void setLocalPath(String localPath) {
+    public void setLocalPath(final String localPath) {
         this.localPath = localPath;
     }
 
@@ -105,7 +87,7 @@ public class TemplateOrVolumePostUploadCommand {
         return requiresHvm;
     }
 
-    public void setRequiresHvm(boolean requiresHvm) {
+    public void setRequiresHvm(final boolean requiresHvm) {
         this.requiresHvm = requiresHvm;
     }
 
@@ -113,7 +95,7 @@ public class TemplateOrVolumePostUploadCommand {
         return imageFormat;
     }
 
-    public void setImageFormat(String imageFormat) {
+    public void setImageFormat(final String imageFormat) {
         this.imageFormat = imageFormat;
     }
 
@@ -121,7 +103,7 @@ public class TemplateOrVolumePostUploadCommand {
         return entityId;
     }
 
-    public void setEntityId(long entityId) {
+    public void setEntityId(final long entityId) {
         this.entityId = entityId;
     }
 
@@ -129,7 +111,7 @@ public class TemplateOrVolumePostUploadCommand {
         return entityUUID;
     }
 
-    public void setEntityUUID(String entityUUID) {
+    public void setEntityUUID(final String entityUUID) {
         this.entityUUID = entityUUID;
     }
 
@@ -137,7 +119,7 @@ public class TemplateOrVolumePostUploadCommand {
         return absolutePath;
     }
 
-    public void setAbsolutePath(String absolutePath) {
+    public void setAbsolutePath(final String absolutePath) {
         this.absolutePath = absolutePath;
     }
 
@@ -145,7 +127,7 @@ public class TemplateOrVolumePostUploadCommand {
         return checksum;
     }
 
-    public void setChecksum(String checksum) {
+    public void setChecksum(final String checksum) {
         this.checksum = checksum;
     }
 
@@ -153,7 +135,7 @@ public class TemplateOrVolumePostUploadCommand {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -161,7 +143,7 @@ public class TemplateOrVolumePostUploadCommand {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -169,7 +151,7 @@ public class TemplateOrVolumePostUploadCommand {
         return maxUploadSize;
     }
 
-    public void setMaxUploadSize(String maxUploadSize) {
+    public void setMaxUploadSize(final String maxUploadSize) {
         this.maxUploadSize = maxUploadSize;
     }
 
@@ -177,23 +159,23 @@ public class TemplateOrVolumePostUploadCommand {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
-    }
-
-    public void setDefaultMaxAccountSecondaryStorage(String defaultMaxAccountSecondaryStorage) {
-        this.defaultMaxAccountSecondaryStorage = defaultMaxAccountSecondaryStorage;
     }
 
     public String getDefaultMaxAccountSecondaryStorage() {
         return defaultMaxAccountSecondaryStorage;
     }
 
-    public void setAccountId(long accountId) {
-        this.accountId = accountId;
+    public void setDefaultMaxAccountSecondaryStorage(final String defaultMaxAccountSecondaryStorage) {
+        this.defaultMaxAccountSecondaryStorage = defaultMaxAccountSecondaryStorage;
     }
 
     public long getAccountId() {
         return accountId;
+    }
+
+    public void setAccountId(final long accountId) {
+        this.accountId = accountId;
     }
 }

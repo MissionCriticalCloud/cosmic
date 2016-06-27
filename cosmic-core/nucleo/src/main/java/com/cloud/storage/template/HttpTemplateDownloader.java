@@ -1,23 +1,16 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.storage.template;
+
+import com.cloud.storage.StorageLayer;
+import com.cloud.utils.Pair;
+import com.cloud.utils.UriUtils;
+import com.cloud.utils.net.Proxy;
+import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import org.apache.cloudstack.storage.command.DownloadCommand.ResourceType;
+import org.apache.cloudstack.utils.imagestore.ImageStoreUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,14 +21,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 
-import com.cloud.storage.StorageLayer;
-import com.cloud.utils.Pair;
-import com.cloud.utils.UriUtils;
-import com.cloud.utils.net.Proxy;
-
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.storage.command.DownloadCommand.ResourceType;
-import org.apache.cloudstack.utils.imagestore.ImageStoreUtil;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -54,34 +39,33 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Download a template file using HTTP
- *
  */
 public class HttpTemplateDownloader extends ManagedContextRunnable implements TemplateDownloader {
     public static final Logger s_logger = LoggerFactory.getLogger(HttpTemplateDownloader.class.getName());
     private static final MultiThreadedHttpConnectionManager s_httpClientManager = new MultiThreadedHttpConnectionManager();
 
     private static final int CHUNK_SIZE = 1024 * 1024; //1M
-    private String downloadUrl;
-    private String toFile;
+    private final HttpClient client;
+    private final HttpMethodRetryHandler myretryhandler;
     public TemplateDownloader.Status status = TemplateDownloader.Status.NOT_STARTED;
     public String errorString = " ";
-    private long remoteSize = 0;
     public long downloadTime = 0;
     public long totalBytes;
-    private final HttpClient client;
+    StorageLayer _storage;
+    boolean inited = true;
+    private final String downloadUrl;
+    private String toFile;
+    private long remoteSize = 0;
     private GetMethod request;
     private boolean resume = false;
     private DownloadCompleteCallback completionCallback;
-    StorageLayer _storage;
-    boolean inited = true;
-
     private String toDir;
-    private long maxTemplateSizeInBytes;
+    private final long maxTemplateSizeInBytes;
     private ResourceType resourceType = ResourceType.TEMPLATE;
-    private final HttpMethodRetryHandler myretryhandler;
 
-    public HttpTemplateDownloader(StorageLayer storageLayer, String downloadUrl, String toDir, DownloadCompleteCallback callback, long maxTemplateSizeInBytes,
-            String user, String password, Proxy proxy, ResourceType resourceType) {
+    public HttpTemplateDownloader(final StorageLayer storageLayer, final String downloadUrl, final String toDir, final DownloadCompleteCallback callback, final long
+            maxTemplateSizeInBytes,
+                                  final String user, final String password, final Proxy proxy, final ResourceType resourceType) {
         _storage = storageLayer;
         this.downloadUrl = downloadUrl;
         setToDir(toDir);
@@ -94,7 +78,7 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
 
         myretryhandler = new HttpMethodRetryHandler() {
             @Override
-            public boolean retryMethod(final HttpMethod method, final IOException exception, int executionCount) {
+            public boolean retryMethod(final HttpMethod method, final IOException exception, final int executionCount) {
                 if (executionCount >= 2) {
                     // Do not retry if over max retry count
                     return false;
@@ -157,14 +141,24 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
     }
 
     @Override
-    public long download(boolean resume, DownloadCompleteCallback callback) {
+    protected void runInContext() {
+        try {
+            download(resume, completionCallback);
+        } catch (final Throwable t) {
+            s_logger.warn("Caught exception during download " + t.getMessage(), t);
+            errorString = "Failed to install: " + t.getMessage();
+            status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
+        }
+    }
+
+    @Override
+    public long download(final boolean resume, final DownloadCompleteCallback callback) {
         switch (status) {
             case ABORTED:
             case UNRECOVERABLE_ERROR:
             case DOWNLOAD_FINISHED:
                 return 0;
             default:
-
         }
         int bytes = 0;
         final File file = new File(toFile);
@@ -243,7 +237,7 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
             final byte[] block = new byte[CHUNK_SIZE];
             long offset = 0;
             boolean done = false;
-            boolean verifiedFormat=false;
+            boolean verifiedFormat = false;
             status = TemplateDownloader.Status.IN_PROGRESS;
             while (!done && status != Status.ABORTED && offset <= remoteSize) {
                 if ((bytes = in.read(block, 0, CHUNK_SIZE)) > -1) {
@@ -251,7 +245,7 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
                     offset += bytes;
                     out.seek(offset);
                     totalBytes += bytes;
-                        if (!verifiedFormat && (offset >= 1048576 || offset >= remoteSize)) { //let's check format after we get 1MB or full file
+                    if (!verifiedFormat && (offset >= 1048576 || offset >= remoteSize)) { //let's check format after we get 1MB or full file
                         String uripath = null;
                         try {
                             final URI str = new URI(getDownloadUrl());
@@ -260,21 +254,21 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
                             s_logger.warn("Invalid download url: " + getDownloadUrl() + ", This should not happen since we have validated the url before!!");
                         }
                         final String unsupportedFormat = ImageStoreUtil.checkTemplateFormat(file.getAbsolutePath(), uripath);
-                            if (unsupportedFormat == null || !unsupportedFormat.isEmpty()) {
-                                 try {
-                                     request.abort();
-                                     out.close();
-                                     in.close();
-                                 } catch (final Exception ex) {
-                                     s_logger.debug("Error on http connection : " + ex.getMessage());
-                                 }
-                                 status = Status.UNRECOVERABLE_ERROR;
-                                 errorString = "Template content is unsupported, or mismatch between selected format and template content. Found  : " + unsupportedFormat;
-                                 return 0;
+                        if (unsupportedFormat == null || !unsupportedFormat.isEmpty()) {
+                            try {
+                                request.abort();
+                                out.close();
+                                in.close();
+                            } catch (final Exception ex) {
+                                s_logger.debug("Error on http connection : " + ex.getMessage());
                             }
-                            s_logger.debug("Verified format of downloading file " + file.getAbsolutePath() + " is supported");
-                            verifiedFormat = true;
+                            status = Status.UNRECOVERABLE_ERROR;
+                            errorString = "Template content is unsupported, or mismatch between selected format and template content. Found  : " + unsupportedFormat;
+                            return 0;
                         }
+                        s_logger.debug("Verified format of downloading file " + file.getAbsolutePath() + " is supported");
+                        verifiedFormat = true;
+                    }
                 } else {
                     done = true;
                 }
@@ -315,29 +309,7 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
         return downloadUrl;
     }
 
-    public String getToFile() {
-        final File file = new File(toFile);
-
-        return file.getAbsolutePath();
-    }
-
     @Override
-    public TemplateDownloader.Status getStatus() {
-        return status;
-    }
-
-    @Override
-    public long getDownloadTime() {
-        return downloadTime;
-    }
-
-    @Override
-    public long getDownloadedBytes() {
-        return totalBytes;
-    }
-
-    @Override
-    @SuppressWarnings("fallthrough")
     public boolean stopDownload() {
         switch (getStatus()) {
             case IN_PROGRESS:
@@ -370,28 +342,27 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
             return 0;
         }
 
-        return (int)(100.0 * totalBytes / remoteSize);
+        return (int) (100.0 * totalBytes / remoteSize);
     }
 
     @Override
-    protected void runInContext() {
-        try {
-            download(resume, completionCallback);
-        } catch (final Throwable t) {
-            s_logger.warn("Caught exception during download " + t.getMessage(), t);
-            errorString = "Failed to install: " + t.getMessage();
-            status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
-        }
-
+    public TemplateDownloader.Status getStatus() {
+        return status;
     }
 
     @Override
-    public void setStatus(TemplateDownloader.Status status) {
+    public void setStatus(final TemplateDownloader.Status status) {
         this.status = status;
     }
 
-    public boolean isResume() {
-        return resume;
+    @Override
+    public long getDownloadTime() {
+        return downloadTime;
+    }
+
+    @Override
+    public long getDownloadedBytes() {
+        return totalBytes;
     }
 
     @Override
@@ -400,31 +371,28 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
     }
 
     @Override
+    public void setDownloadError(final String error) {
+        errorString = error;
+    }
+
+    @Override
     public String getDownloadLocalPath() {
         return getToFile();
     }
 
+    public String getToFile() {
+        final File file = new File(toFile);
+
+        return file.getAbsolutePath();
+    }
+
+    public boolean isResume() {
+        return resume;
+    }
+
     @Override
-    public void setResume(boolean resume) {
+    public void setResume(final boolean resume) {
         this.resume = resume;
-    }
-
-    public void setToDir(String toDir) {
-        this.toDir = toDir;
-    }
-
-    public String getToDir() {
-        return toDir;
-    }
-
-    @Override
-    public long getMaxTemplateSizeInBytes() {
-        return maxTemplateSizeInBytes;
-    }
-
-    @Override
-    public void setDownloadError(String error) {
-        errorString = error;
     }
 
     @Override
@@ -432,8 +400,20 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
         return inited;
     }
 
+    @Override
+    public long getMaxTemplateSizeInBytes() {
+        return maxTemplateSizeInBytes;
+    }
+
+    public String getToDir() {
+        return toDir;
+    }
+
+    public void setToDir(final String toDir) {
+        this.toDir = toDir;
+    }
+
     public ResourceType getResourceType() {
         return resourceType;
     }
-
 }

@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 //
 
 package com.cloud.template;
@@ -24,16 +8,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.event.EventTypes;
@@ -49,7 +23,6 @@ import com.cloud.user.AccountVO;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.component.ComponentContext;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.TemplateDataFactory;
 import org.apache.cloudstack.engine.subsystem.api.storage.TemplateInfo;
@@ -64,6 +37,17 @@ import org.apache.cloudstack.framework.messagebus.MessageBus;
 import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreEntity;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -81,181 +65,80 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ComponentContext.class)
 public class HypervisorTemplateAdapterTest {
+    //UsageEventUtils reflection abuse helpers
+    private final Map<String, Object> oldFields = new HashMap<>();
+    private final List<UsageEventVO> usageEvents = new ArrayList<>();
     @Mock
     EventBus _bus;
     List<Event> events = new ArrayList<>();
-
     @Mock
     TemplateManager _templateMgr;
-
     @Mock
     TemplateService _templateService;
-
     @Mock
     TemplateDataFactory _dataFactory;
-
     @Mock
     VMTemplateZoneDao _templateZoneDao;
-
     @Mock
     TemplateDataStoreDao _templateStoreDao;
-
     @Mock
     UsageEventDao _usageEventDao;
-
     @Mock
     ResourceLimitService _resourceManager;
-
     @Mock
     MessageBus _messageBus;
-
     @Mock
     AccountDao _accountDao;
-
     @Mock
     DataCenterDao _dcDao;
-
     @Mock
     ConfigurationDao _configDao;
-
     @InjectMocks
     HypervisorTemplateAdapter _adapter;
-
-    //UsageEventUtils reflection abuse helpers
-    private Map<String, Object> oldFields = new HashMap<>();
-    private List<UsageEventVO> usageEvents = new ArrayList<>();
 
     @Before
     public void before() {
         MockitoAnnotations.initMocks(this);
     }
 
-    public UsageEventUtils setupUsageUtils() throws EventBusException {
-        Mockito.when(_configDao.getValue(eq("publish.usage.events"))).thenReturn("true");
-        Mockito.when(_usageEventDao.persist(Mockito.any(UsageEventVO.class))).then(new Answer<Void>() {
-            @Override public Void answer(InvocationOnMock invocation) throws Throwable {
-                UsageEventVO vo = (UsageEventVO)invocation.getArguments()[0];
-                usageEvents.add(vo);
-                return null;
-            }
-        });
-
-        Mockito.when(_usageEventDao.listAll()).thenReturn(usageEvents);
-
-        doAnswer(new Answer<Void>() {
-            @Override public Void answer(InvocationOnMock invocation) throws Throwable {
-                Event event = (Event)invocation.getArguments()[0];
-                events.add(event);
-                return null;
-            }
-        }).when(_bus).publish(any(Event.class));
-
-        PowerMockito.mockStatic(ComponentContext.class);
-        when(ComponentContext.getComponent(eq(EventBus.class))).thenReturn(_bus);
-
-        UsageEventUtils utils = new UsageEventUtils();
-
-        Map<String, String> usageUtilsFields = new HashMap<String, String>();
-        usageUtilsFields.put("usageEventDao", "_usageEventDao");
-        usageUtilsFields.put("accountDao", "_accountDao");
-        usageUtilsFields.put("dcDao", "_dcDao");
-        usageUtilsFields.put("configDao", "_configDao");
-
-        for (String fieldName : usageUtilsFields.keySet()) {
-            try {
-                Field f = UsageEventUtils.class.getDeclaredField(fieldName);
-                f.setAccessible(true);
-                //Remember the old fields for cleanup later (see cleanupUsageUtils)
-                Field staticField = UsageEventUtils.class.getDeclaredField("s_" + fieldName);
-                staticField.setAccessible(true);
-                oldFields.put(f.getName(), staticField.get(null));
-                f.set(utils,
-                        this.getClass()
-                                .getDeclaredField(
-                                        usageUtilsFields.get(fieldName))
-                                .get(this));
-            } catch (IllegalArgumentException | IllegalAccessException
-                    | NoSuchFieldException | SecurityException e) {
-                e.printStackTrace();
-            }
-
-        }
-        try {
-            Method method = UsageEventUtils.class.getDeclaredMethod("init");
-            method.setAccessible(true);
-            method.invoke(utils);
-        } catch (SecurityException | IllegalAccessException
-                    | IllegalArgumentException | InvocationTargetException
-                    | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-
-        return utils;
-    }
-
-    public void cleanupUsageUtils() {
-        UsageEventUtils utils = new UsageEventUtils();
-
-        for (String fieldName : oldFields.keySet()) {
-            try {
-                Field f = UsageEventUtils.class.getDeclaredField(fieldName);
-                f.setAccessible(true);
-                f.set(utils, oldFields.get(fieldName));
-            } catch (IllegalArgumentException | IllegalAccessException
-                    | NoSuchFieldException | SecurityException e) {
-                e.printStackTrace();
-            }
-
-        }
-        try {
-            Method method = UsageEventUtils.class.getDeclaredMethod("init");
-            method.setAccessible(true);
-            method.invoke(utils);
-        } catch (SecurityException | NoSuchMethodException
-                | IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Test
     public void testEmitDeleteEventUuid() throws InterruptedException, ExecutionException, EventBusException {
         //All the mocks required for this test to work.
-        ImageStoreEntity store = mock(ImageStoreEntity.class);
+        final ImageStoreEntity store = mock(ImageStoreEntity.class);
         when(store.getId()).thenReturn(1l);
         when(store.getDataCenterId()).thenReturn(1l);
         when(store.getName()).thenReturn("Test Store");
 
-        TemplateDataStoreVO dataStoreVO = mock(TemplateDataStoreVO.class);
+        final TemplateDataStoreVO dataStoreVO = mock(TemplateDataStoreVO.class);
         when(dataStoreVO.getDownloadState()).thenReturn(Status.DOWNLOADED);
 
-        TemplateInfo info = mock(TemplateInfo.class);
+        final TemplateInfo info = mock(TemplateInfo.class);
         when(info.getDataStore()).thenReturn(store);
 
-        VMTemplateVO template = mock(VMTemplateVO.class);
+        final VMTemplateVO template = mock(VMTemplateVO.class);
         when(template.getId()).thenReturn(1l);
         when(template.getName()).thenReturn("Test Template");
         when(template.getFormat()).thenReturn(ImageFormat.QCOW2);
         when(template.getAccountId()).thenReturn(1l);
         when(template.getUuid()).thenReturn("Test UUID"); //TODO possibly return this from method for comparison, if things work how i want
 
-        TemplateProfile profile = mock(TemplateProfile.class);
+        final TemplateProfile profile = mock(TemplateProfile.class);
         when(profile.getTemplate()).thenReturn(template);
         when(profile.getZoneId()).thenReturn(1l);
 
-        TemplateApiResult result = mock(TemplateApiResult.class);
+        final TemplateApiResult result = mock(TemplateApiResult.class);
         when(result.isSuccess()).thenReturn(true);
         when(result.isFailed()).thenReturn(false);
 
-        @SuppressWarnings("unchecked")
+        final
         AsyncCallFuture<TemplateApiResult> future = mock(AsyncCallFuture.class);
         when(future.get()).thenReturn(result);
 
-        AccountVO acct = mock(AccountVO.class);
+        final AccountVO acct = mock(AccountVO.class);
         when(acct.getId()).thenReturn(1l);
         when(acct.getDomainId()).thenReturn(1l);
 
-        when(_templateMgr.getImageStoreByTemplate(anyLong(), anyLong())).thenReturn(Collections.singletonList((DataStore)store));
+        when(_templateMgr.getImageStoreByTemplate(anyLong(), anyLong())).thenReturn(Collections.singletonList((DataStore) store));
         when(_templateStoreDao.listByTemplateStore(anyLong(), anyLong())).thenReturn(Collections.singletonList(dataStoreVO));
         when(_dataFactory.getTemplate(anyLong(), any(DataStore.class))).thenReturn(info);
         when(_dataFactory.listTemplateOnCache(anyLong())).thenReturn(Collections.singletonList(info));
@@ -271,15 +154,102 @@ public class HypervisorTemplateAdapterTest {
         Assert.assertNotNull(events);
         Assert.assertEquals(1, events.size());
 
-        Event event = events.get(0);
+        final Event event = events.get(0);
         Assert.assertNotNull(event);
         Assert.assertNotNull(event.getResourceType());
         Assert.assertEquals(VirtualMachineTemplate.class.getName(), event.getResourceType());
         Assert.assertNotNull(event.getResourceUUID());
-        Assert.assertEquals("Test UUID",  event.getResourceUUID());
+        Assert.assertEquals("Test UUID", event.getResourceUUID());
         Assert.assertEquals(EventTypes.EVENT_TEMPLATE_DELETE, event.getEventType());
 
-
         cleanupUsageUtils();
+    }
+
+    public UsageEventUtils setupUsageUtils() throws EventBusException {
+        Mockito.when(_configDao.getValue(eq("publish.usage.events"))).thenReturn("true");
+        Mockito.when(_usageEventDao.persist(Mockito.any(UsageEventVO.class))).then(new Answer<Void>() {
+            @Override
+            public Void answer(final InvocationOnMock invocation) throws Throwable {
+                final UsageEventVO vo = (UsageEventVO) invocation.getArguments()[0];
+                usageEvents.add(vo);
+                return null;
+            }
+        });
+
+        Mockito.when(_usageEventDao.listAll()).thenReturn(usageEvents);
+
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(final InvocationOnMock invocation) throws Throwable {
+                final Event event = (Event) invocation.getArguments()[0];
+                events.add(event);
+                return null;
+            }
+        }).when(_bus).publish(any(Event.class));
+
+        PowerMockito.mockStatic(ComponentContext.class);
+        when(ComponentContext.getComponent(eq(EventBus.class))).thenReturn(_bus);
+
+        final UsageEventUtils utils = new UsageEventUtils();
+
+        final Map<String, String> usageUtilsFields = new HashMap<String, String>();
+        usageUtilsFields.put("usageEventDao", "_usageEventDao");
+        usageUtilsFields.put("accountDao", "_accountDao");
+        usageUtilsFields.put("dcDao", "_dcDao");
+        usageUtilsFields.put("configDao", "_configDao");
+
+        for (final String fieldName : usageUtilsFields.keySet()) {
+            try {
+                final Field f = UsageEventUtils.class.getDeclaredField(fieldName);
+                f.setAccessible(true);
+                //Remember the old fields for cleanup later (see cleanupUsageUtils)
+                final Field staticField = UsageEventUtils.class.getDeclaredField("s_" + fieldName);
+                staticField.setAccessible(true);
+                oldFields.put(f.getName(), staticField.get(null));
+                f.set(utils,
+                        this.getClass()
+                            .getDeclaredField(
+                                    usageUtilsFields.get(fieldName))
+                            .get(this));
+            } catch (IllegalArgumentException | IllegalAccessException
+                    | NoSuchFieldException | SecurityException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            final Method method = UsageEventUtils.class.getDeclaredMethod("init");
+            method.setAccessible(true);
+            method.invoke(utils);
+        } catch (SecurityException | IllegalAccessException
+                | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
+        return utils;
+    }
+
+    public void cleanupUsageUtils() {
+        final UsageEventUtils utils = new UsageEventUtils();
+
+        for (final String fieldName : oldFields.keySet()) {
+            try {
+                final Field f = UsageEventUtils.class.getDeclaredField(fieldName);
+                f.setAccessible(true);
+                f.set(utils, oldFields.get(fieldName));
+            } catch (IllegalArgumentException | IllegalAccessException
+                    | NoSuchFieldException | SecurityException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            final Method method = UsageEventUtils.class.getDeclaredMethod("init");
+            method.setAccessible(true);
+            method.invoke(utils);
+        } catch (SecurityException | NoSuchMethodException
+                | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 }

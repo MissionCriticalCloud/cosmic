@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.api;
@@ -30,7 +15,7 @@ public class DirectNetworkUsageCommand extends Command {
     private String includeZones;
     private String excludeZones;
 
-    public DirectNetworkUsageCommand(List<String> publicIps, Date start, Date end, String includeZones, String excludeZones) {
+    public DirectNetworkUsageCommand(final List<String> publicIps, final Date start, final Date end, final String includeZones, final String excludeZones) {
         this.setPublicIps(publicIps);
         this.setStart(start);
         this.setEnd(end);
@@ -43,35 +28,35 @@ public class DirectNetworkUsageCommand extends Command {
         return false;
     }
 
-    public void setPublicIps(List<String> publicIps) {
-        this.publicIps = publicIps;
-    }
-
     public List<String> getPublicIps() {
         return publicIps;
     }
 
-    public void setStart(Date start) {
-        this.start = start;
+    public void setPublicIps(final List<String> publicIps) {
+        this.publicIps = publicIps;
     }
 
     public Date getStart() {
         return start;
     }
 
-    public void setEnd(Date end) {
-        this.end = end;
+    public void setStart(final Date start) {
+        this.start = start;
     }
 
     public Date getEnd() {
         return end;
     }
 
+    public void setEnd(final Date end) {
+        this.end = end;
+    }
+
     public String getIncludeZones() {
         return includeZones;
     }
 
-    public void setIncludeZones(String includeZones) {
+    public void setIncludeZones(final String includeZones) {
         this.includeZones = includeZones;
     }
 
@@ -79,8 +64,7 @@ public class DirectNetworkUsageCommand extends Command {
         return excludeZones;
     }
 
-    public void setExcludeZones(String excludeZones) {
+    public void setExcludeZones(final String excludeZones) {
         this.excludeZones = excludeZones;
     }
-
 }

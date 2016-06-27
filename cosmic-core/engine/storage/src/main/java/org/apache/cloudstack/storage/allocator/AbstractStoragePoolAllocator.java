@@ -1,31 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.storage.allocator;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.capacity.Capacity;
 import com.cloud.capacity.dao.CapacityDao;
@@ -45,49 +18,61 @@ import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachineProfile;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.engine.subsystem.api.storage.StoragePoolAllocator;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractStoragePoolAllocator extends AdapterBase implements StoragePoolAllocator {
     private static final Logger s_logger = LoggerFactory.getLogger(AbstractStoragePoolAllocator.class);
+    protected
+    @Inject
+    PrimaryDataStoreDao _storagePoolDao;
+    protected
+    @Inject
+    DataStoreManager dataStoreMgr;
+    protected BigDecimal _storageOverprovisioningFactor = new BigDecimal(1);
+    protected String _allocationAlgorithm = "random";
     @Inject
     StorageManager storageMgr;
-    protected @Inject
-    PrimaryDataStoreDao _storagePoolDao;
     @Inject
     VolumeDao _volumeDao;
     @Inject
     ConfigurationDao _configDao;
     @Inject
     ClusterDao _clusterDao;
-    protected @Inject
-    DataStoreManager dataStoreMgr;
-    protected BigDecimal _storageOverprovisioningFactor = new BigDecimal(1);
     long _extraBytesPerVolume = 0;
     Random _rand;
     boolean _dontMatter;
-    protected String _allocationAlgorithm = "random";
     @Inject
     DiskOfferingDao _diskOfferingDao;
     @Inject
     CapacityDao _capacityDao;
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         super.configure(name, params);
-        if(_configDao != null) {
-            Map<String, String> configs = _configDao.getConfiguration(null, params);
-            String globalStorageOverprovisioningFactor = configs.get("storage.overprovisioning.factor");
+        if (_configDao != null) {
+            final Map<String, String> configs = _configDao.getConfiguration(null, params);
+            final String globalStorageOverprovisioningFactor = configs.get("storage.overprovisioning.factor");
             _storageOverprovisioningFactor = new BigDecimal(NumbersUtil.parseFloat(globalStorageOverprovisioningFactor, 2.0f));
             _extraBytesPerVolume = 0;
             _rand = new Random(System.currentTimeMillis());
             _dontMatter = Boolean.parseBoolean(configs.get("storage.overwrite.provisioning"));
-            String allocationAlgorithm = configs.get("vm.allocation.algorithm");
+            final String allocationAlgorithm = configs.get("vm.allocation.algorithm");
             if (allocationAlgorithm != null) {
                 _allocationAlgorithm = allocationAlgorithm;
             }
@@ -96,78 +81,16 @@ public abstract class AbstractStoragePoolAllocator extends AdapterBase implement
         return false;
     }
 
-    protected abstract List<StoragePool> select(DiskProfile dskCh, VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoid, int returnUpTo);
-
     @Override
-    public List<StoragePool> allocateToPool(DiskProfile dskCh, VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoid, int returnUpTo) {
-        List<StoragePool> pools = select(dskCh, vmProfile, plan, avoid, returnUpTo);
+    public List<StoragePool> allocateToPool(final DiskProfile dskCh, final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid, final int
+            returnUpTo) {
+        final List<StoragePool> pools = select(dskCh, vmProfile, plan, avoid, returnUpTo);
         return reOrder(pools, vmProfile, plan);
     }
 
-    protected List<StoragePool> reorderPoolsByCapacity(DeploymentPlan plan,
-        List<StoragePool> pools) {
-        Long clusterId = plan.getClusterId();
-        short capacityType;
-        if(pools != null && pools.size() != 0){
-            capacityType = pools.get(0).getPoolType().isShared() == true ?
-                    Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED : Capacity.CAPACITY_TYPE_LOCAL_STORAGE;
-        } else{
-            return null;
-        }
+    protected abstract List<StoragePool> select(DiskProfile dskCh, VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoid, int returnUpTo);
 
-        List<Long> poolIdsByCapacity = _capacityDao.orderHostsByFreeCapacity(clusterId, capacityType);
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("List of pools in descending order of free capacity: "+ poolIdsByCapacity);
-        }
-
-      //now filter the given list of Pools by this ordered list
-      Map<Long, StoragePool> poolMap = new HashMap<Long, StoragePool>();
-      for (StoragePool pool : pools) {
-          poolMap.put(pool.getId(), pool);
-      }
-      List<Long> matchingPoolIds = new ArrayList<Long>(poolMap.keySet());
-
-      poolIdsByCapacity.retainAll(matchingPoolIds);
-
-      List<StoragePool> reorderedPools = new ArrayList<StoragePool>();
-      for(Long id: poolIdsByCapacity){
-          reorderedPools.add(poolMap.get(id));
-      }
-
-      return reorderedPools;
-    }
-
-    protected List<StoragePool> reorderPoolsByNumberOfVolumes(DeploymentPlan plan, List<StoragePool> pools, Account account) {
-        if (account == null) {
-            return pools;
-        }
-        long dcId = plan.getDataCenterId();
-        Long podId = plan.getPodId();
-        Long clusterId = plan.getClusterId();
-
-        List<Long> poolIdsByVolCount = _volumeDao.listPoolIdsByVolumeCount(dcId, podId, clusterId, account.getAccountId());
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("List of pools in ascending order of number of volumes for account id: " + account.getAccountId() + " is: " + poolIdsByVolCount);
-        }
-
-        // now filter the given list of Pools by this ordered list
-        Map<Long, StoragePool> poolMap = new HashMap<Long, StoragePool>();
-        for (StoragePool pool : pools) {
-            poolMap.put(pool.getId(), pool);
-        }
-        List<Long> matchingPoolIds = new ArrayList<Long>(poolMap.keySet());
-
-        poolIdsByVolCount.retainAll(matchingPoolIds);
-
-        List<StoragePool> reorderedPools = new ArrayList<StoragePool>();
-        for (Long id : poolIdsByVolCount) {
-            reorderedPools.add(poolMap.get(id));
-        }
-
-        return reorderedPools;
-    }
-
-    protected List<StoragePool> reOrder(List<StoragePool> pools, VirtualMachineProfile vmProfile, DeploymentPlan plan) {
+    protected List<StoragePool> reOrder(List<StoragePool> pools, final VirtualMachineProfile vmProfile, final DeploymentPlan plan) {
         if (pools == null) {
             return null;
         }
@@ -181,13 +104,76 @@ public abstract class AbstractStoragePoolAllocator extends AdapterBase implement
             Collections.shuffle(pools);
         } else if (_allocationAlgorithm.equals("userdispersing")) {
             pools = reorderPoolsByNumberOfVolumes(plan, pools, account);
-        } else if(_allocationAlgorithm.equals("firstfitleastconsumed")){
+        } else if (_allocationAlgorithm.equals("firstfitleastconsumed")) {
             pools = reorderPoolsByCapacity(plan, pools);
         }
         return pools;
     }
 
-    protected boolean filter(ExcludeList avoid, StoragePool pool, DiskProfile dskCh, DeploymentPlan plan) {
+    protected List<StoragePool> reorderPoolsByNumberOfVolumes(final DeploymentPlan plan, final List<StoragePool> pools, final Account account) {
+        if (account == null) {
+            return pools;
+        }
+        final long dcId = plan.getDataCenterId();
+        final Long podId = plan.getPodId();
+        final Long clusterId = plan.getClusterId();
+
+        final List<Long> poolIdsByVolCount = _volumeDao.listPoolIdsByVolumeCount(dcId, podId, clusterId, account.getAccountId());
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("List of pools in ascending order of number of volumes for account id: " + account.getAccountId() + " is: " + poolIdsByVolCount);
+        }
+
+        // now filter the given list of Pools by this ordered list
+        final Map<Long, StoragePool> poolMap = new HashMap<>();
+        for (final StoragePool pool : pools) {
+            poolMap.put(pool.getId(), pool);
+        }
+        final List<Long> matchingPoolIds = new ArrayList<>(poolMap.keySet());
+
+        poolIdsByVolCount.retainAll(matchingPoolIds);
+
+        final List<StoragePool> reorderedPools = new ArrayList<>();
+        for (final Long id : poolIdsByVolCount) {
+            reorderedPools.add(poolMap.get(id));
+        }
+
+        return reorderedPools;
+    }
+
+    protected List<StoragePool> reorderPoolsByCapacity(final DeploymentPlan plan,
+                                                       final List<StoragePool> pools) {
+        final Long clusterId = plan.getClusterId();
+        final short capacityType;
+        if (pools != null && pools.size() != 0) {
+            capacityType = pools.get(0).getPoolType().isShared() == true ?
+                    Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED : Capacity.CAPACITY_TYPE_LOCAL_STORAGE;
+        } else {
+            return null;
+        }
+
+        final List<Long> poolIdsByCapacity = _capacityDao.orderHostsByFreeCapacity(clusterId, capacityType);
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("List of pools in descending order of free capacity: " + poolIdsByCapacity);
+        }
+
+        //now filter the given list of Pools by this ordered list
+        final Map<Long, StoragePool> poolMap = new HashMap<>();
+        for (final StoragePool pool : pools) {
+            poolMap.put(pool.getId(), pool);
+        }
+        final List<Long> matchingPoolIds = new ArrayList<>(poolMap.keySet());
+
+        poolIdsByCapacity.retainAll(matchingPoolIds);
+
+        final List<StoragePool> reorderedPools = new ArrayList<>();
+        for (final Long id : poolIdsByCapacity) {
+            reorderedPools.add(poolMap.get(id));
+        }
+
+        return reorderedPools;
+    }
+
+    protected boolean filter(final ExcludeList avoid, final StoragePool pool, final DiskProfile dskCh, final DeploymentPlan plan) {
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Checking if storage pool is suitable, name: " + pool.getName() + " ,poolId: " + pool.getId());
@@ -199,9 +185,9 @@ public abstract class AbstractStoragePoolAllocator extends AdapterBase implement
             return false;
         }
 
-        Long clusterId = pool.getClusterId();
+        final Long clusterId = pool.getClusterId();
         if (clusterId != null) {
-            ClusterVO cluster = _clusterDao.findById(clusterId);
+            final ClusterVO cluster = _clusterDao.findById(clusterId);
             if (!(cluster.getHypervisorType() == dskCh.getHypervisorType())) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("StoragePool's Cluster does not have required hypervisorType, skipping this pool");
@@ -215,13 +201,13 @@ public abstract class AbstractStoragePoolAllocator extends AdapterBase implement
             return false;
         }
 
-        if(!checkHypervisorCompatibility(dskCh.getHypervisorType(), dskCh.getType(), pool.getPoolType())){
+        if (!checkHypervisorCompatibility(dskCh.getHypervisorType(), dskCh.getType(), pool.getPoolType())) {
             return false;
         }
 
         // check capacity
-        Volume volume = _volumeDao.findById(dskCh.getVolumeId());
-        List<Volume> requestVolumes = new ArrayList<Volume>();
+        final Volume volume = _volumeDao.findById(dskCh.getVolumeId());
+        final List<Volume> requestVolumes = new ArrayList<>();
         requestVolumes.add(volume);
         return storageMgr.storagePoolHasEnoughIops(requestVolumes, pool) && storageMgr.storagePoolHasEnoughSpace(requestVolumes, pool);
     }
@@ -229,7 +215,7 @@ public abstract class AbstractStoragePoolAllocator extends AdapterBase implement
     /*
     Check StoragePool and Volume type compatibility for the hypervisor
      */
-    private boolean checkHypervisorCompatibility(HypervisorType hyperType, Volume.Type volType, Storage.StoragePoolType poolType){
+    private boolean checkHypervisorCompatibility(final HypervisorType hyperType, final Volume.Type volType, final Storage.StoragePoolType poolType) {
         return true;
     }
 }

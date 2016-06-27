@@ -1,33 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.storage.datastore.db;
-
-import java.util.Date;
-import java.util.UUID;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.TableGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.ScopeType;
@@ -38,32 +9,39 @@ import com.cloud.utils.UriUtils;
 import com.cloud.utils.db.Encrypt;
 import com.cloud.utils.db.GenericDao;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.TableGenerator;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.util.Date;
+import java.util.UUID;
+
 @Entity
 @Table(name = "storage_pool")
 public class StoragePoolVO implements StoragePool {
+    @Column(name = GenericDao.CREATED_COLUMN)
+    Date created;
     @Id
     @TableGenerator(name = "storage_pool_sq",
-                    table = "sequence",
-                    pkColumnName = "name",
-                    valueColumnName = "value",
-                    pkColumnValue = "storage_pool_seq",
-                    allocationSize = 1)
+            table = "sequence",
+            pkColumnName = "name",
+            valueColumnName = "value",
+            pkColumnValue = "storage_pool_seq",
+            allocationSize = 1)
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
-
     @Column(name = "name", updatable = false, nullable = false, length = 255)
     private String name = null;
-
     @Column(name = "uuid", length = 255)
     private String uuid = null;
-
     @Column(name = "pool_type", updatable = false, nullable = false, length = 32)
     @Enumerated(value = EnumType.STRING)
     private StoragePoolType poolType;
-
-    @Column(name = GenericDao.CREATED_COLUMN)
-    Date created;
-
     @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
 
@@ -120,22 +98,17 @@ public class StoragePoolVO implements StoragePool {
     @Enumerated(value = EnumType.STRING)
     private HypervisorType hypervisor;
 
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public StoragePoolStatus getStatus() {
-        return status;
-    }
-
     public StoragePoolVO() {
         status = StoragePoolStatus.Initial;
     }
 
-    public StoragePoolVO(long poolId, String name, String uuid, StoragePoolType type, long dataCenterId, Long podId, long availableBytes, long capacityBytes,
-            String hostAddress, int port, String hostPath) {
+    public StoragePoolVO(final StoragePoolVO that) {
+        this(that.id, that.name, that.uuid, that.poolType, that.dataCenterId, that.podId, that.usedBytes, that.capacityBytes, that.hostAddress, that.port, that.path);
+    }
+
+    public StoragePoolVO(final long poolId, final String name, final String uuid, final StoragePoolType type, final long dataCenterId, final Long podId, final long
+            availableBytes, final long capacityBytes,
+                         final String hostAddress, final int port, final String hostPath) {
         this.name = name;
         id = poolId;
         this.uuid = uuid;
@@ -150,11 +123,7 @@ public class StoragePoolVO implements StoragePool {
         setPath(hostPath);
     }
 
-    public StoragePoolVO(StoragePoolVO that) {
-        this(that.id, that.name, that.uuid, that.poolType, that.dataCenterId, that.podId, that.usedBytes, that.capacityBytes, that.hostAddress, that.port, that.path);
-    }
-
-    public StoragePoolVO(StoragePoolType type, String hostAddress, int port, String path) {
+    public StoragePoolVO(final StoragePoolType type, final String hostAddress, final int port, final String path) {
         poolType = type;
         this.hostAddress = hostAddress;
         this.port = port;
@@ -164,13 +133,17 @@ public class StoragePoolVO implements StoragePool {
     }
 
     @Override
-    public String getName() {
-        return name;
+    public long getId() {
+        return id;
+    }
+
+    public void setId(final long id) {
+        this.id = id;
     }
 
     @Override
-    public String getUuid() {
-        return uuid;
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -178,17 +151,13 @@ public class StoragePoolVO implements StoragePool {
         return poolType;
     }
 
-    public void setPoolType(StoragePoolType protocol) {
+    public void setPoolType(final StoragePoolType protocol) {
         poolType = protocol;
     }
 
     @Override
     public Date getCreated() {
         return created;
-    }
-
-    public Date getRemoved() {
-        return removed;
     }
 
     @Override
@@ -202,42 +171,17 @@ public class StoragePoolVO implements StoragePool {
     }
 
     @Override
-    public long getUsedBytes() {
-        return usedBytes;
-    }
-
-    @Override
-    public String getStorageProviderName() {
-        return storageProviderName;
-    }
-
-    public void setStorageProviderName(String providerName) {
-        storageProviderName = providerName;
-    }
-
-    @Override
     public long getCapacityBytes() {
         return capacityBytes;
     }
 
-    public void setUsedBytes(long usedBytes) {
+    @Override
+    public long getUsedBytes() {
+        return usedBytes;
+    }
+
+    public void setUsedBytes(final long usedBytes) {
         this.usedBytes = usedBytes;
-    }
-
-    public void setCapacityBytes(long capacityBytes) {
-        this.capacityBytes = capacityBytes;
-    }
-
-    public void setManaged(boolean managed) {
-        this.managed = managed;
-    }
-
-    public boolean isManaged() {
-        return managed;
-    }
-
-    public void setCapacityIops(Long capacityIops) {
-        this.capacityIops = capacityIops;
     }
 
     @Override
@@ -245,12 +189,16 @@ public class StoragePoolVO implements StoragePool {
         return capacityIops;
     }
 
+    public void setCapacityIops(final Long capacityIops) {
+        this.capacityIops = capacityIops;
+    }
+
     @Override
     public Long getClusterId() {
         return clusterId;
     }
 
-    public void setClusterId(Long clusterId) {
+    public void setClusterId(final Long clusterId) {
         this.clusterId = clusterId;
     }
 
@@ -259,7 +207,7 @@ public class StoragePoolVO implements StoragePool {
         return hostAddress;
     }
 
-    public void setHostAddress(String host) {
+    public void setHostAddress(final String host) {
         hostAddress = host;
     }
 
@@ -281,86 +229,8 @@ public class StoragePoolVO implements StoragePool {
         return userInfo;
     }
 
-    public void setStatus(StoragePoolStatus status) {
-        this.status = status;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setDataCenterId(long dcId) {
-        dataCenterId = dcId;
-    }
-
-    public void setPodId(Long podId) {
-        this.podId = podId;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public void setUserInfo(String userInfo) {
+    public void setUserInfo(final String userInfo) {
         this.userInfo = userInfo;
-    }
-
-    @Override
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    @Override
-    public Long getPodId() {
-        return podId;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setScope(ScopeType scope) {
-        this.scope = scope;
-    }
-
-    public ScopeType getScope() {
-        return scope;
-    }
-
-    @Override
-    public HypervisorType getHypervisor() {
-        return hypervisor;
-    }
-
-    public void setHypervisor(HypervisorType hypervisor) {
-        this.hypervisor = hypervisor;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof StoragePoolVO) || obj == null) {
-            return false;
-        }
-        StoragePoolVO that = (StoragePoolVO)obj;
-        return id == that.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return new Long(id).hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return new StringBuilder("Pool[").append(id).append("|").append(poolType).append("]").toString();
     }
 
     @Override
@@ -374,8 +244,117 @@ public class StoragePoolVO implements StoragePool {
     }
 
     @Override
+    public StoragePoolStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(final StoragePoolStatus status) {
+        this.status = status;
+    }
+
+    @Override
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(final int port) {
+        this.port = port;
+    }
+
+    @Override
+    public Long getPodId() {
+        return podId;
+    }
+
+    @Override
+    public String getStorageProviderName() {
+        return storageProviderName;
+    }
+
+    public void setStorageProviderName(final String providerName) {
+        storageProviderName = providerName;
+    }
+
+    @Override
     public boolean isInMaintenance() {
         return status == StoragePoolStatus.PrepareForMaintenance || status == StoragePoolStatus.Maintenance || status == StoragePoolStatus.ErrorInMaintenance ||
-            removed != null;
+                removed != null;
+    }
+
+    @Override
+    public HypervisorType getHypervisor() {
+        return hypervisor;
+    }
+
+    public void setHypervisor(final HypervisorType hypervisor) {
+        this.hypervisor = hypervisor;
+    }
+
+    public void setPodId(final Long podId) {
+        this.podId = podId;
+    }
+
+    public void setPath(final String path) {
+        this.path = path;
+    }
+
+    public void setCapacityBytes(final long capacityBytes) {
+        this.capacityBytes = capacityBytes;
+    }
+
+    public void setDataCenterId(final long dcId) {
+        dataCenterId = dcId;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
+    }
+
+    public Date getRemoved() {
+        return removed;
+    }
+
+    public boolean isManaged() {
+        return managed;
+    }
+
+    public void setManaged(final boolean managed) {
+        this.managed = managed;
+    }
+
+    public ScopeType getScope() {
+        return scope;
+    }
+
+    public void setScope(final ScopeType scope) {
+        this.scope = scope;
+    }
+
+    @Override
+    public int hashCode() {
+        return new Long(id).hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof StoragePoolVO) || obj == null) {
+            return false;
+        }
+        final StoragePoolVO that = (StoragePoolVO) obj;
+        return id == that.id;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("Pool[").append(id).append("|").append(poolType).append("]").toString();
     }
 }

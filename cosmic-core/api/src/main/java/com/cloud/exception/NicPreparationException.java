@@ -1,14 +1,12 @@
 package com.cloud.exception;
 
-@SuppressWarnings("serial")
 public class NicPreparationException extends InsufficientCapacityException {
 
-  public NicPreparationException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public NicPreparationException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
-  public NicPreparationException(String message) {
-    super(message, null);
-  }
-
+    public NicPreparationException(final String message) {
+        super(message, null);
+    }
 }

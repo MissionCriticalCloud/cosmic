@@ -1,22 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.framework.config.impl;
 
-import java.util.Date;
+import com.cloud.utils.crypt.DBEncryptionUtil;
+import org.apache.cloudstack.config.Configuration;
+import org.apache.cloudstack.framework.config.ConfigKey;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,11 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.utils.crypt.DBEncryptionUtil;
-
-import org.apache.cloudstack.config.Configuration;
-import org.apache.cloudstack.framework.config.ConfigKey;
+import java.util.Date;
 
 @Entity
 @Table(name = "configuration")
@@ -68,7 +50,14 @@ public class ConfigurationVO implements Configuration {
     protected ConfigurationVO() {
     }
 
-    public ConfigurationVO(String category, String instance, String component, String name, String value, String description) {
+    public ConfigurationVO(final String component, final ConfigKey<?> key) {
+        this(key.category(), "DEFAULT", component, key.key(), key.defaultValue(), key.description());
+        defaultValue = key.defaultValue();
+        dynamic = key.isDynamic();
+        scope = key.scope() != null ? key.scope().toString() : null;
+    }
+
+    public ConfigurationVO(final String category, final String instance, final String component, final String name, final String value, final String description) {
         this.category = category;
         this.instance = instance;
         this.component = component;
@@ -77,11 +66,8 @@ public class ConfigurationVO implements Configuration {
         setValue(value);
     }
 
-    public ConfigurationVO(String component, ConfigKey<?> key) {
-        this(key.category(), "DEFAULT", component, key.key(), key.defaultValue(), key.description());
-        defaultValue = key.defaultValue();
-        dynamic = key.isDynamic();
-        scope = key.scope() != null ? key.scope().toString() : null;
+    private boolean isEncryptedConfig() {
+        return "Hidden".equals(getCategory()) || "Secure".equals(getCategory());
     }
 
     @Override
@@ -89,7 +75,7 @@ public class ConfigurationVO implements Configuration {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(final String category) {
         this.category = category;
     }
 
@@ -98,7 +84,7 @@ public class ConfigurationVO implements Configuration {
         return instance;
     }
 
-    public void setInstance(String instance) {
+    public void setInstance(final String instance) {
         this.instance = instance;
     }
 
@@ -107,7 +93,7 @@ public class ConfigurationVO implements Configuration {
         return component;
     }
 
-    public void setComponent(String component) {
+    public void setComponent(final String component) {
         this.component = component;
     }
 
@@ -116,29 +102,25 @@ public class ConfigurationVO implements Configuration {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
     @Override
     public String getValue() {
-        if(isEncryptedConfig()) {
+        if (isEncryptedConfig()) {
             return DBEncryptionUtil.decrypt(value);
         } else {
             return value;
         }
     }
 
-    public void setValue(String value) {
-        if(isEncryptedConfig()) {
+    public void setValue(final String value) {
+        if (isEncryptedConfig()) {
             this.value = DBEncryptionUtil.encrypt(value);
         } else {
             this.value = value;
         }
-    }
-
-    private boolean isEncryptedConfig() {
-        return "Hidden".equals(getCategory()) || "Secure".equals(getCategory());
     }
 
     @Override
@@ -146,8 +128,13 @@ public class ConfigurationVO implements Configuration {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
+    }
+
+    @Override
+    public String getDefaultValue() {
+        return defaultValue;
     }
 
     @Override
@@ -160,21 +147,8 @@ public class ConfigurationVO implements Configuration {
         return dynamic;
     }
 
-    public void setDynamic(boolean dynamic) {
+    public void setDynamic(final boolean dynamic) {
         this.dynamic = dynamic;
-    }
-
-    @Override
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
-    public void setScope(String scope) {
-        this.scope = scope;
     }
 
     @Override
@@ -182,7 +156,15 @@ public class ConfigurationVO implements Configuration {
         return updated;
     }
 
-    public void setUpdated(Date updated) {
+    public void setUpdated(final Date updated) {
         this.updated = updated;
+    }
+
+    public void setScope(final String scope) {
+        this.scope = scope;
+    }
+
+    public void setDefaultValue(final String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }

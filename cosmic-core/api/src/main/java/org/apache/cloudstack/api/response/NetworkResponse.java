@@ -1,35 +1,18 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.List;
-import java.util.Set;
 
 import com.cloud.network.Network;
 import com.cloud.projects.ProjectAccount;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
 
-@SuppressWarnings("unused")
+import java.util.List;
+import java.util.Set;
+
+import com.google.gson.annotations.SerializedName;
+
 @EntityReference(value = {Network.class, ProjectAccount.class})
 public class NetworkResponse extends BaseResponse implements ControlledEntityResponse {
 
@@ -229,188 +212,188 @@ public class NetworkResponse extends BaseResponse implements ControlledEntityRes
         return displayNetwork;
     }
 
-    public void setDisplayNetwork(Boolean displayNetwork) {
+    public void setDisplayNetwork(final Boolean displayNetwork) {
         this.displayNetwork = displayNetwork;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setBroadcastDomainType(String broadcastDomainType) {
+    public void setBroadcastDomainType(final String broadcastDomainType) {
         this.broadcastDomainType = broadcastDomainType;
     }
 
-    public void setTrafficType(String trafficType) {
+    public void setTrafficType(final String trafficType) {
         this.trafficType = trafficType;
     }
 
-    public void setGateway(String gateway) {
+    public void setGateway(final String gateway) {
         this.gateway = gateway;
     }
 
-    public void setNetmask(String netmask) {
+    public void setNetmask(final String netmask) {
         this.netmask = netmask;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
-    public void setNetworkOfferingId(String networkOfferingId) {
+    public void setNetworkOfferingId(final String networkOfferingId) {
         this.networkOfferingId = networkOfferingId;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
-    public void setRelated(String related) {
+    public void setRelated(final String related) {
         this.related = related;
     }
 
-    public void setBroadcastUri(String broadcastUri) {
+    public void setBroadcastUri(final String broadcastUri) {
         this.broadcastUri = broadcastUri;
     }
 
-    public void setDns1(String dns1) {
+    public void setDns1(final String dns1) {
         this.dns1 = dns1;
     }
 
-    public void setDns2(String dns2) {
+    public void setDns2(final String dns2) {
         this.dns2 = dns2;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
     @Override
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
     @Override
-    public void setDomainId(String domainId) {
-        this.domainId = domainId;
-    }
-
-    public void setNetworkOfferingName(String networkOfferingName) {
-        this.networkOfferingName = networkOfferingName;
-    }
-
-    public void setNetworkOfferingDisplayText(String networkOfferingDisplayText) {
-        this.networkOfferingDisplayText = networkOfferingDisplayText;
-    }
-
-    public void setNetworkOfferingConserveMode(Boolean networkOfferingConserveMode) {
-        this.networkOfferingConserveMode = networkOfferingConserveMode;
-    }
-
-    public void setDisplaytext(String displaytext) {
-        this.displaytext = displaytext;
-    }
-
-    public void setVlan(String vlan) {
-        this.vlan = vlan;
-    }
-
-    public void setIsSystem(Boolean isSystem) {
-        this.isSystem = isSystem;
-    }
-
-    @Override
-    public void setDomainName(String domain) {
-        this.domain = domain;
-    }
-
-    public void setNetworkOfferingAvailability(String networkOfferingAvailability) {
-        this.networkOfferingAvailability = networkOfferingAvailability;
-    }
-
-    public void setServices(List<ServiceResponse> services) {
-        this.services = services;
-    }
-
-    public void setIsDefault(Boolean isDefault) {
-        this.isDefault = isDefault;
-    }
-
-    public void setNetworkDomain(String networkDomain) {
-        this.networkDomain = networkDomain;
-    }
-
-    @Override
-    public void setProjectId(String projectId) {
+    public void setProjectId(final String projectId) {
         this.projectId = projectId;
     }
 
     @Override
-    public void setProjectName(String projectName) {
+    public void setProjectName(final String projectName) {
         this.projectName = projectName;
     }
 
-    public void setPhysicalNetworkId(String physicalNetworkId) {
+    @Override
+    public void setDomainId(final String domainId) {
+        this.domainId = domainId;
+    }
+
+    @Override
+    public void setDomainName(final String domain) {
+        this.domain = domain;
+    }
+
+    public void setNetworkOfferingName(final String networkOfferingName) {
+        this.networkOfferingName = networkOfferingName;
+    }
+
+    public void setNetworkOfferingDisplayText(final String networkOfferingDisplayText) {
+        this.networkOfferingDisplayText = networkOfferingDisplayText;
+    }
+
+    public void setNetworkOfferingConserveMode(final Boolean networkOfferingConserveMode) {
+        this.networkOfferingConserveMode = networkOfferingConserveMode;
+    }
+
+    public void setDisplaytext(final String displaytext) {
+        this.displaytext = displaytext;
+    }
+
+    public void setVlan(final String vlan) {
+        this.vlan = vlan;
+    }
+
+    public void setIsSystem(final Boolean isSystem) {
+        this.isSystem = isSystem;
+    }
+
+    public void setNetworkOfferingAvailability(final String networkOfferingAvailability) {
+        this.networkOfferingAvailability = networkOfferingAvailability;
+    }
+
+    public void setServices(final List<ServiceResponse> services) {
+        this.services = services;
+    }
+
+    public void setIsDefault(final Boolean isDefault) {
+        this.isDefault = isDefault;
+    }
+
+    public void setNetworkDomain(final String networkDomain) {
+        this.networkDomain = networkDomain;
+    }
+
+    public void setPhysicalNetworkId(final String physicalNetworkId) {
         this.physicalNetworkId = physicalNetworkId;
     }
 
-    public void setAclType(String aclType) {
+    public void setAclType(final String aclType) {
         this.aclType = aclType;
     }
 
-    public void setSubdomainAccess(Boolean subdomainAccess) {
+    public void setSubdomainAccess(final Boolean subdomainAccess) {
         this.subdomainAccess = subdomainAccess;
     }
 
-    public void setZoneName(String zoneName) {
+    public void setZoneName(final String zoneName) {
         this.zoneName = zoneName;
     }
 
-    public void setCidr(String cidr) {
+    public void setCidr(final String cidr) {
         this.cidr = cidr;
     }
 
-    public void setNetworkCidr(String networkCidr) {
+    public void setNetworkCidr(final String networkCidr) {
         this.networkCidr = networkCidr;
     }
 
-    public void setReservedIpRange(String reservedIpRange) {
+    public void setReservedIpRange(final String reservedIpRange) {
         this.reservedIpRange = reservedIpRange;
     }
 
-    public void setRestartRequired(Boolean restartRequired) {
+    public void setRestartRequired(final Boolean restartRequired) {
         this.restartRequired = restartRequired;
     }
 
-    public void setSpecifyIpRanges(Boolean specifyIpRanges) {
+    public void setSpecifyIpRanges(final Boolean specifyIpRanges) {
         this.specifyIpRanges = specifyIpRanges;
     }
 
-    public void setVpcId(String vpcId) {
+    public void setVpcId(final String vpcId) {
         this.vpcId = vpcId;
     }
 
-    public void setCanUseForDeploy(Boolean canUseForDeploy) {
+    public void setCanUseForDeploy(final Boolean canUseForDeploy) {
         this.canUseForDeploy = canUseForDeploy;
     }
 
-    public void setIsPersistent(Boolean isPersistent) {
+    public void setIsPersistent(final Boolean isPersistent) {
         this.isPersistent = isPersistent;
     }
 
-    public void setTags(List<ResourceTagResponse> tags) {
+    public void setTags(final List<ResourceTagResponse> tags) {
         this.tags = tags;
     }
 
-    public void setIp6Gateway(String ip6Gateway) {
+    public void setIp6Gateway(final String ip6Gateway) {
         this.ip6Gateway = ip6Gateway;
     }
 
-    public void setIp6Cidr(String ip6Cidr) {
+    public void setIp6Cidr(final String ip6Cidr) {
         this.ip6Cidr = ip6Cidr;
     }
 
@@ -418,15 +401,15 @@ public class NetworkResponse extends BaseResponse implements ControlledEntityRes
         return aclId;
     }
 
-    public void setAclId(String aclId) {
+    public void setAclId(final String aclId) {
         this.aclId = aclId;
     }
 
-    public void setStrechedL2Subnet(Boolean strechedL2Subnet) {
+    public void setStrechedL2Subnet(final Boolean strechedL2Subnet) {
         this.strechedL2Subnet = strechedL2Subnet;
     }
 
-    public void setNetworkSpannedZones(Set<String> networkSpannedZones) {
+    public void setNetworkSpannedZones(final Set<String> networkSpannedZones) {
         this.networkSpannedZones = networkSpannedZones;
     }
 }

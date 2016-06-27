@@ -1,29 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.upgrade.dao;
+
+import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.script.Script;
 
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.script.Script;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +16,7 @@ public class Upgrade461to470 implements DbUpgrade {
 
     @Override
     public String[] getUpgradableVersionRange() {
-        return new String[] {"4.6.1", "4.7.0"};
+        return new String[]{"4.6.1", "4.7.0"};
     }
 
     @Override
@@ -48,11 +31,16 @@ public class Upgrade461to470 implements DbUpgrade {
 
     @Override
     public File[] getPrepareScripts() {
-        String script = Script.findScript("", "db/schema-461to470.sql");
+        final String script = Script.findScript("", "db/schema-461to470.sql");
         if (script == null) {
             throw new CloudRuntimeException("Unable to find db/schema-461to470.sql");
         }
-        return new File[] {new File(script)};
+        return new File[]{new File(script)};
+    }
+
+    @Override
+    public void performDataMigration(final Connection conn) {
+        alterAddColumnToCloudUsage(conn);
     }
 
     public void alterAddColumnToCloudUsage(final Connection conn) {
@@ -60,7 +48,7 @@ public class Upgrade461to470 implements DbUpgrade {
         try (PreparedStatement pstmt = conn.prepareStatement(alterTableSql)) {
             pstmt.executeUpdate();
             s_logger.info("Altered cloud_usage.cloud_usage table and added column quota_calculated");
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             if (e.getMessage().contains("quota_calculated")) {
                 s_logger.warn("cloud_usage.cloud_usage table already has a column called quota_calculated");
             } else {
@@ -70,17 +58,12 @@ public class Upgrade461to470 implements DbUpgrade {
     }
 
     @Override
-    public void performDataMigration(Connection conn) {
-        alterAddColumnToCloudUsage(conn);
-    }
-
-    @Override
     public File[] getCleanupScripts() {
-        String script = Script.findScript("", "db/schema-461to470-cleanup.sql");
+        final String script = Script.findScript("", "db/schema-461to470-cleanup.sql");
         if (script == null) {
             throw new CloudRuntimeException("Unable to find db/schema-461to470-cleanup.sql");
         }
 
-        return new File[] {new File(script)};
+        return new File[]{new File(script)};
     }
 }

@@ -1,33 +1,17 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-(function(cloudStack) {
+(function (cloudStack) {
     var getProjectAdmin, selectedProjectObj;
     cloudStack.projects = {
-        requireInvitation: function(args) {
+        requireInvitation: function (args) {
             return g_capabilities.projectinviterequired;
         },
 
-        invitationCheck: function(args) {
+        invitationCheck: function (args) {
             $.ajax({
                 url: createURL('listProjectInvitations'),
                 data: {
                     state: 'Pending'
                 },
-                success: function(json) {
+                success: function (json) {
                     args.response.success({
                         data: json.listprojectinvitationsresponse.projectinvitation ? json.listprojectinvitationsresponse.projectinvitation : []
                     });
@@ -36,13 +20,13 @@
         },
 
         resourceManagement: {
-            update: function(args, projectID) {
+            update: function (args, projectID) {
                 var totalResources = 5;
                 var updatedResources = 0;
 
                 projectID = projectID ? projectID : cloudStack.context.projects[0].id;
 
-                $.each(args.data, function(key, value) {
+                $.each(args.data, function (key, value) {
                     $.ajax({
                         url: createURL('updateResourceLimit', {
                             ignoreProject: true
@@ -52,7 +36,7 @@
                             resourcetype: key,
                             max: args.data[key]
                         },
-                        success: function(json) {
+                        success: function (json) {
                             updatedResources++;
                             if (updatedResources == totalResources) {
                                 args.response.success();
@@ -62,7 +46,7 @@
                 });
             },
 
-            dataProvider: function(args, projectID) {
+            dataProvider: function (args, projectID) {
                 projectID = projectID ? projectID : cloudStack.context.projects[0].id;
 
                 $.ajax({
@@ -72,10 +56,10 @@
                     data: {
                         projectid: projectID
                     },
-                    success: function(json) {
+                    success: function (json) {
                         var resourceLimits = $.grep(
                             json.listresourcelimitsresponse.resourcelimit,
-                            function(resourceLimit) {
+                            function (resourceLimit) {
                                 return resourceLimit.resourcetype != 5 && resourceLimit.resourcetype != 12;
                             }
                         );
@@ -83,7 +67,7 @@
                         args.response.success({
                             data: $.map(
                                 resourceLimits,
-                                function(resource) {
+                                function (resource) {
                                     var resourceMap = {
                                         0: {
                                             id: 'user_vm',
@@ -149,20 +133,20 @@
             }
         },
 
-        dashboard: function(args) {
+        dashboard: function (args) {
             var dataFns = {
-                instances: function(data) {
+                instances: function (data) {
                     $.ajax({
                         url: createURL('listVirtualMachines'),
-                        success: function(json) {
+                        success: function (json) {
                             var instances = json.listvirtualmachinesresponse.virtualmachine ?
                                 json.listvirtualmachinesresponse.virtualmachine : [];
 
                             dataFns.storage($.extend(data, {
-                                runningInstances: $.grep(instances, function(instance) {
+                                runningInstances: $.grep(instances, function (instance) {
                                     return instance.state == 'Running';
                                 }).length,
-                                stoppedInstances: $.grep(instances, function(instance) {
+                                stoppedInstances: $.grep(instances, function (instance) {
                                     return instance.state != 'Running';
                                 }).length,
                                 totalInstances: instances.length
@@ -171,10 +155,10 @@
                     });
                 },
 
-                storage: function(data) {
+                storage: function (data) {
                     $.ajax({
                         url: createURL('listVolumes'),
-                        success: function(json) {
+                        success: function (json) {
                             dataFns.bandwidth($.extend(data, {
                                 totalVolumes: json.listvolumesresponse.volume ? json.listvolumesresponse.count : 0
                             }));
@@ -182,14 +166,14 @@
                     });
                 },
 
-                bandwidth: function(data) {
+                bandwidth: function (data) {
                     var totalBandwidth = 0;
                     $.ajax({
                         url: createURL('listNetworks'),
-                        success: function(json) {
+                        success: function (json) {
                             var networks = json.listnetworksresponse.network ?
                                 json.listnetworksresponse.network : [];
-                            $(networks).each(function() {
+                            $(networks).each(function () {
                                 var network = this;
                                 $.ajax({
                                     url: createURL('listNetworkOfferings'),
@@ -197,7 +181,7 @@
                                     data: {
                                         id: network.networkofferingid
                                     },
-                                    success: function(json) {
+                                    success: function (json) {
                                         totalBandwidth +=
                                             json.listnetworkofferingsresponse.networkoffering[0].networkrate;
                                     }
@@ -211,10 +195,10 @@
                     });
                 },
 
-                ipAddresses: function(data) {
+                ipAddresses: function (data) {
                     $.ajax({
                         url: createURL('listPublicIpAddresses'),
-                        success: function(json) {
+                        success: function (json) {
                             dataFns.loadBalancingRules($.extend(data, {
                                 totalIPAddresses: json.listpublicipaddressesresponse.count ? json.listpublicipaddressesresponse.count : 0
                             }));
@@ -222,10 +206,10 @@
                     });
                 },
 
-                loadBalancingRules: function(data) {
+                loadBalancingRules: function (data) {
                     $.ajax({
                         url: createURL('listLoadBalancerRules'),
-                        success: function(json) {
+                        success: function (json) {
                             dataFns.portForwardingRules($.extend(data, {
                                 totalLoadBalancers: json.listloadbalancerrulesresponse.count ? json.listloadbalancerrulesresponse.count : 0
                             }));
@@ -233,10 +217,10 @@
                     });
                 },
 
-                portForwardingRules: function(data) {
+                portForwardingRules: function (data) {
                     $.ajax({
                         url: createURL('listPortForwardingRules'),
-                        success: function(json) {
+                        success: function (json) {
                             dataFns.users($.extend(data, {
                                 totalPortForwards: json.listportforwardingrulesresponse.count ? json.listportforwardingrulesresponse.count : 0
                             }));
@@ -244,14 +228,14 @@
                     });
                 },
 
-                users: function(data) {
+                users: function (data) {
                     $.ajax({
                         url: createURL('listProjectAccounts'),
-                        success: function(json) {
+                        success: function (json) {
                             var users = json.listprojectaccountsresponse.projectaccount;
 
                             dataFns.events($.extend(data, {
-                                users: $.map(users, function(user) {
+                                users: $.map(users, function (user) {
                                     return {
                                         account: user.account
                                     };
@@ -261,7 +245,7 @@
                     });
                 },
 
-                events: function(data) {
+                events: function (data) {
                     $.ajax({
                         url: createURL('listEvents', {
                             ignoreProject: true
@@ -270,11 +254,11 @@
                             page: 1,
                             pageSize: 8
                         },
-                        success: function(json) {
+                        success: function (json) {
                             var events = json.listeventsresponse.event;
 
                             complete($.extend(data, {
-                                events: $.map(events, function(event) {
+                                events: $.map(events, function (event) {
                                     return {
                                         date: event.created.substr(5, 2) + '/' + event.created.substr(8, 2) + '/' + event.created.substr(2, 2),
                                         desc: event.description
@@ -286,7 +270,7 @@
                 }
             };
 
-            var complete = function(data) {
+            var complete = function (data) {
                 args.response.success({
                     data: data
                 });
@@ -295,8 +279,8 @@
             dataFns.instances();
         },
 
-        add: function(args) {
-            setTimeout(function() {
+        add: function (args) {
+            setTimeout(function () {
                 $.ajax({
                     url: createURL('createProject', {
                         ignoreProject: true
@@ -309,7 +293,7 @@
                     },
                     dataType: 'json',
                     async: true,
-                    success: function(data) {
+                    success: function (data) {
                         args.response.success({
                             data: {
                                 id: data.createprojectresponse.id,
@@ -319,7 +303,7 @@
                             }
                         });
                     },
-                    error: function(json) {
+                    error: function (json) {
                         args.response.error(parseXMLHttpResponse(json));
                     }
                 });
@@ -349,7 +333,7 @@
             },
             add: {
                 label: 'label.invite',
-                action: function(args) {
+                action: function (args) {
                     $.ajax({
                         url: createURL('addAccountToProject', {
                             ignoreProject: true
@@ -361,25 +345,25 @@
                         },
                         dataType: 'json',
                         async: true,
-                        success: function(data) {
+                        success: function (data) {
                             data: args.data,
-                            args.response.success({
-                                _custom: {
-                                    jobId: data.addaccounttoprojectresponse.jobid
-                                },
-                                notification: {
-                                    label: 'label.project.invite',
-                                    poll: pollAsyncJobResult
-                                }
-                            });
+                                args.response.success({
+                                    _custom: {
+                                        jobId: data.addaccounttoprojectresponse.jobid
+                                    },
+                                    notification: {
+                                        label: 'label.project.invite',
+                                        poll: pollAsyncJobResult
+                                    }
+                                });
                         },
-                        error: function(json) {
+                        error: function (json) {
                             args.response.error(parseXMLHttpResponse(json));
                         }
                     });
                 }
             },
-            actionPreFilter: function(args) {
+            actionPreFilter: function (args) {
                 if (args.context.projects &&
                     args.context.projects[0] && !args.context.projects[0].isNew) {
                     return args.context.actions;
@@ -391,13 +375,13 @@
             actions: {
                 destroy: {
                     label: 'label.revoke.project.invite',
-                    action: function(args) {
+                    action: function (args) {
                         $.ajax({
                             url: createURL('deleteProjectInvitation'),
                             data: {
                                 id: args.context.multiRule[0].id
                             },
-                            success: function(data) {
+                            success: function (data) {
                                 args.response.success({
                                     _custom: {
                                         jobId: data.deleteprojectinvitationresponse.jobid
@@ -414,7 +398,7 @@
             },
 
             // Project users data provider
-            dataProvider: function(args) {
+            dataProvider: function (args) {
                 $.ajax({
                     url: createURL('listProjectInvitations', {
                         ignoreProject: true
@@ -426,11 +410,11 @@
                     },
                     dataType: 'json',
                     async: true,
-                    success: function(data) {
+                    success: function (data) {
                         var invites = data.listprojectinvitationsresponse.projectinvitation ?
                             data.listprojectinvitationsresponse.projectinvitation : [];
                         args.response.success({
-                            data: $.map(invites, function(elem) {
+                            data: $.map(invites, function (elem) {
                                 return {
                                     id: elem.id,
                                     account: elem.account,
@@ -445,7 +429,7 @@
         },
         addUserForm: {
             noSelect: true,
-            hideForm: function() {
+            hideForm: function () {
                 return g_capabilities.projectinviterequired;
             },
             fields: {
@@ -464,7 +448,7 @@
             },
             add: {
                 label: 'label.add.account',
-                action: function(args) {
+                action: function (args) {
                     $.ajax({
                         url: createURL('addAccountToProject', {
                             ignoreProject: true
@@ -475,7 +459,7 @@
                         },
                         dataType: 'json',
                         async: true,
-                        success: function(data) {
+                        success: function (data) {
                             args.response.success({
                                 _custom: {
                                     jobId: data.addaccounttoprojectresponse.jobid
@@ -495,7 +479,7 @@
                     });
                 }
             },
-            actionPreFilter: function(args) {
+            actionPreFilter: function (args) {
                 if (!args.context.projects &&
                     args.context.multiRule[0].role != 'Admin') { // This is for the new project wizard
                     return ['destroy'];
@@ -508,12 +492,12 @@
 
                 return [];
             },
-            readOnlyCheck: function(args) { // check if current logged in User is the Project Owner
+            readOnlyCheck: function (args) { // check if current logged in User is the Project Owner
                 if (isAdmin() || isDomainAdmin())
                     return true;
 
                 var projectOwner, currentUser = cloudStack.context.users[0].account;
-                $(args.data).each(function() {
+                $(args.data).each(function () {
                     var data = this;
                     if (data.role == 'Admin')
                         projectOwner = data.username;
@@ -526,7 +510,7 @@
             actions: {
                 destroy: {
                     label: 'label.remove.project.account',
-                    action: function(args) {
+                    action: function (args) {
                         $.ajax({
                             url: createURL('deleteAccountFromProject', {
                                 ignoreProject: true
@@ -537,7 +521,7 @@
                             },
                             dataType: 'json',
                             async: true,
-                            success: function(data) {
+                            success: function (data) {
                                 args.response.success({
                                     _custom: {
                                         jobId: data.deleteaccountfromprojectresponse.jobid
@@ -548,7 +532,7 @@
                                     }
                                 });
                             },
-                            error: function(data) {
+                            error: function (data) {
                                 args.response.error('Could not remove user');
                             }
                         });
@@ -557,7 +541,7 @@
 
                 makeOwner: {
                     label: 'label.make.project.owner',
-                    action: function(args) {
+                    action: function (args) {
                         $.ajax({
                             url: createURL('updateProject', {
                                 ignoreProject: true
@@ -568,12 +552,12 @@
                             },
                             dataType: 'json',
                             async: true,
-                            success: function(data) {
+                            success: function (data) {
                                 args.response.success({
                                     _custom: {
                                         jobId: data.updateprojectresponse.jobid,
-                                        onComplete: function() {
-                                            setTimeout(function() {
+                                        onComplete: function () {
+                                            setTimeout(function () {
                                                 $(window).trigger('cloudStack.fullRefresh');
                                                 if (isUser()) {
                                                     $(window).trigger('cloudStack.detailsRefresh');
@@ -593,7 +577,7 @@
             },
 
             // Project users data provider
-            dataProvider: function(args) {
+            dataProvider: function (args) {
                 $.ajax({
                     url: createURL('listProjectAccounts', {
                         ignoreProject: true
@@ -603,9 +587,9 @@
                     },
                     dataType: 'json',
                     async: true,
-                    success: function(data) {
+                    success: function (data) {
                         args.response.success({
-                            data: $.map(data.listprojectaccountsresponse.projectaccount, function(elem) {
+                            data: $.map(data.listprojectaccountsresponse.projectaccount, function (elem) {
                                 if (elem.role == 'Owner' || elem.role == 'Admin')
                                     getProjectAdmin = elem.account;
                                 return {
@@ -621,7 +605,7 @@
         },
 
         // Project listing data provider
-        dataProvider: function(args) {
+        dataProvider: function (args) {
             var user = args.context.users[0];
             var data1 = {
                 accountId: user.userid,
@@ -633,7 +617,7 @@
 
             var array1 = [];
             var page = 1;
-            var getNextPage = function() {
+            var getNextPage = function () {
                 var data2 = $.extend({}, data1, {
                     page: page,
                     pageSize: 500
@@ -645,10 +629,10 @@
                     }),
                     data: data2,
                     async: false,
-                    success: function(json) {
+                    success: function (json) {
                         var projects = json.listprojectsresponse.project;
                         if (projects != undefined) {
-                            for(var i = 0; i < projects.length; i++) {
+                            for (var i = 0; i < projects.length; i++) {
                                 array1.push($.extend(projects[i], {
                                     displayText: projects[i].displaytext
                                 }));
@@ -662,7 +646,7 @@
                 });
             }
             getNextPage();
-            args.response.success({ data: array1 });
+            args.response.success({data: array1});
         }
     };
 
@@ -712,7 +696,7 @@
 
                         domainid: {
                             label: 'label.domain',
-                            select: function(args) {
+                            select: function (args) {
                                 if (isAdmin() || isDomainAdmin()) {
                                     $.ajax({
                                         url: createURL('listDomains'),
@@ -720,7 +704,7 @@
                                             listAll: true,
                                             details: 'min'
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             var array1 = [{
                                                 id: '',
                                                 description: ''
@@ -734,7 +718,7 @@
                                                     });
                                                 }
                                             }
-                                            array1.sort(function(a, b) {
+                                            array1.sort(function (a, b) {
                                                 return a.description.localeCompare(b.description);
                                             });
                                             args.response.success({
@@ -748,7 +732,7 @@
                                     });
                                 }
                             },
-                            isHidden: function(args) {
+                            isHidden: function (args) {
                                 if (isAdmin() || isDomainAdmin())
                                     return false;
                                 else
@@ -758,7 +742,7 @@
 
                         account: {
                             label: 'label.account',
-                            isHidden: function(args) {
+                            isHidden: function (args) {
                                 if (isAdmin() || isDomainAdmin())
                                     return false;
                                 else
@@ -767,7 +751,7 @@
                         }
                     },
 
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var data = {};
                         listViewDataProvider(args, data);
 
@@ -782,18 +766,18 @@
                                 ignoreProject: true
                             }),
                             data: data,
-                            success: function(data) {
+                            success: function (data) {
                                 args.response.success({
                                     data: data.listprojectsresponse.project,
                                     actionFilter: projectsActionFilter
                                 });
                             },
-                    error: function(XMLHttpResponse) {
-                        cloudStack.dialog.notice({
-                            message: parseXMLHttpResponse(XMLHttpResponse)
-                        });
-                        args.response.error();
-                     }
+                            error: function (XMLHttpResponse) {
+                                cloudStack.dialog.notice({
+                                    message: parseXMLHttpResponse(XMLHttpResponse)
+                                });
+                                args.response.error();
+                            }
                         });
                     },
 
@@ -801,7 +785,7 @@
                         add: {
                             label: 'label.new.project',
                             action: {
-                                custom: function(args) {
+                                custom: function (args) {
                                     $(window).trigger('cloudStack.newProject');
                                 }
                             }
@@ -809,7 +793,7 @@
                     },
 
                     detailView: {
-                        updateContext: function(args) {
+                        updateContext: function (args) {
                             var project;
                             var projectID = args.context.projects[0].id;
                             var url = 'listProjects';
@@ -823,7 +807,7 @@
                                     id: projectID
                                 },
                                 async: false,
-                                success: function(json) {
+                                success: function (json) {
                                     project = json.listprojectsresponse.project[0]; // override project after update owner
                                 }
                             });
@@ -836,37 +820,37 @@
                         actions: {
                             edit: {
                                 label: 'label.edit',
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL('updateProject'),
                                         data: $.extend(true, {}, args.context.projects[0], args.data),
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success();
                                         },
-                                        error: function(json) {
+                                        error: function (json) {
                                             args.response.error(parseXMLHttpResponse(json));
                                         }
                                     });
                                 },
                                 messages: {
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.edit.project.details';
                                     }
                                 }
                             },
                             disable: {
                                 label: 'label.suspend.project',
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL('suspendProject'),
                                         data: {
                                             id: args.context.projects[0].id
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success({
                                                 _custom: {
                                                     jobId: json.suspendprojectresponse.jobid,
-                                                    getUpdatedItem: function() {
+                                                    getUpdatedItem: function () {
                                                         return {
                                                             state: 'Suspended'
                                                         };
@@ -874,16 +858,16 @@
                                                 }
                                             });
                                         },
-                                        error: function(json) {
+                                        error: function (json) {
                                             args.response.error(parseXMLHttpResponse(json));
                                         }
                                     });
                                 },
                                 messages: {
-                                    confirm: function() {
+                                    confirm: function () {
                                         return 'message.suspend.project';
                                     },
-                                    notification: function() {
+                                    notification: function () {
                                         return 'label.suspend.project';
                                     }
                                 },
@@ -894,17 +878,17 @@
 
                             enable: {
                                 label: 'label.activate.project',
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL('activateProject'),
                                         data: {
                                             id: args.context.projects[0].id
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success({
                                                 _custom: {
                                                     jobId: json.activaterojectresponse.jobid, // NOTE: typo
-                                                    getUpdatedItem: function() {
+                                                    getUpdatedItem: function () {
                                                         return {
                                                             state: 'Active'
                                                         };
@@ -912,16 +896,16 @@
                                                 }
                                             });
                                         },
-                                        error: function(json) {
+                                        error: function (json) {
                                             args.response.error(parseXMLHttpResponse(json));
                                         }
                                     });
                                 },
                                 messages: {
-                                    confirm: function() {
+                                    confirm: function () {
                                         return 'message.activate.project';
                                     },
-                                    notification: function() {
+                                    notification: function () {
                                         return 'label.activate.project';
                                     }
                                 },
@@ -932,7 +916,7 @@
 
                             remove: {
                                 label: 'label.delete.project',
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL('deleteProject', {
                                             ignoreProject: true
@@ -942,19 +926,19 @@
                                         },
                                         dataType: 'json',
                                         async: true,
-                                        success: function(data) {
+                                        success: function (data) {
                                             args.response.success({
                                                 _custom: {
-                                                    getUpdatedItem: function(data) {
+                                                    getUpdatedItem: function (data) {
                                                         return $.extend(data, {
                                                             state: 'Destroyed'
                                                         });
                                                     },
-                                                    onComplete: function(data) {
+                                                    onComplete: function (data) {
                                                         $(window).trigger('cloudStack.deleteProject', args);
                                                     },
-                                                    getActionFilter: function(args) {
-                                                        return function() {
+                                                    getActionFilter: function (args) {
+                                                        return function () {
                                                             return [];
                                                         };
                                                     },
@@ -966,10 +950,10 @@
                                 },
 
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.delete.project';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.delete.project';
                                     }
                                 },
@@ -980,7 +964,7 @@
                             }
                         },
 
-                        tabFilter: function(args) {
+                        tabFilter: function (args) {
                             var project = selectedProjectObj;
                             var projectOwner = project.account;
                             var currentAccount = args.context.users[0].account;
@@ -1029,7 +1013,7 @@
                                     contextId: 'projects'
                                 }),
 
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     var projectID = args.context.projects[0].id;
 
                                     var url = 'listProjects';
@@ -1043,7 +1027,7 @@
                                             listAll: true,
                                             id: projectID
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             args.response.success({
                                                 data: json.listprojectsresponse.project ? json.listprojectsresponse.project[0] : {},
                                                 actionFilter: projectsActionFilter
@@ -1055,7 +1039,7 @@
 
                             accounts: {
                                 title: 'label.accounts',
-                                custom: function(args) {
+                                custom: function (args) {
                                     var project = args.context.projects[0];
                                     var multiEditArgs = $.extend(
                                         true, {},
@@ -1073,7 +1057,7 @@
 
                             invitations: {
                                 title: 'label.invitations',
-                                custom: function(args) {
+                                custom: function (args) {
                                     var project = args.context.projects[0];
                                     var $invites = cloudStack.uiCustom.projectsTabs.userManagement({
                                         useInvites: true,
@@ -1088,7 +1072,7 @@
 
                             resources: {
                                 title: 'label.resources',
-                                custom: function(args) {
+                                custom: function (args) {
                                     var $resources = cloudStack.uiCustom
                                         .projectsTabs.dashboardTabs.resources({
                                             projectID: args.context.projects[0].id
@@ -1125,13 +1109,13 @@
                         }
                     },
 
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         $.ajax({
                             url: createURL('listProjectInvitations'),
                             data: {
                                 state: 'Pending'
                             },
-                            success: function(data) {
+                            success: function (data) {
                                 args.response.success({
                                     actionFilter: projectInvitationActionFilter,
                                     data: data.listprojectinvitationsresponse.projectinvitation ? data.listprojectinvitationsresponse.projectinvitation : []
@@ -1145,7 +1129,7 @@
                             label: 'label.enter.token',
                             isHeader: true,
                             addRow: false,
-                            preFilter: function(args) {
+                            preFilter: function (args) {
                                 var invitationsPresent = false;
 
                                 $.ajax({
@@ -1154,7 +1138,7 @@
                                         state: 'Pending'
                                     },
                                     async: false,
-                                    success: function(json) {
+                                    success: function (json) {
                                         if (json.listprojectinvitationsresponse.count) {
                                             invitationsPresent = true;
                                         }
@@ -1182,27 +1166,27 @@
                                     }
                                 }
                             },
-                            action: function(args) {
+                            action: function (args) {
                                 $.ajax({
                                     url: createURL('updateProjectInvitation'),
                                     data: args.data,
-                                    success: function(json) {
+                                    success: function (json) {
                                         args.response.success({
                                             _custom: {
                                                 jobId: json.updateprojectinvitationresponse.jobid
                                             }
                                         });
                                     },
-                                    error: function(json) {
+                                    error: function (json) {
                                         args.response.error(parseXMLHttpResponse(json));
                                     }
                                 });
                             },
                             messages: {
-                                notification: function() {
+                                notification: function () {
                                     return 'label.accept.project.invitation';
                                 },
-                                complete: function() {
+                                complete: function () {
                                     return 'message.join.project';
                                 }
                             },
@@ -1213,7 +1197,7 @@
 
                         accept: {
                             label: 'label.accept.project.invitation',
-                            action: function(args) {
+                            action: function (args) {
                                 $.ajax({
                                     url: createURL('updateProjectInvitation'),
                                     data: {
@@ -1222,11 +1206,11 @@
                                         domainid: args.context.users[0].domainid,
                                         accept: true
                                     },
-                                    success: function(data) {
+                                    success: function (data) {
                                         args.response.success({
                                             _custom: {
                                                 jobId: data.updateprojectinvitationresponse.jobid,
-                                                getUpdatedItem: function() {
+                                                getUpdatedItem: function () {
                                                     return {
                                                         state: 'Accepted'
                                                     };
@@ -1237,10 +1221,10 @@
                                 });
                             },
                             messages: {
-                                confirm: function() {
+                                confirm: function () {
                                     return 'message.confirm.join.project';
                                 },
-                                notification: function() {
+                                notification: function () {
                                     return 'label.accept.project.invitation';
                                 }
                             },
@@ -1251,7 +1235,7 @@
 
                         decline: {
                             label: 'label.decline.invitation',
-                            action: function(args) {
+                            action: function (args) {
                                 $.ajax({
                                     url: createURL('updateProjectInvitation'),
                                     data: {
@@ -1260,11 +1244,11 @@
                                         accept: false
                                     },
 
-                                    success: function(data) {
+                                    success: function (data) {
                                         args.response.success({
                                             _custom: {
                                                 jobId: data.updateprojectinvitationresponse.jobid,
-                                                getUpdatedItem: function() {
+                                                getUpdatedItem: function () {
                                                     return {
                                                         state: 'Declined'
                                                     };
@@ -1278,10 +1262,10 @@
                                 poll: pollAsyncJobResult
                             },
                             messages: {
-                                confirm: function() {
+                                confirm: function () {
                                     return 'message.decline.invitation';
                                 },
-                                notification: function() {
+                                notification: function () {
                                     return 'label.decline.invitation';
                                 }
                             }
@@ -1292,7 +1276,7 @@
         }
     };
 
-    var projectsActionFilter = function(args) {
+    var projectsActionFilter = function (args) {
         var allowedActions = ['remove', 'edit'];
 
         if (args.context.item.account == cloudStack.context.users[0].account ||
@@ -1309,7 +1293,7 @@
         return [];
     };
 
-    var projectInvitationActionFilter = function(args) {
+    var projectInvitationActionFilter = function (args) {
         var state = args.context.item.state;
 
         if (state == 'Accepted' || state == 'Completed' || state == 'Declined') {

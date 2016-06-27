@@ -1,21 +1,18 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.agent;
 
+import com.cloud.agent.Agent.ExitStatus;
+import com.cloud.agent.dao.StorageComponent;
+import com.cloud.agent.dao.impl.PropertiesStorage;
+import com.cloud.resource.ServerResource;
+import com.cloud.utils.LogUtils;
+import com.cloud.utils.NumbersUtil;
+import com.cloud.utils.ProcessUtil;
+import com.cloud.utils.PropertiesUtil;
+import com.cloud.utils.backoff.BackoffAlgorithm;
+import com.cloud.utils.backoff.impl.ConstantTimeBackoff;
+import com.cloud.utils.exception.CloudRuntimeException;
+
+import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -30,20 +27,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
-import javax.naming.ConfigurationException;
-
-import com.cloud.agent.Agent.ExitStatus;
-import com.cloud.agent.dao.StorageComponent;
-import com.cloud.agent.dao.impl.PropertiesStorage;
-import com.cloud.resource.ServerResource;
-import com.cloud.utils.LogUtils;
-import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.ProcessUtil;
-import com.cloud.utils.PropertiesUtil;
-import com.cloud.utils.backoff.BackoffAlgorithm;
-import com.cloud.utils.backoff.impl.ConstantTimeBackoff;
-import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.apache.commons.daemon.DaemonInitException;
@@ -56,7 +39,8 @@ public class AgentShell implements IAgentShell, Daemon {
     private static final Logger s_logger = LoggerFactory.getLogger(AgentShell.class.getName());
 
     private final Properties _properties = new Properties();
-    private final Map<String, Object> _cmdLineProperties = new HashMap<String, Object>();
+    private final Map<String, Object> _cmdLineProperties = new HashMap<>();
+    private final List<Agent> _agents = new ArrayList<>();
     private StorageComponent _storage;
     private BackoffAlgorithm _backoff;
     private String _version;
@@ -71,93 +55,70 @@ public class AgentShell implements IAgentShell, Daemon {
     private int _nextAgentId = 1;
     private volatile boolean _exit = false;
     private int _pingRetries;
-    private final List<Agent> _agents = new ArrayList<Agent>();
 
     public AgentShell() {
     }
 
-    @Override
-    public Properties getProperties() {
-        return _properties;
+    public static void main(final String[] args) {
+        try {
+            s_logger.debug("Initializing AgentShell from main");
+            final AgentShell shell = new AgentShell();
+            shell.init(args);
+            shell.start();
+        } catch (final ConfigurationException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-    @Override
-    public BackoffAlgorithm getBackoffAlgorithm() {
-        return _backoff;
-    }
+    public void init(final String[] args) throws ConfigurationException {
 
-    @Override
-    public int getPingRetries() {
-        return _pingRetries;
-    }
+        // PropertiesUtil is used both in management server and agent packages,
+        // it searches path under class path and common J2EE containers
+        // For KVM agent, do it specially here
 
-    @Override
-    public String getVersion() {
-        return _version;
-    }
+        File file = new File("/etc/cosmic/agent/log4j-cloud.xml");
+        if (!file.exists()) {
+            file = PropertiesUtil.findConfigFile("log4j-cloud.xml");
+        }
 
-    @Override
-    public String getZone() {
-        return _zone;
-    }
+        if (null != file) {
+            DOMConfigurator.configureAndWatch(file.getAbsolutePath());
 
-    @Override
-    public String getPod() {
-        return _pod;
-    }
+            s_logger.info("Agent started");
+        } else {
+            s_logger.error("Could not start the Agent because the absolut path of the \"log4j-cloud.xml\" file cannot be determined.");
+        }
 
-    @Override
-    public String getHost() {
-        return _host;
-    }
+        final Class<?> c = this.getClass();
+        _version = c.getPackage().getImplementationVersion();
+        if (_version == null) {
+            throw new CloudRuntimeException("Unable to find the implementation version of this agent");
+        }
+        s_logger.info("Implementation Version is " + _version);
 
-    @Override
-    public String getPrivateIp() {
-        return _privateIp;
-    }
+        loadProperties();
+        parseCommand(args);
 
-    @Override
-    public int getPort() {
-        return _port;
-    }
+        if (s_logger.isDebugEnabled()) {
+            final List<String> properties = Collections.list((Enumeration<String>) _properties.propertyNames());
+            for (final String property : properties) {
+                s_logger.debug("Found property: " + property);
+            }
+        }
 
-    @Override
-    public int getProxyPort() {
-        return _proxyPort;
-    }
+        s_logger.info("Defaulting to using properties file for storage");
+        _storage = new PropertiesStorage();
+        _storage.configure("Storage", new HashMap<>());
 
-    @Override
-    public int getWorkers() {
-        return _workers;
-    }
+        // merge with properties from command line to let resource access
+        // command line parameters
+        for (final Map.Entry<String, Object> cmdLineProp : getCmdLineProperties().entrySet()) {
+            _properties.put(cmdLineProp.getKey(), cmdLineProp.getValue());
+        }
 
-    @Override
-    public String getGuid() {
-        return _guid;
-    }
-
-    @Override
-    public Map<String, Object> getCmdLineProperties() {
-        return _cmdLineProperties;
-    }
-
-    public String getProperty(String prefix, String name) {
-        if (prefix != null)
-            return _properties.getProperty(prefix + "." + name);
-
-        return _properties.getProperty(name);
-    }
-
-    @Override
-    public String getPersistentProperty(String prefix, String name) {
-        if (prefix != null)
-            return _storage.get(prefix + "." + name);
-        return _storage.get(name);
-    }
-
-    @Override
-    public void setPersistentProperty(String prefix, String name, String value) {
-        // Don't let the agent edit the configuration file.
+        s_logger.info("Defaulting to the constant time backoff algorithm");
+        _backoff = new ConstantTimeBackoff();
+        _backoff.configure("ConstantTimeBackoff", new HashMap<>());
     }
 
     void loadProperties() throws ConfigurationException {
@@ -185,7 +146,7 @@ public class AgentShell implements IAgentShell, Daemon {
         String zone = null;
         String pod = null;
         String guid = null;
-        for (String param : args) {
+        for (final String param : args) {
             final String[] tokens = param.split("=");
             if (tokens.length != 2) {
                 System.out.println("Invalid Parameter: " + param);
@@ -240,18 +201,20 @@ public class AgentShell implements IAgentShell, Daemon {
         }
         _host = host;
 
-        if (zone != null)
+        if (zone != null) {
             _zone = zone;
-        else
+        } else {
             _zone = getProperty(null, "zone");
+        }
         if (_zone == null || (_zone.startsWith("@") && _zone.endsWith("@"))) {
             _zone = "default";
         }
 
-        if (pod != null)
+        if (pod != null) {
             _pod = pod;
-        else
+        } else {
             _pod = getProperty(null, "pod");
+        }
         if (_pod == null || (_pod.startsWith("@") && _pod.endsWith("@"))) {
             _pod = "default";
         }
@@ -263,13 +226,14 @@ public class AgentShell implements IAgentShell, Daemon {
         final String retries = getProperty(null, "ping.retries");
         _pingRetries = NumbersUtil.parseInt(retries, 5);
 
-        String value = getProperty(null, "developer");
-        boolean developer = Boolean.parseBoolean(value);
+        final String value = getProperty(null, "developer");
+        final boolean developer = Boolean.parseBoolean(value);
 
-        if (guid != null)
+        if (guid != null) {
             _guid = guid;
-        else
+        } else {
             _guid = getProperty(null, "guid");
+        }
         if (_guid == null) {
             if (!developer) {
                 throw new ConfigurationException("Unable to find the guid");
@@ -282,68 +246,93 @@ public class AgentShell implements IAgentShell, Daemon {
     }
 
     @Override
-    public void init(DaemonContext dc) throws DaemonInitException {
-        s_logger.debug("Initializing AgentShell from JSVC");
-        try {
-            init(dc.getArguments());
-        } catch (ConfigurationException ex) {
-            throw new DaemonInitException("Initialization failed", ex);
-        }
+    public Map<String, Object> getCmdLineProperties() {
+        return _cmdLineProperties;
     }
 
-    public void init(String[] args) throws ConfigurationException {
+    @Override
+    public Properties getProperties() {
+        return _properties;
+    }
 
-        // PropertiesUtil is used both in management server and agent packages,
-        // it searches path under class path and common J2EE containers
-        // For KVM agent, do it specially here
+    @Override
+    public String getPersistentProperty(final String prefix, final String name) {
+        if (prefix != null) {
+            return _storage.get(prefix + "." + name);
+        }
+        return _storage.get(name);
+    }
 
-        File file = new File("/etc/cosmic/agent/log4j-cloud.xml");
-        if (!file.exists()) {
-            file = PropertiesUtil.findConfigFile("log4j-cloud.xml");
+    @Override
+    public void setPersistentProperty(final String prefix, final String name, final String value) {
+        // Don't let the agent edit the configuration file.
+    }
+
+    @Override
+    public String getHost() {
+        return _host;
+    }
+
+    @Override
+    public String getPrivateIp() {
+        return _privateIp;
+    }
+
+    @Override
+    public int getPort() {
+        return _port;
+    }
+
+    @Override
+    public int getWorkers() {
+        return _workers;
+    }
+
+    @Override
+    public int getProxyPort() {
+        return _proxyPort;
+    }
+
+    @Override
+    public String getGuid() {
+        return _guid;
+    }
+
+    @Override
+    public String getZone() {
+        return _zone;
+    }
+
+    @Override
+    public String getPod() {
+        return _pod;
+    }
+
+    @Override
+    public BackoffAlgorithm getBackoffAlgorithm() {
+        return _backoff;
+    }
+
+    @Override
+    public int getPingRetries() {
+        return _pingRetries;
+    }
+
+    @Override
+    public String getVersion() {
+        return _version;
+    }
+
+    public String getProperty(final String prefix, final String name) {
+        if (prefix != null) {
+            return _properties.getProperty(prefix + "." + name);
         }
 
-        if (null != file) {
-            DOMConfigurator.configureAndWatch(file.getAbsolutePath());
-
-            s_logger.info("Agent started");
-        } else {
-            s_logger.error("Could not start the Agent because the absolut path of the \"log4j-cloud.xml\" file cannot be determined.");
-        }
-
-        final Class<?> c = this.getClass();
-        _version = c.getPackage().getImplementationVersion();
-        if (_version == null) {
-            throw new CloudRuntimeException("Unable to find the implementation version of this agent");
-        }
-        s_logger.info("Implementation Version is " + _version);
-
-        loadProperties();
-        parseCommand(args);
-
-        if (s_logger.isDebugEnabled()) {
-            List<String> properties = Collections.list((Enumeration<String>)_properties.propertyNames());
-            for (String property : properties) {
-                s_logger.debug("Found property: " + property);
-            }
-        }
-
-        s_logger.info("Defaulting to using properties file for storage");
-        _storage = new PropertiesStorage();
-        _storage.configure("Storage", new HashMap<String, Object>());
-
-        // merge with properties from command line to let resource access
-        // command line parameters
-        for (Map.Entry<String, Object> cmdLineProp : getCmdLineProperties().entrySet()) {
-            _properties.put(cmdLineProp.getKey(), cmdLineProp.getValue());
-        }
-
-        s_logger.info("Defaulting to the constant time backoff algorithm");
-        _backoff = new ConstantTimeBackoff();
-        _backoff.configure("ConstantTimeBackoff", new HashMap<String, Object>());
+        return _properties.getProperty(name);
     }
 
     private void launchAgent() throws ConfigurationException {
-        String resourceClassNames = getProperty(null, "resource");
+        final String resourceClassNames = getProperty(null, "resource");
         s_logger.trace("resource=" + resourceClassNames);
         if (resourceClassNames != null) {
             launchAgentFromClassInfo(resourceClassNames);
@@ -353,15 +342,15 @@ public class AgentShell implements IAgentShell, Daemon {
         launchAgentFromTypeInfo();
     }
 
-    private void launchAgentFromClassInfo(String resourceClassNames) throws ConfigurationException {
-        String[] names = resourceClassNames.split("\\|");
-        for (String name : names) {
-            Class<?> impl;
+    private void launchAgentFromClassInfo(final String resourceClassNames) throws ConfigurationException {
+        final String[] names = resourceClassNames.split("\\|");
+        for (final String name : names) {
+            final Class<?> impl;
             try {
                 impl = Class.forName(name);
                 final Constructor<?> constructor = impl.getDeclaredConstructor();
                 constructor.setAccessible(true);
-                ServerResource resource = (ServerResource)constructor.newInstance();
+                final ServerResource resource = (ServerResource) constructor.newInstance();
                 launchAgent(getNextAgentId(), resource);
             } catch (final ClassNotFoundException e) {
                 throw new ConfigurationException("Resource class not found: " + name + " due to: " + e.toString());
@@ -382,7 +371,7 @@ public class AgentShell implements IAgentShell, Daemon {
     }
 
     private void launchAgentFromTypeInfo() throws ConfigurationException {
-        String typeInfo = getProperty(null, "type");
+        final String typeInfo = getProperty(null, "type");
         if (typeInfo == null) {
             s_logger.error("Unable to retrieve the type");
             throw new ConfigurationException("Unable to retrieve the type of this agent.");
@@ -390,9 +379,9 @@ public class AgentShell implements IAgentShell, Daemon {
         s_logger.trace("Launching agent based on type=" + typeInfo);
     }
 
-    private void launchAgent(int localAgentId, ServerResource resource) throws ConfigurationException {
+    private void launchAgent(final int localAgentId, final ServerResource resource) throws ConfigurationException {
         // we don't track agent after it is launched for now
-        Agent agent = new Agent(this, localAgentId, resource);
+        final Agent agent = new Agent(this, localAgentId, resource);
         _agents.add(agent);
         agent.start();
     }
@@ -402,19 +391,29 @@ public class AgentShell implements IAgentShell, Daemon {
     }
 
     @Override
+    public void init(final DaemonContext dc) throws DaemonInitException {
+        s_logger.debug("Initializing AgentShell from JSVC");
+        try {
+            init(dc.getArguments());
+        } catch (final ConfigurationException ex) {
+            throw new DaemonInitException("Initialization failed", ex);
+        }
+    }
+
+    @Override
     public void start() {
         try {
             /* By default we only search for log4j.xml */
             LogUtils.initLog4j("log4j-cloud.xml");
 
             boolean ipv6disabled = false;
-            String ipv6 = getProperty(null, "ipv6disabled");
+            final String ipv6 = getProperty(null, "ipv6disabled");
             if (ipv6 != null) {
                 ipv6disabled = Boolean.parseBoolean(ipv6);
             }
 
             boolean ipv6prefer = false;
-            String ipv6p = getProperty(null, "ipv6prefer");
+            final String ipv6p = getProperty(null, "ipv6prefer");
             if (ipv6p != null) {
                 ipv6prefer = Boolean.parseBoolean(ipv6p);
             }
@@ -445,7 +444,7 @@ public class AgentShell implements IAgentShell, Daemon {
                 instance += ".";
             }
 
-            String pidDir = getProperty(null, "piddir");
+            final String pidDir = getProperty(null, "piddir");
 
             final String run = "agent." + instance + "pid";
             s_logger.debug("Checking to see if " + run + " exists.");
@@ -454,12 +453,12 @@ public class AgentShell implements IAgentShell, Daemon {
             launchAgent();
 
             try {
-                while (!_exit)
+                while (!_exit) {
                     Thread.sleep(1000);
-            } catch (InterruptedException e) {
+                }
+            } catch (final InterruptedException e) {
                 s_logger.debug("[ignored] AgentShell was interupted.");
             }
-
         } catch (final ConfigurationException e) {
             s_logger.error("Unable to start agent: " + e.getMessage());
             System.out.println("Unable to start agent: " + e.getMessage());
@@ -480,16 +479,4 @@ public class AgentShell implements IAgentShell, Daemon {
     public void destroy() {
 
     }
-
-    public static void main(String[] args) {
-        try {
-            s_logger.debug("Initializing AgentShell from main");
-            AgentShell shell = new AgentShell();
-            shell.init(args);
-            shell.start();
-        } catch (ConfigurationException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
 }

@@ -1,32 +1,16 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.Date;
-import java.util.Map;
 
 import com.cloud.serializer.Param;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.StoragePoolStatus;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import java.util.Date;
+import java.util.Map;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = StoragePool.class)
 public class StoragePoolResponse extends BaseResponse {
@@ -126,7 +110,7 @@ public class StoragePoolResponse extends BaseResponse {
         return caps;
     }
 
-    public void setCaps(Map<String, String> cap) {
+    public void setCaps(final Map<String, String> cap) {
         this.caps = cap;
     }
 
@@ -140,7 +124,7 @@ public class StoragePoolResponse extends BaseResponse {
     /**
      * @param scope the scope to set
      */
-    public void setScope(String scope) {
+    public void setScope(final String scope) {
         this.scope = scope;
     }
 
@@ -148,7 +132,7 @@ public class StoragePoolResponse extends BaseResponse {
         return hypervisor;
     }
 
-    public void setHypervisor(String hypervisor) {
+    public void setHypervisor(final String hypervisor) {
         this.hypervisor = hypervisor;
     }
 
@@ -161,7 +145,7 @@ public class StoragePoolResponse extends BaseResponse {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -169,7 +153,7 @@ public class StoragePoolResponse extends BaseResponse {
         return zoneId;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
@@ -177,7 +161,7 @@ public class StoragePoolResponse extends BaseResponse {
         return zoneName;
     }
 
-    public void setZoneName(String zoneName) {
+    public void setZoneName(final String zoneName) {
         this.zoneName = zoneName;
     }
 
@@ -185,7 +169,7 @@ public class StoragePoolResponse extends BaseResponse {
         return podId;
     }
 
-    public void setPodId(String podId) {
+    public void setPodId(final String podId) {
         this.podId = podId;
     }
 
@@ -193,7 +177,7 @@ public class StoragePoolResponse extends BaseResponse {
         return podName;
     }
 
-    public void setPodName(String podName) {
+    public void setPodName(final String podName) {
         this.podName = podName;
     }
 
@@ -201,7 +185,7 @@ public class StoragePoolResponse extends BaseResponse {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -209,7 +193,7 @@ public class StoragePoolResponse extends BaseResponse {
         return ipAddress;
     }
 
-    public void setIpAddress(String ipAddress) {
+    public void setIpAddress(final String ipAddress) {
         this.ipAddress = ipAddress;
     }
 
@@ -217,7 +201,7 @@ public class StoragePoolResponse extends BaseResponse {
         return path;
     }
 
-    public void setPath(String path) {
+    public void setPath(final String path) {
         this.path = path;
     }
 
@@ -225,7 +209,7 @@ public class StoragePoolResponse extends BaseResponse {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 
@@ -233,7 +217,7 @@ public class StoragePoolResponse extends BaseResponse {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -241,7 +225,7 @@ public class StoragePoolResponse extends BaseResponse {
         return clusterId;
     }
 
-    public void setClusterId(String clusterId) {
+    public void setClusterId(final String clusterId) {
         this.clusterId = clusterId;
     }
 
@@ -249,7 +233,7 @@ public class StoragePoolResponse extends BaseResponse {
         return clusterName;
     }
 
-    public void setClusterName(String clusterName) {
+    public void setClusterName(final String clusterName) {
         this.clusterName = clusterName;
     }
 
@@ -257,7 +241,7 @@ public class StoragePoolResponse extends BaseResponse {
         return diskSizeTotal;
     }
 
-    public void setDiskSizeTotal(Long diskSizeTotal) {
+    public void setDiskSizeTotal(final Long diskSizeTotal) {
         this.diskSizeTotal = diskSizeTotal;
     }
 
@@ -265,7 +249,7 @@ public class StoragePoolResponse extends BaseResponse {
         return diskSizeAllocated;
     }
 
-    public void setDiskSizeAllocated(Long diskSizeAllocated) {
+    public void setDiskSizeAllocated(final Long diskSizeAllocated) {
         this.diskSizeAllocated = diskSizeAllocated;
     }
 
@@ -273,7 +257,7 @@ public class StoragePoolResponse extends BaseResponse {
         return diskSizeUsed;
     }
 
-    public void setDiskSizeUsed(Long diskSizeUsed) {
+    public void setDiskSizeUsed(final Long diskSizeUsed) {
         this.diskSizeUsed = diskSizeUsed;
     }
 
@@ -281,7 +265,7 @@ public class StoragePoolResponse extends BaseResponse {
         return capacityIops;
     }
 
-    public void setCapacityIops(Long capacityIops) {
+    public void setCapacityIops(final Long capacityIops) {
         this.capacityIops = capacityIops;
     }
 
@@ -289,7 +273,7 @@ public class StoragePoolResponse extends BaseResponse {
         return tags;
     }
 
-    public void setTags(String tags) {
+    public void setTags(final String tags) {
         this.tags = tags;
     }
 
@@ -297,15 +281,15 @@ public class StoragePoolResponse extends BaseResponse {
         return state;
     }
 
-    public void setState(StoragePoolStatus state) {
+    public void setState(final StoragePoolStatus state) {
         this.state = state;
     }
 
-    public void setSuitableForMigration(Boolean suitableForMigration) {
+    public void setSuitableForMigration(final Boolean suitableForMigration) {
         this.suitableForMigration = suitableForMigration;
     }
 
-    public void setOverProvisionFactor(String overProvisionFactor) {
+    public void setOverProvisionFactor(final String overProvisionFactor) {
         this.overProvisionFactor = overProvisionFactor;
     }
 }

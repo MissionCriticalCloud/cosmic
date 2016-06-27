@@ -1,23 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.admin.usage;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -26,7 +7,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
@@ -34,15 +14,19 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.TrafficTypeImplementorResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "listTrafficTypeImplementors",
-            description = "Lists implementors of implementor of a network traffic type or implementors of all network traffic types",
-            responseObject = TrafficTypeImplementorResponse.class,
-            since = "3.0.0",
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = false)
+        description = "Lists implementors of implementor of a network traffic type or implementors of all network traffic types",
+        responseObject = TrafficTypeImplementorResponse.class,
+        since = "3.0.0",
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = false)
 public class ListTrafficTypeImplementorsCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListTrafficTypeImplementorsCmd.class);
     private static final String s_name = "listtraffictypeimplementorsresponse";
@@ -51,8 +35,8 @@ public class ListTrafficTypeImplementorsCmd extends BaseListCmd {
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
     @Parameter(name = ApiConstants.TRAFFIC_TYPE,
-               type = CommandType.STRING,
-               description = "Optional. The network traffic type, if specified, return its implementor. Otherwise, return all traffic types with their implementor")
+            type = CommandType.STRING,
+            description = "Optional. The network traffic type, if specified, return its implementor. Otherwise, return all traffic types with their implementor")
     private String trafficType;
 
     /////////////////////////////////////////////////////
@@ -65,12 +49,12 @@ public class ListTrafficTypeImplementorsCmd extends BaseListCmd {
 
     @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
-        ResourceAllocationException {
-        List<Pair<TrafficType, String>> results = _networkService.listTrafficTypeImplementor(this);
-        ListResponse<TrafficTypeImplementorResponse> response = new ListResponse<TrafficTypeImplementorResponse>();
-        List<TrafficTypeImplementorResponse> responses = new ArrayList<TrafficTypeImplementorResponse>();
-        for (Pair<TrafficType, String> r : results) {
-            TrafficTypeImplementorResponse p = new TrafficTypeImplementorResponse();
+            ResourceAllocationException {
+        final List<Pair<TrafficType, String>> results = _networkService.listTrafficTypeImplementor(this);
+        final ListResponse<TrafficTypeImplementorResponse> response = new ListResponse<>();
+        final List<TrafficTypeImplementorResponse> responses = new ArrayList<>();
+        for (final Pair<TrafficType, String> r : results) {
+            final TrafficTypeImplementorResponse p = new TrafficTypeImplementorResponse();
             p.setTrafficType(r.first().toString());
             p.setImplementor(r.second());
             p.setObjectName("traffictypeimplementorresponse");
@@ -83,12 +67,12 @@ public class ListTrafficTypeImplementorsCmd extends BaseListCmd {
     }
 
     @Override
-    public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
+    public String getCommandName() {
+        return s_name;
     }
 
     @Override
-    public String getCommandName() {
-        return s_name;
+    public long getEntityOwnerId() {
+        return Account.ACCOUNT_ID_SYSTEM;
     }
 }

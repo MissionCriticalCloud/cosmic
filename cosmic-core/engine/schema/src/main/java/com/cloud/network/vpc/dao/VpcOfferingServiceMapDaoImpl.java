@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.vpc.dao;
-
-import java.util.List;
 
 import com.cloud.network.Network.Service;
 import com.cloud.network.vpc.VpcOfferingServiceMapVO;
@@ -26,6 +8,8 @@ import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -57,30 +41,30 @@ public class VpcOfferingServiceMapDaoImpl extends GenericDaoBase<VpcOfferingServ
     }
 
     @Override
-    public List<VpcOfferingServiceMapVO> listByVpcOffId(long vpcOffId) {
-        SearchCriteria<VpcOfferingServiceMapVO> sc = AllFieldsSearch.create();
+    public List<VpcOfferingServiceMapVO> listByVpcOffId(final long vpcOffId) {
+        final SearchCriteria<VpcOfferingServiceMapVO> sc = AllFieldsSearch.create();
         sc.setParameters("vpcOffId", vpcOffId);
         return listBy(sc);
     }
 
     @Override
-    public boolean areServicesSupportedByNetworkOffering(long networkOfferingId, Service... services) {
-        SearchCriteria<VpcOfferingServiceMapVO> sc = MultipleServicesSearch.create();
+    public boolean areServicesSupportedByNetworkOffering(final long networkOfferingId, final Service... services) {
+        final SearchCriteria<VpcOfferingServiceMapVO> sc = MultipleServicesSearch.create();
         sc.setParameters("vpcOffId", networkOfferingId);
 
         if (services != null) {
-            String[] servicesStr = new String[services.length];
+            final String[] servicesStr = new String[services.length];
 
             int i = 0;
-            for (Service service : services) {
+            for (final Service service : services) {
                 servicesStr[i] = service.getName();
                 i++;
             }
 
-            sc.setParameters("service", (Object[])servicesStr);
+            sc.setParameters("service", (Object[]) servicesStr);
         }
 
-        List<VpcOfferingServiceMapVO> offeringServices = listBy(sc);
+        final List<VpcOfferingServiceMapVO> offeringServices = listBy(sc);
 
         if (services != null) {
             if (offeringServices.size() == services.length) {
@@ -94,16 +78,15 @@ public class VpcOfferingServiceMapDaoImpl extends GenericDaoBase<VpcOfferingServ
     }
 
     @Override
-    public List<String> listServicesForVpcOffering(long offId) {
-        SearchCriteria<String> sc = ServicesSearch.create();
-        ;
+    public List<String> listServicesForVpcOffering(final long offId) {
+        final SearchCriteria<String> sc = ServicesSearch.create();
         sc.setParameters("offeringId", offId);
         return customSearch(sc, null);
     }
 
     @Override
-    public VpcOfferingServiceMapVO findByServiceProviderAndOfferingId(String service, String provider, long vpcOfferingId) {
-        SearchCriteria<VpcOfferingServiceMapVO> sc = AllFieldsSearch.create();
+    public VpcOfferingServiceMapVO findByServiceProviderAndOfferingId(final String service, final String provider, final long vpcOfferingId) {
+        final SearchCriteria<VpcOfferingServiceMapVO> sc = AllFieldsSearch.create();
         sc.setParameters("vpcOffId", vpcOfferingId);
         sc.setParameters("service", service);
         sc.setParameters("provider", provider);

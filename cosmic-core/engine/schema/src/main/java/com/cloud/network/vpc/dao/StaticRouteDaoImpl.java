@@ -1,24 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.vpc.dao;
-
-import java.util.List;
-
-import javax.inject.Inject;
 
 import com.cloud.network.vpc.StaticRoute;
 import com.cloud.network.vpc.StaticRouteVO;
@@ -32,6 +12,9 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
+
+import javax.inject.Inject;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -66,8 +49,8 @@ public class StaticRouteDaoImpl extends GenericDaoBase<StaticRouteVO, Long> impl
     }
 
     @Override
-    public boolean setStateToAdd(StaticRouteVO rule) {
-        SearchCriteria<StaticRouteVO> sc = AllFieldsSearch.create();
+    public boolean setStateToAdd(final StaticRouteVO rule) {
+        final SearchCriteria<StaticRouteVO> sc = AllFieldsSearch.create();
         sc.setParameters("id", rule.getId());
         sc.setParameters("state", StaticRoute.State.Staged);
 
@@ -77,30 +60,30 @@ public class StaticRouteDaoImpl extends GenericDaoBase<StaticRouteVO, Long> impl
     }
 
     @Override
-    public List<? extends StaticRoute> listByVpcIdAndNotRevoked(long vpcId) {
-        SearchCriteria<StaticRouteVO> sc = NotRevokedSearch.create();
+    public List<? extends StaticRoute> listByVpcIdAndNotRevoked(final long vpcId) {
+        final SearchCriteria<StaticRouteVO> sc = NotRevokedSearch.create();
         sc.setParameters("vpcId", vpcId);
         sc.setParameters("state", StaticRoute.State.Revoke);
         return listBy(sc);
     }
 
     @Override
-    public List<StaticRouteVO> listByVpcId(long vpcId) {
-        SearchCriteria<StaticRouteVO> sc = AllFieldsSearch.create();
+    public List<StaticRouteVO> listByVpcId(final long vpcId) {
+        final SearchCriteria<StaticRouteVO> sc = AllFieldsSearch.create();
         sc.setParameters("vpcId", vpcId);
         return listBy(sc);
     }
 
     @Override
     @DB
-    public boolean remove(Long id) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+    public boolean remove(final Long id) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
-        StaticRouteVO entry = findById(id);
+        final StaticRouteVO entry = findById(id);
         if (entry != null) {
             _tagsDao.removeByIdAndType(id, ResourceObjectType.StaticRoute);
         }
-        boolean result = super.remove(id);
+        final boolean result = super.remove(id);
         txn.commit();
         return result;
     }

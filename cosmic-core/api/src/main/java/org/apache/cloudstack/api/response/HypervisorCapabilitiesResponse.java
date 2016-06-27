@@ -1,29 +1,13 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilities;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = HypervisorCapabilities.class)
 public class HypervisorCapabilitiesResponse extends BaseResponse {
@@ -63,7 +47,7 @@ public class HypervisorCapabilitiesResponse extends BaseResponse {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -71,7 +55,7 @@ public class HypervisorCapabilitiesResponse extends BaseResponse {
         return hypervisorVersion;
     }
 
-    public void setHypervisorVersion(String hypervisorVersion) {
+    public void setHypervisorVersion(final String hypervisorVersion) {
         this.hypervisorVersion = hypervisorVersion;
     }
 
@@ -79,7 +63,7 @@ public class HypervisorCapabilitiesResponse extends BaseResponse {
         return hypervisor;
     }
 
-    public void setHypervisor(HypervisorType hypervisor) {
+    public void setHypervisor(final HypervisorType hypervisor) {
         this.hypervisor = hypervisor;
     }
 
@@ -87,7 +71,7 @@ public class HypervisorCapabilitiesResponse extends BaseResponse {
         return maxGuestsLimit;
     }
 
-    public void setMaxGuestsLimit(Long maxGuestsLimit) {
+    public void setMaxGuestsLimit(final Long maxGuestsLimit) {
         this.maxGuestsLimit = maxGuestsLimit;
     }
 
@@ -95,7 +79,7 @@ public class HypervisorCapabilitiesResponse extends BaseResponse {
         return this.isSecurityGroupEnabled;
     }
 
-    public void setIsSecurityGroupEnabled(Boolean sgEnabled) {
+    public void setIsSecurityGroupEnabled(final Boolean sgEnabled) {
         this.isSecurityGroupEnabled = sgEnabled;
     }
 
@@ -103,7 +87,7 @@ public class HypervisorCapabilitiesResponse extends BaseResponse {
         return this.isStorageMotionSupported;
     }
 
-    public void setIsStorageMotionSupported(Boolean smSupported) {
+    public void setIsStorageMotionSupported(final Boolean smSupported) {
         this.isStorageMotionSupported = smSupported;
     }
 
@@ -111,7 +95,7 @@ public class HypervisorCapabilitiesResponse extends BaseResponse {
         return maxDataVolumesLimit;
     }
 
-    public void setMaxDataVolumesLimit(Integer maxDataVolumesLimit) {
+    public void setMaxDataVolumesLimit(final Integer maxDataVolumesLimit) {
         this.maxDataVolumesLimit = maxDataVolumesLimit;
     }
 
@@ -119,7 +103,7 @@ public class HypervisorCapabilitiesResponse extends BaseResponse {
         return maxHostsPerCluster;
     }
 
-    public void setMaxHostsPerCluster(Integer maxHostsPerCluster) {
+    public void setMaxHostsPerCluster(final Integer maxHostsPerCluster) {
         this.maxHostsPerCluster = maxHostsPerCluster;
     }
 }

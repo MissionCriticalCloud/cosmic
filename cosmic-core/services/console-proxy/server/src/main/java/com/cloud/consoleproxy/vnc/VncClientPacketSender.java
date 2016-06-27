@@ -1,20 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.consoleproxy.vnc;
+
+import com.cloud.consoleproxy.util.Logger;
+import com.cloud.consoleproxy.vnc.packet.client.ClientPacket;
+import com.cloud.consoleproxy.vnc.packet.client.FramebufferUpdateRequestPacket;
+import com.cloud.consoleproxy.vnc.packet.client.KeyboardEventPacket;
+import com.cloud.consoleproxy.vnc.packet.client.MouseEventPacket;
+import com.cloud.consoleproxy.vnc.packet.client.SetEncodingsPacket;
+import com.cloud.consoleproxy.vnc.packet.client.SetPixelFormatPacket;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -27,19 +19,11 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import com.cloud.consoleproxy.util.Logger;
-import com.cloud.consoleproxy.vnc.packet.client.ClientPacket;
-import com.cloud.consoleproxy.vnc.packet.client.FramebufferUpdateRequestPacket;
-import com.cloud.consoleproxy.vnc.packet.client.KeyboardEventPacket;
-import com.cloud.consoleproxy.vnc.packet.client.MouseEventPacket;
-import com.cloud.consoleproxy.vnc.packet.client.SetEncodingsPacket;
-import com.cloud.consoleproxy.vnc.packet.client.SetPixelFormatPacket;
-
 public class VncClientPacketSender implements Runnable, PaintNotificationListener, KeyListener, MouseListener, MouseMotionListener, FrameBufferUpdateListener {
     private static final Logger s_logger = Logger.getLogger(VncClientPacketSender.class);
 
     // Queue for outgoing packets
-    private final BlockingQueue<ClientPacket> queue = new ArrayBlockingQueue<ClientPacket>(30);
+    private final BlockingQueue<ClientPacket> queue = new ArrayBlockingQueue<>(30);
 
     private final DataOutputStream os;
     private final VncScreenDescription screen;
@@ -50,7 +34,7 @@ public class VncClientPacketSender implements Runnable, PaintNotificationListene
     // Don't send update request again until we receive next frame buffer update
     private boolean updateRequestSent = false;
 
-    public VncClientPacketSender(DataOutputStream os, VncScreenDescription screen, VncClient vncConnection) {
+    public VncClientPacketSender(final DataOutputStream os, final VncScreenDescription screen, final VncClient vncConnection) {
         this.os = os;
         this.screen = screen;
         this.vncConnection = vncConnection;
@@ -60,7 +44,22 @@ public class VncClientPacketSender implements Runnable, PaintNotificationListene
         requestFullScreenUpdate();
     }
 
-    public void sendClientPacket(ClientPacket packet) {
+    private void sendSetPixelFormat() {
+        if (!screen.isRGB888_32_LE()) {
+            queue.add(new SetPixelFormatPacket(screen, 32, 24, RfbConstants.LITTLE_ENDIAN, RfbConstants.TRUE_COLOR, 255, 255, 255, 16, 8, 0));
+        }
+    }
+
+    private void sendSetEncodings() {
+        queue.add(new SetEncodingsPacket(RfbConstants.SUPPORTED_ENCODINGS_ARRAY));
+    }
+
+    public void requestFullScreenUpdate() {
+        queue.add(new FramebufferUpdateRequestPacket(RfbConstants.FRAMEBUFFER_FULL_UPDATE_REQUEST, 0, 0, screen.getFramebufferWidth(), screen.getFramebufferHeight()));
+        updateRequestSent = true;
+    }
+
+    public void sendClientPacket(final ClientPacket packet) {
         queue.add(packet);
     }
 
@@ -68,13 +67,13 @@ public class VncClientPacketSender implements Runnable, PaintNotificationListene
     public void run() {
         try {
             while (connectionAlive) {
-                ClientPacket packet = queue.poll(1, TimeUnit.SECONDS);
+                final ClientPacket packet = queue.poll(1, TimeUnit.SECONDS);
                 if (packet != null) {
                     packet.write(os);
                     os.flush();
                 }
             }
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             s_logger.error("Unexpected exception: ", e);
             if (connectionAlive) {
                 closeConnection();
@@ -85,30 +84,15 @@ public class VncClientPacketSender implements Runnable, PaintNotificationListene
         }
     }
 
-    private void sendSetEncodings() {
-        queue.add(new SetEncodingsPacket(RfbConstants.SUPPORTED_ENCODINGS_ARRAY));
-    }
-
-    private void sendSetPixelFormat() {
-        if (!screen.isRGB888_32_LE()) {
-            queue.add(new SetPixelFormatPacket(screen, 32, 24, RfbConstants.LITTLE_ENDIAN, RfbConstants.TRUE_COLOR, 255, 255, 255, 16, 8, 0));
-        }
-    }
-
     public void closeConnection() {
         connectionAlive = false;
-    }
-
-    public void requestFullScreenUpdate() {
-        queue.add(new FramebufferUpdateRequestPacket(RfbConstants.FRAMEBUFFER_FULL_UPDATE_REQUEST, 0, 0, screen.getFramebufferWidth(), screen.getFramebufferHeight()));
-        updateRequestSent = true;
     }
 
     @Override
     public void imagePaintedOnScreen() {
         if (!updateRequestSent) {
             queue.add(new FramebufferUpdateRequestPacket(RfbConstants.FRAMEBUFFER_INCREMENTAL_UPDATE_REQUEST, 0, 0, screen.getFramebufferWidth(),
-                screen.getFramebufferHeight()));
+                    screen.getFramebufferHeight()));
             updateRequestSent = true;
         }
     }
@@ -119,38 +103,13 @@ public class VncClientPacketSender implements Runnable, PaintNotificationListene
     }
 
     @Override
-    public void mouseDragged(MouseEvent e) {
+    public void mouseDragged(final MouseEvent e) {
         queue.add(new MouseEventPacket(mapAwtModifiersToVncButtonMask(e.getModifiersEx()), e.getX(), e.getY()));
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
+    public void mouseMoved(final MouseEvent e) {
         queue.add(new MouseEventPacket(mapAwtModifiersToVncButtonMask(e.getModifiersEx()), e.getX(), e.getY()));
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        // Nothing to do
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        queue.add(new MouseEventPacket(mapAwtModifiersToVncButtonMask(e.getModifiersEx()), e.getX(), e.getY()));
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        queue.add(new MouseEventPacket(mapAwtModifiersToVncButtonMask(e.getModifiersEx()), e.getX(), e.getY()));
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        // Nothing to do
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        // Nothing to do
     }
 
     /**
@@ -161,35 +120,59 @@ public class VncClientPacketSender implements Runnable, PaintNotificationListene
      * upwards is represented by a press and release of button 4, and each step
      * downwards is represented by a press and release of button 5.
      *
-     * @param modifiers
-     *            extended modifiers from AWT mouse event
+     * @param modifiers extended modifiers from AWT mouse event
      * @return VNC mouse button mask
      */
-    public static int mapAwtModifiersToVncButtonMask(int modifiers) {
-        int mask =
-            (((modifiers & InputEvent.BUTTON1_DOWN_MASK) != 0) ? 0x1 : 0) | (((modifiers & InputEvent.BUTTON2_DOWN_MASK) != 0) ? 0x2 : 0) |
-                (((modifiers & InputEvent.BUTTON3_DOWN_MASK) != 0) ? 0x4 : 0);
+    public static int mapAwtModifiersToVncButtonMask(final int modifiers) {
+        final int mask =
+                (((modifiers & InputEvent.BUTTON1_DOWN_MASK) != 0) ? 0x1 : 0) | (((modifiers & InputEvent.BUTTON2_DOWN_MASK) != 0) ? 0x2 : 0) |
+                        (((modifiers & InputEvent.BUTTON3_DOWN_MASK) != 0) ? 0x4 : 0);
         return mask;
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
+    public void mouseClicked(final MouseEvent e) {
+        // Nothing to do
+    }
+
+    @Override
+    public void mousePressed(final MouseEvent e) {
+        queue.add(new MouseEventPacket(mapAwtModifiersToVncButtonMask(e.getModifiersEx()), e.getX(), e.getY()));
+    }
+
+    @Override
+    public void mouseReleased(final MouseEvent e) {
+        queue.add(new MouseEventPacket(mapAwtModifiersToVncButtonMask(e.getModifiersEx()), e.getX(), e.getY()));
+    }
+
+    @Override
+    public void mouseEntered(final MouseEvent e) {
+        // Nothing to do
+    }
+
+    @Override
+    public void mouseExited(final MouseEvent e) {
+        // Nothing to do
+    }
+
+    @Override
+    public void keyTyped(final KeyEvent e) {
         // Do nothing
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        ClientPacket request = new KeyboardEventPacket(RfbConstants.KEY_DOWN, mapAwtKeyToVncKey(e.getKeyCode()));
+    public void keyPressed(final KeyEvent e) {
+        final ClientPacket request = new KeyboardEventPacket(RfbConstants.KEY_DOWN, mapAwtKeyToVncKey(e.getKeyCode()));
         queue.add(request);
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-        ClientPacket request = new KeyboardEventPacket(RfbConstants.KEY_UP, mapAwtKeyToVncKey(e.getKeyCode()));
+    public void keyReleased(final KeyEvent e) {
+        final ClientPacket request = new KeyboardEventPacket(RfbConstants.KEY_UP, mapAwtKeyToVncKey(e.getKeyCode()));
         queue.add(request);
     }
 
-    private int mapAwtKeyToVncKey(int key) {
+    private int mapAwtKeyToVncKey(final int key) {
         switch (key) {
             case KeyEvent.VK_BACK_SPACE:
                 return 0xff08;
@@ -259,5 +242,4 @@ public class VncClientPacketSender implements Runnable, PaintNotificationListene
 
         return key;
     }
-
 }

@@ -1,36 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.storage.cache.manager;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.configuration.Config;
@@ -42,7 +10,6 @@ import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.exception.CloudRuntimeException;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.CopyCommandResult;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataMotionService;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
@@ -60,11 +27,28 @@ import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 import org.apache.cloudstack.storage.cache.allocator.StorageCacheAllocator;
 import org.apache.cloudstack.storage.datastore.ObjectInDataStoreManager;
 import org.apache.cloudstack.storage.datastore.db.ImageStoreVO;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class StorageCacheManagerImpl implements StorageCacheManager, Manager {
     private static final Logger s_logger = LoggerFactory.getLogger(StorageCacheManagerImpl.class);
+    private static final Object templateLock = new Object();
+    private static final Object volumeLock = new Object();
+    private static final Object snapshotLock = new Object();
     @Inject
     List<StorageCacheAllocator> storageCacheAllocator;
     @Inject
@@ -81,40 +65,13 @@ public class StorageCacheManagerImpl implements StorageCacheManager, Manager {
     int workers;
     ScheduledExecutorService executors;
     int cacheReplaceMentInterval;
-    private static final Object templateLock = new Object();
-    private static final Object volumeLock = new Object();
-    private static final Object snapshotLock = new Object();
-
-    @Override
-    public DataStore getCacheStorage(Scope scope) {
-        for (StorageCacheAllocator allocator : storageCacheAllocator) {
-            DataStore store = allocator.getCacheStore(scope);
-            if (store != null) {
-                return store;
-            }
-        }
-        return null;
-    }
-
-
-    @Override
-    public DataStore getCacheStorage(DataObject data, Scope scope) {
-        for (StorageCacheAllocator allocator : storageCacheAllocator) {
-            DataStore store = allocator.getCacheStore(data, scope);
-            if (store != null) {
-                return store;
-            }
-        }
-        return null;
-    }
-
 
     protected List<DataStore> getCacheStores() {
-        QueryBuilder<ImageStoreVO> sc = QueryBuilder.create(ImageStoreVO.class);
+        final QueryBuilder<ImageStoreVO> sc = QueryBuilder.create(ImageStoreVO.class);
         sc.and(sc.entity().getRole(), SearchCriteria.Op.EQ, DataStoreRole.ImageCache);
-        List<ImageStoreVO> imageStoreVOs = sc.list();
-        List<DataStore> stores = new ArrayList<DataStore>();
-        for (ImageStoreVO vo : imageStoreVOs) {
+        final List<ImageStoreVO> imageStoreVOs = sc.list();
+        final List<DataStore> stores = new ArrayList<>();
+        for (final ImageStoreVO vo : imageStoreVOs) {
             stores.add(dataStoreManager.getDataStore(vo.getId(), vo.getRole()));
         }
         return stores;
@@ -127,13 +84,18 @@ public class StorageCacheManagerImpl implements StorageCacheManager, Manager {
     }
 
     @Override
-    public void setName(String name) {
-        // TODO Auto-generated method stub
-
+    public DataStore getCacheStorage(final Scope scope) {
+        for (final StorageCacheAllocator allocator : storageCacheAllocator) {
+            final DataStore store = allocator.getCacheStore(scope);
+            if (store != null) {
+                return store;
+            }
+        }
+        return null;
     }
 
     @Override
-    public void setConfigParams(Map<String, Object> params) {
+    public void setName(final String name) {
         // TODO Auto-generated method stub
 
     }
@@ -145,23 +107,56 @@ public class StorageCacheManagerImpl implements StorageCacheManager, Manager {
     }
 
     @Override
+    public DataStore getCacheStorage(final DataObject data, final Scope scope) {
+        for (final StorageCacheAllocator allocator : storageCacheAllocator) {
+            final DataStore store = allocator.getCacheStore(data, scope);
+            if (store != null) {
+                return store;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void setConfigParams(final Map<String, Object> params) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
     public int getRunLevel() {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    public void setRunLevel(int level) {
+    public void setRunLevel(final int level) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public boolean configure(String name, Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         cacheReplacementEnabled = Boolean.parseBoolean(configDao.getValue(Config.StorageCacheReplacementEnabled.key()));
         cacheReplaceMentInterval = NumbersUtil.parseInt(configDao.getValue(Config.StorageCacheReplacementInterval.key()), 86400);
         workers = NumbersUtil.parseInt(configDao.getValue(Config.ExpungeWorkers.key()), 10);
         executors = Executors.newScheduledThreadPool(workers, new NamedThreadFactory("StorageCacheManager-cache-replacement"));
+        return true;
+    }
+
+    @Override
+    public boolean start() {
+        if (cacheReplacementEnabled) {
+            final Random generator = new Random();
+            final int initalDelay = generator.nextInt(cacheReplaceMentInterval);
+            executors.scheduleWithFixedDelay(new CacheReplacementRunner(), initalDelay, cacheReplaceMentInterval, TimeUnit.SECONDS);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean stop() {
+        // TODO Auto-generated method stub
         return true;
     }
 
@@ -173,11 +168,11 @@ public class StorageCacheManagerImpl implements StorageCacheManager, Manager {
             try {
                 replacementLock = GlobalLock.getInternLock("storageCacheMgr.replacement");
                 if (replacementLock.lock(3)) {
-                    List<DataStore> stores = getCacheStores();
+                    final List<DataStore> stores = getCacheStores();
                     Collections.shuffle(stores);
                     DataObject object = null;
                     DataStore findAStore = null;
-                    for (DataStore store : stores) {
+                    for (final DataStore store : stores) {
                         object = cacheReplacementAlgorithm.chooseOneToBeReplaced(store);
                         findAStore = store;
                         if (object != null) {
@@ -194,7 +189,7 @@ public class StorageCacheManagerImpl implements StorageCacheManager, Manager {
                         object = cacheReplacementAlgorithm.chooseOneToBeReplaced(findAStore);
                     }
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 s_logger.debug("Failed to execute CacheReplacementRunner: " + e.toString());
             } finally {
                 if (replacementLock != null) {
@@ -205,23 +200,7 @@ public class StorageCacheManagerImpl implements StorageCacheManager, Manager {
     }
 
     @Override
-    public boolean start() {
-        if (cacheReplacementEnabled) {
-            Random generator = new Random();
-            int initalDelay = generator.nextInt(cacheReplaceMentInterval);
-            executors.scheduleWithFixedDelay(new CacheReplacementRunner(), initalDelay, cacheReplaceMentInterval, TimeUnit.SECONDS);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean stop() {
-        // TODO Auto-generated method stub
-        return true;
-    }
-
-    @Override
-    public DataObject createCacheObject(DataObject data, DataStore store) {
+    public DataObject createCacheObject(final DataObject data, final DataStore store) {
         DataObject objOnCacheStore = null;
         final Object lock;
         final DataObjectType type = data.getType();
@@ -242,7 +221,7 @@ public class StorageCacheManagerImpl implements StorageCacheManager, Manager {
             lock = snapshotLock;
             typeName = "snapshot";
         } else {
-            String msg = "unsupported DataObject comes, then can't acquire correct lock object";
+            final String msg = "unsupported DataObject comes, then can't acquire correct lock object";
             throw new CloudRuntimeException(msg);
         }
         s_logger.debug("check " + typeName + " cache entry(id: " + dataId + ") on store(id: " + storeId + ")");
@@ -253,19 +232,19 @@ public class StorageCacheManagerImpl implements StorageCacheManager, Manager {
             if (obj != null) {
                 State st = obj.getState();
 
-                long miliSeconds = 10000;
-                long timeoutSeconds = 3600;
-                long timeoutMiliSeconds = timeoutSeconds * 1000;
+                final long miliSeconds = 10000;
+                final long timeoutSeconds = 3600;
+                final long timeoutMiliSeconds = timeoutSeconds * 1000;
                 Date now = new Date();
-                long expiredEpoch = now.getTime() + timeoutMiliSeconds;
-                Date expiredDate = new Date(expiredEpoch);
+                final long expiredEpoch = now.getTime() + timeoutMiliSeconds;
+                final Date expiredDate = new Date(expiredEpoch);
 
                 /*
                  * Waiting for completion of cache copy.
                  */
                 while (st == ObjectInDataStoreStateMachine.State.Allocated ||
-                    st == ObjectInDataStoreStateMachine.State.Creating ||
-                    st == ObjectInDataStoreStateMachine.State.Copying) {
+                        st == ObjectInDataStoreStateMachine.State.Creating ||
+                        st == ObjectInDataStoreStateMachine.State.Copying) {
 
                     /*
                      * Threads must release lock within waiting for cache copy and
@@ -274,14 +253,14 @@ public class StorageCacheManagerImpl implements StorageCacheManager, Manager {
                     s_logger.debug("waiting cache copy completion type: " + typeName + ", id: " + obj.getObjectId() + ", lock: " + lock.hashCode());
                     try {
                         lock.wait(miliSeconds);
-                    } catch (InterruptedException e) {
+                    } catch (final InterruptedException e) {
                         s_logger.debug("[ignored] interupted while waiting for cache copy completion.");
                     }
                     s_logger.debug("waken up");
 
                     now = new Date();
                     if (now.after(expiredDate)) {
-                        String msg = "Waiting time exceeds timeout limit(" + timeoutSeconds + " s)";
+                        final String msg = "Waiting time exceeds timeout limit(" + timeoutSeconds + " s)";
                         throw new CloudRuntimeException(msg);
                     }
 
@@ -291,13 +270,13 @@ public class StorageCacheManagerImpl implements StorageCacheManager, Manager {
 
                 if (st == ObjectInDataStoreStateMachine.State.Ready) {
                     s_logger.debug("there is already one in the cache store");
-                    DataObject dataObj = objectInStoreMgr.get(data, store);
+                    final DataObject dataObj = objectInStoreMgr.get(data, store);
                     dataObj.incRefCount();
                     existingDataObj = dataObj;
                 }
             }
 
-            if(existingDataObj == null) {
+            if (existingDataObj == null) {
                 s_logger.debug("create " + typeName + " cache entry(id: " + dataId + ") on store(id: " + storeId + ")");
                 objOnCacheStore = store.create(data);
             }
@@ -311,7 +290,7 @@ public class StorageCacheManagerImpl implements StorageCacheManager, Manager {
             return null;
         }
 
-        AsyncCallFuture<CopyCommandResult> future = new AsyncCallFuture<CopyCommandResult>();
+        final AsyncCallFuture<CopyCommandResult> future = new AsyncCallFuture<>();
         CopyCommandResult result = null;
         try {
             objOnCacheStore.processEvent(Event.CreateOnlyRequested);
@@ -326,10 +305,10 @@ public class StorageCacheManagerImpl implements StorageCacheManager, Manager {
                 objOnCacheStore.incRefCount();
                 return objOnCacheStore;
             }
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             s_logger.debug("create cache storage failed: " + e.toString());
             throw new CloudRuntimeException(e);
-        } catch (ExecutionException e) {
+        } catch (final ExecutionException e) {
             s_logger.debug("create cache storage failed: " + e.toString());
             throw new CloudRuntimeException(e);
         } finally {
@@ -348,32 +327,32 @@ public class StorageCacheManagerImpl implements StorageCacheManager, Manager {
     }
 
     @Override
-    public DataObject createCacheObject(DataObject data, Scope scope) {
-        DataStore cacheStore = getCacheStorage(scope);
+    public DataObject createCacheObject(final DataObject data, final Scope scope) {
+        final DataStore cacheStore = getCacheStorage(scope);
 
         if (cacheStore == null) {
-            String errMsg = "No cache DataStore in scope id " + scope.getScopeId() + " type " + scope.getScopeType().toString();
+            final String errMsg = "No cache DataStore in scope id " + scope.getScopeId() + " type " + scope.getScopeType().toString();
             throw new CloudRuntimeException(errMsg);
         }
         return this.createCacheObject(data, cacheStore);
     }
 
     @Override
-    public DataObject getCacheObject(DataObject data, Scope scope) {
-        DataStore cacheStore = getCacheStorage(scope);
-        DataObject objOnCacheStore = cacheStore.create(data);
+    public DataObject getCacheObject(final DataObject data, final Scope scope) {
+        final DataStore cacheStore = getCacheStorage(scope);
+        final DataObject objOnCacheStore = cacheStore.create(data);
         objOnCacheStore.incRefCount();
         return objOnCacheStore;
     }
 
     @Override
-    public boolean releaseCacheObject(DataObject data) {
+    public boolean releaseCacheObject(final DataObject data) {
         data.decRefCount();
         return true;
     }
 
     @Override
-    public boolean deleteCacheObject(DataObject data) {
+    public boolean deleteCacheObject(final DataObject data) {
         return data.getDataStore().delete(data);
     }
 }

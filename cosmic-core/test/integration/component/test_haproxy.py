@@ -1,24 +1,9 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ P1 tests for VPN users
 """
 # Import Local Modules
-from nose.plugins.attrib import attr
+from marvin.cloudstackAPI import createLBStickinessPolicy
 from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import PASS
 from marvin.lib.base import (
     Account,
     ServiceOffering,
@@ -41,13 +26,11 @@ from marvin.lib.utils import (
     cleanup_resources,
     random_gen,
 )
-from marvin.cloudstackAPI import createLBStickinessPolicy
-from marvin.codes import PASS
 from marvin.sshClient import SshClient
+from nose.plugins.attrib import attr
 
 
 class TestHAProxyStickyness(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestHAProxyStickyness, cls).getClsTestClient()
@@ -362,7 +345,7 @@ class TestHAProxyStickyness(cloudstackTestCase):
                 self.virtual_machine,
                 self.virtual_machine_2])
 
-        #TODO: Add code to check the AppCookie and LbCookie Stickiness policies
+        # TODO: Add code to check the AppCookie and LbCookie Stickiness policies
         methods = ["SourceBased"]
         for method in methods:
             self.debug("Creating stickiness policy for the LB rule: %s" %
@@ -396,9 +379,9 @@ class TestHAProxyStickyness(cloudstackTestCase):
 
         lb_methods = ["roundrobin", "leastconn", "source"]
 
-        configs = {"SourceBased": {"tablesize": '100k'}}
+        configs = { "SourceBased": { "tablesize": '100k' } }
 
-        #TODO: Add code to check the AppCookie and LbCookie Stickiness policies
+        # TODO: Add code to check the AppCookie and LbCookie Stickiness policies
         for lb_method in lb_methods:
             self.debug("Creating a load balancing rule on IP %s and algo %s" %
                        (self.public_ip.ipaddress.ipaddress, lb_method))
@@ -496,8 +479,8 @@ class TestHAProxyStickyness(cloudstackTestCase):
 
         lb_methods = ["roundrobin", "leastconn", "source"]
 
-        #TODO: Add code to check the AppCookie and LbCookie Stickiness policies
-        configs = {"SourceBased": {"tablesize": '100k'}}
+        # TODO: Add code to check the AppCookie and LbCookie Stickiness policies
+        configs = { "SourceBased": { "tablesize": '100k' } }
         for lb_method in lb_methods:
             for method, params in configs.items():
                 self.debug("Creating load balancing rule on IP %s & algo %s" %
@@ -566,8 +549,8 @@ class TestHAProxyStickyness(cloudstackTestCase):
         # 4. No errors should be shown in the logs and alerts
 
         lb_methods = ["roundrobin", "leastconn", "source"]
-        #TODO: Add code to check the AppCookie and LbCookie Stickiness policies
-        configs = {"SourceBased": {"tablesize": '100k'}}
+        # TODO: Add code to check the AppCookie and LbCookie Stickiness policies
+        configs = { "SourceBased": { "tablesize": '100k' } }
         for lb_method in lb_methods:
             for method, params in configs.items():
                 self.debug("Creating load balancing rule on IP %s & algo %s" %
@@ -631,8 +614,8 @@ class TestHAProxyStickyness(cloudstackTestCase):
 
         lb_methods = ["roundrobin", "leastconn", "source"]
 
-        #TODO: Add code to check the AppCookie and LbCookie Stickiness policies
-        configs = {"SourceBased": {"tablesize": '100k'}}
+        # TODO: Add code to check the AppCookie and LbCookie Stickiness policies
+        configs = { "SourceBased": { "tablesize": '100k' } }
 
         for lb_method in lb_methods:
             for method, params in configs.items():
@@ -879,7 +862,7 @@ class TestHAProxyStickyness(cloudstackTestCase):
         self.debug("Creating stickiness policy with invalid params")
         with self.assertRaises(Exception):
             self.configure_Stickiness_Policy(lb_rule, method="LbCookie",
-                                             params={"Test": 10})
+                                             params={ "Test": 10 })
 
         self.debug("Passing invalid parameter")
         with self.assertRaises(Exception):

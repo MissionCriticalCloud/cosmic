@@ -1,37 +1,22 @@
 # -- coding: utf-8 --
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+
 """ General helper functions
 for use in the configuration process
 
 """
-import subprocess
 import logging
 import os.path
 import re
 import shutil
+import subprocess
 from netaddr import *
 from subprocess import check_output
-from pprint import pprint
 
-PUBLIC_INTERFACES = {"router" : "eth2", "vpcrouter" : "eth1"}
+PUBLIC_INTERFACES = { "router": "eth2", "vpcrouter": "eth1" }
 
-STATE_COMMANDS = {"router"    : "ip addr | grep eth2 | grep state | awk '{print $9;}' | xargs bash -c 'if [ \"$0\" == \"UP\" ]; then echo \"MASTER\"; else echo \"BACKUP\"; fi'",
-                  "vpcrouter" : "ip addr | grep eth1 | grep state | awk '{print $9;}' | xargs bash -c 'if [ $0 == \"UP\" ];     then echo \"MASTER\"; else echo \"BACKUP\"; fi'"}
+STATE_COMMANDS = { "router": "ip addr | grep eth2 | grep state | awk '{print $9;}' | xargs bash -c 'if [ \"$0\" == \"UP\" ]; then echo \"MASTER\"; else echo \"BACKUP\"; fi'",
+                   "vpcrouter": "ip addr | grep eth1 | grep state | awk '{print $9;}' | xargs bash -c 'if [ $0 == \"UP\" ];     then echo \"MASTER\"; else echo \"BACKUP\"; fi'" }
+
 
 def reconfigure_interfaces(router_config, interfaces):
     for interface in interfaces:
@@ -52,6 +37,7 @@ def reconfigure_interfaces(router_config, interfaces):
                         execute(cmd)
                 else:
                     execute(cmd)
+
 
 def is_mounted(name):
     for i in execute("mount"):
@@ -86,7 +72,7 @@ def mkdir(name, mode, fatal):
     except OSError as e:
         if e.errno != 17:
             print "failed to make directories " + name + " due to :" + e.strerror
-            if(fatal):
+            if (fatal):
                 sys.exit(1)
 
 
@@ -115,7 +101,7 @@ def get_device_info():
     for i in execute("ip addr show"):
         vals = i.strip().lstrip().rstrip().split()
         if vals[0] == "inet":
-            to = {}
+            to = { }
             to['ip'] = vals[1]
             to['dev'] = vals[-1]
             to['network'] = IPNetwork(to['ip'])
@@ -208,10 +194,11 @@ def execute2(command):
     p.wait()
     return p
 
+
 def get_output_of_command(command):
     """ Execute command """
     logging.debug("Executing command and returning output: %s" % command)
-    return check_output(command,shell=True)
+    return check_output(command, shell=True)
 
 
 def service(name, op):
@@ -244,6 +231,7 @@ def copy_if_needed(src, dest):
     if os.path.isfile(dest):
         return
     copy(src, dest)
+
 
 def copy(src, dest):
     """

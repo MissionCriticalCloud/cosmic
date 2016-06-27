@@ -1,46 +1,30 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 """ Component tests for VPC network functionality - Load Balancing Rules
 """
-#Import Local Modules
-from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.base import (stopRouter,
-                                        startRouter,
-                                        Account,
-                                        VpcOffering,
-                                        VPC,
-                                        ServiceOffering,
-                                        NATRule,
-                                        NetworkACL,
-                                        PublicIPAddress,
-                                        NetworkOffering,
-                                        Network,
-                                        VirtualMachine,
-                                        LoadBalancerRule,
-                                        StaticNATRule)
-from marvin.lib.common import (get_domain,
-                                        get_zone,
-                                        get_template,
-                                        list_routers)
-from marvin.lib.utils import cleanup_resources
+# Import Local Modules
 import socket
 import time
+from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.lib.base import (stopRouter,
+                             startRouter,
+                             Account,
+                             VpcOffering,
+                             VPC,
+                             ServiceOffering,
+                             NATRule,
+                             NetworkACL,
+                             PublicIPAddress,
+                             NetworkOffering,
+                             Network,
+                             VirtualMachine,
+                             LoadBalancerRule,
+                             StaticNATRule)
+from marvin.lib.common import (get_domain,
+                               get_zone,
+                               get_template,
+                               list_routers)
+from marvin.lib.utils import cleanup_resources
+from nose.plugins.attrib import attr
+
 
 class Services:
     """Test VPC network services Load Balancing Rules Test data
@@ -48,134 +32,134 @@ class Services:
 
     def __init__(self):
         self.services = {
-                        "account": {
-                                    "email": "test@test.com",
-                                    "firstname": "Test",
-                                    "lastname": "User",
-                                    "username": "test",
-                                    # Random characters are appended for unique
-                                    # username
-                                    "password": "password",
-                                    },
-                        "host1":None,
-                        "host2":None,
-                        "service_offering": {
-                                    "name": "Tiny Instance",
-                                    "displaytext": "Tiny Instance",
-                                    "cpunumber": 1,
-                                    "cpuspeed": 100,
-                                    "memory": 128,
-                                    },
-                        "network_offering": {
-                                    "name": 'VPC Network offering',
-                                    "displaytext": 'VPC Network off',
-                                    "guestiptype": 'Isolated',
-                                    "supportedservices": 'Vpn,Dhcp,Dns,SourceNat,PortForwarding,Lb,UserData,StaticNat,NetworkACL',
-                                    "traffictype": 'GUEST',
-                                    "availability": 'Optional',
-                                    "useVpc": 'on',
-                                    "serviceProviderList": {
-                                            "Vpn": 'VpcVirtualRouter',
-                                            "Dhcp": 'VpcVirtualRouter',
-                                            "Dns": 'VpcVirtualRouter',
-                                            "SourceNat": 'VpcVirtualRouter',
-                                            "PortForwarding": 'VpcVirtualRouter',
-                                            "Lb": 'VpcVirtualRouter',
-                                            "UserData": 'VpcVirtualRouter',
-                                            "StaticNat": 'VpcVirtualRouter',
-                                            "NetworkACL": 'VpcVirtualRouter'
-                                        },
-                                },
-                        "network_offering_no_lb": {
-                                    "name": 'VPC Network offering',
-                                    "displaytext": 'VPC Network off',
-                                    "guestiptype": 'Isolated',
-                                    "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,UserData,StaticNat,NetworkACL',
-                                    "traffictype": 'GUEST',
-                                    "availability": 'Optional',
-                                    "useVpc": 'on',
-                                    "serviceProviderList": {
-                                            "Dhcp": 'VpcVirtualRouter',
-                                            "Dns": 'VpcVirtualRouter',
-                                            "SourceNat": 'VpcVirtualRouter',
-                                            "PortForwarding": 'VpcVirtualRouter',
-                                            "UserData": 'VpcVirtualRouter',
-                                            "StaticNat": 'VpcVirtualRouter',
-                                            "NetworkACL": 'VpcVirtualRouter'
-                                        },
-                                },
-                        "vpc_offering": {
-                                    "name": 'VPC off',
-                                    "displaytext": 'VPC off',
-                                    "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat',
-                                },
-                        "vpc": {
-                                "name": "TestVPC",
-                                "displaytext": "TestVPC",
-                                "cidr": '10.0.0.1/24'
-                                },
-                        "network": {
-                                "name": "Test Network",
-                                "displaytext": "Test Network",
-                                "netmask": '255.255.255.0'
-                                },
-                        "lbrule": {
-                                    "name": "SSH",
-                                    "alg": "leastconn",
-                                    # Algorithm used for load balancing
-                                    "privateport": 22,
-                                    "publicport": 22,
-                                    "openfirewall": False,
-                                    "startport": 22,
-                                    "endport": 22,
-                                    "protocol": "TCP",
-                                    "cidrlist": '0.0.0.0/0',
-                                },
-                        "lbrule_http": {
-                                    "name": "HTTP",
-                                    "alg": "leastconn",
-                                    # Algorithm used for load balancing
-                                    "privateport": 80,
-                                    "publicport": 80,
-                                    "openfirewall": False,
-                                    "startport": 80,
-                                    "endport": 80,
-                                    "protocol": "TCP",
-                                    "cidrlist": '0.0.0.0/0',
-                                },
-                        "natrule": {
-                                    "privateport": 22,
-                                    "publicport": 22,
-                                    "startport": 22,
-                                    "endport": 22,
-                                    "protocol": "TCP",
-                                    "cidrlist": '0.0.0.0/0',
-                                },
-                        "http_rule": {
-                                    "startport": 80,
-                                    "endport": 80,
-                                    "cidrlist": '0.0.0.0/0',
-                                    "protocol": "TCP"
-                                },
-                        "virtual_machine": {
-                                    "displayname": "Test VM",
-                                    "username": "root",
-                                    "password": "password",
-                                    "ssh_port": 22,
-                                    "hypervisor": 'XenServer',
-                                    # Hypervisor type should be same as
-                                    # hypervisor type of cluster
-                                    "privateport": 22,
-                                    "publicport": 22,
-                                    "protocol": 'TCP',
-                                },
-                        "ostype": 'CentOS 5.3 (64-bit)',
-                        "sleep": 60,
-                        "timeout": 10,
-                    }
+            "account": {
+                "email": "test@test.com",
+                "firstname": "Test",
+                "lastname": "User",
+                "username": "test",
+                # Random characters are appended for unique
+                # username
+                "password": "password",
+            },
+            "host1": None,
+            "host2": None,
+            "service_offering": {
+                "name": "Tiny Instance",
+                "displaytext": "Tiny Instance",
+                "cpunumber": 1,
+                "cpuspeed": 100,
+                "memory": 128,
+            },
+            "network_offering": {
+                "name": 'VPC Network offering',
+                "displaytext": 'VPC Network off',
+                "guestiptype": 'Isolated',
+                "supportedservices": 'Vpn,Dhcp,Dns,SourceNat,PortForwarding,Lb,UserData,StaticNat,NetworkACL',
+                "traffictype": 'GUEST',
+                "availability": 'Optional',
+                "useVpc": 'on',
+                "serviceProviderList": {
+                    "Vpn": 'VpcVirtualRouter',
+                    "Dhcp": 'VpcVirtualRouter',
+                    "Dns": 'VpcVirtualRouter',
+                    "SourceNat": 'VpcVirtualRouter',
+                    "PortForwarding": 'VpcVirtualRouter',
+                    "Lb": 'VpcVirtualRouter',
+                    "UserData": 'VpcVirtualRouter',
+                    "StaticNat": 'VpcVirtualRouter',
+                    "NetworkACL": 'VpcVirtualRouter'
+                },
+            },
+            "network_offering_no_lb": {
+                "name": 'VPC Network offering',
+                "displaytext": 'VPC Network off',
+                "guestiptype": 'Isolated',
+                "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,UserData,StaticNat,NetworkACL',
+                "traffictype": 'GUEST',
+                "availability": 'Optional',
+                "useVpc": 'on',
+                "serviceProviderList": {
+                    "Dhcp": 'VpcVirtualRouter',
+                    "Dns": 'VpcVirtualRouter',
+                    "SourceNat": 'VpcVirtualRouter',
+                    "PortForwarding": 'VpcVirtualRouter',
+                    "UserData": 'VpcVirtualRouter',
+                    "StaticNat": 'VpcVirtualRouter',
+                    "NetworkACL": 'VpcVirtualRouter'
+                },
+            },
+            "vpc_offering": {
+                "name": 'VPC off',
+                "displaytext": 'VPC off',
+                "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat',
+            },
+            "vpc": {
+                "name": "TestVPC",
+                "displaytext": "TestVPC",
+                "cidr": '10.0.0.1/24'
+            },
+            "network": {
+                "name": "Test Network",
+                "displaytext": "Test Network",
+                "netmask": '255.255.255.0'
+            },
+            "lbrule": {
+                "name": "SSH",
+                "alg": "leastconn",
+                # Algorithm used for load balancing
+                "privateport": 22,
+                "publicport": 22,
+                "openfirewall": False,
+                "startport": 22,
+                "endport": 22,
+                "protocol": "TCP",
+                "cidrlist": '0.0.0.0/0',
+            },
+            "lbrule_http": {
+                "name": "HTTP",
+                "alg": "leastconn",
+                # Algorithm used for load balancing
+                "privateport": 80,
+                "publicport": 80,
+                "openfirewall": False,
+                "startport": 80,
+                "endport": 80,
+                "protocol": "TCP",
+                "cidrlist": '0.0.0.0/0',
+            },
+            "natrule": {
+                "privateport": 22,
+                "publicport": 22,
+                "startport": 22,
+                "endport": 22,
+                "protocol": "TCP",
+                "cidrlist": '0.0.0.0/0',
+            },
+            "http_rule": {
+                "startport": 80,
+                "endport": 80,
+                "cidrlist": '0.0.0.0/0',
+                "protocol": "TCP"
+            },
+            "virtual_machine": {
+                "displayname": "Test VM",
+                "username": "root",
+                "password": "password",
+                "ssh_port": 22,
+                "hypervisor": 'XenServer',
+                # Hypervisor type should be same as
+                # hypervisor type of cluster
+                "privateport": 22,
+                "publicport": 22,
+                "protocol": 'TCP',
+            },
+            "ostype": 'CentOS 5.3 (64-bit)',
+            "sleep": 60,
+            "timeout": 10,
+        }
+
 
 class TestVPCNetworkLBRules(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         # We want to fail quicker if it's failure
@@ -189,45 +173,44 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         cls.domain = get_domain(cls.api_client)
         cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
         cls.template = get_template(
-                            cls.api_client,
-                            cls.zone.id,
-                            cls.services["ostype"]
-                            )
+            cls.api_client,
+            cls.zone.id,
+            cls.services["ostype"]
+        )
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
 
         cls.service_offering = ServiceOffering.create(
-                                            cls.api_client,
-                                            cls.services["service_offering"]
-                                            )
+            cls.api_client,
+            cls.services["service_offering"]
+        )
         cls._cleanup = [cls.service_offering]
         return
 
     @classmethod
     def tearDownClass(cls):
         try:
-            #Cleanup resources used
+            # Cleanup resources used
             cleanup_resources(cls.api_client, cls._cleanup)
         except Exception as e:
             print ("Warning: Exception during cleanup : %s" % e)
-            #raise Exception("Warning: Exception during cleanup : %s" % e)
+            # raise Exception("Warning: Exception during cleanup : %s" % e)
         return
-
 
     def setUp(self):
         self.apiclient = self.testClient.getApiClient()
         self.account = Account.create(
-                                    self.apiclient,
-                                    self.services["account"],
-                                    admin=True,
-                                    domainid=self.domain.id
-                                    )
+            self.apiclient,
+            self.services["account"],
+            admin=True,
+            domainid=self.domain.id
+        )
         self.cleanup = [self.account]
         self.debug("Creating a VPC offering..")
         self.vpc_off = VpcOffering.create(
-                                    self.apiclient,
-                                    self.services["vpc_offering"]
-                                    )
+            self.apiclient,
+            self.services["vpc_offering"]
+        )
 
         self.cleanup.append(self.vpc_off)
         self.debug("Enabling the VPC offering created")
@@ -236,40 +219,39 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         self.debug("Creating a VPC network in the account: %s" % self.account.name)
         self.services["vpc"]["cidr"] = '10.1.1.1/16'
         self.vpc = VPC.create(
-                        self.apiclient,
-                        self.services["vpc"],
-                        vpcofferingid=self.vpc_off.id,
-                        zoneid=self.zone.id,
-                        account=self.account.name,
-                        domainid=self.account.domainid
-                        )
+            self.apiclient,
+            self.services["vpc"],
+            vpcofferingid=self.vpc_off.id,
+            zoneid=self.zone.id,
+            account=self.account.name,
+            domainid=self.account.domainid
+        )
         return
 
     def tearDown(self):
         try:
-            #Clean up, terminate the created network offerings
+            # Clean up, terminate the created network offerings
             cleanup_resources(self.apiclient, self.cleanup)
         except Exception as e:
             self.debug("Warning: Exception during cleanup : %s" % e)
-            #raise Exception("Warning: Exception during cleanup : %s" % e)
+            # raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
     def get_Router_For_VPC(self):
         routers = list_routers(self.apiclient,
-                            account=self.account.name,
-                            domainid=self.account.domainid,
-                            )
+                               account=self.account.name,
+                               domainid=self.account.domainid,
+                               )
         self.assertEqual(isinstance(routers, list),
-                        True,
-                        "Check for list routers response return valid data"
-                        )
+                         True,
+                         "Check for list routers response return valid data"
+                         )
         self.assertNotEqual(len(routers),
                             0,
                             "Check list router response"
                             )
         router = routers[0]
         return router
-
 
     def stop_VPC_VRouter(self):
         router = self.get_Router_For_VPC()
@@ -279,18 +261,18 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         self.apiclient.stopRouter(cmd)
 
         routers = list_routers(self.apiclient,
-                            account=self.account.name,
-                            domainid=self.account.domainid,
-                            )
+                               account=self.account.name,
+                               domainid=self.account.domainid,
+                               )
         self.assertEqual(isinstance(routers, list),
-                        True,
-                        "Check for list routers response return valid data"
-                        )
+                         True,
+                         "Check for list routers response return valid data"
+                         )
         router = routers[0]
         self.assertEqual(router.state,
-                    'Stopped',
-                    "Check list router response for router state"
-                    )
+                         'Stopped',
+                         "Check list router response for router state"
+                         )
         return router
 
     def start_VPC_VRouter(self, router):
@@ -301,19 +283,19 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         self.apiclient.startRouter(cmd)
 
         routers = list_routers(self.apiclient,
-                            account=self.account.name,
-                            domainid=self.account.domainid,
-                            zoneid=self.zone.id
-                            )
+                               account=self.account.name,
+                               domainid=self.account.domainid,
+                               zoneid=self.zone.id
+                               )
         self.assertEqual(isinstance(routers, list),
-                        True,
-                        "Check for list routers response return valid data"
-                        )
+                         True,
+                         "Check for list routers response return valid data"
+                         )
         router = routers[0]
         self.assertEqual(router.state,
-                    'Running',
-                    "Check list router response for router state"
-                    )
+                         'Running',
+                         "Check list router response for router state"
+                         )
 
     def check_ssh_into_vm(self, vm, public_ip, testnegative=False):
         self.debug("Checking if we can SSH into VM=%s on public_ip=%s" % (vm.name, public_ip.ipaddress.ipaddress))
@@ -331,7 +313,7 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
 
     def check_wget_from_vm(self, vm, public_ip, testnegative=False):
         import urllib
-        self.debug("Checking if we can wget from a VM=%s http server on public_ip=%s"  % (vm.name, public_ip.ipaddress.ipaddress))
+        self.debug("Checking if we can wget from a VM=%s http server on public_ip=%s" % (vm.name, public_ip.ipaddress.ipaddress))
         try:
             urllib.urlretrieve("http://%s/test.html" % public_ip.ipaddress.ipaddress, filename="test.html")
             if not testnegative:
@@ -346,61 +328,61 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
 
     def create_StaticNatRule_For_VM(self, vm, public_ip, network):
         self.debug("Enabling static NAT for IP: %s" %
-                                            public_ip.ipaddress.ipaddress)
+                   public_ip.ipaddress.ipaddress)
         try:
             StaticNATRule.enable(
-                            self.apiclient,
-                            ipaddressid=public_ip.ipaddress.id,
-                            virtualmachineid=vm.id,
-                            networkid=network.id
-                            )
+                self.apiclient,
+                ipaddressid=public_ip.ipaddress.id,
+                virtualmachineid=vm.id,
+                networkid=network.id
+            )
             self.debug("Static NAT enabled for IP: %s" %
-                                            public_ip.ipaddress.ipaddress)
+                       public_ip.ipaddress.ipaddress)
         except Exception as e:
             self.fail("Failed to enable static NAT on IP: %s - %s" % (
-                                        public_ip.ipaddress.ipaddress, e))
+                public_ip.ipaddress.ipaddress, e))
 
     def create_NatRule_For_VM(self, vm, public_ip, network):
         self.debug("Creatinng NAT rule in network for vm with public IP")
         nat_rule = NATRule.create(self.apiclient,
-                                vm,
-                                self.services["natrule"],
-                                ipaddressid=public_ip.ipaddress.id,
-                                openfirewall=False,
-                                networkid=network.id,
-                                vpcid=self.vpc.id
-                                )
+                                  vm,
+                                  self.services["natrule"],
+                                  ipaddressid=public_ip.ipaddress.id,
+                                  openfirewall=False,
+                                  networkid=network.id,
+                                  vpcid=self.vpc.id
+                                  )
 
         self.debug("Adding NetwrokACl rules to make NAT rule accessible")
         nwacl_nat = NetworkACL.create(self.apiclient,
-                                    networkid=network.id,
-                                    services=self.services["natrule"],
-                                    traffictype='Ingress'
-                                    )
+                                      networkid=network.id,
+                                      services=self.services["natrule"],
+                                      traffictype='Ingress'
+                                      )
         self.debug('nwacl_nat=%s' % nwacl_nat.__dict__)
         return nat_rule
 
     def acquire_Public_IP(self, network):
         self.debug("Associating public IP for network: %s" % network.name)
         public_ip = PublicIPAddress.create(self.apiclient,
-                                accountid=self.account.name,
-                                zoneid=self.zone.id,
-                                domainid=self.account.domainid,
-                                networkid=None, #network.id,
-                                vpcid=self.vpc.id
-                                )
+                                           accountid=self.account.name,
+                                           zoneid=self.zone.id,
+                                           domainid=self.account.domainid,
+                                           networkid=None,  # network.id,
+                                           vpcid=self.vpc.id
+                                           )
         self.debug("Associated %s with network %s" % (public_ip.ipaddress.ipaddress,
-                                        network.id
-                                        ))
+                                                      network.id
+                                                      ))
         return public_ip
 
     def create_VPC(self, cidr='10.1.2.1/16'):
         self.debug("Creating a VPC offering..")
         self.services["vpc_offering"]["name"] = self.services["vpc_offering"]["name"] + str(cidr)
         vpc_off = VpcOffering.create(
-                                    self.apiclient,
-                                    self.services["vpc_offering"]
-                                    )
+            self.apiclient,
+            self.services["vpc_offering"]
+        )
 
         self.cleanup.append(vpc_off)
         self.debug("Enabling the VPC offering created")
@@ -409,23 +391,23 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         self.debug("Creating a VPC network in the account: %s" % self.account.name)
         self.services["vpc"]["cidr"] = cidr
         vpc = VPC.create(
-                        self.apiclient,
-                        self.services["vpc"],
-                        vpcofferingid=vpc_off.id,
-                        zoneid=self.zone.id,
-                        account=self.account.name,
-                        domainid=self.account.domainid
-                        )
+            self.apiclient,
+            self.services["vpc"],
+            vpcofferingid=vpc_off.id,
+            zoneid=self.zone.id,
+            account=self.account.name,
+            domainid=self.account.domainid
+        )
         return vpc
 
-    def create_Network(self, net_offerring, gateway='10.1.1.1',vpc=None):
+    def create_Network(self, net_offerring, gateway='10.1.1.1', vpc=None):
         try:
             self.debug('Create NetworkOffering')
             net_offerring["name"] = "NET_OFF-" + str(gateway)
             nw_off = NetworkOffering.create(self.apiclient,
                                             net_offerring,
                                             conservemode=False
-                                        )
+                                            )
             # Enable Network offering
             nw_off.update(self.apiclient, state='Enabled')
             self.cleanup.append(nw_off)
@@ -434,14 +416,14 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
             self.services["network"]["name"] = "NETWORK-" + str(gateway)
             self.debug('Adding Network=%s' % self.services["network"])
             obj_network = Network.create(self.apiclient,
-                                    self.services["network"],
-                                    accountid=self.account.name,
-                                    domainid=self.account.domainid,
-                                    networkofferingid=nw_off.id,
-                                    zoneid=self.zone.id,
-                                    gateway=gateway,
-                                    vpcid=vpc.id if vpc else self.vpc.id
-                                    )
+                                         self.services["network"],
+                                         accountid=self.account.name,
+                                         domainid=self.account.domainid,
+                                         networkofferingid=nw_off.id,
+                                         zoneid=self.zone.id,
+                                         gateway=gateway,
+                                         vpcid=vpc.id if vpc else self.vpc.id
+                                         )
             self.debug("Created network with ID: %s" % obj_network.id)
             return obj_network
         except:
@@ -451,14 +433,14 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         try:
             self.debug('Creating VM in network=%s' % network.name)
             vm = VirtualMachine.create(
-                                    self.apiclient,
-                                    self.services["virtual_machine"],
-                                    accountid=self.account.name,
-                                    domainid=self.account.domainid,
-                                    serviceofferingid=self.service_offering.id,
-                                    networkids=[str(network.id)],
-                                    hostid=host_id
-                                    )
+                self.apiclient,
+                self.services["virtual_machine"],
+                accountid=self.account.name,
+                domainid=self.account.domainid,
+                serviceofferingid=self.service_offering.id,
+                networkids=[str(network.id)],
+                hostid=host_id
+            )
             self.debug('Created VM=%s in network=%s' % (vm.id, network.name))
 
             return vm
@@ -467,7 +449,7 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
 
     def create_LB_Rule(self, public_ip, network, vmarray, services=None):
         self.debug("Creating LB rule for IP address: %s" %
-                                        public_ip.ipaddress.ipaddress)
+                   public_ip.ipaddress.ipaddress)
         objservices = None
         if services:
             objservices = services
@@ -475,34 +457,34 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
             objservices = self.services["lbrule"]
 
         lb_rule = LoadBalancerRule.create(
-                                    self.apiclient,
-                                    objservices,
-                                    ipaddressid=public_ip.ipaddress.id,
-                                    accountid=self.account.name,
-                                    networkid=network.id,
-                                    vpcid=self.vpc.id,
-                                    domainid=self.account.domainid
-                                )
+            self.apiclient,
+            objservices,
+            ipaddressid=public_ip.ipaddress.id,
+            accountid=self.account.name,
+            networkid=network.id,
+            vpcid=self.vpc.id,
+            domainid=self.account.domainid
+        )
         self.debug("Adding virtual machines %s and %s to LB rule" % (vmarray[0], vmarray[1]))
         lb_rule.assign(self.apiclient, vmarray)
 
         self.debug("Adding NetworkACl rules to make NAT rule accessible")
         nwacl_nat = NetworkACL.create(self.apiclient,
-                                    objservices,
-                                    networkid=network.id,
-                                    traffictype='Ingress'
-                                    )
+                                      objservices,
+                                      networkid=network.id,
+                                      traffictype='Ingress'
+                                      )
         self.debug('nwacl_nat=%s' % nwacl_nat.__dict__)
         return lb_rule
 
     def create_egress_Internet_Rule(self, network):
-        self.debug("Adding Egress rules to network %s and %s to allow access to internet" % (network.name,self.services["http_rule"]))
+        self.debug("Adding Egress rules to network %s and %s to allow access to internet" % (network.name, self.services["http_rule"]))
         nwacl_internet_1 = NetworkACL.create(
-                                self.apiclient,
-                                networkid=network.id,
-                                services=self.services["http_rule"],
-                                traffictype='Egress'
-                                )
+            self.apiclient,
+            networkid=network.id,
+            services=self.services["http_rule"],
+            traffictype='Egress'
+        )
 
         return nwacl_internet_1
 
@@ -531,27 +513,27 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         vm_3 = self.create_VM_in_Network(network_2)
         vm_4 = self.create_VM_in_Network(network_2)
         public_ip_1 = self.acquire_Public_IP(network_1)
-        lb_rule1 = self.create_LB_Rule(public_ip_1, network_1, [vm_1, vm_2]) #
+        lb_rule1 = self.create_LB_Rule(public_ip_1, network_1, [vm_1, vm_2])  #
         public_ip_2 = self.acquire_Public_IP(network_2)
         with self.assertRaises(Exception):
             self.create_LB_Rule(public_ip_2, network_2, [vm_3, vm_4])
 
         lb_rules = LoadBalancerRule.list(self.apiclient,
-                                        id=lb_rule1.id,
-                                        listall=True
-                                        )
+                                         id=lb_rule1.id,
+                                         listall=True
+                                         )
         self.failIfEqual(lb_rules,
-                        None,
-                        "Failed to list the LB Rule"
-                        )
+                         None,
+                         "Failed to list the LB Rule"
+                         )
         vms = VirtualMachine.list(self.apiclient,
-                                networkid=network_1.id,
-                                listall=True
-                                )
+                                  networkid=network_1.id,
+                                  listall=True
+                                  )
         self.failIfEqual(vms,
-                        None,
-                        "Failed to list the VMs in network=%s" % network_1.name
-                        )
+                         None,
+                         "Failed to list the VMs in network=%s" % network_1.name
+                         )
         return
 
     @attr(tags=["advanced", "intervlan"], required_hardware="true")
@@ -581,7 +563,7 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
 
     @attr(tags=["advanced", "intervlan"], required_hardware="true")
     def test_03_VPC_CreateLBRuleInMultipleNetworksVRStoppedState(self):
-        """ Test case no 222 : Create LB rules for a two/multiple virtual networks of a 
+        """ Test case no 222 : Create LB rules for a two/multiple virtual networks of a
             VPC using a new Public IP Address available with the VPC when the Virtual Router is in Stopped State
         """
 
@@ -613,9 +595,9 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         self.start_VPC_VRouter(router)
 
         self.check_wget_from_vm(vm_1, public_ip_1, testnegative=False)
-        return    
+        return
 
-    @attr(tags=["advanced","advancedns", "intervlan"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "intervlan"], required_hardware="true")
     def test_04_VPC_CreateLBRuleInMultipleNetworksVRStoppedState(self):
         """ Test case no 222 : Create LB rules for a two/multiple virtual networks of a
             VPC using a new Public IP Address available with the VPC when the Virtual Router is in Stopped State
@@ -666,9 +648,9 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         vm_1 = self.create_VM_in_Network(network_1)
         vm_2 = self.create_VM_in_Network(network_1)
         vm_3 = self.create_VM_in_Network(network_1)
-        public_ip_1  = self.acquire_Public_IP(network_1)
+        public_ip_1 = self.acquire_Public_IP(network_1)
         lb_rule_http = self.create_LB_Rule(public_ip_1, network_1, [vm_1, vm_2, vm_3], self.services["lbrule_http"])
-        lb_rule_nat  = self.create_LB_Rule(public_ip_1, network_1, [vm_1, vm_2, vm_3])
+        lb_rule_nat = self.create_LB_Rule(public_ip_1, network_1, [vm_1, vm_2, vm_3])
         self.debug('lb_rule_http=%s' % lb_rule_http.__dict__)
         self.check_wget_from_vm(vm_1, public_ip_1, testnegative=False)
         self.check_ssh_into_vm(vm_1, public_ip_1, testnegative=False)
@@ -701,9 +683,9 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         time.sleep(120)
 
         router = self.stop_VPC_VRouter()
-        public_ip_1  = self.acquire_Public_IP(network_1)
+        public_ip_1 = self.acquire_Public_IP(network_1)
         lb_rule_http = self.create_LB_Rule(public_ip_1, network_1, [vm_1, vm_2, vm_3], self.services["lbrule_http"])
-        lb_rule_nat  = self.create_LB_Rule(public_ip_1, network_1, [vm_1, vm_2, vm_3])
+        lb_rule_nat = self.create_LB_Rule(public_ip_1, network_1, [vm_1, vm_2, vm_3])
         self.debug('lb_rule_http=%s' % lb_rule_http.__dict__)
         self.start_VPC_VRouter(router)
 
@@ -711,7 +693,7 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         self.check_ssh_into_vm(vm_1, public_ip_1, testnegative=False)
         lb_rule_nat.delete(self.apiclient)
         self.check_ssh_into_vm(vm_1, public_ip_1, testnegative=True)
-        return    
+        return
 
     @attr(tags=["advanced", "intervlan"], required_hardware="true")
     def test_07_VPC_CreateAndDeleteAllLBRule(self):
@@ -734,9 +716,9 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         vm_1 = self.create_VM_in_Network(network_1)
         vm_2 = self.create_VM_in_Network(network_1)
         vm_3 = self.create_VM_in_Network(network_1)
-        public_ip_1  = self.acquire_Public_IP(network_1)
+        public_ip_1 = self.acquire_Public_IP(network_1)
         lb_rule_http = self.create_LB_Rule(public_ip_1, network_1, [vm_1, vm_2, vm_3], self.services["lbrule_http"])
-        lb_rule_nat  = self.create_LB_Rule(public_ip_1, network_1, [vm_1, vm_2, vm_3])
+        lb_rule_nat = self.create_LB_Rule(public_ip_1, network_1, [vm_1, vm_2, vm_3])
         self.debug('lb_rule_http=%s' % lb_rule_http.__dict__)
         self.check_wget_from_vm(vm_1, public_ip_1, testnegative=False)
         self.check_ssh_into_vm(vm_1, public_ip_1, testnegative=False)
@@ -767,9 +749,9 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         vm_1 = self.create_VM_in_Network(network_1)
         vm_2 = self.create_VM_in_Network(network_1)
         vm_3 = self.create_VM_in_Network(network_1)
-        public_ip_1  = self.acquire_Public_IP(network_1)
+        public_ip_1 = self.acquire_Public_IP(network_1)
         lb_rule_http = self.create_LB_Rule(public_ip_1, network_1, [vm_1, vm_2, vm_3], self.services["lbrule_http"])
-        lb_rule_nat  = self.create_LB_Rule(public_ip_1, network_1, [vm_1, vm_2, vm_3])
+        lb_rule_nat = self.create_LB_Rule(public_ip_1, network_1, [vm_1, vm_2, vm_3])
         self.debug('lb_rule_http=%s' % lb_rule_http.__dict__)
         self.check_wget_from_vm(vm_1, public_ip_1, testnegative=False)
         self.check_ssh_into_vm(vm_1, public_ip_1, testnegative=False)
@@ -778,7 +760,7 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         self.check_ssh_into_vm(vm_1, public_ip_1, testnegative=True)
         self.check_wget_from_vm(vm_1, public_ip_1, testnegative=True)
         return
-    
+
     @attr(tags=["advanced", "intervlan"], required_hardware="true")
     def test_09_VPC_LBRuleCreateFailMultipleVPC(self):
         """ Test User should not be allowed to create a LB rule for a VM that belongs to a different VPC.
@@ -803,7 +785,7 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         vm_1 = self.create_VM_in_Network(network_1)
         vm_2 = self.create_VM_in_Network(network_1)
         vpc2 = self.create_VPC()
-        network_2 = self.create_Network(self.services["network_offering_no_lb"], '10.1.2.1',vpc2)
+        network_2 = self.create_Network(self.services["network_offering_no_lb"], '10.1.2.1', vpc2)
         vm_3 = self.create_VM_in_Network(network_2)
         vm_4 = self.create_VM_in_Network(network_2)
         public_ip_1 = self.acquire_Public_IP(network_1)
@@ -940,7 +922,7 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
         vm_1 = self.create_VM_in_Network(network_1)
         vm_2 = self.create_VM_in_Network(network_1)
         public_ip_1 = self.acquire_Public_IP(network_1)
-        nat_rule1  = self.create_NatRule_For_VM(vm_1, public_ip_1, network_1)
+        nat_rule1 = self.create_NatRule_For_VM(vm_1, public_ip_1, network_1)
         self.check_ssh_into_vm(vm_1, public_ip_1, testnegative=False)
         self.debug('nat_rule1=%s' % nat_rule1.__dict__)
         try:
@@ -1004,7 +986,7 @@ class TestVPCNetworkLBRules(cloudstackTestCase):
 
         with self.assertRaises(Exception):
             lb_rules = LoadBalancerRule.list(self.apiclient,
-                                        id=lb_rule.id,
-                                        listall=True
-                                        )
+                                             id=lb_rule.id,
+                                             listall=True
+                                             )
         return

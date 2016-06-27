@@ -1,33 +1,10 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 # Import Local Modules
-from marvin.cloudstackTestCase import cloudstackTestCase, unittest
+import time
 from marvin.cloudstackAPI import (updateStoragePool,
                                   resizeVolume,
                                   listCapacity,
                                   addCluster)
-from marvin.sshClient import SshClient
-from marvin.lib.common import (get_zone,
-                               get_template,
-                               get_domain,
-                               list_volumes,
-                               get_pod,
-                               is_config_suitable)
+from marvin.cloudstackTestCase import cloudstackTestCase, unittest
 from marvin.lib.base import (Domain,
                              Account,
                              Template,
@@ -37,13 +14,18 @@ from marvin.lib.base import (Domain,
                              StoragePool,
                              ServiceOffering,
                              Configurations)
+from marvin.lib.common import (get_zone,
+                               get_template,
+                               get_domain,
+                               list_volumes,
+                               get_pod,
+                               is_config_suitable)
 from marvin.lib.utils import cleanup_resources
+from marvin.sshClient import SshClient
 from nose.plugins.attrib import attr
-import time
 
 
 class Test42xBugsMgmtSvr(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         try:

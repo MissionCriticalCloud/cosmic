@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.vpc.dao;
-
-import java.util.List;
 
 import com.cloud.network.vpc.VpcGateway;
 import com.cloud.network.vpc.VpcGatewayVO;
@@ -24,6 +6,8 @@ import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -43,8 +27,8 @@ public class VpcGatewayDaoImpl extends GenericDaoBase<VpcGatewayVO, Long> implem
     }
 
     @Override
-    public VpcGatewayVO getPrivateGatewayForVpc(long vpcId) {
-        SearchCriteria<VpcGatewayVO> sc = AllFieldsSearch.create();
+    public VpcGatewayVO getPrivateGatewayForVpc(final long vpcId) {
+        final SearchCriteria<VpcGatewayVO> sc = AllFieldsSearch.create();
         sc.setParameters("vpcId", vpcId);
         sc.setParameters("type", VpcGateway.Type.Private);
 
@@ -52,13 +36,13 @@ public class VpcGatewayDaoImpl extends GenericDaoBase<VpcGatewayVO, Long> implem
     }
 
     @Override
-    public Long getNetworkAclIdForPrivateIp(long vpcId, long networkId, String ipaddr) {
-        SearchCriteria<VpcGatewayVO> sc = AllFieldsSearch.create();
+    public Long getNetworkAclIdForPrivateIp(final long vpcId, final long networkId, final String ipaddr) {
+        final SearchCriteria<VpcGatewayVO> sc = AllFieldsSearch.create();
         sc.setParameters("vpcId", vpcId);
         sc.setParameters("networkid", networkId);
         sc.setParameters("ipaddress", ipaddr);
 
-        VpcGateway vpcGateway = findOneBy(sc);
+        final VpcGateway vpcGateway = findOneBy(sc);
         if (vpcGateway != null) {
             return vpcGateway.getNetworkACLId();
         } else {
@@ -67,16 +51,16 @@ public class VpcGatewayDaoImpl extends GenericDaoBase<VpcGatewayVO, Long> implem
     }
 
     @Override
-    public List<VpcGatewayVO> listByVpcIdAndType(long vpcId, VpcGateway.Type type) {
-        SearchCriteria<VpcGatewayVO> sc = AllFieldsSearch.create();
+    public List<VpcGatewayVO> listByVpcIdAndType(final long vpcId, final VpcGateway.Type type) {
+        final SearchCriteria<VpcGatewayVO> sc = AllFieldsSearch.create();
         sc.setParameters("vpcId", vpcId);
         sc.setParameters("type", type);
         return listBy(sc);
     }
 
     @Override
-    public List<VpcGatewayVO> listByAclIdAndType(long aclId, VpcGateway.Type type) {
-        SearchCriteria<VpcGatewayVO> sc = AllFieldsSearch.create();
+    public List<VpcGatewayVO> listByAclIdAndType(final long aclId, final VpcGateway.Type type) {
+        final SearchCriteria<VpcGatewayVO> sc = AllFieldsSearch.create();
         sc.setParameters("aclId", aclId);
         sc.setParameters("type", type);
         return listBy(sc);

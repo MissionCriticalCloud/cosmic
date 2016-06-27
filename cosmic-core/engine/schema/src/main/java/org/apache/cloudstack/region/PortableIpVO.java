@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.region;
-
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.Date;
 
 @Entity
 @Table(name = "portable_ip_address")
@@ -38,32 +21,23 @@ public class PortableIpVO implements PortableIp {
 
     @Column(name = "region_id")
     int regionId;
-
+    @Column(name = "vlan")
+    String vlan;
+    @Column(name = "gateway")
+    String gateway;
+    @Column(name = "netmask")
+    String netmask;
+    @Column(name = "portable_ip_address")
+    String address;
     @Column(name = "allocated")
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date allocatedTime;
-
     @Column(name = "account_id")
     private Long allocatedToAccountId = null;
-
     @Column(name = "domain_id")
     private Long allocatedInDomainId = null;
-
     @Column(name = "state")
     private State state;
-
-    @Column(name = "vlan")
-    String vlan;
-
-    @Column(name = "gateway")
-    String gateway;
-
-    @Column(name = "netmask")
-    String netmask;
-
-    @Column(name = "portable_ip_address")
-    String address;
-
     @Column(name = "portable_ip_range_id")
     private long rangeId;
 
@@ -83,7 +57,7 @@ public class PortableIpVO implements PortableIp {
 
     }
 
-    public PortableIpVO(int regionId, Long rangeId, String vlan, String gateway, String netmask, String address) {
+    public PortableIpVO(final int regionId, final Long rangeId, final String vlan, final String gateway, final String netmask, final String address) {
         this.regionId = regionId;
         this.vlan = vlan;
         this.gateway = gateway;
@@ -103,7 +77,7 @@ public class PortableIpVO implements PortableIp {
         return allocatedToAccountId;
     }
 
-    public void setAllocatedToAccountId(Long accountId) {
+    public void setAllocatedToAccountId(final Long accountId) {
         this.allocatedToAccountId = accountId;
     }
 
@@ -112,7 +86,7 @@ public class PortableIpVO implements PortableIp {
         return allocatedInDomainId;
     }
 
-    public void setAllocatedInDomainId(Long domainId) {
+    public void setAllocatedInDomainId(final Long domainId) {
         this.allocatedInDomainId = domainId;
     }
 
@@ -121,7 +95,7 @@ public class PortableIpVO implements PortableIp {
         return allocatedTime;
     }
 
-    public void setAllocatedTime(Date date) {
+    public void setAllocatedTime(final Date date) {
         this.allocatedTime = date;
     }
 
@@ -130,7 +104,7 @@ public class PortableIpVO implements PortableIp {
         return state;
     }
 
-    public void setState(State state) {
+    public void setState(final State state) {
         this.state = state;
     }
 
@@ -139,7 +113,7 @@ public class PortableIpVO implements PortableIp {
         return regionId;
     }
 
-    public void setRegionId(int regionId) {
+    public void setRegionId(final int regionId) {
         this.regionId = regionId;
     }
 
@@ -148,7 +122,7 @@ public class PortableIpVO implements PortableIp {
         return dataCenterId;
     }
 
-    public void setAssociatedDataCenterId(Long datacenterId) {
+    public void setAssociatedDataCenterId(final Long datacenterId) {
         this.dataCenterId = datacenterId;
     }
 
@@ -157,7 +131,7 @@ public class PortableIpVO implements PortableIp {
         return networkId;
     }
 
-    public void setAssociatedWithNetworkId(Long networkId) {
+    public void setAssociatedWithNetworkId(final Long networkId) {
         this.networkId = networkId;
     }
 
@@ -166,7 +140,7 @@ public class PortableIpVO implements PortableIp {
         return vpcId;
     }
 
-    public void setAssociatedWithVpcId(Long vpcId) {
+    public void setAssociatedWithVpcId(final Long vpcId) {
         this.vpcId = vpcId;
     }
 
@@ -175,7 +149,7 @@ public class PortableIpVO implements PortableIp {
         return physicalNetworkId;
     }
 
-    public void setPhysicalNetworkId(Long physicalNetworkId) {
+    public void setPhysicalNetworkId(final Long physicalNetworkId) {
         this.physicalNetworkId = physicalNetworkId;
     }
 
@@ -184,7 +158,7 @@ public class PortableIpVO implements PortableIp {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(final String address) {
         this.address = address;
     }
 
@@ -193,7 +167,7 @@ public class PortableIpVO implements PortableIp {
         return vlan;
     }
 
-    public void setVlan(String vlan) {
+    public void setVlan(final String vlan) {
         this.vlan = vlan;
     }
 
@@ -202,7 +176,7 @@ public class PortableIpVO implements PortableIp {
         return netmask;
     }
 
-    public void setNetmask(String netmask) {
+    public void setNetmask(final String netmask) {
         this.netmask = netmask;
     }
 
@@ -211,7 +185,7 @@ public class PortableIpVO implements PortableIp {
         return gateway;
     }
 
-    public void setGateay(String gateway) {
+    public void setGateay(final String gateway) {
         this.gateway = gateway;
     }
 
@@ -219,7 +193,7 @@ public class PortableIpVO implements PortableIp {
         return rangeId;
     }
 
-    public void setRangeId(Long rangeId) {
+    public void setRangeId(final Long rangeId) {
         this.rangeId = rangeId;
     }
 }

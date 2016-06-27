@@ -1,30 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.storage.listener;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.ejb.Local;
-import javax.inject.Inject;
 
 import com.cloud.configuration.Config;
 import com.cloud.event.EventCategory;
@@ -36,10 +10,18 @@ import com.cloud.storage.SnapshotVO;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.fsm.StateListener;
 import com.cloud.utils.fsm.StateMachine2;
-
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.events.EventBus;
 import org.apache.cloudstack.framework.events.EventBusException;
+
+import javax.annotation.PostConstruct;
+import javax.ejb.Local;
+import javax.inject.Inject;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -49,13 +31,11 @@ import org.springframework.stereotype.Component;
 @Local(value = {SnapshotStateListener.class})
 public class SnapshotStateListener implements StateListener<State, Event, SnapshotVO> {
 
+    private static final Logger s_logger = LoggerFactory.getLogger(SnapshotStateListener.class);
     protected static EventBus s_eventBus = null;
     protected static ConfigurationDao s_configDao;
-
     @Inject
     private ConfigurationDao configDao;
-
-    private static final Logger s_logger = LoggerFactory.getLogger(SnapshotStateListener.class);
 
     public SnapshotStateListener() {
 
@@ -67,53 +47,54 @@ public class SnapshotStateListener implements StateListener<State, Event, Snapsh
     }
 
     @Override
-    public boolean preStateTransitionEvent(State oldState, Event event, State newState, SnapshotVO vo, boolean status, Object opaque) {
+    public boolean preStateTransitionEvent(final State oldState, final Event event, final State newState, final SnapshotVO vo, final boolean status, final Object opaque) {
         pubishOnEventBus(event.name(), "preStateTransitionEvent", vo, oldState, newState);
         return true;
     }
 
     @Override
-    public boolean postStateTransitionEvent(StateMachine2.Transition<State, Event> transition, SnapshotVO vo, boolean status, Object opaque) {
-      pubishOnEventBus(transition.getEvent().name(), "postStateTransitionEvent", vo, transition.getCurrentState(), transition.getToState());
-      return true;
+    public boolean postStateTransitionEvent(final StateMachine2.Transition<State, Event> transition, final SnapshotVO vo, final boolean status, final Object opaque) {
+        pubishOnEventBus(transition.getEvent().name(), "postStateTransitionEvent", vo, transition.getCurrentState(), transition.getToState());
+        return true;
     }
 
-  private void pubishOnEventBus(String event, String status, Snapshot vo, State oldState, State newState) {
+    private void pubishOnEventBus(final String event, final String status, final Snapshot vo, final State oldState, final State newState) {
 
-        String configKey = Config.PublishResourceStateEvent.key();
-        String value = s_configDao.getValue(configKey);
-        boolean configValue = Boolean.parseBoolean(value);
-        if(!configValue)
+        final String configKey = Config.PublishResourceStateEvent.key();
+        final String value = s_configDao.getValue(configKey);
+        final boolean configValue = Boolean.parseBoolean(value);
+        if (!configValue) {
             return;
+        }
         try {
             s_eventBus = ComponentContext.getComponent(EventBus.class);
-        } catch (NoSuchBeanDefinitionException nbe) {
+        } catch (final NoSuchBeanDefinitionException nbe) {
             return; // no provider is configured to provide events bus, so just return
         }
 
-        String resourceName = getEntityFromClassName(Snapshot.class.getName());
-        org.apache.cloudstack.framework.events.Event eventMsg =
-            new org.apache.cloudstack.framework.events.Event(ManagementService.Name, EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName,
-                vo.getUuid());
-        Map<String, String> eventDescription = new HashMap<String, String>();
+        final String resourceName = getEntityFromClassName(Snapshot.class.getName());
+        final org.apache.cloudstack.framework.events.Event eventMsg =
+                new org.apache.cloudstack.framework.events.Event(ManagementService.Name, EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName,
+                        vo.getUuid());
+        final Map<String, String> eventDescription = new HashMap<>();
         eventDescription.put("resource", resourceName);
         eventDescription.put("id", vo.getUuid());
         eventDescription.put("old-state", oldState.name());
         eventDescription.put("new-state", newState.name());
 
-        String eventDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        final String eventDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         eventDescription.put("eventDateTime", eventDate);
 
         eventMsg.setDescription(eventDescription);
         try {
             s_eventBus.publish(eventMsg);
-        } catch (EventBusException e) {
+        } catch (final EventBusException e) {
             s_logger.warn("Failed to publish state change event on the the event bus.");
         }
     }
 
-    private String getEntityFromClassName(String entityClassName) {
-        int index = entityClassName.lastIndexOf(".");
+    private String getEntityFromClassName(final String entityClassName) {
+        final int index = entityClassName.lastIndexOf(".");
         String entityName = entityClassName;
         if (index != -1) {
             entityName = entityClassName.substring(index + 1);

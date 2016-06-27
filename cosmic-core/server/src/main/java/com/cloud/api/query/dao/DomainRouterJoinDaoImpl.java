@@ -1,25 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.query.dao;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
 
 import com.cloud.api.ApiResponseHelper;
 import com.cloud.api.query.vo.DomainRouterJoinVO;
@@ -32,11 +11,15 @@ import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
 import org.apache.cloudstack.api.response.DomainRouterResponse;
 import org.apache.cloudstack.api.response.NicResponse;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -44,15 +27,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, Long> implements DomainRouterJoinDao {
     public static final Logger s_logger = LoggerFactory.getLogger(DomainRouterJoinDaoImpl.class);
-
-    @Inject
-    private ConfigurationDao  _configDao;
+    private final SearchBuilder<DomainRouterJoinVO> vrSearch;
+    private final SearchBuilder<DomainRouterJoinVO> vrIdSearch;
     @Inject
     public AccountManager _accountMgr;
-
-    private final SearchBuilder<DomainRouterJoinVO> vrSearch;
-
-    private final SearchBuilder<DomainRouterJoinVO> vrIdSearch;
+    @Inject
+    private ConfigurationDao _configDao;
 
     protected DomainRouterJoinDaoImpl() {
 
@@ -68,8 +48,8 @@ public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, 
     }
 
     @Override
-    public DomainRouterResponse newDomainRouterResponse(DomainRouterJoinVO router, Account caller) {
-        DomainRouterResponse routerResponse = new DomainRouterResponse();
+    public DomainRouterResponse newDomainRouterResponse(final DomainRouterJoinVO router, final Account caller) {
+        final DomainRouterResponse routerResponse = new DomainRouterResponse();
         routerResponse.setId(router.getUuid());
         routerResponse.setZoneId(router.getDataCenterUuid());
         routerResponse.setName(router.getName());
@@ -79,7 +59,7 @@ public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, 
         routerResponse.setIsRedundantRouter(router.isRedundantRouter());
         routerResponse.setRedundantState(router.getRedundantState().toString());
         if (router.getTemplateVersion() != null) {
-            String routerVersion = Version.trimRouterVersion(router.getTemplateVersion());
+            final String routerVersion = Version.trimRouterVersion(router.getTemplateVersion());
             routerResponse.setVersion(routerVersion);
             routerResponse.setRequiresUpgrade((Version.compare(routerVersion, NetworkOrchestrationService.MinVRVersion.valueIn(router.getDataCenterId())) < 0));
         } else {
@@ -95,9 +75,9 @@ public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, 
                 routerResponse.setHypervisor(router.getHypervisorType().toString());
             }
             routerResponse.setPodId(router.getPodUuid());
-            long nic_id = router.getNicId();
+            final long nic_id = router.getNicId();
             if (nic_id > 0) {
-                TrafficType ty = router.getTrafficType();
+                final TrafficType ty = router.getTrafficType();
                 if (ty != null) {
                     // legacy code, public/control/guest nic info is kept in
                     // nics response object
@@ -122,7 +102,7 @@ public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, 
                     }
                 }
 
-                NicResponse nicResponse = new NicResponse();
+                final NicResponse nicResponse = new NicResponse();
                 nicResponse.setId(router.getNicUuid());
                 nicResponse.setIpaddress(router.getIpAddress());
                 nicResponse.setGateway(router.getGateway());
@@ -188,10 +168,10 @@ public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, 
     }
 
     @Override
-    public DomainRouterResponse setDomainRouterResponse(DomainRouterResponse vrData, DomainRouterJoinVO vr) {
-        long nic_id = vr.getNicId();
+    public DomainRouterResponse setDomainRouterResponse(final DomainRouterResponse vrData, final DomainRouterJoinVO vr) {
+        final long nic_id = vr.getNicId();
         if (nic_id > 0) {
-            TrafficType ty = vr.getTrafficType();
+            final TrafficType ty = vr.getTrafficType();
             if (ty != null) {
                 // legacy code, public/control/guest nic info is kept in
                 // nics response object
@@ -215,7 +195,7 @@ public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, 
                     vrData.setNetworkDomain(vr.getNetworkDomain());
                 }
             }
-            NicResponse nicResponse = new NicResponse();
+            final NicResponse nicResponse = new NicResponse();
             nicResponse.setId(vr.getNicUuid());
             nicResponse.setIpaddress(vr.getIpAddress());
             nicResponse.setGateway(vr.getGateway());
@@ -246,26 +226,34 @@ public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, 
     }
 
     @Override
-    public List<DomainRouterJoinVO> searchByIds(Long... vrIds) {
+    public List<DomainRouterJoinVO> newDomainRouterView(final VirtualRouter vr) {
+
+        final SearchCriteria<DomainRouterJoinVO> sc = vrIdSearch.create();
+        sc.setParameters("id", vr.getId());
+        return searchIncludingRemoved(sc, null, null, false);
+    }
+
+    @Override
+    public List<DomainRouterJoinVO> searchByIds(final Long... vrIds) {
         // set detail batch query size
         int DETAILS_BATCH_SIZE = 2000;
-        String batchCfg = _configDao.getValue("detail.batch.query.size");
+        final String batchCfg = _configDao.getValue("detail.batch.query.size");
         if (batchCfg != null) {
             DETAILS_BATCH_SIZE = Integer.parseInt(batchCfg);
         }
         // query details by batches
-        List<DomainRouterJoinVO> uvList = new ArrayList<DomainRouterJoinVO>();
+        final List<DomainRouterJoinVO> uvList = new ArrayList<>();
         // query details by batches
         int curr_index = 0;
         if (vrIds.length > DETAILS_BATCH_SIZE) {
             while ((curr_index + DETAILS_BATCH_SIZE) <= vrIds.length) {
-                Long[] ids = new Long[DETAILS_BATCH_SIZE];
+                final Long[] ids = new Long[DETAILS_BATCH_SIZE];
                 for (int k = 0, j = curr_index; j < curr_index + DETAILS_BATCH_SIZE; j++, k++) {
                     ids[k] = vrIds[j];
                 }
-                SearchCriteria<DomainRouterJoinVO> sc = vrSearch.create();
+                final SearchCriteria<DomainRouterJoinVO> sc = vrSearch.create();
                 sc.setParameters("idIN", ids);
-                List<DomainRouterJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
+                final List<DomainRouterJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
                 if (vms != null) {
                     uvList.addAll(vms);
                 }
@@ -273,28 +261,19 @@ public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, 
             }
         }
         if (curr_index < vrIds.length) {
-            int batch_size = (vrIds.length - curr_index);
+            final int batch_size = (vrIds.length - curr_index);
             // set the ids value
-            Long[] ids = new Long[batch_size];
+            final Long[] ids = new Long[batch_size];
             for (int k = 0, j = curr_index; j < curr_index + batch_size; j++, k++) {
                 ids[k] = vrIds[j];
             }
-            SearchCriteria<DomainRouterJoinVO> sc = vrSearch.create();
+            final SearchCriteria<DomainRouterJoinVO> sc = vrSearch.create();
             sc.setParameters("idIN", ids);
-            List<DomainRouterJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
+            final List<DomainRouterJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
             if (vms != null) {
                 uvList.addAll(vms);
             }
         }
         return uvList;
     }
-
-    @Override
-    public List<DomainRouterJoinVO> newDomainRouterView(VirtualRouter vr) {
-
-        SearchCriteria<DomainRouterJoinVO> sc = vrIdSearch.create();
-        sc.setParameters("id", vr.getId());
-        return searchIncludingRemoved(sc, null, null, false);
-    }
-
 }

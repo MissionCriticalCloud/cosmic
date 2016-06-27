@@ -1,25 +1,7 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-""" Test cases for Verifying revert snapshot 
+""" Test cases for Verifying revert snapshot
 """
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources,
-                             validateList)
+from marvin.codes import PASS
 from marvin.lib.base import (Account,
                              ServiceOffering,
                              Snapshot,
@@ -30,11 +12,13 @@ from marvin.lib.common import (get_domain,
                                get_zone,
                                get_template,
                                list_volumes,
-                              )
-from marvin.codes import PASS
+                               )
+from marvin.lib.utils import (cleanup_resources,
+                              validateList)
+from nose.plugins.attrib import attr
+
 
 class TestUnableToRevertSnapshot(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestUnableToRevertSnapshot, cls).getClsTestClient()
@@ -59,8 +43,8 @@ class TestUnableToRevertSnapshot(cloudstackTestCase):
 
             if cls.hypervisor.lower() not in ['xenserver']:
                 cls.skiptest = True
-                return     
-            # Create an account
+                return
+                # Create an account
             cls.account = Account.create(
                 cls.apiclient,
                 cls.testdata["account"],
@@ -99,7 +83,7 @@ class TestUnableToRevertSnapshot(cloudstackTestCase):
         self.dbclient = self.testClient.getDbConnection()
         self.cleanup = []
         if self.skiptest:
-            self.skipTest("This test is to be checked on xenserver only  Hence, skip for %s"  % self.hypervisor)
+            self.skipTest("This test is to be checked on xenserver only  Hence, skip for %s" % self.hypervisor)
 
     def tearDown(self):
         try:
@@ -114,7 +98,7 @@ class TestUnableToRevertSnapshot(cloudstackTestCase):
 
         # 1. Deploy a VM.
         # 2. Take VM snapshot.
-        # 3. Verify that volume snapshot fails with error 
+        # 3. Verify that volume snapshot fails with error
                 can not create volume snapshot for VM with VM-snapshot
 
         """
@@ -129,33 +113,33 @@ class TestUnableToRevertSnapshot(cloudstackTestCase):
             zoneid=self.zone.id,
         )
         volumes_cluster_list = list_volumes(
-                self.apiclient,
-                virtualmachineid=vm.id,
-                type='ROOT',
-                listall=True
-                )
+            self.apiclient,
+            virtualmachineid=vm.id,
+            type='ROOT',
+            listall=True
+        )
 
         volume_list_validation = validateList(volumes_cluster_list)
 
-	self.assertEqual(
-                volume_list_validation[0],
-                PASS,
-                "Event list validation failed due to %s" %
-		volume_list_validation[2]
-            )
- 
+        self.assertEqual(
+            volume_list_validation[0],
+            PASS,
+            "Event list validation failed due to %s" %
+            volume_list_validation[2]
+        )
+
         root_volume = volumes_cluster_list[0]
-        
-        #Step 2
+
+        # Step 2
         vm_snap = VmSnapshot.create(self.apiclient,
-                vm.id)
+                                    vm.id)
 
         volume_list_validation = validateList(vm_snap)
 
-        #Step 3
+        # Step 3
         with self.assertRaises(Exception):
             Snapshot.create(
-                    self.apiclient,
-                    root_volume.id)
+                self.apiclient,
+                root_volume.id)
 
         return

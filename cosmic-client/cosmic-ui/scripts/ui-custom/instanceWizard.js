@@ -1,29 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
-(function($, cloudStack) {
+(function ($, cloudStack) {
     /**
      * Instance wizard
      */
-    cloudStack.uiCustom.instanceWizard = function(args) {
-        return function(listViewArgs) {
+    cloudStack.uiCustom.instanceWizard = function (args) {
+        return function (listViewArgs) {
             var context = listViewArgs.context;
 
-            var instanceWizard = function(data) {
+            var instanceWizard = function (data) {
                 var $wizard = $('#template').find('div.instance-wizard').clone();
                 var $progress = $wizard.find('div.progress ul li');
                 var $steps = $wizard.find('div.steps').children().hide();
@@ -33,21 +16,21 @@
                 $form.validate();
 
                 // Close instance wizard
-                var close = function() {
+                var close = function () {
                     $wizard.dialog('destroy');
-                    $('div.overlay').fadeOut(function() {
+                    $('div.overlay').fadeOut(function () {
                         $('div.overlay').remove();
                     });
                 };
 
                 // Save instance and close wizard
-                var completeAction = function() {
+                var completeAction = function () {
                     var data = cloudStack.serializeForm($form);
                     var $wizardLoading = $('<div>').addClass('loading-overlay').appendTo($wizard).css('z-index', '10000');
 
                     // Pass network IPs
                     data['my-network-ips'] = [];
-                    $form.find('.my-networks .select .specify-ip input[type=text]').each(function() {
+                    $form.find('.my-networks .select .specify-ip input[type=text]').each(function () {
                         var $input = $(this);
 
                         if (!$input.closest('.select').find('input[type=checkbox]').is(':checked')) return true;
@@ -83,19 +66,19 @@
                         data: data,
                         $wizard: $wizard,
                         response: {
-                            success: function(args) {
+                            success: function (args) {
                                 var $listView = $('.list-view.instances');
 
                                 if ($listView.size()) {
                                     var $loading = $('.list-view.instances').listView('prependItem', {
                                         data: [{
                                             name: data.displayname ? data.displayname : _l('label.new.vm'),
-                                            zonename: $wizard.find('select[name=zoneid] option').filter(function() {
+                                            zonename: $wizard.find('select[name=zoneid] option').filter(function () {
                                                 return $(this).val() == data.zoneid;
                                             }).html(),
                                             state: 'Creating'
                                         }],
-                                        actionFilter: function(args) {
+                                        actionFilter: function (args) {
                                             return [];
                                         }
                                     });
@@ -109,7 +92,7 @@
 
                                 close();
                             },
-                            error: function(message) {
+                            error: function (message) {
                                 $wizard.remove();
                                 $('div.overlay').remove();
 
@@ -123,11 +106,11 @@
                     });
                 };
 
-                var makeSelects = function(name, data, fields, options, selectedObj, selectedObjNonEditable) {
+                var makeSelects = function (name, data, fields, options, selectedObj, selectedObjNonEditable) {
                     var $selects = $('<div>');
                     options = options ? options : {};
 
-                    $(data).each(function() {
+                    $(data).each(function () {
                         var item = this;
                         var id = item[fields.id];
 
@@ -135,63 +118,62 @@
                             .addClass('select')
                             .append(
                                 $('<input>')
-                                .attr({
-                                    type: (function(type) {
-                                        return type ? type : 'radio';
-                                    })(options ? options.type : null),
-                                    name: name,
-                                    'wizard-field': options['wizard-field']
-                                })
-                                .val(id)
-                                .click(function() {
-                                    var $select = $(this).closest('.select');
-                                    var isSingleSelect = $select.hasClass('single-select');
-                                    var $radio = $select.find('input[type=radio]');
-                                    var $newNetwork = $(this).closest('.content').find('.select.new-network');
-                                    var $otherSelects = $select.siblings().filter(':visible');
-                                    var isCheckbox = $(this).attr('type') == 'checkbox';
+                                    .attr({
+                                        type: (function (type) {
+                                            return type ? type : 'radio';
+                                        })(options ? options.type : null),
+                                        name: name,
+                                        'wizard-field': options['wizard-field']
+                                    })
+                                    .val(id)
+                                    .click(function () {
+                                        var $select = $(this).closest('.select');
+                                        var isSingleSelect = $select.hasClass('single-select');
+                                        var $radio = $select.find('input[type=radio]');
+                                        var $newNetwork = $(this).closest('.content').find('.select.new-network');
+                                        var $otherSelects = $select.siblings().filter(':visible');
+                                        var isCheckbox = $(this).attr('type') == 'checkbox';
 
-                                    if (isCheckbox) {
-                                        if (isSingleSelect) {
-                                            $select.siblings('.single-select:visible').find('input[type=checkbox]')
-                                                .attr('checked', false);
+                                        if (isCheckbox) {
+                                            if (isSingleSelect) {
+                                                $select.siblings('.single-select:visible').find('input[type=checkbox]')
+                                                    .attr('checked', false);
 
-                                            var $checkedOtherSelect = $otherSelects.filter(function() {
-                                                return $(this).not('.single-select') &&
-                                                    $(this).find('input[type=checkbox]:checked').size() &&
-                                                    $(this).find('input[type=radio]:checked').size();
-                                            });
+                                                var $checkedOtherSelect = $otherSelects.filter(function () {
+                                                    return $(this).not('.single-select') &&
+                                                        $(this).find('input[type=checkbox]:checked').size() &&
+                                                        $(this).find('input[type=radio]:checked').size();
+                                                });
 
-                                            if (!$checkedOtherSelect.size() &&
-                                                !$('.new-network:visible input[type=radio]:checked').size()) {
+                                                if (!$checkedOtherSelect.size() && !$('.new-network:visible input[type=radio]:checked').size()) {
+                                                    $(this).closest('.select').find('input[type=radio]').click();
+                                                }
+                                            }
+
+                                            if ((!$otherSelects.size()) &&
+                                                $newNetwork.find('input[type=checkbox]').is(':unchecked')) {
+                                                // Set as default
                                                 $(this).closest('.select').find('input[type=radio]').click();
                                             }
                                         }
 
-                                        if ((!$otherSelects.size()) &&
-                                            $newNetwork.find('input[type=checkbox]').is(':unchecked')) {
-                                            // Set as default
-                                            $(this).closest('.select').find('input[type=radio]').click();
+                                        if ($radio.is(':checked') && !$(this).is(':checked')) {
+                                            if (!$radio.closest('.select').index()) {
+                                                return false;
+                                            } else {
+                                                $otherSelects.filter(':first')
+                                                    .find('input[type=radio]').click();
+                                            }
                                         }
-                                    }
 
-                                    if ($radio.is(':checked') && !$(this).is(':checked')) {
-                                        if (!$radio.closest('.select').index()) {
-                                            return false;
-                                        } else {
-                                            $otherSelects.filter(':first')
-                                                .find('input[type=radio]').click();
-                                        }
-                                    }
-
-                                    return true;
-                                })
-                        )
+                                        return true;
+                                    })
+                            )
                             .append(
                                 $('<div>').addClass('select-desc')
-                                .append($('<div>').addClass('name').html(_s(this[fields.name])))
-                                .append($('<div>').addClass('desc').html(_s(this[fields.desc])))
-                        )
+                                    .append($('<div>').addClass('name').html(_s(this[fields.name])))
+                                    .append($('<div>').addClass('desc').html(_s(this[fields.desc])))
+                            )
                             .data('json-obj', this);
 
                         if (selectedObj != null && selectedObj.id == item.id) {
@@ -215,41 +197,41 @@
                         if (options.secondary) {
                             var $secondary = $('<div>').addClass('secondary-input').append(
                                 $('<input>')
-                                .attr({
-                                    type: options.secondary.type,
-                                    name: options.secondary.name,
-                                    'wizard-field': options.secondary['wizard-field']
-                                })
-                                .val(id)
-                                .click(function() {
-                                    var $checkbox = $(this).closest('.select').find('input[type=checkbox]');
+                                    .attr({
+                                        type: options.secondary.type,
+                                        name: options.secondary.name,
+                                        'wizard-field': options.secondary['wizard-field']
+                                    })
+                                    .val(id)
+                                    .click(function () {
+                                        var $checkbox = $(this).closest('.select').find('input[type=checkbox]');
 
-                                    if (!$checkbox.is(':checked')) {
-                                        $checkbox.attr('checked', true);
-                                    }
+                                        if (!$checkbox.is(':checked')) {
+                                            $checkbox.attr('checked', true);
+                                        }
 
-                                    if ($(this).closest('.select-container').hasClass('single-select')) {
-                                        $(this).closest('.select').siblings().find('input[type=checkbox]')
-                                            .attr('checked', false);
-                                    }
+                                        if ($(this).closest('.select-container').hasClass('single-select')) {
+                                            $(this).closest('.select').siblings().find('input[type=checkbox]')
+                                                .attr('checked', false);
+                                        }
 
-                                    if ($select.hasClass('single-select')) {
-                                        $select.siblings('.single-select:visible').find('input[type=checkbox]')
-                                            .attr('checked', false);
-                                    }
-                                })
-                                .after(
-                                    $('<div>').addClass('name').html(options.secondary.desc)
-                                )
+                                        if ($select.hasClass('single-select')) {
+                                            $select.siblings('.single-select:visible').find('input[type=checkbox]')
+                                                .attr('checked', false);
+                                        }
+                                    })
+                                    .after(
+                                        $('<div>').addClass('name').html(options.secondary.desc)
+                                    )
                             ).appendTo($select);
                         }
                     });
 
                     cloudStack.evenOdd($selects, 'div.select', {
-                        even: function($elem) {
+                        even: function ($elem) {
                             $elem.addClass('even');
                         },
-                        odd: function($elem) {
+                        odd: function ($elem) {
                             $elem.addClass('odd');
                         }
                     });
@@ -257,7 +239,7 @@
                     return $selects.children();
                 };
 
-                var dataProvider = function(step, providerArgs, callback) {
+                var dataProvider = function (step, providerArgs, callback) {
                     // Call appropriate data provider
                     args.steps[step - 1]($.extend(providerArgs, {
                         currentData: cloudStack.serializeForm($form),
@@ -267,29 +249,29 @@
                 };
 
                 var dataGenerators = {
-                    setup: function($step, formData) {
-                        var originalValues = function(formData) {
+                    setup: function ($step, formData) {
+                        var originalValues = function (formData) {
                             $step.find('select').val(
                                 formData.zoneid
                             );
 
-                            $step.find('input[type=radio]').filter(function() {
+                            $step.find('input[type=radio]').filter(function () {
                                 return $(this).val() == formData['select-template'];
                             }).click();
                         };
 
                         return {
                             response: {
-                                success: function(args) {
+                                success: function (args) {
                                     // Zones
-                                    $(args.data.zones).each(function() {
+                                    $(args.data.zones).each(function () {
                                         $step.find('.select-zone select').append(
                                             $('<option>')
-                                            .attr({
-                                                value: this.id,
-                                                'wizard-field': 'zone'
-                                            })
-                                            .html(this.name)
+                                                .attr({
+                                                    value: this.id,
+                                                    'wizard-field': 'zone'
+                                                })
+                                                .html(this.name)
                                         );
                                     });
 
@@ -299,13 +281,13 @@
                         };
                     },
 
-                    'select-iso': function($step, formData) {
+                    'select-iso': function ($step, formData) {
                         $step.find('.section.custom-size').hide();
 
-                        var originalValues = function(formData) {
+                        var originalValues = function (formData) {
                             var $inputs = $step.find('.wizard-step-conditional:visible')
                                 .find('input[type=radio]');
-                            var $selected = $inputs.filter(function() {
+                            var $selected = $inputs.filter(function () {
                                 return $(this).val() == formData.templateid;
                             });
 
@@ -323,15 +305,15 @@
 
                         return {
                             response: {
-                                success: function(args) {
+                                success: function (args) {
                                     if (formData['select-template']) {
-                                        $step.find('.wizard-step-conditional').filter(function() {
+                                        $step.find('.wizard-step-conditional').filter(function () {
                                             return $(this).hasClass(formData['select-template']);
                                         }).show();
                                     } else {
                                         $step.find('.select-iso').show();
                                     }
-                                    var makeIsos = function(type, append) {
+                                    var makeIsos = function (type, append) {
                                         var $selects = makeSelects('templateid', args.data.templates[type], {
                                             name: 'name',
                                             desc: 'displaytext',
@@ -343,13 +325,13 @@
 
                                         // Get hypervisor from template
                                         if (type == 'featuredtemplates' || type == 'communitytemplates' || type == 'mytemplates' || type == 'sharedtemplates') {
-                                            $selects.each(function() {
+                                            $selects.each(function () {
                                                 var $select = $(this);
-                                                var template = $.grep(args.data.templates[type], function(tmpl, v) {
+                                                var template = $.grep(args.data.templates[type], function (tmpl, v) {
                                                     return tmpl.id == $select.find('input').val();
                                                 })[0];
 
-                                                $select.change(function() {
+                                                $select.change(function () {
                                                     $templateHypervisor
                                                         .attr('disabled', false)
                                                         .val(template.hypervisor);
@@ -361,7 +343,7 @@
 
                                         if (type == 'featuredisos' || type == 'communityisos' || type == 'myisos' || type == 'sharedisos') {
                                             // Create hypervisor select
-                                            $selects.find('input').bind('click', function() {
+                                            $selects.find('input').bind('click', function () {
                                                 var $select = $(this).closest('.select');
 
                                                 //$select.siblings().removeClass('selected').find('.hypervisor').remove(); //SelectISO has 3 tabs now. This line only remove hypervisor div in the same tab, not enough. The following 3 lines will remove hypervisor div in all of 3 tabs.
@@ -372,20 +354,20 @@
 
                                                 $select.addClass('selected').append(
                                                     $('<div>').addClass('hypervisor')
-                                                    .append($('<label>').html('Hypervisor:'))
-                                                    .append($('<select>').attr({
-                                                        name: 'hypervisorid'
-                                                    }))
+                                                        .append($('<label>').html('Hypervisor:'))
+                                                        .append($('<select>').attr({
+                                                            name: 'hypervisorid'
+                                                        }))
                                                 );
 
                                                 // Get hypervisor data
-                                                $(args.data.hypervisors).each(function() {
+                                                $(args.data.hypervisors).each(function () {
                                                     $select.find('select').append(
                                                         $('<option>').attr({
                                                             value: this[args.hypervisor.idField],
                                                             'wizard-field': 'hypervisor'
                                                         })
-                                                        .html(this[args.hypervisor.nameField])
+                                                            .html(this[args.hypervisor.nameField])
                                                     );
                                                 });
                                             });
@@ -410,11 +392,11 @@
                                             ['sharedisos', 'instance-wizard-shared-isos']
                                             //['isos', 'instance-wizard-all-isos']
                                         ]
-                                    ).each(function() {
+                                    ).each(function () {
                                         var item = this;
                                         var $selectContainer = $wizard.find('#' + item[1]).find('.select-container');
 
-                                        makeIsos(item[0], function($elem) {
+                                        makeIsos(item[0], function ($elem) {
                                             $selectContainer.append($elem);
                                         });
                                     });
@@ -431,27 +413,27 @@
                                         $step.removeClass('custom-disk-size');
                                     }
 
-                                    $step.find('input[type=radio]').bind('change', function() {
+                                    $step.find('input[type=radio]').bind('change', function () {
                                         var $target = $(this);
                                         var val = $target.val();
                                         var item = null;
                                         if (item == null) {
-                                            item = $.grep(args.data.templates.featuredtemplates, function(elem) {
+                                            item = $.grep(args.data.templates.featuredtemplates, function (elem) {
                                                 return elem.id == val;
                                             })[0];
                                         }
                                         if (item == null) {
-                                            item = $.grep(args.data.templates.communitytemplates, function(elem) {
+                                            item = $.grep(args.data.templates.communitytemplates, function (elem) {
                                                 return elem.id == val;
                                             })[0];
                                         }
                                         if (item == null) {
-                                            item = $.grep(args.data.templates.mytemplates, function(elem) {
+                                            item = $.grep(args.data.templates.mytemplates, function (elem) {
                                                 return elem.id == val;
                                             })[0];
                                         }
                                         if (item == null) {
-                                            item = $.grep(args.data.templates.sharedtemplates, function(elem) {
+                                            item = $.grep(args.data.templates.sharedtemplates, function (elem) {
                                                 return elem.id == val;
                                             })[0];
                                         }
@@ -477,10 +459,10 @@
                         };
                     },
 
-                    'service-offering': function($step, formData) {
-                        var originalValues = function(formData) {
+                    'service-offering': function ($step, formData) {
+                        var originalValues = function (formData) {
                             if (formData.serviceofferingid) {
-                                $step.find('input[type=radio]').filter(function() {
+                                $step.find('input[type=radio]').filter(function () {
                                     return $(this).val() == formData.serviceofferingid;
                                 }).click();
                             } else {
@@ -490,7 +472,7 @@
 
                         return {
                             response: {
-                                success: function(args) {
+                                success: function (args) {
                                     $step.find('.content .select-container').append(
                                         makeSelects('serviceofferingid', args.data.serviceOfferings, {
                                             name: 'name',
@@ -501,10 +483,10 @@
                                         })
                                     );
 
-                                    $step.find('input[type=radio]').bind('change', function() {
+                                    $step.find('input[type=radio]').bind('change', function () {
                                         var $target = $(this);
                                         var val = $target.val();
-                                        var item = $.grep(args.data.serviceOfferings, function(elem) {
+                                        var item = $.grep(args.data.serviceOfferings, function (elem) {
                                             return elem.id == val;
                                         })[0];
 
@@ -535,9 +517,9 @@
                         };
                     },
 
-                    'data-disk-offering': function($step, formData) {
-                        var originalValues = function(formData) {
-                            var $targetInput = $step.find('input[type=radio]').filter(function() {
+                    'data-disk-offering': function ($step, formData) {
+                        var originalValues = function (formData) {
+                            var $targetInput = $step.find('input[type=radio]').filter(function () {
                                 return $(this).val() == formData.diskofferingid;
                             }).click();
 
@@ -550,7 +532,7 @@
 
                         return {
                             response: {
-                                success: function(args) {
+                                success: function (args) {
                                     var multiDisk = args.multiDisk;
 
                                     $step.find('.multi-disk-select-container').remove();
@@ -569,17 +551,17 @@
                                     if (multiDisk) { // Render as multiple groups for each disk
                                         var $multiDiskSelect = $('<div>').addClass('multi-disk-select-container');
 
-                                        $(multiDisk).map(function(index, disk) {
+                                        $(multiDisk).map(function (index, disk) {
                                             var $group = $('<div>').addClass('disk-select-group');
                                             var $header = $('<div>').addClass('disk-select-header').append(
                                                 $('<div>').addClass('title').html(disk.label)
                                             ).appendTo($group);
                                             var $checkbox = $('<input>').addClass('multi-disk-select')
-                                            .attr({
-                                                type: 'checkbox',
-                                                'disk-id': disk.id
-                                            })
-                                            .prependTo($header);
+                                                .attr({
+                                                    type: 'checkbox',
+                                                    'disk-id': disk.id
+                                                })
+                                                .prependTo($header);
                                             var $multiSelectContainer = $selectContainer.clone().append(
                                                 makeSelects('diskofferingid.' + disk.id, args.data.diskOfferings, {
                                                     id: 'id',
@@ -594,7 +576,7 @@
                                             $group.data('json-obj', disk);
 
                                             // Show-hide disk group selects
-                                            $checkbox.click(function() {
+                                            $checkbox.click(function () {
                                                 $group.toggleClass('selected');
                                                 $group.find('.select:first input[type=radio]').click();
 
@@ -627,10 +609,10 @@
                                         );
                                     }
 
-                                    $step.find('input[type=radio]').bind('change', function() {
+                                    $step.find('input[type=radio]').bind('change', function () {
                                         var $target = $(this);
                                         var val = $target.val();
-                                        var item = $.grep(args.data.diskOfferings, function(elem) {
+                                        var item = $.grep(args.data.diskOfferings, function (elem) {
                                             return elem.id == val;
                                         })[0];
                                         var isMultiDisk = $step.find('.multi-disk-select').size();
@@ -665,27 +647,27 @@
 
                                         if (custom && !isMultiDisk) {
                                             $target.parent().find('.name')
-                                            .append(
-                                                $('<span>').addClass('custom-size-label')
-                                                .append(': ')
                                                 .append(
-                                                    $('<span>').addClass('custom-disk-size').html(
-                                                        $step.find('.custom-size input[name=size]').val()
-                                                )
-                                                )
-                                                .append(' GB')
-                                            );
+                                                    $('<span>').addClass('custom-size-label')
+                                                        .append(': ')
+                                                        .append(
+                                                            $('<span>').addClass('custom-disk-size').html(
+                                                                $step.find('.custom-size input[name=size]').val()
+                                                            )
+                                                        )
+                                                        .append(' GB')
+                                                );
                                             $target.parent().find('.select-desc .desc')
-                                            .append(
-                                                $('<span>').addClass('custom-size-label')
-                                                .append(', ')
                                                 .append(
-                                                    $('<span>').addClass('custom-disk-size').html(
-                                                        $step.find('.custom-size input[name=size]').val()
-                                                )
-                                                )
-                                                .append(' GB')
-                                            );
+                                                    $('<span>').addClass('custom-size-label')
+                                                        .append(', ')
+                                                        .append(
+                                                            $('<span>').addClass('custom-disk-size').html(
+                                                                $step.find('.custom-size input[name=size]').val()
+                                                            )
+                                                        )
+                                                        .append(' GB')
+                                                );
                                             $step.find('.section.custom-size').show();
                                             $step.addClass('custom-disk-size');
                                             $target.closest('.select-container').scrollTop(
@@ -719,10 +701,10 @@
                         };
                     },
 
-                    'affinity': function($step, formData) {
+                    'affinity': function ($step, formData) {
                         return {
                             response: {
-                                success: function(args) {
+                                success: function (args) {
                                     // Cleanup
                                     $step.find('.main-desc, p.no-affinity-groups').remove();
 
@@ -757,10 +739,10 @@
                         };
                     },
 
-                    'sshkeyPairs': function($step, formData) {
-                        var originalValues = function(formData) {
+                    'sshkeyPairs': function ($step, formData) {
+                        var originalValues = function (formData) {
                             if (formData.sshkeypair) {
-                                $step.find('input[type=radio]').filter(function() {
+                                $step.find('input[type=radio]').filter(function () {
                                     return $(this).val() == formData.sshkeypair;
                                 }).click();
                             } else {
@@ -769,7 +751,7 @@
                         };
                         return {
                             response: {
-                                success: function(args) {
+                                success: function (args) {
                                     $step.find('.main-desc, p.no-sshkey-pairs').remove();
 
                                     if (args.data.sshkeyPairs && args.data.sshkeyPairs.length) {
@@ -802,10 +784,10 @@
                         };
                     },
 
-                    'network': function($step, formData) {
+                    'network': function ($step, formData) {
                         var showAddNetwork = true;
 
-                        var checkShowAddNetwork = function($newNetwork) {
+                        var checkShowAddNetwork = function ($newNetwork) {
                             if (!showAddNetwork) {
                                 $newNetwork.hide();
                             } else {
@@ -813,9 +795,9 @@
                             }
                         };
 
-                        var originalValues = function(formData) {
+                        var originalValues = function (formData) {
                             // Default networks
-                            $step.find('input[type=radio]').filter(function() {
+                            $step.find('input[type=radio]').filter(function () {
                                 return $(this).val() == formData['defaultNetwork'];
                             }).click();
 
@@ -823,7 +805,7 @@
                             var selectedOptionalNetworks = [];
 
                             if ($.isArray(formData['shared-networks']) != -1) {
-                                $(formData['shared-networks']).each(function() {
+                                $(formData['shared-networks']).each(function () {
                                     selectedOptionalNetworks.push(this);
                                 });
                             } else {
@@ -831,9 +813,9 @@
                             }
 
                             var $checkboxes = $step.find('input[name=shared-networks]');
-                            $(selectedOptionalNetworks).each(function() {
+                            $(selectedOptionalNetworks).each(function () {
                                 var networkID = this;
-                                $checkboxes.filter(function() {
+                                $checkboxes.filter(function () {
                                     return $(this).val() == networkID;
                                 }).attr('checked', 'checked');
                             });
@@ -844,7 +826,7 @@
 
                         // Setup new network field
                         $newNetworkCheckbox.unbind('click');
-                        $newNetworkCheckbox.click(function() {
+                        $newNetworkCheckbox.click(function () {
                             $newNetwork.toggleClass('unselected');
 
                             // Select another default if hiding field
@@ -855,7 +837,7 @@
                             }
                         });
 
-                        setTimeout(function() {
+                        setTimeout(function () {
                             var $checkbox = $step.find('.new-network input[type=checkbox]');
                             var $newNetwork = $checkbox.closest('.new-network');
 
@@ -880,9 +862,9 @@
                         }
 
                         // Filter network list by VPC ID
-                        var filterNetworkList = function(vpcID) {
+                        var filterNetworkList = function (vpcID) {
                             var $selects = $step.find('.my-networks .select-container .select');
-                            var $visibleSelects = $($.grep($selects, function(select) {
+                            var $visibleSelects = $($.grep($selects, function (select) {
                                 var $select = $(select);
 
                                 return args.vpcFilter($select.data('json-obj'), vpcID);
@@ -915,11 +897,11 @@
                                 .click();
 
                             cloudStack.evenOdd($visibleSelects, 'div.select', {
-                                even: function($elem) {
+                                even: function ($elem) {
                                     $elem.removeClass('odd');
                                     $elem.addClass('even');
                                 },
-                                odd: function($elem) {
+                                odd: function ($elem) {
                                     $elem.removeClass('even');
                                     $elem.addClass('odd');
                                 }
@@ -929,20 +911,20 @@
                         var $vpcSelect = $step.find('select[name=vpc-filter]');
 
                         $vpcSelect.unbind('change');
-                        $vpcSelect.change(function() {
+                        $vpcSelect.change(function () {
                             filterNetworkList($vpcSelect.val());
                         });
 
                         return {
                             response: {
-                                success: function(args) {
+                                success: function (args) {
                                     var vpcs = args.data.vpcs;
                                     var addClass = args.addClass;
                                     var removeClass = args.removeClass;
 
                                     // Populate VPC drop-down
                                     $vpcSelect.html('');
-                                    $(vpcs).map(function(index, vpc) {
+                                    $(vpcs).map(function (index, vpc) {
                                         var $option = $('<option>');
                                         var id = vpc.id;
                                         var description = vpc.name;
@@ -958,7 +940,7 @@
                                     $vpcSelect.val(-1);
 
                                     // Populate network offering drop-down
-                                    $(args.data.networkOfferings).each(function() {
+                                    $(args.data.networkOfferings).each(function () {
                                         $('<option>')
                                             .val(this.id)
                                             .html(this.name)
@@ -966,7 +948,7 @@
                                     });
 
                                     if (args.type) {
-                                        $step.find('.wizard-step-conditional').filter(function() {
+                                        $step.find('.wizard-step-conditional').filter(function () {
                                             return $(this).hasClass(args.type);
                                         }).show();
                                     } else {
@@ -997,7 +979,7 @@
                                         var $advancedLink = $('<div>').addClass('advanced-options hide-if-unselected');
                                         var $specifyIpField = $('<div>').addClass('specify-ip hide-if-unselected').append(
                                             $('<label>').html(_l('label.ip.address')),
-                                            $('<input>').attr({ type: 'text' })
+                                            $('<input>').attr({type: 'text'})
                                         );
 
                                         // Cleanup
@@ -1006,7 +988,7 @@
                                         }
 
                                         $select.append($advancedLink, $specifyIpField);
-                                        $advancedLink.click(function() {
+                                        $advancedLink.click(function () {
                                             $select.toggleClass('advanced');
                                         });
                                     });
@@ -1028,10 +1010,10 @@
                                     //If there is only one security group and the only one is 'default', make it selected by default
                                     if ($sgSelects.length == 1) {
                                         var $firstCheckbox = $sgSelects.eq(0);
-                                      if ($firstCheckbox.find('div .name').text() == 'default') {
-                                        $firstCheckbox.find('input:checkbox').click();
-                                      }
-                                  }
+                                        if ($firstCheckbox.find('div .name').text() == 'default') {
+                                            $firstCheckbox.find('input:checkbox').click();
+                                        }
+                                    }
 
                                     originalValues(formData);
                                     checkShowAddNetwork($newNetwork);
@@ -1040,11 +1022,11 @@
                         };
                     },
 
-                    'review': function($step, formData) {
-                        $step.find('[wizard-field]').each(function() {
+                    'review': function ($step, formData) {
+                        $step.find('[wizard-field]').each(function () {
                             var field = $(this).attr('wizard-field');
                             var fieldName;
-                            var $input = $wizard.find('[wizard-field=' + field + ']').filter(function() {
+                            var $input = $wizard.find('[wizard-field=' + field + ']').filter(function () {
                                 return ($(this).is(':selected') ||
                                     $(this).is(':checked') ||
                                     $(this).attr('type') == 'hidden') &&
@@ -1065,7 +1047,7 @@
                                 }
                             } else if ($input.eq(0).is('input[type=checkbox]')) {
                                 fieldName = '';
-                                $input.each(function(index) {
+                                $input.each(function (index) {
                                     if (index != 0) fieldName += '<br />';
                                     fieldName += $(this).next('div.select-desc').find('.name').html();
                                 });
@@ -1091,13 +1073,13 @@
                     }
                 };
 
-                $wizard.bind('cloudStack.instanceWizard.showStep', function(e, args) {
-                    showStep(args.index, { refresh: true });
+                $wizard.bind('cloudStack.instanceWizard.showStep', function (e, args) {
+                    showStep(args.index, {refresh: true});
                 });
 
                 // Go to specified step in wizard,
                 // updating nav items and diagram
-                var showStep = function(index, options) {
+                var showStep = function (index, options) {
                     if (!options) options = {};
                     var targetIndex = index - 1;
 
@@ -1147,19 +1129,19 @@
                     else $previousButton.show();
 
                     // Update progress bar
-                    var $targetProgress = $progress.removeClass('active').filter(function() {
+                    var $targetProgress = $progress.removeClass('active').filter(function () {
                         return $(this).index() <= targetIndex;
                     }).toggleClass('active');
 
                     // Update diagram; show/hide as necessary
-                    $diagramParts.filter(function() {
+                    $diagramParts.filter(function () {
                         return $(this).index() <= targetIndex;
                     }).fadeIn('slow');
-                    $diagramParts.filter(function() {
+                    $diagramParts.filter(function () {
                         return $(this).index() > targetIndex;
                     }).fadeOut('slow');
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         if (!$targetStep.find('input[type=radio]:checked').size()) {
                             $targetStep.find('input[type=radio]:first').click();
                         }
@@ -1167,14 +1149,14 @@
                 };
 
                 // Events
-                $wizard.click(function(event) {
+                $wizard.click(function (event) {
                     var $target = $(event.target);
                     var $activeStep = $form.find('.step:visible');
 
                     // Next button
                     if ($target.closest('div.button.next').size()) {
                         //step 2 - select template/ISO
-                        if($activeStep.hasClass('select-iso')) {
+                        if ($activeStep.hasClass('select-iso')) {
                             if ($activeStep.find('.content:visible input:checked').size() == 0) {
                                 cloudStack.dialog.notice({
                                     message: 'message.step.1.continue'
@@ -1290,10 +1272,10 @@
 
                 showStep(1);
 
-                $wizard.bind('change', function(event) {
+                $wizard.bind('change', function (event) {
                     var $target = $(event.target);
                     var $step = $target.closest('.step');
-                    var $futureSteps = $step.siblings().filter(function() {
+                    var $futureSteps = $step.siblings().filter(function () {
                         return $(this).index() > $step.index();
                     });
 
@@ -1302,7 +1284,7 @@
                 });
 
                 var minCustomDiskSize = args.minDiskOfferingSize ?
-                                    args.minDiskOfferingSize() : 1;
+                    args.minDiskOfferingSize() : 1;
 
                 var maxCustomDiskSize = args.maxDiskOfferingSize ?
                     args.maxDiskOfferingSize() : 100;
@@ -1312,16 +1294,16 @@
                 $wizard.find('.section.custom-size.custom-disk-size input[type=text]').val(minCustomDiskSize);
                 $wizard.find('.section.custom-size.custom-disk-size .size.max span').html(maxCustomDiskSize);
                 $wizard.find('.tab-view').tabs();
-                $wizard.find('.slider').each(function() {
-                   var $slider = $(this);
+                $wizard.find('.slider').each(function () {
+                    var $slider = $(this);
 
                     $slider.slider({
                         min: minCustomDiskSize,
                         max: maxCustomDiskSize,
-                        start: function(event) {
+                        start: function (event) {
                             $slider.closest('.section.custom-size').find('input[type=radio]').click();
                         },
-                        slide: function(event, ui) {
+                        slide: function (event, ui) {
                             $slider.closest('.section.custom-size').find('input[type=text]').val(
                                 ui.value
                             );
@@ -1332,7 +1314,7 @@
                     });
                 });
 
-                $wizard.find('div.data-disk-offering div.custom-size input[type=text]').bind('change', function() {
+                $wizard.find('div.data-disk-offering div.custom-size input[type=text]').bind('change', function () {
                     var old = $wizard.find('div.data-disk-offering div.custom-size input[type=text]').val();
                     $wizard.find('div.data-disk-offering span.custom-disk-size').html(_s(old));
                 });

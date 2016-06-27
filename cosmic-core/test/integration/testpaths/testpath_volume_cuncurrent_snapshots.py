@@ -1,29 +1,10 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ Test cases for VM/Volume snapshot Test Path
     Snapshot Test cases related to handling concurrent snapshots at host level.
 """
 
-from nose.plugins.attrib import attr
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import (
-    cleanup_resources,
-    validateList
-)
+from marvin.codes import PASS
 from marvin.lib.base import (
     Account,
     StoragePool,
@@ -45,11 +26,13 @@ from marvin.lib.common import (
     is_snapshot_on_nfs,
     createChecksum
 )
+from marvin.lib.utils import (
+    cleanup_resources,
+    validateList
+)
 from marvin.sshClient import SshClient
-import time
-
+from nose.plugins.attrib import attr
 from threading import Thread
-from marvin.codes import PASS
 
 
 def MigrateRootVolume(self,
@@ -135,7 +118,6 @@ def CreateSnapshot(self, root_volume, is_recurring):
 
 
 class TestConcurrentSnapshots(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         testClient = super(TestConcurrentSnapshots, cls).getClsTestClient()
@@ -718,7 +700,7 @@ class TestConcurrentSnapshots(cloudstackTestCase):
 
         # Step 1
         if not self.testdata["configurableData"][
-                "restartManagementServerThroughTestCase"]:
+            "restartManagementServerThroughTestCase"]:
             self.skipTest(
                 "Skip test if restartManagementServerThroughTestCase \
                         is not provided")

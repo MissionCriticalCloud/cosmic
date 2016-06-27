@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.api.storage;
@@ -22,7 +7,6 @@ package com.cloud.agent.api.storage;
 import com.cloud.agent.api.to.TemplateTO;
 import com.cloud.storage.Upload.Type;
 import com.cloud.template.VirtualMachineTemplate;
-
 import org.apache.cloudstack.api.InternalIdentity;
 
 public class UploadCommand extends AbstractUploadCommand implements InternalIdentity {
@@ -38,7 +22,7 @@ public class UploadCommand extends AbstractUploadCommand implements InternalIden
     private long id;
     private Type type;
 
-    public UploadCommand(VirtualMachineTemplate template, String url, String installPath, long sizeInBytes) {
+    public UploadCommand(final VirtualMachineTemplate template, final String url, final String installPath, final long sizeInBytes) {
 
         this.template = new TemplateTO(template);
         this.url = url;
@@ -46,10 +30,9 @@ public class UploadCommand extends AbstractUploadCommand implements InternalIden
         checksum = template.getChecksum();
         id = template.getId();
         templateSizeInBytes = sizeInBytes;
-
     }
 
-    public UploadCommand(String url, long id, long sizeInBytes, String installPath, Type type) {
+    public UploadCommand(final String url, final long id, final long sizeInBytes, final String installPath, final Type type) {
         template = null;
         this.url = url;
         this.installPath = installPath;
@@ -61,7 +44,7 @@ public class UploadCommand extends AbstractUploadCommand implements InternalIden
     protected UploadCommand() {
     }
 
-    public UploadCommand(UploadCommand that) {
+    public UploadCommand(final UploadCommand that) {
         template = that.template;
         url = that.url;
         installPath = that.installPath;
@@ -69,15 +52,27 @@ public class UploadCommand extends AbstractUploadCommand implements InternalIden
         id = that.id;
     }
 
+    public String getChecksum() {
+        return checksum;
+    }
+
+    public void setChecksum(final String checksum) {
+        this.checksum = checksum;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     public TemplateTO getTemplate() {
         return template;
     }
 
-    public void setTemplate(TemplateTO template) {
+    public void setTemplate(final TemplateTO template) {
         this.template = template;
     }
 
@@ -87,7 +82,7 @@ public class UploadCommand extends AbstractUploadCommand implements InternalIden
     }
 
     @Override
-    public void setUrl(String url) {
+    public void setUrl(final String url) {
         this.url = url;
     }
 
@@ -95,7 +90,7 @@ public class UploadCommand extends AbstractUploadCommand implements InternalIden
         return hvm;
     }
 
-    public void setHvm(boolean hvm) {
+    public void setHvm(final boolean hvm) {
         this.hvm = hvm;
     }
 
@@ -103,7 +98,7 @@ public class UploadCommand extends AbstractUploadCommand implements InternalIden
         return auth;
     }
 
-    public void setAuth(PasswordAuth auth) {
+    public void setAuth(final PasswordAuth auth) {
         this.auth = auth;
     }
 
@@ -111,7 +106,7 @@ public class UploadCommand extends AbstractUploadCommand implements InternalIden
         return templateSizeInBytes;
     }
 
-    public void setTemplateSizeInBytes(Long templateSizeInBytes) {
+    public void setTemplateSizeInBytes(final Long templateSizeInBytes) {
         this.templateSizeInBytes = templateSizeInBytes;
     }
 
@@ -120,27 +115,15 @@ public class UploadCommand extends AbstractUploadCommand implements InternalIden
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
-    }
-
-    public void setInstallPath(String installPath) {
-        this.installPath = installPath;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setChecksum(String checksum) {
-        this.checksum = checksum;
     }
 
     public String getInstallPath() {
         return installPath;
     }
 
-    public String getChecksum() {
-        return checksum;
+    public void setInstallPath(final String installPath) {
+        this.installPath = installPath;
     }
 }

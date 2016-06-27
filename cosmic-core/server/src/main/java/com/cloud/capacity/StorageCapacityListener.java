@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.capacity;
-
-import java.math.BigDecimal;
 
 import com.cloud.agent.Listener;
 import com.cloud.agent.api.AgentControlAnswer;
@@ -32,52 +14,53 @@ import com.cloud.host.Status;
 import com.cloud.storage.Storage;
 import com.cloud.storage.StorageManager;
 
+import java.math.BigDecimal;
+
 public class StorageCapacityListener implements Listener {
 
     CapacityDao _capacityDao;
     StorageManager _storageMgr;
 
-    public StorageCapacityListener(CapacityDao capacityDao, StorageManager storageMgr) {
+    public StorageCapacityListener(final CapacityDao capacityDao, final StorageManager storageMgr) {
         this._capacityDao = capacityDao;
         this._storageMgr = storageMgr;
     }
 
     @Override
-    public boolean processAnswers(long agentId, long seq, Answer[] answers) {
+    public boolean processAnswers(final long agentId, final long seq, final Answer[] answers) {
         return false;
     }
 
     @Override
-    public boolean processCommands(long agentId, long seq, Command[] commands) {
+    public boolean processCommands(final long agentId, final long seq, final Command[] commands) {
         return false;
     }
 
     @Override
-    public AgentControlAnswer processControlCommand(long agentId, AgentControlCommand cmd) {
+    public AgentControlAnswer processControlCommand(final long agentId, final AgentControlCommand cmd) {
 
         return null;
     }
 
     @Override
-    public void processConnect(Host server, StartupCommand startup, boolean forRebalance) throws ConnectionException {
+    public void processConnect(final Host server, final StartupCommand startup, final boolean forRebalance) throws ConnectionException {
 
         if (!(startup instanceof StartupStorageCommand)) {
             return;
         }
 
-        StartupStorageCommand ssCmd = (StartupStorageCommand)startup;
+        final StartupStorageCommand ssCmd = (StartupStorageCommand) startup;
         if (ssCmd.getResourceType() == Storage.StorageResourceType.STORAGE_HOST) {
-            BigDecimal overProvFactor = BigDecimal.valueOf(CapacityManager.StorageOverprovisioningFactor.value());
-            CapacityVO capacity =
-                new CapacityVO(server.getId(), server.getDataCenterId(), server.getPodId(), server.getClusterId(), 0L, (overProvFactor.multiply(new BigDecimal(
-                    server.getTotalSize()))).longValue(), Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED);
+            final BigDecimal overProvFactor = BigDecimal.valueOf(CapacityManager.StorageOverprovisioningFactor.value());
+            final CapacityVO capacity =
+                    new CapacityVO(server.getId(), server.getDataCenterId(), server.getPodId(), server.getClusterId(), 0L, (overProvFactor.multiply(new BigDecimal(
+                            server.getTotalSize()))).longValue(), Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED);
             _capacityDao.persist(capacity);
         }
-
     }
 
     @Override
-    public boolean processDisconnect(long agentId, Status state) {
+    public boolean processDisconnect(final long agentId, final Status state) {
         return false;
     }
 
@@ -92,8 +75,7 @@ public class StorageCapacityListener implements Listener {
     }
 
     @Override
-    public boolean processTimeout(long agentId, long seq) {
+    public boolean processTimeout(final long agentId, final long seq) {
         return false;
     }
-
 }

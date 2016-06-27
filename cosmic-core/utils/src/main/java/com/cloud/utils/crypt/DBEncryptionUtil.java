@@ -1,28 +1,13 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.utils.crypt;
 
-import java.util.Properties;
-
 import com.cloud.utils.db.DbProperties;
 import com.cloud.utils.exception.CloudRuntimeException;
+
+import java.util.Properties;
 
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
@@ -34,7 +19,7 @@ public class DBEncryptionUtil {
     public static final Logger s_logger = LoggerFactory.getLogger(DBEncryptionUtil.class);
     private static StandardPBEStringEncryptor s_encryptor = null;
 
-    public static String encrypt(String plain) {
+    public static String encrypt(final String plain) {
         if (!EncryptionSecretKeyChecker.useEncryption() || (plain == null) || plain.isEmpty()) {
             return plain;
         }
@@ -44,36 +29,18 @@ public class DBEncryptionUtil {
         String encryptedString = null;
         try {
             encryptedString = s_encryptor.encrypt(plain);
-        } catch (EncryptionOperationNotPossibleException e) {
+        } catch (final EncryptionOperationNotPossibleException e) {
             s_logger.debug("Error while encrypting: " + plain);
             throw e;
         }
         return encryptedString;
     }
 
-    public static String decrypt(String encrypted) {
-        if (!EncryptionSecretKeyChecker.useEncryption() || (encrypted == null) || encrypted.isEmpty()) {
-            return encrypted;
-        }
-        if (s_encryptor == null) {
-            initialize();
-        }
-
-        String plain = null;
-        try {
-            plain = s_encryptor.decrypt(encrypted);
-        } catch (EncryptionOperationNotPossibleException e) {
-            s_logger.debug("Error while decrypting: " + encrypted);
-            throw e;
-        }
-        return plain;
-    }
-
     private static void initialize() {
         final Properties dbProps = DbProperties.getDbProperties();
 
         if (EncryptionSecretKeyChecker.useEncryption()) {
-            String dbSecretKey = dbProps.getProperty("db.cloud.encrypt.secret");
+            final String dbSecretKey = dbProps.getProperty("db.cloud.encrypt.secret");
             if (dbSecretKey == null || dbSecretKey.isEmpty()) {
                 throw new CloudRuntimeException("Empty DB secret key in db.properties");
             }
@@ -84,5 +51,23 @@ public class DBEncryptionUtil {
         } else {
             throw new CloudRuntimeException("Trying to encrypt db values when encrytion is not enabled");
         }
+    }
+
+    public static String decrypt(final String encrypted) {
+        if (!EncryptionSecretKeyChecker.useEncryption() || (encrypted == null) || encrypted.isEmpty()) {
+            return encrypted;
+        }
+        if (s_encryptor == null) {
+            initialize();
+        }
+
+        String plain = null;
+        try {
+            plain = s_encryptor.decrypt(encrypted);
+        } catch (final EncryptionOperationNotPossibleException e) {
+            s_logger.debug("Error while decrypting: " + encrypted);
+            throw e;
+        }
+        return plain;
     }
 }

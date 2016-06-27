@@ -1,20 +1,3 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 """ Tests for Dynamic Compute Offering Feature
 
     Test Plan: https://cwiki.apache.org/confluence/display/CLOUDSTACK
@@ -25,12 +8,9 @@
     Feature Specifications: https://cwiki.apache.org/confluence/display/
     CLOUDSTACK/Dynamic+Compute+Offering+FS
 """
+from ddt import ddt, data
 from marvin.cloudstackTestCase import cloudstackTestCase, unittest
-from marvin.lib.utils import (
-    cleanup_resources,
-    validateList,
-    random_gen
-)
+from marvin.codes import PASS, ADMIN_ACCOUNT, USER_ACCOUNT, FAILED
 from marvin.lib.base import (
     Account,
     VirtualMachine,
@@ -46,15 +26,16 @@ from marvin.lib.common import (
     verifyComputeOfferingCreation,
     get_hypervisor_type
 )
-
+from marvin.lib.utils import (
+    cleanup_resources,
+    validateList,
+    random_gen
+)
 from nose.plugins.attrib import attr
-from marvin.codes import PASS, ADMIN_ACCOUNT, USER_ACCOUNT, FAILED
-from ddt import ddt, data
 
 
 @ddt
 class TestDynamicServiceOffering(cloudstackTestCase):
-
     """Test Dynamic Service Offerings
     """
 
@@ -478,7 +459,6 @@ class TestDynamicServiceOffering(cloudstackTestCase):
 
 @ddt
 class TestScaleVmDynamicServiceOffering(cloudstackTestCase):
-
     """Test scaling VMs with dynamic Service Offerings
     """
 
@@ -892,7 +872,7 @@ class TestScaleVmDynamicServiceOffering(cloudstackTestCase):
         return
 
     @data(ADMIN_ACCOUNT, USER_ACCOUNT)
-    @attr(tags=["basic", "advanced"],required_hardware="true")
+    @attr(tags=["basic", "advanced"], required_hardware="true")
     def test_change_so_running_vm_static_to_static(self, value):
         """Test scale running VM from static offering to static offering"""
 
@@ -964,7 +944,7 @@ class TestScaleVmDynamicServiceOffering(cloudstackTestCase):
         return
 
     @data(ADMIN_ACCOUNT, USER_ACCOUNT)
-    @attr(tags=["basic", "advanced"],required_hardware="true")
+    @attr(tags=["basic", "advanced"], required_hardware="true")
     def test_change_so_running_vm_static_to_dynamic(self, value):
         """Test scale running VM from static offering to dynamic offering"""
 
@@ -1070,7 +1050,7 @@ class TestScaleVmDynamicServiceOffering(cloudstackTestCase):
         return
 
     @data(ADMIN_ACCOUNT, USER_ACCOUNT)
-    @attr(tags=["basic", "advanced"],required_hardware="true")
+    @attr(tags=["basic", "advanced"], required_hardware="true")
     def test_change_so_running_vm_dynamic_to_static(self, value):
         """Test scale running VM from dynamic offering to static offering"""
 
@@ -1147,7 +1127,7 @@ class TestScaleVmDynamicServiceOffering(cloudstackTestCase):
         return
 
     @data(ADMIN_ACCOUNT, USER_ACCOUNT)
-    @attr(tags=["basic", "advanced"],required_hardware="true")
+    @attr(tags=["basic", "advanced"], required_hardware="true")
     def test_change_so_running_vm_dynamic_to_dynamic(self, value):
         """Test scale running VM from dynamic offering to dynamic offering"""
 
@@ -1254,7 +1234,6 @@ class TestScaleVmDynamicServiceOffering(cloudstackTestCase):
 
 @ddt
 class TestAccountLimits(cloudstackTestCase):
-
     """Test max limit of account (cpunumber and memory) with dynamic
        compute offering
     """
@@ -1593,7 +1572,6 @@ class TestAccountLimits(cloudstackTestCase):
 
 @ddt
 class TestAffinityGroup(cloudstackTestCase):
-
     """Test affinity group working with VMs created with dynamic offering
     """
 

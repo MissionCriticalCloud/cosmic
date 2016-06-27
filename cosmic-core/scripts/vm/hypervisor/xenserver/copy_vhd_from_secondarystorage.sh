@@ -1,30 +1,14 @@
-#!/bin/bash
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+#! /bin/bash
 
 #set -x
- 
+
 usage() {
-  printf "Usage: %s [vhd file in secondary storage] [uuid of the source sr] [name label]  \n" $(basename $0) 
+  printf "Usage: %s [vhd file in secondary storage] [uuid of the source sr] [name label]  \n" $(basename $0)
 }
 
 cleanup()
 {
-  if [ ! -z $localmp ]; then 
+  if [ ! -z $localmp ]; then
     umount -fl $localmp
     if [ $? -eq 0 ];  then
       rmdir $localmp
@@ -158,7 +142,7 @@ elif [ $type == "lvmoiscsi" -o $type == "lvm" -o $type == "lvmohba" ]; then
     exit 0
   fi
   copyvhd $desvhd $vhdfile $lvsize $type
-else 
+else
   echo "15#doesn't support sr type $type"
   cleanup
   exit 0

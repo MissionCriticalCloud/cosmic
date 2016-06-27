@@ -1,21 +1,11 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.cloud.network.router.deployment;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -24,16 +14,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.HostPodVO;
@@ -60,8 +40,11 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine;
-
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,6 +60,17 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
 
     protected RouterDeploymentDefinition deployment;
 
+    @Before
+    public void initTest() {
+        initMocks();
+
+        deployment = builder.create()
+                            .setGuestNetwork(mockNw)
+                            .setDeployDestination(mockDestination)
+                            .setAccountOwner(mockOwner)
+                            .setParams(params)
+                            .build();
+    }
 
     @Override
     protected void initMocks() {
@@ -89,26 +83,14 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         when(mockNw.getId()).thenReturn(NW_ID_1);
     }
 
-    @Before
-    public void initTest() {
-        initMocks();
-
-        deployment = builder.create()
-                .setGuestNetwork(mockNw)
-                .setDeployDestination(mockDestination)
-                .setAccountOwner(mockOwner)
-                .setParams(params)
-                .build();
-    }
-
     @Test
     public void testRedundancyProperty() {
         // Set and confirm is redundant
         when(mockNw.isRedundant()).thenReturn(true);
         final RouterDeploymentDefinition deployment = builder.create()
-                .setGuestNetwork(mockNw)
-                .setDeployDestination(mockDestination)
-                .build();
+                                                             .setGuestNetwork(mockNw)
+                                                             .setDeployDestination(mockDestination)
+                                                             .build();
         assertTrue("The builder ignored redundancy from its inner network", deployment.isRedundant());
         when(mockNw.isRedundant()).thenReturn(false);
         assertFalse("The builder ignored redundancy from its inner network", deployment.isRedundant());
@@ -141,7 +123,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     public void testLock() {
         // Prepare
         when(mockNwDao.acquireInLockTable(NW_ID_1, NetworkOrchestrationService.NetworkLockTimeout.value()))
-        .thenReturn(mockNw);
+                .thenReturn(mockNw);
 
         // Execute
         deployment.lock();
@@ -156,7 +138,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     public void testLockFails() {
         // Prepare
         when(mockNwDao.acquireInLockTable(NW_ID_1, NetworkOrchestrationService.NetworkLockTimeout.value()))
-        .thenReturn(null);
+                .thenReturn(null);
 
         // Execute
         try {
@@ -166,7 +148,6 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
             verify(mockNwDao, times(1)).acquireInLockTable(NW_ID_1, 600);
             assertNull(deployment.tableLockId);
         }
-
     }
 
     @Test
@@ -475,7 +456,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
 
     @Test
     public void testFindOrDeployVirtualRouter() throws ConcurrentOperationException,
-    InsufficientCapacityException, ResourceUnavailableException {
+            InsufficientCapacityException, ResourceUnavailableException {
         // Prepare
         final RouterDeploymentDefinition deploymentUT = spy(deployment);
         doNothing().when(deploymentUT).findOrDeployVirtualRouter();
@@ -489,7 +470,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
 
     @Test(expected = ConcurrentOperationException.class)
     public void testDeployVirtualRouter() throws ConcurrentOperationException,
-    InsufficientCapacityException, ResourceUnavailableException {
+            InsufficientCapacityException, ResourceUnavailableException {
 
         // Prepare
         final List<DeployDestination> mockDestinations = new ArrayList<>();
@@ -527,7 +508,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
 
     @Test
     public void testDeployVirtualRouterSkip() throws ConcurrentOperationException,
-    InsufficientCapacityException, ResourceUnavailableException {
+            InsufficientCapacityException, ResourceUnavailableException {
 
         // Prepare
         final List<DeployDestination> mockDestinations = new ArrayList<>();
@@ -587,12 +568,12 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         final Type type = Type.VirtualRouter;
         final PhysicalNetworkServiceProviderVO physicalNwSrvProvider = mock(PhysicalNetworkServiceProviderVO.class);
         when(physicalProviderDao.findByServiceProvider(PHYSICAL_NW_ID, type.toString()))
-        .thenReturn(physicalNwSrvProvider);
+                .thenReturn(physicalNwSrvProvider);
         when(physicalNwSrvProvider.getId()).thenReturn(PROVIDER_ID);
 
         final VirtualRouterProviderVO vrProvider = mock(VirtualRouterProviderVO.class);
         when(mockVrProviderDao.findByNspIdAndType(PROVIDER_ID, type))
-        .thenReturn(vrProvider);
+                .thenReturn(vrProvider);
 
         // Execute
         deployment.findVirtualProvider();
@@ -608,7 +589,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         when(mockNetworkModel.getPhysicalNetworkId(deployment.guestNetwork)).thenReturn(PHYSICAL_NW_ID);
         final Type type = Type.VirtualRouter;
         when(physicalProviderDao.findByServiceProvider(PHYSICAL_NW_ID, type.toString()))
-        .thenReturn(null);
+                .thenReturn(null);
 
         // Execute
         deployment.findVirtualProvider();
@@ -621,11 +602,11 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         final Type type = Type.VirtualRouter;
         final PhysicalNetworkServiceProviderVO physicalNwSrvProvider = mock(PhysicalNetworkServiceProviderVO.class);
         when(physicalProviderDao.findByServiceProvider(PHYSICAL_NW_ID, type.toString()))
-        .thenReturn(physicalNwSrvProvider);
+                .thenReturn(physicalNwSrvProvider);
         when(physicalNwSrvProvider.getId()).thenReturn(PROVIDER_ID);
 
         when(mockVrProviderDao.findByNspIdAndType(PROVIDER_ID, type))
-        .thenReturn(null);
+                .thenReturn(null);
 
         // Execute
         deployment.findVirtualProvider();
@@ -714,7 +695,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         final DomainRouterVO routerVO1 = mock(DomainRouterVO.class);
         final DomainRouterVO routerVO2 = mock(DomainRouterVO.class);
         when(mockNetworkHelper.deployRouter(deploymentUT, false))
-        .thenReturn(routerVO1).thenReturn(routerVO2);
+                .thenReturn(routerVO1).thenReturn(routerVO2);
 
         // Execute
         deploymentUT.deployAllVirtualRouters();
@@ -765,8 +746,10 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         assertEquals("New account shouldn't have been updated", mockOwner, deployment.owner);
     }
 
-
-
+    @Test
+    public void testPrepareDeploymentPublicNw() {
+        driveTestPrepareDeployment(true, true);
+    }
 
     protected void driveTestPrepareDeployment(final boolean isRedundant, final boolean isPublicNw) {
         // Prepare
@@ -788,11 +771,6 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     }
 
     @Test
-    public void testPrepareDeploymentPublicNw() {
-        driveTestPrepareDeployment(true, true);
-    }
-
-    @Test
     public void testPrepareDeploymentNonRedundant() {
         driveTestPrepareDeployment(false, true);
     }
@@ -800,6 +778,12 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     @Test
     public void testPrepareDeploymentRedundantNonPublicNw() {
         driveTestPrepareDeployment(true, false);
+    }
+
+    @Test
+    public void testExecuteDeploymentNoRoutersToDeploy()
+            throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException {
+        driveTestExecuteDeployment(0, true);
     }
 
     protected void driveTestExecuteDeployment(final int noOfRoutersToDeploy, final boolean passPreparation)
@@ -829,12 +813,6 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         verify(deploymentUT, times(proceedToDeployment)).findServiceOfferingId();
         verify(deploymentUT, times(proceedToDeployment)).findSourceNatIP();
         verify(deploymentUT, times(proceedToDeployment)).deployAllVirtualRouters();
-    }
-
-    @Test
-    public void testExecuteDeploymentNoRoutersToDeploy()
-            throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException {
-        driveTestExecuteDeployment(0, true);
     }
 
     @Test

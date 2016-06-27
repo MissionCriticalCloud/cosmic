@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-server</artifactId>
@@ -10,27 +10,90 @@
     </parent>
     <dependencies>
         <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-nucleo</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-cluster</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-security</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-jobs</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-utils</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>xml-apis</artifactId>
+                    <groupId>xml-apis</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-api</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-schema</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-orchestration</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-ipc</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-events</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-config</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-db</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-components-api</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-api</artifactId>
+            <version>5.1.0.1-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-nucleo</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-framework-cluster</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-framework-security</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -40,11 +103,6 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-framework-jobs</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -67,24 +125,6 @@
             <artifactId>commons-codec</artifactId>
         </dependency>
         <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-utils</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>xml-apis</artifactId>
-                    <groupId>xml-apis</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-api</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <exclusions>
@@ -93,41 +133,6 @@
                     <groupId>xml-apis</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-engine-schema</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-framework-ipc</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-framework-events</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-framework-config</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-framework-db</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-engine-components-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.opensaml</groupId>
@@ -192,18 +197,18 @@
                             <target>
                                 <copy overwrite="true" todir="${basedir}/target/conf">
                                     <fileset dir="${basedir}/conf">
-                                        <include name="*.in"/>
+                                        <include name="*.in" />
                                     </fileset>
-                                    <globmapper from="*.in" to="*"/>
+                                    <globmapper from="*.in" to="*" />
                                     <filterchain>
                                         <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile" value="${cs.replace.properties}"/>
+                                            <param type="propertiesfile" value="${cs.replace.properties}" />
                                         </filterreader>
                                     </filterchain>
                                 </copy>
                                 <copy todir="${basedir}/target/conf">
                                     <fileset dir="${basedir}/conf">
-                                        <exclude name="*.in"/>
+                                        <exclude name="*.in" />
                                     </fileset>
                                 </copy>
                             </target>

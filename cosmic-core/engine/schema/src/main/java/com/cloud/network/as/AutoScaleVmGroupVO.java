@@ -1,23 +1,7 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.as;
 
-import java.util.Date;
-import java.util.UUID;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,73 +13,56 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.api.InternalIdentity;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "autoscale_vmgroups")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class AutoScaleVmGroupVO implements AutoScaleVmGroup, InternalIdentity {
 
+    @Column(name = GenericDao.REMOVED_COLUMN)
+    protected Date removed;
+    @Column(name = GenericDao.CREATED_COLUMN)
+    protected Date created;
+    @Column(name = "display", updatable = true, nullable = false)
+    protected boolean display = true;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     long id;
-
     @Column(name = "uuid")
     String uuid;
-
     @Column(name = "zone_id", updatable = false)
     private long zoneId;
-
     @Column(name = "domain_id", updatable = false)
     private long domainId;
-
     @Column(name = "account_id")
     private long accountId;
-
     @Column(name = "load_balancer_id")
     private Long loadBalancerId;
-
     @Column(name = "min_members", updatable = true)
     private int minMembers;
-
     @Column(name = "max_members", updatable = true)
     private int maxMembers;
-
     @Column(name = "member_port")
     private int memberPort;
-
     @Column(name = "interval")
     private int interval;
-
     @Column(name = "last_interval", updatable = true)
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date lastInterval;
-
     @Column(name = "profile_id")
     private long profileId;
-
-    @Column(name = GenericDao.REMOVED_COLUMN)
-    protected Date removed;
-
-    @Column(name = GenericDao.CREATED_COLUMN)
-    protected Date created;
-
     @Column(name = "state")
     private String state;
-
-    @Column(name = "display", updatable = true, nullable = false)
-    protected boolean display = true;
 
     public AutoScaleVmGroupVO() {
     }
 
-    public AutoScaleVmGroupVO(long lbRuleId, long zoneId, long domainId,
-            long accountId, int minMembers, int maxMembers, int memberPort,
-            int interval, Date lastInterval, long profileId, String state) {
+    public AutoScaleVmGroupVO(final long lbRuleId, final long zoneId, final long domainId,
+                              final long accountId, final int minMembers, final int maxMembers, final int memberPort,
+                              final int interval, final Date lastInterval, final long profileId, final String state) {
 
         uuid = UUID.randomUUID().toString();
         loadBalancerId = lbRuleId;
@@ -121,15 +88,6 @@ public class AutoScaleVmGroupVO implements AutoScaleVmGroup, InternalIdentity {
         return id;
     }
 
-    public long getZoneId() {
-        return zoneId;
-    }
-
-    @Override
-    public long getDomainId() {
-        return domainId;
-    }
-
     @Override
     public long getAccountId() {
         return accountId;
@@ -138,6 +96,11 @@ public class AutoScaleVmGroupVO implements AutoScaleVmGroup, InternalIdentity {
     @Override
     public Long getLoadBalancerId() {
         return loadBalancerId;
+    }
+
+    @Override
+    public long getProfileId() {
+        return profileId;
     }
 
     @Override
@@ -166,8 +129,59 @@ public class AutoScaleVmGroupVO implements AutoScaleVmGroup, InternalIdentity {
     }
 
     @Override
-    public long getProfileId() {
-        return profileId;
+    public String getState() {
+        return state;
+    }
+
+    public void setState(final String state) {
+        this.state = state;
+    }
+
+    @Override
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
+    }
+
+    @Override
+    public boolean isDisplay() {
+        return display;
+    }
+
+    public void setDisplay(final boolean display) {
+        this.display = display;
+    }
+
+    public void setLastInterval(final Date lastInterval) {
+        this.lastInterval = lastInterval;
+    }
+
+    public void setInterval(final Integer interval) {
+        this.interval = interval;
+    }
+
+    public void setMaxMembers(final int maxMembers) {
+        this.maxMembers = maxMembers;
+    }
+
+    public void setMinMembers(final int minMembers) {
+        this.minMembers = minMembers;
+    }
+
+    public void setLoadBalancerId(final Long loadBalancerId) {
+        this.loadBalancerId = loadBalancerId;
+    }
+
+    public long getZoneId() {
+        return zoneId;
+    }
+
+    @Override
+    public long getDomainId() {
+        return domainId;
     }
 
     public Date getRemoved() {
@@ -176,53 +190,6 @@ public class AutoScaleVmGroupVO implements AutoScaleVmGroup, InternalIdentity {
 
     public Date getCreated() {
         return created;
-    }
-
-    @Override
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public void setMinMembers(int minMembers) {
-        this.minMembers = minMembers;
-    }
-
-    public void setMaxMembers(int maxMembers) {
-        this.maxMembers = maxMembers;
-    }
-
-    public void setInterval(Integer interval) {
-        this.interval = interval;
-    }
-
-    public void setLastInterval(Date lastInterval) {
-        this.lastInterval = lastInterval;
-    }
-
-    public void setLoadBalancerId(Long loadBalancerId) {
-        this.loadBalancerId = loadBalancerId;
-    }
-
-    @Override
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public void setDisplay(boolean display) {
-        this.display = display;
-    }
-
-    @Override
-    public boolean isDisplay() {
-        return display;
     }
 
     @Override

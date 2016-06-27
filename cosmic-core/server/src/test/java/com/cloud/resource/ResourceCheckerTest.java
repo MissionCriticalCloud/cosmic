@@ -1,5 +1,10 @@
 package com.cloud.resource;
 
+import static junit.framework.TestCase.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.powermock.api.mockito.PowerMockito.when;
+
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.DataCenterDao;
@@ -9,13 +14,10 @@ import com.cloud.exception.PermissionDeniedException;
 import com.cloud.org.Grouping;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
-import static junit.framework.TestCase.fail;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import static org.powermock.api.mockito.PowerMockito.when;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
@@ -30,7 +32,6 @@ public class ResourceCheckerTest {
     @Mock
     private HostPodDao hostPodDao;
 
-
     @Test(expected = InvalidParameterValueException.class)
     public void test_checkIfDataCenterExists_whenDataCenterDoesNotExist() throws Exception {
         when(dataCenterDao.findById(1L)).thenReturn(null);
@@ -39,12 +40,19 @@ public class ResourceCheckerTest {
         resourceChecker.checkIfDataCenterExists(1L);
     }
 
+    private ResourceChecker buildResourceChecker() {
+        return ResourceChecker.builder()
+                              .dataCenterDao(dataCenterDao)
+                              .accountManager(accountManager)
+                              .hostPodDao(hostPodDao)
+                              .build();
+    }
+
     @Test
     public void test_checkIfDataCenterExists_whenDataCenterExists() throws Exception {
         final DataCenterVO dataCenter = new DataCenterVO();
         when(dataCenterDao.findById(1L)).thenReturn(dataCenter);
         final ResourceChecker resourceChecker = buildResourceChecker();
-
 
         assertThat(resourceChecker.checkIfDataCenterExists(1L), is(dataCenter));
     }
@@ -151,14 +159,4 @@ public class ResourceCheckerTest {
             fail("No InvalidParameterValueException should have been generated");
         }
     }
-
-    private ResourceChecker buildResourceChecker() {
-        return ResourceChecker.builder()
-                .dataCenterDao(dataCenterDao)
-                .accountManager(accountManager)
-                .hostPodDao(hostPodDao)
-                .build();
-    }
-
-
 }

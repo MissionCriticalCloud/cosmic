@@ -1,29 +1,15 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.vm.dao;
+
+import org.apache.cloudstack.api.response.SecurityGroupRuleResponse;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.cloudstack.api.response.SecurityGroupRuleResponse;
-
 public class UserVmData {
+    private final Set<SecurityGroupData> securityGroupList;
+    private final Set<NicData> nics;
     private Long id;
     private String name;
     private String uuid;
@@ -64,11 +50,9 @@ public class UserVmData {
     private Long guestOsId;
     private Long rootDeviceId;
     private String rootDeviceType;
-    private Set<SecurityGroupData> securityGroupList;
     private String password;
     private Long jobId;
     private Integer jobStatus;
-    private Set<NicData> nics;
     private String hypervisor;
     private long accountId;
     private Long publicIpId;
@@ -79,8 +63,8 @@ public class UserVmData {
     private boolean initialized;
 
     public UserVmData() {
-        securityGroupList = new HashSet<SecurityGroupData>();
-        nics = new HashSet<NicData>();
+        securityGroupList = new HashSet<>();
+        nics = new HashSet<>();
         initialized = false;
     }
 
@@ -104,7 +88,7 @@ public class UserVmData {
         return hypervisor;
     }
 
-    public void setHypervisor(String hypervisor) {
+    public void setHypervisor(final String hypervisor) {
         this.hypervisor = hypervisor;
     }
 
@@ -116,7 +100,7 @@ public class UserVmData {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -124,7 +108,7 @@ public class UserVmData {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -132,7 +116,7 @@ public class UserVmData {
         return this.uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(final String uuid) {
         this.uuid = uuid;
     }
 
@@ -140,7 +124,7 @@ public class UserVmData {
         return displayName;
     }
 
-    public void setDisplayName(String displayName) {
+    public void setDisplayName(final String displayName) {
         this.displayName = displayName;
     }
 
@@ -148,7 +132,7 @@ public class UserVmData {
         return ipAddress;
     }
 
-    public void setIpAddress(String ipAddress) {
+    public void setIpAddress(final String ipAddress) {
         this.ipAddress = ipAddress;
     }
 
@@ -156,7 +140,7 @@ public class UserVmData {
         return accountName;
     }
 
-    public void setAccountName(String accountName) {
+    public void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
@@ -164,7 +148,7 @@ public class UserVmData {
         return domainId;
     }
 
-    public void setDomainId(Long domainId) {
+    public void setDomainId(final Long domainId) {
         this.domainId = domainId;
     }
 
@@ -172,7 +156,7 @@ public class UserVmData {
         return domainName;
     }
 
-    public void setDomainName(String domainName) {
+    public void setDomainName(final String domainName) {
         this.domainName = domainName;
     }
 
@@ -180,7 +164,7 @@ public class UserVmData {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 
@@ -188,7 +172,7 @@ public class UserVmData {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
@@ -196,7 +180,7 @@ public class UserVmData {
         return haEnable;
     }
 
-    public void setHaEnable(Boolean haEnable) {
+    public void setHaEnable(final Boolean haEnable) {
         this.haEnable = haEnable;
     }
 
@@ -204,7 +188,7 @@ public class UserVmData {
         return groupId;
     }
 
-    public void setGroupId(Long groupId) {
+    public void setGroupId(final Long groupId) {
         this.groupId = groupId;
     }
 
@@ -212,7 +196,7 @@ public class UserVmData {
         return group;
     }
 
-    public void setGroup(String group) {
+    public void setGroup(final String group) {
         this.group = group;
     }
 
@@ -220,7 +204,7 @@ public class UserVmData {
         return zoneId;
     }
 
-    public void setZoneId(Long zoneId) {
+    public void setZoneId(final Long zoneId) {
         this.zoneId = zoneId;
     }
 
@@ -228,7 +212,7 @@ public class UserVmData {
         return zoneName;
     }
 
-    public void setZoneName(String zoneName) {
+    public void setZoneName(final String zoneName) {
         this.zoneName = zoneName;
     }
 
@@ -236,7 +220,7 @@ public class UserVmData {
         return hostId;
     }
 
-    public void setHostId(Long hostId) {
+    public void setHostId(final Long hostId) {
         this.hostId = hostId;
     }
 
@@ -244,7 +228,7 @@ public class UserVmData {
         return hostName;
     }
 
-    public void setHostName(String hostName) {
+    public void setHostName(final String hostName) {
         this.hostName = hostName;
     }
 
@@ -252,7 +236,7 @@ public class UserVmData {
         return templateId;
     }
 
-    public void setTemplateId(Long templateId) {
+    public void setTemplateId(final Long templateId) {
         this.templateId = templateId;
     }
 
@@ -260,7 +244,7 @@ public class UserVmData {
         return templateName;
     }
 
-    public void setTemplateName(String templateName) {
+    public void setTemplateName(final String templateName) {
         this.templateName = templateName;
     }
 
@@ -268,7 +252,7 @@ public class UserVmData {
         return templateDisplayText;
     }
 
-    public void setTemplateDisplayText(String templateDisplayText) {
+    public void setTemplateDisplayText(final String templateDisplayText) {
         this.templateDisplayText = templateDisplayText;
     }
 
@@ -276,7 +260,7 @@ public class UserVmData {
         return passwordEnabled;
     }
 
-    public void setPasswordEnabled(Boolean passwordEnabled) {
+    public void setPasswordEnabled(final Boolean passwordEnabled) {
         this.passwordEnabled = passwordEnabled;
     }
 
@@ -284,7 +268,7 @@ public class UserVmData {
         return isoId;
     }
 
-    public void setIsoId(Long isoId) {
+    public void setIsoId(final Long isoId) {
         this.isoId = isoId;
     }
 
@@ -292,7 +276,7 @@ public class UserVmData {
         return isoName;
     }
 
-    public void setIsoName(String isoName) {
+    public void setIsoName(final String isoName) {
         this.isoName = isoName;
     }
 
@@ -300,7 +284,7 @@ public class UserVmData {
         return isoDisplayText;
     }
 
-    public void setIsoDisplayText(String isoDisplayText) {
+    public void setIsoDisplayText(final String isoDisplayText) {
         this.isoDisplayText = isoDisplayText;
     }
 
@@ -308,7 +292,7 @@ public class UserVmData {
         return serviceOfferingId;
     }
 
-    public void setServiceOfferingId(Long serviceOfferingId) {
+    public void setServiceOfferingId(final Long serviceOfferingId) {
         this.serviceOfferingId = serviceOfferingId;
     }
 
@@ -316,7 +300,7 @@ public class UserVmData {
         return serviceOfferingName;
     }
 
-    public void setServiceOfferingName(String serviceOfferingName) {
+    public void setServiceOfferingName(final String serviceOfferingName) {
         this.serviceOfferingName = serviceOfferingName;
     }
 
@@ -324,7 +308,7 @@ public class UserVmData {
         return cpuNumber;
     }
 
-    public void setCpuNumber(Integer cpuNumber) {
+    public void setCpuNumber(final Integer cpuNumber) {
         this.cpuNumber = cpuNumber;
     }
 
@@ -332,7 +316,7 @@ public class UserVmData {
         return cpuSpeed;
     }
 
-    public void setCpuSpeed(Integer cpuSpeed) {
+    public void setCpuSpeed(final Integer cpuSpeed) {
         this.cpuSpeed = cpuSpeed;
     }
 
@@ -340,7 +324,7 @@ public class UserVmData {
         return memory;
     }
 
-    public void setMemory(Integer memory) {
+    public void setMemory(final Integer memory) {
         this.memory = memory;
     }
 
@@ -348,7 +332,7 @@ public class UserVmData {
         return cpuUsed;
     }
 
-    public void setCpuUsed(String cpuUsed) {
+    public void setCpuUsed(final String cpuUsed) {
         this.cpuUsed = cpuUsed;
     }
 
@@ -356,7 +340,7 @@ public class UserVmData {
         return networkKbsRead;
     }
 
-    public void setNetworkKbsRead(Long networkKbsRead) {
+    public void setNetworkKbsRead(final Long networkKbsRead) {
         this.networkKbsRead = networkKbsRead;
     }
 
@@ -364,7 +348,7 @@ public class UserVmData {
         return networkKbsWrite;
     }
 
-    public void setNetworkKbsWrite(Long networkKbsWrite) {
+    public void setNetworkKbsWrite(final Long networkKbsWrite) {
         this.networkKbsWrite = networkKbsWrite;
     }
 
@@ -372,7 +356,7 @@ public class UserVmData {
         return diskKbsRead;
     }
 
-    public void setDiskKbsRead(Long diskKbsRead) {
+    public void setDiskKbsRead(final Long diskKbsRead) {
         this.diskKbsRead = diskKbsRead;
     }
 
@@ -380,7 +364,7 @@ public class UserVmData {
         return diskKbsWrite;
     }
 
-    public void setDiskKbsWrite(Long diskKbsWrite) {
+    public void setDiskKbsWrite(final Long diskKbsWrite) {
         this.diskKbsWrite = diskKbsWrite;
     }
 
@@ -388,7 +372,7 @@ public class UserVmData {
         return diskIORead;
     }
 
-    public void setDiskIORead(Long diskIORead) {
+    public void setDiskIORead(final Long diskIORead) {
         this.diskIORead = diskIORead;
     }
 
@@ -396,7 +380,7 @@ public class UserVmData {
         return diskIOWrite;
     }
 
-    public void setDiskIOWrite(Long diskIOWrite) {
+    public void setDiskIOWrite(final Long diskIOWrite) {
         this.diskIOWrite = diskIOWrite;
     }
 
@@ -404,7 +388,7 @@ public class UserVmData {
         return guestOsId;
     }
 
-    public void setGuestOsId(Long guestOsId) {
+    public void setGuestOsId(final Long guestOsId) {
         this.guestOsId = guestOsId;
     }
 
@@ -412,7 +396,7 @@ public class UserVmData {
         return rootDeviceId;
     }
 
-    public void setRootDeviceId(Long rootDeviceId) {
+    public void setRootDeviceId(final Long rootDeviceId) {
         this.rootDeviceId = rootDeviceId;
     }
 
@@ -420,7 +404,7 @@ public class UserVmData {
         return rootDeviceType;
     }
 
-    public void setRootDeviceType(String rootDeviceType) {
+    public void setRootDeviceType(final String rootDeviceType) {
         this.rootDeviceType = rootDeviceType;
     }
 
@@ -428,7 +412,7 @@ public class UserVmData {
         return password;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(final String password) {
         this.password = password;
     }
 
@@ -436,7 +420,7 @@ public class UserVmData {
         return jobId;
     }
 
-    public void setJobId(Long jobId) {
+    public void setJobId(final Long jobId) {
         this.jobId = jobId;
     }
 
@@ -444,7 +428,7 @@ public class UserVmData {
         return jobStatus;
     }
 
-    public void setJobStatus(Integer jobStatus) {
+    public void setJobStatus(final Integer jobStatus) {
         this.jobStatus = jobStatus;
     }
 
@@ -452,7 +436,7 @@ public class UserVmData {
         return forVirtualNetwork;
     }
 
-    public void setForVirtualNetwork(Boolean forVirtualNetwork) {
+    public void setForVirtualNetwork(final Boolean forVirtualNetwork) {
         this.forVirtualNetwork = forVirtualNetwork;
     }
 
@@ -460,7 +444,7 @@ public class UserVmData {
         return nics;
     }
 
-    public void addNic(NicData nics) {
+    public void addNic(final NicData nics) {
         this.nics.add(nics);
     }
 
@@ -468,8 +452,53 @@ public class UserVmData {
         return securityGroupList;
     }
 
-    public void addSecurityGroup(SecurityGroupData securityGroups) {
+    public void addSecurityGroup(final SecurityGroupData securityGroups) {
         this.securityGroupList.add(securityGroups);
+    }
+
+    public long getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(final long accountId) {
+        this.accountId = accountId;
+    }
+
+    public Long getPublicIpId() {
+        return publicIpId;
+    }
+
+    public void setPublicIpId(final Long publicIpId) {
+        this.publicIpId = publicIpId;
+    }
+
+    @Override
+    public String toString() {
+        return "id=" + id + ", name=" + name;
+    }
+
+    public String getPublicIp() {
+        return publicIp;
+    }
+
+    public void setPublicIp(final String publicIp) {
+        this.publicIp = publicIp;
+    }
+
+    public String getInstanceName() {
+        return instanceName;
+    }
+
+    public void setInstanceName(final String instanceName) {
+        this.instanceName = instanceName;
+    }
+
+    public String getSshPublicKey() {
+        return sshPublicKey;
+    }
+
+    public void setSshPublicKey(final String sshPublicKey) {
+        this.sshPublicKey = sshPublicKey;
     }
 
     public class NicData {
@@ -490,7 +519,7 @@ public class UserVmData {
             return objectName;
         }
 
-        public void setObjectName(String objectName) {
+        public void setObjectName(final String objectName) {
             this.objectName = objectName;
         }
 
@@ -498,7 +527,7 @@ public class UserVmData {
             return id;
         }
 
-        public void setId(Long id) {
+        public void setId(final Long id) {
             this.id = id;
         }
 
@@ -506,7 +535,7 @@ public class UserVmData {
             return networkid;
         }
 
-        public void setNetworkid(Long networkid) {
+        public void setNetworkid(final Long networkid) {
             this.networkid = networkid;
         }
 
@@ -514,7 +543,7 @@ public class UserVmData {
             return netmask;
         }
 
-        public void setNetmask(String netmask) {
+        public void setNetmask(final String netmask) {
             this.netmask = netmask;
         }
 
@@ -522,7 +551,7 @@ public class UserVmData {
             return gateway;
         }
 
-        public void setGateway(String gateway) {
+        public void setGateway(final String gateway) {
             this.gateway = gateway;
         }
 
@@ -530,7 +559,7 @@ public class UserVmData {
             return ipaddress;
         }
 
-        public void setIpaddress(String ipaddress) {
+        public void setIpaddress(final String ipaddress) {
             this.ipaddress = ipaddress;
         }
 
@@ -538,7 +567,7 @@ public class UserVmData {
             return isolationUri;
         }
 
-        public void setIsolationUri(String isolationUri) {
+        public void setIsolationUri(final String isolationUri) {
             this.isolationUri = isolationUri;
         }
 
@@ -546,7 +575,7 @@ public class UserVmData {
             return broadcastUri;
         }
 
-        public void setBroadcastUri(String broadcastUri) {
+        public void setBroadcastUri(final String broadcastUri) {
             this.broadcastUri = broadcastUri;
         }
 
@@ -554,7 +583,7 @@ public class UserVmData {
             return trafficType;
         }
 
-        public void setTrafficType(String trafficType) {
+        public void setTrafficType(final String trafficType) {
             this.trafficType = trafficType;
         }
 
@@ -562,7 +591,7 @@ public class UserVmData {
             return type;
         }
 
-        public void setType(String type) {
+        public void setType(final String type) {
             this.type = type;
         }
 
@@ -570,7 +599,7 @@ public class UserVmData {
             return isDefault;
         }
 
-        public void setIsDefault(Boolean isDefault) {
+        public void setIsDefault(final Boolean isDefault) {
             this.isDefault = isDefault;
         }
 
@@ -578,7 +607,7 @@ public class UserVmData {
             return macAddress;
         }
 
-        public void setMacAddress(String macAddress) {
+        public void setMacAddress(final String macAddress) {
             this.macAddress = macAddress;
         }
 
@@ -591,19 +620,24 @@ public class UserVmData {
         }
 
         @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
+        public boolean equals(final Object obj) {
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+            if (getClass() != obj.getClass()) {
                 return false;
-            NicData other = (NicData)obj;
+            }
+            final NicData other = (NicData) obj;
             if (id == null) {
-                if (other.id != null)
+                if (other.id != null) {
                     return false;
-            } else if (!id.equals(other.id))
+                }
+            } else if (!id.equals(other.id)) {
                 return false;
+            }
             return true;
         }
     }
@@ -624,7 +658,7 @@ public class UserVmData {
             return objectName;
         }
 
-        public void setObjectName(String objectName) {
+        public void setObjectName(final String objectName) {
             this.objectName = objectName;
         }
 
@@ -632,7 +666,7 @@ public class UserVmData {
             return id;
         }
 
-        public void setId(Long id) {
+        public void setId(final Long id) {
             this.id = id;
         }
 
@@ -640,7 +674,7 @@ public class UserVmData {
             return name;
         }
 
-        public void setName(String name) {
+        public void setName(final String name) {
             this.name = name;
         }
 
@@ -648,7 +682,7 @@ public class UserVmData {
             return description;
         }
 
-        public void setDescription(String description) {
+        public void setDescription(final String description) {
             this.description = description;
         }
 
@@ -656,7 +690,7 @@ public class UserVmData {
             return accountName;
         }
 
-        public void setAccountName(String accountName) {
+        public void setAccountName(final String accountName) {
             this.accountName = accountName;
         }
 
@@ -664,7 +698,7 @@ public class UserVmData {
             return domainId;
         }
 
-        public void setDomainId(Long domainId) {
+        public void setDomainId(final Long domainId) {
             this.domainId = domainId;
         }
 
@@ -672,7 +706,7 @@ public class UserVmData {
             return domainName;
         }
 
-        public void setDomainName(String domainName) {
+        public void setDomainName(final String domainName) {
             this.domainName = domainName;
         }
 
@@ -694,66 +728,25 @@ public class UserVmData {
         }
 
         @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
+        public boolean equals(final Object obj) {
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+            if (getClass() != obj.getClass()) {
                 return false;
-            SecurityGroupData other = (SecurityGroupData)obj;
+            }
+            final SecurityGroupData other = (SecurityGroupData) obj;
             if (id == null) {
-                if (other.id != null)
+                if (other.id != null) {
                     return false;
-            } else if (!id.equals(other.id))
+                }
+            } else if (!id.equals(other.id)) {
                 return false;
+            }
             return true;
         }
-
-    }
-
-    @Override
-    public String toString() {
-        return "id=" + id + ", name=" + name;
-    }
-
-    public long getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(long accountId) {
-        this.accountId = accountId;
-    }
-
-    public Long getPublicIpId() {
-        return publicIpId;
-    }
-
-    public void setPublicIpId(Long publicIpId) {
-        this.publicIpId = publicIpId;
-    }
-
-    public String getPublicIp() {
-        return publicIp;
-    }
-
-    public void setPublicIp(String publicIp) {
-        this.publicIp = publicIp;
-    }
-
-    public String getInstanceName() {
-        return instanceName;
-    }
-
-    public void setInstanceName(String instanceName) {
-        this.instanceName = instanceName;
-    }
-
-    public String getSshPublicKey() {
-        return sshPublicKey;
-    }
-
-    public void setSshPublicKey(String sshPublicKey) {
-        this.sshPublicKey = sshPublicKey;
     }
 }

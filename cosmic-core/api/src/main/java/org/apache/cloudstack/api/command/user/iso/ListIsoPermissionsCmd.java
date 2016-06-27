@@ -18,25 +18,21 @@ package org.apache.cloudstack.api.command.user.iso;
 
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.template.VirtualMachineTemplate;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.BaseListTemplateOrIsoPermissionsCmd;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.response.TemplatePermissionsResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listIsoPermissions", description = "List ISO visibility and all accounts that have permissions to view this ISO.", responseObject = TemplatePermissionsResponse.class, responseView = ResponseView.Restricted,
-            requestHasSensitiveInfo = false,
-            responseHasSensitiveInfo = false)
+@APICommand(name = "listIsoPermissions", description = "List ISO visibility and all accounts that have permissions to view this ISO.", responseObject =
+        TemplatePermissionsResponse.class, responseView = ResponseView.Restricted,
+        requestHasSensitiveInfo = false,
+        responseHasSensitiveInfo = false)
 public class ListIsoPermissionsCmd extends BaseListTemplateOrIsoPermissionsCmd {
     protected String getResponseName() {
         return "listisopermissionsresponse";
-    }
-
-    @Override
-    public String getMediaType() {
-        return "iso";
     }
 
     @Override
@@ -47,6 +43,11 @@ public class ListIsoPermissionsCmd extends BaseListTemplateOrIsoPermissionsCmd {
     @Override
     protected boolean templateIsCorrectType(VirtualMachineTemplate template) {
         return template.getFormat().equals(ImageFormat.ISO);
+    }
+
+    @Override
+    public String getMediaType() {
+        return "iso";
     }
 
     @Override

@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.hypervisor;
 
 import com.cloud.agent.api.Command;
@@ -32,18 +16,24 @@ import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.dao.VMTemplateDetailsDao;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;
-import com.cloud.vm.*;
+import com.cloud.vm.NicProfile;
+import com.cloud.vm.NicVO;
+import com.cloud.vm.UserVmManager;
+import com.cloud.vm.VMInstanceVO;
+import com.cloud.vm.VirtualMachine;
+import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class HypervisorGuruBase extends AdapterBase implements HypervisorGuru {
     public static final Logger s_logger = LoggerFactory.getLogger(HypervisorGuruBase.class);
@@ -71,50 +61,6 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
 
     protected HypervisorGuruBase() {
         super();
-    }
-
-    @Override
-    public NicTO toNicTO(final NicProfile profile) {
-        final NicTO to = new NicTO();
-        to.setDeviceId(profile.getDeviceId());
-        to.setBroadcastType(profile.getBroadcastType());
-        to.setType(profile.getTrafficType());
-        to.setIp(profile.getIPv4Address());
-        to.setNetmask(profile.getIPv4Netmask());
-        to.setMac(profile.getMacAddress());
-        to.setDns1(profile.getIPv4Dns1());
-        to.setDns2(profile.getIPv4Dns2());
-        to.setGateway(profile.getIPv4Gateway());
-        to.setDefaultNic(profile.isDefaultNic());
-        to.setBroadcastUri(profile.getBroadCastUri());
-        to.setIsolationuri(profile.getIsolationUri());
-        to.setNetworkRateMbps(profile.getNetworkRate());
-        to.setName(profile.getName());
-        to.setSecurityGroupEnabled(profile.isSecurityGroupEnabled());
-
-        final NetworkVO network = _networkDao.findById(profile.getNetworkId());
-        to.setNetworkUuid(network.getUuid());
-
-        // Workaround to make sure the TO has the UUID we need for Nicira integration
-        final NicVO nicVO = _nicDao.findById(profile.getId());
-        if (nicVO != null) {
-            to.setUuid(nicVO.getUuid());
-            List<String> secIps = null;
-            if (nicVO.getSecondaryIp()) {
-                secIps = _nicSecIpDao.getSecondaryIpAddressesForNic(nicVO.getId());
-            }
-            to.setNicSecIps(secIps);
-        } else {
-            s_logger.warn("Unabled to load NicVO for NicProfile " + profile.getId());
-            //Workaround for dynamically created nics
-            //FixMe: uuid and secondary IPs can be made part of nic profile
-            to.setUuid(UUID.randomUUID().toString());
-        }
-
-        //check whether the this nic has secondary ip addresses set
-        //set nic secondary ip address in NicTO which are used for security group
-        // configuration. Use full when vm stop/start
-        return to;
     }
 
     protected VirtualMachineTO toVirtualMachineTO(final VirtualMachineProfile vmProfile) {
@@ -177,6 +123,50 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
     }
 
     @Override
+    public NicTO toNicTO(final NicProfile profile) {
+        final NicTO to = new NicTO();
+        to.setDeviceId(profile.getDeviceId());
+        to.setBroadcastType(profile.getBroadcastType());
+        to.setType(profile.getTrafficType());
+        to.setIp(profile.getIPv4Address());
+        to.setNetmask(profile.getIPv4Netmask());
+        to.setMac(profile.getMacAddress());
+        to.setDns1(profile.getIPv4Dns1());
+        to.setDns2(profile.getIPv4Dns2());
+        to.setGateway(profile.getIPv4Gateway());
+        to.setDefaultNic(profile.isDefaultNic());
+        to.setBroadcastUri(profile.getBroadCastUri());
+        to.setIsolationuri(profile.getIsolationUri());
+        to.setNetworkRateMbps(profile.getNetworkRate());
+        to.setName(profile.getName());
+        to.setSecurityGroupEnabled(profile.isSecurityGroupEnabled());
+
+        final NetworkVO network = _networkDao.findById(profile.getNetworkId());
+        to.setNetworkUuid(network.getUuid());
+
+        // Workaround to make sure the TO has the UUID we need for Nicira integration
+        final NicVO nicVO = _nicDao.findById(profile.getId());
+        if (nicVO != null) {
+            to.setUuid(nicVO.getUuid());
+            List<String> secIps = null;
+            if (nicVO.getSecondaryIp()) {
+                secIps = _nicSecIpDao.getSecondaryIpAddressesForNic(nicVO.getId());
+            }
+            to.setNicSecIps(secIps);
+        } else {
+            s_logger.warn("Unabled to load NicVO for NicProfile " + profile.getId());
+            //Workaround for dynamically created nics
+            //FixMe: uuid and secondary IPs can be made part of nic profile
+            to.setUuid(UUID.randomUUID().toString());
+        }
+
+        //check whether the this nic has secondary ip addresses set
+        //set nic secondary ip address in NicTO which are used for security group
+        // configuration. Use full when vm stop/start
+        return to;
+    }
+
+    @Override
     public List<Command> finalizeExpunge(final VirtualMachine vm) {
         return null;
     }
@@ -195,5 +185,4 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
     public Map<String, String> getClusterSettings(final long vmId) {
         return null;
     }
-
 }

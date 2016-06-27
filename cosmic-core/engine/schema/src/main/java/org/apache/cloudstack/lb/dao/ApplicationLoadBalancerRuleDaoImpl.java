@@ -1,23 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package org.apache.cloudstack.lb.dao;
-
-import java.util.List;
 
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.State;
@@ -29,16 +10,18 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.net.Ip;
-
 import org.apache.cloudstack.lb.ApplicationLoadBalancerRuleVO;
+
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class ApplicationLoadBalancerRuleDaoImpl extends GenericDaoBase<ApplicationLoadBalancerRuleVO, Long> implements ApplicationLoadBalancerRuleDao {
     protected final SearchBuilder<ApplicationLoadBalancerRuleVO> AllFieldsSearch;
+    protected final SearchBuilder<ApplicationLoadBalancerRuleVO> NotRevokedSearch;
     final GenericSearchBuilder<ApplicationLoadBalancerRuleVO, String> listIps;
     final GenericSearchBuilder<ApplicationLoadBalancerRuleVO, Long> CountBy;
-    protected final SearchBuilder<ApplicationLoadBalancerRuleVO> NotRevokedSearch;
     final GenericSearchBuilder<ApplicationLoadBalancerRuleVO, Long> CountNotRevoked;
     final GenericSearchBuilder<ApplicationLoadBalancerRuleVO, Long> CountActive;
 
@@ -84,32 +67,32 @@ public class ApplicationLoadBalancerRuleDaoImpl extends GenericDaoBase<Applicati
     }
 
     @Override
-    public List<ApplicationLoadBalancerRuleVO> listBySrcIpSrcNtwkId(Ip sourceIp, long sourceNetworkId) {
-        SearchCriteria<ApplicationLoadBalancerRuleVO> sc = AllFieldsSearch.create();
+    public List<ApplicationLoadBalancerRuleVO> listBySrcIpSrcNtwkId(final Ip sourceIp, final long sourceNetworkId) {
+        final SearchCriteria<ApplicationLoadBalancerRuleVO> sc = AllFieldsSearch.create();
         sc.setParameters("sourceIp", sourceIp);
         sc.setParameters("sourceIpNetworkId", sourceNetworkId);
         return listBy(sc);
     }
 
     @Override
-    public List<String> listLbIpsBySourceIpNetworkId(long sourceIpNetworkId) {
-        SearchCriteria<String> sc = listIps.create();
+    public List<String> listLbIpsBySourceIpNetworkId(final long sourceIpNetworkId) {
+        final SearchCriteria<String> sc = listIps.create();
         sc.setParameters("sourceIpNetworkId", sourceIpNetworkId);
         return customSearch(sc, null);
     }
 
     @Override
-    public long countBySourceIp(Ip sourceIp, long sourceIpNetworkId) {
-        SearchCriteria<Long> sc = CountBy.create();
+    public long countBySourceIp(final Ip sourceIp, final long sourceIpNetworkId) {
+        final SearchCriteria<Long> sc = CountBy.create();
         sc.setParameters("sourceIp", sourceIp);
         sc.setParameters("sourceIpNetworkId", sourceIpNetworkId);
-        List<Long> results = customSearch(sc, null);
+        final List<Long> results = customSearch(sc, null);
         return results.get(0);
     }
 
     @Override
-    public List<ApplicationLoadBalancerRuleVO> listBySourceIpAndNotRevoked(Ip sourceIp, long sourceNetworkId) {
-        SearchCriteria<ApplicationLoadBalancerRuleVO> sc = NotRevokedSearch.create();
+    public List<ApplicationLoadBalancerRuleVO> listBySourceIpAndNotRevoked(final Ip sourceIp, final long sourceNetworkId) {
+        final SearchCriteria<ApplicationLoadBalancerRuleVO> sc = NotRevokedSearch.create();
         sc.setParameters("sourceIp", sourceIp);
         sc.setParameters("sourceIpNetworkId", sourceNetworkId);
         sc.setParameters("state", FirewallRule.State.Revoke);
@@ -117,31 +100,30 @@ public class ApplicationLoadBalancerRuleDaoImpl extends GenericDaoBase<Applicati
     }
 
     @Override
-    public List<String> listLbIpsBySourceIpNetworkIdAndScheme(long sourceIpNetworkId, Scheme scheme) {
-        SearchCriteria<String> sc = listIps.create();
+    public List<String> listLbIpsBySourceIpNetworkIdAndScheme(final long sourceIpNetworkId, final Scheme scheme) {
+        final SearchCriteria<String> sc = listIps.create();
         sc.setParameters("sourceIpNetworkId", sourceIpNetworkId);
         sc.setParameters("scheme", scheme);
         return customSearch(sc, null);
     }
 
     @Override
-    public long countBySourceIpAndNotRevoked(Ip sourceIp, long sourceIpNetworkId) {
-        SearchCriteria<Long> sc = CountNotRevoked.create();
+    public long countBySourceIpAndNotRevoked(final Ip sourceIp, final long sourceIpNetworkId) {
+        final SearchCriteria<Long> sc = CountNotRevoked.create();
         sc.setParameters("sourceIp", sourceIp);
         sc.setParameters("sourceIpNetworkId", sourceIpNetworkId);
         sc.setParameters("state", State.Revoke);
-        List<Long> results = customSearch(sc, null);
+        final List<Long> results = customSearch(sc, null);
         return results.get(0);
     }
 
     @Override
-    public long countActiveBySourceIp(Ip sourceIp, long sourceIpNetworkId) {
-        SearchCriteria<Long> sc = CountActive.create();
+    public long countActiveBySourceIp(final Ip sourceIp, final long sourceIpNetworkId) {
+        final SearchCriteria<Long> sc = CountActive.create();
         sc.setParameters("sourceIp", sourceIp);
         sc.setParameters("sourceIpNetworkId", sourceIpNetworkId);
         sc.setParameters("state", State.Active);
-        List<Long> results = customSearch(sc, null);
+        final List<Long> results = customSearch(sc, null);
         return results.get(0);
     }
-
 }

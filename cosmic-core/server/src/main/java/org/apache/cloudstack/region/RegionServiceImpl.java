@@ -1,26 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.region;
-
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.naming.ConfigurationException;
 
 import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
@@ -29,7 +7,6 @@ import com.cloud.user.Account;
 import com.cloud.user.UserAccount;
 import com.cloud.utils.component.Manager;
 import com.cloud.utils.component.ManagerBase;
-
 import org.apache.cloudstack.api.command.admin.account.DeleteAccountCmd;
 import org.apache.cloudstack.api.command.admin.account.DisableAccountCmd;
 import org.apache.cloudstack.api.command.admin.account.EnableAccountCmd;
@@ -41,6 +18,12 @@ import org.apache.cloudstack.api.command.admin.user.DisableUserCmd;
 import org.apache.cloudstack.api.command.admin.user.EnableUserCmd;
 import org.apache.cloudstack.api.command.admin.user.UpdateUserCmd;
 import org.apache.cloudstack.api.command.user.region.ListRegionsCmd;
+
+import javax.inject.Inject;
+import javax.naming.ConfigurationException;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -53,6 +36,11 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
     private RegionManager _regionMgr;
 
     private String _name;
+
+    @Override
+    public String getName() {
+        return _name;
+    }
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
@@ -70,16 +58,11 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
         return true;
     }
 
-    @Override
-    public String getName() {
-        return _name;
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public Region addRegion(int id, String name, String endPoint) {
+    public Region addRegion(final int id, final String name, final String endPoint) {
         //Check for valid Name
         //Check valid end_point url
         return _regionMgr.addRegion(id, name, endPoint);
@@ -89,7 +72,7 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
      * {@inheritDoc}
      */
     @Override
-    public Region updateRegion(int id, String name, String endPoint) {
+    public Region updateRegion(final int id, final String name, final String endPoint) {
         //Check for valid Name
         //Check valid end_point url
         return _regionMgr.updateRegion(id, name, endPoint);
@@ -99,7 +82,7 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
      * {@inheritDoc}
      */
     @Override
-    public boolean removeRegion(int id) {
+    public boolean removeRegion(final int id) {
         return _regionMgr.removeRegion(id);
     }
 
@@ -107,7 +90,7 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
      * {@inheritDoc}
      */
     @Override
-    public List<? extends Region> listRegions(ListRegionsCmd cmd) {
+    public List<? extends Region> listRegions(final ListRegionsCmd cmd) {
         return _regionMgr.listRegions(cmd.getId(), cmd.getName());
     }
 
@@ -115,7 +98,7 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
      * {@inheritDoc}
      */
     @Override
-    public boolean deleteUserAccount(DeleteAccountCmd cmd) {
+    public boolean deleteUserAccount(final DeleteAccountCmd cmd) {
         return _regionMgr.deleteUserAccount(cmd.getId());
     }
 
@@ -123,7 +106,7 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
      * {@inheritDoc}
      */
     @Override
-    public Account updateAccount(UpdateAccountCmd cmd) {
+    public Account updateAccount(final UpdateAccountCmd cmd) {
         return _regionMgr.updateAccount(cmd);
     }
 
@@ -131,7 +114,7 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
      * {@inheritDoc}
      */
     @Override
-    public Account disableAccount(DisableAccountCmd cmd) throws ConcurrentOperationException, ResourceUnavailableException {
+    public Account disableAccount(final DisableAccountCmd cmd) throws ConcurrentOperationException, ResourceUnavailableException {
         return _regionMgr.disableAccount(cmd.getAccountName(), cmd.getDomainId(), cmd.getId(), cmd.getLockRequested());
     }
 
@@ -139,7 +122,7 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
      * {@inheritDoc}
      */
     @Override
-    public Account enableAccount(EnableAccountCmd cmd) {
+    public Account enableAccount(final EnableAccountCmd cmd) {
         return _regionMgr.enableAccount(cmd.getAccountName(), cmd.getDomainId(), cmd.getId());
     }
 
@@ -147,7 +130,7 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
      * {@inheritDoc}
      */
     @Override
-    public boolean deleteUser(DeleteUserCmd cmd) {
+    public boolean deleteUser(final DeleteUserCmd cmd) {
         return _regionMgr.deleteUser(cmd);
     }
 
@@ -155,7 +138,7 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
      * {@inheritDoc}
      */
     @Override
-    public Domain updateDomain(UpdateDomainCmd cmd) {
+    public Domain updateDomain(final UpdateDomainCmd cmd) {
         return _regionMgr.updateDomain(cmd);
     }
 
@@ -163,7 +146,7 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
      * {@inheritDoc}
      */
     @Override
-    public boolean deleteDomain(DeleteDomainCmd cmd) {
+    public boolean deleteDomain(final DeleteDomainCmd cmd) {
         return _regionMgr.deleteDomain(cmd.getId(), cmd.getCleanup());
     }
 
@@ -171,7 +154,7 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
      * {@inheritDoc}
      */
     @Override
-    public UserAccount updateUser(UpdateUserCmd cmd) {
+    public UserAccount updateUser(final UpdateUserCmd cmd) {
         return _regionMgr.updateUser(cmd);
     }
 
@@ -179,7 +162,7 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
      * {@inheritDoc}
      */
     @Override
-    public UserAccount disableUser(DisableUserCmd cmd) {
+    public UserAccount disableUser(final DisableUserCmd cmd) {
         return _regionMgr.disableUser(cmd.getId());
     }
 
@@ -187,8 +170,7 @@ public class RegionServiceImpl extends ManagerBase implements RegionService, Man
      * {@inheritDoc}
      */
     @Override
-    public UserAccount enableUser(EnableUserCmd cmd) {
+    public UserAccount enableUser(final EnableUserCmd cmd) {
         return _regionMgr.enableUser(cmd.getId());
     }
-
 }

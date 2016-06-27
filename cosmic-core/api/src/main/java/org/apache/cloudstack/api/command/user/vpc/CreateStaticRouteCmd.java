@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.vpc;
 
 import com.cloud.event.EventTypes;
@@ -24,7 +8,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.vpc.StaticRoute;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcGateway;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
@@ -37,19 +20,19 @@ import org.apache.cloudstack.api.response.PrivateGatewayResponse;
 import org.apache.cloudstack.api.response.StaticRouteResponse;
 import org.apache.cloudstack.api.response.VpcResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @APICommand(name = "createStaticRoute", description = "Creates a static route", responseObject = StaticRouteResponse.class, entityType = {StaticRoute.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateStaticRouteCmd extends BaseAsyncCreateCmd {
-    private static final String s_name = "createstaticrouteresponse";
     public static final Logger s_logger = LoggerFactory.getLogger(CreateStaticRouteCmd.class.getName());
-
+    private static final String s_name = "createstaticrouteresponse";
     @Parameter(name = ApiConstants.VPC_ID,
-               type = CommandType.UUID,
-               entityType = VpcResponse.class,
-               description = "The VPC id we are creating static route for.")
+            type = CommandType.UUID,
+            entityType = VpcResponse.class,
+            description = "The VPC id we are creating static route for.")
     private Long vpcId;
 
     @Parameter(name = ApiConstants.CIDR, required = true, type = CommandType.STRING, description = "The CIDR to create the static route for")
@@ -64,35 +47,6 @@ public class CreateStaticRouteCmd extends BaseAsyncCreateCmd {
             description = "The private gateway id to get the ipaddress from (DEPRECATED!).")
     private Long gatewayId;
 
-    // Compatibility with < 5.2
-    private void Compatibility() {
-        if (getGatewayId() != null) {
-            VpcGateway gateway = _vpcService.getVpcPrivateGateway(getGatewayId());
-            gwIpAddress = gateway.getGateway();
-            vpcId = gateway.getVpcId();
-        }
-        CheckParameters();
-    }
-
-    private void CheckParameters() throws InvalidParameterValueException {
-        if (vpcId == null) {
-            throw new InvalidParameterValueException(
-                    "VpcId should not be empty. Either specify VpcId (recommended) or specify gatewayId (deprecated).");
-        }
-        if (gwIpAddress == null) {
-            throw new InvalidParameterValueException(
-                    "Parameter nexthop should not be empty. Either specify nexthop ip address (recommended) or specify gatewayId (deprecated).");
-        }
-    }
-
-    /////////////////////////////////////////////////////
-    /////////////////// Accessors ///////////////////////
-    /////////////////////////////////////////////////////
-    public Long getVpcId() {
-        Compatibility();
-        return vpcId;
-    }
-
     public String getCidr() {
         return cidr;
     }
@@ -102,20 +56,16 @@ public class CreateStaticRouteCmd extends BaseAsyncCreateCmd {
         return gwIpAddress;
     }
 
-    public Long getGatewayId() {
-        return gatewayId;
-    }
-
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
     @Override
     public void create() throws ResourceAllocationException {
         try {
-            StaticRoute result = _vpcService.createStaticRoute(getVpcId(), getCidr(), getGwIpAddress());
+            final StaticRoute result = _vpcService.createStaticRoute(getVpcId(), getCidr(), getGwIpAddress());
             setEntityId(result.getId());
             setEntityUuid(result.getUuid());
-        } catch (NetworkRuleConflictException ex) {
+        } catch (final NetworkRuleConflictException ex) {
             s_logger.info("Network rule conflict: " + ex.getMessage());
             s_logger.trace("Network rule conflict: ", ex);
             throw new ServerApiException(ApiErrorCode.NETWORK_RULE_CONFLICT_ERROR, ex.getMessage());
@@ -130,6 +80,54 @@ public class CreateStaticRouteCmd extends BaseAsyncCreateCmd {
     @Override
     public String getEventDescription() {
         return "Applying static route. Static route Id: " + getEntityId();
+    }
+
+    @Override
+    public ApiCommandJobType getInstanceType() {
+        return ApiCommandJobType.StaticRoute;
+    }
+
+    @Override
+    public String getSyncObjType() {
+        return BaseAsyncCmd.vpcSyncObject;
+    }
+
+    @Override
+    public Long getSyncObjId() {
+        return getVpcId();
+    }
+
+    /////////////////////////////////////////////////////
+    /////////////////// Accessors ///////////////////////
+    /////////////////////////////////////////////////////
+    public Long getVpcId() {
+        Compatibility();
+        return vpcId;
+    }
+
+    // Compatibility with < 5.2
+    private void Compatibility() {
+        if (getGatewayId() != null) {
+            final VpcGateway gateway = _vpcService.getVpcPrivateGateway(getGatewayId());
+            gwIpAddress = gateway.getGateway();
+            vpcId = gateway.getVpcId();
+        }
+        CheckParameters();
+    }
+
+    public Long getGatewayId() {
+        return gatewayId;
+    }
+
+    private void CheckParameters() throws InvalidParameterValueException {
+        if (vpcId == null) {
+            throw new InvalidParameterValueException(
+                    "VpcId should not be empty. Either specify VpcId (recommended) or specify gatewayId (deprecated).");
+        }
+        if (gwIpAddress == null) {
+            throw new InvalidParameterValueException(
+                    "Parameter nexthop should not be empty. Either specify nexthop ip address (recommended) or specify gatewayId (deprecated).");
+        }
     }
 
     @Override
@@ -163,20 +161,5 @@ public class CreateStaticRouteCmd extends BaseAsyncCreateCmd {
     @Override
     public long getEntityOwnerId() {
         return _entityMgr.findById(Vpc.class, getVpcId()).getAccountId();
-    }
-
-    @Override
-    public String getSyncObjType() {
-        return BaseAsyncCmd.vpcSyncObject;
-    }
-
-    @Override
-    public Long getSyncObjId() {
-        return getVpcId();
-    }
-
-    @Override
-    public ApiCommandJobType getInstanceType() {
-        return ApiCommandJobType.StaticRoute;
     }
 }

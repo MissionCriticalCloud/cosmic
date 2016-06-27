@@ -1,33 +1,16 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
-
-import java.util.List;
-import java.util.Map;
 
 import com.cloud.serializer.Param;
 import com.cloud.user.Account;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
 
-@SuppressWarnings("unused")
+import java.util.List;
+import java.util.Map;
+
+import com.google.gson.annotations.SerializedName;
+
 @EntityReference(value = Account.class)
 public class AccountResponse extends BaseResponse implements ResourceLimitAndCountResponse {
     @SerializedName(ApiConstants.ID)
@@ -243,246 +226,246 @@ public class AccountResponse extends BaseResponse implements ResourceLimitAndCou
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setAccountType(Short accountType) {
+    public void setAccountType(final Short accountType) {
         this.accountType = accountType;
     }
 
-    public void setDomainId(String domainId) {
+    public void setDomainId(final String domainId) {
         this.domainId = domainId;
     }
 
-    public void setDomainName(String domainName) {
+    public void setDomainName(final String domainName) {
         this.domainName = domainName;
     }
 
-    public void setBytesReceived(Long bytesReceived) {
+    public void setBytesReceived(final Long bytesReceived) {
         this.bytesReceived = bytesReceived;
     }
 
-    public void setBytesSent(Long bytesSent) {
+    public void setBytesSent(final Long bytesSent) {
         this.bytesSent = bytesSent;
     }
 
-    @Override
-    public void setVmLimit(String vmLimit) {
-        this.vmLimit = vmLimit;
-    }
-
-    @Override
-    public void setVmTotal(Long vmTotal) {
-        this.vmTotal = vmTotal;
-    }
-
-    @Override
-    public void setVmAvailable(String vmAvailable) {
-        this.vmAvailable = vmAvailable;
-    }
-
-    @Override
-    public void setIpLimit(String ipLimit) {
-        this.ipLimit = ipLimit;
-    }
-
-    @Override
-    public void setIpTotal(Long ipTotal) {
-        this.ipTotal = ipTotal;
-    }
-
-    @Override
-    public void setIpAvailable(String ipAvailable) {
-        this.ipAvailable = ipAvailable;
-    }
-
-    @Override
-    public void setVolumeLimit(String volumeLimit) {
-        this.volumeLimit = volumeLimit;
-    }
-
-    @Override
-    public void setVolumeTotal(Long volumeTotal) {
-        this.volumeTotal = volumeTotal;
-    }
-
-    @Override
-    public void setVolumeAvailable(String volumeAvailable) {
-        this.volumeAvailable = volumeAvailable;
-    }
-
-    @Override
-    public void setSnapshotLimit(String snapshotLimit) {
-        this.snapshotLimit = snapshotLimit;
-    }
-
-    @Override
-    public void setSnapshotTotal(Long snapshotTotal) {
-        this.snapshotTotal = snapshotTotal;
-    }
-
-    @Override
-    public void setSnapshotAvailable(String snapshotAvailable) {
-        this.snapshotAvailable = snapshotAvailable;
-    }
-
-    @Override
-    public void setTemplateLimit(String templateLimit) {
-        this.templateLimit = templateLimit;
-    }
-
-    @Override
-    public void setTemplateTotal(Long templateTotal) {
-        this.templateTotal = templateTotal;
-    }
-
-    @Override
-    public void setTemplateAvailable(String templateAvailable) {
-        this.templateAvailable = templateAvailable;
-    }
-
-    @Override
-    public void setVmStopped(Integer vmStopped) {
-        this.vmStopped = vmStopped;
-    }
-
-    @Override
-    public void setVmRunning(Integer vmRunning) {
-        this.vmRunning = vmRunning;
-    }
-
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
-    public void setCleanupRequired(Boolean cleanupRequired) {
+    public void setCleanupRequired(final Boolean cleanupRequired) {
         this.cleanupRequired = cleanupRequired;
     }
 
-    public void setUsers(List<UserResponse> users) {
+    public void setUsers(final List<UserResponse> users) {
         this.users = users;
     }
 
-    public void setNetworkDomain(String networkDomain) {
+    public void setNetworkDomain(final String networkDomain) {
         this.networkDomain = networkDomain;
     }
 
-    public void setDetails(Map<String, String> details) {
+    public void setDetails(final Map<String, String> details) {
         this.details = details;
     }
 
-    public void setProjectLimit(String projectLimit) {
+    public void setProjectLimit(final String projectLimit) {
         this.projectLimit = projectLimit;
     }
 
-    public void setProjectTotal(Long projectTotal) {
+    public void setProjectTotal(final Long projectTotal) {
         this.projectTotal = projectTotal;
     }
 
-    public void setProjectAvailable(String projectAvailable) {
+    public void setProjectAvailable(final String projectAvailable) {
         this.projectAvailable = projectAvailable;
     }
 
     @Override
-    public void setNetworkLimit(String networkLimit) {
+    public void setNetworkLimit(final String networkLimit) {
         this.networkLimit = networkLimit;
     }
 
     @Override
-    public void setNetworkTotal(Long networkTotal) {
+    public void setNetworkTotal(final Long networkTotal) {
         this.networkTotal = networkTotal;
     }
 
     @Override
-    public void setNetworkAvailable(String networkAvailable) {
+    public void setNetworkAvailable(final String networkAvailable) {
         this.networkAvailable = networkAvailable;
     }
 
     @Override
-    public void setVpcLimit(String vpcLimit) {
+    public void setVpcLimit(final String vpcLimit) {
         this.vpcLimit = networkLimit;
     }
 
     @Override
-    public void setVpcTotal(Long vpcTotal) {
+    public void setVpcTotal(final Long vpcTotal) {
         this.vpcTotal = vpcTotal;
     }
 
     @Override
-    public void setVpcAvailable(String vpcAvailable) {
+    public void setVpcAvailable(final String vpcAvailable) {
         this.vpcAvailable = vpcAvailable;
     }
 
     @Override
-    public void setCpuLimit(String cpuLimit) {
+    public void setCpuLimit(final String cpuLimit) {
         this.cpuLimit = cpuLimit;
     }
 
     @Override
-    public void setCpuTotal(Long cpuTotal) {
+    public void setCpuTotal(final Long cpuTotal) {
         this.cpuTotal = cpuTotal;
     }
 
     @Override
-    public void setCpuAvailable(String cpuAvailable) {
+    public void setCpuAvailable(final String cpuAvailable) {
         this.cpuAvailable = cpuAvailable;
     }
 
     @Override
-    public void setMemoryLimit(String memoryLimit) {
+    public void setMemoryLimit(final String memoryLimit) {
         this.memoryLimit = memoryLimit;
     }
 
     @Override
-    public void setMemoryTotal(Long memoryTotal) {
+    public void setMemoryTotal(final Long memoryTotal) {
         this.memoryTotal = memoryTotal;
     }
 
     @Override
-    public void setMemoryAvailable(String memoryAvailable) {
+    public void setMemoryAvailable(final String memoryAvailable) {
         this.memoryAvailable = memoryAvailable;
     }
 
     @Override
-    public void setPrimaryStorageLimit(String primaryStorageLimit) {
+    public void setPrimaryStorageLimit(final String primaryStorageLimit) {
         this.primaryStorageLimit = primaryStorageLimit;
     }
 
     @Override
-    public void setPrimaryStorageTotal(Long primaryStorageTotal) {
+    public void setPrimaryStorageTotal(final Long primaryStorageTotal) {
         this.primaryStorageTotal = primaryStorageTotal;
     }
 
     @Override
-    public void setPrimaryStorageAvailable(String primaryStorageAvailable) {
+    public void setPrimaryStorageAvailable(final String primaryStorageAvailable) {
         this.primaryStorageAvailable = primaryStorageAvailable;
     }
 
     @Override
-    public void setSecondaryStorageLimit(String secondaryStorageLimit) {
+    public void setSecondaryStorageLimit(final String secondaryStorageLimit) {
         this.secondaryStorageLimit = secondaryStorageLimit;
     }
 
     @Override
-    public void setSecondaryStorageTotal(Long secondaryStorageTotal) {
+    public void setSecondaryStorageTotal(final Long secondaryStorageTotal) {
         this.secondaryStorageTotal = secondaryStorageTotal;
     }
 
     @Override
-    public void setSecondaryStorageAvailable(String secondaryStorageAvailable) {
+    public void setSecondaryStorageAvailable(final String secondaryStorageAvailable) {
         this.secondaryStorageAvailable = secondaryStorageAvailable;
     }
 
-    public void setDefaultZone(String defaultZoneId) {
+    @Override
+    public void setVmLimit(final String vmLimit) {
+        this.vmLimit = vmLimit;
+    }
+
+    @Override
+    public void setVmTotal(final Long vmTotal) {
+        this.vmTotal = vmTotal;
+    }
+
+    @Override
+    public void setVmAvailable(final String vmAvailable) {
+        this.vmAvailable = vmAvailable;
+    }
+
+    @Override
+    public void setIpLimit(final String ipLimit) {
+        this.ipLimit = ipLimit;
+    }
+
+    @Override
+    public void setIpTotal(final Long ipTotal) {
+        this.ipTotal = ipTotal;
+    }
+
+    @Override
+    public void setIpAvailable(final String ipAvailable) {
+        this.ipAvailable = ipAvailable;
+    }
+
+    @Override
+    public void setVolumeLimit(final String volumeLimit) {
+        this.volumeLimit = volumeLimit;
+    }
+
+    @Override
+    public void setVolumeTotal(final Long volumeTotal) {
+        this.volumeTotal = volumeTotal;
+    }
+
+    @Override
+    public void setVolumeAvailable(final String volumeAvailable) {
+        this.volumeAvailable = volumeAvailable;
+    }
+
+    @Override
+    public void setSnapshotLimit(final String snapshotLimit) {
+        this.snapshotLimit = snapshotLimit;
+    }
+
+    @Override
+    public void setSnapshotTotal(final Long snapshotTotal) {
+        this.snapshotTotal = snapshotTotal;
+    }
+
+    @Override
+    public void setSnapshotAvailable(final String snapshotAvailable) {
+        this.snapshotAvailable = snapshotAvailable;
+    }
+
+    @Override
+    public void setTemplateLimit(final String templateLimit) {
+        this.templateLimit = templateLimit;
+    }
+
+    @Override
+    public void setTemplateTotal(final Long templateTotal) {
+        this.templateTotal = templateTotal;
+    }
+
+    @Override
+    public void setTemplateAvailable(final String templateAvailable) {
+        this.templateAvailable = templateAvailable;
+    }
+
+    @Override
+    public void setVmStopped(final Integer vmStopped) {
+        this.vmStopped = vmStopped;
+    }
+
+    @Override
+    public void setVmRunning(final Integer vmRunning) {
+        this.vmRunning = vmRunning;
+    }
+
+    public void setDefaultZone(final String defaultZoneId) {
         this.defaultZoneId = defaultZoneId;
     }
 
-    public void setIsDefault(Boolean isDefault) {
+    public void setIsDefault(final Boolean isDefault) {
         this.isDefault = isDefault;
     }
 }

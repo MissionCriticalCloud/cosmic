@@ -1,27 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.cloudstack.storage.helper;
-
-import java.util.List;
-import java.util.UUID;
-
-import javax.inject.Inject;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
@@ -42,7 +19,6 @@ import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.snapshot.VMSnapshot;
-
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPointSelector;
 import org.apache.cloudstack.engine.subsystem.api.storage.Scope;
@@ -52,6 +28,11 @@ import org.apache.cloudstack.storage.command.IntroduceObjectAnswer;
 import org.apache.cloudstack.storage.command.IntroduceObjectCmd;
 import org.apache.cloudstack.storage.to.VolumeObjectTO;
 import org.apache.cloudstack.storage.vmsnapshot.VMSnapshotHelper;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,39 +54,39 @@ public class HypervisorHelperImpl implements HypervisorHelper {
     HostDao hostDao;
 
     @Override
-    public DataTO introduceObject(DataTO object, Scope scope, Long storeId) {
-        EndPoint ep = selector.select(scope, storeId);
-        IntroduceObjectCmd cmd = new IntroduceObjectCmd(object);
+    public DataTO introduceObject(final DataTO object, final Scope scope, final Long storeId) {
+        final EndPoint ep = selector.select(scope, storeId);
+        final IntroduceObjectCmd cmd = new IntroduceObjectCmd(object);
         Answer answer = null;
         if (ep == null) {
-            String errMsg = "No remote endpoint to send command, check if host or ssvm is down?";
+            final String errMsg = "No remote endpoint to send command, check if host or ssvm is down?";
             s_logger.error(errMsg);
             answer = new Answer(cmd, false, errMsg);
         } else {
             answer = ep.sendMessage(cmd);
         }
         if (answer == null || !answer.getResult()) {
-            String errMsg = answer == null ? null : answer.getDetails();
+            final String errMsg = answer == null ? null : answer.getDetails();
             throw new CloudRuntimeException("Failed to introduce object, due to " + errMsg);
         }
-        IntroduceObjectAnswer introduceObjectAnswer = (IntroduceObjectAnswer)answer;
+        final IntroduceObjectAnswer introduceObjectAnswer = (IntroduceObjectAnswer) answer;
         return introduceObjectAnswer.getDataTO();
     }
 
     @Override
-    public boolean forgetObject(DataTO object, Scope scope, Long storeId) {
-        EndPoint ep = selector.select(scope, storeId);
-        ForgetObjectCmd cmd = new ForgetObjectCmd(object);
+    public boolean forgetObject(final DataTO object, final Scope scope, final Long storeId) {
+        final EndPoint ep = selector.select(scope, storeId);
+        final ForgetObjectCmd cmd = new ForgetObjectCmd(object);
         Answer answer = null;
         if (ep == null) {
-            String errMsg = "No remote endpoint to send command, check if host or ssvm is down?";
+            final String errMsg = "No remote endpoint to send command, check if host or ssvm is down?";
             s_logger.error(errMsg);
             answer = new Answer(cmd, false, errMsg);
         } else {
             answer = ep.sendMessage(cmd);
         }
         if (answer == null || !answer.getResult()) {
-            String errMsg = answer == null ? null : answer.getDetails();
+            final String errMsg = answer == null ? null : answer.getDetails();
             if (errMsg != null) {
                 s_logger.debug("Failed to forget object: " + errMsg);
             }
@@ -115,55 +96,55 @@ public class HypervisorHelperImpl implements HypervisorHelper {
     }
 
     @Override
-    public VMSnapshotTO quiesceVm(VirtualMachine virtualMachine) {
-        String value = configurationDao.getValue("vmsnapshot.create.wait");
-        int wait = NumbersUtil.parseInt(value, 1800);
-        Long hostId = vmSnapshotHelper.pickRunningHost(virtualMachine.getId());
-        VMSnapshotTO vmSnapshotTO = new VMSnapshotTO(1L,  UUID.randomUUID().toString(), VMSnapshot.Type.Disk, null, null, false,
+    public VMSnapshotTO quiesceVm(final VirtualMachine virtualMachine) {
+        final String value = configurationDao.getValue("vmsnapshot.create.wait");
+        final int wait = NumbersUtil.parseInt(value, 1800);
+        final Long hostId = vmSnapshotHelper.pickRunningHost(virtualMachine.getId());
+        final VMSnapshotTO vmSnapshotTO = new VMSnapshotTO(1L, UUID.randomUUID().toString(), VMSnapshot.Type.Disk, null, null, false,
                 null, true);
-        GuestOSVO guestOS = guestOSDao.findById(virtualMachine.getGuestOSId());
-        List<VolumeObjectTO> volumeTOs = vmSnapshotHelper.getVolumeTOList(virtualMachine.getId());
-        CreateVMSnapshotCommand ccmd =
-            new CreateVMSnapshotCommand(virtualMachine.getInstanceName(), virtualMachine.getUuid(), vmSnapshotTO, volumeTOs, guestOS.getDisplayName());
-        HostVO host = hostDao.findById(hostId);
-        GuestOSHypervisorVO guestOsMapping = guestOsHypervisorDao.findByOsIdAndHypervisor(guestOS.getId(), host.getHypervisorType().toString(), host.getHypervisorVersion());
+        final GuestOSVO guestOS = guestOSDao.findById(virtualMachine.getGuestOSId());
+        final List<VolumeObjectTO> volumeTOs = vmSnapshotHelper.getVolumeTOList(virtualMachine.getId());
+        final CreateVMSnapshotCommand ccmd =
+                new CreateVMSnapshotCommand(virtualMachine.getInstanceName(), virtualMachine.getUuid(), vmSnapshotTO, volumeTOs, guestOS.getDisplayName());
+        final HostVO host = hostDao.findById(hostId);
+        final GuestOSHypervisorVO guestOsMapping = guestOsHypervisorDao.findByOsIdAndHypervisor(guestOS.getId(), host.getHypervisorType().toString(), host.getHypervisorVersion());
         ccmd.setPlatformEmulator(guestOsMapping.getGuestOsName());
         ccmd.setWait(wait);
         try {
-            Answer answer = agentMgr.send(hostId, ccmd);
+            final Answer answer = agentMgr.send(hostId, ccmd);
             if (answer != null && answer.getResult()) {
-                CreateVMSnapshotAnswer snapshotAnswer = (CreateVMSnapshotAnswer)answer;
+                final CreateVMSnapshotAnswer snapshotAnswer = (CreateVMSnapshotAnswer) answer;
                 vmSnapshotTO.setVolumes(snapshotAnswer.getVolumeTOs());
             } else {
-                String errMsg = (answer != null) ? answer.getDetails() : null;
+                final String errMsg = (answer != null) ? answer.getDetails() : null;
                 throw new CloudRuntimeException("Failed to quiesce vm, due to " + errMsg);
             }
-        } catch (AgentUnavailableException e) {
+        } catch (final AgentUnavailableException e) {
             throw new CloudRuntimeException("Failed to quiesce vm", e);
-        } catch (OperationTimedoutException e) {
+        } catch (final OperationTimedoutException e) {
             throw new CloudRuntimeException("Failed to quiesce vm", e);
         }
         return vmSnapshotTO;
     }
 
     @Override
-    public boolean unquiesceVM(VirtualMachine virtualMachine, VMSnapshotTO vmSnapshotTO) {
-        Long hostId = vmSnapshotHelper.pickRunningHost(virtualMachine.getId());
-        List<VolumeObjectTO> volumeTOs = vmSnapshotHelper.getVolumeTOList(virtualMachine.getId());
-        GuestOSVO guestOS = guestOSDao.findById(virtualMachine.getGuestOSId());
+    public boolean unquiesceVM(final VirtualMachine virtualMachine, final VMSnapshotTO vmSnapshotTO) {
+        final Long hostId = vmSnapshotHelper.pickRunningHost(virtualMachine.getId());
+        final List<VolumeObjectTO> volumeTOs = vmSnapshotHelper.getVolumeTOList(virtualMachine.getId());
+        final GuestOSVO guestOS = guestOSDao.findById(virtualMachine.getGuestOSId());
 
-        DeleteVMSnapshotCommand deleteSnapshotCommand = new DeleteVMSnapshotCommand(virtualMachine.getInstanceName(), vmSnapshotTO, volumeTOs, guestOS.getDisplayName());
+        final DeleteVMSnapshotCommand deleteSnapshotCommand = new DeleteVMSnapshotCommand(virtualMachine.getInstanceName(), vmSnapshotTO, volumeTOs, guestOS.getDisplayName());
         try {
-            Answer answer = agentMgr.send(hostId, deleteSnapshotCommand);
+            final Answer answer = agentMgr.send(hostId, deleteSnapshotCommand);
             if (answer != null && answer.getResult()) {
                 return true;
             } else {
-                String errMsg = (answer != null) ? answer.getDetails() : null;
+                final String errMsg = (answer != null) ? answer.getDetails() : null;
                 throw new CloudRuntimeException("Failed to unquiesce vm, due to " + errMsg);
             }
-        } catch (AgentUnavailableException e) {
+        } catch (final AgentUnavailableException e) {
             throw new CloudRuntimeException("Failed to unquiesce vm", e);
-        } catch (OperationTimedoutException e) {
+        } catch (final OperationTimedoutException e) {
             throw new CloudRuntimeException("Failed to unquiesce vm", e);
         }
     }

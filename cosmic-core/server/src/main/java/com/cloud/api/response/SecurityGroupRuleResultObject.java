@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.api.response;
 
 import com.cloud.network.security.SecurityRule.SecurityRuleType;
@@ -46,8 +30,9 @@ public class SecurityGroupRuleResultObject {
     public SecurityGroupRuleResultObject() {
     }
 
-    public SecurityGroupRuleResultObject(Long id, int startPort, int endPort, String protocol, String allowedSecurityGroup, String allowedSecGroupAcct,
-            String allowedSourceIpCidr) {
+    public SecurityGroupRuleResultObject(final Long id, final int startPort, final int endPort, final String protocol, final String allowedSecurityGroup, final String
+            allowedSecGroupAcct,
+                                         final String allowedSourceIpCidr) {
         this.id = id;
         this.startPort = startPort;
         this.endPort = endPort;
@@ -61,7 +46,7 @@ public class SecurityGroupRuleResultObject {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -69,23 +54,23 @@ public class SecurityGroupRuleResultObject {
         return startPort;
     }
 
-    public void setRuleType(SecurityRuleType type) {
-        this.type = type;
+    public void setStartPort(final int startPort) {
+        this.startPort = startPort;
     }
 
     public SecurityRuleType getRuleType() {
         return type;
     }
 
-    public void setStartPort(int startPort) {
-        this.startPort = startPort;
+    public void setRuleType(final SecurityRuleType type) {
+        this.type = type;
     }
 
     public int getEndPort() {
         return endPort;
     }
 
-    public void setEndPort(int endPort) {
+    public void setEndPort(final int endPort) {
         this.endPort = endPort;
     }
 
@@ -93,7 +78,7 @@ public class SecurityGroupRuleResultObject {
         return protocol;
     }
 
-    public void setProtocol(String protocol) {
+    public void setProtocol(final String protocol) {
         this.protocol = protocol;
     }
 
@@ -101,7 +86,7 @@ public class SecurityGroupRuleResultObject {
         return allowedSecurityGroup;
     }
 
-    public void setAllowedSecurityGroup(String allowedSecurityGroup) {
+    public void setAllowedSecurityGroup(final String allowedSecurityGroup) {
         this.allowedSecurityGroup = allowedSecurityGroup;
     }
 
@@ -109,7 +94,7 @@ public class SecurityGroupRuleResultObject {
         return allowedSecGroupAcct;
     }
 
-    public void setAllowedSecGroupAcct(String allowedSecGroupAcct) {
+    public void setAllowedSecGroupAcct(final String allowedSecGroupAcct) {
         this.allowedSecGroupAcct = allowedSecGroupAcct;
     }
 
@@ -117,7 +102,7 @@ public class SecurityGroupRuleResultObject {
         return allowedSourceIpCidr;
     }
 
-    public void setAllowedSourceIpCidr(String allowedSourceIpCidr) {
+    public void setAllowedSourceIpCidr(final String allowedSourceIpCidr) {
         this.allowedSourceIpCidr = allowedSourceIpCidr;
     }
 }

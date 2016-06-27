@@ -1,20 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.framework.jobs.impl;
+
+import com.cloud.vm.VirtualMachine;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -24,44 +10,24 @@ import javax.persistence.Enumerated;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
-import com.cloud.vm.VirtualMachine;
-
 @Entity
 @Table(name = "vm_work_job")
 @DiscriminatorValue(value = "VmWork")
 @PrimaryKeyJoinColumn(name = "id")
 public class VmWorkJobVO extends AsyncJobVO {
 
-    // These steps are rather arbitrary.  What's recorded depends on the
-    // the operation being performed.
-    public enum Step {
-        Filed(false), Prepare(false), Starting(true), Started(false), Release(false), Done(false), Migrating(true), Reconfiguring(false), Error(false);
-
-        boolean updateState; // Should the VM State be updated after this step?
-
-        private Step(boolean updateState) {
-            this.updateState = updateState;
-        }
-
-        boolean updateState() {
-            return updateState;
-        }
-    }
-
     @Column(name = "step")
     Step step;
-
     @Column(name = "vm_type")
     @Enumerated(value = EnumType.STRING)
     VirtualMachine.Type vmType;
-
     @Column(name = "vm_instance_id")
     long vmInstanceId;
 
     protected VmWorkJobVO() {
     }
 
-    public VmWorkJobVO(String related) {
+    public VmWorkJobVO(final String related) {
         step = Step.Filed;
         setRelated(related);
     }
@@ -70,7 +36,7 @@ public class VmWorkJobVO extends AsyncJobVO {
         return step;
     }
 
-    public void setStep(Step step) {
+    public void setStep(final Step step) {
         this.step = step;
     }
 
@@ -78,7 +44,7 @@ public class VmWorkJobVO extends AsyncJobVO {
         return vmType;
     }
 
-    public void setVmType(VirtualMachine.Type vmType) {
+    public void setVmType(final VirtualMachine.Type vmType) {
         this.vmType = vmType;
     }
 
@@ -86,7 +52,23 @@ public class VmWorkJobVO extends AsyncJobVO {
         return vmInstanceId;
     }
 
-    public void setVmInstanceId(long vmInstanceId) {
+    public void setVmInstanceId(final long vmInstanceId) {
         this.vmInstanceId = vmInstanceId;
+    }
+
+    // These steps are rather arbitrary.  What's recorded depends on the
+    // the operation being performed.
+    public enum Step {
+        Filed(false), Prepare(false), Starting(true), Started(false), Release(false), Done(false), Migrating(true), Reconfiguring(false), Error(false);
+
+        boolean updateState; // Should the VM State be updated after this step?
+
+        private Step(final boolean updateState) {
+            this.updateState = updateState;
+        }
+
+        boolean updateState() {
+            return updateState;
+        }
     }
 }

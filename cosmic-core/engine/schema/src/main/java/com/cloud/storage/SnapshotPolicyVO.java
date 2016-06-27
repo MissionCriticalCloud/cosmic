@@ -1,22 +1,7 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.storage;
 
-import java.util.UUID;
+import com.cloud.storage.snapshot.SnapshotPolicy;
+import com.cloud.utils.DateUtil.IntervalType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,52 +9,42 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.storage.snapshot.SnapshotPolicy;
-import com.cloud.utils.DateUtil.IntervalType;
+import java.util.UUID;
 
 @Entity
 @Table(name = "snapshot_policy")
 public class SnapshotPolicyVO implements SnapshotPolicy {
 
+    @Column(name = "display", updatable = true, nullable = false)
+    protected boolean display = true;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     long id;
-
     @Column(name = "volume_id")
     long volumeId;
-
     @Column(name = "schedule")
     String schedule;
-
     @Column(name = "timezone")
     String timezone;
-
-    @Column(name = "interval")
-    private short interval;
-
-    @Column(name = "max_snaps")
-    private int maxSnaps;
-
     @Column(name = "active")
     boolean active = false;
-
     @Column(name = "uuid")
     String uuid;
-
-    @Column(name = "display", updatable = true, nullable = false)
-    protected boolean display = true;
+    @Column(name = "interval")
+    private short interval;
+    @Column(name = "max_snaps")
+    private int maxSnaps;
 
     public SnapshotPolicyVO() {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public SnapshotPolicyVO(long volumeId, String schedule, String timezone, IntervalType intvType, int maxSnaps, boolean display) {
+    public SnapshotPolicyVO(final long volumeId, final String schedule, final String timezone, final IntervalType intvType, final int maxSnaps, final boolean display) {
         this.volumeId = volumeId;
         this.schedule = schedule;
         this.timezone = timezone;
-        this.interval = (short)intvType.ordinal();
+        this.interval = (short) intvType.ordinal();
         this.maxSnaps = maxSnaps;
         this.active = true;
         this.display = display;
@@ -87,23 +62,13 @@ public class SnapshotPolicyVO implements SnapshotPolicy {
     }
 
     @Override
-    public void setSchedule(String schedule) {
-        this.schedule = schedule;
-    }
-
-    @Override
     public String getSchedule() {
         return schedule;
     }
 
     @Override
-    public void setInterval(short interval) {
-        this.interval = interval;
-    }
-
-    @Override
-    public void setTimezone(String timezone) {
-        this.timezone = timezone;
+    public void setSchedule(final String schedule) {
+        this.schedule = schedule;
     }
 
     @Override
@@ -112,13 +77,18 @@ public class SnapshotPolicyVO implements SnapshotPolicy {
     }
 
     @Override
+    public void setTimezone(final String timezone) {
+        this.timezone = timezone;
+    }
+
+    @Override
     public short getInterval() {
         return interval;
     }
 
     @Override
-    public void setMaxSnaps(int maxSnaps) {
-        this.maxSnaps = maxSnaps;
+    public void setInterval(final short interval) {
+        this.interval = interval;
     }
 
     @Override
@@ -127,12 +97,17 @@ public class SnapshotPolicyVO implements SnapshotPolicy {
     }
 
     @Override
+    public void setMaxSnaps(final int maxSnaps) {
+        this.maxSnaps = maxSnaps;
+    }
+
+    @Override
     public boolean isActive() {
         return active;
     }
 
     @Override
-    public void setActive(boolean active) {
+    public void setActive(final boolean active) {
         this.active = active;
     }
 
@@ -141,7 +116,7 @@ public class SnapshotPolicyVO implements SnapshotPolicy {
         return this.uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(final String uuid) {
         this.uuid = uuid;
     }
 
@@ -149,7 +124,7 @@ public class SnapshotPolicyVO implements SnapshotPolicy {
         return display;
     }
 
-    public void setDisplay(boolean display) {
+    public void setDisplay(final boolean display) {
         this.display = display;
     }
 }

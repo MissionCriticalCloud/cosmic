@@ -1,29 +1,12 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
 """ BVT tests for Network Life Cycle
 """
 # Import Local Modules
+from ddt import ddt, data
+from marvin.cloudstackAPI import rebootRouter
+from marvin.cloudstackException import CloudstackAPIException
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.codes import (FAILED, STATIC_NAT_RULE, LB_RULE,
                           NAT_RULE, PASS)
-from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.cloudstackException import CloudstackAPIException
-from marvin.cloudstackAPI import rebootRouter
-from marvin.sshClient import SshClient
-from marvin.lib.utils import cleanup_resources, get_process_status
 from marvin.lib.base import (Account,
                              VirtualMachine,
                              ServiceOffering,
@@ -46,8 +29,10 @@ from marvin.lib.common import (get_domain,
                                list_lb_rules,
                                list_configurations,
                                verifyGuestTrafficPortGroups)
+from marvin.lib.utils import cleanup_resources, get_process_status
+from marvin.sshClient import SshClient
 from nose.plugins.attrib import attr
-from ddt import ddt, data
+
 # Import System modules
 import time
 import logging
@@ -59,8 +44,8 @@ stream_handler = logging.StreamHandler()
 logger.setLevel(logging.DEBUG)
 logger.addHandler(stream_handler)
 
-class TestPublicIP(cloudstackTestCase):
 
+class TestPublicIP(cloudstackTestCase):
     def setUp(self):
         self.apiclient = self.testClient.getApiClient()
 
@@ -188,10 +173,10 @@ class TestPublicIP(cloudstackTestCase):
         if list_pub_ip_addr_resp is None:
             return
         if (list_pub_ip_addr_resp) and (
-            isinstance(
-                list_pub_ip_addr_resp,
-                list)) and (
-                len(list_pub_ip_addr_resp) > 0):
+                isinstance(
+                    list_pub_ip_addr_resp,
+                    list)) and (
+                    len(list_pub_ip_addr_resp) > 0):
             self.fail("list public ip response is not empty")
         return
 
@@ -247,7 +232,6 @@ class TestPublicIP(cloudstackTestCase):
 
 
 class TestPortForwarding(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
 
@@ -396,10 +380,10 @@ class TestPortForwarding(cloudstackTestCase):
         # SSH virtual machine to test port forwarding
         try:
             logger.debug("SSHing into VM with IP address %s with NAT IP %s" %
-                       (
-                           self.virtual_machine.ipaddress,
-                           src_nat_ip_addr.ipaddress
-                       ))
+                         (
+                             self.virtual_machine.ipaddress,
+                             src_nat_ip_addr.ipaddress
+                         ))
 
             self.virtual_machine.get_ssh_client(src_nat_ip_addr.ipaddress)
             vm_response = VirtualMachine.list(
@@ -524,10 +508,10 @@ class TestPortForwarding(cloudstackTestCase):
 
         try:
             logger.debug("SSHing into VM with IP address %s with NAT IP %s" %
-                       (
-                           self.virtual_machine.ipaddress,
-                           ip_address.ipaddress.ipaddress
-                       ))
+                         (
+                             self.virtual_machine.ipaddress,
+                             ip_address.ipaddress.ipaddress
+                         ))
             self.virtual_machine.get_ssh_client(ip_address.ipaddress.ipaddress)
         except Exception as e:
             self.fail(
@@ -574,7 +558,6 @@ class TestPortForwarding(cloudstackTestCase):
 
 
 class TestRebootRouter(cloudstackTestCase):
-
     def setUp(self):
 
         self.apiclient = self.testClient.getApiClient()
@@ -686,7 +669,6 @@ class TestRebootRouter(cloudstackTestCase):
                 "SSH Access failed for %s: %si, before reboot of Router" %
                 (self.public_ip.ipaddress.ipaddress, e))
 
-
         # Validate the Following
         # 1. Post restart PF and LB rules should still function
         # 2. verify if the ssh into the virtual machine
@@ -763,7 +745,6 @@ class TestRebootRouter(cloudstackTestCase):
 
 
 class TestReleaseIP(cloudstackTestCase):
-
     def setUp(self):
         self.apiclient = self.testClient.getApiClient()
         self.services = self.testClient.getParsedTestDataConfig()
@@ -903,7 +884,6 @@ class TestReleaseIP(cloudstackTestCase):
 
 
 class TestDeleteAccount(cloudstackTestCase):
-
     def setUp(self):
 
         self.apiclient = self.testClient.getApiClient()
@@ -1043,7 +1023,6 @@ class TestDeleteAccount(cloudstackTestCase):
 
 @ddt
 class TestRouterRules(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
 
@@ -1175,8 +1154,8 @@ class TestRouterRules(cloudstackTestCase):
                 networkid=self.virtual_machine.nic[0].networkid,
                 domainid=self.account.domainid)
 
-            vmidipmap = [{"vmid": str(self.virtual_machine.id),
-                          "vmip": str(self.virtual_machine.nic[0].ipaddress)}]
+            vmidipmap = [{ "vmid": str(self.virtual_machine.id),
+                           "vmip": str(self.virtual_machine.nic[0].ipaddress) }]
 
             self.lb_rule.assign(
                 self.apiclient,
@@ -1245,10 +1224,10 @@ class TestRouterRules(cloudstackTestCase):
 
         try:
             logger.debug("SSHing into VM with IP address %s with NAT IP %s" %
-                       (
-                           self.virtual_machine.ipaddress,
-                           self.ipaddress.ipaddress.ipaddress
-                       ))
+                         (
+                             self.virtual_machine.ipaddress,
+                             self.ipaddress.ipaddress.ipaddress
+                         ))
             self.virtual_machine.get_ssh_client(
                 self.ipaddress.ipaddress.ipaddress)
         except Exception as e:

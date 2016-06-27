@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.project;
 
 import com.cloud.event.EventTypes;
@@ -21,7 +5,6 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.projects.Project;
 import com.cloud.user.Account;
-
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -31,6 +14,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.context.CallContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +45,62 @@ public class CreateProjectCmd extends BaseAsyncCreateCmd {
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
 
+    @Override
+    public void execute() {
+        final Project project = _projectService.enableProject(this.getEntityId());
+        if (project != null) {
+            final ProjectResponse response = _responseGenerator.createProjectResponse(project);
+            response.setResponseName(getCommandName());
+            this.setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create a project");
+        }
+    }
+
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
+
+    @Override
+    public long getEntityOwnerId() {
+        final Account caller = CallContext.current().getCallingAccount();
+
+        if ((accountName != null && domainId == null) || (domainId != null && accountName == null)) {
+            throw new InvalidParameterValueException("Account name and domain id must be specified together");
+        }
+
+        if (accountName != null) {
+            return _accountService.finalizeOwner(caller, accountName, domainId, null).getId();
+        }
+
+        return caller.getId();
+    }
+
+    @Override
+    public void create() throws ResourceAllocationException {
+        CallContext.current().setEventDetails("Project Name: " + getName());
+        final Project project = _projectService.createProject(getName(), getDisplayText(), getAccountName(), getDomainId());
+        if (project != null) {
+            this.setEntityId(project.getId());
+            this.setEntityUuid(project.getUuid());
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create a project");
+        }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDisplayText() {
+        return displayText;
+    }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// API Implementation///////////////////
+    // ///////////////////////////////////////////////////
+
     public String getAccountName() {
         if (accountName != null) {
             return accountName;
@@ -75,63 +115,6 @@ public class CreateProjectCmd extends BaseAsyncCreateCmd {
         } else {
             return CallContext.current().getCallingAccount().getDomainId();
         }
-
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDisplayText() {
-        return displayText;
-    }
-
-    @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
-    public long getEntityOwnerId() {
-        Account caller = CallContext.current().getCallingAccount();
-
-        if ((accountName != null && domainId == null) || (domainId != null && accountName == null)) {
-            throw new InvalidParameterValueException("Account name and domain id must be specified together");
-        }
-
-        if (accountName != null) {
-            return _accountService.finalizeOwner(caller, accountName, domainId, null).getId();
-        }
-
-        return caller.getId();
-    }
-
-    // ///////////////////////////////////////////////////
-    // ///////////// API Implementation///////////////////
-    // ///////////////////////////////////////////////////
-
-    @Override
-    public void execute() {
-        Project project = _projectService.enableProject(this.getEntityId());
-        if (project != null) {
-            ProjectResponse response = _responseGenerator.createProjectResponse(project);
-            response.setResponseName(getCommandName());
-            this.setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create a project");
-        }
-    }
-
-    @Override
-    public void create() throws ResourceAllocationException {
-        CallContext.current().setEventDetails("Project Name: " + getName());
-        Project project = _projectService.createProject(getName(), getDisplayText(), getAccountName(), getDomainId());
-        if (project != null) {
-            this.setEntityId(project.getId());
-            this.setEntityUuid(project.getUuid());
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create a project");
-        }
     }
 
     @Override
@@ -143,5 +126,4 @@ public class CreateProjectCmd extends BaseAsyncCreateCmd {
     public String getEventDescription() {
         return "creating project";
     }
-
 }

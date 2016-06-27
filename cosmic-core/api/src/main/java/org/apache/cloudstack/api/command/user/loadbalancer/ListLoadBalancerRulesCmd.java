@@ -1,27 +1,7 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.command.user.loadbalancer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.utils.Pair;
-
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -34,6 +14,10 @@ import org.apache.cloudstack.api.response.LoadBalancerResponse;
 import org.apache.cloudstack.api.response.NetworkResponse;
 import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,15 +39,15 @@ public class ListLoadBalancerRulesCmd extends BaseListTaggedResourcesCmd {
     private String loadBalancerRuleName;
 
     @Parameter(name = ApiConstants.PUBLIC_IP_ID,
-               type = CommandType.UUID,
-               entityType = IPAddressResponse.class,
-               description = "the public IP address ID of the load balancer rule")
+            type = CommandType.UUID,
+            entityType = IPAddressResponse.class,
+            description = "the public IP address ID of the load balancer rule")
     private Long publicIpId;
 
     @Parameter(name = ApiConstants.VIRTUAL_MACHINE_ID,
-               type = CommandType.UUID,
-               entityType = UserVmResponse.class,
-               description = "the ID of the virtual machine of the load balancer rule")
+            type = CommandType.UUID,
+            entityType = UserVmResponse.class,
+            description = "the ID of the virtual machine of the load balancer rule")
     private Long virtualMachineId;
 
     @Parameter(name = ApiConstants.ZONE_ID, type = CommandType.UUID, entityType = ZoneResponse.class, description = "the availability zone ID")
@@ -72,7 +56,8 @@ public class ListLoadBalancerRulesCmd extends BaseListTaggedResourcesCmd {
     @Parameter(name = ApiConstants.NETWORK_ID, type = CommandType.UUID, entityType = NetworkResponse.class, description = "list by network ID the rule belongs to")
     private Long networkId;
 
-    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "list resources by display flag; only ROOT admin is eligible to pass this parameter", since = "4.4", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "list resources by display flag; only ROOT admin is eligible to pass this parameter",
+            since = "4.4", authorized = {RoleType.Admin})
     private Boolean display;
 
     // ///////////////////////////////////////////////////
@@ -116,18 +101,13 @@ public class ListLoadBalancerRulesCmd extends BaseListTaggedResourcesCmd {
     // ///////////////////////////////////////////////////
 
     @Override
-    public String getCommandName() {
-        return s_name;
-    }
-
-    @Override
     public void execute() {
-        Pair<List<? extends LoadBalancer>, Integer> loadBalancers = _lbService.searchForLoadBalancers(this);
-        ListResponse<LoadBalancerResponse> response = new ListResponse<LoadBalancerResponse>();
-        List<LoadBalancerResponse> lbResponses = new ArrayList<LoadBalancerResponse>();
+        final Pair<List<? extends LoadBalancer>, Integer> loadBalancers = _lbService.searchForLoadBalancers(this);
+        final ListResponse<LoadBalancerResponse> response = new ListResponse<>();
+        final List<LoadBalancerResponse> lbResponses = new ArrayList<>();
         if (loadBalancers != null) {
-            for (LoadBalancer loadBalancer : loadBalancers.first()) {
-                LoadBalancerResponse lbResponse = _responseGenerator.createLoadBalancerResponse(loadBalancer);
+            for (final LoadBalancer loadBalancer : loadBalancers.first()) {
+                final LoadBalancerResponse lbResponse = _responseGenerator.createLoadBalancerResponse(loadBalancer);
                 lbResponse.setObjectName("loadbalancerrule");
                 lbResponses.add(lbResponse);
             }
@@ -137,4 +117,8 @@ public class ListLoadBalancerRulesCmd extends BaseListTaggedResourcesCmd {
         this.setResponseObject(response);
     }
 
+    @Override
+    public String getCommandName() {
+        return s_name;
+    }
 }

@@ -1,26 +1,17 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.dc;
 
 import com.cloud.org.Grouping;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Date;
 import java.util.UUID;
 
@@ -30,29 +21,21 @@ public class HostPodVO implements Pod {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
-
-    @Column(name = "name")
-    private String name = null;
-
-    @Column(name = "data_center_id")
-    private long dataCenterId;
-
-    @Column(name = "gateway")
-    private String gateway;
-
-    @Column(name = "cidr_address")
-    private String cidrAddress;
-
-    @Column(name = "cidr_size")
-    private int cidrSize;
-
-    @Column(name = "description")
-    private String description;
-
     @Column(name = "allocation_state")
     @Enumerated(value = EnumType.STRING)
     AllocationState allocationState;
-
+    @Column(name = "name")
+    private String name = null;
+    @Column(name = "data_center_id")
+    private long dataCenterId;
+    @Column(name = "gateway")
+    private String gateway;
+    @Column(name = "cidr_address")
+    private String cidrAddress;
+    @Column(name = "cidr_size")
+    private int cidrSize;
+    @Column(name = "description")
+    private String description;
     @Column(name = "external_dhcp")
     private Boolean externalDhcp;
 
@@ -81,27 +64,14 @@ public class HostPodVO implements Pod {
         this.uuid = UUID.randomUUID().toString();
     }
 
+    // Use for comparisons only.
+    public HostPodVO(final Long id) {
+        this.id = id;
+    }
+
     @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    public long getDataCenterId() {
-        return dataCenterId;
-    }
-
-    public void setDataCenterId(final long dataCenterId) {
-        this.dataCenterId = dataCenterId;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
     }
 
     @Override
@@ -127,8 +97,13 @@ public class HostPodVO implements Pod {
         return gateway;
     }
 
-    public void setGateway(final String gateway) {
-        this.gateway = gateway;
+    @Override
+    public long getDataCenterId() {
+        return dataCenterId;
+    }
+
+    public void setDataCenterId(final long dataCenterId) {
+        this.dataCenterId = dataCenterId;
     }
 
     @Override
@@ -136,8 +111,13 @@ public class HostPodVO implements Pod {
         return description;
     }
 
-    public void setDescription(final String description) {
-        this.description = description;
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
     }
 
     @Override
@@ -149,16 +129,6 @@ public class HostPodVO implements Pod {
         this.allocationState = allocationState;
     }
 
-    // Use for comparisons only.
-    public HostPodVO(final Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public int hashCode() {
-        return NumbersUtil.hash(id);
-    }
-
     @Override
     public boolean getExternalDhcp() {
         return externalDhcp;
@@ -166,6 +136,23 @@ public class HostPodVO implements Pod {
 
     public void setExternalDhcp(final boolean use) {
         externalDhcp = use;
+    }
+
+    public boolean belongsToDataCenter(final long dataCenterId) {
+        return this.dataCenterId == dataCenterId;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    public void setGateway(final String gateway) {
+        this.gateway = gateway;
+    }
+
+    @Override
+    public int hashCode() {
+        return NumbersUtil.hash(id);
     }
 
     @Override
@@ -188,9 +175,5 @@ public class HostPodVO implements Pod {
 
     public void setUuid(final String uuid) {
         this.uuid = uuid;
-    }
-
-    public boolean belongsToDataCenter(final long dataCenterId) {
-        return this.dataCenterId == dataCenterId;
     }
 }

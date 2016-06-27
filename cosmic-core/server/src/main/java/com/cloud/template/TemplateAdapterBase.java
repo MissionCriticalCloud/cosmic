@@ -1,26 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.template;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 import com.cloud.api.ApiDBUtils;
 import com.cloud.configuration.Config;
@@ -57,7 +35,6 @@ import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.command.user.iso.DeleteIsoCmd;
 import org.apache.cloudstack.api.command.user.iso.RegisterIsoCmd;
@@ -70,40 +47,61 @@ import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.datastore.db.ImageStoreDao;
 import org.apache.cloudstack.storage.datastore.db.ImageStoreVO;
 import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
+
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class TemplateAdapterBase extends AdapterBase implements TemplateAdapter {
     private final static Logger s_logger = LoggerFactory.getLogger(TemplateAdapterBase.class);
-    protected @Inject
+    protected
+    @Inject
     DomainDao _domainDao;
-    protected @Inject
+    protected
+    @Inject
     AccountDao _accountDao;
-    protected @Inject
+    protected
+    @Inject
     ConfigurationDao _configDao;
-    protected @Inject
+    protected
+    @Inject
     UserDao _userDao;
-    protected @Inject
+    protected
+    @Inject
     AccountManager _accountMgr;
-    protected @Inject
+    protected
+    @Inject
     DataCenterDao _dcDao;
-    protected @Inject
+    protected
+    @Inject
     VMTemplateDao _tmpltDao;
-    protected @Inject
+    protected
+    @Inject
     TemplateDataStoreDao _tmpltStoreDao;
-    protected @Inject
+    protected
+    @Inject
     VMTemplateZoneDao _tmpltZoneDao;
-    protected @Inject
+    protected
+    @Inject
     UsageEventDao _usageEventDao;
-    protected @Inject
+    protected
+    @Inject
     HostDao _hostDao;
-    protected @Inject
+    protected
+    @Inject
     UserVmDao _userVmDao;
-    protected @Inject
+    protected
+    @Inject
     GuestOSHypervisorDao _osHyperDao;
-    protected @Inject
+    protected
+    @Inject
     ResourceLimitService _resourceLimitMgr;
-    protected @Inject
+    protected
+    @Inject
     ImageStoreDao _imgStoreDao;
     @Inject
     TemplateManager templateMgr;
@@ -118,18 +116,200 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
     }
 
     @Override
-    public TemplateProfile prepare(boolean isIso, Long userId, String name, String displayText, Integer bits, Boolean passwordEnabled, Boolean requiresHVM, String url,
-        Boolean isPublic, Boolean featured, Boolean isExtractable, String format, Long guestOSId, Long zoneId, HypervisorType hypervisorType, String accountName,
-        Long domainId, String chksum, Boolean bootable, Map details) throws ResourceAllocationException {
-        return prepare(isIso, userId, name, displayText, bits, passwordEnabled, requiresHVM, url, isPublic, featured, isExtractable, format, guestOSId, zoneId,
-            hypervisorType, chksum, bootable, null, null, details, false, null, false, TemplateType.USER);
+    public TemplateProfile prepare(final RegisterTemplateCmd cmd) throws ResourceAllocationException {
+        //check if the caller can operate with the template owner
+        final Account caller = CallContext.current().getCallingAccount();
+        final Account owner = _accountMgr.getAccount(cmd.getEntityOwnerId());
+        _accountMgr.checkAccess(caller, null, true, owner);
+
+        final boolean isRouting = (cmd.isRoutingType() == null) ? false : cmd.isRoutingType();
+
+        Long zoneId = cmd.getZoneId();
+        // ignore passed zoneId if we are using region wide image store
+        final List<ImageStoreVO> stores = _imgStoreDao.findRegionImageStores();
+        if (stores != null && stores.size() > 0) {
+            zoneId = -1L;
+        }
+
+        return prepare(false, CallContext.current().getCallingUserId(), cmd.getTemplateName(), cmd.getDisplayText(), cmd.getBits(), cmd.isPasswordEnabled(),
+                cmd.getRequiresHvm(), cmd.getUrl(), cmd.isPublic(), cmd.isFeatured(), cmd.isExtractable(), cmd.getFormat(), cmd.getOsTypeId(), zoneId,
+                HypervisorType.getType(cmd.getHypervisor()), cmd.getChecksum(), true, cmd.getTemplateTag(), owner, cmd.getDetails(), cmd.isSshKeyEnabled(), null,
+                cmd.isDynamicallyScalable(), isRouting ? TemplateType.ROUTING : TemplateType.USER);
     }
 
     @Override
-    public TemplateProfile prepare(boolean isIso, long userId, String name, String displayText, Integer bits, Boolean passwordEnabled, Boolean requiresHVM, String url,
-        Boolean isPublic, Boolean featured, Boolean isExtractable, String format, Long guestOSId, Long zoneId, HypervisorType hypervisorType, String chksum,
-        Boolean bootable, String templateTag, Account templateOwner, Map details, Boolean sshkeyEnabled, String imageStoreUuid, Boolean isDynamicallyScalable,
-        TemplateType templateType) throws ResourceAllocationException {
+    public TemplateProfile prepare(final GetUploadParamsForTemplateCmd cmd) throws ResourceAllocationException {
+        //check if the caller can operate with the template owner
+        final Account caller = CallContext.current().getCallingAccount();
+        final Account owner = _accountMgr.getAccount(cmd.getEntityOwnerId());
+        _accountMgr.checkAccess(caller, null, true, owner);
+
+        final boolean isRouting = (cmd.isRoutingType() == null) ? false : cmd.isRoutingType();
+
+        Long zoneId = cmd.getZoneId();
+        // ignore passed zoneId if we are using region wide image store
+        final List<ImageStoreVO> stores = _imgStoreDao.findRegionImageStores();
+        if (stores != null && stores.size() > 0) {
+            zoneId = -1L;
+        }
+
+        return prepare(false, CallContext.current().getCallingUserId(), cmd.getName(), cmd.getDisplayText(), cmd.getBits(), cmd.isPasswordEnabled(),
+                cmd.getRequiresHvm(), null, cmd.isPublic(), cmd.isFeatured(), cmd.isExtractable(), cmd.getFormat(), cmd.getOsTypeId(), zoneId,
+                HypervisorType.getType(cmd.getHypervisor()), cmd.getChecksum(), true, cmd.getTemplateTag(), owner, cmd.getDetails(), cmd.isSshKeyEnabled(), null,
+                cmd.isDynamicallyScalable(), isRouting ? TemplateType.ROUTING : TemplateType.USER);
+    }
+
+    @Override
+    public TemplateProfile prepare(final RegisterIsoCmd cmd) throws ResourceAllocationException {
+        //check if the caller can operate with the template owner
+        final Account caller = CallContext.current().getCallingAccount();
+        final Account owner = _accountMgr.getAccount(cmd.getEntityOwnerId());
+        _accountMgr.checkAccess(caller, null, true, owner);
+
+        Long zoneId = cmd.getZoneId();
+        // ignore passed zoneId if we are using region wide image store
+        final List<ImageStoreVO> stores = _imgStoreDao.findRegionImageStores();
+        if (stores != null && stores.size() > 0) {
+            zoneId = -1L;
+        }
+
+        return prepare(true, CallContext.current().getCallingUserId(), cmd.getIsoName(), cmd.getDisplayText(), 64, false, true, cmd.getUrl(), cmd.isPublic(),
+                cmd.isFeatured(), cmd.isExtractable(), ImageFormat.ISO.toString(), cmd.getOsTypeId(), zoneId, HypervisorType.None, cmd.getChecksum(), cmd.isBootable(), null,
+                owner, null, false, cmd.getImageStoreUuid(), cmd.isDynamicallyScalable(), TemplateType.USER);
+    }
+
+    @Override
+    abstract public VMTemplateVO create(TemplateProfile profile);
+
+    @Override
+    public TemplateProfile prepareDelete(final DeleteTemplateCmd cmd) {
+        final Long templateId = cmd.getId();
+        Long userId = CallContext.current().getCallingUserId();
+        final Account account = CallContext.current().getCallingAccount();
+        final Long zoneId = cmd.getZoneId();
+
+        final VMTemplateVO template = _tmpltDao.findById(templateId);
+        if (template == null) {
+            throw new InvalidParameterValueException("unable to find template with id " + templateId);
+        }
+
+        userId = accountAndUserValidation(account, userId, null, template, "Unable to delete template ");
+
+        final UserVO user = _userDao.findById(userId);
+        if (user == null) {
+            throw new InvalidParameterValueException("Please specify a valid user.");
+        }
+
+        if (template.getFormat() == ImageFormat.ISO) {
+            throw new InvalidParameterValueException("Please specify a valid template.");
+        }
+
+        return new TemplateProfile(userId, template, zoneId);
+    }
+
+    private Long accountAndUserValidation(final Account account, final long userId, final UserVmVO vmInstanceCheck, final VMTemplateVO template, final String msg) throws
+            PermissionDeniedException {
+
+        if (account != null) {
+            if (!_accountMgr.isAdmin(account.getId())) {
+                if ((vmInstanceCheck != null) && (account.getId() != vmInstanceCheck.getAccountId())) {
+                    throw new PermissionDeniedException(msg + ". Permission denied.");
+                }
+
+                if ((template != null) &&
+                        (!template.isPublicTemplate() && (account.getId() != template.getAccountId()) && (template.getTemplateType() != TemplateType.PERHOST))) {
+                    //special handling for the project case
+                    final Account owner = _accountMgr.getAccount(template.getAccountId());
+                    if (owner.getType() == Account.ACCOUNT_TYPE_PROJECT) {
+                        if (!_projectMgr.canAccessProjectAccount(account, owner.getId())) {
+                            throw new PermissionDeniedException(msg + ". Permission denied. The caller can't access project's template");
+                        }
+                    } else {
+                        throw new PermissionDeniedException(msg + ". Permission denied.");
+                    }
+                }
+            } else {
+                if ((vmInstanceCheck != null) && !_domainDao.isChildDomain(account.getDomainId(), vmInstanceCheck.getDomainId())) {
+                    throw new PermissionDeniedException(msg + ". Permission denied.");
+                }
+                // FIXME: if template/ISO owner is null we probably need to
+                // throw some kind of exception
+
+                if (template != null) {
+                    final Account templateOwner = _accountDao.findById(template.getAccountId());
+                    if ((templateOwner != null) && !_domainDao.isChildDomain(account.getDomainId(), templateOwner.getDomainId())) {
+                        throw new PermissionDeniedException(msg + ". Permission denied.");
+                    }
+                }
+            }
+        }
+
+        return userId;
+    }
+
+    @Override
+    public TemplateProfile prepareDelete(final DeleteIsoCmd cmd) {
+        final Long templateId = cmd.getId();
+        Long userId = CallContext.current().getCallingUserId();
+        final Account account = CallContext.current().getCallingAccount();
+        final Long zoneId = cmd.getZoneId();
+
+        final VMTemplateVO template = _tmpltDao.findById(templateId);
+        if (template == null) {
+            throw new InvalidParameterValueException("unable to find iso with id " + templateId);
+        }
+
+        userId = accountAndUserValidation(account, userId, null, template, "Unable to delete iso ");
+
+        final UserVO user = _userDao.findById(userId);
+        if (user == null) {
+            throw new InvalidParameterValueException("Please specify a valid user.");
+        }
+
+        if (template.getFormat() != ImageFormat.ISO) {
+            throw new InvalidParameterValueException("Please specify a valid iso.");
+        }
+
+        return new TemplateProfile(userId, template, zoneId);
+    }
+
+    @Override
+    public TemplateProfile prepareExtractTemplate(final ExtractTemplateCmd cmd) {
+        final Long templateId = cmd.getId();
+        final Long userId = CallContext.current().getCallingUserId();
+        final Long zoneId = cmd.getZoneId();
+
+        final VMTemplateVO template = _tmpltDao.findById(templateId);
+        if (template == null) {
+            throw new InvalidParameterValueException("unable to find template with id " + templateId);
+        }
+        return new TemplateProfile(userId, template, zoneId);
+    }
+
+    @Override
+    abstract public boolean delete(TemplateProfile profile);
+
+    @Override
+    public TemplateProfile prepare(final boolean isIso, final Long userId, final String name, final String displayText, final Integer bits, final Boolean passwordEnabled, final
+    Boolean requiresHVM, final String url,
+                                   final Boolean isPublic, final Boolean featured, final Boolean isExtractable, final String format, final Long guestOSId, final Long zoneId,
+                                   final HypervisorType hypervisorType, final String
+                                           accountName,
+                                   final Long domainId, final String chksum, final Boolean bootable, final Map details) throws ResourceAllocationException {
+        return prepare(isIso, userId, name, displayText, bits, passwordEnabled, requiresHVM, url, isPublic, featured, isExtractable, format, guestOSId, zoneId,
+                hypervisorType, chksum, bootable, null, null, details, false, null, false, TemplateType.USER);
+    }
+
+    @Override
+    public TemplateProfile prepare(final boolean isIso, final long userId, final String name, final String displayText, Integer bits, Boolean passwordEnabled, Boolean
+            requiresHVM, final String url,
+                                   Boolean isPublic, Boolean featured, Boolean isExtractable, final String format, Long guestOSId, Long zoneId, final HypervisorType
+                                           hypervisorType, final String
+                                           chksum,
+                                   Boolean bootable, final String templateTag, final Account templateOwner, Map details, Boolean sshkeyEnabled, final String imageStoreUuid,
+                                   final Boolean
+                                           isDynamicallyScalable,
+                                   final TemplateType templateType) throws ResourceAllocationException {
         //Long accountId = null;
         // parameters verification
 
@@ -145,7 +325,7 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
             if (bootable == null) {
                 bootable = Boolean.TRUE;
             }
-            GuestOS noneGuestOs = ApiDBUtils.findGuestOSByDisplayName(ApiConstants.ISO_GUEST_OS_NONE);
+            final GuestOS noneGuestOs = ApiDBUtils.findGuestOSByDisplayName(ApiConstants.ISO_GUEST_OS_NONE);
             if ((guestOSId == null || guestOSId == noneGuestOs.getId()) && bootable == true) {
                 throw new InvalidParameterValueException("Please pass a valid GuestOS Id");
             }
@@ -171,14 +351,14 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
             sshkeyEnabled = Boolean.FALSE;
         }
 
-        boolean isAdmin = _accountMgr.isRootAdmin(templateOwner.getId());
+        final boolean isAdmin = _accountMgr.isRootAdmin(templateOwner.getId());
         boolean isRegionStore = false;
-        List<ImageStoreVO> stores = _imgStoreDao.findRegionImageStores();
+        final List<ImageStoreVO> stores = _imgStoreDao.findRegionImageStores();
         if (stores != null && stores.size() > 0) {
             isRegionStore = true;
         }
 
-        if (!isAdmin && zoneId == null && !isRegionStore ) {
+        if (!isAdmin && zoneId == null && !isRegionStore) {
             // domain admin and user should also be able to register template on a region store
             throw new InvalidParameterValueException("Please specify a valid zone Id. Only admins can create templates in all zones.");
         }
@@ -189,7 +369,7 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
         }
 
         // check whether owner can create public templates
-        boolean allowPublicUserTemplates = TemplateManager.AllowPublicUserTemplates.valueIn(templateOwner.getId());
+        final boolean allowPublicUserTemplates = TemplateManager.AllowPublicUserTemplates.valueIn(templateOwner.getId());
         if (!isAdmin && !allowPublicUserTemplates && isPublic) {
             throw new InvalidParameterValueException("Only private templates/ISO can be created.");
         }
@@ -198,16 +378,16 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
             featured = Boolean.FALSE;
         }
 
-        ImageFormat imgfmt;
+        final ImageFormat imgfmt;
         try {
             imgfmt = ImageFormat.valueOf(format.toUpperCase());
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             s_logger.debug("ImageFormat IllegalArgumentException: " + e.getMessage());
             throw new IllegalArgumentException("Image format: " + format + " is incorrect. Supported formats are " + EnumUtils.listValues(ImageFormat.values()));
         }
 
         // Check that the resource limit for templates/ISOs won't be exceeded
-        UserVO user = _userDao.findById(userId);
+        final UserVO user = _userDao.findById(userId);
         if (user == null) {
             throw new IllegalArgumentException("Unable to find user with id " + userId);
         }
@@ -216,18 +396,18 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
 
         // If a zoneId is specified, make sure it is valid
         if (zoneId != null) {
-            DataCenterVO zone = _dcDao.findById(zoneId);
+            final DataCenterVO zone = _dcDao.findById(zoneId);
             if (zone == null) {
                 throw new IllegalArgumentException("Please specify a valid zone.");
             }
-            Account caller = CallContext.current().getCallingAccount();
-            if(Grouping.AllocationState.Disabled == zone.getAllocationState() && !_accountMgr.isRootAdmin(caller.getId())){
-                throw new PermissionDeniedException("Cannot perform this operation, Zone is currently disabled: "+ zoneId );
+            final Account caller = CallContext.current().getCallingAccount();
+            if (Grouping.AllocationState.Disabled == zone.getAllocationState() && !_accountMgr.isRootAdmin(caller.getId())) {
+                throw new PermissionDeniedException("Cannot perform this operation, Zone is currently disabled: " + zoneId);
             }
         }
 
-        List<VMTemplateVO> systemvmTmplts = _tmpltDao.listAllSystemVMTemplates();
-        for (VMTemplateVO template : systemvmTmplts) {
+        final List<VMTemplateVO> systemvmTmplts = _tmpltDao.listAllSystemVMTemplates();
+        for (final VMTemplateVO template : systemvmTmplts) {
             if (template.getName().equalsIgnoreCase(name) || template.getDisplayText().equalsIgnoreCase(displayText)) {
                 throw new IllegalArgumentException("Cannot use reserved names for templates");
             }
@@ -235,8 +415,8 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
 
         if (hypervisorType.equals(Hypervisor.HypervisorType.XenServer)) {
             if (details == null || !details.containsKey("hypervisortoolsversion") || details.get("hypervisortoolsversion") == null ||
-                ((String)details.get("hypervisortoolsversion")).equalsIgnoreCase("none")) {
-                String hpvs = _configDao.getValue(Config.XenServerPVdriverVersion.key());
+                    ((String) details.get("hypervisortoolsversion")).equalsIgnoreCase("none")) {
+                final String hpvs = _configDao.getValue(Config.XenServerPVdriverVersion.key());
                 if (hpvs != null) {
                     if (details == null) {
                         details = new HashMap<String, String>();
@@ -246,213 +426,36 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
             }
         }
 
-        Long id = _tmpltDao.getNextInSequence(Long.class, "id");
+        final Long id = _tmpltDao.getNextInSequence(Long.class, "id");
         CallContext.current().setEventDetails("Id: " + id + " name: " + name);
         return new TemplateProfile(id, userId, name, displayText, bits, passwordEnabled, requiresHVM, url, isPublic, featured, isExtractable, imgfmt, guestOSId, zoneId,
-            hypervisorType, templateOwner.getAccountName(), templateOwner.getDomainId(), templateOwner.getAccountId(), chksum, bootable, templateTag, details,
-            sshkeyEnabled, null, isDynamicallyScalable, templateType);
-
+                hypervisorType, templateOwner.getAccountName(), templateOwner.getDomainId(), templateOwner.getAccountId(), chksum, bootable, templateTag, details,
+                sshkeyEnabled, null, isDynamicallyScalable, templateType);
     }
 
-    @Override
-    public TemplateProfile prepare(RegisterTemplateCmd cmd) throws ResourceAllocationException {
-        //check if the caller can operate with the template owner
-        Account caller = CallContext.current().getCallingAccount();
-        Account owner = _accountMgr.getAccount(cmd.getEntityOwnerId());
-        _accountMgr.checkAccess(caller, null, true, owner);
-
-        boolean isRouting = (cmd.isRoutingType() == null) ? false : cmd.isRoutingType();
-
-        Long zoneId = cmd.getZoneId();
-        // ignore passed zoneId if we are using region wide image store
-        List<ImageStoreVO> stores = _imgStoreDao.findRegionImageStores();
-        if (stores != null && stores.size() > 0) {
-            zoneId = -1L;
-        }
-
-        return prepare(false, CallContext.current().getCallingUserId(), cmd.getTemplateName(), cmd.getDisplayText(), cmd.getBits(), cmd.isPasswordEnabled(),
-            cmd.getRequiresHvm(), cmd.getUrl(), cmd.isPublic(), cmd.isFeatured(), cmd.isExtractable(), cmd.getFormat(), cmd.getOsTypeId(), zoneId,
-            HypervisorType.getType(cmd.getHypervisor()), cmd.getChecksum(), true, cmd.getTemplateTag(), owner, cmd.getDetails(), cmd.isSshKeyEnabled(), null,
-            cmd.isDynamicallyScalable(), isRouting ? TemplateType.ROUTING : TemplateType.USER);
-
-    }
-
-    @Override
-    public TemplateProfile prepare(GetUploadParamsForTemplateCmd cmd) throws ResourceAllocationException {
-        //check if the caller can operate with the template owner
-        Account caller = CallContext.current().getCallingAccount();
-        Account owner = _accountMgr.getAccount(cmd.getEntityOwnerId());
-        _accountMgr.checkAccess(caller, null, true, owner);
-
-        boolean isRouting = (cmd.isRoutingType() == null) ? false : cmd.isRoutingType();
-
-        Long zoneId = cmd.getZoneId();
-        // ignore passed zoneId if we are using region wide image store
-        List<ImageStoreVO> stores = _imgStoreDao.findRegionImageStores();
-        if (stores != null && stores.size() > 0) {
-            zoneId = -1L;
-        }
-
-        return prepare(false, CallContext.current().getCallingUserId(), cmd.getName(), cmd.getDisplayText(), cmd.getBits(), cmd.isPasswordEnabled(),
-                       cmd.getRequiresHvm(), null, cmd.isPublic(), cmd.isFeatured(), cmd.isExtractable(), cmd.getFormat(), cmd.getOsTypeId(), zoneId,
-                       HypervisorType.getType(cmd.getHypervisor()), cmd.getChecksum(), true, cmd.getTemplateTag(), owner, cmd.getDetails(), cmd.isSshKeyEnabled(), null,
-                       cmd.isDynamicallyScalable(), isRouting ? TemplateType.ROUTING : TemplateType.USER);
-
-    }
-
-    @Override
-    public TemplateProfile prepare(RegisterIsoCmd cmd) throws ResourceAllocationException {
-        //check if the caller can operate with the template owner
-        Account caller = CallContext.current().getCallingAccount();
-        Account owner = _accountMgr.getAccount(cmd.getEntityOwnerId());
-        _accountMgr.checkAccess(caller, null, true, owner);
-
-        Long zoneId = cmd.getZoneId();
-        // ignore passed zoneId if we are using region wide image store
-        List<ImageStoreVO> stores = _imgStoreDao.findRegionImageStores();
-        if (stores != null && stores.size() > 0) {
-            zoneId = -1L;
-        }
-
-        return prepare(true, CallContext.current().getCallingUserId(), cmd.getIsoName(), cmd.getDisplayText(), 64, false, true, cmd.getUrl(), cmd.isPublic(),
-            cmd.isFeatured(), cmd.isExtractable(), ImageFormat.ISO.toString(), cmd.getOsTypeId(), zoneId, HypervisorType.None, cmd.getChecksum(), cmd.isBootable(), null,
-            owner, null, false, cmd.getImageStoreUuid(), cmd.isDynamicallyScalable(), TemplateType.USER);
-    }
-
-    protected VMTemplateVO persistTemplate(TemplateProfile profile, VirtualMachineTemplate.State initialState) {
-        Long zoneId = profile.getZoneId();
-        VMTemplateVO template =
-            new VMTemplateVO(profile.getTemplateId(), profile.getName(), profile.getFormat(), profile.getIsPublic(), profile.getFeatured(), profile.getIsExtractable(),
-                profile.getTemplateType(), profile.getUrl(), profile.getRequiresHVM(), profile.getBits(), profile.getAccountId(), profile.getCheckSum(),
-                profile.getDisplayText(), profile.getPasswordEnabled(), profile.getGuestOsId(), profile.getBootable(), profile.getHypervisorType(),
-                profile.getTemplateTag(), profile.getDetails(), profile.getSshKeyEnabled(), profile.IsDynamicallyScalable());
+    protected VMTemplateVO persistTemplate(final TemplateProfile profile, final VirtualMachineTemplate.State initialState) {
+        final Long zoneId = profile.getZoneId();
+        final VMTemplateVO template =
+                new VMTemplateVO(profile.getTemplateId(), profile.getName(), profile.getFormat(), profile.getIsPublic(), profile.getFeatured(), profile.getIsExtractable(),
+                        profile.getTemplateType(), profile.getUrl(), profile.getRequiresHVM(), profile.getBits(), profile.getAccountId(), profile.getCheckSum(),
+                        profile.getDisplayText(), profile.getPasswordEnabled(), profile.getGuestOsId(), profile.getBootable(), profile.getHypervisorType(),
+                        profile.getTemplateTag(), profile.getDetails(), profile.getSshKeyEnabled(), profile.IsDynamicallyScalable());
         template.setState(initialState);
 
         if (zoneId == null || zoneId.longValue() == -1) {
-            List<DataCenterVO> dcs = _dcDao.listAll();
+            final List<DataCenterVO> dcs = _dcDao.listAll();
 
             if (dcs.isEmpty()) {
                 throw new CloudRuntimeException("No zones are present in the system, can't add template");
             }
 
             template.setCrossZones(true);
-            for (DataCenterVO dc : dcs) {
+            for (final DataCenterVO dc : dcs) {
                 _tmpltDao.addTemplateToZone(template, dc.getId());
             }
-
         } else {
             _tmpltDao.addTemplateToZone(template, zoneId);
         }
         return _tmpltDao.findById(template.getId());
     }
-
-    private Long accountAndUserValidation(Account account, long userId, UserVmVO vmInstanceCheck, VMTemplateVO template, String msg) throws PermissionDeniedException {
-
-        if (account != null) {
-            if (!_accountMgr.isAdmin(account.getId())) {
-                if ((vmInstanceCheck != null) && (account.getId() != vmInstanceCheck.getAccountId())) {
-                    throw new PermissionDeniedException(msg + ". Permission denied.");
-                }
-
-                if ((template != null) &&
-                    (!template.isPublicTemplate() && (account.getId() != template.getAccountId()) && (template.getTemplateType() != TemplateType.PERHOST))) {
-                    //special handling for the project case
-                    Account owner = _accountMgr.getAccount(template.getAccountId());
-                    if (owner.getType() == Account.ACCOUNT_TYPE_PROJECT) {
-                        if (!_projectMgr.canAccessProjectAccount(account, owner.getId())) {
-                            throw new PermissionDeniedException(msg + ". Permission denied. The caller can't access project's template");
-                        }
-                    } else {
-                        throw new PermissionDeniedException(msg + ". Permission denied.");
-                    }
-                }
-            } else {
-                if ((vmInstanceCheck != null) && !_domainDao.isChildDomain(account.getDomainId(), vmInstanceCheck.getDomainId())) {
-                    throw new PermissionDeniedException(msg + ". Permission denied.");
-                }
-                // FIXME: if template/ISO owner is null we probably need to
-                // throw some kind of exception
-
-                if (template != null) {
-                    Account templateOwner = _accountDao.findById(template.getAccountId());
-                    if ((templateOwner != null) && !_domainDao.isChildDomain(account.getDomainId(), templateOwner.getDomainId())) {
-                        throw new PermissionDeniedException(msg + ". Permission denied.");
-                    }
-                }
-            }
-        }
-
-        return userId;
-    }
-
-    @Override
-    public TemplateProfile prepareDelete(DeleteTemplateCmd cmd) {
-        Long templateId = cmd.getId();
-        Long userId = CallContext.current().getCallingUserId();
-        Account account = CallContext.current().getCallingAccount();
-        Long zoneId = cmd.getZoneId();
-
-        VMTemplateVO template = _tmpltDao.findById(templateId);
-        if (template == null) {
-            throw new InvalidParameterValueException("unable to find template with id " + templateId);
-        }
-
-        userId = accountAndUserValidation(account, userId, null, template, "Unable to delete template ");
-
-        UserVO user = _userDao.findById(userId);
-        if (user == null) {
-            throw new InvalidParameterValueException("Please specify a valid user.");
-        }
-
-        if (template.getFormat() == ImageFormat.ISO) {
-            throw new InvalidParameterValueException("Please specify a valid template.");
-        }
-
-        return new TemplateProfile(userId, template, zoneId);
-    }
-
-    @Override
-    public TemplateProfile prepareExtractTemplate(ExtractTemplateCmd cmd) {
-        Long templateId = cmd.getId();
-        Long userId = CallContext.current().getCallingUserId();
-        Long zoneId = cmd.getZoneId();
-
-        VMTemplateVO template = _tmpltDao.findById(templateId);
-        if (template == null) {
-            throw new InvalidParameterValueException("unable to find template with id " + templateId);
-        }
-        return new TemplateProfile(userId, template, zoneId);
-    }
-
-    @Override
-    public TemplateProfile prepareDelete(DeleteIsoCmd cmd) {
-        Long templateId = cmd.getId();
-        Long userId = CallContext.current().getCallingUserId();
-        Account account = CallContext.current().getCallingAccount();
-        Long zoneId = cmd.getZoneId();
-
-        VMTemplateVO template = _tmpltDao.findById(templateId);
-        if (template == null) {
-            throw new InvalidParameterValueException("unable to find iso with id " + templateId);
-        }
-
-        userId = accountAndUserValidation(account, userId, null, template, "Unable to delete iso ");
-
-        UserVO user = _userDao.findById(userId);
-        if (user == null) {
-            throw new InvalidParameterValueException("Please specify a valid user.");
-        }
-
-        if (template.getFormat() != ImageFormat.ISO) {
-            throw new InvalidParameterValueException("Please specify a valid iso.");
-        }
-
-        return new TemplateProfile(userId, template, zoneId);
-    }
-
-    @Override
-    abstract public VMTemplateVO create(TemplateProfile profile);
-
-    @Override
-    abstract public boolean delete(TemplateProfile profile);
 }

@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.user;
 
 import javax.persistence.Column;
@@ -82,7 +66,7 @@ public class VmDiskStatisticsVO {
     protected VmDiskStatisticsVO() {
     }
 
-    public VmDiskStatisticsVO(long accountId, long dcId, Long vmId, Long volumeId) {
+    public VmDiskStatisticsVO(final long accountId, final long dcId, final Long vmId, final Long volumeId) {
         this.accountId = accountId;
         this.dataCenterId = dcId;
         this.vmId = vmId;
@@ -121,7 +105,7 @@ public class VmDiskStatisticsVO {
         return currentIORead;
     }
 
-    public void setCurrentIORead(long currentIORead) {
+    public void setCurrentIORead(final long currentIORead) {
         this.currentIORead = currentIORead;
     }
 
@@ -129,7 +113,7 @@ public class VmDiskStatisticsVO {
         return currentIOWrite;
     }
 
-    public void setCurrentIOWrite(long currentIOWrite) {
+    public void setCurrentIOWrite(final long currentIOWrite) {
         this.currentIOWrite = currentIOWrite;
     }
 
@@ -137,15 +121,15 @@ public class VmDiskStatisticsVO {
         return netIORead;
     }
 
+    public void setNetIORead(final long netIORead) {
+        this.netIORead = netIORead;
+    }
+
     public long getNetIOWrite() {
         return netIOWrite;
     }
 
-    public void setNetIORead(long netIORead) {
-        this.netIORead = netIORead;
-    }
-
-    public void setNetIOWrite(long netIOWrite) {
+    public void setNetIOWrite(final long netIOWrite) {
         this.netIOWrite = netIOWrite;
     }
 
@@ -153,7 +137,7 @@ public class VmDiskStatisticsVO {
         return aggIORead;
     }
 
-    public void setAggIORead(long aggIORead) {
+    public void setAggIORead(final long aggIORead) {
         this.aggIORead = aggIORead;
     }
 
@@ -161,7 +145,7 @@ public class VmDiskStatisticsVO {
         return aggIOWrite;
     }
 
-    public void setAggIOWrite(long aggIOWrite) {
+    public void setAggIOWrite(final long aggIOWrite) {
         this.aggIOWrite = aggIOWrite;
     }
 
@@ -169,7 +153,7 @@ public class VmDiskStatisticsVO {
         return currentBytesRead;
     }
 
-    public void setCurrentBytesRead(long currentBytesRead) {
+    public void setCurrentBytesRead(final long currentBytesRead) {
         this.currentBytesRead = currentBytesRead;
     }
 
@@ -177,7 +161,7 @@ public class VmDiskStatisticsVO {
         return currentBytesWrite;
     }
 
-    public void setCurrentBytesWrite(long currentBytesWrite) {
+    public void setCurrentBytesWrite(final long currentBytesWrite) {
         this.currentBytesWrite = currentBytesWrite;
     }
 
@@ -185,15 +169,15 @@ public class VmDiskStatisticsVO {
         return netBytesRead;
     }
 
+    public void setNetBytesRead(final long netBytesRead) {
+        this.netBytesRead = netBytesRead;
+    }
+
     public long getNetBytesWrite() {
         return netBytesWrite;
     }
 
-    public void setNetBytesRead(long netBytesRead) {
-        this.netBytesRead = netBytesRead;
-    }
-
-    public void setNetBytesWrite(long netBytesWrite) {
+    public void setNetBytesWrite(final long netBytesWrite) {
         this.netBytesWrite = netBytesWrite;
     }
 
@@ -201,7 +185,7 @@ public class VmDiskStatisticsVO {
         return aggBytesRead;
     }
 
-    public void setAggBytesRead(long aggBytesRead) {
+    public void setAggBytesRead(final long aggBytesRead) {
         this.aggBytesRead = aggBytesRead;
     }
 
@@ -209,8 +193,7 @@ public class VmDiskStatisticsVO {
         return aggBytesWrite;
     }
 
-    public void setAggBytesWrite(long aggBytesWrite) {
+    public void setAggBytesWrite(final long aggBytesWrite) {
         this.aggBytesWrite = aggBytesWrite;
     }
-
 }

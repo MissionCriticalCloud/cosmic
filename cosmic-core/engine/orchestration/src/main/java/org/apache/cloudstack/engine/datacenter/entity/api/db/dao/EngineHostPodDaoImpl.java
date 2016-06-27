@@ -1,28 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.engine.datacenter.entity.api.db.dao;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 
 import com.cloud.org.Grouping;
 import com.cloud.utils.db.GenericDaoBase;
@@ -32,11 +8,19 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
-
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity;
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State;
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineHostPodVO;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -68,20 +52,19 @@ public class EngineHostPodDaoImpl extends GenericDaoBase<EngineHostPodVO, Long> 
         StateChangeSearch.and("id", StateChangeSearch.entity().getId(), SearchCriteria.Op.EQ);
         StateChangeSearch.and("state", StateChangeSearch.entity().getState(), SearchCriteria.Op.EQ);
         StateChangeSearch.done();
-
     }
 
     @Override
-    public List<EngineHostPodVO> listByDataCenterId(long id) {
-        SearchCriteria<EngineHostPodVO> sc = DataCenterIdSearch.create();
+    public List<EngineHostPodVO> listByDataCenterId(final long id) {
+        final SearchCriteria<EngineHostPodVO> sc = DataCenterIdSearch.create();
         sc.setParameters("dcId", id);
 
         return listBy(sc);
     }
 
     @Override
-    public EngineHostPodVO findByName(String name, long dcId) {
-        SearchCriteria<EngineHostPodVO> sc = DataCenterAndNameSearch.create();
+    public EngineHostPodVO findByName(final String name, final long dcId) {
+        final SearchCriteria<EngineHostPodVO> sc = DataCenterAndNameSearch.create();
         sc.setParameters("dc", dcId);
         sc.setParameters("name", name);
 
@@ -89,27 +72,27 @@ public class EngineHostPodDaoImpl extends GenericDaoBase<EngineHostPodVO, Long> 
     }
 
     @Override
-    public HashMap<Long, List<Object>> getCurrentPodCidrSubnets(long zoneId, long podIdToSkip) {
-        HashMap<Long, List<Object>> currentPodCidrSubnets = new HashMap<Long, List<Object>>();
+    public HashMap<Long, List<Object>> getCurrentPodCidrSubnets(final long zoneId, final long podIdToSkip) {
+        final HashMap<Long, List<Object>> currentPodCidrSubnets = new HashMap<>();
 
-        String selectSql = "SELECT id, cidr_address, cidr_size FROM host_pod_ref WHERE data_center_id=" + zoneId + " and removed IS NULL";
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final String selectSql = "SELECT id, cidr_address, cidr_size FROM host_pod_ref WHERE data_center_id=" + zoneId + " and removed IS NULL";
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         try {
-            PreparedStatement stmt = txn.prepareAutoCloseStatement(selectSql);
-            ResultSet rs = stmt.executeQuery();
+            final PreparedStatement stmt = txn.prepareAutoCloseStatement(selectSql);
+            final ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                Long podId = rs.getLong("id");
+                final Long podId = rs.getLong("id");
                 if (podId.longValue() == podIdToSkip) {
                     continue;
                 }
-                String cidrAddress = rs.getString("cidr_address");
-                long cidrSize = rs.getLong("cidr_size");
-                List<Object> cidrPair = new ArrayList<Object>();
+                final String cidrAddress = rs.getString("cidr_address");
+                final long cidrSize = rs.getLong("cidr_size");
+                final List<Object> cidrPair = new ArrayList<>();
                 cidrPair.add(0, cidrAddress);
                 cidrPair.add(1, new Long(cidrSize));
                 currentPodCidrSubnets.put(podId, cidrPair);
             }
-        } catch (SQLException ex) {
+        } catch (final SQLException ex) {
             s_logger.warn("DB exception " + ex.getMessage(), ex);
             return null;
         }
@@ -118,77 +101,75 @@ public class EngineHostPodDaoImpl extends GenericDaoBase<EngineHostPodVO, Long> 
     }
 
     @Override
-    public boolean remove(Long id) {
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        EngineHostPodVO pod = createForUpdate();
-        pod.setName(null);
-
-        update(id, pod);
-
-        boolean result = super.remove(id);
-        txn.commit();
-        return result;
-    }
-
-    @Override
-    public List<Long> listDisabledPods(long zoneId) {
-        GenericSearchBuilder<EngineHostPodVO, Long> podIdSearch = createSearchBuilder(Long.class);
+    public List<Long> listDisabledPods(final long zoneId) {
+        final GenericSearchBuilder<EngineHostPodVO, Long> podIdSearch = createSearchBuilder(Long.class);
         podIdSearch.selectFields(podIdSearch.entity().getId());
         podIdSearch.and("dataCenterId", podIdSearch.entity().getDataCenterId(), Op.EQ);
         podIdSearch.and("allocationState", podIdSearch.entity().getAllocationState(), Op.EQ);
         podIdSearch.done();
 
-        SearchCriteria<Long> sc = podIdSearch.create();
+        final SearchCriteria<Long> sc = podIdSearch.create();
         sc.addAnd("dataCenterId", SearchCriteria.Op.EQ, zoneId);
         sc.addAnd("allocationState", SearchCriteria.Op.EQ, Grouping.AllocationState.Disabled);
         return customSearch(sc, null);
     }
 
     @Override
-    public boolean updateState(State currentState, Event event, State nextState, DataCenterResourceEntity podEntity, Object data) {
+    public boolean remove(final Long id) {
+        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        txn.start();
+        final EngineHostPodVO pod = createForUpdate();
+        pod.setName(null);
 
-        EngineHostPodVO vo = findById(podEntity.getId());
+        update(id, pod);
 
-        Date oldUpdatedTime = vo.getLastUpdated();
+        final boolean result = super.remove(id);
+        txn.commit();
+        return result;
+    }
 
-        SearchCriteria<EngineHostPodVO> sc = StateChangeSearch.create();
+    @Override
+    public boolean updateState(final State currentState, final Event event, final State nextState, final DataCenterResourceEntity podEntity, final Object data) {
+
+        final EngineHostPodVO vo = findById(podEntity.getId());
+
+        final Date oldUpdatedTime = vo.getLastUpdated();
+
+        final SearchCriteria<EngineHostPodVO> sc = StateChangeSearch.create();
         sc.setParameters("id", vo.getId());
         sc.setParameters("state", currentState);
 
-        UpdateBuilder builder = getUpdateBuilder(vo);
+        final UpdateBuilder builder = getUpdateBuilder(vo);
         builder.set(vo, "state", nextState);
         builder.set(vo, "lastUpdated", new Date());
 
-        int rows = update(vo, sc);
+        final int rows = update(vo, sc);
 
         if (rows == 0 && s_logger.isDebugEnabled()) {
-            EngineHostPodVO dbDC = findByIdIncludingRemoved(vo.getId());
+            final EngineHostPodVO dbDC = findByIdIncludingRemoved(vo.getId());
             if (dbDC != null) {
-                StringBuilder str = new StringBuilder("Unable to update ").append(vo.toString());
+                final StringBuilder str = new StringBuilder("Unable to update ").append(vo.toString());
                 str.append(": DB Data={id=").append(dbDC.getId()).append("; state=").append(dbDC.getState()).append(";updatedTime=").append(dbDC.getLastUpdated());
                 str.append(": New Data={id=")
-                    .append(vo.getId())
-                    .append("; state=")
-                    .append(nextState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatedTime=")
-                    .append(vo.getLastUpdated());
+                   .append(vo.getId())
+                   .append("; state=")
+                   .append(nextState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatedTime=")
+                   .append(vo.getLastUpdated());
                 str.append(": stale Data={id=")
-                    .append(vo.getId())
-                    .append("; state=")
-                    .append(currentState)
-                    .append("; event=")
-                    .append(event)
-                    .append("; updatedTime=")
-                    .append(oldUpdatedTime);
+                   .append(vo.getId())
+                   .append("; state=")
+                   .append(currentState)
+                   .append("; event=")
+                   .append(event)
+                   .append("; updatedTime=")
+                   .append(oldUpdatedTime);
             } else {
                 s_logger.debug("Unable to update dataCenter: id=" + vo.getId() + ", as there is no such dataCenter exists in the database anymore");
             }
         }
         return rows > 0;
-
     }
-
 }

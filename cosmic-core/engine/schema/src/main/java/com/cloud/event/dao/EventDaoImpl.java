@@ -1,23 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.event.dao;
-
-import java.util.Date;
-import java.util.List;
 
 import com.cloud.event.Event.State;
 import com.cloud.event.EventVO;
@@ -27,6 +8,9 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
+
+import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,23 +40,24 @@ public class EventDaoImpl extends GenericDaoBase<EventVO, Long> implements Event
     }
 
     @Override
-    public List<EventVO> searchAllEvents(SearchCriteria<EventVO> sc, Filter filter) {
+    public List<EventVO> searchAllEvents(final SearchCriteria<EventVO> sc, final Filter filter) {
         return listIncludingRemovedBy(sc, filter);
     }
 
     @Override
-    public List<EventVO> listOlderEvents(Date oldTime) {
-        if (oldTime == null)
+    public List<EventVO> listOlderEvents(final Date oldTime) {
+        if (oldTime == null) {
             return null;
-        SearchCriteria<EventVO> sc = createSearchCriteria();
+        }
+        final SearchCriteria<EventVO> sc = createSearchCriteria();
         sc.addAnd("createDate", SearchCriteria.Op.LT, oldTime);
         sc.addAnd("archived", SearchCriteria.Op.EQ, false);
         return listIncludingRemovedBy(sc, null);
     }
 
     @Override
-    public EventVO findCompletedEvent(long startId) {
-        SearchCriteria<EventVO> sc = CompletedEventSearch.create();
+    public EventVO findCompletedEvent(final long startId) {
+        final SearchCriteria<EventVO> sc = CompletedEventSearch.create();
         sc.setParameters("state", State.Completed);
         sc.setParameters("startId", startId);
         sc.setParameters("archived", false);
@@ -80,8 +65,8 @@ public class EventDaoImpl extends GenericDaoBase<EventVO, Long> implements Event
     }
 
     @Override
-    public List<EventVO> listToArchiveOrDeleteEvents(List<Long> ids, String type, Date startDate, Date endDate, List<Long> accountIds) {
-        SearchCriteria<EventVO> sc = ToArchiveOrDeleteEventSearch.create();
+    public List<EventVO> listToArchiveOrDeleteEvents(final List<Long> ids, final String type, final Date startDate, final Date endDate, final List<Long> accountIds) {
+        final SearchCriteria<EventVO> sc = ToArchiveOrDeleteEventSearch.create();
         if (ids != null) {
             sc.setParameters("id", ids.toArray(new Object[ids.size()]));
         }
@@ -101,9 +86,9 @@ public class EventDaoImpl extends GenericDaoBase<EventVO, Long> implements Event
     }
 
     @Override
-    public void archiveEvents(List<EventVO> events) {
+    public void archiveEvents(final List<EventVO> events) {
         if (events != null && !events.isEmpty()) {
-            TransactionLegacy txn = TransactionLegacy.currentTxn();
+            final TransactionLegacy txn = TransactionLegacy.currentTxn();
             txn.start();
             for (EventVO event : events) {
                 event = lockRow(event.getId(), true);

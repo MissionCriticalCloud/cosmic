@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.api;
@@ -47,11 +32,17 @@ public class StartupCommand extends Command {
     String resourceName;
     String gatewayIpAddress;
 
-    public StartupCommand(Host.Type type) {
+    public StartupCommand(final Host.Type type) {
         this.type = type;
     }
 
-    public StartupCommand(Long id, Host.Type type, String name, String dataCenter, String pod, String guid, String version) {
+    public StartupCommand(final Long id, final Host.Type type, final String name, final String dataCenter, final String pod, final String guid, final String version, final
+    String gatewayIpAddress) {
+        this(id, type, name, dataCenter, pod, guid, version);
+        this.gatewayIpAddress = gatewayIpAddress;
+    }
+
+    public StartupCommand(final Long id, final Host.Type type, final String name, final String dataCenter, final String pod, final String guid, final String version) {
         super();
         this.id = id;
         this.dataCenter = dataCenter;
@@ -62,16 +53,11 @@ public class StartupCommand extends Command {
         this.type = type;
     }
 
-    public StartupCommand(Long id, Host.Type type, String name, String dataCenter, String pod, String guid, String version, String gatewayIpAddress) {
-        this(id, type, name, dataCenter, pod, guid, version);
-        this.gatewayIpAddress = gatewayIpAddress;
-    }
-
     public Host.Type getHostType() {
         return type;
     }
 
-    public void setHostType(Host.Type type) {
+    public void setHostType(final Host.Type type) {
         this.type = type;
     }
 
@@ -79,35 +65,47 @@ public class StartupCommand extends Command {
         return iqn;
     }
 
-    public void setCluster(String cluster) {
-        this.cluster = cluster;
+    public void setIqn(final String iqn) {
+        this.iqn = iqn;
     }
 
     public String getCluster() {
         return cluster;
     }
 
-    public void setIqn(String iqn) {
-        this.iqn = iqn;
+    public void setCluster(final String cluster) {
+        this.cluster = cluster;
     }
 
     public String getDataCenter() {
         return dataCenter;
     }
 
+    public void setDataCenter(final String dataCenter) {
+        this.dataCenter = dataCenter;
+    }
+
     public String getPod() {
         return pod;
+    }
+
+    public void setPod(final String pod) {
+        this.pod = pod;
     }
 
     public Long getId() {
         return id;
     }
 
+    public void setId(final Long id) {
+        this.id = id;
+    }
+
     public String getStorageIpAddressDeux() {
         return storageIpAddressDeux;
     }
 
-    public void setStorageIpAddressDeux(String storageIpAddressDeux) {
+    public void setStorageIpAddressDeux(final String storageIpAddressDeux) {
         this.storageIpAddressDeux = storageIpAddressDeux;
     }
 
@@ -115,7 +113,7 @@ public class StartupCommand extends Command {
         return storageMacAddressDeux;
     }
 
-    public void setStorageMacAddressDeux(String storageMacAddressDeux) {
+    public void setStorageMacAddressDeux(final String storageMacAddressDeux) {
         this.storageMacAddressDeux = storageMacAddressDeux;
     }
 
@@ -123,7 +121,7 @@ public class StartupCommand extends Command {
         return storageNetmaskDeux;
     }
 
-    public void setStorageNetmaskDeux(String storageNetmaskDeux) {
+    public void setStorageNetmaskDeux(final String storageNetmaskDeux) {
         this.storageNetmaskDeux = storageNetmaskDeux;
     }
 
@@ -131,27 +129,27 @@ public class StartupCommand extends Command {
         return guid;
     }
 
+    public void setGuid(final String guid) {
+        this.guid = guid;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
     }
 
     public String getVersion() {
         return version;
     }
 
-    public void setDataCenter(String dataCenter) {
-        this.dataCenter = dataCenter;
+    public void setVersion(final String version) {
+        this.version = version;
     }
 
-    public void setPod(String pod) {
-        this.pod = pod;
-    }
-
-    public void setGuid(String guid) {
-        this.guid = guid;
-    }
-
-    public void setGuid(String guid, String resourceName) {
+    public void setGuid(final String guid, final String resourceName) {
         this.resourceName = resourceName;
         this.guid = guid + "-" + resourceName;
     }
@@ -160,7 +158,7 @@ public class StartupCommand extends Command {
         return publicNetmask;
     }
 
-    public void setPublicNetmask(String publicNetmask) {
+    public void setPublicNetmask(final String publicNetmask) {
         this.publicNetmask = publicNetmask;
     }
 
@@ -168,7 +166,7 @@ public class StartupCommand extends Command {
         return publicMacAddress;
     }
 
-    public void setPublicMacAddress(String publicMacAddress) {
+    public void setPublicMacAddress(final String publicMacAddress) {
         this.publicMacAddress = publicMacAddress;
     }
 
@@ -176,7 +174,7 @@ public class StartupCommand extends Command {
         return privateIpAddress;
     }
 
-    public void setPrivateIpAddress(String privateIpAddress) {
+    public void setPrivateIpAddress(final String privateIpAddress) {
         this.privateIpAddress = privateIpAddress;
     }
 
@@ -184,7 +182,7 @@ public class StartupCommand extends Command {
         return privateMacAddress;
     }
 
-    public void setPrivateMacAddress(String privateMacAddress) {
+    public void setPrivateMacAddress(final String privateMacAddress) {
         this.privateMacAddress = privateMacAddress;
     }
 
@@ -192,7 +190,7 @@ public class StartupCommand extends Command {
         return privateNetmask;
     }
 
-    public void setPrivateNetmask(String privateNetmask) {
+    public void setPrivateNetmask(final String privateNetmask) {
         this.privateNetmask = privateNetmask;
     }
 
@@ -200,7 +198,7 @@ public class StartupCommand extends Command {
         return storageIpAddress;
     }
 
-    public void setStorageIpAddress(String storageIpAddress) {
+    public void setStorageIpAddress(final String storageIpAddress) {
         this.storageIpAddress = storageIpAddress;
     }
 
@@ -208,7 +206,7 @@ public class StartupCommand extends Command {
         return storageNetmask;
     }
 
-    public void setStorageNetmask(String storageNetmask) {
+    public void setStorageNetmask(final String storageNetmask) {
         this.storageNetmask = storageNetmask;
     }
 
@@ -216,7 +214,7 @@ public class StartupCommand extends Command {
         return storageMacAddress;
     }
 
-    public void setStorageMacAddress(String storageMacAddress) {
+    public void setStorageMacAddress(final String storageMacAddress) {
         this.storageMacAddress = storageMacAddress;
     }
 
@@ -224,19 +222,7 @@ public class StartupCommand extends Command {
         return publicIpAddress;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public void setPublicIpAddress(String publicIpAddress) {
+    public void setPublicIpAddress(final String publicIpAddress) {
         this.publicIpAddress = publicIpAddress;
     }
 
@@ -244,23 +230,19 @@ public class StartupCommand extends Command {
         return agentTag;
     }
 
-    public void setAgentTag(String tag) {
+    public void setAgentTag(final String tag) {
         agentTag = tag;
-    }
-
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
     }
 
     public String getGuidWithoutResource() {
         if (resourceName == null) {
             return guid;
         } else {
-            int hyph = guid.lastIndexOf('-');
+            final int hyph = guid.lastIndexOf('-');
             if (hyph == -1) {
                 return guid;
             }
-            String tmpResource = guid.substring(hyph + 1, guid.length());
+            final String tmpResource = guid.substring(hyph + 1, guid.length());
             if (resourceName.equals(tmpResource)) {
                 return guid.substring(0, hyph);
             } else {
@@ -273,11 +255,15 @@ public class StartupCommand extends Command {
         return resourceName;
     }
 
+    public void setResourceName(final String resourceName) {
+        this.resourceName = resourceName;
+    }
+
     public String getGatewayIpAddress() {
         return gatewayIpAddress;
     }
 
-    public void setGatewayIpAddress(String gatewayIpAddress) {
+    public void setGatewayIpAddress(final String gatewayIpAddress) {
         this.gatewayIpAddress = gatewayIpAddress;
     }
 

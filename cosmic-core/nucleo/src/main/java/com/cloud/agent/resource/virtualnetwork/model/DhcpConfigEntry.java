@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.resource.virtualnetwork.model;
@@ -29,7 +14,7 @@ public class DhcpConfigEntry {
         // Empty for (de)serialization
     }
 
-    public DhcpConfigEntry(String routerIpAddress, String gateway, String netmask, String firstIpOfSubnet) {
+    public DhcpConfigEntry(final String routerIpAddress, final String gateway, final String netmask, final String firstIpOfSubnet) {
         super();
         this.routerIpAddress = routerIpAddress;
         this.gateway = gateway;
@@ -41,7 +26,7 @@ public class DhcpConfigEntry {
         return routerIpAddress;
     }
 
-    public void setRouterIpAddress(String routerIpAddress) {
+    public void setRouterIpAddress(final String routerIpAddress) {
         this.routerIpAddress = routerIpAddress;
     }
 
@@ -49,7 +34,7 @@ public class DhcpConfigEntry {
         return gateway;
     }
 
-    public void setGateway(String gateway) {
+    public void setGateway(final String gateway) {
         this.gateway = gateway;
     }
 
@@ -57,7 +42,7 @@ public class DhcpConfigEntry {
         return netmask;
     }
 
-    public void setNetmask(String netmask) {
+    public void setNetmask(final String netmask) {
         this.netmask = netmask;
     }
 
@@ -65,8 +50,7 @@ public class DhcpConfigEntry {
         return firstIpOfSubnet;
     }
 
-    public void setFirstIpOfSubnet(String firstIpOfSubnet) {
+    public void setFirstIpOfSubnet(final String firstIpOfSubnet) {
         this.firstIpOfSubnet = firstIpOfSubnet;
     }
-
 }

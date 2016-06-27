@@ -1,37 +1,23 @@
 #!/usr/bin/python
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+
 
 import logging
+import os
 import re
 import shutil
-import os
 
 
 class LineEdit(object):
     """Helper for LineEditingFile that keeps track of one edit."""
+
     def __init__(self, search, sub, *sub_args, **kwargs):
         if len(sub_args) > 0:
             sub = sub % sub_args
         flags = kwargs.get('flags', 0)
         self.pattern = re.compile(search, flags=flags)
         self.sub = sub
-        self.count = kwargs.get('count', 0)                            # max subs to make
-        self.subs = 0                                                  # subs made so far
+        self.count = kwargs.get('count', 0)  # max subs to make
+        self.subs = 0  # subs made so far
 
 
 class LineEditingFile(object):
@@ -125,7 +111,7 @@ class LineEditingFile(object):
     # noinspection PyUnusedLocal
     def __exit__(self, exc, value, traceback):
         if exc is not None:
-            return False                                               # return false results in re-raise
+            return False  # return false results in re-raise
 
         self.commit()
 
@@ -159,20 +145,20 @@ class LineEditingFile(object):
                             logging.debug("  + %s" % changed_line[:-1])
                             changes += subs
                             edit.subs += subs
-                    if changes == 0:                                   # buffer until we find a change
+                    if changes == 0:  # buffer until we find a change
                         lines.append(changed_line)
-                    elif changed_file is None:                         # found first change, flush buffer
+                    elif changed_file is None:  # found first change, flush buffer
                         changed_file = open(changed_filename, 'w')
                         if hasattr(os, 'fchmod'):
-                            os.fchmod(changed_file.fileno(),           # can cause OSError which aborts
+                            os.fchmod(changed_file.fileno(),  # can cause OSError which aborts
                                       stat.st_mode)
                         if hasattr(os, 'fchown'):
-                            os.fchown(changed_file.fileno(),           # can cause OSError which aborts
+                            os.fchown(changed_file.fileno(),  # can cause OSError which aborts
                                       stat.st_uid, stat.st_gid)
                         changed_file.writelines(lines)
                         changed_file.write(changed_line)
-                        del lines                                      # reclaim buffer memory
-                    else:                                              # already flushed, just write
+                        del lines  # reclaim buffer memory
+                    else:  # already flushed, just write
                         changed_file.write(changed_line)
 
             if changes == 0:
@@ -181,19 +167,21 @@ class LineEditingFile(object):
             else:
                 changed_file.close()
                 changed_file = None
-                if os.path.exists(backup_filename):                    # back up the original
+                if os.path.exists(backup_filename):  # back up the original
                     os.unlink(backup_filename)
                 shutil.copy(self.filename, backup_filename)
-                os.rename(changed_filename, self.filename)             # the swap
+                os.rename(changed_filename, self.filename)  # the swap
                 logging.info("Edited file %s (%d changes)" %
                              (self.filename, changes))
         finally:
-            if changed_file is not None:                               # failed, clean up
+            if changed_file is not None:  # failed, clean up
                 changed_file.close()
                 os.unlink(changed_filename)
         return changes
 
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     import doctest
+
     doctest.testmod()

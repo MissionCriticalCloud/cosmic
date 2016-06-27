@@ -1,29 +1,12 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.network.dao;
-
-import java.util.List;
-
-import javax.inject.Inject;
 
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.JoinBuilder;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+
+import javax.inject.Inject;
+import java.util.List;
 
 public class LoadBalancerCertMapDaoImpl extends GenericDaoBase<LoadBalancerCertMapVO, Long> implements LoadBalancerCertMapDao {
 
@@ -42,28 +25,20 @@ public class LoadBalancerCertMapDaoImpl extends GenericDaoBase<LoadBalancerCertM
         findByLbRuleId = createSearchBuilder();
         findByLbRuleId.and("loadBalancerId", findByLbRuleId.entity().getLbId(), SearchCriteria.Op.EQ);
         findByLbRuleId.done();
-
     }
 
     @Override
-    public List<LoadBalancerCertMapVO> listByCertId(Long certId) {
-        SearchCriteria<LoadBalancerCertMapVO> sc = listByCertId.create();
+    public List<LoadBalancerCertMapVO> listByCertId(final Long certId) {
+        final SearchCriteria<LoadBalancerCertMapVO> sc = listByCertId.create();
         sc.setParameters("certificateId", certId);
         return listBy(sc);
     }
 
     @Override
-    public LoadBalancerCertMapVO findByLbRuleId(Long lbId) {
-        SearchCriteria<LoadBalancerCertMapVO> sc = findByLbRuleId.create();
-        sc.setParameters("loadBalancerId", lbId);
-        return findOneBy(sc);
-    }
+    public List<LoadBalancerCertMapVO> listByAccountId(final Long accountId) {
 
-    @Override
-    public List<LoadBalancerCertMapVO> listByAccountId(Long accountId) {
-
-        SearchBuilder<LoadBalancerCertMapVO> listByAccountId;
-        SearchBuilder<SslCertVO> certsForAccount;
+        final SearchBuilder<LoadBalancerCertMapVO> listByAccountId;
+        final SearchBuilder<SslCertVO> certsForAccount;
 
         listByAccountId = createSearchBuilder();
         certsForAccount = _sslCertDao.createSearchBuilder();
@@ -72,8 +47,15 @@ public class LoadBalancerCertMapDaoImpl extends GenericDaoBase<LoadBalancerCertM
         certsForAccount.done();
         listByAccountId.done();
 
-        SearchCriteria<LoadBalancerCertMapVO> sc = listByAccountId.create();
+        final SearchCriteria<LoadBalancerCertMapVO> sc = listByAccountId.create();
         sc.setParameters("accountId", accountId);
         return listBy(sc);
+    }
+
+    @Override
+    public LoadBalancerCertMapVO findByLbRuleId(final Long lbId) {
+        final SearchCriteria<LoadBalancerCertMapVO> sc = findByLbRuleId.create();
+        sc.setParameters("loadBalancerId", lbId);
+        return findOneBy(sc);
     }
 }

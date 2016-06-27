@@ -1,22 +1,4 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.user;
-
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,6 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.Date;
 
 @Entity
 @Table(name = "op_user_stats_log")
@@ -57,8 +40,9 @@ public class UserStatsLogVO {
     public UserStatsLogVO() {
     }
 
-    public UserStatsLogVO(long userStatsId, long netBytesReceived, long netBytesSent, long currentBytesReceived, long currentBytesSent, long aggBytesReceived,
-            long aggBytesSent, Date updatedTime) {
+    public UserStatsLogVO(final long userStatsId, final long netBytesReceived, final long netBytesSent, final long currentBytesReceived, final long currentBytesSent, final long
+            aggBytesReceived,
+                          final long aggBytesSent, final Date updatedTime) {
         this.userStatsId = userStatsId;
         this.netBytesReceived = netBytesReceived;
         this.netBytesSent = netBytesSent;
@@ -77,7 +61,7 @@ public class UserStatsLogVO {
         return currentBytesReceived;
     }
 
-    public void setCurrentBytesReceived(long currentBytesReceived) {
+    public void setCurrentBytesReceived(final long currentBytesReceived) {
         this.currentBytesReceived = currentBytesReceived;
     }
 
@@ -85,7 +69,7 @@ public class UserStatsLogVO {
         return currentBytesSent;
     }
 
-    public void setCurrentBytesSent(long currentBytesSent) {
+    public void setCurrentBytesSent(final long currentBytesSent) {
         this.currentBytesSent = currentBytesSent;
     }
 
@@ -93,15 +77,15 @@ public class UserStatsLogVO {
         return netBytesReceived;
     }
 
+    public void setNetBytesReceived(final long netBytesReceived) {
+        this.netBytesReceived = netBytesReceived;
+    }
+
     public long getNetBytesSent() {
         return netBytesSent;
     }
 
-    public void setNetBytesReceived(long netBytesReceived) {
-        this.netBytesReceived = netBytesReceived;
-    }
-
-    public void setNetBytesSent(long netBytesSent) {
+    public void setNetBytesSent(final long netBytesSent) {
         this.netBytesSent = netBytesSent;
     }
 
@@ -109,7 +93,7 @@ public class UserStatsLogVO {
         return aggBytesReceived;
     }
 
-    public void setAggBytesReceived(long aggBytesReceived) {
+    public void setAggBytesReceived(final long aggBytesReceived) {
         this.aggBytesReceived = aggBytesReceived;
     }
 
@@ -117,7 +101,7 @@ public class UserStatsLogVO {
         return aggBytesSent;
     }
 
-    public void setAggBytesSent(long aggBytesSent) {
+    public void setAggBytesSent(final long aggBytesSent) {
         this.aggBytesSent = aggBytesSent;
     }
 
@@ -125,8 +109,7 @@ public class UserStatsLogVO {
         return updatedTime;
     }
 
-    public void setUpdatedTime(Date updatedTime) {
+    public void setUpdatedTime(final Date updatedTime) {
         this.updatedTime = updatedTime;
     }
-
 }

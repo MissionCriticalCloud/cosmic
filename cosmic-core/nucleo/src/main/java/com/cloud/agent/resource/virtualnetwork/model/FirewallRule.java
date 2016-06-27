@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.resource.virtualnetwork.model;
@@ -42,8 +27,9 @@ public class FirewallRule {
         // Empty constructor for (de)serialization
     }
 
-    public FirewallRule(long id, String srcVlanTag, String srcIp, String protocol, int[] srcPortRange, boolean revoked, boolean alreadyAdded, List<String> sourceCidrList,
-            String purpose, Integer icmpType, Integer icmpCode, String trafficType, String guestCidr, boolean defaultEgressPolicy) {
+    public FirewallRule(final long id, final String srcVlanTag, final String srcIp, final String protocol, final int[] srcPortRange, final boolean revoked, final boolean
+            alreadyAdded, final List<String> sourceCidrList,
+                        final String purpose, final Integer icmpType, final Integer icmpCode, final String trafficType, final String guestCidr, final boolean defaultEgressPolicy) {
         this.id = id;
         this.srcVlanTag = srcVlanTag;
         this.srcIp = srcIp;
@@ -64,7 +50,7 @@ public class FirewallRule {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
@@ -72,7 +58,7 @@ public class FirewallRule {
         return srcVlanTag;
     }
 
-    public void setSrcVlanTag(String srcVlanTag) {
+    public void setSrcVlanTag(final String srcVlanTag) {
         this.srcVlanTag = srcVlanTag;
     }
 
@@ -80,7 +66,7 @@ public class FirewallRule {
         return srcIp;
     }
 
-    public void setSrcIp(String srcIp) {
+    public void setSrcIp(final String srcIp) {
         this.srcIp = srcIp;
     }
 
@@ -88,7 +74,7 @@ public class FirewallRule {
         return protocol;
     }
 
-    public void setProtocol(String protocol) {
+    public void setProtocol(final String protocol) {
         this.protocol = protocol;
     }
 
@@ -96,7 +82,7 @@ public class FirewallRule {
         return srcPortRange;
     }
 
-    public void setSrcPortRange(int[] srcPortRange) {
+    public void setSrcPortRange(final int[] srcPortRange) {
         this.srcPortRange = srcPortRange;
     }
 
@@ -104,7 +90,7 @@ public class FirewallRule {
         return revoked;
     }
 
-    public void setRevoked(boolean revoked) {
+    public void setRevoked(final boolean revoked) {
         this.revoked = revoked;
     }
 
@@ -112,7 +98,7 @@ public class FirewallRule {
         return alreadyAdded;
     }
 
-    public void setAlreadyAdded(boolean alreadyAdded) {
+    public void setAlreadyAdded(final boolean alreadyAdded) {
         this.alreadyAdded = alreadyAdded;
     }
 
@@ -120,7 +106,7 @@ public class FirewallRule {
         return sourceCidrList;
     }
 
-    public void setSourceCidrList(List<String> sourceCidrList) {
+    public void setSourceCidrList(final List<String> sourceCidrList) {
         this.sourceCidrList = sourceCidrList;
     }
 
@@ -128,7 +114,7 @@ public class FirewallRule {
         return purpose;
     }
 
-    public void setPurpose(String purpose) {
+    public void setPurpose(final String purpose) {
         this.purpose = purpose;
     }
 
@@ -136,7 +122,7 @@ public class FirewallRule {
         return icmpType;
     }
 
-    public void setIcmpType(Integer icmpType) {
+    public void setIcmpType(final Integer icmpType) {
         this.icmpType = icmpType;
     }
 
@@ -144,7 +130,7 @@ public class FirewallRule {
         return icmpCode;
     }
 
-    public void setIcmpCode(Integer icmpCode) {
+    public void setIcmpCode(final Integer icmpCode) {
         this.icmpCode = icmpCode;
     }
 
@@ -152,7 +138,7 @@ public class FirewallRule {
         return trafficType;
     }
 
-    public void setTrafficType(String trafficType) {
+    public void setTrafficType(final String trafficType) {
         this.trafficType = trafficType;
     }
 
@@ -160,7 +146,7 @@ public class FirewallRule {
         return guestCidr;
     }
 
-    public void setGuestCidr(String guestCidr) {
+    public void setGuestCidr(final String guestCidr) {
         this.guestCidr = guestCidr;
     }
 
@@ -168,8 +154,7 @@ public class FirewallRule {
         return defaultEgressPolicy;
     }
 
-    public void setDefaultEgressPolicy(boolean defaultEgressPolicy) {
+    public void setDefaultEgressPolicy(final boolean defaultEgressPolicy) {
         this.defaultEgressPolicy = defaultEgressPolicy;
     }
-
 }

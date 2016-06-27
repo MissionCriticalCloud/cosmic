@@ -1,25 +1,9 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.cloud.agent.api.to;
-
-import java.net.URI;
 
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.TrafficType;
+
+import java.net.URI;
 
 /**
  * Transfer object to transfer network settings.
@@ -42,70 +26,14 @@ public class NetworkTO {
     public NetworkTO() {
     }
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public BroadcastDomainType getBroadcastType() {
-        return broadcastType;
-    }
-
-    public void setBroadcastType(BroadcastDomainType broadcastType) {
-        this.broadcastType = broadcastType;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public void setNetmask(String netmask) {
-        this.netmask = netmask;
-    }
-
-    public void setGateway(String gateway) {
-        this.gateway = gateway;
-    }
-
-    public void setMac(String mac) {
-        this.mac = mac;
-    }
-
-    public void setDns1(String dns1) {
-        this.dns1 = dns1;
-    }
-
-    public void setDns2(String dns2) {
-        this.dns2 = dns2;
-    }
-
-    public void setType(TrafficType type) {
-        this.type = type;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setSecurityGroupEnabled(boolean enabled) {
-        this.isSecurityGroupEnabled = enabled;
-    }
-
     /**
      * This constructor is usually for hosts where the other information are not important.
      *
-     * @param ip ip address
+     * @param ip      ip address
      * @param netmask netmask
-     * @param mac mac address
+     * @param mac     mac address
      */
-    public NetworkTO(String ip, String netmask, String mac) {
+    public NetworkTO(final String ip, final String netmask, final String mac) {
         this(ip, netmask, mac, null, null, null);
     }
 
@@ -121,7 +49,7 @@ public class NetworkTO {
      * @param dns1
      * @param dns2
      */
-    public NetworkTO(String ip, String netmask, String mac, String gateway, String dns1, String dns2) {
+    public NetworkTO(final String ip, final String netmask, final String mac, final String gateway, final String dns1, final String dns2) {
         this.ip = ip;
         this.netmask = netmask;
         this.mac = mac;
@@ -130,39 +58,83 @@ public class NetworkTO {
         this.dns2 = dns2;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
     public String getIp() {
         return ip;
+    }
+
+    public void setIp(final String ip) {
+        this.ip = ip;
     }
 
     public String getNetmask() {
         return netmask;
     }
 
+    public void setNetmask(final String netmask) {
+        this.netmask = netmask;
+    }
+
     public String getGateway() {
         return gateway;
+    }
+
+    public void setGateway(final String gateway) {
+        this.gateway = gateway;
     }
 
     public String getMac() {
         return mac;
     }
 
+    public void setMac(final String mac) {
+        this.mac = mac;
+    }
+
     public String getDns1() {
         return dns1;
+    }
+
+    public void setDns1(final String dns1) {
+        this.dns1 = dns1;
     }
 
     public String getDns2() {
         return dns2;
     }
 
+    public void setDns2(final String dns2) {
+        this.dns2 = dns2;
+    }
+
     public TrafficType getType() {
         return type;
+    }
+
+    public void setType(final TrafficType type) {
+        this.type = type;
     }
 
     public URI getBroadcastUri() {
         return broadcastUri;
     }
 
-    public void setBroadcastUri(URI broadcastUri) {
+    public void setBroadcastUri(final URI broadcastUri) {
         // only do this if the scheme needs aligning with the broadcastUri
         if (broadcastUri != null && getBroadcastType() == null) {
             setBroadcastType(BroadcastDomainType.getSchemeValue(broadcastUri));
@@ -170,15 +142,27 @@ public class NetworkTO {
         this.broadcastUri = broadcastUri;
     }
 
+    public BroadcastDomainType getBroadcastType() {
+        return broadcastType;
+    }
+
+    public void setBroadcastType(final BroadcastDomainType broadcastType) {
+        this.broadcastType = broadcastType;
+    }
+
     public URI getIsolationUri() {
         return isolationUri;
     }
 
-    public void setIsolationuri(URI isolationUri) {
+    public void setIsolationuri(final URI isolationUri) {
         this.isolationUri = isolationUri;
     }
 
     public boolean isSecurityGroupEnabled() {
         return this.isSecurityGroupEnabled;
+    }
+
+    public void setSecurityGroupEnabled(final boolean enabled) {
+        this.isSecurityGroupEnabled = enabled;
     }
 }

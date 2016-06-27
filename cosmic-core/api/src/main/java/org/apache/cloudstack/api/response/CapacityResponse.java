@@ -1,26 +1,10 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.api.response;
 
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
-
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
+
+import com.google.gson.annotations.SerializedName;
 
 public class CapacityResponse extends BaseResponse {
     @SerializedName(ApiConstants.TYPE)
@@ -67,7 +51,7 @@ public class CapacityResponse extends BaseResponse {
         return capacityType;
     }
 
-    public void setCapacityType(Short capacityType) {
+    public void setCapacityType(final Short capacityType) {
         this.capacityType = capacityType;
     }
 
@@ -75,7 +59,7 @@ public class CapacityResponse extends BaseResponse {
         return zoneId;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
@@ -83,7 +67,7 @@ public class CapacityResponse extends BaseResponse {
         return zoneName;
     }
 
-    public void setZoneName(String zoneName) {
+    public void setZoneName(final String zoneName) {
         this.zoneName = zoneName;
     }
 
@@ -91,7 +75,7 @@ public class CapacityResponse extends BaseResponse {
         return podId;
     }
 
-    public void setPodId(String podId) {
+    public void setPodId(final String podId) {
         this.podId = podId;
     }
 
@@ -99,7 +83,7 @@ public class CapacityResponse extends BaseResponse {
         return podName;
     }
 
-    public void setPodName(String podName) {
+    public void setPodName(final String podName) {
         this.podName = podName;
     }
 
@@ -107,7 +91,7 @@ public class CapacityResponse extends BaseResponse {
         return clusterId;
     }
 
-    public void setClusterId(String clusterId) {
+    public void setClusterId(final String clusterId) {
         this.clusterId = clusterId;
     }
 
@@ -115,7 +99,7 @@ public class CapacityResponse extends BaseResponse {
         return clusterName;
     }
 
-    public void setClusterName(String clusterName) {
+    public void setClusterName(final String clusterName) {
         this.clusterName = clusterName;
     }
 
@@ -123,7 +107,7 @@ public class CapacityResponse extends BaseResponse {
         return capacityUsed;
     }
 
-    public void setCapacityUsed(Long capacityUsed) {
+    public void setCapacityUsed(final Long capacityUsed) {
         this.capacityUsed = capacityUsed;
     }
 
@@ -131,7 +115,7 @@ public class CapacityResponse extends BaseResponse {
         return capacityTotal;
     }
 
-    public void setCapacityTotal(Long capacityTotal) {
+    public void setCapacityTotal(final Long capacityTotal) {
         this.capacityTotal = capacityTotal;
     }
 
@@ -139,7 +123,7 @@ public class CapacityResponse extends BaseResponse {
         return percentUsed;
     }
 
-    public void setPercentUsed(String percentUsed) {
+    public void setPercentUsed(final String percentUsed) {
         this.percentUsed = percentUsed;
     }
 }

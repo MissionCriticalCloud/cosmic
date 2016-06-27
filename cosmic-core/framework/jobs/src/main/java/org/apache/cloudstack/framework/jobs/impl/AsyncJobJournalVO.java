@@ -1,22 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package org.apache.cloudstack.framework.jobs.impl;
 
-import java.util.Date;
+import com.cloud.utils.DateUtil;
+import com.cloud.utils.db.GenericDao;
+import org.apache.cloudstack.framework.jobs.AsyncJob;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,35 +12,26 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.cloud.utils.DateUtil;
-import com.cloud.utils.db.GenericDao;
-
-import org.apache.cloudstack.framework.jobs.AsyncJob;
+import java.util.Date;
 
 @Entity
 @Table(name = "async_job_journal")
 public class AsyncJobJournalVO {
+    @Column(name = GenericDao.CREATED_COLUMN)
+    protected Date created;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id = null;
-
     @Column(name = "job_id")
     private long jobId;
-
     @Column(name = "journal_type", updatable = false, nullable = false, length = 32)
     @Enumerated(value = EnumType.STRING)
     private AsyncJob.JournalType journalType;
-
     @Column(name = "journal_text", length = 1024)
     private String journalText;
-
     @Column(name = "journal_obj", length = 1024)
     private String journalObjJsonString;
-
-    @Column(name = GenericDao.CREATED_COLUMN)
-    protected Date created;
 
     public AsyncJobJournalVO() {
         created = DateUtil.currentGMTTime();
@@ -64,7 +41,7 @@ public class AsyncJobJournalVO {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -72,7 +49,7 @@ public class AsyncJobJournalVO {
         return jobId;
     }
 
-    public void setJobId(long jobId) {
+    public void setJobId(final long jobId) {
         this.jobId = jobId;
     }
 
@@ -80,7 +57,7 @@ public class AsyncJobJournalVO {
         return journalType;
     }
 
-    public void setJournalType(AsyncJob.JournalType journalType) {
+    public void setJournalType(final AsyncJob.JournalType journalType) {
         this.journalType = journalType;
     }
 
@@ -88,7 +65,7 @@ public class AsyncJobJournalVO {
         return journalText;
     }
 
-    public void setJournalText(String journalText) {
+    public void setJournalText(final String journalText) {
         this.journalText = journalText;
     }
 
@@ -96,7 +73,7 @@ public class AsyncJobJournalVO {
         return journalObjJsonString;
     }
 
-    public void setJournalObjJsonString(String journalObjJsonString) {
+    public void setJournalObjJsonString(final String journalObjJsonString) {
         this.journalObjJsonString = journalObjJsonString;
     }
 
@@ -104,7 +81,7 @@ public class AsyncJobJournalVO {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 }

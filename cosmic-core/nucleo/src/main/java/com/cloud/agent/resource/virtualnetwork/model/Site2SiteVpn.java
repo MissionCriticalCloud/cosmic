@@ -1,20 +1,5 @@
 //
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+
 //
 
 package com.cloud.agent.resource.virtualnetwork.model;
@@ -29,9 +14,11 @@ public class Site2SiteVpn extends ConfigBase {
         super(ConfigBase.SITE2SITEVPN);
     }
 
-    public Site2SiteVpn(String localPublicIp, String localGuestCidr, String localPublicGateway, String peerGatewayIp, String peerGuestCidrList, String espPolicy,
- String ikePolicy,
-            String ipsecPsk, Long ikeLifetime, Long espLifetime, boolean create, Boolean dpd, boolean passive, boolean encap) {
+    public Site2SiteVpn(final String localPublicIp, final String localGuestCidr, final String localPublicGateway, final String peerGatewayIp, final String peerGuestCidrList,
+                        final String espPolicy,
+                        final String ikePolicy,
+                        final String ipsecPsk, final Long ikeLifetime, final Long espLifetime, final boolean create, final Boolean dpd, final boolean passive, final boolean
+                                encap) {
         super(ConfigBase.SITE2SITEVPN);
         this.localPublicIp = localPublicIp;
         this.localGuestCidr = localGuestCidr;
@@ -53,7 +40,7 @@ public class Site2SiteVpn extends ConfigBase {
         return localPublicIp;
     }
 
-    public void setLocalPublicIp(String localPublicIp) {
+    public void setLocalPublicIp(final String localPublicIp) {
         this.localPublicIp = localPublicIp;
     }
 
@@ -61,7 +48,7 @@ public class Site2SiteVpn extends ConfigBase {
         return localGuestCidr;
     }
 
-    public void setLocalGuestCidr(String localGuestCidr) {
+    public void setLocalGuestCidr(final String localGuestCidr) {
         this.localGuestCidr = localGuestCidr;
     }
 
@@ -69,7 +56,7 @@ public class Site2SiteVpn extends ConfigBase {
         return localPublicGateway;
     }
 
-    public void setLocalPublicGateway(String localPublicGateway) {
+    public void setLocalPublicGateway(final String localPublicGateway) {
         this.localPublicGateway = localPublicGateway;
     }
 
@@ -77,7 +64,7 @@ public class Site2SiteVpn extends ConfigBase {
         return peerGatewayIp;
     }
 
-    public void setPeerGatewayIp(String peerGatewayIp) {
+    public void setPeerGatewayIp(final String peerGatewayIp) {
         this.peerGatewayIp = peerGatewayIp;
     }
 
@@ -85,7 +72,7 @@ public class Site2SiteVpn extends ConfigBase {
         return peerGuestCidrList;
     }
 
-    public void setPeerGuestCidrList(String peerGuestCidrList) {
+    public void setPeerGuestCidrList(final String peerGuestCidrList) {
         this.peerGuestCidrList = peerGuestCidrList;
     }
 
@@ -93,7 +80,7 @@ public class Site2SiteVpn extends ConfigBase {
         return espPolicy;
     }
 
-    public void setEspPolicy(String espPolicy) {
+    public void setEspPolicy(final String espPolicy) {
         this.espPolicy = espPolicy;
     }
 
@@ -101,7 +88,7 @@ public class Site2SiteVpn extends ConfigBase {
         return ikePolicy;
     }
 
-    public void setIkePolicy(String ikePolicy) {
+    public void setIkePolicy(final String ikePolicy) {
         this.ikePolicy = ikePolicy;
     }
 
@@ -109,7 +96,7 @@ public class Site2SiteVpn extends ConfigBase {
         return ipsecPsk;
     }
 
-    public void setIpsecPsk(String ipsecPsk) {
+    public void setIpsecPsk(final String ipsecPsk) {
         this.ipsecPsk = ipsecPsk;
     }
 
@@ -117,7 +104,7 @@ public class Site2SiteVpn extends ConfigBase {
         return ikeLifetime;
     }
 
-    public void setIkeLifetime(Long ikeLifetime) {
+    public void setIkeLifetime(final Long ikeLifetime) {
         this.ikeLifetime = ikeLifetime;
     }
 
@@ -125,7 +112,7 @@ public class Site2SiteVpn extends ConfigBase {
         return espLifetime;
     }
 
-    public void setEspLifetime(Long espLifetime) {
+    public void setEspLifetime(final Long espLifetime) {
         this.espLifetime = espLifetime;
     }
 
@@ -133,7 +120,7 @@ public class Site2SiteVpn extends ConfigBase {
         return create;
     }
 
-    public void setCreate(boolean create) {
+    public void setCreate(final boolean create) {
         this.create = create;
     }
 
@@ -141,7 +128,7 @@ public class Site2SiteVpn extends ConfigBase {
         return dpd;
     }
 
-    public void setDpd(boolean dpd) {
+    public void setDpd(final boolean dpd) {
         this.dpd = dpd;
     }
 
@@ -149,7 +136,7 @@ public class Site2SiteVpn extends ConfigBase {
         return passive;
     }
 
-    public void setPassive(boolean passive) {
+    public void setPassive(final boolean passive) {
         this.passive = passive;
     }
 
@@ -157,8 +144,7 @@ public class Site2SiteVpn extends ConfigBase {
         return encap;
     }
 
-    public void setEncap(boolean encap) {
+    public void setEncap(final boolean encap) {
         this.encap = encap;
     }
-
 }

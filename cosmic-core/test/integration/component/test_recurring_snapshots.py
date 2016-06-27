@@ -1,23 +1,5 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
-from nose.plugins.attrib import attr
+import time
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.utils import (cleanup_resources)
 from marvin.lib.base import (Account,
                              DiskOffering,
                              ServiceOffering,
@@ -30,11 +12,11 @@ from marvin.lib.common import (get_zone,
                                list_volumes,
                                list_snapshot_policy
                                )
-import time
+from marvin.lib.utils import (cleanup_resources)
+from nose.plugins.attrib import attr
 
 
 class Services:
-
     """Test Snapshots Services
     """
 
@@ -53,8 +35,8 @@ class Services:
                 "name": "Tiny Instance",
                 "displaytext": "Tiny Instance",
                 "cpunumber": 1,
-                "cpuspeed": 200,    # in MHz
-                                    "memory": 256,      # In MBs
+                "cpuspeed": 200,  # in MHz
+                "memory": 256,  # In MBs
             },
             "disk_offering": {
                 "displaytext": "Small Disk",
@@ -62,29 +44,29 @@ class Services:
                 "disksize": 1
             },
             "server_with_disk":
-            {
-                "displayname": "Test VM -With Disk",
-                "username": "root",
-                "password": "password",
-                "ssh_port": 22,
-                "hypervisor": 'XenServer',
-                "privateport": 22,
-                "publicport": 22,
-                "protocol": 'TCP',
-            },
+                {
+                    "displayname": "Test VM -With Disk",
+                    "username": "root",
+                    "password": "password",
+                    "ssh_port": 22,
+                    "hypervisor": 'XenServer',
+                    "privateport": 22,
+                    "publicport": 22,
+                    "protocol": 'TCP',
+                },
 
             "server_without_disk":
-            {
-                "displayname": "Test VM-No Disk",
-                "username": "root",
-                "password": "password",
-                "ssh_port": 22,
-                "hypervisor": 'XenServer',
-                "privateport": 22,
-                # For NAT rule creation
-                "publicport": 22,
-                "protocol": 'TCP',
-            },
+                {
+                    "displayname": "Test VM-No Disk",
+                    "username": "root",
+                    "password": "password",
+                    "ssh_port": 22,
+                    "hypervisor": 'XenServer',
+                    "privateport": 22,
+                    # For NAT rule creation
+                    "publicport": 22,
+                    "protocol": 'TCP',
+                },
             "server": {
                 "displayname": "TestVM",
                 "username": "root",
@@ -118,7 +100,7 @@ class Services:
             },
             "volume": {
                 "diskname": "APP Data Volume",
-                "size": 1,   # in GBs
+                "size": 1,  # in GBs
                 # Data Disk
                 "diskdevice": ['/dev/xvdb', '/dev/sdb',
                                '/dev/hdb', '/dev/vdb'],
@@ -138,7 +120,6 @@ class Services:
 
 
 class TestRecurringSnapshots(cloudstackTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestRecurringSnapshots, cls).getClsTestClient()

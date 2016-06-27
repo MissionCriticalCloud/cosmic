@@ -1,20 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.network.rules;
 
 import com.cloud.exception.CloudException;
@@ -31,8 +14,8 @@ import com.cloud.network.vpc.PrivateGateway;
 import com.cloud.network.vpc.PrivateIpVO;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.VirtualMachineManager;
-
 import org.apache.cloudstack.network.topology.NetworkTopologyVisitor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,29 +78,6 @@ public class PrivateGatewayRules extends RuleApplier {
         return result;
     }
 
-    public boolean isAddOperation() {
-        return _isAddOperation;
-    }
-
-    public NicProfile getNicProfile() {
-        return _nicProfile;
-    }
-
-    public PrivateIpVO retrivePrivateIP(final NetworkTopologyVisitor visitor) {
-        final PrivateIpVO ipVO = visitor.getVirtualNetworkApplianceFactory().getPrivateIpDao().findByIpAndSourceNetworkId(_nicProfile.getNetworkId(), _nicProfile.getIPv4Address());
-        return ipVO;
-    }
-
-    public Network retrievePrivateNetwork(final NetworkTopologyVisitor visitor) {
-        // This network might be the same we have already as an instance in the
-        // RuleApplier super class.
-        // Just doing this here, but will double check is remove if it's not
-        // needed.
-        final NetworkDao networkDao = visitor.getVirtualNetworkApplianceFactory().getNetworkDao();
-        final Network network = networkDao.findById(_nicProfile.getNetworkId());
-        return network;
-    }
-
     protected boolean destroyPrivateGateway(final NetworkTopologyVisitor visitor) throws ConcurrentOperationException, ResourceUnavailableException {
 
         final NetworkModel networkModel = visitor.getVirtualNetworkApplianceFactory().getNetworkModel();
@@ -149,5 +109,28 @@ public class PrivateGatewayRules extends RuleApplier {
         result = result && itMgr.removeVmFromNetwork(_router, privateNetwork, null);
         s_logger.debug("Private gateawy " + _privateGateway + " is removed from router " + _router);
         return result;
+    }
+
+    public boolean isAddOperation() {
+        return _isAddOperation;
+    }
+
+    public NicProfile getNicProfile() {
+        return _nicProfile;
+    }
+
+    public PrivateIpVO retrivePrivateIP(final NetworkTopologyVisitor visitor) {
+        final PrivateIpVO ipVO = visitor.getVirtualNetworkApplianceFactory().getPrivateIpDao().findByIpAndSourceNetworkId(_nicProfile.getNetworkId(), _nicProfile.getIPv4Address());
+        return ipVO;
+    }
+
+    public Network retrievePrivateNetwork(final NetworkTopologyVisitor visitor) {
+        // This network might be the same we have already as an instance in the
+        // RuleApplier super class.
+        // Just doing this here, but will double check is remove if it's not
+        // needed.
+        final NetworkDao networkDao = visitor.getVirtualNetworkApplianceFactory().getNetworkDao();
+        final Network network = networkDao.findById(_nicProfile.getNetworkId());
+        return network;
     }
 }

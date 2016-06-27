@@ -1,21 +1,6 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.api.dispatch;
+
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 import com.cloud.dao.EntityManager;
 import com.cloud.exception.InvalidParameterValueException;
@@ -27,8 +12,15 @@ import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.InfrastructureEntity;
 import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
-import org.apache.cloudstack.api.*;
+import org.apache.cloudstack.api.ACL;
+import org.apache.cloudstack.api.ApiErrorCode;
+import org.apache.cloudstack.api.BaseAsyncCreateCmd;
+import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.BaseCmd.CommandType;
+import org.apache.cloudstack.api.EntityReference;
+import org.apache.cloudstack.api.InternalIdentity;
+import org.apache.cloudstack.api.Parameter;
+import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.admin.resource.ArchiveAlertsCmd;
 import org.apache.cloudstack.api.command.admin.resource.DeleteAlertsCmd;
 import org.apache.cloudstack.api.command.admin.usage.GetUsageRecordsCmd;
@@ -36,18 +28,23 @@ import org.apache.cloudstack.api.command.user.event.ArchiveEventsCmd;
 import org.apache.cloudstack.api.command.user.event.DeleteEventsCmd;
 import org.apache.cloudstack.api.command.user.event.ListEventsCmd;
 import org.apache.cloudstack.context.CallContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ParamProcessWorker implements DispatchWorker {
 
@@ -188,7 +185,6 @@ public class ParamProcessWorker implements DispatchWorker {
                         }
                     }
                 }
-
             } catch (final IllegalArgumentException e) {
                 s_logger.error("Error initializing command " + cmd.getCommandName() + ", field " + field.getName() + " is not accessible.");
                 throw new CloudRuntimeException("Internal error initializing parameters for command " + cmd.getCommandName() + " [field " + field.getName() +
@@ -198,36 +194,9 @@ public class ParamProcessWorker implements DispatchWorker {
                 throw new CloudRuntimeException("Internal error initializing parameters for command " + cmd.getCommandName() + " [field " + field.getName() +
                         " is not accessible]");
             }
-
         }
 
         doAccessChecks(cmd, entitiesToAccess);
-    }
-
-
-    private void doAccessChecks(final BaseCmd cmd, final Map<Object, AccessType> entitiesToAccess) {
-        final Account caller = CallContext.current().getCallingAccount();
-        // due to deleteAccount design flaw CLOUDSTACK-6588, we should still include those removed account as well to clean up leftover resources from that account
-        final Account owner = _accountMgr.getAccount(cmd.getEntityOwnerId());
-
-        if (cmd instanceof BaseAsyncCreateCmd) {
-            // check that caller can access the owner account.
-            _accountMgr.checkAccess(caller, null, false, owner);
-        }
-
-        if (!entitiesToAccess.isEmpty()) {
-            // check that caller can access the owner account.
-            _accountMgr.checkAccess(caller, null, false, owner);
-            for (final Map.Entry<Object, AccessType> entry : entitiesToAccess.entrySet()) {
-                final Object entity = entry.getKey();
-                if (entity instanceof ControlledEntity) {
-                    _accountMgr.checkAccess(caller, entry.getValue(), true, (ControlledEntity) entity);
-                } else if (entity instanceof InfrastructureEntity) {
-                    // FIXME: Move this code in adapter, remove code from
-                    // Account manager
-                }
-            }
-        }
     }
 
     private void setFieldValue(final Field field, final BaseCmd cmdObj, final Object paramObj, final Parameter annotation) throws IllegalArgumentException, ParseException {
@@ -304,8 +273,9 @@ public class ParamProcessWorker implements DispatchWorker {
                                 listParam.add(Integer.valueOf(token));
                                 break;
                             case UUID:
-                                if (token.isEmpty())
+                                if (token.isEmpty()) {
                                     break;
+                                }
                                 final Long internalId = translateUuidToInternalId(token, annotation);
                                 listParam.add(internalId);
                                 break;
@@ -358,6 +328,31 @@ public class ParamProcessWorker implements DispatchWorker {
         }
     }
 
+    private void doAccessChecks(final BaseCmd cmd, final Map<Object, AccessType> entitiesToAccess) {
+        final Account caller = CallContext.current().getCallingAccount();
+        // due to deleteAccount design flaw CLOUDSTACK-6588, we should still include those removed account as well to clean up leftover resources from that account
+        final Account owner = _accountMgr.getAccount(cmd.getEntityOwnerId());
+
+        if (cmd instanceof BaseAsyncCreateCmd) {
+            // check that caller can access the owner account.
+            _accountMgr.checkAccess(caller, null, false, owner);
+        }
+
+        if (!entitiesToAccess.isEmpty()) {
+            // check that caller can access the owner account.
+            _accountMgr.checkAccess(caller, null, false, owner);
+            for (final Map.Entry<Object, AccessType> entry : entitiesToAccess.entrySet()) {
+                final Object entity = entry.getKey();
+                if (entity instanceof ControlledEntity) {
+                    _accountMgr.checkAccess(caller, entry.getValue(), true, (ControlledEntity) entity);
+                } else if (entity instanceof InfrastructureEntity) {
+                    // FIXME: Move this code in adapter, remove code from
+                    // Account manager
+                }
+            }
+        }
+    }
+
     private boolean isObjInNewDateFormat(final String string) {
         final Matcher matcher = BaseCmd.newInputDateFormat.matcher(string);
         return matcher.matches();
@@ -384,8 +379,9 @@ public class ParamProcessWorker implements DispatchWorker {
         // Match against Java's UUID regex to check if input is uuid string
         final boolean isUuid = uuid.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
         // Enforce that it's uuid for newly added apis from version 3.x
-        if (!isPre3x && !isUuid)
+        if (!isPre3x && !isUuid) {
             return null;
+        }
 
         // There may be multiple entities defined on the @EntityReference of a Response.class
         // UUID CommandType would expect only one entityType, so use the first entityType
@@ -430,8 +426,9 @@ public class ParamProcessWorker implements DispatchWorker {
             }
         }
         if (internalId == null) {
-            if (s_logger.isDebugEnabled())
+            if (s_logger.isDebugEnabled()) {
                 s_logger.debug("Object entity uuid = " + uuid + " does not exist in the database.");
+            }
             throw new InvalidParameterValueException("Invalid parameter " + annotation.name() + " value=" + uuid +
                     " due to incorrect long value format, or entity does not exist or due to incorrect parameter annotation for the field in api cmd class.");
         }
