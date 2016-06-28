@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.hypervisor.xenserver.resource.wrapper.xen610;
 
 import com.cloud.agent.api.Answer;
@@ -17,6 +13,7 @@ import com.cloud.hypervisor.xenserver.resource.XsLocalNetwork;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
+import com.cloud.utils.Pair;
 import com.cloud.utils.exception.CloudRuntimeException;
 import org.apache.cloudstack.storage.to.VolumeObjectTO;
 
@@ -46,7 +43,7 @@ public final class XenServer610MigrateWithStorageCommandWrapper extends CommandW
     public Answer execute(final MigrateWithStorageCommand command, final XenServer610Resource xenServer610Resource) {
         final Connection connection = xenServer610Resource.getConnection();
         final VirtualMachineTO vmSpec = command.getVirtualMachine();
-        final Map<VolumeTO, StorageFilerTO> volumeToFiler = command.getVolumeToFiler();
+        final List<Pair<VolumeTO, StorageFilerTO>> volumeToFiler = command.getVolumeToFilerAsList();
         final String vmName = vmSpec.getName();
         Task task = null;
 
@@ -69,9 +66,9 @@ public final class XenServer610MigrateWithStorageCommandWrapper extends CommandW
             // Create the vif map. The vm stays in the same cluster so we have to pass an empty vif map.
             final Map<VIF, Network> vifMap = new HashMap<>();
             final Map<VDI, SR> vdiMap = new HashMap<>();
-            for (final Map.Entry<VolumeTO, StorageFilerTO> entry : volumeToFiler.entrySet()) {
-                final VolumeTO volume = entry.getKey();
-                final StorageFilerTO sotrageFiler = entry.getValue();
+            for (final Pair<VolumeTO, StorageFilerTO> entry : volumeToFiler) {
+                final VolumeTO volume = entry.first();
+                final StorageFilerTO sotrageFiler = entry.second();
                 vdiMap.put(xenServer610Resource.getVDIbyUuid(connection, volume.getPath()), xenServer610Resource.getStorageRepository(connection, sotrageFiler.getUuid()));
             }
 
