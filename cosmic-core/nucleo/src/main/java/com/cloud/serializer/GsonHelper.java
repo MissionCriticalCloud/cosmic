@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.serializer;
 
 import com.cloud.agent.api.Answer;

@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.agent.api;
 
 import com.cloud.storage.template.TemplateProp;

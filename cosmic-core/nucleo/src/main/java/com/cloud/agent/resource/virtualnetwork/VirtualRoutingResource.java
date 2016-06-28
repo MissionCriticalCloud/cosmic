@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.agent.resource.virtualnetwork;
 
 import com.cloud.agent.api.Answer;

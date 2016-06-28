@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.network.element;
 
 import com.cloud.agent.AgentManager;

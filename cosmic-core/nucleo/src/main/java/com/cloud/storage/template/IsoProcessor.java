@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.storage.template;
 
 import com.cloud.storage.Storage.ImageFormat;

@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.agent.api.storage;
 
 import com.cloud.storage.Upload;

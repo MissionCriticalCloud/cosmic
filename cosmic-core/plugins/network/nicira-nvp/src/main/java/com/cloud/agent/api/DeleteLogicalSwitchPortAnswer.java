@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.agent.api;
 
 public class DeleteLogicalSwitchPortAnswer extends Answer {

@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.script;
 
 import java.io.BufferedReader;

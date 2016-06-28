@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
 import static com.cloud.hypervisor.xenserver.resource.wrapper.xenbase.XenServerUtilitiesHelper.SCRIPT_CMD_PATH;

@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.storage.resource;
 
 import com.cloud.agent.api.Answer;

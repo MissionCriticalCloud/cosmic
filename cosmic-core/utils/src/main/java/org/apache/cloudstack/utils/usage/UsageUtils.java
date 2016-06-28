@@ -1,7 +1,3 @@
-//
-
-//
-
 package org.apache.cloudstack.utils.usage;
 
 public class UsageUtils {

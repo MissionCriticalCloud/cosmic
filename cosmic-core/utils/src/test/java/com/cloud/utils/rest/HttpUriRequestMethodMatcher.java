@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.rest;
 
 import static org.hamcrest.Matchers.equalTo;

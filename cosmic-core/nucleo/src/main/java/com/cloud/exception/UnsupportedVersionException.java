@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.exception;
 
 import com.cloud.utils.SerialVersionUID;

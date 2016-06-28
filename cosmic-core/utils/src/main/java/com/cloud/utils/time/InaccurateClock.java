@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.time;
 
 import com.cloud.utils.concurrency.NamedThreadFactory;

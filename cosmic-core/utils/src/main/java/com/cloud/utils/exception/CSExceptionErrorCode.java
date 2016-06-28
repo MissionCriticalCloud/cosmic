@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.exception;
 
 import java.util.HashMap;

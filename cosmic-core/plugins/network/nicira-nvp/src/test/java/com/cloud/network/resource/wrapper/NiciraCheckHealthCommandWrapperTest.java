@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.network.resource.wrapper;
 
 import static org.hamcrest.MatcherAssert.assertThat;

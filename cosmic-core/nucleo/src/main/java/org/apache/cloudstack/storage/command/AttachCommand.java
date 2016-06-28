@@ -1,7 +1,3 @@
-//
-
-//
-
 package org.apache.cloudstack.storage.command;
 
 import com.cloud.agent.api.to.DiskTO;

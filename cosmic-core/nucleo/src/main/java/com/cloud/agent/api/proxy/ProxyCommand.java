@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.agent.api.proxy;
 
 import com.cloud.agent.api.Command;

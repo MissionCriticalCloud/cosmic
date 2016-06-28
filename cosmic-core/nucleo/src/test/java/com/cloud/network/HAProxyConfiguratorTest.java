@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.network;
 
 import static org.junit.Assert.assertTrue;

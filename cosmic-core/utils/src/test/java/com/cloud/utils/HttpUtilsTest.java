@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils;
 
 import static org.junit.Assert.assertFalse;

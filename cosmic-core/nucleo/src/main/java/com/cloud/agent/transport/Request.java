@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.agent.transport;
 
 import com.cloud.agent.api.Answer;

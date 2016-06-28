@@ -1,7 +1,3 @@
-//
-
-//
-
 package org.apache.cloudstack.utils.hypervisor;
 
 import com.cloud.utils.exception.CloudRuntimeException;

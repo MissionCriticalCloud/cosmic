@@ -1,6 +1,3 @@
-//
-
-//
 package com.cloud.utils.storage;
 
 import static org.junit.Assert.assertEquals;

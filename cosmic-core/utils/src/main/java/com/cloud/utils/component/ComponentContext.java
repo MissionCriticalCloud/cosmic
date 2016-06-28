@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.component;
 
 import com.cloud.utils.mgmt.JmxUtil;

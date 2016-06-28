@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.net;
 
 public class Ip4Address {

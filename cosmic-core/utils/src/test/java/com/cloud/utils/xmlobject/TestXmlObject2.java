@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.xmlobject;
 
 import org.junit.Test;

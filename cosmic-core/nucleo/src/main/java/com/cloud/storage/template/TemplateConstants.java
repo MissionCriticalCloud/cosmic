@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.storage.template;
 
 public final class TemplateConstants {

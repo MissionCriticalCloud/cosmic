@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.host;
 
 public final class HostInfo {

@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.exception;
 
 public class UsageServerException extends CloudException {

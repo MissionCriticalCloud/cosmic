@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.agent.api.routing;
 
 // details of site participating in the GLSB service, represents configuration load balancer rule and the zone

@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.exception;
 
 import static org.junit.Assert.assertTrue;

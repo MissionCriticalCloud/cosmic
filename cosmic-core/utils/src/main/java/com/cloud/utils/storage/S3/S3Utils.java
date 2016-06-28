@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.storage.S3;
 
 import static com.amazonaws.Protocol.HTTP;

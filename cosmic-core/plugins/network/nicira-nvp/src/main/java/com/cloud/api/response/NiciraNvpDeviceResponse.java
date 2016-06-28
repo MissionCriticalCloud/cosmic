@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.api.response;
 
 import com.cloud.network.NiciraNvpDeviceVO;

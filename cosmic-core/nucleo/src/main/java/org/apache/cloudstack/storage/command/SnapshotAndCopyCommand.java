@@ -1,7 +1,3 @@
-//
-
-//
-
 package org.apache.cloudstack.storage.command;
 
 import java.util.Map;

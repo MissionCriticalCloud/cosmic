@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.storage;
 
 import com.cloud.utils.component.Manager;

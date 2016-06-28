@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.ssh;
 
 import static org.junit.Assert.assertTrue;

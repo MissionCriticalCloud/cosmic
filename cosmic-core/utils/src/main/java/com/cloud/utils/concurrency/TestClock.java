@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.concurrency;
 
 import java.util.Calendar;

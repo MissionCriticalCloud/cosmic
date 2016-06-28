@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.agent.api;
 
 public class CleanupNetworkRulesCmd extends Command implements CronCommand {

@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.crypt;
 
 import javax.crypto.Cipher;

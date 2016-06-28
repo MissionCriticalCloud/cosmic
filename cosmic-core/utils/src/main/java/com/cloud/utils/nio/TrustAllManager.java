@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.nio;
 
 public class TrustAllManager implements javax.net.ssl.TrustManager, javax.net.ssl.X509TrustManager {

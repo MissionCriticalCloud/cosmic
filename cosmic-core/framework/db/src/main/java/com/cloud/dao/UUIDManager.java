@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.dao;
 
 public interface UUIDManager {

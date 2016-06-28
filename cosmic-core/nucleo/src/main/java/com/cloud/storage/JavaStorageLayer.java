@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.storage;
 
 import javax.ejb.Local;

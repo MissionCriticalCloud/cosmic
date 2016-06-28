@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils;
 
 import java.lang.reflect.Method;

@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.network.nicira;
 
 import java.lang.reflect.Type;

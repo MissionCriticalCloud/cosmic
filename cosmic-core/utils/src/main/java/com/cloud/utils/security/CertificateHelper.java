@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.security;
 
 import com.cloud.utils.Ternary;

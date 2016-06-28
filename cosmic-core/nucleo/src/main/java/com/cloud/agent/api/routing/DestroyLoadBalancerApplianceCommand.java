@@ -1,7 +1,3 @@
-//
-
-//
-
 /**
  * NetworkElementCommand to destroy a VPX instance on the Netscaler SDX load balancer appliance
  */

@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.events;
 
 import java.lang.reflect.InvocationTargetException;
