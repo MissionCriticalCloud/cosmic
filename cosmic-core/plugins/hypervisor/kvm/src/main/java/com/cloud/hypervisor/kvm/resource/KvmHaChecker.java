@@ -37,11 +37,11 @@ public class KvmHaChecker extends KvmHaBase implements Callable<Boolean> {
             cmd.add("-m", pool.innerMountDestPath);
             cmd.add("-h", hostIp);
             cmd.add("-r");
-            cmd.add("-t", String.valueOf(heartBeatUpdateFreq));
+            cmd.add("-t", String.valueOf(heartBeatUpdateFreq / 1000));
             final OutputInterpreter.OneLineParser parser = new OutputInterpreter.OneLineParser();
             final String result = cmd.execute(parser);
             logger.debug("pool: " + pool.innetPoolIp);
-            logger.debug("reture: " + result);
+            logger.debug("return: " + result);
             logger.debug("parser: " + parser.getLine());
             if (result == null && parser.getLine().contains("> DEAD <")) {
                 logger.debug("read heartbeat failed: " + result);
