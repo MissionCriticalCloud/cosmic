@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.network.resource;
 
 import com.cloud.agent.IAgentControl;

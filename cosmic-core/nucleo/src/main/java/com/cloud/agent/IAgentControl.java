@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.agent;
 
 import com.cloud.agent.api.AgentControlAnswer;

@@ -1,6 +1,3 @@
-//
-
-//
 package com.cloud.utils;
 
 import com.cloud.utils.DateUtil.IntervalType;

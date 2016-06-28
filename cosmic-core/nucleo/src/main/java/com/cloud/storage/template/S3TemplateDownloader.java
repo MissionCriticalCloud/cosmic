@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.storage.template;
 
 import static com.cloud.utils.StringUtils.join;

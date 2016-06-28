@@ -1,7 +1,3 @@
-//
-
-//
-
 package org.apache.cloudstack.utils.identity;
 
 import com.cloud.utils.component.AdapterBase;

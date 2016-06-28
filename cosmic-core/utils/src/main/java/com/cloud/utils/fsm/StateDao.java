@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.fsm;
 
 public interface StateDao<S, E, V> {

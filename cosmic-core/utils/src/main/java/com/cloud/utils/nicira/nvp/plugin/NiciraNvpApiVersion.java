@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.nicira.nvp.plugin;
 
 import com.cloud.maint.Version;

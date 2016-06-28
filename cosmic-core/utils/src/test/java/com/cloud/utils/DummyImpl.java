@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils;
 
 import org.springframework.stereotype.Component;

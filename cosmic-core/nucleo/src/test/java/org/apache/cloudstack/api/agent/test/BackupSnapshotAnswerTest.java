@@ -1,7 +1,3 @@
-//
-
-//
-
 package org.apache.cloudstack.api.agent.test;
 
 import static org.junit.Assert.assertFalse;

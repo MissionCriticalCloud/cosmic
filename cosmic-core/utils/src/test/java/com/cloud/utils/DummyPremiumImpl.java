@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils;
 
 public class DummyPremiumImpl implements DummyInterface {

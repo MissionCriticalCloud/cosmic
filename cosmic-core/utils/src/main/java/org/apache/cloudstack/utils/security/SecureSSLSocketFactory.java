@@ -1,7 +1,3 @@
-//
-
-//
-
 package org.apache.cloudstack.utils.security;
 
 import javax.net.ssl.KeyManager;

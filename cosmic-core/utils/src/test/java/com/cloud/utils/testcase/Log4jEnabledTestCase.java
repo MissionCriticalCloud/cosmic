@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.testcase;
 
 import java.io.File;

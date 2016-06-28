@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.db;
 
 import com.cloud.utils.PropertiesUtil;

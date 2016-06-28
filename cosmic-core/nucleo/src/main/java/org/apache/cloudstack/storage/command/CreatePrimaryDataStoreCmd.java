@@ -1,7 +1,3 @@
-//
-
-//
-
 package org.apache.cloudstack.storage.command;
 
 public final class CreatePrimaryDataStoreCmd extends StorageSubSystemCommand {

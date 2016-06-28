@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.network.nicira;
 
 public class SourceNatRule extends NatRule {

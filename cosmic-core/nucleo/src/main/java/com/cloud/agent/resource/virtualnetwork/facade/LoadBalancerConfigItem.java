@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.agent.resource.virtualnetwork.facade;
 
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;

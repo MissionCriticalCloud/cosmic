@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
 import com.cloud.agent.api.Answer;

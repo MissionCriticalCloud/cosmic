@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.storage.encoding;
 
 public class DecodedDataObject {

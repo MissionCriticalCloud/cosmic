@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.network.utils;
 
 import com.cloud.agent.api.Answer;

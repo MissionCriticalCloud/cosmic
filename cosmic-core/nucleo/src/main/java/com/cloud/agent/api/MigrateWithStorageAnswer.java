@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.agent.api;
 
 import org.apache.cloudstack.storage.to.VolumeObjectTO;

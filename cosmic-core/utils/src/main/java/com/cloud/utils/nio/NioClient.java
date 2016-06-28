@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.nio;
 
 import org.apache.cloudstack.utils.security.SSLUtils;

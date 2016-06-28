@@ -1,7 +1,3 @@
-//
-
-//
-
 package org.apache.cloudstack.utils.graphite;
 
 import java.io.IOException;

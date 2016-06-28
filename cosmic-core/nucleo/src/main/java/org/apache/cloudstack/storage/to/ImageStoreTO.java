@@ -1,7 +1,3 @@
-//
-
-//
-
 package org.apache.cloudstack.storage.to;
 
 import com.cloud.agent.api.to.DataStoreTO;

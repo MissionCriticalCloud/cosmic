@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.network.nicira;
 
 import static org.junit.Assert.assertTrue;

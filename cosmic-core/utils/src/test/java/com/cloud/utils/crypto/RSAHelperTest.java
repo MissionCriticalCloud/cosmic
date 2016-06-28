@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.crypto;
 
 import static org.junit.Assert.assertNotNull;

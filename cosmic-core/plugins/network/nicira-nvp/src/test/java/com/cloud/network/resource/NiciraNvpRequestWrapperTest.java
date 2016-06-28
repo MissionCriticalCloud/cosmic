@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.network.resource;
 
 import static org.junit.Assert.assertNotNull;

@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.fsm;
 
 public interface StateObject<S> {

@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.agent.api.storage;
 
 public class CreatePrivateTemplateCommand extends StorageCommand {

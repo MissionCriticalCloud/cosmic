@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.net;
 
 import static com.cloud.utils.AutoCloseableUtil.closeAutoCloseable;

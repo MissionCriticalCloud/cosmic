@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.net;
 
 import com.cloud.utils.IteratorUtil;

@@ -1,7 +1,3 @@
-//
-
-//
-
 package org.apache.commons.httpclient.contrib.ssl;
 
 import javax.net.ssl.TrustManager;

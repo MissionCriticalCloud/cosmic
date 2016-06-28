@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils;
 
 import com.cloud.utils.crypt.DBEncryptionUtil;

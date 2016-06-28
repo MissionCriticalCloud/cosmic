@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.component;
 
 import net.sf.cglib.core.NamingPolicy;

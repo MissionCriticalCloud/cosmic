@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.network;
 
 import org.apache.cloudstack.api.InternalIdentity;

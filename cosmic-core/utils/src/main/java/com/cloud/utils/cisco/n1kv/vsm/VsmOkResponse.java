@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.cisco.n1kv.vsm;
 
 import org.w3c.dom.Element;

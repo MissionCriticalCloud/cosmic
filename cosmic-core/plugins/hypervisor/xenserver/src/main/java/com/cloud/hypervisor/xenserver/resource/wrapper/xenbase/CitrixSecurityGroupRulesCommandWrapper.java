@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
 import com.cloud.agent.api.Answer;

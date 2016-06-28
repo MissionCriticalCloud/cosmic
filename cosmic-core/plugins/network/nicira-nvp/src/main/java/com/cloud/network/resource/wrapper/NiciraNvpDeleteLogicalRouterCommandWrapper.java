@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.network.resource.wrapper;
 
 import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;

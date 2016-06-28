@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.agent.api.routing;
 
 public class DhcpEntryCommand extends NetworkElementCommand {

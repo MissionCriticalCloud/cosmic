@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.agent.api.routing;
 
 import static org.junit.Assert.assertEquals;

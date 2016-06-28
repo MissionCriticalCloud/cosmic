@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.rest;
 
 public class CloudstackRESTException extends Exception {

@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.rest;
 
 import org.apache.http.client.methods.CloseableHttpResponse;

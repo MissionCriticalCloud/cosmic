@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.network.nicira;
 
 import org.apache.commons.lang.builder.EqualsBuilder;

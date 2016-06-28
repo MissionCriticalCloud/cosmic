@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils;
 
 import static java.beans.Introspector.getBeanInfo;

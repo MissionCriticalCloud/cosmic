@@ -1,7 +1,3 @@
-//
-
-//
-
 package org.apache.commons.httpclient.contrib.ssl;
 
 import org.apache.cloudstack.utils.security.SSLUtils;

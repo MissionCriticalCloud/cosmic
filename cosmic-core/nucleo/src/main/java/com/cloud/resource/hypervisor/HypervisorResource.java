@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.resource.hypervisor;
 
 import com.cloud.agent.api.RebootAnswer;

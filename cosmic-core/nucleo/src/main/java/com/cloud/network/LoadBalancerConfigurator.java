@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.network;
 
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;

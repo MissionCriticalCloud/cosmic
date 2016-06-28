@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.utils.fsm;
 
 import com.cloud.utils.SerialVersionUID;

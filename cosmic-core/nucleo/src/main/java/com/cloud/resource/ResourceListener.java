@@ -1,7 +1,3 @@
-//
-
-//
-
 package com.cloud.resource;
 
 import com.cloud.host.Host;
