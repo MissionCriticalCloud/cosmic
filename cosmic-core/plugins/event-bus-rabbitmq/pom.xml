@@ -2,11 +2,11 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-mom-rabbitmq</artifactId>
     <name>Cosmic Plugin - RabbitMQ Event Bus</name>
-    <version>5.1.0.1</version>
+    <version>5.1.0.2-SNAPSHOT</version>
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>5.1.0.1</version>
+        <version>5.1.0.2-SNAPSHOT</version>
         <relativePath>../../</relativePath>
     </parent>
     <dependencies>
@@ -18,7 +18,7 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-events</artifactId>
-            <version>5.1.0.1</version>
+            <version>5.1.0.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>
@@ -29,6 +29,6 @@
         <connection>scm:git:git@github.com:MissionCriticalCloud/cosmic-plugin-event-bus-rabbitmq.git</connection>
         <developerConnection>scm:git:git@github.com:MissionCriticalCloud/cosmic-plugin-event-bus-rabbitmq.git
         </developerConnection>
-        <tag>cosmic-5.1.0.1</tag>
+        <tag>HEAD</tag>
     </scm>
 </project>
