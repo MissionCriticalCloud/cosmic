@@ -57,6 +57,7 @@
         <cs.gson.version>1.7.2</cs.gson.version>
 
         <!-- Dependency management properties -->
+        <cs.amqp-client.version>3.5.4</cs.amqp-client.version>
         <cs.apache-log4j-extras.version>1.2.17</cs.apache-log4j-extras.version>
         <cs.aws-java-sdk.version>1.10.34</cs.aws-java-sdk.version>
         <cs.axis-jaxrpc.version>1.4</cs.axis-jaxrpc.version>
@@ -66,15 +67,24 @@
         <cs.commons-codec.version>1.10</cs.commons-codec.version>
         <cs.commons-configuration.version>1.10</cs.commons-configuration.version>
         <cs.commons-daemon.version>1.0.15</cs.commons-daemon.version>
+        <cs.commons-httpclient.version>3.1</cs.commons-httpclient.version>
         <cs.commons-io.version>2.4</cs.commons-io.version>
         <cs.commons-lang3.version>3.4</cs.commons-lang3.version>
         <cs.commons-net.version>3.3</cs.commons-net.version>
-        <cs.commons-validator.version>1.4.0</cs.commons-validator.version>
+        <cs.commons-validator.version>1.5.0</cs.commons-validator.version>
+        <cs.cxf-bundle-jaxrs.version>2.7.13</cs.cxf-bundle-jaxrs.version>
+        <cs.dbunit.version>2.4.9</cs.dbunit.version>
+        <cs.ehcache-core.version>2.6.9</cs.ehcache-core.version>
         <cs.ejb-api.version>3.0</cs.ejb-api.version>
         <cs.esapi.version>2.1.0</cs.esapi.version>
         <cs.guava-testlib.version>18.0</cs.guava-testlib.version>
         <cs.guava.version>18.0</cs.guava.version>
         <cs.hamcrest-all.version>1.3</cs.hamcrest-all.version>
+        <cs.jackson-annotations.version>2.6.3</cs.jackson-annotations.version>
+        <cs.jackson-core.version>2.6.3</cs.jackson-core.version>
+        <cs.jackson-databind.version>2.6.3</cs.jackson-databind.version>
+        <cs.jackson-jaxrs-json-provider.version>2.6.3</cs.jackson-jaxrs-json-provider.version>
+        <cs.jackson-module-jaxb-annotations.version>2.6.3</cs.jackson-module-jaxb-annotations.version>
         <cs.jasypt.version>1.9.2</cs.jasypt.version>
         <cs.java-ipv6.version>0.15</cs.java-ipv6.version>
         <cs.javax.inject.version>1</cs.javax.inject.version>
@@ -86,7 +96,7 @@
         <cs.mail.version>1.4.7</cs.mail.version>
         <cs.mockito-all.version>1.10.19</cs.mockito-all.version>
         <cs.mycila.license.version>2.7</cs.mycila.license.version>
-        <cs.opensaml.version>2.6.1</cs.opensaml.version>
+        <cs.netty-all.version>4.0.25.Final</cs.netty-all.version>
         <cs.org.jacoco.agent.rt.version>0.7.6.201602180812</cs.org.jacoco.agent.rt.version>
         <cs.org.jacoco.agent.version>0.7.6.201602180812</cs.org.jacoco.agent.version>
         <cs.powermock-api-mockito.version>1.6.4</cs.powermock-api-mockito.version>
@@ -94,8 +104,10 @@
         <cs.rados.version>0.2.0</cs.rados.version>
         <cs.reflections.version>0.9.9</cs.reflections.version>
         <cs.selenium-server.version>1.0-20081010.060147</cs.selenium-server.version>
+        <cs.spock-core.version>0.7-groovy-2.0</cs.spock-core.version>
         <cs.trilead-ssh2.version>1.0.0-build217</cs.trilead-ssh2.version>
         <cs.xen-api.version>6.2.0-3.1</cs.xen-api.version>
+        <cs.xercesimpl.version>2.11.0</cs.xercesimpl.version>
         <cs.xml-apis.version>1.4.01</cs.xml-apis.version>
         <cs.xmlrpc-client.version>3.1.3</cs.xmlrpc-client.version>
         <cs.xmlrpc-common.version>3.1.3</cs.xmlrpc-common.version>
@@ -132,6 +144,71 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${cs.netty-all.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.spockframework</groupId>
+                <artifactId>spock-core</artifactId>
+                <version>${cs.spock-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.rabbitmq</groupId>
+                <artifactId>amqp-client</artifactId>
+                <version>${cs.amqp-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dbunit</groupId>
+                <artifactId>dbunit</artifactId>
+                <version>${cs.dbunit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-bundle-jaxrs</artifactId>
+                <version>${cs.cxf-bundle-jaxrs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                <artifactId>jackson-jaxrs-json-provider</artifactId>
+                <version>${cs.jackson-jaxrs-json-provider.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-jaxb-annotations</artifactId>
+                <version>${cs.jackson-module-jaxb-annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${cs.jackson-annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${cs.jackson-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${cs.jackson-databind.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-httpclient</groupId>
+                <artifactId>commons-httpclient</artifactId>
+                <version>${cs.commons-httpclient.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xerces</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>${cs.xercesimpl.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.ehcache</groupId>
+                <artifactId>ehcache-core</artifactId>
+                <version>${cs.ehcache-core.version}</version>
+            </dependency>
             <dependency>
                 <groupId>jstl</groupId>
                 <artifactId>jstl</artifactId>
@@ -363,11 +440,6 @@
                 <version>${cs.jna.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.opensaml</groupId>
-                <artifactId>opensaml</artifactId>
-                <version>${cs.opensaml.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>xml-apis</groupId>
                 <artifactId>xml-apis</artifactId>
                 <version>${cs.xml-apis.version}</version>
@@ -405,6 +477,18 @@
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
         </dependency>
     </dependencies>
 
@@ -532,7 +616,28 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.4.1</version>
+                <executions>
+                    <execution>
+                        <id>enforce</id>
+                        <configuration>
+                            <rules>
+                                <DependencyConvergence />
+                            </rules>
+                        </configuration>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
+
     <profiles>
         <profile>
             <id>development</id>

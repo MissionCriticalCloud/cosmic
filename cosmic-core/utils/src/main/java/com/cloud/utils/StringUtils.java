@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.owasp.esapi.StringUtilities;
-
 public class StringUtils {
     private static final char[] hexChar = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
     private static final String UTF8 = "UTF-8";
@@ -228,10 +226,6 @@ public class StringUtils {
         }
 
         return lstTags1.containsAll(lstTags2) && lstTags2.containsAll(lstTags1);
-    }
-
-    public static String stripControlCharacters(final String s) {
-        return StringUtilities.stripControls(s);
     }
 
     public static int formatForOutput(final String text, final int start, final int columns, final char separator) {
