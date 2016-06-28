@@ -26,42 +26,22 @@ public class StorageStrategyFactoryImpl implements StorageStrategyFactory {
 
     @Override
     public DataMotionStrategy getDataMotionStrategy(final DataObject srcData, final DataObject destData) {
-        return bestMatch(dataMotionStrategies, new CanHandle<DataMotionStrategy>() {
-            @Override
-            public StrategyPriority canHandle(final DataMotionStrategy strategy) {
-                return strategy.canHandle(srcData, destData);
-            }
-        });
+        return bestMatch(dataMotionStrategies, strategy -> strategy.canHandle(srcData, destData));
     }
 
     @Override
     public DataMotionStrategy getDataMotionStrategy(final Map<VolumeInfo, DataStore> volumeMap, final Host srcHost, final Host destHost) {
-        return bestMatch(dataMotionStrategies, new CanHandle<DataMotionStrategy>() {
-            @Override
-            public StrategyPriority canHandle(final DataMotionStrategy strategy) {
-                return strategy.canHandle(volumeMap, srcHost, destHost);
-            }
-        });
+        return bestMatch(dataMotionStrategies, strategy -> strategy.canHandle(volumeMap, srcHost, destHost));
     }
 
     @Override
     public SnapshotStrategy getSnapshotStrategy(final Snapshot snapshot, final SnapshotOperation op) {
-        return bestMatch(snapshotStrategies, new CanHandle<SnapshotStrategy>() {
-            @Override
-            public StrategyPriority canHandle(final SnapshotStrategy strategy) {
-                return strategy.canHandle(snapshot, op);
-            }
-        });
+        return bestMatch(snapshotStrategies, strategy -> strategy.canHandle(snapshot, op));
     }
 
     @Override
     public VMSnapshotStrategy getVmSnapshotStrategy(final VMSnapshot vmSnapshot) {
-        return bestMatch(vmSnapshotStrategies, new CanHandle<VMSnapshotStrategy>() {
-            @Override
-            public StrategyPriority canHandle(final VMSnapshotStrategy strategy) {
-                return strategy.canHandle(vmSnapshot);
-            }
-        });
+        return bestMatch(vmSnapshotStrategies, strategy -> strategy.canHandle(vmSnapshot));
     }
 
     private static <T> T bestMatch(final Collection<T> collection, final CanHandle<T> canHandle) {
@@ -83,17 +63,9 @@ public class StorageStrategyFactoryImpl implements StorageStrategyFactory {
         return strategyToUse;
     }
 
-    public List<SnapshotStrategy> getSnapshotStrategies() {
-        return snapshotStrategies;
-    }
-
     @Inject
     public void setSnapshotStrategies(final List<SnapshotStrategy> snapshotStrategies) {
         this.snapshotStrategies = snapshotStrategies;
-    }
-
-    public List<DataMotionStrategy> getDataMotionStrategies() {
-        return dataMotionStrategies;
     }
 
     @Inject
@@ -101,16 +73,12 @@ public class StorageStrategyFactoryImpl implements StorageStrategyFactory {
         this.dataMotionStrategies = dataMotionStrategies;
     }
 
-    public List<VMSnapshotStrategy> getVmSnapshotStrategies() {
-        return vmSnapshotStrategies;
-    }
-
     @Inject
     public void setVmSnapshotStrategies(final List<VMSnapshotStrategy> vmSnapshotStrategies) {
         this.vmSnapshotStrategies = vmSnapshotStrategies;
     }
 
-    private static interface CanHandle<T> {
+    private interface CanHandle<T> {
         StrategyPriority canHandle(T strategy);
     }
 }

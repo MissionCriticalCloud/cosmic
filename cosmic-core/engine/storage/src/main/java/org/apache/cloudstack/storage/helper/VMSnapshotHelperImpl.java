@@ -94,7 +94,7 @@ public class VMSnapshotHelperImpl implements VMSnapshotHelper {
     public List<VolumeObjectTO> getVolumeTOList(final Long vmId) {
         final List<VolumeObjectTO> volumeTOs = new ArrayList<>();
         final List<VolumeVO> volumeVos = volumeDao.findByInstance(vmId);
-        VolumeInfo volumeInfo = null;
+        VolumeInfo volumeInfo;
         for (final VolumeVO volume : volumeVos) {
             volumeInfo = volumeDataFactory.getVolume(volume.getId());
 

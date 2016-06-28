@@ -43,9 +43,6 @@ public class LocalStoragePoolAllocator extends AbstractStoragePoolAllocator {
     @Inject
     ConfigurationDao _configDao;
 
-    public LocalStoragePoolAllocator() {
-    }
-
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         super.configure(name, params);
@@ -101,17 +98,7 @@ public class LocalStoragePoolAllocator extends AbstractStoragePoolAllocator {
             }
             final List<StoragePoolVO> availablePools =
                     _storagePoolDao.findLocalStoragePoolsByTags(plan.getDataCenterId(), plan.getPodId(), plan.getClusterId(), dskCh.getTags());
-            for (final StoragePoolVO pool : availablePools) {
-                if (suitablePools.size() == returnUpTo) {
-                    break;
-                }
-                final StoragePool storagePool = (StoragePool) this.dataStoreMgr.getPrimaryDataStore(pool.getId());
-                if (filter(avoid, storagePool, dskCh, plan)) {
-                    suitablePools.add(storagePool);
-                } else {
-                    avoid.addPool(pool.getId());
-                }
-            }
+            detectSuitableOrToAvoidPools(dskCh, plan, avoid, returnUpTo, suitablePools, availablePools);
 
             // add remaining pools in cluster, that did not match tags, to avoid
             // set

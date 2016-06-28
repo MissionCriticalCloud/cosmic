@@ -13,7 +13,6 @@ import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VMTemplateZoneDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.download.DownloadMonitor;
-import com.cloud.utils.net.Proxy;
 import org.apache.cloudstack.engine.subsystem.api.storage.CopyCommandResult;
 import org.apache.cloudstack.engine.subsystem.api.storage.CreateCmdResult;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
@@ -32,8 +31,6 @@ import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreVO;
 
 import javax.inject.Inject;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Map;
 
@@ -61,19 +58,6 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
     VMTemplateZoneDao _vmTemplateZoneDao;
     @Inject
     AlertManager _alertMgr;
-
-    protected Proxy getHttpProxy() {
-        if (_proxy == null) {
-            return null;
-        }
-        try {
-            final URI uri = new URI(_proxy);
-            final Proxy prx = new Proxy(uri);
-            return prx;
-        } catch (final URISyntaxException e) {
-            return null;
-        }
-    }
 
     @Override
     public Map<String, String> getCapabilities() {
@@ -248,14 +232,6 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
 
     @Override
     public void resize(final DataObject data, final AsyncCompletionCallback<CreateCmdResult> callback) {
-    }
-
-    protected Long getMaxTemplateSizeInBytes() {
-        try {
-            return Long.parseLong(configDao.getValue("max.template.iso.size")) * 1024L * 1024L * 1024L;
-        } catch (final NumberFormatException e) {
-            return null;
-        }
     }
 
     @Override

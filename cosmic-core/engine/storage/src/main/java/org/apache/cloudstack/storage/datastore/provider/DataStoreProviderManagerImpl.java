@@ -176,21 +176,9 @@ public class DataStoreProviderManagerImpl extends ManagerBase implements DataSto
         return this.getDataStoreProvider(DataStoreProvider.DEFAULT_PRIMARY);
     }
 
-    public void setPrimaryDataStoreProviderMgr(final PrimaryDataStoreProviderManager primaryDataStoreProviderMgr) {
-        this.primaryDataStoreProviderMgr = primaryDataStoreProviderMgr;
-    }
-
-    public void setImageStoreProviderMgr(final ImageStoreProviderManager imageDataStoreProviderMgr) {
-        this.imageStoreProviderMgr = imageDataStoreProviderMgr;
-    }
-
     @Override
     public DataStoreProvider getDefaultImageDataStoreProvider() {
         return this.getDataStoreProvider(DataStoreProvider.NFS_IMAGE);
-    }
-
-    public List<DataStoreProvider> getProviders() {
-        return providers;
     }
 
     @Inject

@@ -30,8 +30,6 @@
     <bean id="VHDX" class="org.apache.cloudstack.storage.image.format.VHDX"/>
     <bean id="unknown" class="org.apache.cloudstack.storage.image.format.Unknown"/>
 
-    <bean id="hypervisorHelperImpl" class="org.apache.cloudstack.storage.helper.HypervisorHelperImpl"/>
-
     <bean id="VMSnapshotHelperImpl"
           class="org.apache.cloudstack.storage.helper.VMSnapshotHelperImpl"/>
 

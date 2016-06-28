@@ -31,32 +31,6 @@ public class ImageStoreHelper {
     @Inject
     SnapshotDataStoreDao snapshotStoreDao;
 
-    public ImageStoreVO createImageStore(final Map<String, Object> params) {
-        ImageStoreVO store = imageStoreDao.findByName((String) params.get("name"));
-        if (store != null) {
-            return store;
-        }
-        store = new ImageStoreVO();
-        store.setProtocol((String) params.get("protocol"));
-        store.setProviderName((String) params.get("providerName"));
-        store.setScope((ScopeType) params.get("scope"));
-        store.setDataCenterId((Long) params.get("zoneId"));
-        final String uuid = (String) params.get("uuid");
-        if (uuid != null) {
-            store.setUuid(uuid);
-        } else {
-            store.setUuid(UUID.randomUUID().toString());
-        }
-        store.setName((String) params.get("name"));
-        if (store.getName() == null) {
-            store.setName(store.getUuid());
-        }
-        store.setUrl((String) params.get("url"));
-        store.setRole((DataStoreRole) params.get("role"));
-        store = imageStoreDao.persist(store);
-        return store;
-    }
-
     public ImageStoreVO createImageStore(final Map<String, Object> params, final Map<String, String> details) {
         ImageStoreVO store = imageStoreDao.findByName((String) params.get("name"));
         if (store != null) {
@@ -122,16 +96,6 @@ public class ImageStoreHelper {
             }
         }
         return store;
-    }
-
-    public boolean deleteImageStore(final long id) {
-        final ImageStoreVO store = imageStoreDao.findById(id);
-        if (store == null) {
-            throw new CloudRuntimeException("can't find image store:" + id);
-        }
-
-        imageStoreDao.remove(id);
-        return true;
     }
 
     /**

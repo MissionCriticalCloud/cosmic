@@ -22,6 +22,7 @@ import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.engine.subsystem.api.storage.StoragePoolAllocator;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -108,6 +109,21 @@ public abstract class AbstractStoragePoolAllocator extends AdapterBase implement
             pools = reorderPoolsByCapacity(plan, pools);
         }
         return pools;
+    }
+
+    protected void detectSuitableOrToAvoidPools(final DiskProfile dskCh, final DeploymentPlan plan, final ExcludeList avoid, final int returnUpTo, final List<StoragePool>
+            suitablePools, final List<StoragePoolVO> storagePools) {
+        for (final StoragePoolVO storage : storagePools) {
+            if (suitablePools.size() == returnUpTo) {
+                break;
+            }
+            final StoragePool storagePool = (StoragePool) this.dataStoreMgr.getPrimaryDataStore(storage.getId());
+            if (filter(avoid, storagePool, dskCh, plan)) {
+                suitablePools.add(storagePool);
+            } else {
+                avoid.addPool(storagePool.getId());
+            }
+        }
     }
 
     protected List<StoragePool> reorderPoolsByNumberOfVolumes(final DeploymentPlan plan, final List<StoragePool> pools, final Account account) {
