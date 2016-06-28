@@ -12,7 +12,6 @@ import com.cloud.vm.VirtualMachineProfile;
 import org.apache.cloudstack.engine.cloud.entity.api.db.VMEntityVO;
 
 import javax.inject.Inject;
-import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -30,28 +29,13 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
     public VirtualMachineEntityImpl() {
     }
 
-    public VirtualMachineEntityImpl(final String vmId, final String owner, final String hostName, final String displayName, final int cpu, final int speed, final long memory,
-                                    final List<String> computeTags,
-                                    final List<String> rootDiskTags, final List<String> networks, final VMEntityManager manager) {
-        this(vmId, manager);
-        this.vmEntityVO.setOwner(owner);
-        this.vmEntityVO.setHostname(hostName);
-        this.vmEntityVO.setDisplayname(displayName);
-        this.vmEntityVO.setComputeTags(computeTags);
-        this.vmEntityVO.setRootDiskTags(rootDiskTags);
-        this.vmEntityVO.setNetworkIds(networks);
-
-        manager.saveVirtualMachine(vmEntityVO);
-    }
-
     public VirtualMachineEntityImpl(final String vmId, final VMEntityManager manager) {
         this.manager = manager;
         this.vmEntityVO = this.manager.loadVirtualMachine(vmId);
     }
 
-    public void init(final String vmId, final String owner, final String hostName, final String displayName, final int cpu, final int speed, final long memory, final
-    List<String> computeTags,
-                     final List<String> rootDiskTags, final List<String> networks) {
+    public void init(final String vmId, final String owner, final String hostName, final String displayName, final List<String> computeTags, final List<String> rootDiskTags,
+                     final List<String> networks) {
         init(vmId);
         this.vmEntityVO.setOwner(owner);
         this.vmEntityVO.setHostname(hostName);
@@ -116,22 +100,6 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
     }
 
     @Override
-    public void delDetail(final String name, final String value) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void updateDetail(final String name, final String value) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public List<Method> getApplicableActions() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public List<String> listVolumeIds() {
         // TODO Auto-generated method stub
         return null;
@@ -144,51 +112,15 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
     }
 
     @Override
-    public List<String> listNicUuids() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<NicEntity> listNics() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public TemplateEntity getTemplate() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<String> listTags() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void addTag() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void delTag() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public String reserve(final DeploymentPlanner plannerToUse, final DeploymentPlan plan, final ExcludeList exclude, final String caller) throws InsufficientCapacityException,
             ResourceUnavailableException {
         return manager.reserveVirtualMachine(this.vmEntityVO, plannerToUse, plan, exclude);
-    }
-
-    @Override
-    public void migrateTo(final String reservationId, final String caller) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -220,12 +152,6 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
     }
 
     @Override
-    public SnapshotEntity takeSnapshotOf() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public void attach(final VolumeEntity volume, final short deviceId) {
         // TODO Auto-generated method stub
 
@@ -233,18 +159,6 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
 
     @Override
     public void detach(final VolumeEntity volume) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void connectTo(final NetworkEntity network, final short nicId) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void disconnectFrom(final NetworkEntity netowrk, final short nicId) {
         // TODO Auto-generated method stub
 
     }

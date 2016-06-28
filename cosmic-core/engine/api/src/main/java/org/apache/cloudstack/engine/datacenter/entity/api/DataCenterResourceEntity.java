@@ -43,16 +43,17 @@ public interface DataCenterResourceEntity extends CloudStackEntity, StateObject<
     @GET
     State getState();
 
-    public void persist();
+    void persist();
 
     String getName();
 
     /**
      * This is the state machine for how CloudStack should interact with
      */
-    public enum State {
-        Disabled("The resource is disabled so CloudStack should not use it.  This is the initial state of all resources added to CloudStack."), Enabled(
-                "The resource is now enabled for CloudStack to use."), Deactivated("The resource is deactivated so CloudStack should not use it for new resource needs.");
+    enum State {
+        Disabled("The resource is disabled so CloudStack should not use it.  This is the initial state of all resources added to CloudStack."),
+        Enabled("The resource is now enabled for CloudStack to use."),
+        Deactivated("The resource is deactivated so CloudStack should not use it for new resource needs.");
 
         protected static final StateMachine2<State, Event, DataCenterResourceEntity> s_fsm = new StateMachine2<>();
 
@@ -65,7 +66,7 @@ public interface DataCenterResourceEntity extends CloudStackEntity, StateObject<
 
         String _description;
 
-        private State(final String description) {
+        State(final String description) {
             _description = description;
         }
 

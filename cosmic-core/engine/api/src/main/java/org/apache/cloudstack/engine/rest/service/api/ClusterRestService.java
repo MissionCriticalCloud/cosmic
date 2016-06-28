@@ -1,7 +1,6 @@
 package org.apache.cloudstack.engine.rest.service.api;
 
 import org.apache.cloudstack.engine.datacenter.entity.api.ClusterEntity;
-import org.apache.cloudstack.engine.service.api.ProvisioningService;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -14,8 +13,6 @@ import java.util.List;
 
 @Produces("application/json")
 public class ClusterRestService {
-    //    @Inject
-    ProvisioningService _provisioningService;
 
     @GET
     @Path("/clusters")

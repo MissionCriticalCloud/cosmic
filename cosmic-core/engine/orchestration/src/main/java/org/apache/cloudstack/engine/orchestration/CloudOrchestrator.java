@@ -121,7 +121,7 @@ public class CloudOrchestrator implements OrchestrationService {
         }
 
         final VirtualMachineEntityImpl vmEntity = ComponentContext.inject(VirtualMachineEntityImpl.class);
-        vmEntity.init(id, owner, hostName, displayName, cpu, speed, memory, computeTags, rootDiskTags, new ArrayList<>(networkNicMap.keySet()));
+        vmEntity.init(id, owner, hostName, displayName, computeTags, rootDiskTags, new ArrayList<>(networkNicMap.keySet()));
 
         final HypervisorType hypervisorType = HypervisorType.valueOf(hypervisor);
 
@@ -202,7 +202,7 @@ public class CloudOrchestrator implements OrchestrationService {
         // VirtualMachineEntityImpl vmEntity = new VirtualMachineEntityImpl(id, owner, hostName, displayName, cpu, speed, memory, computeTags, rootDiskTags, networks,
         // vmEntityManager);
         final VirtualMachineEntityImpl vmEntity = ComponentContext.inject(VirtualMachineEntityImpl.class);
-        vmEntity.init(id, owner, hostName, displayName, cpu, speed, memory, computeTags, rootDiskTags, new ArrayList<>(networkNicMap.keySet()));
+        vmEntity.init(id, owner, hostName, displayName, computeTags, rootDiskTags, new ArrayList<>(networkNicMap.keySet()));
 
         //load vm instance and offerings and call virtualMachineManagerImpl
         final VMInstanceVO vm = _vmDao.findByUuid(id);

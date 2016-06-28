@@ -19,15 +19,7 @@ public interface EntityService {
 
     List<String> listNetworks();
 
-    List<String> listNics();
-
-    List<String> listSnapshots();
-
     List<String> listTemplates();
-
-    List<String> listStoragePools();
-
-    List<String> listHosts();
 
     VirtualMachine getVirtualMachine(String vm);
 

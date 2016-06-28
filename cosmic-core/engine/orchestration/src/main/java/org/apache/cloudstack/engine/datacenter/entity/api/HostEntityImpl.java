@@ -5,9 +5,7 @@ import com.cloud.utils.fsm.NoTransitionException;
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineHostVO;
 
-import java.lang.reflect.Method;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 public class HostEntityImpl implements HostEntity {
@@ -132,30 +130,8 @@ public class HostEntityImpl implements HostEntity {
         hostVO.setDetail(name, value);
     }
 
-    @Override
-    public void delDetail(final String name, final String value) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void updateDetail(final String name, final String value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public List<Method> getApplicableActions() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public void setOwner(final String owner) {
         hostVO.setOwner(owner);
-    }
-
-    @Override
-    public Long getTotalMemory() {
-        return hostVO.getTotalMemory();
     }
 
     @Override

@@ -2229,15 +2229,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     }
 
     @Override
-    public boolean setupDns(final Network network, final Provider provider) {
-        final boolean dnsProvided = _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Dns, provider);
-        final boolean dhcpProvided = _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Dhcp, provider);
-
-        final boolean setupDns = dnsProvided || dhcpProvided;
-        return setupDns;
-    }
-
-    @Override
     @DB
     public void releaseNic(final VirtualMachineProfile vmProfile, final Nic nic) throws ConcurrentOperationException, ResourceUnavailableException {
         releaseNic(vmProfile, nic.getId());
@@ -2245,9 +2236,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
     @Override
     public NicProfile createNicForVm(final Network network, final NicProfile requested, final ReservationContext context, final VirtualMachineProfile vmProfile, final boolean
-            prepare)
-            throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException, ConcurrentOperationException, InsufficientCapacityException,
-            ResourceUnavailableException {
+            prepare) throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException {
 
         final VirtualMachine vm = vmProfile.getVirtualMachine();
         final DataCenter dc = _entityMgr.findById(DataCenter.class, network.getDataCenterId());

@@ -32,7 +32,6 @@ import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -310,27 +309,6 @@ public class DefaultEndPointSelector implements EndPointSelector {
     @Override
     public EndPoint select(final Scope scope, final Long storeId) {
         return findEndPointInScope(scope, findOneHostOnPrimaryStorage, storeId);
-    }
-
-    @Override
-    public List<EndPoint> selectAll(final DataStore store) {
-        final List<EndPoint> endPoints = new ArrayList<>();
-        if (store.getScope().getScopeType() == ScopeType.HOST) {
-            final HostVO host = hostDao.findById(store.getScope().getScopeId());
-
-            endPoints.add(RemoteHostEndPoint.getHypervisorHostEndPoint(host));
-        } else if (store.getScope().getScopeType() == ScopeType.CLUSTER) {
-            final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
-            sc.and(sc.entity().getClusterId(), Op.EQ, store.getScope().getScopeId());
-            sc.and(sc.entity().getStatus(), Op.EQ, Status.Up);
-            final List<HostVO> hosts = sc.list();
-            for (final HostVO host : hosts) {
-                endPoints.add(RemoteHostEndPoint.getHypervisorHostEndPoint(host));
-            }
-        } else {
-            throw new CloudRuntimeException("shouldn't use it for other scope");
-        }
-        return endPoints;
     }
 
     @Override

@@ -77,15 +77,6 @@ public class DataStoreManagerImpl implements DataStoreManager {
     }
 
     @Override
-    public DataStore getImageCacheStore(final long zoneId) {
-        final List<DataStore> stores = getImageCacheStores(new ZoneScope(zoneId));
-        if (stores == null || stores.size() == 0) {
-            return null;
-        }
-        return imageDataStoreMgr.getImageStore(stores);
-    }
-
-    @Override
     public List<DataStore> listImageStores() {
         return imageDataStoreMgr.listImageStores();
     }
@@ -97,11 +88,7 @@ public class DataStoreManagerImpl implements DataStoreManager {
 
     @Override
     public boolean isRegionStore(final DataStore store) {
-        if (store.getScope().getScopeType() == ScopeType.ZONE && store.getScope().getScopeId() == null) {
-            return true;
-        } else {
-            return false;
-        }
+        return store.getScope().getScopeType() == ScopeType.ZONE && store.getScope().getScopeId() == null;
     }
 
     public void setPrimaryStoreMgr(final PrimaryDataStoreProviderManager primaryStoreMgr) {

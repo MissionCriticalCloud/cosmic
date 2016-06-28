@@ -1,9 +1,7 @@
 package org.apache.cloudstack.engine.subsystem.api.storage;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StoragePool;
-import org.apache.cloudstack.engine.subsystem.api.storage.disktype.DiskFormat;
 
 import java.util.Map;
 
@@ -19,12 +17,6 @@ public interface PrimaryDataStoreInfo extends StoragePool {
     static final String CHAP_TARGET_SECRET = "chapTargetSecret";
     static final String VOLUME_SIZE = "volumeSize";
 
-    boolean isHypervisorSupported(HypervisorType hypervisor);
-
-    boolean isLocalStorageSupported();
-
-    boolean isVolumeDiskTypeSupported(DiskFormat diskType);
-
     @Override
     String getUuid();
 
@@ -36,6 +28,4 @@ public interface PrimaryDataStoreInfo extends StoragePool {
     Map<String, String> getDetails();
 
     void setDetails(Map<String, String> details);
-
-    PrimaryDataStoreLifeCycle getLifeCycle();
 }

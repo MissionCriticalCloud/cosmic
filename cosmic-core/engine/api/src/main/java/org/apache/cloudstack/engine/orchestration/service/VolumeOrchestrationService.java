@@ -38,14 +38,14 @@ import java.util.Set;
  */
 public interface VolumeOrchestrationService {
 
-    static final ConfigKey<Long> CustomDiskOfferingMinSize = new ConfigKey<>("Advanced",
+    ConfigKey<Long> CustomDiskOfferingMinSize = new ConfigKey<>("Advanced",
             Long.class,
             "custom.diskoffering.size.min",
             "1",
             "Minimum size in GB for custom disk offering.",
             true
     );
-    static final ConfigKey<Long> CustomDiskOfferingMaxSize = new ConfigKey<>("Advanced",
+    ConfigKey<Long> CustomDiskOfferingMaxSize = new ConfigKey<>("Advanced",
             Long.class,
             "custom.diskoffering.size.max",
             "1024",
@@ -53,8 +53,8 @@ public interface VolumeOrchestrationService {
             true
     );
 
-    VolumeInfo moveVolume(VolumeInfo volume, long destPoolDcId, Long destPoolPodId, Long destPoolClusterId, HypervisorType dataDiskHyperType)
-            throws ConcurrentOperationException, StorageUnavailableException;
+    VolumeInfo moveVolume(VolumeInfo volume, long destPoolDcId, Long destPoolPodId, Long destPoolClusterId, HypervisorType dataDiskHyperType) throws
+            ConcurrentOperationException, StorageUnavailableException;
 
     Volume allocateDuplicateVolume(Volume oldVol, Long templateId);
 
@@ -96,8 +96,7 @@ public interface VolumeOrchestrationService {
     boolean canVmRestartOnAnotherServer(long vmId);
 
     DiskProfile allocateTemplatedVolume(Type type, String name, DiskOffering offering, Long rootDisksize, Long minIops, Long maxIops, VirtualMachineTemplate template,
-                                        VirtualMachine vm,
-                                        Account owner);
+                                        VirtualMachine vm, Account owner);
 
     String getVmNameFromVolumeId(long volumeId);
 

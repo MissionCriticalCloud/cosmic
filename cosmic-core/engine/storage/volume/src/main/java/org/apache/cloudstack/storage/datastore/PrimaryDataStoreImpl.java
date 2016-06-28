@@ -33,7 +33,6 @@ import org.apache.cloudstack.engine.subsystem.api.storage.TemplateDataFactory;
 import org.apache.cloudstack.engine.subsystem.api.storage.TemplateInfo;
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
 import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
-import org.apache.cloudstack.engine.subsystem.api.storage.disktype.DiskFormat;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 import org.apache.cloudstack.storage.to.PrimaryDataStoreTO;
@@ -130,33 +129,13 @@ public class PrimaryDataStoreImpl implements PrimaryDataStore {
     }
 
     @Override
-    public DiskFormat getDefaultDiskType() {
-        return null;
-    }
-
-    @Override
     public DataStoreRole getRole() {
         return DataStoreRole.Primary;
     }
 
     @Override
-    public boolean isHypervisorSupported(final HypervisorType hypervisor) {
-        return true;
-    }
-
-    @Override
-    public boolean isLocalStorageSupported() {
-        return false;
-    }
-
-    @Override
     public long getId() {
         return pdsv.getId();
-    }
-
-    @Override
-    public boolean isVolumeDiskTypeSupported(final DiskFormat diskType) {
-        return false;
     }
 
     @Override
@@ -177,11 +156,6 @@ public class PrimaryDataStoreImpl implements PrimaryDataStore {
     @Override
     public void setDetails(final Map<String, String> details) {
         _details = details;
-    }
-
-    @Override
-    public PrimaryDataStoreLifeCycle getLifeCycle() {
-        return lifeCycle;
     }
 
     @Override
