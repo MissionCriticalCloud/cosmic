@@ -10,6 +10,12 @@
     <description>Cosmic is an IaaS (“Infrastructure as a Service”) cloud orchestration platform.</description>
     <url>http://www.cosmiccloud.io</url>
 
+    <scm>
+        <connection>scm:git:git@github.com:MissionCriticalCloud/cosmic.git</connection>
+        <developerConnection>scm:git:git@github.com:MissionCriticalCloud/cosmic.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
     <distributionManagement>
         <repository>
             <id>beta-nexus</id>
@@ -401,12 +407,6 @@
             <artifactId>javax.inject</artifactId>
         </dependency>
     </dependencies>
-
-    <scm>
-        <connection>scm:git:git@github.com:MissionCriticalCloud/blackhole.git</connection>
-        <developerConnection>scm:git:git@github.com:MissionCriticalCloud/blackhole.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
 
     <build>
         <pluginManagement>
