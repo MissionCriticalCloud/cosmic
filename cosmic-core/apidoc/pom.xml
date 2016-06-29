@@ -7,7 +7,7 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>5.1.0.1-SNAPSHOT</version>
+        <version>5.1.0.2-SNAPSHOT</version>
     </parent>
     <properties>
         <client.config.base>${project.build.directory}/dependency</client.config.base>
