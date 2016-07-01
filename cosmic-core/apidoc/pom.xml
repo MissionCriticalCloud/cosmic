@@ -55,29 +55,6 @@
                 <version>1.2.1</version>
                 <executions>
                     <execution>
-                        <id>extract-commands-properties-file</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <workingDirectory>${project.build.directory}</workingDirectory>
-                    <executable>jar</executable>
-                    <arguments>
-                        <argument>-xf</argument>
-                        <argument>dependency/cloud-client-ui-${project.version}.war</argument>
-                        <argument>WEB-INF/classes/commands.properties</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <executions>
-                    <execution>
                         <id>compile</id>
                         <phase>compile</phase>
                         <goals>
@@ -109,6 +86,22 @@
                                 <argument>-cjf</argument>
                                 <argument>apidoc.tar.bz2</argument>
                                 <argument>xmldoc</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>extract-commands-properties-file</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                            <executable>jar</executable>
+                            <arguments>
+                                <argument>-xf</argument>
+                                <argument>dependency/cloud-client-ui-${project.version}.war</argument>
+                                <argument>WEB-INF/classes/commands.properties</argument>
                             </arguments>
                         </configuration>
                     </execution>
