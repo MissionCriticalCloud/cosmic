@@ -5,14 +5,14 @@
     <name>Cosmic Engine Storage Snapshot Component</name>
     <parent>
         <groupId>cloud.cosmic</groupId>
-        <artifactId>cloud-engine</artifactId>
+        <artifactId>cosmic-core</artifactId>
         <version>5.1.0.2-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../../../</relativePath>
     </parent>
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-engine-storage</artifactId>
+            <artifactId>cloud-engine-storage-default</artifactId>
             <version>5.1.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>

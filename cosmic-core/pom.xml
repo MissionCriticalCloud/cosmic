@@ -17,7 +17,17 @@
 
     <modules>
         <module>api</module>
-        <module>engine</module>
+        <module>engine/api</module>
+        <module>engine/components-api</module>
+        <module>engine/network</module>
+        <module>engine/orchestration</module>
+        <module>engine/schema</module>
+        <module>engine/storage/volume</module>
+        <module>engine/storage/cache</module>
+        <module>engine/storage/snapshot</module>
+        <module>engine/storage/default</module>
+        <module>engine/storage/datamotion</module>
+        <module>engine/storage/image</module>
         <module>framework/cluster</module>
         <module>framework/config</module>
         <module>framework/db</module>

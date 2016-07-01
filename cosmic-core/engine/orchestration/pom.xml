@@ -5,8 +5,9 @@
     <name>Cosmic Cloud Engine Orchestration Component</name>
     <parent>
         <groupId>cloud.cosmic</groupId>
-        <artifactId>cloud-engine</artifactId>
+        <artifactId>cosmic-core</artifactId>
         <version>5.1.0.2-SNAPSHOT</version>
+        <relativePath>../../</relativePath>
     </parent>
     <dependencies>
         <dependency>
@@ -39,8 +40,6 @@
             <artifactId>cloud-utils</artifactId>
             <version>5.1.0.2-SNAPSHOT</version>
         </dependency>
-        <!-- <dependency> <groupId>cloud.cosmic</groupId> <artifactId>cloud-server</artifactId>
-          <version>5.1.0.2-SNAPSHOT</version> </dependency> -->
     </dependencies>
     <build>
         <plugins>
