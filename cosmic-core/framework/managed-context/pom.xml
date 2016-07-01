@@ -7,10 +7,4 @@
         <artifactId>cosmic-framework</artifactId>
         <version>5.1.0.2-SNAPSHOT</version>
     </parent>
-    <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-    </dependencies>
 </project>
