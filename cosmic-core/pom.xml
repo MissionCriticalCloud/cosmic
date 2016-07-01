@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -16,38 +17,48 @@
 
     <modules>
         <module>api</module>
-        <module>nucleo</module>
-        <module>server</module>
-        <module>usage</module>
-        <module>utils</module>
         <module>engine</module>
-        <module>plugins/api/rate-limit</module>
-        <module>plugins/api/discovery</module>
-        <module>plugins/affinity-group-processors/host-anti-affinity</module>
-        <module>plugins/affinity-group-processors/explicit-dedication</module>
+        <module>framework/cluster</module>
+        <module>framework/config</module>
+        <module>framework/db</module>
+        <module>framework/events</module>
+        <module>framework/ipc</module>
+        <module>framework/jobs</module>
+        <module>framework/managed-context</module>
+        <module>framework/rest</module>
+        <module>framework/security</module>
+        <module>framework/spring/lifecycle</module>
+        <module>framework/spring/module</module>
+        <module>nucleo</module>
         <module>plugins/acl-static-role-based</module>
-        <module>plugins/storage/allocator-random</module>
-        <module>plugins/storage/volume-default</module>
-        <module>plugins/storage/image-default</module>
-        <module>plugins/storage/image-s3</module>
-        <module>plugins/network/internal-loadbalancer</module>
-        <module>plugins/host-allocator-random</module>
-        <module>plugins/deployment-planners/user-concentrated-pod</module>
-        <module>plugins/deployment-planners/user-dispersing</module>
-        <module>plugins/deployment-planners/implicit-dedication</module>
-        <module>plugins/deployment-planners/skip-heuristics</module>
-        <module>plugins/dedicated-resources</module>
-        <module>plugins/hypervisor/kvm</module>
-        <module>plugins/hypervisor/xenserver</module>
-        <module>plugins/hypervisor/ovm3</module>
+        <module>plugins/affinity-group-processors/explicit-dedication</module>
+        <module>plugins/affinity-group-processors/host-anti-affinity</module>
+        <module>plugins/api/discovery</module>
+        <module>plugins/api/rate-limit</module>
         <module>plugins/authentication/ldap</module>
         <module>plugins/authentication/sha256salted</module>
-        <module>plugins/network/nicira-nvp</module>
+        <module>plugins/dedicated-resources</module>
+        <module>plugins/deployment-planners/implicit-dedication</module>
+        <module>plugins/deployment-planners/skip-heuristics</module>
+        <module>plugins/deployment-planners/user-concentrated-pod</module>
+        <module>plugins/deployment-planners/user-dispersing</module>
         <module>plugins/event-bus-rabbitmq</module>
-        <module>framework</module>
+        <module>plugins/host-allocator-random</module>
+        <module>plugins/hypervisor/kvm</module>
+        <module>plugins/hypervisor/ovm3</module>
+        <module>plugins/hypervisor/xenserver</module>
+        <module>plugins/network/internal-loadbalancer</module>
+        <module>plugins/network/nicira-nvp</module>
+        <module>plugins/storage/allocator-random</module>
+        <module>plugins/storage/image-default</module>
+        <module>plugins/storage/image-s3</module>
+        <module>plugins/storage/volume-default</module>
+        <module>server</module>
         <module>services/console-proxy-server</module>
         <module>services/secondary-storage-controller</module>
         <module>services/secondary-storage-server</module>
+        <module>usage</module>
+        <module>utils</module>
     </modules>
 
     <dependencies>
