@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cloud.cosmic</groupId>
@@ -76,6 +77,8 @@
         <cs.ehcache-core.version>2.6.9</cs.ehcache-core.version>
         <cs.ejb-api.version>3.0</cs.ejb-api.version>
         <cs.esapi.version>2.1.0</cs.esapi.version>
+        <cs.gmaven-runtime-1.7.version>1.3</cs.gmaven-runtime-1.7.version>
+        <cs.groovy-all.version>2.0.5</cs.groovy-all.version>
         <cs.guava-testlib.version>18.0</cs.guava-testlib.version>
         <cs.guava.version>18.0</cs.guava.version>
         <cs.hamcrest-all.version>1.3</cs.hamcrest-all.version>
@@ -114,6 +117,29 @@
 
         <!-- MySQL is also used in the plugin section -->
         <cs.mysql.version>5.1.34</cs.mysql.version>
+
+        <!-- Plugin management properties -->
+        <cs.build-helper-maven-plugin.version>1.9.1</cs.build-helper-maven-plugin.version>
+        <cs.exec-maven-plugin.version>1.2.1</cs.exec-maven-plugin.version>
+        <cs.gmaven-plugin.version>1.3</cs.gmaven-plugin.version>
+        <cs.jacoco-maven-plugin.version>0.7.6.201602180812</cs.jacoco-maven-plugin.version>
+        <cs.ldap-maven-plugin.version>1.1.0</cs.ldap-maven-plugin.version>
+        <cs.maven-antrun-plugin.version>1.8</cs.maven-antrun-plugin.version>
+        <cs.maven-compiler-plugin.version>3.2</cs.maven-compiler-plugin.version>
+        <cs.maven-dependency-plugin.version>2.10</cs.maven-dependency-plugin.version>
+        <cs.maven-enforcer-plugin.version>1.4.1</cs.maven-enforcer-plugin.version>
+        <cs.maven-failsafe-plugin.version>2.18.1</cs.maven-failsafe-plugin.version>
+        <cs.maven-jar-plugin.version>2.5</cs.maven-jar-plugin.version>
+        <cs.maven-jetty-plugin.version>6.1.26</cs.maven-jetty-plugin.version>
+        <cs.maven-jettygzip-plugin.version>0.0.4</cs.maven-jettygzip-plugin.version>
+        <cs.maven-jgit-buildnumber-plugin.version>1.2.6</cs.maven-jgit-buildnumber-plugin.version>
+        <cs.maven-pmd-plugin.version>3.6</cs.maven-pmd-plugin.version>
+        <cs.maven-release-plugin.version>2.5.3</cs.maven-release-plugin.version>
+        <cs.maven-surefire-plugin.version>2.18.1</cs.maven-surefire-plugin.version>
+        <cs.maven-war-plugin.version>2.5</cs.maven-war-plugin.version>
+        <cs.properties-maven-plugin.version>1.0-alpha-2</cs.properties-maven-plugin.version>
+        <cs.sonar-maven-plugin.version>3.0.2</cs.sonar-maven-plugin.version>
+        <cs.tomcat7-maven-plugin.version>2.2</cs.tomcat7-maven-plugin.version>
     </properties>
 
     <licenses>
@@ -499,14 +525,54 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>com.btmatthews.maven.plugins</groupId>
+                    <artifactId>ldap-maven-plugin</artifactId>
+                    <version>${cs.ldap-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.gmaven</groupId>
+                    <artifactId>gmaven-plugin</artifactId>
+                    <version>${cs.gmaven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <version>${cs.properties-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>maven-jetty-plugin</artifactId>
+                    <version>${cs.maven-jetty-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>${cs.maven-war-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>${cs.exec-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.googlecode.todomap</groupId>
+                    <artifactId>maven-jettygzip-plugin</artifactId>
+                    <version>${cs.maven-jettygzip-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>ru.concerteza.buildnumber</groupId>
+                    <artifactId>maven-jgit-buildnumber-plugin</artifactId>
+                    <version>${cs.maven-jgit-buildnumber-plugin.version}</version>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.tomcat.maven</groupId>
                     <artifactId>tomcat7-maven-plugin</artifactId>
-                    <version>2.2</version>
+                    <version>${cs.tomcat7-maven-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.3</version>
+                    <version>${cs.maven-release-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
@@ -538,12 +604,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>1.8</version>
+                    <version>${cs.maven-antrun-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.2</version>
+                    <version>${cs.maven-compiler-plugin.version}</version>
                     <configuration>
                         <source>${cs.jdk.version}</source>
                         <target>${cs.jdk.version}</target>
@@ -556,12 +622,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>2.10</version>
+                    <version>${cs.maven-dependency-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.18.1</version>
+                    <version>${cs.maven-surefire-plugin.version}</version>
                     <configuration>
                         <argLine>-Djava.security.egd=file:/dev/./urandom -noverify</argLine>
                     </configuration>
@@ -569,19 +635,19 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>2.18.1</version>
+                    <version>${cs.maven-failsafe-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.6</version>
+                    <version>${cs.maven-pmd-plugin.version}</version>
                 </plugin>
 
                 <!-- TODO: review the follwoing plugins to evaluate if they should be here -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.5</version>
+                    <version>${cs.maven-jar-plugin.version}</version>
                     <configuration>
                         <archive>
                             <manifest>
@@ -594,7 +660,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>1.9.1</version>
+                    <version>${cs.build-helper-maven-plugin.version}</version>
                     <executions>
                         <execution>
                             <id>remove-old-installers</id>
@@ -610,12 +676,17 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>${cs.sonar-maven-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.7.6.201602180812</version>
+                    <version>${cs.jacoco-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${cs.maven-enforcer-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -623,7 +694,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
                 <executions>
                     <execution>
                         <id>enforce</id>
@@ -718,7 +788,6 @@
                     <plugin> <!-- Copy jacoco agent to /tmp -->
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>2.10</version>
                         <executions>
                             <execution>
                                 <id>copy-jacoco-agent-to-tmp</id>

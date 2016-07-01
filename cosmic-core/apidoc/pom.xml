@@ -38,7 +38,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -52,7 +51,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
                 <executions>
                     <execution>
                         <id>extract-commands-properties-file</id>
@@ -60,23 +58,16 @@
                         <goals>
                             <goal>exec</goal>
                         </goals>
+                        <configuration>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                            <executable>jar</executable>
+                            <arguments>
+                                <argument>-xf</argument>
+                                <argument>dependency/cloud-client-ui-${project.version}.war</argument>
+                                <argument>WEB-INF/classes/commands.properties</argument>
+                            </arguments>
+                        </configuration>
                     </execution>
-                </executions>
-                <configuration>
-                    <workingDirectory>${project.build.directory}</workingDirectory>
-                    <executable>jar</executable>
-                    <arguments>
-                        <argument>-xf</argument>
-                        <argument>dependency/cloud-client-ui-${project.version}.war</argument>
-                        <argument>WEB-INF/classes/commands.properties</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <executions>
                     <execution>
                         <id>compile</id>
                         <phase>compile</phase>
