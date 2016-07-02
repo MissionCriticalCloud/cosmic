@@ -245,16 +245,6 @@
                 <version>${cs.guava-testlib.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.jacoco</groupId>
-                <artifactId>org.jacoco.agent</artifactId>
-                <version>${cs.org.jacoco.agent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jacoco</groupId>
-                <artifactId>org.jacoco.agent.rt</artifactId>
-                <version>${cs.org.jacoco.agent.rt.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${cs.commons-lang3.version}</version>
@@ -674,16 +664,6 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.sonarsource.scanner.maven</groupId>
-                    <artifactId>sonar-maven-plugin</artifactId>
-                    <version>${cs.sonar-maven-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${cs.jacoco-maven-plugin.version}</version>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
                     <version>${cs.maven-enforcer-plugin.version}</version>
@@ -746,7 +726,35 @@
                     <artifactId>org.jacoco.agent</artifactId>
                 </dependency>
             </dependencies>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>org.jacoco.agent</artifactId>
+                        <version>${cs.org.jacoco.agent.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>org.jacoco.agent.rt</artifactId>
+                        <version>${cs.org.jacoco.agent.rt.version}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
             <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.sonarsource.scanner.maven</groupId>
+                            <artifactId>sonar-maven-plugin</artifactId>
+                            <version>${cs.sonar-maven-plugin.version}</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.jacoco</groupId>
+                            <artifactId>jacoco-maven-plugin</artifactId>
+                            <version>${cs.jacoco-maven-plugin.version}</version>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
                 <plugins>
                     <plugin>
                         <groupId>org.sonarsource.scanner.maven</groupId>
