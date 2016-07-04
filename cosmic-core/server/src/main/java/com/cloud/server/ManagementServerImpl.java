@@ -992,15 +992,6 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
             throw new InvalidParameterValueException("privatePort is an invalid value");
         }
 
-        // s_logger.debug("Checking if " + privateIp +
-        // " is a valid private IP address. Guest IP address is: " +
-        // _configs.get("guest.ip.network"));
-        //
-        // if (!NetUtils.isValidPrivateIp(privateIp,
-        // _configs.get("guest.ip.network"))) {
-        // throw new
-        // InvalidParameterValueException("Invalid private ip address");
-        // }
         if (!NetUtils.isValidProto(proto)) {
             throw new InvalidParameterValueException("Invalid protocol");
         }
