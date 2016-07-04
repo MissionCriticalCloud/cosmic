@@ -137,10 +137,10 @@ public class CreateApplicationLoadBalancerCmd extends BaseAsyncCreateCmd {
             lbResponse.setResponseName(getCommandName());
         } catch (final Exception ex) {
             s_logger.warn("Failed to create load balancer due to exception ", ex);
-        } finally {
-            if (rule == null) {
-                throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create load balancer");
-            }
+        }
+
+        if (rule == null) {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create load balancer");
         }
     }
 
