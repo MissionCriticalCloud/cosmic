@@ -85,7 +85,7 @@ public class NetUtils {
             final InetAddress addr = InetAddress.getByName(host);
             return ipFromInetAddress(addr);
         } catch (final UnknownHostException e) {
-            s_logger.warn("Unable to resolve " + host + " to IP due to UnknownHostException");
+            s_logger.warn("Unable to resolve " + host + " to IP due to UnknownHostException", e);
             return null;
         }
     }
@@ -165,8 +165,8 @@ public class NetUtils {
             String[] info = null;
             try {
                 info = NetUtils.getNetworkParams(nic);
-            } catch (final NullPointerException ignored) {
-                s_logger.debug("Caught NullPointerException when trying to getDefaultHostIp");
+            } catch (final NullPointerException e) {
+                s_logger.debug("Caught NullPointerException when trying to getDefaultHostIp", e);
             }
             if (info != null) {
                 return info[0];
@@ -417,6 +417,7 @@ public class NetUtils {
             addr = InetAddress.getByName(strAddress);
             return isLocalAddress(addr);
         } catch (final UnknownHostException e) {
+            s_logger.warn("Cannot determine if address '" + strAddress + "' is local", e);
         }
         return false;
     }
@@ -1254,8 +1255,8 @@ public class NetUtils {
             if (endInt != null && startInt != null && startInt.compareTo(endInt) <= 0) {
                 return endInt.subtract(startInt).add(BigInteger.ONE);
             }
-        } catch (final IllegalArgumentException ex) {
-            s_logger.error("Failed to convert a string to an IPv6 address", ex);
+        } catch (final IllegalArgumentException e) {
+            s_logger.error("Failed to convert a string to an IPv6 address", e);
         }
         return null;
     }
@@ -1354,16 +1355,16 @@ public class NetUtils {
     public static String standardizeIp6Address(final String ip6Addr) {
         try {
             return IPv6Address.fromString(ip6Addr).toString();
-        } catch (final IllegalArgumentException ex) {
-            throw new IllegalArgumentException("Invalid IPv6 address: " + ex.getMessage());
+        } catch (final IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid IPv6 address: " + e.getMessage(), e);
         }
     }
 
     public static String standardizeIp6Cidr(final String ip6Cidr) {
         try {
             return IPv6Network.fromString(ip6Cidr).toString();
-        } catch (final IllegalArgumentException ex) {
-            throw new IllegalArgumentException("Invalid IPv6 CIDR: " + ex.getMessage());
+        } catch (final IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid IPv6 CIDR: " + e.getMessage(), e);
         }
     }
 
