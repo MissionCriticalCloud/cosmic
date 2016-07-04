@@ -2,7 +2,6 @@ package org.apache.cloudstack.framework.codestyle;
 
 import org.apache.cloudstack.framework.async.AsyncCallFuture;
 import org.apache.cloudstack.framework.async.AsyncCallbackDispatcher;
-import org.apache.cloudstack.framework.async.AsyncCallbackDriver;
 import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
 import org.apache.cloudstack.framework.async.AsyncRpcContext;
 
@@ -18,7 +17,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/SampleManagementServerAppContext.xml")
 public class AsyncSampleEventDrivenStyleCaller {
-    AsyncCallbackDriver _callbackDriver;
     private AsyncSampleCallee _ds;
 
     public static void main(final String[] args) {
@@ -29,7 +27,6 @@ public class AsyncSampleEventDrivenStyleCaller {
     @Test
     public void MethodThatWillCallAsyncMethod() {
         final String vol = new String("Hello");
-        final AsyncCallbackDispatcher<AsyncSampleEventDrivenStyleCaller, Object> caller = AsyncCallbackDispatcher.create(this);
         final AsyncCallFuture<String> future = _ds.createVolume(vol);
         try {
             final String result = future.get();

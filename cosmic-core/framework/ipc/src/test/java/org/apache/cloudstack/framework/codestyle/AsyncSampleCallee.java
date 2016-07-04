@@ -4,8 +4,6 @@ import org.apache.cloudstack.framework.async.AsyncCallFuture;
 import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
 
 public class AsyncSampleCallee {
-    AsyncSampleCallee _driver;
-
     public AsyncCallFuture<String> createVolume(final Object realParam) {
 
         final String result = realParam.toString();
