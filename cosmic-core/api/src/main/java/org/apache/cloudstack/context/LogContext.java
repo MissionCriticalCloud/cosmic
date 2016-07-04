@@ -101,7 +101,7 @@ public class LogContext {
             callingContext = new LogContext(userId, accountId, contextId);
         }
         s_currentContext.set(callingContext);
-        MDC.put("logcontextid", UuidUtils.first(contextId));
+        MDC.put("logcontextid", " (logid: " + UuidUtils.first(contextId) + ")");
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("Registered for log: " + callingContext);
         }
