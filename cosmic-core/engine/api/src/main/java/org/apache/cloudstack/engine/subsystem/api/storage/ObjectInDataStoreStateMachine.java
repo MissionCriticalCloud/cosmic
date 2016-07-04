@@ -16,7 +16,7 @@ public interface ObjectInDataStoreStateMachine extends StateObject<ObjectInDataS
         Failed("Failed to download template");
         String _description;
 
-        private State(final String description) {
+        State(final String description) {
             _description = description;
         }
 

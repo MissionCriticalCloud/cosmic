@@ -12,19 +12,19 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>${project.version}</version>
+            <version>5.1.0.2-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-schema</artifactId>
-            <version>${project.version}</version>
+            <version>5.1.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-components-api</artifactId>
-            <version>${project.version}</version>
+            <version>5.1.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>commons-daemon</groupId>
@@ -142,7 +142,7 @@
                             <dependency>
                                 <groupId>cloud.cosmic</groupId>
                                 <artifactId>cloud-usage</artifactId>
-                                <version>${project.version}</version>
+                                <version>5.1.0.2-SNAPSHOT</version>
                             </dependency>
                         </dependencies>
                         <executions>

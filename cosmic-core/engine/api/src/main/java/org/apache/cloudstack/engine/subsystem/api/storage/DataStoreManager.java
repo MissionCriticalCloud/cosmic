@@ -19,8 +19,6 @@ public interface DataStoreManager {
 
     List<DataStore> getImageCacheStores(Scope scope);
 
-    DataStore getImageCacheStore(long zoneId);
-
     List<DataStore> listImageStores();
 
     List<DataStore> listImageCacheStores();

@@ -5,11 +5,6 @@ import com.cloud.hypervisor.Hypervisor.HypervisorType;
 public interface HostEntity extends DataCenterResourceEntity {
 
     /**
-     * @return total amount of memory.
-     */
-    Long getTotalMemory();
-
-    /**
      * @return # of cores in a machine.  Note two cpus with two cores each returns 4.
      */
     Integer getCpus();

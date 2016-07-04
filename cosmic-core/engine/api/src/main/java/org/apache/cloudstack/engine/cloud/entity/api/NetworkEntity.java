@@ -6,15 +6,5 @@ import org.apache.cloudstack.engine.entity.api.CloudStackEntity;
 import java.util.List;
 
 public interface NetworkEntity extends CloudStackEntity, Network {
-    void routeTo(NetworkEntity network);
-
-    List<EdgeService> listEdgeServicesTo();
-
-    List<String> listVirtualMachineUuids();
-
     List<VirtualMachineEntity> listVirtualMachines();
-
-    List<NicEntity> listNics();
-
-    void addIpRange();
 }

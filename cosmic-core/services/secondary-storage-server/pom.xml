@@ -29,12 +29,12 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-agent</artifactId>
-            <version>${project.version}</version>
+            <version>5.1.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-server</artifactId>
-            <version>${project.version}</version>
+            <version>5.1.0.2-SNAPSHOT</version>
         </dependency>
         <!-- dependencies for starting a post upload server on ssvm -->
         <dependency>

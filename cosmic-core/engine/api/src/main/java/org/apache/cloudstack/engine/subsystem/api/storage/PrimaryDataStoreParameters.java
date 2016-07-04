@@ -177,10 +177,6 @@ public class PrimaryDataStoreParameters {
         return capacityIops;
     }
 
-    public void setCapacityIops(final Long capacityIops) {
-        this.capacityIops = capacityIops;
-    }
-
     public HypervisorType getHypervisorType() {
         return hypervisorType;
     }
@@ -235,15 +231,7 @@ public class PrimaryDataStoreParameters {
         return capacityBytes;
     }
 
-    public void setCapacityBytes(final long capacityBytes) {
-        this.capacityBytes = capacityBytes;
-    }
-
     public long getUsedBytes() {
         return usedBytes;
-    }
-
-    public void setUsedBytes(final long usedBytes) {
-        this.usedBytes = usedBytes;
     }
 }

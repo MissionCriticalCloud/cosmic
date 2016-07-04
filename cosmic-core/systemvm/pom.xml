@@ -15,17 +15,17 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-agent</artifactId>
-            <version>${project.version}</version>
+            <version>5.1.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-secondary-storage</artifactId>
-            <version>${project.version}</version>
+            <version>5.1.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-console-proxy</artifactId>
-            <version>${project.version}</version>
+            <version>5.1.0.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>

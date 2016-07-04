@@ -3,7 +3,6 @@ package org.apache.cloudstack.engine.cloud.entity.api;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
-import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.CloudException;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -40,28 +39,9 @@ public interface VirtualMachineEntity extends CloudStackEntity {
     List<VolumeEntity> listVolumes();
 
     /**
-     * @return List of uuids for nics attached to this virtual machine.
-     */
-    List<String> listNicUuids();
-
-    /**
-     * @return List of nics attached to this virtual machine.
-     */
-    List<NicEntity> listNics();
-
-    /**
      * @return the template this virtual machine is based off.
      */
     TemplateEntity getTemplate();
-
-    /**
-     * @return the list of tags associated with the virtual machine
-     */
-    List<String> listTags();
-
-    void addTag();
-
-    void delTag();
 
     /**
      * Start the virtual machine with a given deployment plan
@@ -75,13 +55,6 @@ public interface VirtualMachineEntity extends CloudStackEntity {
             ResourceUnavailableException;
 
     /**
-     * Migrate this VM to a certain destination.
-     *
-     * @param reservationId reservation id from reserve call.
-     */
-    void migrateTo(String reservationId, String caller);
-
-    /**
      * Deploy this virtual machine according to the reservation from before.
      *
      * @param reservationId reservation id from reserve call.
@@ -91,7 +64,7 @@ public interface VirtualMachineEntity extends CloudStackEntity {
     /**
      * Stop the virtual machine
      */
-    boolean stop(String caller) throws ResourceUnavailableException, CloudException;
+    boolean stop(String caller) throws CloudException;
 
     /**
      * Cleans up after any botched starts.  CloudStack Orchestration Platform
@@ -103,7 +76,7 @@ public interface VirtualMachineEntity extends CloudStackEntity {
     /**
      * Destroys the VM.
      */
-    boolean destroy(String caller) throws AgentUnavailableException, CloudException, ConcurrentOperationException;
+    boolean destroy(String caller) throws CloudException, ConcurrentOperationException;
 
     /**
      * Duplicate this VM in the database so that it will start new
@@ -112,11 +85,6 @@ public interface VirtualMachineEntity extends CloudStackEntity {
      * @return a new VirtualMachineEntity
      */
     VirtualMachineEntity duplicate(String externalId);
-
-    /**
-     * Take a VM snapshot
-     */
-    SnapshotEntity takeSnapshotOf();
 
     /**
      * Attach volume to this VM
@@ -132,19 +100,4 @@ public interface VirtualMachineEntity extends CloudStackEntity {
      * @param volume volume to detach
      */
     void detach(VolumeEntity volume);
-
-    /**
-     * Connect the VM to a network
-     *
-     * @param network  network to attach
-     * @param deviceId device id to use when a nic is created
-     */
-    void connectTo(NetworkEntity network, short nicId);
-
-    /**
-     * Disconnect the VM from this network
-     *
-     * @param netowrk network to disconnect from
-     */
-    void disconnectFrom(NetworkEntity netowrk, short nicId);
 }

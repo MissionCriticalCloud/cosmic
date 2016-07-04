@@ -1,14 +1,11 @@
 package org.apache.cloudstack.engine.datacenter.entity.api;
 
-import com.cloud.org.Cluster;
 import com.cloud.org.Grouping.AllocationState;
 import com.cloud.utils.fsm.NoTransitionException;
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineHostPodVO;
 
-import java.lang.reflect.Method;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 public class PodEntityImpl implements PodEntity {
@@ -129,31 +126,8 @@ public class PodEntityImpl implements PodEntity {
 
     }
 
-    @Override
-    public void delDetail(final String name, final String value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void updateDetail(final String name, final String value) {
-
-    }
-
-    @Override
-    public List<Method> getApplicableActions() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public void setOwner(final String owner) {
         podVO.setOwner(owner);
-    }
-
-    @Override
-    public List<Cluster> listClusters() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -179,10 +153,5 @@ public class PodEntityImpl implements PodEntity {
     @Override
     public AllocationState getAllocationState() {
         return podVO.getAllocationState();
-    }
-
-    @Override
-    public boolean getExternalDhcp() {
-        return podVO.getExternalDhcp();
     }
 }

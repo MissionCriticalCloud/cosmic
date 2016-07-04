@@ -1,16 +1,12 @@
 package org.apache.cloudstack.engine.datacenter.entity.api;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.org.Cluster.ClusterType;
 import com.cloud.org.Grouping.AllocationState;
-import com.cloud.org.Managed.ManagedState;
 import com.cloud.utils.fsm.NoTransitionException;
 import org.apache.cloudstack.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineClusterVO;
 
-import java.lang.reflect.Method;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 public class ClusterEntityImpl implements ClusterEntity {
@@ -129,25 +125,6 @@ public class ClusterEntityImpl implements ClusterEntity {
     @Override
     public void addDetail(final String name, final String value) {
         // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void delDetail(final String name, final String value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void updateDetail(final String name, final String value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public List<Method> getApplicableActions() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public void setOwner(final String owner) {
@@ -170,17 +147,7 @@ public class ClusterEntityImpl implements ClusterEntity {
     }
 
     @Override
-    public ClusterType getClusterType() {
-        return clusterVO.getClusterType();
-    }
-
-    @Override
     public AllocationState getAllocationState() {
         return clusterVO.getAllocationState();
-    }
-
-    @Override
-    public ManagedState getManagedState() {
-        return clusterVO.getManagedState();
     }
 }

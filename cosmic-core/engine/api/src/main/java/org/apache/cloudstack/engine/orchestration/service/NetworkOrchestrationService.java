@@ -178,42 +178,26 @@ public interface NetworkOrchestrationService {
      * @throws InsufficientCapacityException
      * @throws ResourceUnavailableException
      */
-    NicProfile prepareNic(VirtualMachineProfile vmProfile, DeployDestination dest, ReservationContext context, long nicId,
-                          Network network)
-            throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException,
-            ConcurrentOperationException, InsufficientCapacityException,
-            ResourceUnavailableException;
+    NicProfile prepareNic(VirtualMachineProfile vmProfile, DeployDestination dest, ReservationContext context, long nicId, Network network) throws ConcurrentOperationException,
+            InsufficientCapacityException, ResourceUnavailableException;
 
     void removeNic(VirtualMachineProfile vm, Nic nic);
-
-    /**
-     * @param network
-     * @param provider
-     * @return
-     */
-    boolean setupDns(Network network, Provider provider);
 
     void releaseNic(VirtualMachineProfile vmProfile, Nic nic)
             throws ConcurrentOperationException, ResourceUnavailableException;
 
-    NicProfile createNicForVm(Network network, NicProfile requested, ReservationContext context,
-                              VirtualMachineProfile vmProfile, boolean prepare)
-            throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException,
-            ConcurrentOperationException, InsufficientCapacityException,
-            ResourceUnavailableException;
+    NicProfile createNicForVm(Network network, NicProfile requested, ReservationContext context, VirtualMachineProfile vmProfile, boolean prepare) throws
+            ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException;
 
     NetworkProfile convertNetworkToNetworkProfile(long networkId);
 
-    boolean restartNetwork(Long networkId, Account callerAccount, User callerUser, boolean cleanup)
-            throws ConcurrentOperationException, ResourceUnavailableException,
+    boolean restartNetwork(Long networkId, Account callerAccount, User callerUser, boolean cleanup) throws ConcurrentOperationException, ResourceUnavailableException,
             InsufficientCapacityException;
 
     boolean shutdownNetworkElementsAndResources(ReservationContext context, boolean b, Network network);
 
-    void implementNetworkElementsAndResources(DeployDestination dest, ReservationContext context, Network network,
-                                              NetworkOffering findById)
-            throws ConcurrentOperationException, InsufficientAddressCapacityException, ResourceUnavailableException,
-            InsufficientCapacityException;
+    void implementNetworkElementsAndResources(DeployDestination dest, ReservationContext context, Network network, NetworkOffering findById) throws ConcurrentOperationException,
+            ResourceUnavailableException, InsufficientCapacityException;
 
     Map<String, String> finalizeServicesAndProvidersForNetwork(NetworkOffering offering, Long physicalNetworkId);
 

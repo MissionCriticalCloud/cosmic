@@ -7,8 +7,6 @@ import org.apache.cloudstack.engine.datacenter.entity.api.db.EngineDataCenterVO;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -82,23 +80,6 @@ public class ZoneEntityImpl implements ZoneEntity, FiniteStateObject<DataCenterR
     }
 
     @Override
-    public void delDetail(final String name, final String value) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void updateDetail(final String name, final String value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public List<Method> getApplicableActions() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public boolean enable() {
         try {
             manager.changeState(this, Event.EnableRequest);
@@ -166,13 +147,5 @@ public class ZoneEntityImpl implements ZoneEntity, FiniteStateObject<DataCenterR
     public List<PodEntity> listPods() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public List<String> listPodIds() {
-        final List<String> podIds = new ArrayList<>();
-        podIds.add("pod-uuid-1");
-        podIds.add("pod-uuid-2");
-        return podIds;
     }
 }

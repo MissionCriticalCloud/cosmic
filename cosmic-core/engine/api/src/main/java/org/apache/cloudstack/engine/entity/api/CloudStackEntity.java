@@ -1,9 +1,7 @@
 package org.apache.cloudstack.engine.entity.api;
 
 import javax.ws.rs.GET;
-import java.lang.reflect.Method;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,13 +61,4 @@ public interface CloudStackEntity {
     Map<String, String> getDetails();
 
     void addDetail(String name, String value);
-
-    void delDetail(String name, String value);
-
-    void updateDetail(String name, String value);
-
-    /**
-     * @return list of actions that can be performed on the object in its current state
-     */
-    List<Method> getApplicableActions();
 }
