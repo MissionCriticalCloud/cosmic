@@ -157,8 +157,6 @@ public class CreateGlobalLoadBalancerRuleCmd extends BaseAsyncCreateCmd {
         } catch (final Exception ex) {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.PARAM_ERROR, ex.getMessage());
-        } finally {
-
         }
     }
 

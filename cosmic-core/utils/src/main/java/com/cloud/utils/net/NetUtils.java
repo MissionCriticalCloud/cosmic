@@ -80,16 +80,6 @@ public class NetUtils {
         return "localhost";
     }
 
-    public static String resolveToIp(final String host) {
-        try {
-            final InetAddress addr = InetAddress.getByName(host);
-            return ipFromInetAddress(addr);
-        } catch (final UnknownHostException e) {
-            s_logger.warn("Unable to resolve " + host + " to IP due to UnknownHostException");
-            return null;
-        }
-    }
-
     public static String ipFromInetAddress(final InetAddress addr) {
         assert addr != null;
 
@@ -165,8 +155,8 @@ public class NetUtils {
             String[] info = null;
             try {
                 info = NetUtils.getNetworkParams(nic);
-            } catch (final NullPointerException ignored) {
-                s_logger.debug("Caught NullPointerException when trying to getDefaultHostIp");
+            } catch (final NullPointerException e) {
+                s_logger.debug("Caught NullPointerException when trying to getDefaultHostIp", e);
             }
             if (info != null) {
                 return info[0];
@@ -332,24 +322,6 @@ public class NetUtils {
         return long2Ip(addr);
     }
 
-    public static InetAddress getFirstNonLoopbackLocalInetAddress() {
-        final InetAddress[] addrs = getAllLocalInetAddresses();
-        if (addrs != null) {
-            for (final InetAddress addr : addrs) {
-                if (s_logger.isInfoEnabled()) {
-                    s_logger.info("Check local InetAddress : " + addr.toString() + ", total count :" + addrs.length);
-                }
-
-                if (!addr.isLoopbackAddress()) {
-                    return addr;
-                }
-            }
-        }
-
-        s_logger.warn("Unable to determine a non-loopback address, local inet address count :" + addrs.length);
-        return null;
-    }
-
     public static InetAddress[] getAllLocalInetAddresses() {
         final List<InetAddress> addrList = new ArrayList<>();
         try {
@@ -417,6 +389,7 @@ public class NetUtils {
             addr = InetAddress.getByName(strAddress);
             return isLocalAddress(addr);
         } catch (final UnknownHostException e) {
+            s_logger.warn("Cannot determine if address '" + strAddress + "' is local", e);
         }
         return false;
     }
@@ -450,22 +423,6 @@ public class NetUtils {
             formatter.close();
         }
         return sb.toString();
-    }
-
-    public static long getMacAddressAsLong(final InetAddress address) {
-        long macAddressAsLong = 0;
-        try {
-            final NetworkInterface ni = NetworkInterface.getByInetAddress(address);
-            final byte[] mac = ni.getHardwareAddress();
-
-            for (int i = 0; i < mac.length; i++) {
-                macAddressAsLong |= (long) (mac[i] & 0xff) << (mac.length - i - 1) * 8;
-            }
-        } catch (final SocketException e) {
-            s_logger.error("SocketException when trying to retrieve MAC address", e);
-        }
-
-        return macAddressAsLong;
     }
 
     /**
@@ -508,30 +465,6 @@ public class NetUtils {
         } catch (final SocketException e) {
             return null;
         }
-    }
-
-    public static boolean isValidPrivateIp(final String ipAddress, final String guestIPAddress) {
-
-        final InetAddress privIp = parseIpAddress(ipAddress);
-        if (privIp == null) {
-            return false;
-        }
-        if (!privIp.isSiteLocalAddress()) {
-            return false;
-        }
-
-        String firstGuestOctet = "10";
-        if (guestIPAddress != null && !guestIPAddress.isEmpty()) {
-            final String[] guestIPList = guestIPAddress.split("\\.");
-            firstGuestOctet = guestIPList[0];
-        }
-
-        final String[] ipList = ipAddress.split("\\.");
-        if (!ipList[0].equals(firstGuestOctet)) {
-            return false;
-        }
-
-        return true;
     }
 
     private static InetAddress parseIpAddress(final String address) {
@@ -726,23 +659,6 @@ public class NetUtils {
         return getSubNet(ip, netmask);
     }
 
-    public static String[] ipAndNetMaskToRange(final String ip, final String netmask) {
-        final long ipAddr = ip2Long(ip);
-        long subnet = ip2Long(netmask);
-        final long start = (ipAddr & subnet) + 1;
-        long end = start;
-        int bits = subnet == 0 ? 0 : 1;
-        while ((subnet = subnet >> 1 & subnet) != 0) {
-            bits++;
-        }
-        end = end >> MAX_CIDR - bits;
-
-        end++;
-        end = (end << MAX_CIDR - bits) - 2;
-
-        return new String[]{long2Ip(start), long2Ip(end)};
-    }
-
     public static Pair<String, Integer> getCidr(final String cidr) {
         final String[] tokens = cidr.split("/");
         return new Pair<>(tokens[0], Integer.parseInt(tokens[1]));
@@ -861,15 +777,6 @@ public class NetUtils {
 
     public static boolean isValidPort(final int p) {
         return !(p > 65535 || p < 1);
-    }
-
-    public static boolean isValidLBPort(final String p) {
-        try {
-            final int port = Integer.parseInt(p);
-            return !(port > 65535 || port < 1);
-        } catch (final NumberFormatException e) {
-            return false;
-        }
     }
 
     public static boolean isValidProto(final String p) {
@@ -1254,8 +1161,8 @@ public class NetUtils {
             if (endInt != null && startInt != null && startInt.compareTo(endInt) <= 0) {
                 return endInt.subtract(startInt).add(BigInteger.ONE);
             }
-        } catch (final IllegalArgumentException ex) {
-            s_logger.error("Failed to convert a string to an IPv6 address", ex);
+        } catch (final IllegalArgumentException e) {
+            s_logger.error("Failed to convert a string to an IPv6 address", e);
         }
         return null;
     }
@@ -1354,16 +1261,16 @@ public class NetUtils {
     public static String standardizeIp6Address(final String ip6Addr) {
         try {
             return IPv6Address.fromString(ip6Addr).toString();
-        } catch (final IllegalArgumentException ex) {
-            throw new IllegalArgumentException("Invalid IPv6 address: " + ex.getMessage());
+        } catch (final IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid IPv6 address: " + e.getMessage(), e);
         }
     }
 
     public static String standardizeIp6Cidr(final String ip6Cidr) {
         try {
             return IPv6Network.fromString(ip6Cidr).toString();
-        } catch (final IllegalArgumentException ex) {
-            throw new IllegalArgumentException("Invalid IPv6 CIDR: " + ex.getMessage());
+        } catch (final IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid IPv6 CIDR: " + e.getMessage(), e);
         }
     }
 

@@ -178,11 +178,10 @@ public class CreateAutoScaleVmGroupCmd extends BaseAsyncCreateCmd {
         } catch (final Exception ex) {
             // TODO what will happen if Resource Layer fails in a step inbetween
             s_logger.warn("Failed to create autoscale vm group", ex);
-        } finally {
-            if (!success || vmGroup == null) {
-                _autoScaleService.deleteAutoScaleVmGroup(getEntityId());
-                throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create Autoscale Vm Group");
-            }
+        }
+        if (!success || vmGroup == null) {
+            _autoScaleService.deleteAutoScaleVmGroup(getEntityId());
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create Autoscale Vm Group");
         }
     }
 
