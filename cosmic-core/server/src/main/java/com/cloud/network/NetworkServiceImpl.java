@@ -171,13 +171,14 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * NetworkServiceImpl implements NetworkService.
  */
 public class NetworkServiceImpl extends ManagerBase implements NetworkService {
-    private static final Logger s_logger = Logger.getLogger(NetworkServiceImpl.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(NetworkServiceImpl.class);
 
     private static final long MIN_VLAN_ID = 0L;
     private static final long MAX_VLAN_ID = 4095L; // 2^12 - 1
