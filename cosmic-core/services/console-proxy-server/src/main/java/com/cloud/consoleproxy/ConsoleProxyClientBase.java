@@ -8,7 +8,8 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * an instance of specialized console protocol implementation, such as VNC
@@ -16,7 +17,7 @@ import org.apache.log4j.Logger;
  * It mainly implements the features needed by front-end AJAX viewer
  */
 public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, ConsoleProxyClientListener {
-    private static final Logger s_logger = Logger.getLogger(ConsoleProxyClientBase.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyClientBase.class);
 
     private static int s_nextClientId = 0;
     protected int clientId = getNextClientId();

@@ -8,13 +8,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.UnknownHostException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * ConsoleProxyVncClient bridges a VNC engine with the front-end AJAX viewer
  */
 public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
-    private static final Logger s_logger = Logger.getLogger(ConsoleProxyVncClient.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyVncClient.class);
 
     private static final int SHIFT_KEY_MASK = 64;
     private static final int CTRL_KEY_MASK = 128;

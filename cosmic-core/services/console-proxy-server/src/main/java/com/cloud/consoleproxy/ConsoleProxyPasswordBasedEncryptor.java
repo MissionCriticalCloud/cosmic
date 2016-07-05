@@ -13,7 +13,8 @@ import java.security.NoSuchAlgorithmException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Kelven Yang
@@ -21,7 +22,7 @@ import org.apache.log4j.Logger;
  *         and deserialize it back.
  */
 public class ConsoleProxyPasswordBasedEncryptor {
-    private static final Logger s_logger = Logger.getLogger(ConsoleProxyPasswordBasedEncryptor.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyPasswordBasedEncryptor.class);
 
     private final Gson gson;
 

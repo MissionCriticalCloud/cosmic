@@ -22,6 +22,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 //
 // This file is originally from XenConsole with modifications
 //
@@ -32,7 +35,7 @@ import java.util.regex.Pattern;
  * connections and import/export operations.
  */
 public final class RawHTTP {
-    private static final Logger s_logger = Logger.getLogger(RawHTTP.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(RawHTTP.class);
 
     private static final Pattern END_PATTERN = Pattern.compile("^\r\n$");
     private static final Pattern HEADER_PATTERN = Pattern.compile("^([A-Z_a-z0-9-]+):\\s*(.*)\r\n$");

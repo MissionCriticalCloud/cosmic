@@ -1,7 +1,6 @@
 package com.cloud.consoleproxy.vnc;
 
 import com.cloud.consoleproxy.ConsoleProxyClientListener;
-import com.cloud.consoleproxy.util.Logger;
 import com.cloud.consoleproxy.vnc.packet.server.FramebufferUpdatePacket;
 import com.cloud.consoleproxy.vnc.packet.server.ServerCutText;
 
@@ -10,8 +9,11 @@ import java.awt.datatransfer.StringSelection;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class VncServerPacketReceiver implements Runnable {
-    private static final Logger s_logger = Logger.getLogger(VncServerPacketReceiver.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(VncServerPacketReceiver.class);
 
     private final VncScreenDescription screen;
     private final FrameBufferUpdateListener fburListener;

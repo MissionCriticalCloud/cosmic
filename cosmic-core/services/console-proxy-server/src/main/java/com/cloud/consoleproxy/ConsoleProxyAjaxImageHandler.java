@@ -1,7 +1,5 @@
 package com.cloud.consoleproxy;
 
-import com.cloud.consoleproxy.util.Logger;
-
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -13,9 +11,11 @@ import java.util.Map;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConsoleProxyAjaxImageHandler implements HttpHandler {
-    private static final Logger s_logger = Logger.getLogger(ConsoleProxyAjaxImageHandler.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyAjaxImageHandler.class);
 
     @Override
     public void handle(final HttpExchange t) throws IOException {

@@ -1,6 +1,5 @@
 package com.cloud.consoleproxy;
 
-import com.cloud.consoleproxy.util.Logger;
 import com.cloud.utils.PropertiesUtil;
 
 import java.io.File;
@@ -24,6 +23,8 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.xml.DOMConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * ConsoleProxy, singleton class that manages overall activities in console proxy process. To make legacy code work, we still
@@ -32,7 +33,7 @@ public class ConsoleProxy {
     public static final int KEYBOARD_RAW = 0;
     public static final int KEYBOARD_COOKED = 1;
     public static final int VIEWER_LINGER_SECONDS = 180;
-    private static final Logger s_logger = Logger.getLogger(ConsoleProxy.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxy.class);
     public static Object context;
 
     // this has become more ugly, to store keystore info passed from management server (we now use management server managed keystore to support
@@ -93,7 +94,6 @@ public class ConsoleProxy {
         }
 
         configLog4j();
-        Logger.setFactory(new ConsoleProxyLoggerFactory());
 
         // Using reflection to setup private/secure communication channel towards management server
         ConsoleProxy.context = context;

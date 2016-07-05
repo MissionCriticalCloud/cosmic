@@ -1,13 +1,15 @@
 package com.cloud.consoleproxy.vnc.packet.server;
 
-import com.cloud.consoleproxy.util.Logger;
 import com.cloud.consoleproxy.vnc.RfbConstants;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ServerCutText {
-    private static final Logger s_logger = Logger.getLogger(ServerCutText.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(ServerCutText.class);
 
     private String content;
 

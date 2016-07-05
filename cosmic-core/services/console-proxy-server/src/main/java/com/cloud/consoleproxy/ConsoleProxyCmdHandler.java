@@ -1,7 +1,5 @@
 package com.cloud.consoleproxy;
 
-import com.cloud.consoleproxy.util.Logger;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -9,9 +7,11 @@ import java.io.OutputStreamWriter;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConsoleProxyCmdHandler implements HttpHandler {
-    private static final Logger s_logger = Logger.getLogger(ConsoleProxyCmdHandler.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyCmdHandler.class);
 
     @Override
     public void handle(final HttpExchange t) throws IOException {

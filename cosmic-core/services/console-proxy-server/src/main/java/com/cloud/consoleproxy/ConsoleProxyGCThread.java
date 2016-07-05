@@ -4,7 +4,8 @@ import java.io.File;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * ConsoleProxyGCThread does house-keeping work for the process, it helps cleanup log files,
@@ -12,7 +13,7 @@ import org.apache.log4j.Logger;
  * management software
  */
 public class ConsoleProxyGCThread extends Thread {
-    private static final Logger s_logger = Logger.getLogger(ConsoleProxyGCThread.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyGCThread.class);
 
     private final static int MAX_SESSION_IDLE_SECONDS = 180;
 

@@ -1,6 +1,5 @@
 package com.cloud.consoleproxy.vnc;
 
-import com.cloud.consoleproxy.util.Logger;
 import com.cloud.consoleproxy.vnc.packet.client.ClientPacket;
 import com.cloud.consoleproxy.vnc.packet.client.FramebufferUpdateRequestPacket;
 import com.cloud.consoleproxy.vnc.packet.client.KeyboardEventPacket;
@@ -19,8 +18,11 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class VncClientPacketSender implements Runnable, PaintNotificationListener, KeyListener, MouseListener, MouseMotionListener, FrameBufferUpdateListener {
-    private static final Logger s_logger = Logger.getLogger(VncClientPacketSender.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(VncClientPacketSender.class);
 
     // Queue for outgoing packets
     private final BlockingQueue<ClientPacket> queue = new ArrayBlockingQueue<>(30);

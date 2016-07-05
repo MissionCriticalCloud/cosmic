@@ -17,10 +17,11 @@ import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFactory {
-    private static final Logger s_logger = Logger.getLogger(ConsoleProxySecureServerFactoryImpl.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxySecureServerFactoryImpl.class);
 
     private SSLContext sslContext = null;
 

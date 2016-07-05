@@ -1,6 +1,5 @@
 package com.cloud.consoleproxy.vnc.packet.server;
 
-import com.cloud.consoleproxy.util.Logger;
 import com.cloud.consoleproxy.vnc.VncScreenDescription;
 
 import java.awt.Graphics2D;
@@ -10,8 +9,11 @@ import java.awt.image.DataBufferInt;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class RawRect extends AbstractRect {
-    private static final Logger s_logger = Logger.getLogger(RawRect.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(RawRect.class);
     private final int[] buf;
 
     public RawRect(final VncScreenDescription screen, final int x, final int y, final int width, final int height, final DataInputStream is) throws IOException {
