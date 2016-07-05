@@ -50,9 +50,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <skipTests>${skipTests}</skipTests>
-                    <systemPropertyVariables>
-                        <log4j.configuration>file:${project.build.testSourceDirectory}/conf/log4j.xml</log4j.configuration>
-                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>

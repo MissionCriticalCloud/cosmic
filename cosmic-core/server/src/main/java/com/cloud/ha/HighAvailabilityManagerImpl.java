@@ -57,9 +57,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.NDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 /**
  * HighAvailabilityManagerImpl coordinates the HA process. VMs are registered with the HA Manager for HA. The request is stored
@@ -940,14 +940,14 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
                     }
                 }
 
-                NDC.push("work-" + work.getId());
+                MDC.put("workid", " (workid: " + work.getId() + ")");
                 s_logger.info("Processing work " + work);
                 processWork(work);
             } catch (final Throwable th) {
                 s_logger.error("Caught this throwable, ", th);
             } finally {
                 if (work != null) {
-                    NDC.pop();
+                    MDC.remove("workId");
                 }
             }
         }

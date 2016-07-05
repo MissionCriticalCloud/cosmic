@@ -14,9 +14,9 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
 
-import org.apache.log4j.NDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 /**
  * CallContext records information about the environment the call is made.  This
@@ -120,7 +120,7 @@ public class CallContext {
             callingContext = new CallContext(userId, accountId, contextId);
         }
         s_currentContext.set(callingContext);
-        NDC.push("ctx-" + UuidUtils.first(contextId));
+        MDC.put("ctx", " (ctx: " + UuidUtils.first(contextId) + ")");
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("Registered: " + callingContext);
         }
@@ -169,17 +169,7 @@ public class CallContext {
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("Unregistered: " + context);
         }
-        final String contextId = context.getContextId();
-        String sessionIdOnStack = null;
-        final String sessionIdPushedToNDC = "ctx-" + UuidUtils.first(contextId);
-        while ((sessionIdOnStack = NDC.pop()) != null) {
-            if (sessionIdOnStack.isEmpty() || sessionIdPushedToNDC.equals(sessionIdOnStack)) {
-                break;
-            }
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Popping from NDC: " + contextId);
-            }
-        }
+        MDC.remove("ctx");
 
         final Stack<CallContext> stack = s_currentContextStack.get();
         stack.pop();

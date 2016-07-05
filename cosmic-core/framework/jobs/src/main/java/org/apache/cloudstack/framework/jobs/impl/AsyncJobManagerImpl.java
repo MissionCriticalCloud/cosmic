@@ -61,7 +61,6 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.NDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -194,19 +193,19 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
                 final String related = job.getRelated();
                 String logContext = job.getShortUuid();
                 if (related != null && !related.isEmpty()) {
-                    NDC.push("job-" + related + "/" + "job-" + job.getId());
+                    MDC.put("job", " (job: " + related + "/" + "job: " + job.getId() + ")");
                     final AsyncJob relatedJob = _jobDao.findByIdIncludingRemoved(Long.parseLong(related));
                     if (relatedJob != null) {
                         logContext = relatedJob.getShortUuid();
                     }
                 } else {
-                    NDC.push("job-" + job.getId());
+                    MDC.put("job", " (job: " + job.getId() + ")");
                 }
-                MDC.put("logcontextid", logContext);
+                MDC.put("logcontextid", " (logid: " + logContext + ")");
                 try {
                     super.run();
                 } finally {
-                    NDC.pop();
+                    MDC.remove("job");
                 }
             }
 
@@ -238,7 +237,7 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
                             logContext = relatedJob.getShortUuid();
                         }
                     }
-                    MDC.put("logcontextid", logContext);
+                    MDC.put("logcontextid", " (logid: " + logContext + ")");
 
                     // execute the job
                     if (s_logger.isDebugEnabled()) {
