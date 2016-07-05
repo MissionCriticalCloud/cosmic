@@ -1,9 +1,9 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.LogLevel.Log4jLevel;
+import com.cloud.agent.api.LogLevel.Level;
 import com.cloud.storage.VolumeStats;
 
-@LogLevel(Log4jLevel.Trace)
+@LogLevel(Level.Trace)
 public class GetFileStatsAnswer extends Answer implements VolumeStats {
     long size;
 

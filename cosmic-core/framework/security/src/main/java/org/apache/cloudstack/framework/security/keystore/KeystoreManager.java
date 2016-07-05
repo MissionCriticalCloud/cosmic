@@ -1,7 +1,7 @@
 package org.apache.cloudstack.framework.security.keystore;
 
 import com.cloud.agent.api.LogLevel;
-import com.cloud.agent.api.LogLevel.Log4jLevel;
+import com.cloud.agent.api.LogLevel.Level;
 import com.cloud.utils.component.Manager;
 
 public interface KeystoreManager extends Manager {
@@ -16,13 +16,13 @@ public interface KeystoreManager extends Manager {
     Certificates getCertificates(String name);
 
     public static class Certificates {
-        @LogLevel(Log4jLevel.Off)
+        @LogLevel(Level.Off)
         private String privKey;
-        @LogLevel(Log4jLevel.Off)
+        @LogLevel(Level.Off)
         private String privCert;
-        @LogLevel(Log4jLevel.Off)
+        @LogLevel(Level.Off)
         private String certChain;
-        @LogLevel(Log4jLevel.Off)
+        @LogLevel(Level.Off)
         private String rootCACert;
 
         public Certificates() {

@@ -17,12 +17,13 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GsonHelper {
     protected static final Gson s_gson;
     protected static final Gson s_gogger;
-    private static final Logger s_logger = Logger.getLogger(GsonHelper.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(GsonHelper.class);
 
     static {
         final GsonBuilder gsonBuilder = new GsonBuilder();

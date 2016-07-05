@@ -1,9 +1,9 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.LogLevel.Log4jLevel;
+import com.cloud.agent.api.LogLevel.Level;
 import com.cloud.storage.StorageStats;
 
-@LogLevel(Log4jLevel.Trace)
+@LogLevel(Level.Trace)
 public class GetStorageStatsAnswer extends Answer implements StorageStats {
     protected long used;
     protected long capacity;

@@ -1,7 +1,7 @@
 package com.cloud.agent.api.to;
 
 import com.cloud.agent.api.LogLevel;
-import com.cloud.agent.api.LogLevel.Log4jLevel;
+import com.cloud.agent.api.LogLevel.Level;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.utils.storage.S3.ClientOptions;
 
@@ -12,9 +12,9 @@ public final class S3TO implements ClientOptions, DataStoreTO {
     private static final String pathSeparator = "/";
     private Long id;
     private String uuid;
-    @LogLevel(Log4jLevel.Off)
+    @LogLevel(Level.Off)
     private String accessKey;
-    @LogLevel(Log4jLevel.Off)
+    @LogLevel(Level.Off)
     private String secretKey;
     private String endPoint;
     private String bucketName;

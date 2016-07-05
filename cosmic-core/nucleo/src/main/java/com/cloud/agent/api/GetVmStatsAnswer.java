@@ -1,10 +1,10 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.LogLevel.Log4jLevel;
+import com.cloud.agent.api.LogLevel.Level;
 
 import java.util.HashMap;
 
-@LogLevel(Log4jLevel.Trace)
+@LogLevel(Level.Trace)
 public class GetVmStatsAnswer extends Answer {
 
     HashMap<String, VmStatsEntry> vmStatsMap;

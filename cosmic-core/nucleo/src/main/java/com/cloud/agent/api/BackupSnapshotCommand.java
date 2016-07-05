@@ -1,6 +1,6 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.LogLevel.Log4jLevel;
+import com.cloud.agent.api.LogLevel.Level;
 import com.cloud.agent.api.to.S3TO;
 import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.agent.api.to.SwiftTO;
@@ -16,7 +16,7 @@ public class BackupSnapshotCommand extends SnapshotCommand {
     private boolean isVolumeInactive;
     private String vmName;
     private Long snapshotId;
-    @LogLevel(Log4jLevel.Off)
+    @LogLevel(Level.Off)
     private SwiftTO swift;
     private S3TO s3;
     private Long secHostId;

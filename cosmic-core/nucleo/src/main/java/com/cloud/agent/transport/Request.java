@@ -34,7 +34,8 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.stream.JsonReader;
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Request is a simple wrapper around command and answer to add sequencing,
@@ -64,7 +65,7 @@ public class Request {
     protected static final short FLAG_FROM_SERVER = 0x20;
     protected static final short FLAG_CONTROL = 0x40;
     protected static final short FLAG_COMPRESSED = 0x80;
-    private static final Logger s_logger = Logger.getLogger(Request.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(Request.class);
     protected Version _ver;
     protected long _session;
     protected long _seq;

@@ -2,11 +2,11 @@ package com.cloud.agent.transport;
 
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.LogLevel;
-import com.cloud.agent.api.LogLevel.Log4jLevel;
+import com.cloud.agent.api.LogLevel.Level;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 public class LoggingExclusionStrategy implements ExclusionStrategy {
     Logger _logger = null;
@@ -18,6 +18,7 @@ public class LoggingExclusionStrategy implements ExclusionStrategy {
     @Override
     public boolean shouldSkipField(final FieldAttributes field) {
         final LogLevel level = field.getAnnotation(LogLevel.class);
+
         return level != null && !level.value().enabled(_logger);
     }
 
@@ -26,14 +27,13 @@ public class LoggingExclusionStrategy implements ExclusionStrategy {
         if (clazz.isArray() || !Command.class.isAssignableFrom(clazz)) {
             return false;
         }
-        Log4jLevel log4jLevel = null;
+
+        Level loglevel = Level.Debug;
         final LogLevel level = clazz.getAnnotation(LogLevel.class);
-        if (level == null) {
-            log4jLevel = LogLevel.Log4jLevel.Debug;
-        } else {
-            log4jLevel = level.value();
+        if (level != null) {
+            loglevel = level.value();
         }
 
-        return !log4jLevel.enabled(_logger);
+        return !loglevel.enabled(_logger);
     }
 }
