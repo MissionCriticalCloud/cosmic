@@ -4,8 +4,6 @@ import com.cloud.agent.api.storage.UploadAnswer;
 import com.cloud.agent.api.storage.UploadProgressCommand.RequestType;
 import com.cloud.storage.Upload.Status;
 
-import org.apache.log4j.Level;
-
 public class UploadErrorState extends UploadInactiveState {
 
     public UploadErrorState(final UploadListener ul) {
@@ -56,10 +54,10 @@ public class UploadErrorState extends UploadInactiveState {
             getUploadListener().cancelStatusTask();
             getUploadListener().cancelTimeoutTask();
             getUploadListener().updateDatabase(Status.UPLOAD_ERROR, "Storage agent or storage VM disconnected");
-            getUploadListener().log("Entering upload error state because the storage host disconnected", Level.WARN);
+            getUploadListener().logWarn("Entering upload error state because the storage host disconnected");
         } else if (event == UploadEvent.TIMEOUT_CHECK) {
             getUploadListener().updateDatabase(Status.UPLOAD_ERROR, "Timeout waiting for response from storage host");
-            getUploadListener().log("Entering upload error state: timeout waiting for response from storage host", Level.WARN);
+            getUploadListener().logWarn("Entering upload error state: timeout waiting for response from storage host");
         }
         getUploadListener().setUploadInactive(Status.UPLOAD_ERROR);
     }

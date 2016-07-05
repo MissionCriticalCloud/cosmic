@@ -4,7 +4,6 @@ import com.cloud.agent.api.storage.DownloadAnswer;
 
 import java.util.Date;
 
-import org.apache.log4j.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +18,7 @@ public abstract class DownloadState {
 
     public String handleEvent(final DownloadEvent event, final Object eventObj) {
         if (s_logger.isTraceEnabled()) {
-            getDownloadListener().log("handleEvent, event type=" + event + ", curr state=" + getName(), Level.TRACE);
+            getDownloadListener().logTrace("handleEvent, event type=" + event + ", curr state=" + getName());
         }
         switch (event) {
             case DOWNLOAD_ANSWER:
@@ -53,7 +52,7 @@ public abstract class DownloadState {
 
     public void onEntry(final String prevState, final DownloadEvent event, final Object evtObj) {
         if (s_logger.isTraceEnabled()) {
-            getDownloadListener().log("onEntry, event type=" + event + ", curr state=" + getName(), Level.TRACE);
+            getDownloadListener().logTrace("onEntry, event type=" + event + ", curr state=" + getName());
         }
         if (event == DownloadEvent.DOWNLOAD_ANSWER) {
             getDownloadListener().callback((DownloadAnswer) evtObj);

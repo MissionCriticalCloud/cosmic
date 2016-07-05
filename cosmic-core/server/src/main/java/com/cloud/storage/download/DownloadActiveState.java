@@ -4,8 +4,6 @@ import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import org.apache.cloudstack.storage.command.DownloadProgressCommand.RequestType;
 
-import org.apache.log4j.Level;
-
 public abstract class DownloadActiveState extends DownloadState {
 
     public DownloadActiveState(final DownloadListener dl) {
@@ -48,17 +46,17 @@ public abstract class DownloadActiveState extends DownloadState {
     @Override
     public String handleTimeout(final long updateMs) {
         if (s_logger.isTraceEnabled()) {
-            getDownloadListener().log("handleTimeout, updateMs=" + updateMs + ", curr state= " + getName(), Level.TRACE);
+            getDownloadListener().logTrace("handleTimeout, updateMs=" + updateMs + ", curr state= " + getName());
         }
         String newState = getName();
         if (updateMs > 5 * DownloadListener.STATUS_POLL_INTERVAL) {
             newState = Status.DOWNLOAD_ERROR.toString();
-            getDownloadListener().log("timeout: transitioning to download error state, currstate=" + getName(), Level.DEBUG);
+            getDownloadListener().logDebug("timeout: transitioning to download error state, currstate=" + getName());
         } else if (updateMs > 3 * DownloadListener.STATUS_POLL_INTERVAL) {
             getDownloadListener().cancelStatusTask();
             getDownloadListener().scheduleImmediateStatusCheck(RequestType.GET_STATUS);
             getDownloadListener().scheduleTimeoutTask(3 * DownloadListener.STATUS_POLL_INTERVAL);
-            getDownloadListener().log(getName() + " first timeout: checking again ", Level.DEBUG);
+            getDownloadListener().logDebug(getName() + " first timeout: checking again ");
         } else {
             getDownloadListener().scheduleTimeoutTask(3 * DownloadListener.STATUS_POLL_INTERVAL);
         }

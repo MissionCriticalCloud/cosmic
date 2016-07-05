@@ -4,8 +4,6 @@ import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import org.apache.cloudstack.storage.command.DownloadProgressCommand.RequestType;
 
-import org.apache.log4j.Level;
-
 public class DownloadErrorState extends DownloadInactiveState {
 
     public DownloadErrorState(final DownloadListener dl) {
@@ -57,11 +55,11 @@ public class DownloadErrorState extends DownloadInactiveState {
             getDownloadListener().cancelTimeoutTask();
             final DownloadAnswer answer = new DownloadAnswer("Storage agent or storage VM disconnected", Status.DOWNLOAD_ERROR);
             getDownloadListener().callback(answer);
-            getDownloadListener().log("Entering download error state because the storage host disconnected", Level.WARN);
+            getDownloadListener().logWarn("Entering download error state because the storage host disconnected");
         } else if (event == DownloadEvent.TIMEOUT_CHECK) {
             final DownloadAnswer answer = new DownloadAnswer("Timeout waiting for response from storage host", Status.DOWNLOAD_ERROR);
             getDownloadListener().callback(answer);
-            getDownloadListener().log("Entering download error state: timeout waiting for response from storage host", Level.WARN);
+            getDownloadListener().logWarn("Entering download error state: timeout waiting for response from storage host");
         }
         getDownloadListener().setDownloadInactive(Status.DOWNLOAD_ERROR);
     }

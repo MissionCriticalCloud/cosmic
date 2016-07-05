@@ -40,15 +40,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Monitor progress of template download to a single storage server
  */
 public class DownloadListener implements Listener {
 
-    public static final Logger s_logger = Logger.getLogger(DownloadListener.class.getName());
+    public static final Logger s_logger = LoggerFactory.getLogger(DownloadListener.class.getName());
     public static final int SMALL_DELAY = 100;
     public static final long STATUS_POLL_INTERVAL = 10000L;
     public static final String DOWNLOADED = Status.DOWNLOADED.toString();
@@ -131,7 +131,7 @@ public class DownloadListener implements Listener {
     public void sendCommand(final RequestType reqType) {
         if (getJobId() != null) {
             if (s_logger.isTraceEnabled()) {
-                log("Sending progress command ", Level.TRACE);
+                logTrace("Sending progress command ");
             }
             try {
                 final DownloadProgressCommand dcmd = new DownloadProgressCommand(getCommand(), getJobId(), reqType);
@@ -150,8 +150,16 @@ public class DownloadListener implements Listener {
         return jobId;
     }
 
-    public void log(final String message, final Level level) {
-        s_logger.log(level, message + ", " + object.getType() + ": " + object.getId() + " at host " + _ssAgent.getId());
+    public void logWarn(final String message) {
+        s_logger.warn(message + ", " + object.getType() + ": " + object.getId() + " at host " + _ssAgent.getId());
+    }
+
+    public void logDebug(final String message) {
+        s_logger.debug(message + ", " + object.getType() + ": " + object.getId() + " at host " + _ssAgent.getId());
+    }
+
+    public void logTrace(final String message) {
+        s_logger.trace(message + ", " + object.getType() + ": " + object.getId() + " at host " + _ssAgent.getId());
     }
 
     public DownloadCommand getCommand() {
@@ -301,7 +309,7 @@ public class DownloadListener implements Listener {
         _timeoutTask = new TimeoutTask(this);
         _timer.schedule(_timeoutTask, delay);
         if (s_logger.isDebugEnabled()) {
-            log("Scheduling timeout at " + delay + " ms", Level.DEBUG);
+            logDebug("Scheduling timeout at " + delay + " ms");
         }
     }
 
