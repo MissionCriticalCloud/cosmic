@@ -363,34 +363,6 @@ public class VncClient {
         return c;
     }
 
-    public static void main(final String[] args) {
-        if (args.length < 3) {
-            printHelpMessage();
-            System.exit(1);
-        }
-
-        final String host = args[0];
-        final String port = args[1];
-        final String password = args[2];
-
-        try {
-            new VncClient(host, Integer.parseInt(port), password, false, null);
-        } catch (final NumberFormatException e) {
-            s_logger.error("Incorrect VNC server port number: " + port + ".");
-            System.exit(1);
-        } catch (final UnknownHostException e) {
-            s_logger.error("Incorrect VNC server host name: " + host + ".");
-            System.exit(1);
-        } catch (final IOException e) {
-            s_logger.error("Cannot communicate with VNC server: " + e.getMessage());
-            System.exit(1);
-        } catch (final Throwable e) {
-            s_logger.error("An error happened: " + e.getMessage());
-            System.exit(1);
-        }
-        System.exit(0);
-    }
-
     private static void printHelpMessage() {
         /* LOG */
         s_logger.info("Usage: HOST PORT PASSWORD.");

@@ -24,10 +24,6 @@ public class Version {
         return "0";
     }
 
-    public static void main(final String[] args) {
-        System.out.println("Result is " + compare(args[0], args[1]));
-    }
-
     /**
      * Compares two version strings and see which one is higher version.
      *

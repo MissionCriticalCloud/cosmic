@@ -1,6 +1,5 @@
 package com.cloud.test;
 
-import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.net.NetUtils;
@@ -16,13 +15,6 @@ import java.util.UUID;
 import java.util.Vector;
 
 public class IPRangeConfig {
-
-    public static void main(final String[] args) {
-        final IPRangeConfig config = ComponentContext.inject(IPRangeConfig.class);
-        config.run(args);
-        System.exit(0);
-    }
-
     public void run(final String[] args) {
         if (args.length < 2) {
             printError(usage());

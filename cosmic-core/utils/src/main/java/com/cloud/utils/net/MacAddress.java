@@ -2,8 +2,6 @@ package com.cloud.utils.net;
 
 import static com.cloud.utils.AutoCloseableUtil.closeAutoCloseable;
 
-import com.cloud.utils.NumbersUtil;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -180,13 +178,6 @@ public class MacAddress {
             return in.substring(lastIndex - 2, end).trim();
         }
         return null;
-    }
-
-    public static void main(final String[] args) {
-        final MacAddress addr = MacAddress.getMacAddress();
-        System.out.println("addr in integer is " + addr.toLong());
-        System.out.println("addr in bytes is " + NumbersUtil.bytesToString(addr.toByteArray(), 0, addr.toByteArray().length));
-        System.out.println("addr in char is " + addr.toString(":"));
     }
 
     public static MacAddress getMacAddress() {
