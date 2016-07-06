@@ -199,7 +199,7 @@ class updateDataBag:
             if ('localgw' in self.qFile.data['cmd_line']):
                 dp['gateway'] = self.qFile.data['cmd_line']['localgw']
             else:
-                dp['gateway'] = 'None'
+                dp['gateway'] = self.qFile.data['cmd_line'].get('gateway', 'None')
             dp['nic_dev_id'] = num
             dp['nw_type'] = nw_type
             qf = QueueFile()

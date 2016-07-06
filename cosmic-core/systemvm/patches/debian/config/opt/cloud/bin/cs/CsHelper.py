@@ -166,12 +166,12 @@ def get_hostname():
         return line.strip()
 
 
-def execute(command):
+def execute(command, wait=True):
     """ Execute command """
     logging.debug("Executing: %s" % command)
     p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    result = p.communicate()[0]
-    return result.splitlines()
+    if wait:
+        return p.communicate()[0].splitlines()
 
 
 def save_iptables(command, iptables_file):
