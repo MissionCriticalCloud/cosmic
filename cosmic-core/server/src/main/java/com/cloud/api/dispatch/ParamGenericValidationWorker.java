@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This worker validates parameters in a generic way, by using annotated
@@ -23,7 +24,7 @@ public class ParamGenericValidationWorker implements DispatchWorker {
 
     protected static final List<String> defaultParamNames = new ArrayList<>();
     protected static final String ERROR_MSG_PREFIX = "Unknown parameters :";
-    static Logger s_logger = Logger.getLogger(ParamGenericValidationWorker.class.getName());
+    static Logger s_logger = LoggerFactory.getLogger(ParamGenericValidationWorker.class.getName());
 
     static {
         defaultParamNames.add(ApiConstants.ACCOUNT_ID);
