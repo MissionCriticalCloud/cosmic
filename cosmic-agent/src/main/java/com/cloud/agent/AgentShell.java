@@ -4,7 +4,6 @@ import com.cloud.agent.Agent.ExitStatus;
 import com.cloud.agent.dao.StorageComponent;
 import com.cloud.agent.dao.impl.PropertiesStorage;
 import com.cloud.resource.ServerResource;
-import com.cloud.utils.LogUtils;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.ProcessUtil;
 import com.cloud.utils.PropertiesUtil;
@@ -31,7 +30,6 @@ import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.apache.commons.daemon.DaemonInitException;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.log4j.xml.DOMConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,18 +74,7 @@ public class AgentShell implements IAgentShell, Daemon {
         // it searches path under class path and common J2EE containers
         // For KVM agent, do it specially here
 
-        File file = new File("/etc/cosmic/agent/log4j-cloud.xml");
-        if (!file.exists()) {
-            file = PropertiesUtil.findConfigFile("log4j-cloud.xml");
-        }
-
-        if (null != file) {
-            DOMConfigurator.configureAndWatch(file.getAbsolutePath());
-
-            s_logger.info("Agent started");
-        } else {
-            s_logger.error("Could not start the Agent because the absolut path of the \"log4j-cloud.xml\" file cannot be determined.");
-        }
+        s_logger.info("Agent started");
 
         final Class<?> c = this.getClass();
         _version = c.getPackage().getImplementationVersion();
@@ -403,9 +390,6 @@ public class AgentShell implements IAgentShell, Daemon {
     @Override
     public void start() {
         try {
-            /* By default we only search for log4j.xml */
-            LogUtils.initLog4j("log4j-cloud.xml");
-
             boolean ipv6disabled = false;
             final String ipv6 = getProperty(null, "ipv6disabled");
             if (ipv6 != null) {

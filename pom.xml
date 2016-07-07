@@ -58,7 +58,6 @@
 
         <!-- Dependency management properties -->
         <cs.amqp-client.version>3.5.4</cs.amqp-client.version>
-        <cs.apache-log4j-extras.version>1.2.17</cs.apache-log4j-extras.version>
         <cs.aws-java-sdk.version>1.10.34</cs.aws-java-sdk.version>
         <cs.axis-jaxrpc.version>1.4</cs.axis-jaxrpc.version>
         <cs.axis.version>1.4</cs.axis.version>
@@ -338,17 +337,6 @@
                 <version>${cs.aws-java-sdk.version}</version>
             </dependency>
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>apache-log4j-extras</artifactId>
-                <version>${cs.apache-log4j-extras.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>log4j</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>javax.ejb</groupId>
                 <artifactId>ejb-api</artifactId>
                 <version>${cs.ejb-api.version}</version>
@@ -498,16 +486,8 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>apache-log4j-extras</artifactId>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
         </dependency>
     </dependencies>
 

@@ -9,8 +9,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -38,7 +38,7 @@ public class EasyX509TrustManager implements X509TrustManager {
     /**
      * Log object for this class.
      */
-    private static final Log LOG = LogFactory.getLog(EasyX509TrustManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EasyX509TrustManager.class);
     private X509TrustManager standardTrustManager = null;
 
     /**
