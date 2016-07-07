@@ -1,7 +1,6 @@
 package com.cloud.test;
 
 import com.cloud.network.Networks.TrafficType;
-import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.net.NetUtils;
@@ -15,13 +14,6 @@ import java.util.List;
 import java.util.Vector;
 
 public class PodZoneConfig {
-
-    public static void main(final String[] args) {
-        final PodZoneConfig config = ComponentContext.inject(PodZoneConfig.class);
-        //config.run(args);
-        System.exit(0);
-    }
-
     public static long getPodId(final String pod, final long dcId) {
         final String selectSql = "SELECT * FROM `cloud`.`host_pod_ref` WHERE name = \"" + pod + "\" AND data_center_id = \"" + dcId + "\"";
         final String errorMsg = "Could not read pod ID fro mdatabase. Please contact Cloud Support.";

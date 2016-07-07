@@ -90,11 +90,6 @@ public enum Status {
         return strs;
     }
 
-    public static void main(final String[] args) {
-        System.out.println("Finite State Machine for Host:");
-        System.out.println(s_fsm.toString());
-    }
-
     public boolean updateManagementServer() {
         return updateManagementServer;
     }

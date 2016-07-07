@@ -307,31 +307,6 @@ public class ConsoleProxy {
         }
     }
 
-    public static void main(final String[] argv) {
-        standaloneStart = true;
-        configLog4j();
-        Logger.setFactory(new ConsoleProxyLoggerFactory());
-
-        final InputStream confs = ConsoleProxy.class.getResourceAsStream("/conf/consoleproxy.properties");
-        final Properties conf = new Properties();
-        if (confs == null) {
-            s_logger.info("Can't load consoleproxy.properties from classpath, will use default configuration");
-        } else {
-            try {
-                conf.load(confs);
-            } catch (final Exception e) {
-                s_logger.error(e.toString(), e);
-            } finally {
-                try {
-                    confs.close();
-                } catch (final IOException ioex) {
-                    s_logger.error(ioex.toString(), ioex);
-                }
-            }
-        }
-        start(conf);
-    }
-
     public static ConsoleProxyClient getVncViewer(final ConsoleProxyClientParam param) throws Exception {
         ConsoleProxyClient viewer = null;
 

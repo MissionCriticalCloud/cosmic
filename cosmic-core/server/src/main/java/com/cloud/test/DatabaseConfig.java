@@ -6,7 +6,6 @@ import com.cloud.service.dao.ServiceOfferingDaoImpl;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.Storage.ProvisioningType;
 import com.cloud.storage.dao.DiskOfferingDaoImpl;
-import com.cloud.utils.PropertiesUtil;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Transaction;
@@ -37,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.log4j.xml.DOMConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -348,37 +346,6 @@ public class DatabaseConfig {
 
     public DatabaseConfig(final String configFileName) {
         _configFileName = configFileName;
-    }
-
-    /**
-     * @param args - name of server-setup.xml file which contains the bootstrap data
-     */
-    public static void main(final String[] args) {
-        System.setProperty("javax.xml.parsers.DocumentBuilderFactory", "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
-        System.setProperty("javax.xml.parsers.SAXParserFactory", "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl");
-
-        final File file = PropertiesUtil.findConfigFile("log4j-cloud.xml");
-        if (file != null) {
-            System.out.println("Log4j configuration from : " + file.getAbsolutePath());
-            DOMConfigurator.configureAndWatch(file.getAbsolutePath(), 10000);
-        } else {
-            System.out.println("Configure log4j with default properties");
-        }
-
-        if (args.length < 1) {
-            s_logger.error("error starting database config, missing initial data file");
-        } else {
-            try {
-                final DatabaseConfig config = ComponentContext.inject(DatabaseConfig.class);
-                config.doVersionCheck();
-                config.doConfig();
-                System.exit(0);
-            } catch (final Exception ex) {
-                System.out.print("Error Caught");
-                ex.printStackTrace();
-                s_logger.error("error", ex);
-            }
-        }
     }
 
     private void doVersionCheck() {

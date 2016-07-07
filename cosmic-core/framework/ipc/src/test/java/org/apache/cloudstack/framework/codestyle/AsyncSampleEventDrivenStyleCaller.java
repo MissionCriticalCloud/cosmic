@@ -19,11 +19,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class AsyncSampleEventDrivenStyleCaller {
     private AsyncSampleCallee _ds;
 
-    public static void main(final String[] args) {
-        final AsyncSampleEventDrivenStyleCaller caller = new AsyncSampleEventDrivenStyleCaller();
-        caller.MethodThatWillCallAsyncMethod();
-    }
-
     @Test
     public void MethodThatWillCallAsyncMethod() {
         final String vol = new String("Hello");
