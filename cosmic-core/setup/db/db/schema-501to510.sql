@@ -36,7 +36,7 @@ INSERT INTO `cloud`.`static_routes`
 SELECT  `static_routes_pre510`.id,
   `static_routes_pre510`.uuid,
   `static_routes_pre510`.cidr,
-  `vpc_gateways`.ip4_address,
+  `vpc_gateways`.gateway,
   `static_routes_pre510`.state,
   `static_routes_pre510`.vpc_id,
   `static_routes_pre510`.account_id,
