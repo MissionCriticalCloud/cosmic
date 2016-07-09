@@ -1,10 +1,10 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.LogLevel.Log4jLevel;
+import com.cloud.agent.api.LogLevel.Level;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.storage.Storage.StoragePoolType;
 
-@LogLevel(Log4jLevel.Trace)
+@LogLevel(Level.Trace)
 public class GetStorageStatsCommand extends Command {
     private String id;
     private String localPath;

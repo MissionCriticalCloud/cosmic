@@ -40,12 +40,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UploadListener implements Listener {
 
-    public static final Logger s_logger = Logger.getLogger(UploadListener.class.getName());
+    public static final Logger s_logger = LoggerFactory.getLogger(UploadListener.class.getName());
     public static final int SMALL_DELAY = 100;
     public static final long STATUS_POLL_INTERVAL = 10000L;
     public static final String UPLOADED = Status.UPLOADED.toString();
@@ -326,12 +326,20 @@ public class UploadListener implements Listener {
         timeoutTask = new TimeoutTask(this);
         timer.schedule(timeoutTask, delay);
         if (s_logger.isDebugEnabled()) {
-            log("Scheduling timeout at " + delay + " ms", Level.DEBUG);
+            logDebug("Scheduling timeout at " + delay + " ms");
         }
     }
 
-    public void log(final String message, final Level level) {
-        s_logger.log(level, message + ", " + type.toString() + " = " + typeName + " at host " + sserver.getName());
+    public void logWarn(final String message) {
+        s_logger.warn(message + ", " + type.toString() + " = " + typeName + " at host " + sserver.getName());
+    }
+
+    public void logDebug(final String message) {
+        s_logger.debug(message + ", " + type.toString() + " = " + typeName + " at host " + sserver.getName());
+    }
+
+    public void logTrace(final String message) {
+        s_logger.trace(message + ", " + type.toString() + " = " + typeName + " at host " + sserver.getName());
     }
 
     public void updateDatabase(final Status state, final String uploadErrorString) {
@@ -378,7 +386,7 @@ public class UploadListener implements Listener {
     public void sendCommand(final RequestType reqType) {
         if (getJobId() != null) {
             if (s_logger.isTraceEnabled()) {
-                log("Sending progress command ", Level.TRACE);
+                logTrace("Sending progress command ");
             }
             try {
                 final EndPoint ep = _epSelector.select(sserver);

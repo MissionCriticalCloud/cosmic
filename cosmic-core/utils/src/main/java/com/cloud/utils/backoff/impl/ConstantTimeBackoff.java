@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of BackoffAlgorithm that waits for some seconds.
@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
  * }
  **/
 public class ConstantTimeBackoff extends AdapterBase implements BackoffAlgorithm, ConstantTimeBackoffMBean {
-    private final static Log LOG = LogFactory.getLog(ConstantTimeBackoff.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ConstantTimeBackoff.class);
     private final Map<String, Thread> _asleep = new ConcurrentHashMap<>();
     long _time;
 

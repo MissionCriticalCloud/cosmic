@@ -4,8 +4,6 @@ import com.cloud.agent.api.storage.UploadAnswer;
 import com.cloud.agent.api.storage.UploadProgressCommand.RequestType;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 
-import org.apache.log4j.Level;
-
 public abstract class UploadActiveState extends UploadState {
 
     public UploadActiveState(final UploadListener ul) {
@@ -49,17 +47,17 @@ public abstract class UploadActiveState extends UploadState {
     @Override
     public String handleTimeout(final long updateMs) {
         if (s_logger.isTraceEnabled()) {
-            getUploadListener().log("handleTimeout, updateMs=" + updateMs + ", curr state= " + getName(), Level.TRACE);
+            getUploadListener().logTrace("handleTimeout, updateMs=" + updateMs + ", curr state= " + getName());
         }
         String newState = getName();
         if (updateMs > 5 * UploadListener.STATUS_POLL_INTERVAL) {
             newState = Status.UPLOAD_ERROR.toString();
-            getUploadListener().log("timeout: transitioning to upload error state, currstate=" + getName(), Level.DEBUG);
+            getUploadListener().logDebug("timeout: transitioning to upload error state, currstate=" + getName());
         } else if (updateMs > 3 * UploadListener.STATUS_POLL_INTERVAL) {
             getUploadListener().cancelStatusTask();
             getUploadListener().scheduleImmediateStatusCheck(RequestType.GET_STATUS);
             getUploadListener().scheduleTimeoutTask(3 * UploadListener.STATUS_POLL_INTERVAL);
-            getUploadListener().log(getName() + " first timeout: checking again ", Level.DEBUG);
+            getUploadListener().logDebug(getName() + " first timeout: checking again ");
         } else {
             getUploadListener().scheduleTimeoutTask(3 * UploadListener.STATUS_POLL_INTERVAL);
         }

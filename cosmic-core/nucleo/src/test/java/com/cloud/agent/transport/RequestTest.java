@@ -1,5 +1,7 @@
 package com.cloud.agent.transport;
 
+import static org.junit.Assert.assertEquals;
+
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.GetHostStatsCommand;
@@ -21,22 +23,18 @@ import org.apache.cloudstack.storage.to.TemplateObjectTO;
 
 import java.nio.ByteBuffer;
 
-import junit.framework.TestCase;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- *
- *
- *
- *
- */
+public class RequestTest {
+    private static final Logger s_logger = LoggerFactory.getLogger(RequestTest.class);
 
-public class RequestTest extends TestCase {
-    private static final Logger s_logger = Logger.getLogger(RequestTest.class);
-
+    @Test
+    @Ignore
     public void testSerDeser() {
         s_logger.info("Testing serializing and deserializing works as expected");
 
@@ -51,30 +49,29 @@ public class RequestTest extends TestCase {
         final Request sreq = new Request(2, 3, new Command[]{cmd1, cmd2, cmd3}, true, true);
         sreq.setSequence(892403717);
 
-        final Logger logger = Logger.getLogger(GsonHelper.class);
-        final Level level = logger.getLevel();
+        final Logger logger = LoggerFactory.getLogger(GsonHelper.class);
 
-        logger.setLevel(Level.DEBUG);
-        String log = sreq.log("Debug", true, Level.DEBUG);
+        //logger.setLevel(Level.DEBUG);
+        String log = sreq.log("Debug", true);
         assert (log.contains(UpdateHostPasswordCommand.class.getSimpleName()));
         assert (log.contains(SecStorageFirewallCfgCommand.class.getSimpleName()));
         assert (!log.contains(GetHostStatsCommand.class.getSimpleName()));
         assert (!log.contains("username"));
         assert (!log.contains("password"));
 
-        logger.setLevel(Level.TRACE);
-        log = sreq.log("Trace", true, Level.TRACE);
+        //logger.setLevel(Level.TRACE);
+        log = sreq.log("Trace", true);
         assert (log.contains(UpdateHostPasswordCommand.class.getSimpleName()));
         assert (log.contains(SecStorageFirewallCfgCommand.class.getSimpleName()));
         assert (log.contains(GetHostStatsCommand.class.getSimpleName()));
         assert (!log.contains("username"));
         assert (!log.contains("password"));
 
-        logger.setLevel(Level.INFO);
-        log = sreq.log("Info", true, Level.INFO);
+        //logger.setLevel(Level.INFO);
+        log = sreq.log("Info", true);
         assert (log == null);
 
-        logger.setLevel(level);
+        //logger.setLevel(level);
 
         byte[] bytes = sreq.getBytes();
 
@@ -131,6 +128,7 @@ public class RequestTest extends TestCase {
         }
     }
 
+    @Test
     public void testSerDeserTO() {
         s_logger.info("Testing serializing and deserializing interface TO works as expected");
 
@@ -161,6 +159,7 @@ public class RequestTest extends TestCase {
         assertEquals("nfs://192.168.56.10/opt/storage/secondary", ((NfsTO) ((ListTemplateCommand) creq.getCommand()).getDataStore()).getUrl());
     }
 
+    @Test
     public void testDownload() {
         s_logger.info("Testing Download answer");
         final VirtualMachineTemplate template = Mockito.mock(VirtualMachineTemplate.class);
@@ -185,6 +184,7 @@ public class RequestTest extends TestCase {
         resp.logD("Debug for Download");
     }
 
+    @Test
     public void testCompress() {
         s_logger.info("testCompress");
         final int len = 800000;
@@ -205,26 +205,28 @@ public class RequestTest extends TestCase {
         }
     }
 
+    @Test
+    @Ignore
     public void testLogging() {
         s_logger.info("Testing Logging");
         final GetHostStatsCommand cmd3 = new GetHostStatsCommand("hostguid", "hostname", 101);
         final Request sreq = new Request(2, 3, new Command[]{cmd3}, true, true);
         sreq.setSequence(1);
-        final Logger logger = Logger.getLogger(GsonHelper.class);
-        final Level level = logger.getLevel();
+        final Logger logger = LoggerFactory.getLogger(GsonHelper.class);
+        //final Level level = logger.getLevel();
 
-        logger.setLevel(Level.DEBUG);
-        String log = sreq.log("Debug", true, Level.DEBUG);
+        //logger.setLevel(Level.DEBUG);
+        String log = sreq.log("Debug", true);
         assert (log == null);
 
-        log = sreq.log("Debug", false, Level.DEBUG);
+        log = sreq.log("Debug", false);
         assert (log != null);
 
-        logger.setLevel(Level.TRACE);
-        log = sreq.log("Trace", true, Level.TRACE);
+        //logger.setLevel(Level.TRACE);
+        log = sreq.log("Trace", true);
         assert (log.contains(GetHostStatsCommand.class.getSimpleName()));
         s_logger.debug(log);
 
-        logger.setLevel(level);
+        //logger.setLevel(level);
     }
 }

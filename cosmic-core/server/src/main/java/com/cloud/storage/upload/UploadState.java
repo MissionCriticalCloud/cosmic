@@ -4,7 +4,6 @@ import com.cloud.agent.api.storage.UploadAnswer;
 
 import java.util.Date;
 
-import org.apache.log4j.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +19,7 @@ public abstract class UploadState {
 
     public String handleEvent(final UploadEvent event, final Object eventObj) {
         if (s_logger.isTraceEnabled()) {
-            getUploadListener().log("handleEvent, event type=" + event + ", curr state=" + getName(), Level.TRACE);
+            getUploadListener().logTrace("handleEvent, event type=" + event + ", curr state=" + getName());
         }
         switch (event) {
             case UPLOAD_ANSWER:
@@ -54,7 +53,7 @@ public abstract class UploadState {
 
     public void onEntry(final String prevState, final UploadEvent event, final Object evtObj) {
         if (s_logger.isTraceEnabled()) {
-            getUploadListener().log("onEntry, event type=" + event + ", curr state=" + getName(), Level.TRACE);
+            getUploadListener().logTrace("onEntry, event type=" + event + ", curr state=" + getName());
         }
         if (event == UploadEvent.UPLOAD_ANSWER) {
             getUploadListener().updateDatabase((UploadAnswer) evtObj);

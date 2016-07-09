@@ -13,7 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BareMetalRemovalUpdater {
 
@@ -24,7 +25,7 @@ public class BareMetalRemovalUpdater {
     public static final String NAME = "name";
     public static final String SELECT_CONFIGURATION_ITEMS = "SELECT category, instance, component, name, value FROM configuration WHERE name = ?";
     public static final String UPDATE_CONFIGURATION_ITEM = "UPDATE configuration SET value = ? WHERE category = ? AND instance = ? AND component = ? AND name = ?";
-    private static final Logger logger = Logger.getLogger(BareMetalRemovalUpdater.class);
+    private static final Logger logger = LoggerFactory.getLogger(BareMetalRemovalUpdater.class);
     private static final String BARE_METAL = "baremetal";
     private static final String VALUE_SEPARATOR = ",";
     private static final String HYPERVISOR_LIST = "hypervisor.list";

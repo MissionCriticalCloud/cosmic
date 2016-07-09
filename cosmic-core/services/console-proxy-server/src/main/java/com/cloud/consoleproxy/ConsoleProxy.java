@@ -1,6 +1,5 @@
 package com.cloud.consoleproxy;
 
-import com.cloud.consoleproxy.util.Logger;
 import com.cloud.utils.PropertiesUtil;
 
 import java.io.File;
@@ -11,8 +10,6 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Hashtable;
@@ -23,7 +20,8 @@ import java.util.concurrent.Executor;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * ConsoleProxy, singleton class that manages overall activities in console proxy process. To make legacy code work, we still
@@ -32,7 +30,7 @@ public class ConsoleProxy {
     public static final int KEYBOARD_RAW = 0;
     public static final int KEYBOARD_COOKED = 1;
     public static final int VIEWER_LINGER_SECONDS = 180;
-    private static final Logger s_logger = Logger.getLogger(ConsoleProxy.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxy.class);
     public static Object context;
 
     // this has become more ugly, to store keystore info passed from management server (we now use management server managed keystore to support
@@ -92,9 +90,6 @@ public class ConsoleProxy {
             }
         }
 
-        configLog4j();
-        Logger.setFactory(new ConsoleProxyLoggerFactory());
-
         // Using reflection to setup private/secure communication channel towards management server
         ConsoleProxy.context = context;
         ConsoleProxy.ksBits = ksBits;
@@ -151,37 +146,6 @@ public class ConsoleProxy {
         }
 
         start(conf);
-    }
-
-    private static void configLog4j() {
-        URL configUrl = System.class.getResource("/conf/log4j-cloud.xml");
-        if (configUrl == null) {
-            configUrl = ClassLoader.getSystemResource("log4j-cloud.xml");
-        }
-
-        if (configUrl == null) {
-            configUrl = ClassLoader.getSystemResource("conf/log4j-cloud.xml");
-        }
-
-        if (configUrl != null) {
-            try {
-                System.out.println("Configure log4j using " + configUrl.toURI().toString());
-            } catch (final URISyntaxException e1) {
-                e1.printStackTrace();
-            }
-
-            try {
-                final File file = new File(configUrl.toURI());
-
-                System.out.println("Log4j configuration from : " + file.getAbsolutePath());
-                DOMConfigurator.configureAndWatch(file.getAbsolutePath(), 10000);
-            } catch (final URISyntaxException e) {
-                System.out.println("Unable to convert log4j configuration Url to URI");
-            }
-            // DOMConfigurator.configure(configUrl);
-        } else {
-            System.out.println("Configure log4j with default properties");
-        }
     }
 
     public static void start(final Properties conf) {

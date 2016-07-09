@@ -199,7 +199,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMachineManager, VmWorkJobHandler, Listener, Configurable {
     public static final String VM_WORK_JOB_HANDLER = VirtualMachineManagerImpl.class.getSimpleName();
@@ -232,7 +233,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     static final ConfigKey<Integer> VmJobStateReportInterval = new ConfigKey<>("Advanced",
             Integer.class, "vm.job.report.interval", "60",
             "Interval to send application level pings to make sure the connection is still working", false);
-    private static final Logger s_logger = Logger.getLogger(VirtualMachineManagerImpl.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(VirtualMachineManagerImpl.class);
     private static final String VM_SYNC_ALERT_SUBJECT = "VM state sync alert";
     @Inject
     protected NetworkOrchestrationService _networkMgr;
@@ -1054,7 +1055,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 final long seq_no = _agentMgr.send(agentId, new Commands(syncVMMetaDataCmd), this);
                 s_logger.debug("Cluster VM metadata sync started with jobid " + seq_no);
             } catch (final AgentUnavailableException e) {
-                s_logger.fatal("The Cluster VM metadata sync process failed for cluster id " + clusterId + " with ", e);
+                s_logger.error("The Cluster VM metadata sync process failed for cluster id " + clusterId + " with ", e);
             }
         }
     }

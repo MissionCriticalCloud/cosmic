@@ -405,13 +405,6 @@
                     <webAppConfig>
                         <contextPath>/client</contextPath>
                     </webAppConfig>
-
-                    <systemProperties>
-                        <systemProperty>
-                            <name>log4j.configuration</name>
-                            <value>log4j-cloud.xml</value>
-                        </systemProperty>
-                    </systemProperties>
                 </configuration>
             </plugin>
             <plugin>

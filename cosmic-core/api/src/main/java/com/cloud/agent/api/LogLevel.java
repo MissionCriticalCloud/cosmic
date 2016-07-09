@@ -7,27 +7,43 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
-/**
- */
 @Target({TYPE, FIELD})
 @Retention(RUNTIME)
 public @interface LogLevel {
-    Log4jLevel value() default Log4jLevel.Debug;
+    Level value() default Level.Debug;
 
-    public enum Log4jLevel { // Had to do this because Level is not primitive.
-        Off(Level.OFF), Trace(Level.TRACE), Debug(Level.DEBUG);
+    enum Level {
+        Off(LoggingLevel.Off), Trace(LoggingLevel.Trace), Debug(LoggingLevel.Debug), Info(LoggingLevel.Info);
 
-        Level _level;
+        LoggingLevel _level;
 
-        private Log4jLevel(final Level level) {
+        Level(final LoggingLevel level) {
             _level = level;
         }
 
         public boolean enabled(final Logger logger) {
-            return _level != Level.OFF && logger.isEnabledFor(_level);
+            final boolean ret;
+            switch (_level) {
+                case Trace:
+                    ret = logger.isTraceEnabled();
+                    break;
+                case Debug:
+                    ret = logger.isDebugEnabled();
+                    break;
+                case Info:
+                    ret = logger.isInfoEnabled();
+                    break;
+                default:
+                    ret = false;
+                    break;
+            }
+            return ret;
         }
+    }
+
+    enum LoggingLevel {
+        Off, Trace, Debug, Info
     }
 }

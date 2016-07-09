@@ -1,7 +1,6 @@
 package com.cloud.consoleproxy.vnc;
 
 import com.cloud.consoleproxy.ConsoleProxyClientListener;
-import com.cloud.consoleproxy.util.Logger;
 import com.cloud.consoleproxy.util.RawHTTP;
 import com.cloud.consoleproxy.vnc.packet.client.KeyboardEventPacket;
 import com.cloud.consoleproxy.vnc.packet.client.MouseEventPacket;
@@ -21,8 +20,11 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.spec.KeySpec;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class VncClient {
-    private static final Logger s_logger = Logger.getLogger(VncClient.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(VncClient.class);
     private final VncScreenDescription screen = new VncScreenDescription();
     private Socket socket;
     private DataInputStream is;

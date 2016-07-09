@@ -1,12 +1,13 @@
 package com.cloud.consoleproxy;
 
-import com.cloud.consoleproxy.util.Logger;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ConsoleProxyHttpHandlerHelper {
-    private static final Logger s_logger = Logger.getLogger(ConsoleProxyHttpHandlerHelper.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyHttpHandlerHelper.class);
 
     public static Map<String, String> getQueryMap(final String query) {
         final String[] params = query.split("&");

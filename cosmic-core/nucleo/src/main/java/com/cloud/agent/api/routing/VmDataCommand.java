@@ -1,7 +1,7 @@
 package com.cloud.agent.api.routing;
 
 import com.cloud.agent.api.LogLevel;
-import com.cloud.agent.api.LogLevel.Log4jLevel;
+import com.cloud.agent.api.LogLevel.Level;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ public class VmDataCommand extends NetworkElementCommand {
 
     String vmIpAddress;
     String vmName;
-    @LogLevel(Log4jLevel.Trace)
+    @LogLevel(Level.Trace)
     List<String[]> vmData;
     boolean executeInSequence = false;
 

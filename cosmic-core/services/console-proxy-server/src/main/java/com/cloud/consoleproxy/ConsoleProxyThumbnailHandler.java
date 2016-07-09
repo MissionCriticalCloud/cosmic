@@ -1,7 +1,5 @@
 package com.cloud.consoleproxy;
 
-import com.cloud.consoleproxy.util.Logger;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -17,9 +15,11 @@ import java.util.Map;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConsoleProxyThumbnailHandler implements HttpHandler {
-    private static final Logger s_logger = Logger.getLogger(ConsoleProxyThumbnailHandler.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyThumbnailHandler.class);
 
     public ConsoleProxyThumbnailHandler() {
     }

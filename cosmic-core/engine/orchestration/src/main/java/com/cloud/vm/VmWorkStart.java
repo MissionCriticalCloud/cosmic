@@ -11,12 +11,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VmWorkStart extends VmWork {
     private static final long serialVersionUID = 9038937399817468894L;
 
-    private static final Logger s_logger = Logger.getLogger(VmWorkStart.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(VmWorkStart.class);
 
     long dcId;
     Long podId;

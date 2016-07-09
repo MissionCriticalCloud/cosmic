@@ -14,20 +14,19 @@ import java.util.Properties;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NfsSecondaryStorageResourceTest extends TestCase {
-    private static final Logger s_logger = Logger.getLogger(NfsSecondaryStorageResourceTest.class.getName());
+    private static final Logger s_logger = LoggerFactory.getLogger(NfsSecondaryStorageResourceTest.class.getName());
     private static Map<String, Object> testParams;
     NfsSecondaryStorageResource resource;
 
     @Before
     @Override
     public void setUp() throws ConfigurationException {
-        s_logger.setLevel(Level.ALL);
         resource = new NfsSecondaryStorageResource();
         resource.setInSystemVM(true);
         testParams = PropertiesUtil.toMap(loadProperties());

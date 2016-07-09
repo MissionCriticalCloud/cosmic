@@ -1,6 +1,6 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.LogLevel.Log4jLevel;
+import com.cloud.agent.api.LogLevel.Level;
 import com.cloud.utils.net.NetUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -241,7 +241,7 @@ public class SecurityGroupRulesCmd extends Command {
         private String proto;
         private int startPort;
         private int endPort;
-        @LogLevel(Log4jLevel.Trace)
+        @LogLevel(Level.Trace)
         private String[] allowedCidrs;
 
         public IpPortAndProto() {

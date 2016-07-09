@@ -11,11 +11,12 @@ import com.cloud.org.Grouping;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ResourceChecker {
 
-    private static final Logger logger = Logger.getLogger(ResourceManagerImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ResourceManagerImpl.class);
 
     private final DataCenterDao dataCenterDao;
     private final AccountManager accountManager;

@@ -150,10 +150,11 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IpAddressManagerImpl extends ManagerBase implements IpAddressManager, Configurable {
-    private static final Logger s_logger = Logger.getLogger(IpAddressManagerImpl.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(IpAddressManagerImpl.class);
     @Inject
     protected NicIpAliasDao _nicIpAliasDao;
     @Inject

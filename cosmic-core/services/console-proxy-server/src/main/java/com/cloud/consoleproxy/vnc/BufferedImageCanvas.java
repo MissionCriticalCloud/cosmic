@@ -1,7 +1,6 @@
 package com.cloud.consoleproxy.vnc;
 
 import com.cloud.consoleproxy.util.ImageHelper;
-import com.cloud.consoleproxy.util.Logger;
 import com.cloud.consoleproxy.util.TileInfo;
 
 import java.awt.Canvas;
@@ -14,13 +13,16 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A <code>BuffereImageCanvas</code> component represents frame buffer image on
  * the screen. It also notifies its subscribers when screen is repainted.
  */
 public class BufferedImageCanvas extends Canvas implements FrameBufferCanvas {
     private static final long serialVersionUID = 1L;
-    private static final Logger s_logger = Logger.getLogger(BufferedImageCanvas.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(BufferedImageCanvas.class);
     private final PaintNotificationListener listener;
     // Offline screen buffer
     private BufferedImage offlineImage;

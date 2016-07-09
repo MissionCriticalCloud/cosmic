@@ -1,14 +1,15 @@
 package com.cloud.consoleproxy;
 
-import com.cloud.consoleproxy.util.Logger;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class AjaxFIFOImageCache {
-    private static final Logger s_logger = Logger.getLogger(AjaxFIFOImageCache.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(AjaxFIFOImageCache.class);
 
     private final List<Integer> fifoQueue;
     private final Map<Integer, byte[]> cache;

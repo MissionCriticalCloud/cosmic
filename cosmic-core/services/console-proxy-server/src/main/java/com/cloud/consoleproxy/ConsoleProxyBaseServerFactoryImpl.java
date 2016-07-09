@@ -1,15 +1,15 @@
 package com.cloud.consoleproxy;
 
-import com.cloud.consoleproxy.util.Logger;
-
 import javax.net.ssl.SSLServerSocket;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import com.sun.net.httpserver.HttpServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConsoleProxyBaseServerFactoryImpl implements ConsoleProxyServerFactory {
-    private static final Logger s_logger = Logger.getLogger(ConsoleProxyBaseServerFactoryImpl.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyBaseServerFactoryImpl.class);
 
     @Override
     public void init(final byte[] ksBits, final String ksPassword) {

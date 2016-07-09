@@ -1,6 +1,5 @@
 package com.cloud.servlet;
 
-import com.cloud.utils.LogUtils;
 import com.cloud.utils.SerialVersionUID;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.db.TransactionLegacy;
@@ -23,7 +22,6 @@ public class CloudStartupServlet extends HttpServlet {
 
     @Override
     public void init(final ServletConfig config) throws ServletException {
-        LogUtils.initLog4j("log4j-cloud.xml");
         SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
 
         // wait when condition is ready for initialization

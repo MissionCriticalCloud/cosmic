@@ -1,6 +1,6 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.LogLevel.Log4jLevel;
+import com.cloud.agent.api.LogLevel.Level;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +12,7 @@ public abstract class Command {
 
     public static final String HYPERVISOR_TYPE = "hypervisorType";
     // allow command to carry over hypervisor or other environment related context info
-    @LogLevel(Log4jLevel.Trace)
+    @LogLevel(Level.Trace)
     protected Map<String, String> contextMap = new HashMap<>();
     private int wait;  //in second
 

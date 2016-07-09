@@ -30,7 +30,6 @@
             <directoryMode>555</directoryMode>
             <fileMode>555</fileMode>
             <includes>
-                <include>log4j-cloud.xml</include>
                 <include>consoleproxy.properties</include>
                 <include>agent.properties</include>
             </includes>

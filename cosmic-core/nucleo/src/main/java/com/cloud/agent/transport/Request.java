@@ -33,8 +33,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.stream.JsonReader;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Request is a simple wrapper around command and answer to add sequencing,
@@ -64,7 +64,7 @@ public class Request {
     protected static final short FLAG_FROM_SERVER = 0x20;
     protected static final short FLAG_CONTROL = 0x40;
     protected static final short FLAG_COMPRESSED = 0x80;
-    private static final Logger s_logger = Logger.getLogger(Request.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(Request.class);
     protected Version _ver;
     protected long _session;
     protected long _seq;
@@ -419,14 +419,14 @@ public class Request {
 
     public void logD(final String msg, final boolean logContent) {
         if (s_logger.isDebugEnabled()) {
-            final String log = log(msg, logContent, Level.DEBUG);
+            final String log = log(msg, logContent);
             if (log != null) {
                 s_logger.debug(log);
             }
         }
     }
 
-    protected String log(final String msg, final boolean logContent, final Level level) {
+    protected String log(final String msg, final boolean logContent) {
         final StringBuilder content = new StringBuilder();
         if (logContent) {
             if (_cmds == null) {
@@ -510,12 +510,12 @@ public class Request {
 
     public void logT(final String msg, final boolean logD) {
         if (s_logger.isTraceEnabled()) {
-            final String log = log(msg, true, Level.TRACE);
+            final String log = log(msg, true);
             if (log != null) {
                 s_logger.trace(log);
             }
         } else if (logD && s_logger.isDebugEnabled()) {
-            final String log = log(msg, false, Level.DEBUG);
+            final String log = log(msg, false);
             if (log != null) {
                 s_logger.debug(log);
             }
@@ -524,7 +524,7 @@ public class Request {
 
     @Override
     public String toString() {
-        return log("", true, Level.DEBUG);
+        return log("", true);
     }
 
     public long getAgentId() {

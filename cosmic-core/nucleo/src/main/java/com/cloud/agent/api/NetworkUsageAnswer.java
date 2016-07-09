@@ -1,8 +1,8 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.LogLevel.Log4jLevel;
+import com.cloud.agent.api.LogLevel.Level;
 
-@LogLevel(Log4jLevel.Debug)
+@LogLevel(Level.Debug)
 public class NetworkUsageAnswer extends Answer {
     String routerName;
     Long bytesSent;
