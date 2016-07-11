@@ -308,10 +308,6 @@ class CsRedundant(object):
             else:
                 logging.error("Device %s was not ready could not bring it up" % dev)
 
-        logging.debug("Configuring static routes")
-        static_routes = CsStaticRoutes("staticroutes", self.config)
-        static_routes.process()
-
         cmd = "%s -C %s" % (self.CONNTRACKD_BIN, self.CONNTRACKD_CONF)
         CsHelper.execute("%s -c" % cmd)
         CsHelper.execute("%s -f" % cmd)
@@ -326,6 +322,8 @@ class CsRedundant(object):
             CsPasswdSvc(interface.get_ip()).start()
 
         CsHelper.service("dnsmasq", "restart")
+
+        # From here on the state is master
         self.cl.set_master_state(True)
         self.cl.save()
         self.release_lock()
@@ -333,6 +331,11 @@ class CsRedundant(object):
         interfaces = [interface for interface in self.address.get_interfaces() if interface.is_public()]
         CsHelper.reconfigure_interfaces(self.cl, interfaces)
         logging.info("Router switched to master mode")
+
+        # Apply static routes (depends on master state)
+        logging.debug("Configuring static routes")
+        static_routes = CsStaticRoutes("staticroutes", self.config)
+        static_routes.process()
 
     def _collect_ignore_ips(self):
         """
