@@ -613,8 +613,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     @Override
                     public void doInTransactionWithoutResult(final TransactionStatus status) {
                         final NetworkVO vo = new NetworkVO(id, network, offering.getId(), guru.getName(), owner.getDomainId(), owner.getId(), relatedFile, name, displayText,
-                                predefined
-                                        .getNetworkDomain(), offering.getGuestType(), plan.getDataCenterId(), plan.getPhysicalNetworkId(), aclType, offering.getSpecifyIpRanges(),
+                                predefined.getNetworkDomain(), offering.getGuestType(), plan.getDataCenterId(), plan.getPhysicalNetworkId(), aclType, offering.getSpecifyIpRanges(),
                                 vpcId, offering.getRedundantRouter());
                         vo.setDisplayNetwork(isDisplayNetworkEnabled == null ? true : isDisplayNetworkEnabled);
                         vo.setStrechedL2Network(offering.getSupportsStrechedL2());
@@ -2465,8 +2464,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                         s_logger.warn("Failed to re-program the network as a part of network " + network + " implement due to aggregated commands execution failure!");
                         // see DataCenterVO.java
                         final ResourceUnavailableException ex = new ResourceUnavailableException("Unable to apply network rules as a part of network " + network + " implement",
-                                DataCenter.class,
-                                network.getDataCenterId());
+                                DataCenter.class, network.getDataCenterId());
                         ex.addProxyObject(_entityMgr.findById(DataCenter.class, network.getDataCenterId()).getUuid());
                         throw ex;
                     }

@@ -507,7 +507,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
             return true;
         } else {
             s_logger.warn("Unable to setup guest network on virtual router " + router + " is not in the right state " + router.getState());
-            throw new ResourceUnavailableException("Unable to setup guest network on the backend," + " virtual router " + router + " is not in the right state", DataCenter.class,
+            throw new ResourceUnavailableException("Unable to setup guest network on the backend, virtual router " + router + " is not in the right state", DataCenter.class,
                     router.getDataCenterId());
         }
     }

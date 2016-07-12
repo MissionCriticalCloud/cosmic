@@ -19,8 +19,6 @@ public interface PhysicalNetwork extends Identity, InternalIdentity {
 
     List<String> getTags();
 
-    // TrafficType getTrafficType();
-
     List<String> getIsolationMethods();
 
     Long getDomainId();
@@ -33,15 +31,15 @@ public interface PhysicalNetwork extends Identity, InternalIdentity {
 
     String getName();
 
-    public enum State {
+    enum State {
         Disabled, Enabled
     }
 
-    public enum IsolationMethod {
+    enum IsolationMethod {
         VLAN, L3, GRE, STT, BCF_SEGMENT, MIDO, SSP, VXLAN, ODL, L3VPN, VSP, VCS
     }
 
-    public enum BroadcastDomainRange {
+    enum BroadcastDomainRange {
         POD, ZONE
     }
 }

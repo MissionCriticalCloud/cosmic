@@ -120,29 +120,11 @@ public class NetworkVO implements Network {
         uuid = UUID.randomUUID().toString();
     }
 
-    public NetworkVO(final long id, final Network that, final long offeringId, final String guruName, final long domainId, final long accountId, final long related, final String
-            name, final String displayText,
-                     final String networkDomain, final GuestType guestType, final long dcId, final Long physicalNetworkId, final ACLType aclType, final boolean specifyIpRanges,
-                     final Long vpcId, final boolean
-                             isRedundant) {
-        this(id,
-                that.getTrafficType(),
-                that.getMode(),
-                that.getBroadcastDomainType(),
-                offeringId,
-                domainId,
-                accountId,
-                related,
-                name,
-                displayText,
-                networkDomain,
-                guestType,
-                dcId,
-                physicalNetworkId,
-                aclType,
-                specifyIpRanges,
-                vpcId,
-                isRedundant);
+    public NetworkVO(final long id, final Network that, final long offeringId, final String guruName, final long domainId, final long accountId, final long related,
+                     final String name, final String displayText, final String networkDomain, final GuestType guestType, final long dcId, final Long physicalNetworkId,
+                     final ACLType aclType, final boolean specifyIpRanges, final Long vpcId, final boolean isRedundant) {
+        this(id, that.getTrafficType(), that.getMode(), that.getBroadcastDomainType(), offeringId, domainId, accountId, related, name, displayText, networkDomain, guestType,
+                dcId, physicalNetworkId, aclType, specifyIpRanges, vpcId, isRedundant);
         gateway = that.getGateway();
         cidr = that.getCidr();
         networkCidr = that.getNetworkCidr();
@@ -176,11 +158,10 @@ public class NetworkVO implements Network {
      * @param vpcId               TODO
      * @param dataCenterId
      */
-    public NetworkVO(final long id, final TrafficType trafficType, final Mode mode, final BroadcastDomainType broadcastDomainType, final long networkOfferingId, final long
-            domainId, final long accountId,
-                     final long related, final String name, final String displayText, final String networkDomain, final GuestType guestType, final long dcId, final Long
-                             physicalNetworkId, final ACLType aclType,
-                     final boolean specifyIpRanges, final Long vpcId, final boolean isRedundant) {
+    public NetworkVO(final long id, final TrafficType trafficType, final Mode mode, final BroadcastDomainType broadcastDomainType, final long networkOfferingId,
+                     final long domainId, final long accountId, final long related, final String name, final String displayText, final String networkDomain,
+                     final GuestType guestType, final long dcId, final Long physicalNetworkId, final ACLType aclType, final boolean specifyIpRanges, final Long vpcId,
+                     final boolean isRedundant) {
         this(trafficType, mode, broadcastDomainType, networkOfferingId, State.Allocated, dcId, physicalNetworkId, isRedundant);
         this.domainId = domainId;
         this.accountId = accountId;
@@ -207,9 +188,8 @@ public class NetworkVO implements Network {
      * @param dataCenterId
      * @param physicalNetworkId   TODO
      */
-    public NetworkVO(final TrafficType trafficType, final Mode mode, final BroadcastDomainType broadcastDomainType, final long networkOfferingId, final State state, final long
-            dataCenterId,
-                     final Long physicalNetworkId, final boolean isRedundant) {
+    public NetworkVO(final TrafficType trafficType, final Mode mode, final BroadcastDomainType broadcastDomainType, final long networkOfferingId, final State state,
+                     final long dataCenterId, final Long physicalNetworkId, final boolean isRedundant) {
         this.trafficType = trafficType;
         this.mode = mode;
         this.broadcastDomainType = broadcastDomainType;

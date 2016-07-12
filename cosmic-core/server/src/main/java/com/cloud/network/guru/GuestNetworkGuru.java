@@ -94,7 +94,6 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
     protected NetworkDao _networkDao;
     @Inject
     protected PhysicalNetworkDao _physicalNetworkDao;
-    // Currently set to anything except STT for the Nicira integration.
     protected IsolationMethod[] _isolationMethods;
     @Inject
     ConfigurationDao _configDao;
