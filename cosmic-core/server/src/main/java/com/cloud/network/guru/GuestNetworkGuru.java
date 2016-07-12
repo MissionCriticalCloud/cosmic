@@ -135,9 +135,15 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
             }
         }
 
-        s_logger.debug("Isolation methods '" + Arrays.toString(methods.toArray(new String[methods.size()])) + "' are not supported by this guru");
+        logMismatchInRequiredAndSupportedIsolationMethods(methods);
 
         return false;
+    }
+
+    private void logMismatchInRequiredAndSupportedIsolationMethods(final List<String> methods) {
+        final String requiredIsolationMethods = Arrays.toString(methods.toArray(new String[methods.size()]));
+        final String supportedIsolationMethods = Arrays.toString(_isolationMethods);
+        s_logger.debug("Isolation methods '" + requiredIsolationMethods + "' are not supported by this guru (supported methods are " + supportedIsolationMethods + ")");
     }
 
     public IsolationMethod[] getIsolationMethods() {
