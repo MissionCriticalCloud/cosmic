@@ -23,10 +23,8 @@ public interface ExternalNetworkDeviceManager extends Manager {
 
     class NetworkDevice {
         private static final List<NetworkDevice> supportedNetworkDevices = new ArrayList<>();
-        public static final NetworkDevice JuniperSRXFirewall = new NetworkDevice("JuniperSRXFirewall", Network.Provider.JuniperSRX.getName());
         public static final NetworkDevice ExternalDhcp = new NetworkDevice("ExternalDhcp");
         public static final NetworkDevice NiciraNvp = new NetworkDevice("NiciraNvp", Network.Provider.NiciraNvp.getName());
-        public static final NetworkDevice CiscoVnmc = new NetworkDevice("CiscoVnmc", Network.Provider.CiscoVnmc.getName());
         private final String _name;
         private final String _provider;
 
