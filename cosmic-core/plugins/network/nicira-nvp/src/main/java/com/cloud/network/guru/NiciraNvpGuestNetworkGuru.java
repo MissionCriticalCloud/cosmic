@@ -83,6 +83,7 @@ public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
 
     @Override
     protected boolean canHandle(final NetworkOffering offering, final DataCenter.NetworkType networkType, final PhysicalNetwork physicalNetwork) {
+        s_logger.debug("Checking of guru can handle request");
         // This guru handles only Guest Isolated network that supports Source nat service
         if (networkType == DataCenter.NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() == Network.GuestType.Isolated
                 && isMyIsolationMethod(physicalNetwork) && ntwkOfferingSrvcDao.areServicesSupportedByNetworkOffering(offering.getId(), Network.Service.Connectivity)) {

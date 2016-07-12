@@ -92,8 +92,7 @@ public class ExternalGuestNetworkGuru extends GuestNetworkGuru {
 
     @Override
     protected boolean canHandle(final NetworkOffering offering, final NetworkType networkType, final PhysicalNetwork physicalNetwork) {
-        // This guru handles only Guest Isolated network that supports Source
-        // nat service
+        s_logger.debug("Checking of guru can handle request");
         if (networkType == NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() == Network.GuestType.Isolated &&
                 isMyIsolationMethod(physicalNetwork) && !offering.isSystemOnly()) {
             return true;
