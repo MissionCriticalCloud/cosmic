@@ -4579,36 +4579,54 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final User user = context.getCallingUser();
         final Account account = context.getCallingAccount();
 
+        final VmWorkJobVO workJob = fetchOrCreateVmWorkJob(vm, network, requested, context, user, account);
+        AsyncJobExecutionContext.getCurrentExecutionContext().joinJob(workJob.getId());
+
+        return new VmJobVirtualMachineOutcome(workJob, vm.getId());
+    }
+
+    private VmWorkJobVO fetchOrCreateVmWorkJob(final VirtualMachine vm, final Network network, final NicProfile requested, final CallContext context, final User user, final
+    Account account) {
         final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(VirtualMachine.Type.Instance, vm.getId(), VmWorkAddVmToNetwork.class.getName());
 
         VmWorkJobVO workJob = null;
         if (pendingWorkJobs != null && pendingWorkJobs.size() > 0) {
             assert pendingWorkJobs.size() == 1;
             workJob = pendingWorkJobs.get(0);
-            s_logger.info("Found pending job in queue " + workJob + " and will reuse that to add vm " + vm + " to network " + network);
-        } else {
-            workJob = new VmWorkJobVO(context.getContextId());
-
-            workJob.setDispatcher(VmWorkConstants.VM_WORK_JOB_DISPATCHER);
-            workJob.setCmd(VmWorkAddVmToNetwork.class.getName());
-
-            workJob.setAccountId(account.getId());
-            workJob.setUserId(user.getId());
-            workJob.setVmType(VirtualMachine.Type.Instance);
-            workJob.setVmInstanceId(vm.getId());
-            workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
-
-            // save work context info (there are some duplications)
-            final String vmWorkJobHandler = VirtualMachineManagerImpl.VM_WORK_JOB_HANDLER;
-            final VmWorkAddVmToNetwork workInfo = new VmWorkAddVmToNetwork(user.getId(), account.getId(), vm.getId(), vmWorkJobHandler, network.getId(), requested);
-            workJob.setCmdInfo(VmWorkSerializer.serialize(workInfo));
-
-            _jobMgr.submitAsyncJob(workJob, VmWorkConstants.VM_WORK_QUEUE, vm.getId());
-            s_logger.info("Submitted new job to queue to add vm " + vm + " to network " + network);
+            if (jobIsForSameNetwork(network, workJob)) {
+                s_logger.info("Found pending job in queue " + workJob + " and will reuse that to add vm " + vm + " to network " + network);
+                return workJob;
+            }
         }
-        AsyncJobExecutionContext.getCurrentExecutionContext().joinJob(workJob.getId());
+        return createNewVmWorkJob(vm, network, requested, context, user, account);
+    }
 
-        return new VmJobVirtualMachineOutcome(workJob, vm.getId());
+    private boolean jobIsForSameNetwork(final Network network, final VmWorkJobVO workJob) {
+        return new JobHelper().jobIsForSameNetwork(workJob, network);
+    }
+
+    private VmWorkJobVO createNewVmWorkJob(final VirtualMachine vm, final Network network, final NicProfile requested, final CallContext context, final User user, final Account
+            account) {
+        final VmWorkJobVO workJob;
+        workJob = new VmWorkJobVO(context.getContextId());
+
+        workJob.setDispatcher(VmWorkConstants.VM_WORK_JOB_DISPATCHER);
+        workJob.setCmd(VmWorkAddVmToNetwork.class.getName());
+
+        workJob.setAccountId(account.getId());
+        workJob.setUserId(user.getId());
+        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmInstanceId(vm.getId());
+        workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
+
+        // save work context info (there are some duplications)
+        final String vmWorkJobHandler = VirtualMachineManagerImpl.VM_WORK_JOB_HANDLER;
+        final VmWorkAddVmToNetwork workInfo = new VmWorkAddVmToNetwork(user.getId(), account.getId(), vm.getId(), vmWorkJobHandler, network.getId(), requested);
+        workJob.setCmdInfo(VmWorkSerializer.serialize(workInfo));
+
+        _jobMgr.submitAsyncJob(workJob, VmWorkConstants.VM_WORK_QUEUE, vm.getId());
+        s_logger.info("Submitted new job to queue to add vm " + vm + " to network " + network);
+        return workJob;
     }
 
     public Outcome<VirtualMachine> removeNicFromVmThroughJobQueue(
@@ -4668,5 +4686,18 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         _workJobDao.persist(workJob);
 
         return workJob;
+    }
+
+    public static class JobHelper {
+        public boolean jobIsForSameNetwork(final VmWorkJobVO workJob, final Network network) {
+            final VmWorkAddVmToNetwork workInfo = VmWorkSerializer.deserialize(VmWorkAddVmToNetwork.class, workJob.getCmdInfo());
+            if (workInfo != null) {
+                final Long workInfoNetworkId = workInfo.getNetworkId();
+                final long networkId = network.getId();
+                return workInfoNetworkId != null && workInfoNetworkId == networkId;
+            } else {
+                return false;
+            }
+        }
     }
 }

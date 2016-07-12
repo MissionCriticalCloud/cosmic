@@ -206,6 +206,10 @@ public class NetworkVO implements Network {
         uuid = UUID.randomUUID().toString();
     }
 
+    public void setId(final long id) {
+        this.id = id;
+    }
+
     @Override
     public long getId() {
         return id;
