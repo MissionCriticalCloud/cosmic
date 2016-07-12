@@ -2737,7 +2737,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             InsufficientCapacityException {
         final CallContext cctx = CallContext.current();
 
-        s_logger.debug("Adding vm " + vm + " to network " + network + "; requested nic profile " + requested);
+        s_logger.debug("Orchestrating add vm " + vm + " to network " + network + " with requested nic profile " + requested);
         final VMInstanceVO vmVO = _vmDao.findById(vm.getId());
         final ReservationContext context = new ReservationContextImpl(null, null, cctx.getCallingUser(), cctx.getCallingAccount());
 
@@ -4055,7 +4055,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     @Override
     public NicProfile addVmToNetwork(final VirtualMachine vm, final Network network, final NicProfile requested)
             throws ConcurrentOperationException, ResourceUnavailableException, InsufficientCapacityException {
-
+        s_logger.info("Adding VM " + vm + " to network " + network + " with requested nic profile " + requested);
         final AsyncJobExecutionContext jobContext = AsyncJobExecutionContext.getCurrentExecutionContext();
         if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
             // avoid re-entrance
@@ -4572,23 +4572,21 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         return new VmJobVirtualMachineOutcome(workJob, vm.getId());
     }
 
-    public Outcome<VirtualMachine> addVmToNetworkThroughJobQueue(
-            final VirtualMachine vm, final Network network, final NicProfile requested) {
-
+    public Outcome<VirtualMachine> addVmToNetworkThroughJobQueue(final VirtualMachine vm, final Network network, final NicProfile requested) {
         final CallContext context = CallContext.current();
+        s_logger.info("Orchestrating add vm " + vm + " to network " + network + " with requested nic profile " + requested + " via job queue");
+
         final User user = context.getCallingUser();
         final Account account = context.getCallingAccount();
 
-        final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(
-                VirtualMachine.Type.Instance, vm.getId(),
-                VmWorkAddVmToNetwork.class.getName());
+        final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(VirtualMachine.Type.Instance, vm.getId(), VmWorkAddVmToNetwork.class.getName());
 
         VmWorkJobVO workJob = null;
         if (pendingWorkJobs != null && pendingWorkJobs.size() > 0) {
             assert pendingWorkJobs.size() == 1;
             workJob = pendingWorkJobs.get(0);
+            s_logger.info("Found pending job in queue " + workJob + " and will reuse that to add vm " + vm + " to network " + network);
         } else {
-
             workJob = new VmWorkJobVO(context.getContextId());
 
             workJob.setDispatcher(VmWorkConstants.VM_WORK_JOB_DISPATCHER);
@@ -4601,11 +4599,12 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
             // save work context info (there are some duplications)
-            final VmWorkAddVmToNetwork workInfo = new VmWorkAddVmToNetwork(user.getId(), account.getId(), vm.getId(),
-                    VirtualMachineManagerImpl.VM_WORK_JOB_HANDLER, network.getId(), requested);
+            final String vmWorkJobHandler = VirtualMachineManagerImpl.VM_WORK_JOB_HANDLER;
+            final VmWorkAddVmToNetwork workInfo = new VmWorkAddVmToNetwork(user.getId(), account.getId(), vm.getId(), vmWorkJobHandler, network.getId(), requested);
             workJob.setCmdInfo(VmWorkSerializer.serialize(workInfo));
 
             _jobMgr.submitAsyncJob(workJob, VmWorkConstants.VM_WORK_QUEUE, vm.getId());
+            s_logger.info("Submitted new job to queue to add vm " + vm + " to network " + network);
         }
         AsyncJobExecutionContext.getCurrentExecutionContext().joinJob(workJob.getId());
 
