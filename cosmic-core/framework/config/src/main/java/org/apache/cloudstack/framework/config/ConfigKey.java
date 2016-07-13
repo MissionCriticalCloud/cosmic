@@ -23,13 +23,13 @@ public class ConfigKey<T> {
     private final T _multiplier;
     T _value = null;
 
-    public ConfigKey(final String category, final Class<T> type, final String name, final String defaultValue, final String description, final boolean isDynamic, final Scope
-            scope) {
+    public ConfigKey(final String category, final Class<T> type, final String name, final String defaultValue, final String description, final boolean isDynamic,
+                     final Scope scope) {
         this(type, name, category, defaultValue, description, isDynamic, scope, null);
     }
 
-    public ConfigKey(final Class<T> type, final String name, final String category, final String defaultValue, final String description, final boolean isDynamic, final Scope
-            scope, final T multiplier) {
+    public ConfigKey(final Class<T> type, final String name, final String category, final String defaultValue, final String description, final boolean isDynamic,
+                     final Scope scope, final T multiplier) {
         _category = category;
         _type = type;
         _name = name;

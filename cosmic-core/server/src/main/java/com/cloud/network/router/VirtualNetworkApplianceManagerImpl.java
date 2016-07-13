@@ -2093,9 +2093,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
     protected boolean aggregationExecution(final AggregationControlCommand.Action action, final Network network, final List<DomainRouterVO> routers)
             throws AgentUnavailableException, ResourceUnavailableException {
-
         int errors = 0;
-
         for (final DomainRouterVO router : routers) {
 
             final String routerControlIp = _routerControlHelper.getRouterControlIp(router.getId());

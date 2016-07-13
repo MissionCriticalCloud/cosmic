@@ -22,11 +22,9 @@ public interface ExternalNetworkDeviceManager extends Manager {
     boolean deleteNetworkDevice(DeleteNetworkDeviceCmd cmd);
 
     class NetworkDevice {
-        public static final NetworkDevice ExternalDhcp = new NetworkDevice("ExternalDhcp", null);
-        public static final NetworkDevice JuniperSRXFirewall = new NetworkDevice("JuniperSRXFirewall", Network.Provider.JuniperSRX.getName());
-        public static final NetworkDevice NiciraNvp = new NetworkDevice("NiciraNvp", Network.Provider.NiciraNvp.getName());
-        public static final NetworkDevice CiscoVnmc = new NetworkDevice("CiscoVnmc", Network.Provider.CiscoVnmc.getName());
         private static final List<NetworkDevice> supportedNetworkDevices = new ArrayList<>();
+        public static final NetworkDevice ExternalDhcp = new NetworkDevice("ExternalDhcp");
+        public static final NetworkDevice NiciraNvp = new NetworkDevice("NiciraNvp", Network.Provider.NiciraNvp.getName());
         private final String _name;
         private final String _provider;
 
@@ -34,6 +32,10 @@ public interface ExternalNetworkDeviceManager extends Manager {
             _name = deviceName;
             _provider = ntwkServiceprovider;
             supportedNetworkDevices.add(this);
+        }
+
+        public NetworkDevice(final String deviceName) {
+            this(deviceName, null);
         }
 
         public static NetworkDevice getNetworkDevice(final String devicerName) {

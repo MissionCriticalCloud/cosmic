@@ -968,8 +968,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 }
                 network = implementedNetwork.second();
             } catch (final ResourceUnavailableException ex) {
-                s_logger.warn("Failed to implement persistent guest network " + network + "due to ", ex);
-                final CloudRuntimeException e = new CloudRuntimeException("Failed to implement persistent guest network");
+                s_logger.warn("Failed to implement persistent guest network " + network + "due to: " + ex.getMessage());
+                final CloudRuntimeException e = new CloudRuntimeException("Failed to implement persistent guest network", ex);
                 e.addProxyObject(network.getUuid(), "networkId");
                 throw e;
             }
