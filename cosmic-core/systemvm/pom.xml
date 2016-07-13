@@ -5,7 +5,7 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>5.1.0.3</version>
+        <version>5.1.0.4-SNAPSHOT</version>
     </parent>
     <properties>
         <mkisofs>mkisofs</mkisofs>
@@ -14,17 +14,17 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-agent</artifactId>
-            <version>5.1.0.3</version>
+            <version>5.1.0.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-secondary-storage</artifactId>
-            <version>5.1.0.3</version>
+            <version>5.1.0.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-console-proxy</artifactId>
-            <version>5.1.0.3</version>
+            <version>5.1.0.4-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>
