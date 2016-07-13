@@ -5,7 +5,7 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>5.1.0.3-SNAPSHOT</version>
+        <version>5.1.0.3</version>
         <relativePath>../../</relativePath>
     </parent>
     <properties>
@@ -24,12 +24,12 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-agent</artifactId>
-            <version>5.1.0.3-SNAPSHOT</version>
+            <version>5.1.0.3</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-server</artifactId>
-            <version>5.1.0.3-SNAPSHOT</version>
+            <version>5.1.0.3</version>
         </dependency>
         <!-- dependencies for starting a post upload server on ssvm -->
         <dependency>
