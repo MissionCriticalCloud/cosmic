@@ -298,20 +298,14 @@ public class DirectAgentAttache extends AgentAttache {
                     if (currentCmd.getContextParam("logid") != null) {
                         MDC.put("logcontextid", currentCmd.getContextParam("logid"));
                     }
-                    try {
-                        if (resource != null) {
-                            answer = resource.executeRequest(cmds[i]);
-                            if (answer == null) {
-                                s_logger.warn("Resource returned null answer!");
-                                answer = new Answer(cmds[i], false, "Resource returned null answer");
-                            }
-                        } else {
-                            answer = new Answer(cmds[i], false, "Agent is disconnected");
+                    if (resource != null) {
+                        answer = resource.executeRequest(cmds[i]);
+                        if (answer == null) {
+                            s_logger.warn("Resource returned null answer!");
+                            answer = new Answer(cmds[i], false, "Resource returned null answer");
                         }
-                    } catch (final Throwable t) {
-                        // Catch Throwable as all exceptions will otherwise be eaten by the executor framework
-                        s_logger.warn(log(seq, "Throwable caught while executing command"), t);
-                        answer = new Answer(cmds[i], false, t.toString());
+                    } else {
+                        answer = new Answer(cmds[i], false, "Agent is disconnected");
                     }
                     answers.add(answer);
                     if (!answer.getResult() && stopOnError) {
@@ -328,9 +322,6 @@ public class DirectAgentAttache extends AgentAttache {
                 }
 
                 processAnswers(seq, resp);
-            } catch (final Throwable t) {
-                // This is pretty serious as processAnswers might not be called and the calling process is stuck waiting for the full timeout
-                s_logger.error(log(seq, "Throwable caught in runInContext, this will cause the management to become unpredictable"), t);
             } finally {
                 _outstandingTaskCount.decrementAndGet();
                 scheduleFromQueue();

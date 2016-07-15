@@ -74,6 +74,7 @@ import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventUtils;
 import com.cloud.exception.AffinityConflictException;
 import com.cloud.exception.AgentUnavailableException;
+import com.cloud.exception.CloudException;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ConnectionException;
 import com.cloud.exception.InsufficientAddressCapacityException;
@@ -1148,7 +1149,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                     l.add(rs.getLong(1));
                 }
             } catch (final SQLException e) {
-            } catch (final Throwable e) {
+                s_logger.warn("Caught (previously ignored) SQLException", e);
             }
         } finally {
             if (txn != null) {
@@ -1250,7 +1251,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                     l.add(rs.getLong(1));
                 }
             } catch (final SQLException e) {
-            } catch (final Throwable e) {
+                s_logger.warn("Caught (previously ignored) SQLException", e);
             }
             return l;
         } finally {
@@ -1572,7 +1573,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                     l.add(rs.getLong(1));
                 }
             } catch (final SQLException e) {
-            } catch (final Throwable e) {
+                s_logger.warn("Caught (previously ignored) SQLException", e);
             }
             return l;
         } finally {
@@ -3463,7 +3464,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     }
 
     @Override
-    public Pair<JobInfo.Status, String> handleVmWorkJob(final VmWork work) throws Exception {
+    public Pair<JobInfo.Status, String> handleVmWorkJob(final VmWork work) throws CloudException {
         return _jobHandlerProxy.handleVmWorkJob(work);
     }
 

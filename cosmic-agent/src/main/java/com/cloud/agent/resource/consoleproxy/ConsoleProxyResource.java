@@ -435,11 +435,7 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
             // this method won't be called in high frequency, serialize access
             // to script execution
             synchronized (this) {
-                try {
-                    addRouteToInternalIpOrCidr(_localgw, _eth1ip, _eth1mask, address);
-                } catch (final Throwable e) {
-                    s_logger.warn("Unexpected exception while adding internal route to " + address, e);
-                }
+                addRouteToInternalIpOrCidr(_localgw, _eth1ip, _eth1mask, address);
             }
         }
     }

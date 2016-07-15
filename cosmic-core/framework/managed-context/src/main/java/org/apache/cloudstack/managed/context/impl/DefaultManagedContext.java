@@ -54,7 +54,7 @@ public class DefaultManagedContext implements ManagedContext {
 
         final Stack<ListenerInvocation> invocations = new Stack<>();
         final boolean reentry = !ManagedContextUtils.setAndCheckOwner(owner);
-        Throwable firstError = null;
+        RuntimeException firstError = null;
 
         try {
             for (final ManagedContextListener<?> listener : listeners) {
@@ -62,14 +62,14 @@ public class DefaultManagedContext implements ManagedContext {
 
                 try {
                     data = listener.onEnterContext(reentry);
-                } catch (final Throwable t) {
+                } catch (final RuntimeException e) {
                     /* If one listener fails, still call all other listeners
                      * and then we will call onLeaveContext for all
                      */
                     if (firstError == null) {
-                        firstError = t;
+                        firstError = e;
                     }
-                    log.error("Failed onEnterContext for listener [{}]", listener, t);
+                    log.error("Failed onEnterContext for listener [{}]", listener, e);
                 }
 
                 /* Stack data structure is used because in between onEnter and onLeave
@@ -93,9 +93,9 @@ public class DefaultManagedContext implements ManagedContext {
                     final ListenerInvocation invocation = invocations.pop();
                     try {
                         invocation.listener.onLeaveContext(invocation.data, reentry);
-                    } catch (final Throwable t) {
-                        lastError = t;
-                        log.error("Failed onLeaveContext for listener [{}]", invocation.listener, t);
+                    } catch (final RuntimeException e) {
+                        lastError = e;
+                        log.error("Failed onLeaveContext for listener [{}]", invocation.listener, e);
                     }
                 }
 

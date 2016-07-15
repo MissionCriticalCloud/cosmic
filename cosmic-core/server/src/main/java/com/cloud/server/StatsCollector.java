@@ -10,6 +10,8 @@ import com.cloud.agent.api.VmDiskStatsEntry;
 import com.cloud.agent.api.VmStatsEntry;
 import com.cloud.cluster.ManagementServerHostVO;
 import com.cloud.cluster.dao.ManagementServerHostDao;
+import com.cloud.exception.AgentUnavailableException;
+import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.StorageUnavailableException;
 import com.cloud.gpu.dao.HostGpuGroupsDao;
 import com.cloud.host.Host;
@@ -357,164 +359,151 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
     class HostCollector extends ManagedContextRunnable {
         @Override
         protected void runInContext() {
-            try {
-                s_logger.debug("HostStatsCollector is running...");
+            s_logger.debug("HostStatsCollector is running...");
 
-                final SearchCriteria<HostVO> sc = _hostDao.createSearchCriteria();
-                sc.addAnd("status", SearchCriteria.Op.EQ, Status.Up.toString());
-                sc.addAnd("resourceState", SearchCriteria.Op.NIN, ResourceState.Maintenance, ResourceState.PrepareForMaintenance, ResourceState.ErrorInMaintenance);
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.Storage.toString());
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.ConsoleProxy.toString());
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.SecondaryStorage.toString());
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.LocalSecondaryStorage.toString());
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.TrafficMonitor.toString());
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.SecondaryStorageVM.toString());
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.ExternalFirewall.toString());
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.ExternalLoadBalancer.toString());
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.L2Networking.toString());
-                final ConcurrentHashMap<Long, HostStats> hostStats = new ConcurrentHashMap<>();
-                final List<HostVO> hosts = _hostDao.search(sc, null);
-                for (final HostVO host : hosts) {
-                    final HostStatsEntry stats = (HostStatsEntry) _resourceMgr.getHostStatistics(host.getId());
-                    if (stats != null) {
-                        hostStats.put(host.getId(), stats);
-                    } else {
-                        s_logger.warn("Received invalid host stats for host: " + host.getId());
-                    }
-                }
-                _hostStats = hostStats;
-                // Get a subset of hosts with GPU support from the list of "hosts"
-                List<HostVO> gpuEnabledHosts = new ArrayList<>();
-                if (hostIds != null) {
-                    for (final HostVO host : hosts) {
-                        if (hostIds.contains(host.getId())) {
-                            gpuEnabledHosts.add(host);
-                        }
-                    }
+            final SearchCriteria<HostVO> sc = _hostDao.createSearchCriteria();
+            sc.addAnd("status", SearchCriteria.Op.EQ, Status.Up.toString());
+            sc.addAnd("resourceState", SearchCriteria.Op.NIN, ResourceState.Maintenance, ResourceState.PrepareForMaintenance, ResourceState.ErrorInMaintenance);
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.Storage.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.ConsoleProxy.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.SecondaryStorage.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.LocalSecondaryStorage.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.TrafficMonitor.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.SecondaryStorageVM.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.ExternalFirewall.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.ExternalLoadBalancer.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.L2Networking.toString());
+            final ConcurrentHashMap<Long, HostStats> hostStats = new ConcurrentHashMap<>();
+            final List<HostVO> hosts = _hostDao.search(sc, null);
+            for (final HostVO host : hosts) {
+                final HostStatsEntry stats = (HostStatsEntry) _resourceMgr.getHostStatistics(host.getId());
+                if (stats != null) {
+                    hostStats.put(host.getId(), stats);
                 } else {
-                    // Check for all the hosts managed by CloudStack.
-                    gpuEnabledHosts = hosts;
+                    s_logger.warn("Received invalid host stats for host: " + host.getId());
                 }
-                for (final HostVO host : gpuEnabledHosts) {
-                    final HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails = _resourceMgr.getGPUStatistics(host);
-                    if (groupDetails != null) {
-                        _resourceMgr.updateGPUDetails(host.getId(), groupDetails);
+            }
+            _hostStats = hostStats;
+            // Get a subset of hosts with GPU support from the list of "hosts"
+            List<HostVO> gpuEnabledHosts = new ArrayList<>();
+            if (hostIds != null) {
+                for (final HostVO host : hosts) {
+                    if (hostIds.contains(host.getId())) {
+                        gpuEnabledHosts.add(host);
                     }
                 }
-                hostIds = _hostGpuGroupsDao.listHostIds();
-            } catch (final Throwable t) {
-                s_logger.error("Error trying to retrieve host stats", t);
+            } else {
+                // Check for all the hosts managed by CloudStack.
+                gpuEnabledHosts = hosts;
             }
+            for (final HostVO host : gpuEnabledHosts) {
+                final HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails = _resourceMgr.getGPUStatistics(host);
+                if (groupDetails != null) {
+                    _resourceMgr.updateGPUDetails(host.getId(), groupDetails);
+                }
+            }
+            hostIds = _hostGpuGroupsDao.listHostIds();
         }
     }
 
     class VmStatsCollector extends ManagedContextRunnable {
         @Override
         protected void runInContext() {
-            try {
-                s_logger.debug("VmStatsCollector is running...");
+            s_logger.debug("VmStatsCollector is running...");
 
-                final SearchCriteria<HostVO> sc = _hostDao.createSearchCriteria();
-                sc.addAnd("status", SearchCriteria.Op.EQ, Status.Up.toString());
-                sc.addAnd("resourceState", SearchCriteria.Op.NIN, ResourceState.Maintenance, ResourceState.PrepareForMaintenance, ResourceState.ErrorInMaintenance);
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.Storage.toString());
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.ConsoleProxy.toString());
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.SecondaryStorage.toString());
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.LocalSecondaryStorage.toString());
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.TrafficMonitor.toString());
-                sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.SecondaryStorageVM.toString());
-                final List<HostVO> hosts = _hostDao.search(sc, null);
+            final SearchCriteria<HostVO> sc = _hostDao.createSearchCriteria();
+            sc.addAnd("status", SearchCriteria.Op.EQ, Status.Up.toString());
+            sc.addAnd("resourceState", SearchCriteria.Op.NIN, ResourceState.Maintenance, ResourceState.PrepareForMaintenance, ResourceState.ErrorInMaintenance);
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.Storage.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.ConsoleProxy.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.SecondaryStorage.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.LocalSecondaryStorage.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.TrafficMonitor.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.SecondaryStorageVM.toString());
+            final List<HostVO> hosts = _hostDao.search(sc, null);
 
                 /* HashMap for metrics to be send to Graphite */
-                final HashMap metrics = new HashMap<>();
+            final HashMap metrics = new HashMap<>();
 
-                for (final HostVO host : hosts) {
-                    final List<UserVmVO> vms = _userVmDao.listRunningByHostId(host.getId());
-                    final List<Long> vmIds = new ArrayList<>();
+            for (final HostVO host : hosts) {
+                final List<UserVmVO> vms = _userVmDao.listRunningByHostId(host.getId());
+                final List<Long> vmIds = new ArrayList<>();
 
-                    for (final UserVmVO vm : vms) {
-                        vmIds.add(vm.getId());
+                for (final UserVmVO vm : vms) {
+                    vmIds.add(vm.getId());
+                }
+
+                final HashMap<Long, VmStatsEntry> vmStatsById = _userVmMgr.getVirtualMachineStatistics(host.getId(), host.getName(), vmIds);
+
+                if (vmStatsById != null) {
+                    VmStatsEntry statsInMemory = null;
+
+                    final Set<Long> vmIdSet = vmStatsById.keySet();
+                    for (final Long vmId : vmIdSet) {
+                        final VmStatsEntry statsForCurrentIteration = vmStatsById.get(vmId);
+                        statsInMemory = (VmStatsEntry) _VmStats.get(vmId);
+
+                        if (statsInMemory == null) {
+                            //no stats exist for this vm, directly persist
+                            _VmStats.put(vmId, statsForCurrentIteration);
+                        } else {
+                            //update each field
+                            statsInMemory.setCPUUtilization(statsForCurrentIteration.getCPUUtilization());
+                            statsInMemory.setNumCPUs(statsForCurrentIteration.getNumCPUs());
+                            statsInMemory.setNetworkReadKBs(statsInMemory.getNetworkReadKBs() + statsForCurrentIteration.getNetworkReadKBs());
+                            statsInMemory.setNetworkWriteKBs(statsInMemory.getNetworkWriteKBs() + statsForCurrentIteration.getNetworkWriteKBs());
+                            statsInMemory.setDiskWriteKBs(statsInMemory.getDiskWriteKBs() + statsForCurrentIteration.getDiskWriteKBs());
+                            statsInMemory.setDiskReadIOs(statsInMemory.getDiskReadIOs() + statsForCurrentIteration.getDiskReadIOs());
+                            statsInMemory.setDiskWriteIOs(statsInMemory.getDiskWriteIOs() + statsForCurrentIteration.getDiskWriteIOs());
+                            statsInMemory.setDiskReadKBs(statsInMemory.getDiskReadKBs() + statsForCurrentIteration.getDiskReadKBs());
+
+                            _VmStats.put(vmId, statsInMemory);
+                        }
+
+                        /**
+                         * Add statistics to HashMap only when they should be send to a external stats collector
+                         * Performance wise it seems best to only append to the HashMap when needed
+                         */
+                        if (externalStatsEnabled) {
+                            final VMInstanceVO vmVO = _vmInstance.findById(vmId);
+                            final String vmName = vmVO.getUuid();
+
+                            metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".cpu.num", statsForCurrentIteration.getNumCPUs());
+                            metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".cpu.utilization", statsForCurrentIteration.getCPUUtilization());
+                            metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".network.read_kbs", statsForCurrentIteration.getNetworkReadKBs());
+                            metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".network.write_kbs", statsForCurrentIteration.getNetworkWriteKBs());
+                            metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".disk.write_kbs", statsForCurrentIteration.getDiskWriteKBs());
+                            metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".disk.read_kbs", statsForCurrentIteration.getDiskReadKBs());
+                            metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".disk.write_iops", statsForCurrentIteration.getDiskWriteIOs());
+                            metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".disk.read_iops", statsForCurrentIteration.getDiskReadIOs());
+                        }
                     }
 
-                    try {
-                        final HashMap<Long, VmStatsEntry> vmStatsById = _userVmMgr.getVirtualMachineStatistics(host.getId(), host.getName(), vmIds);
+                    /**
+                     * Send the metrics to a external stats collector
+                     * We send it on a per-host basis to prevent that we flood the host
+                     * Currently only Graphite is supported
+                     */
+                    if (!metrics.isEmpty()) {
+                        if (externalStatsType != null && externalStatsType == ExternalStatsProtocol.GRAPHITE) {
 
-                        if (vmStatsById != null) {
-                            VmStatsEntry statsInMemory = null;
-
-                            final Set<Long> vmIdSet = vmStatsById.keySet();
-                            for (final Long vmId : vmIdSet) {
-                                final VmStatsEntry statsForCurrentIteration = vmStatsById.get(vmId);
-                                statsInMemory = (VmStatsEntry) _VmStats.get(vmId);
-
-                                if (statsInMemory == null) {
-                                    //no stats exist for this vm, directly persist
-                                    _VmStats.put(vmId, statsForCurrentIteration);
-                                } else {
-                                    //update each field
-                                    statsInMemory.setCPUUtilization(statsForCurrentIteration.getCPUUtilization());
-                                    statsInMemory.setNumCPUs(statsForCurrentIteration.getNumCPUs());
-                                    statsInMemory.setNetworkReadKBs(statsInMemory.getNetworkReadKBs() + statsForCurrentIteration.getNetworkReadKBs());
-                                    statsInMemory.setNetworkWriteKBs(statsInMemory.getNetworkWriteKBs() + statsForCurrentIteration.getNetworkWriteKBs());
-                                    statsInMemory.setDiskWriteKBs(statsInMemory.getDiskWriteKBs() + statsForCurrentIteration.getDiskWriteKBs());
-                                    statsInMemory.setDiskReadIOs(statsInMemory.getDiskReadIOs() + statsForCurrentIteration.getDiskReadIOs());
-                                    statsInMemory.setDiskWriteIOs(statsInMemory.getDiskWriteIOs() + statsForCurrentIteration.getDiskWriteIOs());
-                                    statsInMemory.setDiskReadKBs(statsInMemory.getDiskReadKBs() + statsForCurrentIteration.getDiskReadKBs());
-
-                                    _VmStats.put(vmId, statsInMemory);
-                                }
-
-                                /**
-                                 * Add statistics to HashMap only when they should be send to a external stats collector
-                                 * Performance wise it seems best to only append to the HashMap when needed
-                                 */
-                                if (externalStatsEnabled) {
-                                    final VMInstanceVO vmVO = _vmInstance.findById(vmId);
-                                    final String vmName = vmVO.getUuid();
-
-                                    metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".cpu.num", statsForCurrentIteration.getNumCPUs());
-                                    metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".cpu.utilization", statsForCurrentIteration.getCPUUtilization());
-                                    metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".network.read_kbs", statsForCurrentIteration.getNetworkReadKBs());
-                                    metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".network.write_kbs", statsForCurrentIteration.getNetworkWriteKBs());
-                                    metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".disk.write_kbs", statsForCurrentIteration.getDiskWriteKBs());
-                                    metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".disk.read_kbs", statsForCurrentIteration.getDiskReadKBs());
-                                    metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".disk.write_iops", statsForCurrentIteration.getDiskWriteIOs());
-                                    metrics.put(externalStatsPrefix + "cloudstack.stats.instances." + vmName + ".disk.read_iops", statsForCurrentIteration.getDiskReadIOs());
-                                }
+                            if (externalStatsPort == -1) {
+                                externalStatsPort = 2003;
                             }
 
-                            /**
-                             * Send the metrics to a external stats collector
-                             * We send it on a per-host basis to prevent that we flood the host
-                             * Currently only Graphite is supported
-                             */
-                            if (!metrics.isEmpty()) {
-                                if (externalStatsType != null && externalStatsType == ExternalStatsProtocol.GRAPHITE) {
+                            s_logger.debug("Sending VmStats of host " + host.getId() + " to Graphite host " + externalStatsHost + ":" + externalStatsPort);
 
-                                    if (externalStatsPort == -1) {
-                                        externalStatsPort = 2003;
-                                    }
-
-                                    s_logger.debug("Sending VmStats of host " + host.getId() + " to Graphite host " + externalStatsHost + ":" + externalStatsPort);
-
-                                    try {
-                                        final GraphiteClient g = new GraphiteClient(externalStatsHost, externalStatsPort);
-                                        g.sendMetrics(metrics);
-                                    } catch (final GraphiteException e) {
-                                        s_logger.debug("Failed sending VmStats to Graphite host " + externalStatsHost + ":" + externalStatsPort + ": " + e.getMessage());
-                                    }
-
-                                    metrics.clear();
-                                }
+                            try {
+                                final GraphiteClient g = new GraphiteClient(externalStatsHost, externalStatsPort);
+                                g.sendMetrics(metrics);
+                            } catch (final GraphiteException e) {
+                                s_logger.debug("Failed sending VmStats to Graphite host " + externalStatsHost + ":" + externalStatsPort + ": " + e.getMessage());
                             }
+
+                            metrics.clear();
                         }
-                    } catch (final Exception e) {
-                        s_logger.debug("Failed to get VM stats for host with ID: " + host.getId());
-                        continue;
                     }
                 }
-            } catch (final Throwable t) {
-                s_logger.error("Error trying to retrieve VM stats", t);
             }
         }
     }
@@ -700,206 +689,198 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
     class StorageCollector extends ManagedContextRunnable {
         @Override
         protected void runInContext() {
-            try {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("StorageCollector is running...");
-                }
-
-                final List<DataStore> stores = _dataStoreMgr.listImageStores();
-                final ConcurrentHashMap<Long, StorageStats> storageStats = new ConcurrentHashMap<>();
-                for (final DataStore store : stores) {
-                    if (store.getUri() == null) {
-                        continue;
-                    }
-
-                    final GetStorageStatsCommand command = new GetStorageStatsCommand(store.getTO());
-                    final EndPoint ssAhost = _epSelector.select(store);
-                    if (ssAhost == null) {
-                        s_logger.debug("There is no secondary storage VM for secondary storage host " + store.getName());
-                        continue;
-                    }
-                    final long storeId = store.getId();
-                    final Answer answer = ssAhost.sendMessage(command);
-                    if (answer != null && answer.getResult()) {
-                        storageStats.put(storeId, (StorageStats) answer);
-                        s_logger.trace("HostId: " + storeId + " Used: " + ((StorageStats) answer).getByteUsed() + " Total Available: " +
-                                ((StorageStats) answer).getCapacityBytes());
-                    }
-                }
-                _storageStats = storageStats;
-                final ConcurrentHashMap<Long, StorageStats> storagePoolStats = new ConcurrentHashMap<>();
-
-                final List<StoragePoolVO> storagePools = _storagePoolDao.listAll();
-                for (final StoragePoolVO pool : storagePools) {
-                    // check if the pool has enabled hosts
-                    final List<Long> hostIds = _storageManager.getUpHostsInPool(pool.getId());
-                    if (hostIds == null || hostIds.isEmpty()) {
-                        continue;
-                    }
-                    final GetStorageStatsCommand command = new GetStorageStatsCommand(pool.getUuid(), pool.getPoolType(), pool.getPath());
-                    final long poolId = pool.getId();
-                    try {
-                        final Answer answer = _storageManager.sendToPool(pool, command);
-                        if (answer != null && answer.getResult()) {
-                            storagePoolStats.put(pool.getId(), (StorageStats) answer);
-
-                            // Seems like we have dynamically updated the pool size since the prev. size and the current do not match
-                            if (_storagePoolStats.get(poolId) != null && _storagePoolStats.get(poolId).getCapacityBytes() != ((StorageStats) answer).getCapacityBytes()) {
-                                pool.setCapacityBytes(((StorageStats) answer).getCapacityBytes());
-                                _storagePoolDao.update(pool.getId(), pool);
-                            }
-                        }
-                    } catch (final StorageUnavailableException e) {
-                        s_logger.info("Unable to reach " + pool, e);
-                    } catch (final Exception e) {
-                        s_logger.warn("Unable to get stats for " + pool, e);
-                    }
-                }
-                _storagePoolStats = storagePoolStats;
-            } catch (final Throwable t) {
-                s_logger.error("Error trying to retrieve storage stats", t);
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("StorageCollector is running...");
             }
+
+            final List<DataStore> stores = _dataStoreMgr.listImageStores();
+            final ConcurrentHashMap<Long, StorageStats> storageStats = new ConcurrentHashMap<>();
+            for (final DataStore store : stores) {
+                if (store.getUri() == null) {
+                    continue;
+                }
+
+                final GetStorageStatsCommand command = new GetStorageStatsCommand(store.getTO());
+                final EndPoint ssAhost = _epSelector.select(store);
+                if (ssAhost == null) {
+                    s_logger.debug("There is no secondary storage VM for secondary storage host " + store.getName());
+                    continue;
+                }
+                final long storeId = store.getId();
+                final Answer answer = ssAhost.sendMessage(command);
+                if (answer != null && answer.getResult()) {
+                    storageStats.put(storeId, (StorageStats) answer);
+                    s_logger.trace("HostId: " + storeId + " Used: " + ((StorageStats) answer).getByteUsed() + " Total Available: " +
+                            ((StorageStats) answer).getCapacityBytes());
+                }
+            }
+            _storageStats = storageStats;
+            final ConcurrentHashMap<Long, StorageStats> storagePoolStats = new ConcurrentHashMap<>();
+
+            final List<StoragePoolVO> storagePools = _storagePoolDao.listAll();
+            for (final StoragePoolVO pool : storagePools) {
+                // check if the pool has enabled hosts
+                final List<Long> hostIds = _storageManager.getUpHostsInPool(pool.getId());
+                if (hostIds == null || hostIds.isEmpty()) {
+                    continue;
+                }
+                final GetStorageStatsCommand command = new GetStorageStatsCommand(pool.getUuid(), pool.getPoolType(), pool.getPath());
+                final long poolId = pool.getId();
+                try {
+                    final Answer answer = _storageManager.sendToPool(pool, command);
+                    if (answer != null && answer.getResult()) {
+                        storagePoolStats.put(pool.getId(), (StorageStats) answer);
+
+                        // Seems like we have dynamically updated the pool size since the prev. size and the current do not match
+                        if (_storagePoolStats.get(poolId) != null && _storagePoolStats.get(poolId).getCapacityBytes() != ((StorageStats) answer).getCapacityBytes()) {
+                            pool.setCapacityBytes(((StorageStats) answer).getCapacityBytes());
+                            _storagePoolDao.update(pool.getId(), pool);
+                        }
+                    }
+                } catch (final StorageUnavailableException e) {
+                    s_logger.info("Unable to reach " + pool, e);
+                } catch (final Exception e) {
+                    s_logger.warn("Unable to get stats for " + pool, e);
+                }
+            }
+            _storagePoolStats = storagePoolStats;
         }
     }
 
     class AutoScaleMonitor extends ManagedContextRunnable {
         @Override
         protected void runInContext() {
-            try {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("AutoScaling Monitor is running...");
-                }
-                // list all AS VMGroups
-                final List<AutoScaleVmGroupVO> asGroups = _asGroupDao.listAll();
-                for (final AutoScaleVmGroupVO asGroup : asGroups) {
-                    // check group state
-                    if ((asGroup.getState().equals("enabled")) && (is_native(asGroup.getId()))) {
-                        // check minimum vm of group
-                        final Integer currentVM = _asGroupVmDao.countByGroup(asGroup.getId());
-                        if (currentVM < asGroup.getMinMembers()) {
-                            _asManager.doScaleUp(asGroup.getId(), asGroup.getMinMembers() - currentVM);
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("AutoScaling Monitor is running...");
+            }
+            // list all AS VMGroups
+            final List<AutoScaleVmGroupVO> asGroups = _asGroupDao.listAll();
+            for (final AutoScaleVmGroupVO asGroup : asGroups) {
+                // check group state
+                if ((asGroup.getState().equals("enabled")) && (is_native(asGroup.getId()))) {
+                    // check minimum vm of group
+                    final Integer currentVM = _asGroupVmDao.countByGroup(asGroup.getId());
+                    if (currentVM < asGroup.getMinMembers()) {
+                        _asManager.doScaleUp(asGroup.getId(), asGroup.getMinMembers() - currentVM);
+                        continue;
+                    }
+
+                    //check interval
+                    final long now = (new Date()).getTime();
+                    if (asGroup.getLastInterval() != null) {
+                        if ((now - asGroup.getLastInterval().getTime()) < asGroup
+                                .getInterval()) {
                             continue;
                         }
+                    }
 
-                        //check interval
-                        final long now = (new Date()).getTime();
-                        if (asGroup.getLastInterval() != null) {
-                            if ((now - asGroup.getLastInterval().getTime()) < asGroup
-                                    .getInterval()) {
-                                continue;
-                            }
-                        }
+                    // update last_interval
+                    asGroup.setLastInterval(new Date());
+                    _asGroupDao.persist(asGroup);
 
-                        // update last_interval
-                        asGroup.setLastInterval(new Date());
-                        _asGroupDao.persist(asGroup);
-
-                        // collect RRDs data for this group
-                        if (s_logger.isDebugEnabled()) {
-                            s_logger.debug("[AutoScale] Collecting RRDs data...");
-                        }
-                        final Map<String, String> params = new HashMap<>();
-                        final List<AutoScaleVmGroupVmMapVO> asGroupVmVOs = _asGroupVmDao.listByGroup(asGroup.getId());
-                        params.put("total_vm", String.valueOf(asGroupVmVOs.size()));
-                        for (int i = 0; i < asGroupVmVOs.size(); i++) {
-                            final long vmId = asGroupVmVOs.get(i).getInstanceId();
-                            final VMInstanceVO vmVO = _vmInstance.findById(vmId);
-                            //xe vm-list | grep vmname -B 1 | head -n 1 | awk -F':' '{print $2}'
-                            params.put("vmname" + String.valueOf(i + 1), vmVO.getInstanceName());
-                            params.put("vmid" + String.valueOf(i + 1), String.valueOf(vmVO.getId()));
-                        }
-                        // get random hostid because all vms are in a cluster
-                        final long vmId = asGroupVmVOs.get(0).getInstanceId();
+                    // collect RRDs data for this group
+                    if (s_logger.isDebugEnabled()) {
+                        s_logger.debug("[AutoScale] Collecting RRDs data...");
+                    }
+                    final Map<String, String> params = new HashMap<>();
+                    final List<AutoScaleVmGroupVmMapVO> asGroupVmVOs = _asGroupVmDao.listByGroup(asGroup.getId());
+                    params.put("total_vm", String.valueOf(asGroupVmVOs.size()));
+                    for (int i = 0; i < asGroupVmVOs.size(); i++) {
+                        final long vmId = asGroupVmVOs.get(i).getInstanceId();
                         final VMInstanceVO vmVO = _vmInstance.findById(vmId);
-                        final Long receiveHost = vmVO.getHostId();
+                        //xe vm-list | grep vmname -B 1 | head -n 1 | awk -F':' '{print $2}'
+                        params.put("vmname" + String.valueOf(i + 1), vmVO.getInstanceName());
+                        params.put("vmid" + String.valueOf(i + 1), String.valueOf(vmVO.getId()));
+                    }
+                    // get random hostid because all vms are in a cluster
+                    final long vmId = asGroupVmVOs.get(0).getInstanceId();
+                    final VMInstanceVO vmVO = _vmInstance.findById(vmId);
+                    final Long receiveHost = vmVO.getHostId();
 
-                        // setup parameters phase: duration and counter
-                        // list pair [counter, duration]
-                        final List<Pair<String, Integer>> lstPair = getPairofCounternameAndDuration(asGroup.getId());
-                        int total_counter = 0;
-                        final String[] lstCounter = new String[lstPair.size()];
-                        for (int i = 0; i < lstPair.size(); i++) {
-                            final Pair<String, Integer> pair = lstPair.get(i);
-                            final String strCounterNames = pair.first();
-                            final Integer duration = pair.second();
+                    // setup parameters phase: duration and counter
+                    // list pair [counter, duration]
+                    final List<Pair<String, Integer>> lstPair = getPairofCounternameAndDuration(asGroup.getId());
+                    int total_counter = 0;
+                    final String[] lstCounter = new String[lstPair.size()];
+                    for (int i = 0; i < lstPair.size(); i++) {
+                        final Pair<String, Integer> pair = lstPair.get(i);
+                        final String strCounterNames = pair.first();
+                        final Integer duration = pair.second();
 
-                            lstCounter[i] = strCounterNames.split(",")[0];
-                            total_counter++;
-                            params.put("duration" + String.valueOf(total_counter), duration.toString());
-                            params.put("counter" + String.valueOf(total_counter), lstCounter[i]);
-                            params.put("con" + String.valueOf(total_counter), strCounterNames.split(",")[1]);
-                        }
-                        params.put("total_counter", String.valueOf(total_counter));
+                        lstCounter[i] = strCounterNames.split(",")[0];
+                        total_counter++;
+                        params.put("duration" + String.valueOf(total_counter), duration.toString());
+                        params.put("counter" + String.valueOf(total_counter), lstCounter[i]);
+                        params.put("con" + String.valueOf(total_counter), strCounterNames.split(",")[1]);
+                    }
+                    params.put("total_counter", String.valueOf(total_counter));
 
-                        final PerformanceMonitorCommand perfMon = new PerformanceMonitorCommand(params, 20);
+                    final PerformanceMonitorCommand perfMon = new PerformanceMonitorCommand(params, 20);
 
-                        try {
-                            final Answer answer = _agentMgr.send(receiveHost, perfMon);
-                            if (answer == null || !answer.getResult()) {
-                                s_logger.debug("Failed to send data to node !");
-                            } else {
-                                final String result = answer.getDetails();
-                                s_logger.debug("[AutoScale] RRDs collection answer: " + result);
-                                final HashMap<Long, Double> avgCounter = new HashMap<>();
+                    try {
+                        final Answer answer = _agentMgr.send(receiveHost, perfMon);
+                        if (answer == null || !answer.getResult()) {
+                            s_logger.debug("Failed to send data to node !");
+                        } else {
+                            final String result = answer.getDetails();
+                            s_logger.debug("[AutoScale] RRDs collection answer: " + result);
+                            final HashMap<Long, Double> avgCounter = new HashMap<>();
 
-                                // extract data
-                                final String[] counterElements = result.split(",");
-                                if ((counterElements != null) && (counterElements.length > 0)) {
-                                    for (final String string : counterElements) {
-                                        try {
-                                            final String[] counterVals = string.split(":");
-                                            final String[] counter_vm = counterVals[0].split("\\.");
+                            // extract data
+                            final String[] counterElements = result.split(",");
+                            if ((counterElements != null) && (counterElements.length > 0)) {
+                                for (final String string : counterElements) {
+                                    try {
+                                        final String[] counterVals = string.split(":");
+                                        final String[] counter_vm = counterVals[0].split("\\.");
 
-                                            final Long counterId = Long.parseLong(counter_vm[1]);
-                                            final Long conditionId = Long.parseLong(params.get("con" + counter_vm[1]));
-                                            Double coVal = Double.parseDouble(counterVals[1]);
+                                        final Long counterId = Long.parseLong(counter_vm[1]);
+                                        final Long conditionId = Long.parseLong(params.get("con" + counter_vm[1]));
+                                        Double coVal = Double.parseDouble(counterVals[1]);
 
-                                            // Summary of all counter by counterId key
-                                            if (avgCounter.get(counterId) == null) {
+                                        // Summary of all counter by counterId key
+                                        if (avgCounter.get(counterId) == null) {
                                                 /* initialize if data is not set */
-                                                avgCounter.put(counterId, new Double(0));
-                                            }
-
-                                            final String counterName = getCounternamebyCondition(conditionId.longValue());
-                                            if (Counter.Source.memory.toString().equals(counterName)) {
-                                                // calculate memory in percent
-                                                final Long profileId = asGroup.getProfileId();
-                                                final AutoScaleVmProfileVO profileVo = _asProfileDao.findById(profileId);
-                                                final ServiceOfferingVO serviceOff = _serviceOfferingDao.findById(profileVo.getServiceOfferingId());
-                                                final int maxRAM = serviceOff.getRamSize();
-
-                                                // get current RAM percent
-                                                coVal = coVal / maxRAM;
-                                            } else {
-                                                // cpu
-                                                coVal = coVal * 100;
-                                            }
-
-                                            // update data entry
-                                            avgCounter.put(counterId, avgCounter.get(counterId) + coVal);
-                                        } catch (final Exception e) {
-                                            e.printStackTrace();
+                                            avgCounter.put(counterId, new Double(0));
                                         }
-                                    }
 
-                                    final String scaleAction = getAutoscaleAction(avgCounter, asGroup.getId(), currentVM, params);
-                                    if (scaleAction != null) {
-                                        s_logger.debug("[AutoScale] Doing scale action: " + scaleAction + " for group " + asGroup.getId());
-                                        if (scaleAction.equals("scaleup")) {
-                                            _asManager.doScaleUp(asGroup.getId(), 1);
+                                        final String counterName = getCounternamebyCondition(conditionId.longValue());
+                                        if (Counter.Source.memory.toString().equals(counterName)) {
+                                            // calculate memory in percent
+                                            final Long profileId = asGroup.getProfileId();
+                                            final AutoScaleVmProfileVO profileVo = _asProfileDao.findById(profileId);
+                                            final ServiceOfferingVO serviceOff = _serviceOfferingDao.findById(profileVo.getServiceOfferingId());
+                                            final int maxRAM = serviceOff.getRamSize();
+
+                                            // get current RAM percent
+                                            coVal = coVal / maxRAM;
                                         } else {
-                                            _asManager.doScaleDown(asGroup.getId());
+                                            // cpu
+                                            coVal = coVal * 100;
                                         }
+
+                                        // update data entry
+                                        avgCounter.put(counterId, avgCounter.get(counterId) + coVal);
+                                    } catch (final Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                final String scaleAction = getAutoscaleAction(avgCounter, asGroup.getId(), currentVM, params);
+                                if (scaleAction != null) {
+                                    s_logger.debug("[AutoScale] Doing scale action: " + scaleAction + " for group " + asGroup.getId());
+                                    if (scaleAction.equals("scaleup")) {
+                                        _asManager.doScaleUp(asGroup.getId(), 1);
+                                    } else {
+                                        _asManager.doScaleDown(asGroup.getId());
                                     }
                                 }
                             }
-                        } catch (final Exception e) {
-                            e.printStackTrace();
                         }
+                    } catch (OperationTimedoutException | AgentUnavailableException e) {
+                        s_logger.warn("Caught (previously ignored) exception while running the auto scale monitor", e);
                     }
                 }
-            } catch (final Throwable t) {
-                s_logger.error("Error trying to monitor autoscaling", t);
             }
         }
 

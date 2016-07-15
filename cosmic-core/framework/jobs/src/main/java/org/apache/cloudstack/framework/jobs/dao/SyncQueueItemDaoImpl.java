@@ -101,8 +101,6 @@ public class SyncQueueItemDaoImpl extends GenericDaoBase<SyncQueueItemVO, Long> 
             }
         } catch (final SQLException e) {
             s_logger.error("Unexpected sql exception, ", e);
-        } catch (final Throwable e) {
-            s_logger.error("Unexpected exception, ", e);
         }
         return l;
     }

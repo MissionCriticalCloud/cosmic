@@ -1341,24 +1341,15 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
     public class WorkerThread extends ManagedContextRunnable {
         @Override
         protected void runInContext() {
-            try {
-                work();
-            } catch (final Throwable th) {
-                s_logger.error("Problem with SG work", th);
-            }
+            work();
         }
     }
 
     public class CleanupThread extends ManagedContextRunnable {
         @Override
         protected void runInContext() {
-            try {
-                cleanupFinishedWork();
-                cleanupUnfinishedWork();
-                //processScheduledWork();
-            } catch (final Throwable th) {
-                s_logger.error("Problem with SG Cleanup", th);
-            }
+            cleanupFinishedWork();
+            cleanupUnfinishedWork();
         }
     }
 }

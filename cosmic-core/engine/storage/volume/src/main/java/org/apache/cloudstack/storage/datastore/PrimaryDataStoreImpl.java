@@ -15,7 +15,6 @@ import com.cloud.storage.dao.VMTemplatePoolDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.db.GlobalLock;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.storage.encoding.EncodingType;
 import org.apache.cloudstack.engine.subsystem.api.storage.ClusterScope;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
@@ -312,18 +311,6 @@ public class PrimaryDataStoreImpl implements PrimaryDataStore {
                         }
                         templateStoragePoolRef = new VMTemplateStoragePoolVO(getId(), obj.getId());
                         templateStoragePoolRef = templatePoolDao.persist(templateStoragePoolRef);
-                    }
-                } catch (final Throwable t) {
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Failed to insert (" + templateIdPoolIdString + ") to template_spool_ref", t);
-                    }
-                    templateStoragePoolRef = templatePoolDao.findByPoolTemplate(getId(), obj.getId());
-                    if (templateStoragePoolRef == null) {
-                        throw new CloudRuntimeException("Failed to create template storage pool entry");
-                    } else {
-                        if (s_logger.isDebugEnabled()) {
-                            s_logger.debug("Another thread already inserts " + templateStoragePoolRef.getId() + " to template_spool_ref", t);
-                        }
                     }
                 } finally {
                     lock.unlock();

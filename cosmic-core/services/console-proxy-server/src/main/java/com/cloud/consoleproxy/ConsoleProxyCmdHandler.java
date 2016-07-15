@@ -1,7 +1,6 @@
 package com.cloud.consoleproxy;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 import com.sun.net.httpserver.Headers;
@@ -19,24 +18,12 @@ public class ConsoleProxyCmdHandler implements HttpHandler {
             Thread.currentThread().setName("Cmd Thread " + Thread.currentThread().getId() + " " + t.getRemoteAddress());
             s_logger.info("CmdHandler " + t.getRequestURI());
             doHandle(t);
-        } catch (final Exception e) {
-            s_logger.error(e.toString(), e);
-            final String response = "Not found";
-            t.sendResponseHeaders(404, response.length());
-            final OutputStream os = t.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
-        } catch (final OutOfMemoryError e) {
-            s_logger.error("Unrecoverable OutOfMemory Error, exit and let it be re-launched");
-            System.exit(1);
-        } catch (final Throwable e) {
-            s_logger.error(e.toString(), e);
         } finally {
             t.close();
         }
     }
 
-    public void doHandle(final HttpExchange t) throws Exception {
+    public void doHandle(final HttpExchange t) throws IOException {
         final String path = t.getRequestURI().getPath();
         final int i = path.indexOf("/", 1);
         final String cmd = path.substring(i + 1);

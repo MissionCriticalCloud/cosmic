@@ -1,6 +1,7 @@
 package com.cloud.api;
 
 import com.cloud.dao.EntityManager;
+import com.cloud.exception.CloudException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.user.Account;
 import com.cloud.user.User;
@@ -92,12 +93,12 @@ public class ApiAsyncJobDispatcher extends AdapterBase implements AsyncJobDispat
 
                 // serialize this to the async job table
                 _asyncJobMgr.completeAsyncJob(job.getId(), JobInfo.Status.SUCCEEDED, 0, ApiSerializerHelper.toSerializedString(cmdObj.getResponseObject()));
-            } catch (final InvalidParameterValueException ipve) {
-                throw new ServerApiException(ApiErrorCode.PARAM_ERROR, ipve.getMessage());
+            } catch (final InvalidParameterValueException | CloudException e) {
+                throw new ServerApiException(ApiErrorCode.PARAM_ERROR, e.getMessage());
             } finally {
                 CallContext.unregister();
             }
-        } catch (final Throwable e) {
+        } catch (IllegalAccessException | InstantiationException | ClassNotFoundException | ServerApiException e) {
             String errorMsg = null;
             int errorCode = ApiErrorCode.INTERNAL_ERROR.getHttpCode();
             if (!(e instanceof ServerApiException)) {

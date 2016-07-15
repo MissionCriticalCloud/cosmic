@@ -413,8 +413,6 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
             return HypervisorType.None;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + sql, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + sql, e);
         }
     }
 
@@ -477,8 +475,6 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
             return result;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + ORDER_POOLS_NUMBER_OF_VOLUMES_FOR_ACCOUNT, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + ORDER_POOLS_NUMBER_OF_VOLUMES_FOR_ACCOUNT, e);
         }
     }
 
@@ -501,8 +497,6 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
             return result;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + ORDER_ZONE_WIDE_POOLS_NUMBER_OF_VOLUMES_FOR_ACCOUNT, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + ORDER_ZONE_WIDE_POOLS_NUMBER_OF_VOLUMES_FOR_ACCOUNT, e);
         }
     }
 
@@ -562,8 +556,6 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
             }
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + SELECT_POOLSCOPE, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + SELECT_POOLSCOPE, e);
         }
         return null;
     }

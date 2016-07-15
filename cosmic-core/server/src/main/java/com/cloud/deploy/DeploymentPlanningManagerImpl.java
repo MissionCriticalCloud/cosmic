@@ -1506,13 +1506,9 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
     class HostReservationReleaseChecker extends ManagedContextTimerTask {
         @Override
         protected void runInContext() {
-            try {
-                s_logger.debug("Checking if any host reservation can be released ... ");
-                checkHostReservations();
-                s_logger.debug("Done running HostReservationReleaseChecker ... ");
-            } catch (final Throwable t) {
-                s_logger.error("Exception in HostReservationReleaseChecker", t);
-            }
+            s_logger.debug("Checking if any host reservation can be released ... ");
+            checkHostReservations();
+            s_logger.debug("Done running HostReservationReleaseChecker ... ");
         }
     }
 }

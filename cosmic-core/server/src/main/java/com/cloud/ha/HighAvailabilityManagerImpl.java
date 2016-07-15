@@ -943,8 +943,6 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
                 MDC.put("workid", " (workid: " + work.getId() + ")");
                 s_logger.info("Processing work " + work);
                 processWork(work);
-            } catch (final Throwable th) {
-                s_logger.error("Caught this throwable, ", th);
             } finally {
                 if (work != null) {
                     MDC.remove("workId");

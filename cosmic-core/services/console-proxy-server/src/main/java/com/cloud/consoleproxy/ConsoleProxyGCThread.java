@@ -92,12 +92,7 @@ public class ConsoleProxyGCThread extends Thread {
         if (files != null) {
             for (final File file : files) {
                 if (System.currentTimeMillis() - file.lastModified() >= 86400000L) {
-                    try {
-                        file.delete();
-                    } catch (final Throwable e) {
-                        s_logger.info("[ignored]"
-                                + "failed to delete file: " + e.getLocalizedMessage());
-                    }
+                    file.delete();
                 }
             }
         }

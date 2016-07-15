@@ -167,8 +167,6 @@ public class ClusterDaoImpl extends GenericDaoBase<ClusterVO, Long> implements C
             return result;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + GET_POD_CLUSTER_MAP_PREFIX, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + GET_POD_CLUSTER_MAP_PREFIX, e);
         }
     }
 

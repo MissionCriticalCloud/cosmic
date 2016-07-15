@@ -1,5 +1,6 @@
 package com.cloud.vm;
 
+import com.cloud.exception.CloudException;
 import com.cloud.serializer.GsonHelper;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.framework.jobs.impl.JobSerializerHelper;
@@ -74,7 +75,7 @@ public class VmWorkJobHandlerProxy implements VmWorkJobHandler {
     }
 
     @Override
-    public Pair<JobInfo.Status, String> handleVmWorkJob(final VmWork work) throws Exception {
+    public Pair<JobInfo.Status, String> handleVmWorkJob(final VmWork work) throws CloudException {
 
         final Method method = getHandlerMethod(work.getClass());
         if (method != null) {
@@ -93,16 +94,19 @@ public class VmWorkJobHandlerProxy implements VmWorkJobHandler {
                 assert (obj instanceof Pair);
                 return (Pair<JobInfo.Status, String>) obj;
             } catch (final InvocationTargetException e) {
-                s_logger.error("Invocation exception, caused by: " + e.getCause());
+                final Throwable cause = e.getCause();
+                s_logger.error("Invocation exception, caused by: " + cause);
 
                 // legacy CloudStack code relies on checked exception for error handling
                 // we need to re-throw the real exception here
-                if (e.getCause() != null && e.getCause() instanceof Exception) {
-                    s_logger.info("Rethrow exception " + e.getCause());
-                    throw (Exception) e.getCause();
+                if (cause != null && cause instanceof Exception) {
+                    s_logger.info("Rethrow exception " + cause);
+                    throw new CloudException("Caught exception while handling a VmWorkJob", cause);
                 }
 
-                throw e;
+                throw new CloudException("Caught exception while handling a VmWorkJob", e);
+            } catch (final IllegalAccessException e) {
+                throw new CloudException("Caught exception while handling a VmWorkJob", e);
             }
         } else {
             s_logger.error("Unable to find handler for VM work job: " + work.getClass().getName() + _gsonLogger.toJson(work));

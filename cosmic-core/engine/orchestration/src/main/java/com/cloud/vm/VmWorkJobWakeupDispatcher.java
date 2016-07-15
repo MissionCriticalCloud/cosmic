@@ -14,6 +14,7 @@ import org.apache.cloudstack.framework.jobs.impl.AsyncJobJoinMapVO;
 import org.apache.cloudstack.framework.jobs.impl.VmWorkJobVO;
 
 import javax.inject.Inject;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -46,56 +47,53 @@ public class VmWorkJobWakeupDispatcher extends AdapterBase implements AsyncJobDi
 
     @Override
     public void runJob(final AsyncJob job) {
+        final List<AsyncJobJoinMapVO> joinRecords = _joinMapDao.listJoinRecords(job.getId());
+        if (joinRecords.size() != 1) {
+            s_logger.warn("AsyncJob-" + job.getId() + " received wakeup call with un-supported joining job number: " + joinRecords.size());
+
+            // if we fail wakeup-execution for any reason, avoid release sync-source if there is any
+            job.setSyncSource(null);
+            return;
+        }
+
+        final AsyncJobJoinMapVO joinRecord = joinRecords.get(0);
+        final VmWorkJobVO joinedJob = _workjobDao.findById(joinRecord.getJoinJobId());
+
+        Class<?> workClz = null;
         try {
-            final List<AsyncJobJoinMapVO> joinRecords = _joinMapDao.listJoinRecords(job.getId());
-            if (joinRecords.size() != 1) {
-                s_logger.warn("AsyncJob-" + job.getId()
-                        + " received wakeup call with un-supported joining job number: " + joinRecords.size());
+            workClz = Class.forName(job.getCmd());
+        } catch (final ClassNotFoundException e) {
+            s_logger.error("VM work class " + job.getCmd() + " is not found", e);
+            return;
+        }
 
-                // if we fail wakeup-execution for any reason, avoid release sync-source if there is any
-                job.setSyncSource(null);
-                return;
+        // get original work context information from joined job
+        final VmWork work = VmWorkSerializer.deserialize(workClz, joinedJob.getCmdInfo());
+        assert (work != null);
+
+        final AccountVO account = _accountDao.findById(work.getAccountId());
+        assert (account != null);
+
+        final VMInstanceVO vm = _instanceDao.findById(work.getVmId());
+        assert (vm != null);
+
+        CallContext.register(work.getUserId(), work.getAccountId(), job.getRelated());
+        try {
+            final Method handler = getHandler(joinRecord.getWakeupHandler());
+            if (handler != null) {
+                handler.invoke(_vmMgr);
+            } else {
+                assert (false);
+                s_logger.error("Unable to find wakeup handler " + joinRecord.getWakeupHandler() +
+                        " when waking up job-" + job.getId());
             }
-
-            final AsyncJobJoinMapVO joinRecord = joinRecords.get(0);
-            final VmWorkJobVO joinedJob = _workjobDao.findById(joinRecord.getJoinJobId());
-
-            Class<?> workClz = null;
-            try {
-                workClz = Class.forName(job.getCmd());
-            } catch (final ClassNotFoundException e) {
-                s_logger.error("VM work class " + job.getCmd() + " is not found", e);
-                return;
-            }
-
-            // get original work context information from joined job
-            final VmWork work = VmWorkSerializer.deserialize(workClz, joinedJob.getCmdInfo());
-            assert (work != null);
-
-            final AccountVO account = _accountDao.findById(work.getAccountId());
-            assert (account != null);
-
-            final VMInstanceVO vm = _instanceDao.findById(work.getVmId());
-            assert (vm != null);
-
-            CallContext.register(work.getUserId(), work.getAccountId(), job.getRelated());
-            try {
-                final Method handler = getHandler(joinRecord.getWakeupHandler());
-                if (handler != null) {
-                    handler.invoke(_vmMgr);
-                } else {
-                    assert (false);
-                    s_logger.error("Unable to find wakeup handler " + joinRecord.getWakeupHandler() +
-                            " when waking up job-" + job.getId());
-                }
-            } finally {
-                CallContext.unregister();
-            }
-        } catch (final Throwable e) {
+        } catch (InvocationTargetException | IllegalAccessException e) {
             s_logger.warn("Unexpected exception in waking up job-" + job.getId());
 
             // if we fail wakeup-execution for any reason, avoid release sync-source if there is any
             job.setSyncSource(null);
+        } finally {
+            CallContext.unregister();
         }
     }
 

@@ -287,16 +287,7 @@ public class SecurityGroupManagerImpl2 extends SecurityGroupManagerImpl {
         @Override
         public void run() {
             while (true) {
-                try {
-                    _managedContext.runWithContext(new Runnable() {
-                        @Override
-                        public void run() {
-                            work();
-                        }
-                    });
-                } catch (final Throwable th) {
-                    s_logger.error("SG Work: Caught this throwable, ", th);
-                }
+                _managedContext.runWithContext(() -> work());
             }
         }
     }

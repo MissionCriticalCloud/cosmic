@@ -1,5 +1,6 @@
 package com.cloud.vm;
 
+import com.cloud.exception.CloudException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;
@@ -98,7 +99,7 @@ public class VmWorkJobDispatcher extends AdapterBase implements AsyncJobDispatch
         } catch (final InvalidParameterValueException e) {
             s_logger.error("Unable to complete " + job + ", job origin:" + job.getRelated());
             _asyncJobMgr.completeAsyncJob(job.getId(), JobInfo.Status.FAILED, 0, _asyncJobMgr.marshallResultObject(e));
-        } catch (final Throwable e) {
+        } catch (final CloudException e) {
             s_logger.error("Unable to complete " + job + ", job origin:" + job.getRelated(), e);
 
             //RuntimeException ex = new RuntimeException("Job failed due to exception " + e.getMessage());

@@ -55,38 +55,27 @@ public class RpcProviderImpl implements RpcProvider {
     }
 
     private void handleCallRequestPdu(final String sourceAddress, final String targetAddress, final RpcCallRequestPdu pdu) {
-        try {
-            final RpcServerCall call = new RpcServerCallImpl(this, sourceAddress, targetAddress, pdu);
+        final RpcServerCall call = new RpcServerCallImpl(this, sourceAddress, targetAddress, pdu);
 
-            // TODO, we are trying to avoid locking when calling into callbacks
-            // this should be optimized later
-            final List<RpcServiceEndpoint> endpoints = new ArrayList<>();
-            synchronized (_serviceEndpoints) {
-                endpoints.addAll(_serviceEndpoints);
-            }
-
-            for (final RpcServiceEndpoint endpoint : endpoints) {
-                if (endpoint.onCallReceive(call)) {
-                    return;
-                }
-            }
-
-            final RpcCallResponsePdu responsePdu = new RpcCallResponsePdu();
-            responsePdu.setCommand(pdu.getCommand());
-            responsePdu.setRequestStartTick(pdu.getRequestStartTick());
-            responsePdu.setRequestTag(pdu.getRequestTag());
-            responsePdu.setResult(RpcCallResponsePdu.RESULT_HANDLER_NOT_EXIST);
-            sendRpcPdu(targetAddress, sourceAddress, _messageSerializer.serializeTo(RpcCallResponsePdu.class, responsePdu));
-        } catch (final Throwable e) {
-
-            final RpcCallResponsePdu responsePdu = new RpcCallResponsePdu();
-            responsePdu.setCommand(pdu.getCommand());
-            responsePdu.setRequestStartTick(pdu.getRequestStartTick());
-            responsePdu.setRequestTag(pdu.getRequestTag());
-            responsePdu.setResult(RpcCallResponsePdu.RESULT_HANDLER_EXCEPTION);
-
-            sendRpcPdu(targetAddress, sourceAddress, _messageSerializer.serializeTo(RpcCallResponsePdu.class, responsePdu));
+        // TODO, we are trying to avoid locking when calling into callbacks
+        // this should be optimized later
+        final List<RpcServiceEndpoint> endpoints = new ArrayList<>();
+        synchronized (_serviceEndpoints) {
+            endpoints.addAll(_serviceEndpoints);
         }
+
+        for (final RpcServiceEndpoint endpoint : endpoints) {
+            if (endpoint.onCallReceive(call)) {
+                return;
+            }
+        }
+
+        final RpcCallResponsePdu responsePdu = new RpcCallResponsePdu();
+        responsePdu.setCommand(pdu.getCommand());
+        responsePdu.setRequestStartTick(pdu.getRequestStartTick());
+        responsePdu.setRequestTag(pdu.getRequestTag());
+        responsePdu.setResult(RpcCallResponsePdu.RESULT_HANDLER_NOT_EXIST);
+        sendRpcPdu(targetAddress, sourceAddress, _messageSerializer.serializeTo(RpcCallResponsePdu.class, responsePdu));
     }
 
     private void handleCallResponsePdu(final String sourceAddress, final String targetAddress, final RpcCallResponsePdu pdu) {

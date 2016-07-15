@@ -4,6 +4,11 @@ import com.cloud.api.dispatch.DispatchChain;
 import com.cloud.api.dispatch.DispatchChainFactory;
 import com.cloud.api.dispatch.DispatchTask;
 import com.cloud.dao.EntityManager;
+import com.cloud.exception.CloudException;
+import com.cloud.exception.InsufficientCapacityException;
+import com.cloud.exception.NetworkRuleConflictException;
+import com.cloud.exception.ResourceAllocationException;
+import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.projects.Project;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
@@ -76,7 +81,7 @@ public class ApiDispatcher {
         }
     }
 
-    public void dispatch(final BaseCmd cmd, final Map<String, String> params, final boolean execute) throws Exception {
+    public void dispatch(final BaseCmd cmd, final Map<String, String> params, final boolean execute) throws CloudException {
         // Let the chain of responsibility dispatch gradually
         standardDispatchChain.dispatch(new DispatchTask(cmd, params));
 
@@ -122,6 +127,10 @@ public class ApiDispatcher {
             ((BaseCustomIdCmd) cmd).checkUuid();
         }
 
-        cmd.execute();
+        try {
+            cmd.execute();
+        } catch (ResourceUnavailableException | InsufficientCapacityException | ResourceAllocationException | NetworkRuleConflictException e) {
+            throw new CloudException("Caught exception while executing command", e);
+        }
     }
 }

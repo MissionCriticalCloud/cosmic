@@ -126,12 +126,8 @@ public class SnapshotSchedulerImpl extends ManagerBase implements SnapshotSchedu
             final TimerTask timerTask = new ManagedContextTimerTask() {
                 @Override
                 protected void runInContext() {
-                    try {
-                        final Date currentTimestamp = new Date();
-                        poll(currentTimestamp);
-                    } catch (final Throwable t) {
-                        s_logger.warn("Catch throwable in snapshot scheduler ", t);
-                    }
+                    final Date currentTimestamp = new Date();
+                    poll(currentTimestamp);
                 }
             };
             _testClockTimer = new Timer("SnapshotPollTask");

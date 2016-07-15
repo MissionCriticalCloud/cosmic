@@ -38,20 +38,15 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
             if (s_logger.isTraceEnabled()) {
                 s_logger.trace(t.getRequestURI() + " process time " + (System.currentTimeMillis() - startTick) + " ms");
             }
-        } catch (final IOException e) {
-            throw e;
         } catch (final IllegalArgumentException e) {
             s_logger.warn("Exception, ", e);
             t.sendResponseHeaders(400, -1);     // bad request
-        } catch (final Throwable e) {
-            s_logger.error("Unexpected exception, ", e);
-            t.sendResponseHeaders(500, -1);     // server error
         } finally {
             t.close();
         }
     }
 
-    private void doHandle(final HttpExchange t) throws Exception, IllegalArgumentException {
+    private void doHandle(final HttpExchange t) throws IllegalArgumentException, IOException {
         final String queries = t.getRequestURI().getQuery();
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("Handle AJAX request: " + queries);

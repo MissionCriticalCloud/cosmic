@@ -2052,55 +2052,48 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     @Override
     @DB
     public boolean deleteCluster(final DeleteClusterCmd cmd) {
-        try {
-            Transaction.execute(new TransactionCallbackNoReturn() {
-                @Override
-                public void doInTransactionWithoutResult(final TransactionStatus status) {
-                    final ClusterVO cluster = _clusterDao.lockRow(cmd.getId(), true);
-                    if (cluster == null) {
-                        if (s_logger.isDebugEnabled()) {
-                            s_logger.debug("Cluster: " + cmd.getId() + " does not even exist.  Delete call is ignored.");
-                        }
-                        throw new CloudRuntimeException("Cluster: " + cmd.getId() + " does not exist");
+        Transaction.execute(new TransactionCallbackNoReturn() {
+            @Override
+            public void doInTransactionWithoutResult(final TransactionStatus status) {
+                final ClusterVO cluster = _clusterDao.lockRow(cmd.getId(), true);
+                if (cluster == null) {
+                    if (s_logger.isDebugEnabled()) {
+                        s_logger.debug("Cluster: " + cmd.getId() + " does not even exist.  Delete call is ignored.");
                     }
+                    throw new CloudRuntimeException("Cluster: " + cmd.getId() + " does not exist");
+                }
 
-                    cluster.getHypervisorType();
+                cluster.getHypervisorType();
 
-                    final List<HostVO> hosts = listAllHostsInCluster(cmd.getId());
-                    if (hosts.size() > 0) {
-                        if (s_logger.isDebugEnabled()) {
-                            s_logger.debug("Cluster: " + cmd.getId() + " still has hosts, can't remove");
-                        }
-                        throw new CloudRuntimeException("Cluster: " + cmd.getId() + " cannot be removed. Cluster still has hosts");
+                final List<HostVO> hosts = listAllHostsInCluster(cmd.getId());
+                if (hosts.size() > 0) {
+                    if (s_logger.isDebugEnabled()) {
+                        s_logger.debug("Cluster: " + cmd.getId() + " still has hosts, can't remove");
                     }
+                    throw new CloudRuntimeException("Cluster: " + cmd.getId() + " cannot be removed. Cluster still has hosts");
+                }
 
-                    // don't allow to remove the cluster if it has non-removed storage
-                    // pools
-                    final List<StoragePoolVO> storagePools = _storagePoolDao.listPoolsByCluster(cmd.getId());
-                    if (storagePools.size() > 0) {
-                        if (s_logger.isDebugEnabled()) {
-                            s_logger.debug("Cluster: " + cmd.getId() + " still has storage pools, can't remove");
-                        }
-                        throw new CloudRuntimeException("Cluster: " + cmd.getId() + " cannot be removed. Cluster still has storage pools");
+                // don't allow to remove the cluster if it has non-removed storage
+                // pools
+                final List<StoragePoolVO> storagePools = _storagePoolDao.listPoolsByCluster(cmd.getId());
+                if (storagePools.size() > 0) {
+                    if (s_logger.isDebugEnabled()) {
+                        s_logger.debug("Cluster: " + cmd.getId() + " still has storage pools, can't remove");
                     }
+                    throw new CloudRuntimeException("Cluster: " + cmd.getId() + " cannot be removed. Cluster still has storage pools");
+                }
 
-                    if (_clusterDao.remove(cmd.getId())) {
-                        _capacityDao.removeBy(null, null, null, cluster.getId(), null);
-                        // remove from dedicated resources
-                        final DedicatedResourceVO dr = _dedicatedDao.findByClusterId(cluster.getId());
-                        if (dr != null) {
-                            _dedicatedDao.remove(dr.getId());
-                        }
+                if (_clusterDao.remove(cmd.getId())) {
+                    _capacityDao.removeBy(null, null, null, cluster.getId(), null);
+                    // remove from dedicated resources
+                    final DedicatedResourceVO dr = _dedicatedDao.findByClusterId(cluster.getId());
+                    if (dr != null) {
+                        _dedicatedDao.remove(dr.getId());
                     }
                 }
-            });
-            return true;
-        } catch (final CloudRuntimeException e) {
-            throw e;
-        } catch (final Throwable t) {
-            s_logger.error("Unable to delete cluster: " + cmd.getId(), t);
-            return false;
-        }
+            }
+        });
+        return true;
     }
 
     @Override
@@ -2391,38 +2384,31 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     @DB
     @ActionEvent(eventType = EventTypes.EVENT_HOST_RESERVATION_RELEASE, eventDescription = "releasing host reservation", async = true)
     public boolean releaseHostReservation(final Long hostId) {
-        try {
-            return Transaction.execute(new TransactionCallback<Boolean>() {
-                @Override
-                public Boolean doInTransaction(final TransactionStatus status) {
-                    final PlannerHostReservationVO reservationEntry = _plannerHostReserveDao.findByHostId(hostId);
-                    if (reservationEntry != null) {
-                        final long id = reservationEntry.getId();
-                        final PlannerHostReservationVO hostReservation = _plannerHostReserveDao.lockRow(id, true);
-                        if (hostReservation == null) {
-                            if (s_logger.isDebugEnabled()) {
-                                s_logger.debug("Host reservation for host: " + hostId + " does not even exist.  Release reservartion call is ignored.");
-                            }
-                            return false;
+        return Transaction.execute(new TransactionCallback<Boolean>() {
+            @Override
+            public Boolean doInTransaction(final TransactionStatus status) {
+                final PlannerHostReservationVO reservationEntry = _plannerHostReserveDao.findByHostId(hostId);
+                if (reservationEntry != null) {
+                    final long id = reservationEntry.getId();
+                    final PlannerHostReservationVO hostReservation = _plannerHostReserveDao.lockRow(id, true);
+                    if (hostReservation == null) {
+                        if (s_logger.isDebugEnabled()) {
+                            s_logger.debug("Host reservation for host: " + hostId + " does not even exist.  Release reservartion call is ignored.");
                         }
-                        hostReservation.setResourceUsage(null);
-                        _plannerHostReserveDao.persist(hostReservation);
-                        return true;
+                        return false;
                     }
-
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Host reservation for host: " + hostId + " does not even exist.  Release reservartion call is ignored.");
-                    }
-
-                    return false;
+                    hostReservation.setResourceUsage(null);
+                    _plannerHostReserveDao.persist(hostReservation);
+                    return true;
                 }
-            });
-        } catch (final CloudRuntimeException e) {
-            throw e;
-        } catch (final Throwable t) {
-            s_logger.error("Unable to release host reservation for host: " + hostId, t);
-            return false;
-        }
+
+                if (s_logger.isDebugEnabled()) {
+                    s_logger.debug("Host reservation for host: " + hostId + " does not even exist.  Release reservartion call is ignored.");
+                }
+
+                return false;
+            }
+        });
     }
 
     @Override

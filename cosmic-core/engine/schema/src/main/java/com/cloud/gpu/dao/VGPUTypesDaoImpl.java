@@ -83,8 +83,6 @@ public class VGPUTypesDaoImpl extends GenericDaoBase<VGPUTypesVO, Long> implemen
             return result;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + finalQuery, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + finalQuery, e);
         }
     }
 

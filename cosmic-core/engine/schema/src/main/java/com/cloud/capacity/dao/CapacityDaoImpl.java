@@ -301,8 +301,6 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
             return result;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + sql, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + sql, e);
         }
     }
 
@@ -327,8 +325,6 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
             return result;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + sql, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + sql, e);
         }
     }
 
@@ -397,8 +393,6 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
             return result;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + sql, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + sql, e);
         }
     }
 
@@ -488,8 +482,6 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
             return new Pair<>(result, clusterCapacityMap);
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + sql, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + sql, e);
         }
     }
 
@@ -576,8 +568,6 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
             return summedCapacityList;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + sql, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + sql, e);
         }
     }
 
@@ -610,8 +600,6 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
             return result;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + sql, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + sql, e);
         }
     }
 
@@ -650,8 +638,6 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
             return new Pair<>(result, podCapacityMap);
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + sql, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + sql, e);
         }
     }
 
@@ -699,8 +685,6 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
             return result;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + sql, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + sql, e);
         }
     }
 
@@ -804,8 +788,6 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
             return summedCapacityList;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + finalQuery, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + finalQuery, e);
         }
     }
 
@@ -877,8 +859,6 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
             return result;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + sql, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + sql, e);
         }
     }
 
@@ -927,8 +907,6 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
             return result;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + sql, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + sql, e);
         }
     }
 

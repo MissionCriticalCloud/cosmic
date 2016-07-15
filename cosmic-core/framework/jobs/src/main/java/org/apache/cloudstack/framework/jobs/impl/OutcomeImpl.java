@@ -1,5 +1,7 @@
 package org.apache.cloudstack.framework.jobs.impl;
 
+import com.cloud.exception.InsufficientCapacityException;
+import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.utils.Predicate;
 import org.apache.cloudstack.framework.jobs.AsyncJob;
 import org.apache.cloudstack.framework.jobs.AsyncJobExecutionContext;
@@ -52,7 +54,7 @@ public class OutcomeImpl<T> implements Outcome<T> {
         s_jobMgr.waitAndCheck(getJob(), _topics, _checkIntervalInMs, -1, _predicate);
         try {
             AsyncJobExecutionContext.getCurrentExecutionContext().disjoinJob(_job.getId());
-        } catch (final Throwable e) {
+        } catch (ResourceUnavailableException | InsufficientCapacityException e) {
             throw new ExecutionException("Job task has trouble executing", e);
         }
 
@@ -89,7 +91,7 @@ public class OutcomeImpl<T> implements Outcome<T> {
         s_jobMgr.waitAndCheck(getJob(), _topics, _checkIntervalInMs, unit.toMillis(timeToWait), _predicate);
         try {
             AsyncJobExecutionContext.getCurrentExecutionContext().disjoinJob(_job.getId());
-        } catch (final Throwable e) {
+        } catch (ResourceUnavailableException | InsufficientCapacityException e) {
             throw new ExecutionException("Job task has trouble executing", e);
         }
         return retrieve();

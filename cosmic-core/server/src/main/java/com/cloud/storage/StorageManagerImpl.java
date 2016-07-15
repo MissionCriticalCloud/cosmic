@@ -561,8 +561,8 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
                                     }
                                 }
                             }
-                        } catch (final Throwable th) {
-                            s_logger.warn("Unable to destroy uploaded volume " + volume.getUuid() + ". Error details: " + th.getMessage());
+                        } catch (InterruptedException | ExecutionException e) {
+                            s_logger.warn("Unable to destroy uploaded volume " + volume.getUuid() + ". Error details: " + e.getMessage());
                         }
                     }
 
@@ -614,8 +614,8 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
                                     }
                                 }
                             }
-                        } catch (final Throwable th) {
-                            s_logger.warn("Unable to destroy uploaded template " + template.getUuid() + ". Error details: " + th.getMessage());
+                        } catch (InterruptedException | ExecutionException e) {
+                            s_logger.warn("Unable to destroy uploaded template " + template.getUuid() + ". Error details: " + e.getMessage());
                         }
                     }
                 } finally {
@@ -1284,51 +1284,39 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         // Cleanup expired volume URLs
         final List<VolumeDataStoreVO> volumesOnImageStoreList = _volumeStoreDao.listVolumeDownloadUrls();
         for (final VolumeDataStoreVO volumeOnImageStore : volumesOnImageStoreList) {
-
-            try {
-                final long downloadUrlCurrentAgeInSecs = DateUtil.getTimeDifference(DateUtil.now(), volumeOnImageStore.getExtractUrlCreated());
-                if (downloadUrlCurrentAgeInSecs < _downloadUrlExpirationInterval) {  // URL hasnt expired yet
-                    continue;
-                }
-
-                s_logger.debug("Removing download url " + volumeOnImageStore.getExtractUrl() + " for volume id " + volumeOnImageStore.getVolumeId());
-
-                // Remove it from image store
-                final ImageStoreEntity secStore = (ImageStoreEntity) _dataStoreMgr.getDataStore(volumeOnImageStore.getDataStoreId(), DataStoreRole.Image);
-                secStore.deleteExtractUrl(volumeOnImageStore.getInstallPath(), volumeOnImageStore.getExtractUrl(), Upload.Type.VOLUME);
-
-                // Now expunge it from DB since this entry was created only for download purpose
-                _volumeStoreDao.expunge(volumeOnImageStore.getId());
-            } catch (final Throwable th) {
-                s_logger.warn("Caught exception while deleting download url " + volumeOnImageStore.getExtractUrl() +
-                        " for volume id " + volumeOnImageStore.getVolumeId(), th);
+            final long downloadUrlCurrentAgeInSecs = DateUtil.getTimeDifference(DateUtil.now(), volumeOnImageStore.getExtractUrlCreated());
+            if (downloadUrlCurrentAgeInSecs < _downloadUrlExpirationInterval) {  // URL hasnt expired yet
+                continue;
             }
+
+            s_logger.debug("Removing download url " + volumeOnImageStore.getExtractUrl() + " for volume id " + volumeOnImageStore.getVolumeId());
+
+            // Remove it from image store
+            final ImageStoreEntity secStore = (ImageStoreEntity) _dataStoreMgr.getDataStore(volumeOnImageStore.getDataStoreId(), DataStoreRole.Image);
+            secStore.deleteExtractUrl(volumeOnImageStore.getInstallPath(), volumeOnImageStore.getExtractUrl(), Upload.Type.VOLUME);
+
+            // Now expunge it from DB since this entry was created only for download purpose
+            _volumeStoreDao.expunge(volumeOnImageStore.getId());
         }
 
         // Cleanup expired template URLs
         final List<TemplateDataStoreVO> templatesOnImageStoreList = _templateStoreDao.listTemplateDownloadUrls();
         for (final TemplateDataStoreVO templateOnImageStore : templatesOnImageStoreList) {
-
-            try {
-                final long downloadUrlCurrentAgeInSecs = DateUtil.getTimeDifference(DateUtil.now(), templateOnImageStore.getExtractUrlCreated());
-                if (downloadUrlCurrentAgeInSecs < _downloadUrlExpirationInterval) {  // URL hasnt expired yet
-                    continue;
-                }
-
-                s_logger.debug("Removing download url " + templateOnImageStore.getExtractUrl() + " for template id " + templateOnImageStore.getTemplateId());
-
-                // Remove it from image store
-                final ImageStoreEntity secStore = (ImageStoreEntity) _dataStoreMgr.getDataStore(templateOnImageStore.getDataStoreId(), DataStoreRole.Image);
-                secStore.deleteExtractUrl(templateOnImageStore.getInstallPath(), templateOnImageStore.getExtractUrl(), Upload.Type.TEMPLATE);
-
-                // Now remove download details from DB.
-                templateOnImageStore.setExtractUrl(null);
-                templateOnImageStore.setExtractUrlCreated(null);
-                _templateStoreDao.update(templateOnImageStore.getId(), templateOnImageStore);
-            } catch (final Throwable th) {
-                s_logger.warn("caught exception while deleting download url " + templateOnImageStore.getExtractUrl() +
-                        " for template id " + templateOnImageStore.getTemplateId(), th);
+            final long downloadUrlCurrentAgeInSecs = DateUtil.getTimeDifference(DateUtil.now(), templateOnImageStore.getExtractUrlCreated());
+            if (downloadUrlCurrentAgeInSecs < _downloadUrlExpirationInterval) {  // URL hasnt expired yet
+                continue;
             }
+
+            s_logger.debug("Removing download url " + templateOnImageStore.getExtractUrl() + " for template id " + templateOnImageStore.getTemplateId());
+
+            // Remove it from image store
+            final ImageStoreEntity secStore = (ImageStoreEntity) _dataStoreMgr.getDataStore(templateOnImageStore.getDataStoreId(), DataStoreRole.Image);
+            secStore.deleteExtractUrl(templateOnImageStore.getInstallPath(), templateOnImageStore.getExtractUrl(), Upload.Type.TEMPLATE);
+
+            // Now remove download details from DB.
+            templateOnImageStore.setExtractUrl(null);
+            templateOnImageStore.setExtractUrlCreated(null);
+            _templateStoreDao.update(templateOnImageStore.getId(), templateOnImageStore);
         }
     }
 

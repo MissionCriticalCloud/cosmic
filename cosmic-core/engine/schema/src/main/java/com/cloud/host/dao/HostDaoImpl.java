@@ -270,11 +270,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
          * UnmanagedDirectConnectSearch.and("lastPinged", UnmanagedDirectConnectSearch.entity().getLastPinged(),
          * SearchCriteria.Op.LTEQ); UnmanagedDirectConnectSearch.cp(); UnmanagedDirectConnectSearch.cp();
          */
-        try {
-            HostTransferSearch = _hostTransferDao.createSearchBuilder();
-        } catch (final Throwable e) {
-            s_logger.debug("error", e);
-        }
+        HostTransferSearch = _hostTransferDao.createSearchBuilder();
         HostTransferSearch.and("id", HostTransferSearch.entity().getId(), SearchCriteria.Op.NULL);
         UnmanagedDirectConnectSearch.join("hostTransferSearch", HostTransferSearch, HostTransferSearch.entity().getId(), UnmanagedDirectConnectSearch.entity().getId(),
                 JoinType.LEFTOUTER);

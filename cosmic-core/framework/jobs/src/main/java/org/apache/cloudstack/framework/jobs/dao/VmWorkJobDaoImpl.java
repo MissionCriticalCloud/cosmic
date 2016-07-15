@@ -159,14 +159,9 @@ public class VmWorkJobDaoImpl extends GenericDaoBase<VmWorkJobVO, Long> implemen
                                                 "job_dispatcher='VmWorkJobDispatcher') AND job_init_msid=?)")
                 ) {
                     pstmt.setLong(1, msid);
-
                     pstmt.execute();
                 } catch (final SQLException e) {
-                    s_logger.info("[ignored]"
-                            + "SQL failed to delete vm work job: " + e.getLocalizedMessage());
-                } catch (final Throwable e) {
-                    s_logger.info("[ignored]"
-                            + "caught an error during delete vm work job: " + e.getLocalizedMessage());
+                    s_logger.info("[ignored] SQL failed to delete vm work job: " + e.getLocalizedMessage());
                 }
 
                 try (
@@ -177,11 +172,7 @@ public class VmWorkJobDaoImpl extends GenericDaoBase<VmWorkJobVO, Long> implemen
 
                     pstmt.execute();
                 } catch (final SQLException e) {
-                    s_logger.info("[ignored]"
-                            + "SQL failed to delete async job: " + e.getLocalizedMessage());
-                } catch (final Throwable e) {
-                    s_logger.info("[ignored]"
-                            + "caught an error during delete async job: " + e.getLocalizedMessage());
+                    s_logger.info("[ignored] SQL failed to delete async job: " + e.getLocalizedMessage());
                 }
             }
         });

@@ -437,17 +437,7 @@ public class Request {
                     throw e;
                 }
             }
-            try {
-                s_gogger.toJson(_cmds, content);
-            } catch (final Throwable e) {
-                final StringBuilder buff = new StringBuilder();
-                for (final Command cmd : _cmds) {
-                    buff.append(cmd.getClass().getSimpleName()).append("/");
-                }
-                s_logger.error("Gson serialization error " + buff.toString(), e);
-                assert false : "More gson errors on " + buff.toString();
-                return "";
-            }
+            s_gogger.toJson(_cmds, content);
             if (content.length() <= (1 + _cmds.length * 3)) {
                 return null;
             }
