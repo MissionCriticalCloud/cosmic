@@ -52,34 +52,18 @@ public abstract class AgentAttache {
             StopCommand.class.toString(), CheckVirtualMachineCommand.class.toString(), PingTestCommand.class.toString(), CheckHealthCommand.class.toString(),
             ReadyCommand.class.toString(), ShutdownCommand.class.toString(), SetupCommand.class.toString(),
             CleanupNetworkRulesCmd.class.toString(), CheckNetworkCommand.class.toString(), PvlanSetupCommand.class.toString(), CheckOnHostCommand.class.toString()};
-    protected static final Comparator<Request> s_reqComparator = new Comparator<Request>() {
-        @Override
-        public int compare(final Request o1, final Request o2) {
-            final long seq1 = o1.getSequence();
-            final long seq2 = o2.getSequence();
-            if (seq1 < seq2) {
-                return -1;
-            } else if (seq1 > seq2) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
+    protected static final Comparator<Request> s_reqComparator = (o1, o2) -> {
+        final long seq1 = o1.getSequence();
+        final long seq2 = o2.getSequence();
+        return Long.compare(seq1, seq2);
     };
-    protected static final Comparator<Object> s_seqComparator = new Comparator<Object>() {
-        @Override
-        public int compare(final Object o1, final Object o2) {
-            final long seq1 = ((Request) o1).getSequence();
-            final long seq2 = (Long) o2;
-            if (seq1 < seq2) {
-                return -1;
-            } else if (seq1 > seq2) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
+
+    protected static final Comparator<Object> s_seqComparator = (o1, o2) -> {
+        final long seq1 = ((Request) o1).getSequence();
+        final long seq2 = (Long) o2;
+        return Long.compare(seq1, seq2);
     };
+
     protected final static String[] s_commandsNotAllowedInConnectingMode = new String[]{StartCommand.class.toString(), CreateCommand.class.toString()};
     private static final Logger s_logger = LoggerFactory.getLogger(AgentAttache.class);
     private static final ScheduledExecutorService s_listenerExecutor = Executors.newScheduledThreadPool(10, new NamedThreadFactory("ListenerTimer"));

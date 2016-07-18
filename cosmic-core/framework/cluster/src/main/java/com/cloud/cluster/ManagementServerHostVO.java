@@ -161,6 +161,6 @@ public class ManagementServerHostVO implements ManagementServerHost {
 
     @Override
     public String toString() {
-        return new StringBuilder("ManagementServer[").append("-").append(id).append("-").append(msid).append("-").append(state).append("]").toString();
+        return new StringBuilder("ManagementServer[").append("-").append(id).append("-").append(msid).append("-").append(state).append("-").append(name).append("]").toString();
     }
 }
