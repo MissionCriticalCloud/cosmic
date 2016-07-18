@@ -20,6 +20,11 @@
             <artifactId>cloud-framework-events</artifactId>
             <version>5.1.0.4-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-framework-managed-context</artifactId>
+            <version>5.1.0.4-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <build>
         <defaultGoal>install</defaultGoal>
