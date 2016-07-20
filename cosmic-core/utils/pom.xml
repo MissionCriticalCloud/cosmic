@@ -1,18 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-utils</artifactId>
     <name>Cosmic Utils</name>
     <parent>
         <groupId>cloud.cosmic</groupId>
-        <artifactId>cosmic-core</artifactId>
+        <artifactId>cosmic</artifactId>
         <version>5.1.0.4-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
     </parent>
     <dependencies>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-framework-managed-context</artifactId>
-            <version>5.1.0.4-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
@@ -149,12 +146,19 @@
         </dependency>
     </dependencies>
     <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>generate-test-jar</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
