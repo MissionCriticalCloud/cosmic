@@ -32,6 +32,7 @@ public class ClusterServiceServletImpl implements ClusterService {
 
     @Override
     public String execute(final ClusterServicePdu pdu) throws RemoteException {
+        s_logger.info("Executing a PDU: " + pdu);
 
         final HttpClient client = getHttpClient();
         final PostMethod method = new PostMethod(_serviceUrl);

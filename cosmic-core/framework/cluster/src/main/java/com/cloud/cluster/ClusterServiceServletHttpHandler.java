@@ -3,6 +3,7 @@ package com.cloud.cluster;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.util.Arrays;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -29,16 +30,12 @@ public class ClusterServiceServletHttpHandler implements HttpRequestHandler {
     public void handle(final HttpRequest request, final HttpResponse response, final HttpContext context) throws HttpException, IOException {
 
         try {
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Start Handling cluster HTTP request");
-            }
+            s_logger.info("Handling cluster HTTP request: " + request);
 
             parseRequest(request);
             handleRequest(request, response);
 
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Handle cluster HTTP request done");
-            }
+            s_logger.info("Handle cluster HTTP request done");
         } catch (final Throwable e) {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("Exception " + e.toString());
@@ -55,13 +52,16 @@ public class ClusterServiceServletHttpHandler implements HttpRequestHandler {
     }
 
     private void parseRequest(final HttpRequest request) throws IOException {
+        s_logger.debug("Parsing request");
         if (request instanceof HttpEntityEnclosingRequest) {
             final HttpEntityEnclosingRequest entityRequest = (HttpEntityEnclosingRequest) request;
 
             final String body = EntityUtils.toString(entityRequest.getEntity());
             if (body != null) {
+                s_logger.debug("Request body: " + body);
                 final String[] paramArray = body.split("&");
                 if (paramArray != null) {
+                    s_logger.debug("Request body params: " + Arrays.toString(paramArray));
                     for (final String paramEntry : paramArray) {
                         final String[] paramValue = paramEntry.split("=");
                         if (paramValue.length != 2) {
@@ -84,6 +84,8 @@ public class ClusterServiceServletHttpHandler implements HttpRequestHandler {
     protected void handleRequest(final HttpRequest req, final HttpResponse response) {
         final String method = (String) req.getParams().getParameter("method");
 
+        s_logger.debug("Request method: " + method);
+
         int nMethod = RemoteMethodConstants.METHOD_UNKNOWN;
         String responseContent = null;
         try {
@@ -102,8 +104,7 @@ public class ClusterServiceServletHttpHandler implements HttpRequestHandler {
 
                 case RemoteMethodConstants.METHOD_UNKNOWN:
                 default:
-                    assert (false);
-                    s_logger.error("unrecognized method " + nMethod);
+                    s_logger.error("Unrecognized method " + nMethod);
                     break;
             }
         } catch (final Throwable e) {
@@ -140,6 +141,7 @@ public class ClusterServiceServletHttpHandler implements HttpRequestHandler {
     }
 
     private String handleDeliverPduMethodCall(final HttpRequest req) {
+        s_logger.debug("Handling method Deliver PDU with request: " + req);
 
         final String pduSeq = (String) req.getParams().getParameter("pduSeq");
         final String pduAckSeq = (String) req.getParams().getParameter("pduAckSeq");
@@ -165,6 +167,8 @@ public class ClusterServiceServletHttpHandler implements HttpRequestHandler {
     }
 
     private String handlePingMethodCall(final HttpRequest req) {
+        s_logger.debug("Handling method Ping with request: " + req);
+
         final String callingPeer = (String) req.getParams().getParameter("callingPeer");
 
         if (s_logger.isDebugEnabled()) {

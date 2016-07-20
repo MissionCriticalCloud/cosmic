@@ -113,10 +113,12 @@ public class ClusterManagerImpl extends ManagerBase implements ClusterManager, C
 
     @Override
     public void OnReceiveClusterServicePdu(final ClusterServicePdu pdu) {
+        s_logger.info("Handling receive cluster service pdu: " + pdu);
         addIncomingClusterPdu(pdu);
     }
 
     private void addIncomingClusterPdu(final ClusterServicePdu pdu) {
+        s_logger.debug("Adding incoming cluster pdu to queue: " + pdu);
         synchronized (_clusterPduIncomingQueue) {
             _clusterPduIncomingQueue.add(pdu);
             _clusterPduIncomingQueue.notifyAll();
@@ -142,6 +144,7 @@ public class ClusterManagerImpl extends ManagerBase implements ClusterManager, C
             try {
                 pdu.wait();
             } catch (final InterruptedException e) {
+                s_logger.debug("Previously ignore exception when waiting for commands to execute, commands: " + cmds, e);
             }
         }
 
@@ -360,6 +363,7 @@ public class ClusterManagerImpl extends ManagerBase implements ClusterManager, C
         while (true) {
             try {
                 final ClusterServicePdu pdu = popOutgoingClusterPdu(1000);
+                s_logger.debug("Popped a PDU from the outgoing cluster pdu queue: " + pdu);
                 if (pdu == null) {
                     continue;
                 }
@@ -404,7 +408,7 @@ public class ClusterManagerImpl extends ManagerBase implements ClusterManager, C
                     }
                 }
             } catch (final Throwable e) {
-                s_logger.error("Unexcpeted exception: ", e);
+                s_logger.error("Unexpected exception: ", e);
             }
         }
     }
@@ -469,6 +473,7 @@ public class ClusterManagerImpl extends ManagerBase implements ClusterManager, C
             try {
                 _clusterPduOutgoingQueue.wait(timeoutMs);
             } catch (final InterruptedException e) {
+                s_logger.debug("Previously ignored exception when popping something from the outgoing cluster pdu queue", e);
             }
 
             if (_clusterPduOutgoingQueue.size() > 0) {

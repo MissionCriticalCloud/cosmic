@@ -88,4 +88,18 @@ public class ClusterServicePdu {
     public void setPduType(final int pduType) {
         this.pduType = pduType;
     }
+
+    @Override
+    public String toString() {
+        return "ClusterServicePdu{" +
+                "sequenceId=" + sequenceId +
+                ", ackSequenceId=" + ackSequenceId +
+                ", sourcePeer='" + sourcePeer + '\'' +
+                ", destPeer='" + destPeer + '\'' +
+                ", agentId=" + agentId +
+                ", stopOnError=" + stopOnError +
+                ", jsonPackage='" + jsonPackage + '\'' +
+                ", pduType=" + pduType +
+                '}';
+    }
 }
