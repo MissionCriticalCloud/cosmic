@@ -17,7 +17,6 @@ import com.cloud.agent.transport.Response;
 import com.cloud.exception.AgentControlChannelException;
 import com.cloud.resource.ServerResource;
 import com.cloud.utils.PropertiesUtil;
-import com.cloud.utils.backoff.BackoffAlgorithm;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.NioConnectionException;
@@ -90,10 +89,9 @@ public class Agent implements HandlerFactory, IAgentControl {
     private boolean _reconnectAllowed = true;
     private final ExecutorService _executor;
 
-    public Agent(final IAgentShell shell, final int localAgentId, final ServerResource resource) throws ConfigurationException {
+    public Agent(final IAgentShell shell, final ServerResource resource) throws ConfigurationException {
         _shell = shell;
         _resource = resource;
-        _link = null;
 
         resource.setAgentControl(this);
 
@@ -114,18 +112,14 @@ public class Agent implements HandlerFactory, IAgentControl {
 
         _connection = new NioClient("Agent", _shell.getHost(), _shell.getPort(), _shell.getWorkers(), this);
 
-        // ((NioClient)_connection).setBindAddress(_shell.getPrivateIp());
-
         s_logger.debug("Adding shutdown hook");
         Runtime.getRuntime().addShutdownHook(new ShutdownThread(this));
 
         _ugentTaskPool =
-                new ThreadPoolExecutor(shell.getPingRetries(), 2 * shell.getPingRetries(), 10, TimeUnit.MINUTES, new SynchronousQueue<>(), new NamedThreadFactory(
-                        "UgentTask"));
+                new ThreadPoolExecutor(shell.getPingRetries(), 2 * shell.getPingRetries(), 10, TimeUnit.MINUTES, new SynchronousQueue<>(), new NamedThreadFactory("UrgentTask"));
 
         _executor =
-                new ThreadPoolExecutor(_shell.getWorkers(), 5 * _shell.getWorkers(), 1, TimeUnit.DAYS, new LinkedBlockingQueue<>(), new NamedThreadFactory(
-                        "agentRequest-Handler"));
+                new ThreadPoolExecutor(_shell.getWorkers(), 5 * _shell.getWorkers(), 1, TimeUnit.DAYS, new LinkedBlockingQueue<>(), new NamedThreadFactory("agentRequest-Handler"));
 
         s_logger.info("Agent [id = " + (_id != null ? _id : "new") + " : type = " + getResourceName() + " : zone = " + _shell.getZone() + " : pod = " + _shell.getPod() +
                 " : workers = " + _shell.getWorkers() + " : host = " + _shell.getHost() + " : port = " + _shell.getPort());
@@ -137,10 +131,6 @@ public class Agent implements HandlerFactory, IAgentControl {
 
     public ServerResource getResource() {
         return _resource;
-    }
-
-    public BackoffAlgorithm getBackoffAlgorithm() {
-        return _shell.getBackoffAlgorithm();
     }
 
     public void start() {

@@ -6,33 +6,29 @@ import java.util.Map;
 import java.util.Properties;
 
 public interface IAgentShell {
-    public Map<String, Object> getCmdLineProperties();
+    Map<String, Object> getCmdLineProperties();
 
-    public Properties getProperties();
+    Properties getProperties();
 
-    public String getPersistentProperty(String prefix, String name);
+    String getPersistentProperty(String prefix, String name);
 
-    public void setPersistentProperty(String prefix, String name, String value);
+    void setPersistentProperty(String prefix, String name, String value);
 
-    public String getHost();
+    String getHost();
 
-    public String getPrivateIp();
+    int getPort();
 
-    public int getPort();
+    int getWorkers();
 
-    public int getWorkers();
+    String getGuid();
 
-    public int getProxyPort();
+    String getZone();
 
-    public String getGuid();
+    String getPod();
 
-    public String getZone();
+    BackoffAlgorithm getBackoffAlgorithm();
 
-    public String getPod();
+    int getPingRetries();
 
-    public BackoffAlgorithm getBackoffAlgorithm();
-
-    public int getPingRetries();
-
-    public String getVersion();
+    String getVersion();
 }

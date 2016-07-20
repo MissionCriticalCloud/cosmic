@@ -54,9 +54,6 @@ public class AgentShell implements IAgentShell, Daemon {
     private volatile boolean _exit = false;
     private int _pingRetries;
 
-    public AgentShell() {
-    }
-
     public static void main(final String[] args) {
         try {
             s_logger.debug("Initializing AgentShell from main");
@@ -261,11 +258,6 @@ public class AgentShell implements IAgentShell, Daemon {
     }
 
     @Override
-    public String getPrivateIp() {
-        return _privateIp;
-    }
-
-    @Override
     public int getPort() {
         return _port;
     }
@@ -273,11 +265,6 @@ public class AgentShell implements IAgentShell, Daemon {
     @Override
     public int getWorkers() {
         return _workers;
-    }
-
-    @Override
-    public int getProxyPort() {
-        return _proxyPort;
     }
 
     @Override
@@ -338,7 +325,7 @@ public class AgentShell implements IAgentShell, Daemon {
                 final Constructor<?> constructor = impl.getDeclaredConstructor();
                 constructor.setAccessible(true);
                 final ServerResource resource = (ServerResource) constructor.newInstance();
-                launchAgent(getNextAgentId(), resource);
+                launchAgent(resource);
             } catch (final ClassNotFoundException e) {
                 throw new ConfigurationException("Resource class not found: " + name + " due to: " + e.toString());
             } catch (final SecurityException e) {
@@ -366,16 +353,13 @@ public class AgentShell implements IAgentShell, Daemon {
         s_logger.trace("Launching agent based on type=" + typeInfo);
     }
 
-    private void launchAgent(final int localAgentId, final ServerResource resource) throws ConfigurationException {
+    private void launchAgent(final ServerResource resource) throws ConfigurationException {
         // we don't track agent after it is launched for now
-        final Agent agent = new Agent(this, localAgentId, resource);
+        final Agent agent = new Agent(this, resource);
         _agents.add(agent);
         agent.start();
     }
 
-    public synchronized int getNextAgentId() {
-        return _nextAgentId++;
-    }
 
     @Override
     public void init(final DaemonContext dc) throws DaemonInitException {
