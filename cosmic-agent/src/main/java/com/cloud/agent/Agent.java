@@ -70,25 +70,25 @@ public class Agent implements HandlerFactory, IAgentControl {
     private final ThreadPoolExecutor _ugentTaskPool;
     List<IAgentControlListener> _controlListeners = new ArrayList<>();
 
-    IAgentShell _shell;
-    NioConnection _connection;
-    ServerResource _resource;
-    Link _link;
-    Long _id;
+    private final IAgentShell _shell;
+    private NioConnection _connection;
+    private ServerResource _resource;
+    private Link _link;
+    private Long _id;
 
-    Timer _timer = new Timer("Agent Timer");
+    private final Timer _timer = new Timer("Agent Timer");
 
-    List<WatchTask> _watchList = new ArrayList<>();
-    long _sequence = 0;
-    long _lastPingResponseTime = 0;
-    long _pingInterval = 0;
-    AtomicInteger _inProgress = new AtomicInteger();
+    private final List<WatchTask> _watchList = new ArrayList<>();
+    private long _sequence = 0;
+    private long _lastPingResponseTime = 0;
+    private long _pingInterval = 0;
+    private final AtomicInteger _inProgress = new AtomicInteger();
 
-    StartupTask _startup = null;
-    long _startupWaitDefault = 180000;
-    long _startupWait = _startupWaitDefault;
-    boolean _reconnectAllowed = true;
-    ExecutorService _executor;
+    private StartupTask _startup = null;
+    private final long _startupWaitDefault = 180000;
+    private long _startupWait = _startupWaitDefault;
+    private boolean _reconnectAllowed = true;
+    private final ExecutorService _executor;
 
     public Agent(final IAgentShell shell, final int localAgentId, final ServerResource resource) throws ConfigurationException {
         _shell = shell;
