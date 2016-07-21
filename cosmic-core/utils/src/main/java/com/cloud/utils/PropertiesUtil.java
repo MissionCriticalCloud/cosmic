@@ -9,12 +9,66 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PropertiesUtil {
     private static final Logger s_logger = LoggerFactory.getLogger(PropertiesUtil.class);
+
+    public static final String PROPERTY_KEY_VALUE_SEPARATOR = "=";
+
+    public static String parse(final Properties properties, final String propertyKey, final String defaultValue) {
+        return properties.containsKey(propertyKey) ? String.valueOf(properties.get(propertyKey)) : defaultValue;
+    }
+
+    public static Integer parse(final Properties properties, final String propertyKey, final Integer defaultValue) {
+        return Integer.valueOf(parse(properties, propertyKey, defaultValue.toString()));
+    }
+
+    public static Boolean parse(final Properties properties, final String propertyKey, final Boolean defaultValue) {
+        return Boolean.valueOf(parse(properties, propertyKey, defaultValue.toString()));
+    }
+
+    public static Properties parse(final Stream<String> properties) {
+        return properties.filter(wellDefinedProperties())
+                         .map(splitPropertyInKeyValuePair())
+                         .filter(propertiesWithBothKeyAndValue())
+                         .reduce(new Properties(), propertiesAccumulator(), propertiesCombiner());
+    }
+
+    private static Predicate<String[]> propertiesWithBothKeyAndValue() {
+        return keyValuePair -> keyValuePair.length == 2;
+    }
+
+    private static Function<String, String[]> splitPropertyInKeyValuePair() {
+        return property -> property.split(PROPERTY_KEY_VALUE_SEPARATOR);
+    }
+
+    private static Predicate<String> wellDefinedProperties() {
+        return property -> property.contains(PROPERTY_KEY_VALUE_SEPARATOR);
+    }
+
+    public static BinaryOperator<Properties> propertiesCombiner() {
+        return (properties1, properties2) -> {
+            final Properties merged = new Properties();
+            merged.putAll(properties1);
+            merged.putAll(properties2);
+            return merged;
+        };
+    }
+
+    public static BiFunction<Properties, String[], Properties> propertiesAccumulator() {
+        return (accumulator, keyValuePair) -> {
+            accumulator.setProperty(keyValuePair[0], keyValuePair[1]);
+            return accumulator;
+        };
+    }
 
     public static Map<String, Object> toMap(final Properties props) {
         final Set<String> names = props.stringPropertyNames();
