@@ -983,8 +983,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             throw new ConfigurationException("Unable to find the ovs-pvlan-vm.sh");
         }
 
-        String value = (String) params.get("developer");
-        final boolean isDeveloper = Boolean.parseBoolean(value);
+        final boolean isDeveloper = (Boolean) params.get("developer");
 
         if (isDeveloper) {
             params.putAll(getDeveloperProperties());
@@ -1071,7 +1070,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             localStorageUuid = UUID.randomUUID().toString();
         }
 
-        value = (String) params.get("scripts.timeout");
+        String value = (String) params.get("scripts.timeout");
         timeout = NumbersUtil.parseInt(value, 30 * 60) * 1000;
 
         value = (String) params.get("stop.script.timeout");
