@@ -1,6 +1,9 @@
 package com.cloud.utils;
 
+import static com.cloud.utils.PropertiesUtil.stringSplitDecomposer;
+
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.core.AllOf.allOf;
@@ -9,6 +12,8 @@ import static org.hamcrest.core.Is.is;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Stream;
@@ -23,6 +28,35 @@ public class PropertiesUtilsTest {
     private static final String PROPERTY_KEY_HOST = "host";
     private static final String PROPERTY_KEY_POD = "pod";
     private static final String PROPERTY_KEY_DEVELOPER = "developer";
+
+    @Test
+    public void test_parse_whenPropertyIsPresentAndIsAList() throws Exception {
+        final Properties properties = new Properties();
+        properties.setProperty("key", "element1,element2,element3");
+        final List<String> defaultValue = Collections.emptyList();
+
+        final List<String> list = PropertiesUtil.parse(properties, "key", defaultValue, stringSplitDecomposer(",", String.class));
+
+        assertThat(list, containsInAnyOrder("element1", "element2", "element3"));
+    }
+
+    @Test
+    public void test_parse_whenPropertyIsPresentAndIsAListAndIsEmpty() throws Exception {
+        final Properties properties = new Properties();
+        properties.setProperty("key", "");
+        final List<String> defaultValue = Arrays.asList(new String[]{"element1", "element2", "element3"});
+
+        assertThat(PropertiesUtil.parse(properties, "key", defaultValue, stringSplitDecomposer(",", String.class)), empty());
+    }
+
+    @Test
+    public void test_parse_whenPropertyIsNotPresentAndIsAList() throws Exception {
+        final Properties properties = new Properties();
+        properties.setProperty("key", "element1,element2,element3");
+        final List<String> defaultValue = Collections.emptyList();
+
+        assertThat(PropertiesUtil.parse(properties, "key1", defaultValue, stringSplitDecomposer(",", String.class)), empty());
+    }
 
     @Test
     public void test_parse_whenPropertiesExists() throws Exception {
@@ -46,14 +80,22 @@ public class PropertiesUtilsTest {
     }
 
     @Test
-    public void tets_parse_whenStreamIsEmpty() throws Exception {
+    public void test_parse_whenValueIsOfCustomType() throws Exception {
+        final Properties properties = new Properties();
+        properties.setProperty("key", MyCustomType.VALUE1.toString());
+
+        assertThat(PropertiesUtil.parse(properties, "key", MyCustomType.VALUE2, MyCustomType.class), is(MyCustomType.VALUE1));
+    }
+
+    @Test
+    public void test_parse_whenStreamIsEmpty() throws Exception {
         final Properties properties = PropertiesUtil.parse(Stream.empty());
 
         assertThat(properties.entrySet(), empty());
     }
 
     @Test
-    public void tets_parse_whenStreamIsNotEmpty() throws Exception {
+    public void test_parse_whenStreamIsNotEmpty() throws Exception {
         final Stream<String> stream = Arrays.stream(new String[]{"key1=value1", "key2=value2", "key1=value3"});
 
         final Properties properties = PropertiesUtil.parse(stream);
@@ -153,4 +195,10 @@ public class PropertiesUtilsTest {
         Assert.assertEquals("d", config.get("c"));
         tempFile.delete();
     }
+
+    private enum MyCustomType {
+        VALUE1, VALUE2
+    }
 }
+
+

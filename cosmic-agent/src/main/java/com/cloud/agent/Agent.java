@@ -34,8 +34,6 @@ import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.channels.ClosedChannelException;
@@ -91,17 +89,11 @@ public class Agent implements HandlerFactory, IAgentControl {
     private boolean _reconnectAllowed = true;
     private final ExecutorService _executor;
 
-    public Agent(final AgentProperties agentProperties, final BackoffAlgorithm backOffAlgorithm) throws ConfigurationException {
+    public Agent(final AgentProperties agentProperties, final BackoffAlgorithm backOffAlgorithm, final ServerResource resource) throws ConfigurationException {
         this.agentProperties = agentProperties;
         this.backOffAlgorithm = backOffAlgorithm;
-        resource = loadServerResource(agentProperties.getResource());
+        this.resource = resource;
         resource.setAgentControl(this);
-
-        if (!resource.configure(getResourceName(), agentProperties.buildPropertiesMap())) {
-            throw new ConfigurationException("Unable to configure " + resource.getName());
-        } else {
-            logger.info("Agent resource {} configured", resource.getName());
-        }
 
         _connection = new NioClient("Agent", agentProperties.getHost(), agentProperties.getPort(), agentProperties.getWorkers(), this);
 
@@ -117,28 +109,6 @@ public class Agent implements HandlerFactory, IAgentControl {
 
         logger.info("Agent [id = " + (_id != null ? _id : "new") + " : type = " + getResourceName() + " : zone = " + agentProperties.getZone() + " : pod = "
                 + agentProperties.getPod() + " : workers = " + agentProperties.getWorkers() + " : host = " + agentProperties.getHost() + " : port = " + agentProperties.getPort());
-    }
-
-    private ServerResource loadServerResource(final String resourceClassName) throws ConfigurationException {
-        final String[] names = resourceClassName.split("\\|");
-        for (final String name : names) {
-            final Class<?> impl;
-            try {
-                impl = Class.forName(name);
-                final Constructor<?> constructor = impl.getDeclaredConstructor();
-                constructor.setAccessible(true);
-                return (ServerResource) constructor.newInstance();
-            } catch (final ClassNotFoundException
-                    | SecurityException
-                    | NoSuchMethodException
-                    | IllegalArgumentException
-                    | InstantiationException
-                    | IllegalAccessException
-                    | InvocationTargetException e) {
-                throw new ConfigurationException("Failed to launch agent due to: " + e.getMessage());
-            }
-        }
-        throw new ConfigurationException("Could not find server resource class to load in: " + resourceClassName);
     }
 
     public String getResourceName() {
@@ -200,7 +170,9 @@ public class Agent implements HandlerFactory, IAgentControl {
         }
 
         _urgentTaskPool.shutdownNow();
-        this.notifyAll();
+        synchronized (this) {
+            this.notifyAll();
+        }
     }
 
     public void sendStartup(final Link link) {

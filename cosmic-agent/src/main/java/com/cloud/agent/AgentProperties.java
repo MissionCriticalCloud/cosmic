@@ -25,26 +25,28 @@ import static com.cloud.agent.AgentConstants.PROPERTY_KEY_WORKERS;
 import static com.cloud.agent.AgentConstants.PROPERTY_KEY_ZONE;
 import static com.cloud.utils.PropertiesUtil.parse;
 
+import com.cloud.utils.PropertiesPojo;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
-public class AgentProperties {
+public class AgentProperties implements PropertiesPojo {
     private String host = "";
-    private int workers = DEFAULT_NUMBER_OF_WORKERS;
     private int port = DEFAULT_PORT;
+    private int consoleProxyHttpPort = DEFAULT_CONSOLE_PROXY_HTTP_PORT;
     private String zone = DEFAULT_ZONE;
     private String pod = "";
     private String guid = "";
+    private String resource = "";
+    private String instance = "";
+    private int workers = DEFAULT_NUMBER_OF_WORKERS;
     private int pingRetries = DEFAULT_NUMBER_OF_PING_RETRIES;
     private boolean developer = false;
-    private String resource = "";
     private boolean ipv6Disabled = DEFAULT_IPV6_DISABLED;
     private boolean ipa6Preferred = DEFAULT_IPV6_PREFERRED;
-    private String instance = "";
     private String pidDir = DEFAULT_PID_DIR;
-    private int consoleProxyHttpPort = DEFAULT_CONSOLE_PROXY_HTTP_PORT;
     private String version = "";
 
     public void load(final Properties properties) {
@@ -65,12 +67,6 @@ public class AgentProperties {
         version = parse(properties, PROPERTY_KEY_CONSOLE_VERSION, version);
 
         validateValues();
-    }
-
-    public void load(final Map<String, Object> map) {
-        final Properties properties = new Properties();
-        properties.putAll(map);
-        load(properties);
     }
 
     private void validateValues() {
@@ -148,17 +144,17 @@ public class AgentProperties {
         final HashMap<String, Object> propertiesMap = new HashMap<>();
         propertiesMap.put(PROPERTY_KEY_HOST, host);
         propertiesMap.put(PROPERTY_KEY_PORT, port);
-        propertiesMap.put(PROPERTY_KEY_WORKERS, workers);
         propertiesMap.put(PROPERTY_KEY_ZONE, zone);
         propertiesMap.put(PROPERTY_KEY_POD, pod);
         propertiesMap.put(PROPERTY_KEY_GUID, guid);
-        propertiesMap.put(PROPERTY_KEY_PING_RETRIES, pingRetries);
-        propertiesMap.put(PROPERTY_KEY_DEVELOPER, developer);
         propertiesMap.put(PROPERTY_KEY_RESOURCE, resource);
-        propertiesMap.put(PROPERTY_KEY_IPV6_DISABLED, ipv6Disabled);
-        propertiesMap.put(PROPERTY_KEY_IPV6_PREFERRED, ipa6Preferred);
         propertiesMap.put(PROPERTY_KEY_INSTANCE, instance);
         propertiesMap.put(PROPERTY_KEY_PID_DIR, pidDir);
+        propertiesMap.put(PROPERTY_KEY_WORKERS, workers);
+        propertiesMap.put(PROPERTY_KEY_PING_RETRIES, pingRetries);
+        propertiesMap.put(PROPERTY_KEY_DEVELOPER, developer);
+        propertiesMap.put(PROPERTY_KEY_IPV6_DISABLED, ipv6Disabled);
+        propertiesMap.put(PROPERTY_KEY_IPV6_PREFERRED, ipa6Preferred);
         propertiesMap.put(PROPERTY_KEY_CONSOLE_PROXY_HTTP_PORT, consoleProxyHttpPort);
         return propertiesMap;
     }

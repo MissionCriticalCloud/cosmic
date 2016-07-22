@@ -1,6 +1,9 @@
 package com.cloud.agent;
 
+import static java.util.stream.Collectors.toMap;
+
 import com.cloud.agent.Agent.ExitStatus;
+import com.cloud.resource.ServerResource;
 import com.cloud.utils.ProcessUtil;
 import com.cloud.utils.PropertiesUtil;
 import com.cloud.utils.backoff.BackoffAlgorithm;
@@ -10,8 +13,11 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.daemon.Daemon;
@@ -25,8 +31,39 @@ public class AgentShell implements IAgentShell, Daemon {
     private static final String FILE_NAME_AGENT_PROPERTIES = "agent.properties";
 
     private final AgentProperties agentProperties = new AgentProperties();
+    private final Map<String, Object> allProperties = new HashMap<>();
     private Agent agent;
     private BackoffAlgorithm backOff;
+
+    @Override
+    public String getHost() {
+        return agentProperties.getHost();
+    }
+
+    @Override
+    public int getPort() {
+        return agentProperties.getPort();
+    }
+
+    @Override
+    public int getWorkers() {
+        return agentProperties.getWorkers();
+    }
+
+    @Override
+    public String getGuid() {
+        return agentProperties.getGuid();
+    }
+
+    @Override
+    public String getZone() {
+        return agentProperties.getZone();
+    }
+
+    @Override
+    public String getPod() {
+        return agentProperties.getPod();
+    }
 
     public static void main(final String[] args) {
         try {
@@ -60,7 +97,27 @@ public class AgentShell implements IAgentShell, Daemon {
         }
 
         logger.info("Found {} at {}", FILE_NAME_AGENT_PROPERTIES, file.getAbsolutePath());
-        agentProperties.load(loadPropertiesFromFile(file));
+        final Properties properties = loadPropertiesFromFile(file);
+        allProperties.putAll(convertPropertiesToStringObjectMap(properties));
+        agentProperties.load(properties);
+    }
+
+    protected boolean parseCommand(final String[] args) throws ConfigurationException {
+        final Properties commandLineProperties = PropertiesUtil.parse(Arrays.stream(args));
+        logPropertiesFound(commandLineProperties);
+        agentProperties.load(commandLineProperties);
+        allProperties.putAll(convertPropertiesToStringObjectMap(commandLineProperties));
+
+        final String guid = agentProperties.getGuid();
+        if (guid == null && !agentProperties.isDeveloper()) {
+            throw new ConfigurationException("Unable to find the guid");
+        }
+
+        return true;
+    }
+
+    private Map<String, Object> convertPropertiesToStringObjectMap(final Properties properties) {
+        return properties.entrySet().stream().collect(toMap(entry -> entry.getKey().toString(), Map.Entry::getValue));
     }
 
     private Properties loadPropertiesFromFile(final File file) {
@@ -78,57 +135,51 @@ public class AgentShell implements IAgentShell, Daemon {
         properties.entrySet().forEach(entry -> logger.debug("Found property: {} = {}", entry.getKey(), entry.getValue()));
     }
 
-    protected boolean parseCommand(final String[] args) throws ConfigurationException {
-        final Properties commandLineProperties = PropertiesUtil.parse(Arrays.stream(args));
-        agentProperties.load(commandLineProperties);
-
-        final String guid = agentProperties.getGuid();
-        if (guid == null && !agentProperties.isDeveloper()) {
-            throw new ConfigurationException("Unable to find the guid");
-        }
-
-        return true;
-    }
-
-    @Override
-    public String getHost() {
-        return agentProperties.getHost();
-    }
-
-    @Override
-    public int getPort() {
-        return agentProperties.getPort();
-    }
-
-    @Override
-    public int getWorkers() {
-        return agentProperties.getWorkers();
-    }
-
-    @Override
-    public String getGuid() {
-        return agentProperties.getGuid();
-    }
-
-    @Override
-    public String getZone() {
-        return agentProperties.getZone();
-    }
-
-    @Override
-    public String getPod() {
-        return agentProperties.getPod();
-    }
-
     private void launchAgent() throws ConfigurationException {
         final String resourceClassNames = agentProperties.getResource();
-        logger.debug("Launching agent with resource is {}", resourceClassNames);
+        logger.debug("Launching agent with resource {}", resourceClassNames);
         if (resourceClassNames != null) {
-            agent = new Agent(agentProperties, backOff);
+            final ServerResource serverResource = loadServerResource(agentProperties.getResource());
+            configureServerResource(serverResource);
+            agent = new Agent(agentProperties, backOff, serverResource);
             agent.start();
         } else {
             throw new ConfigurationException("Cannot launch agent without a agent resource class");
         }
+    }
+
+    private void configureServerResource(final ServerResource serverResource) throws ConfigurationException {
+        final String serverResourceName = serverResource.getClass().getSimpleName();
+        logger.debug("Configuring agent resource {}", serverResourceName);
+
+        if (!serverResource.configure(serverResourceName, allProperties)) {
+            throw new ConfigurationException("Unable to configure " + serverResourceName);
+        } else {
+            logger.info("Agent resource {} configured", serverResourceName);
+        }
+    }
+
+    private ServerResource loadServerResource(final String resourceClassName) throws ConfigurationException {
+        logger.debug("Loading agent resource from class name {}", resourceClassName);
+        final String[] names = resourceClassName.split("\\|");
+        for (final String name : names) {
+            final Class<?> impl;
+            try {
+                impl = Class.forName(name);
+                final Constructor<?> constructor = impl.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                return (ServerResource) constructor.newInstance();
+            } catch (final ClassNotFoundException
+                    | SecurityException
+                    | NoSuchMethodException
+                    | IllegalArgumentException
+                    | InstantiationException
+                    | IllegalAccessException
+                    | InvocationTargetException e) {
+                throw new ConfigurationException("Failed to launch agent due to " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            }
+        }
+        throw new ConfigurationException("Could not find server resource class to load in: " + resourceClassName);
     }
 
     @Override
@@ -148,7 +199,9 @@ public class AgentShell implements IAgentShell, Daemon {
             configureIpStack();
             checkPidFile();
             launchAgent();
-            agent.wait();
+            synchronized (agent) {
+                agent.wait();
+            }
         } catch (final ConfigurationException e) {
             logger.error("Unable to start agent due to bad configuration", e);
             System.exit(ExitStatus.Configuration.value());

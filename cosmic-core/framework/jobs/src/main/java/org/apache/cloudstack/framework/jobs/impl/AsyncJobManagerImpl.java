@@ -485,7 +485,7 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
                 for (Long id : wakeupList) {
                     // TODO, we assume that all jobs in this category is API job only
                     AsyncJobVO jobToWakeup = _jobDao.findById(id);
-                    if (jobToWakeup != null && (jobToWakeup.getPendingSignals() & AsyncJob.Constants.SIGNAL_MASK_WAKEUP) != 0)
+                    if (jobToWakeup != null && (jobToWakeup.getPendingSignals() & AsyncJob.CloudConstants.SIGNAL_MASK_WAKEUP) != 0)
                         scheduleExecution(jobToWakeup, false);
                 }
         */

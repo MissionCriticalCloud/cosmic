@@ -1570,7 +1570,7 @@ public class LibvirtComputingResourceTest {
         when(libvirtUtilitiesHelper.retrieveSshPubKeyPath()).thenReturn("/path/pub/keys");
         when(libvirtUtilitiesHelper.retrieveSshPrvKeyPath()).thenReturn("/path/pvt/keys");
 
-        when(libvirtComputingResource.getTimeout()).thenReturn(0);
+        when(libvirtComputingResource.getScriptsTimeout()).thenReturn(0);
 
         final LibvirtRequestWrapper wrapper = LibvirtRequestWrapper.getInstance();
         assertNotNull(wrapper);
@@ -1578,7 +1578,7 @@ public class LibvirtComputingResourceTest {
         final Answer answer = wrapper.execute(command, libvirtComputingResource);
         assertFalse(answer.getResult());
 
-        verify(libvirtComputingResource, times(1)).getTimeout();
+        verify(libvirtComputingResource, times(1)).getScriptsTimeout();
     }
 
     @Test
@@ -3889,7 +3889,7 @@ public class LibvirtComputingResourceTest {
         when(libvirtComputingResource.getGuestBridgeName()).thenReturn(guestBridgeName);
 
         final int timeout = 0;
-        when(libvirtComputingResource.getTimeout()).thenReturn(timeout);
+        when(libvirtComputingResource.getScriptsTimeout()).thenReturn(timeout);
         final String ovsPvlanDhcpHostPath = "/pvlan";
         when(libvirtComputingResource.getOvsPvlanDhcpHostPath()).thenReturn(ovsPvlanDhcpHostPath);
         when(libvirtComputingResource.getLibvirtUtilitiesHelper()).thenReturn(libvirtUtilitiesHelper);
@@ -3931,7 +3931,7 @@ public class LibvirtComputingResourceTest {
         final String guestBridgeName = "br0";
         when(libvirtComputingResource.getGuestBridgeName()).thenReturn(guestBridgeName);
         final int timeout = 0;
-        when(libvirtComputingResource.getTimeout()).thenReturn(timeout);
+        when(libvirtComputingResource.getScriptsTimeout()).thenReturn(timeout);
 
         final String ovsPvlanVmPath = "/pvlan";
         when(libvirtComputingResource.getOvsPvlanVmPath()).thenReturn(ovsPvlanVmPath);
@@ -3960,7 +3960,7 @@ public class LibvirtComputingResourceTest {
         when(libvirtComputingResource.getGuestBridgeName()).thenReturn(guestBridgeName);
 
         final int timeout = 0;
-        when(libvirtComputingResource.getTimeout()).thenReturn(timeout);
+        when(libvirtComputingResource.getScriptsTimeout()).thenReturn(timeout);
         final String ovsPvlanDhcpHostPath = "/pvlan";
         when(libvirtComputingResource.getOvsPvlanDhcpHostPath()).thenReturn(ovsPvlanDhcpHostPath);
         when(libvirtComputingResource.getLibvirtUtilitiesHelper()).thenReturn(libvirtUtilitiesHelper);
@@ -4002,7 +4002,7 @@ public class LibvirtComputingResourceTest {
         when(libvirtComputingResource.getGuestBridgeName()).thenReturn(guestBridgeName);
 
         final int timeout = 0;
-        when(libvirtComputingResource.getTimeout()).thenReturn(timeout);
+        when(libvirtComputingResource.getScriptsTimeout()).thenReturn(timeout);
         final String ovsPvlanDhcpHostPath = "/pvlan";
         when(libvirtComputingResource.getOvsPvlanDhcpHostPath()).thenReturn(ovsPvlanDhcpHostPath);
         when(libvirtComputingResource.getLibvirtUtilitiesHelper()).thenReturn(libvirtUtilitiesHelper);
@@ -4624,12 +4624,11 @@ public class LibvirtComputingResourceTest {
         final LibvirtComputingResource lvcr = new LibvirtComputingResource();
         assertFalse(lvcr.isInterface("bla"));
         assertTrue(lvcr.isInterface("p99p00"));
-        for (final String ifNamePattern : lvcr.ifNamePatterns) {
+        for (final String ifNamePattern : lvcr.getIfNamePatterns()) {
             // excluding regexps as "\\\\d+" won't replace with String.replaceAll(String,String);
             if (!ifNamePattern.contains("\\")) {
                 final String ifName = ifNamePattern.replaceFirst("\\^", "") + "0";
-                assertTrue("The pattern '" + ifNamePattern + "' is expected to be valid for interface " + ifName,
-                        lvcr.isInterface(ifName));
+                assertTrue("The pattern '" + ifNamePattern + "' is expected to be valid for interface " + ifName, lvcr.isInterface(ifName));
             }
         }
     }

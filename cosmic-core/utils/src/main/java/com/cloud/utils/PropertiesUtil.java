@@ -1,11 +1,15 @@
 package com.cloud.utils;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -23,16 +27,28 @@ public class PropertiesUtil {
 
     public static final String PROPERTY_KEY_VALUE_SEPARATOR = "=";
 
+    public static <T> List<T> parse(final Properties properties, final String propertyKey, final List<T> defaultValue, final Function<Object, Stream<T>> decomposer) {
+        return properties.containsKey(propertyKey) ? decomposer.apply(properties.get(propertyKey)).collect(toList()) : defaultValue;
+    }
+
     public static String parse(final Properties properties, final String propertyKey, final String defaultValue) {
         return properties.containsKey(propertyKey) ? String.valueOf(properties.get(propertyKey)) : defaultValue;
     }
 
-    public static Integer parse(final Properties properties, final String propertyKey, final Integer defaultValue) {
-        return Integer.valueOf(parse(properties, propertyKey, defaultValue.toString()));
+    public static int parse(final Properties properties, final String propertyKey, final int defaultValue) {
+        return Integer.valueOf(parse(properties, propertyKey, Integer.toString(defaultValue)));
     }
 
-    public static Boolean parse(final Properties properties, final String propertyKey, final Boolean defaultValue) {
-        return Boolean.valueOf(parse(properties, propertyKey, defaultValue.toString()));
+    public static long parse(final Properties properties, final String propertyKey, final long defaultValue) {
+        return Long.valueOf(parse(properties, propertyKey, Long.toString(defaultValue)));
+    }
+
+    public static boolean parse(final Properties properties, final String propertyKey, final boolean defaultValue) {
+        return Boolean.valueOf(parse(properties, propertyKey, Boolean.toString(defaultValue)));
+    }
+
+    public static <T extends Enum<T>> T parse(final Properties properties, final String propertyKey, final T defaultValue, final Class<T> clazz) {
+        return Enum.valueOf(clazz, parse(properties, propertyKey, defaultValue.toString()).toUpperCase());
     }
 
     public static Properties parse(final Stream<String> properties) {
@@ -52,6 +68,12 @@ public class PropertiesUtil {
 
     private static Predicate<String> wellDefinedProperties() {
         return property -> property.contains(PROPERTY_KEY_VALUE_SEPARATOR);
+    }
+
+    public static <T> Function<Object, Stream<T>> stringSplitDecomposer(final String regex, final Class<T> clazz) {
+        return (Object value) -> Arrays.stream(((String) value).split(regex))
+                                       .filter(array -> !array.isEmpty())
+                                       .map(clazz::cast);
     }
 
     public static BinaryOperator<Properties> propertiesCombiner() {

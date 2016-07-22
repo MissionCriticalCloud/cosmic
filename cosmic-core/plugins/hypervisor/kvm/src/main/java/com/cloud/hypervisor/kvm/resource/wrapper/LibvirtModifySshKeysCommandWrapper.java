@@ -35,7 +35,7 @@ public final class LibvirtModifySshKeysCommandWrapper
         String result = null;
         if (!sshKeysDir.exists()) {
             // Change permissions for the 700
-            final Script script = new Script("mkdir", libvirtComputingResource.getTimeout(), s_logger);
+            final Script script = new Script("mkdir", libvirtComputingResource.getScriptsTimeout(), s_logger);
             script.add("-m", "700");
             script.add(sshkeyspath);
             script.execute();
@@ -91,7 +91,7 @@ public final class LibvirtModifySshKeysCommandWrapper
                 result = "Write file " + sshprvkeypath + ":" + e.toString();
                 s_logger.debug(result);
             }
-            final Script script = new Script("chmod", libvirtComputingResource.getTimeout(), s_logger);
+            final Script script = new Script("chmod", libvirtComputingResource.getScriptsTimeout(), s_logger);
             script.add("600", sshprvkeypath);
             script.execute();
         }
