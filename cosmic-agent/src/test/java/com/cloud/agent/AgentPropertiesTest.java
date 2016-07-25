@@ -22,10 +22,13 @@ import static com.cloud.agent.AgentConstants.PROPERTY_KEY_ZONE;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.isEmptyString;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -48,7 +51,7 @@ public class AgentPropertiesTest {
 
         agentProperties.load(properties);
 
-        assertThat(agentProperties.getHost(), is(MY_HOST));
+        assertThat(agentProperties.getHosts(), containsInAnyOrder(MY_HOST));
         assertThat(agentProperties.getPort(), is(MY_PORT));
         assertThat(agentProperties.isIpv6Disabled(), is(true));
         assertThat(agentProperties.isIpa6Preferred(), is(false));
@@ -68,7 +71,7 @@ public class AgentPropertiesTest {
         agentProperties.load(properties1);
         agentProperties.load(properties2);
 
-        assertThat(agentProperties.getHost(), is(OTHER_HOST));
+        assertThat(agentProperties.getHosts(), containsInAnyOrder(OTHER_HOST));
         assertThat(agentProperties.getPort(), is(MY_PORT));
         assertThat(agentProperties.isIpv6Disabled(), is(true));
         assertThat(agentProperties.isIpa6Preferred(), is(false));
@@ -143,6 +146,17 @@ public class AgentPropertiesTest {
     }
 
     @Test
+    public void test_load_whenThereAreMultipleHostsDefined() throws Exception {
+        final AgentProperties agentProperties = new AgentProperties();
+        final Properties properties = new Properties();
+        properties.setProperty(PROPERTY_KEY_HOST, "host1,host2");
+
+        agentProperties.load(properties);
+
+        assertThat(agentProperties.getHosts(), containsInAnyOrder("host1", "host2"));
+    }
+
+    @Test
     public void test_buildPropertiesMap() throws Exception {
         final AgentProperties agentProperties = new AgentProperties();
         final Properties properties = new Properties();
@@ -153,7 +167,8 @@ public class AgentPropertiesTest {
 
         final Map<String, Object> propertiesMap = agentProperties.buildPropertiesMap();
 
-        assertThat(propertiesMap, hasEntry(PROPERTY_KEY_HOST, MY_HOST));
+        assertThat(propertiesMap, hasKey(PROPERTY_KEY_HOST));
+        assertThat((List<String>) propertiesMap.get(PROPERTY_KEY_HOST), containsInAnyOrder(MY_HOST));
         assertThat(propertiesMap, hasEntry(PROPERTY_KEY_PORT, MY_PORT));
         assertThat(propertiesMap, hasEntry(PROPERTY_KEY_IPV6_DISABLED, true));
         assertThat(propertiesMap, hasEntry(PROPERTY_KEY_IPV6_PREFERRED, false));

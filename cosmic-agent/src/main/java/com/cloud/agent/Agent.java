@@ -70,6 +70,8 @@ public class Agent implements HandlerFactory, IAgentControl {
     private final AgentProperties agentProperties;
     private final BackoffAlgorithm backOffAlgorithm;
 
+    private final HostRotator hostRotator = new HostRotator();
+
     private NioConnection _connection;
     private final ServerResource resource;
     private Link _link;
@@ -95,7 +97,10 @@ public class Agent implements HandlerFactory, IAgentControl {
         this.resource = resource;
         resource.setAgentControl(this);
 
-        _connection = new NioClient("Agent", agentProperties.getHost(), agentProperties.getPort(), agentProperties.getWorkers(), this);
+        hostRotator.addAll(agentProperties.getHosts());
+
+        final String host = rotateHost();
+        _connection = new NioClient("Agent", host, agentProperties.getPort(), agentProperties.getWorkers(), this);
 
         logger.debug("Adding shutdown hook");
         Runtime.getRuntime().addShutdownHook(new ShutdownThread(this));
@@ -108,7 +113,13 @@ public class Agent implements HandlerFactory, IAgentControl {
                         new NamedThreadFactory("agentRequest-Handler"));
 
         logger.info("Agent [id = " + (_id != null ? _id : "new") + " : type = " + getResourceName() + " : zone = " + agentProperties.getZone() + " : pod = "
-                + agentProperties.getPod() + " : workers = " + agentProperties.getWorkers() + " : host = " + agentProperties.getHost() + " : port = " + agentProperties.getPort());
+                + agentProperties.getPod() + " : workers = " + agentProperties.getWorkers() + " : host = " + agentProperties.getHosts() + " : port = " + agentProperties.getPort());
+    }
+
+    private String rotateHost() {
+        final String host = hostRotator.nextHost();
+        logger.debug("Rotating management server host to {}", host);
+        return host;
     }
 
     public String getResourceName() {
@@ -128,11 +139,12 @@ public class Agent implements HandlerFactory, IAgentControl {
         try {
             _connection.start();
         } catch (final NioConnectionException e) {
-            logger.warn("Attempted to connect to the server, but received an unexpected exception, trying again...", e);
+            logger.warn("Attempted to connect to the  server, but received an unexpected exception, trying again...", e);
         }
         while (!_connection.isStartup()) {
             backOffAlgorithm.waitBeforeRetry();
-            _connection = new NioClient("Agent", agentProperties.getHost(), agentProperties.getPort(), agentProperties.getWorkers(), this);
+            final String host = rotateHost();
+            _connection = new NioClient("Agent", host, agentProperties.getPort(), agentProperties.getWorkers(), this);
             try {
                 _connection.start();
             } catch (final NioConnectionException e) {
@@ -294,7 +306,8 @@ public class Agent implements HandlerFactory, IAgentControl {
             backOffAlgorithm.waitBeforeRetry();
         }
 
-        _connection = new NioClient("Agent", agentProperties.getHost(), agentProperties.getPort(), agentProperties.getWorkers(), this);
+        final String host = rotateHost();
+        _connection = new NioClient("Agent", host, agentProperties.getPort(), agentProperties.getWorkers(), this);
         do {
             logger.info("Reconnecting...");
             try {

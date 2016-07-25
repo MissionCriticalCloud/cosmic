@@ -7,33 +7,37 @@ import static com.cloud.agent.AgentConstants.DEFAULT_NUMBER_OF_PING_RETRIES;
 import static com.cloud.agent.AgentConstants.DEFAULT_NUMBER_OF_WORKERS;
 import static com.cloud.agent.AgentConstants.DEFAULT_PID_DIR;
 import static com.cloud.agent.AgentConstants.DEFAULT_PORT;
-import static com.cloud.agent.AgentConstants.DEFAULT_ZONE;
 import static com.cloud.agent.AgentConstants.PROPERTY_KEY_CONSOLE_PROXY_HTTP_PORT;
-import static com.cloud.agent.AgentConstants.PROPERTY_KEY_CONSOLE_VERSION;
-import static com.cloud.agent.AgentConstants.PROPERTY_KEY_DEVELOPER;
-import static com.cloud.agent.AgentConstants.PROPERTY_KEY_GUID;
-import static com.cloud.agent.AgentConstants.PROPERTY_KEY_HOST;
-import static com.cloud.agent.AgentConstants.PROPERTY_KEY_INSTANCE;
 import static com.cloud.agent.AgentConstants.PROPERTY_KEY_IPV6_DISABLED;
 import static com.cloud.agent.AgentConstants.PROPERTY_KEY_IPV6_PREFERRED;
 import static com.cloud.agent.AgentConstants.PROPERTY_KEY_PID_DIR;
 import static com.cloud.agent.AgentConstants.PROPERTY_KEY_PING_RETRIES;
-import static com.cloud.agent.AgentConstants.PROPERTY_KEY_POD;
-import static com.cloud.agent.AgentConstants.PROPERTY_KEY_PORT;
-import static com.cloud.agent.AgentConstants.PROPERTY_KEY_RESOURCE;
 import static com.cloud.agent.AgentConstants.PROPERTY_KEY_WORKERS;
-import static com.cloud.agent.AgentConstants.PROPERTY_KEY_ZONE;
+import static com.cloud.agent.AgentConstants.PROPERTY_LIST_SEPARATOR;
+import static com.cloud.utils.CloudConstants.DEFAULT_ZONE;
+import static com.cloud.utils.CloudConstants.PROPERTY_KEY_CONSOLE_VERSION;
+import static com.cloud.utils.CloudConstants.PROPERTY_KEY_DEVELOPER;
+import static com.cloud.utils.CloudConstants.PROPERTY_KEY_GUID;
+import static com.cloud.utils.CloudConstants.PROPERTY_KEY_HOST;
+import static com.cloud.utils.CloudConstants.PROPERTY_KEY_INSTANCE;
+import static com.cloud.utils.CloudConstants.PROPERTY_KEY_POD;
+import static com.cloud.utils.CloudConstants.PROPERTY_KEY_PORT;
+import static com.cloud.utils.CloudConstants.PROPERTY_KEY_RESOURCE;
+import static com.cloud.utils.CloudConstants.PROPERTY_KEY_ZONE;
 import static com.cloud.utils.PropertiesUtil.parse;
+import static com.cloud.utils.PropertiesUtil.stringSplitDecomposer;
 
 import com.cloud.utils.PropertiesPojo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
 public class AgentProperties implements PropertiesPojo {
-    private String host = "";
+    private List<String> hosts = new ArrayList<>();
     private int port = DEFAULT_PORT;
     private int consoleProxyHttpPort = DEFAULT_CONSOLE_PROXY_HTTP_PORT;
     private String zone = DEFAULT_ZONE;
@@ -50,7 +54,7 @@ public class AgentProperties implements PropertiesPojo {
     private String version = "";
 
     public void load(final Properties properties) {
-        host = parse(properties, PROPERTY_KEY_HOST, host);
+        hosts = parse(properties, PROPERTY_KEY_HOST, hosts, stringSplitDecomposer(PROPERTY_LIST_SEPARATOR, String.class));
         workers = parse(properties, PROPERTY_KEY_WORKERS, workers);
         port = parse(properties, PROPERTY_KEY_PORT, port);
         zone = parse(properties, PROPERTY_KEY_ZONE, zone);
@@ -76,8 +80,8 @@ public class AgentProperties implements PropertiesPojo {
         instance = developer ? UUID.randomUUID().toString() : instance;
     }
 
-    public String getHost() {
-        return host;
+    public List<String> getHosts() {
+        return hosts;
     }
 
     public int getWorkers() {
@@ -142,7 +146,7 @@ public class AgentProperties implements PropertiesPojo {
 
     public Map<String, Object> buildPropertiesMap() {
         final HashMap<String, Object> propertiesMap = new HashMap<>();
-        propertiesMap.put(PROPERTY_KEY_HOST, host);
+        propertiesMap.put(PROPERTY_KEY_HOST, hosts);
         propertiesMap.put(PROPERTY_KEY_PORT, port);
         propertiesMap.put(PROPERTY_KEY_ZONE, zone);
         propertiesMap.put(PROPERTY_KEY_POD, pod);
