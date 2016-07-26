@@ -145,10 +145,10 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
         }
 
         s_daoMaps.put(_entityBeanType, this);
-        final Class<?>[] interphaces = _entityBeanType.getInterfaces();
-        if (interphaces != null) {
-            for (final Class<?> interphace : interphaces) {
-                s_daoMaps.put(interphace, this);
+        final Class<?>[] interfaceClasses = _entityBeanType.getInterfaces();
+        if (interfaceClasses != null) {
+            for (final Class<?> interfaceClass : interfaceClasses) {
+                s_daoMaps.put(interfaceClass, this);
             }
         }
 
@@ -269,9 +269,10 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
     }
 
     public static <J> GenericDao<? extends J, ? extends Serializable> getDao(final Class<J> entityType) {
-        final
-        GenericDao<? extends J, ? extends Serializable> dao = (GenericDao<? extends J, ? extends Serializable>) s_daoMaps.get(entityType);
-        assert dao != null : "Unable to find DAO for " + entityType + ".  Are you sure you waited for the DAO to be initialized before asking for it?";
+        final GenericDao<? extends J, ? extends Serializable> dao = (GenericDao<? extends J, ? extends Serializable>) s_daoMaps.get(entityType);
+        if (dao == null) {
+            s_logger.info("Unable to find DAO for {}", entityType);
+        }
         return dao;
     }
 
