@@ -62,11 +62,11 @@ public class LibvirtVifDriverTest {
         // map to the default vif driver for the bridge type
         final Map<String, Object> params = new HashMap<>();
 
-        res.bridgeType = BridgeType.NATIVE;
+        res.setBridgeType(BridgeType.NATIVE);
         configure(params);
         checkAllSame(bridgeVifDriver);
 
-        res.bridgeType = BridgeType.OPENVSWITCH;
+        res.setBridgeType(BridgeType.OPENVSWITCH);
         configure(params);
         checkAllSame(ovsVifDriver);
     }
@@ -102,13 +102,13 @@ public class LibvirtVifDriverTest {
 
         // Switch res' bridge type for test purposes
         params.put(LibVirtVifDriver, LibvirtComputingResource.DEFAULT_BRIDGE_VIF_DRIVER_CLASS);
-        res.bridgeType = BridgeType.NATIVE;
+        res.setBridgeType(BridgeType.NATIVE);
         configure(params);
         checkAllSame(bridgeVifDriver);
 
         params.clear();
         params.put(LibVirtVifDriver, LibvirtComputingResource.DEFAULT_OVS_VIF_DRIVER_CLASS);
-        res.bridgeType = BridgeType.OPENVSWITCH;
+        res.setBridgeType(BridgeType.OPENVSWITCH);
         configure(params);
         checkAllSame(ovsVifDriver);
     }
@@ -121,13 +121,13 @@ public class LibvirtVifDriverTest {
 
         // Switch res' bridge type for test purposes
         params.put(LibVirtVifDriver, LibvirtComputingResource.DEFAULT_OVS_VIF_DRIVER_CLASS);
-        res.bridgeType = BridgeType.NATIVE;
+        res.setBridgeType(BridgeType.NATIVE);
         configure(params);
         checkAllSame(ovsVifDriver);
 
         params.clear();
         params.put(LibVirtVifDriver, LibvirtComputingResource.DEFAULT_BRIDGE_VIF_DRIVER_CLASS);
-        res.bridgeType = BridgeType.OPENVSWITCH;
+        res.setBridgeType(BridgeType.OPENVSWITCH);
         configure(params);
         checkAllSame(bridgeVifDriver);
     }
@@ -138,7 +138,7 @@ public class LibvirtVifDriverTest {
         final Map<String, Object> params = new HashMap<>();
         params.put(LibVirtVifDriver + "." + "Public", FakeVifDriverClassName);
         params.put(LibVirtVifDriver + "." + "Guest", LibvirtComputingResource.DEFAULT_OVS_VIF_DRIVER_CLASS);
-        res.bridgeType = BridgeType.NATIVE;
+        res.setBridgeType(BridgeType.NATIVE);
         configure(params);
 
         // Initially, set all traffic types to use default
@@ -156,7 +156,7 @@ public class LibvirtVifDriverTest {
     public void testBadTrafficType() throws ConfigurationException {
         final Map<String, Object> params = new HashMap<>();
         params.put(LibVirtVifDriver + "." + "NonExistentTrafficType", FakeVifDriverClassName);
-        res.bridgeType = BridgeType.NATIVE;
+        res.setBridgeType(BridgeType.NATIVE);
         configure(params);
 
         // Set all traffic types to use default, because bad traffic type should be ignored
@@ -171,7 +171,7 @@ public class LibvirtVifDriverTest {
     public void testEmptyTrafficType() throws ConfigurationException {
         final Map<String, Object> params = new HashMap<>();
         params.put(LibVirtVifDriver + ".", FakeVifDriverClassName);
-        res.bridgeType = BridgeType.NATIVE;
+        res.setBridgeType(BridgeType.NATIVE);
         configure(params);
 
         // Set all traffic types to use default, because bad traffic type should be ignored
@@ -186,7 +186,7 @@ public class LibvirtVifDriverTest {
     public void testBadVifDriverClassName() throws ConfigurationException {
         final Map<String, Object> params = new HashMap<>();
         params.put(LibVirtVifDriver + "." + "Public", NonExistentVifDriverClassName);
-        res.bridgeType = BridgeType.NATIVE;
+        res.setBridgeType(BridgeType.NATIVE);
         configure(params);
     }
 }

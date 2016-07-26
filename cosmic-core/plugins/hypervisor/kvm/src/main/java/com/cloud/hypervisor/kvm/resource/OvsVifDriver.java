@@ -4,7 +4,6 @@ import com.cloud.agent.api.to.NicTO;
 import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.network.Networks;
-import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
@@ -31,8 +30,7 @@ public class OvsVifDriver extends VifDriverBase {
             networkScriptsDir = "scripts/vm/network/vnet";
         }
 
-        final String value = (String) params.get("scripts.timeout");
-        timeout = NumbersUtil.parseInt(value, 30 * 60) * 1000;
+        timeout = ((Integer) params.get("scripts.timeout")) * 1000;
 
         createControlNetwork(bridges.get("linklocal"));
     }

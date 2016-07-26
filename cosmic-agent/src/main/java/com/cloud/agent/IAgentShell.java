@@ -1,38 +1,15 @@
 package com.cloud.agent;
 
-import com.cloud.utils.backoff.BackoffAlgorithm;
-
-import java.util.Map;
-import java.util.Properties;
-
 public interface IAgentShell {
-    public Map<String, Object> getCmdLineProperties();
+    String getHost();
 
-    public Properties getProperties();
+    int getPort();
 
-    public String getPersistentProperty(String prefix, String name);
+    int getWorkers();
 
-    public void setPersistentProperty(String prefix, String name, String value);
+    String getGuid();
 
-    public String getHost();
+    String getZone();
 
-    public String getPrivateIp();
-
-    public int getPort();
-
-    public int getWorkers();
-
-    public int getProxyPort();
-
-    public String getGuid();
-
-    public String getZone();
-
-    public String getPod();
-
-    public BackoffAlgorithm getBackoffAlgorithm();
-
-    public int getPingRetries();
-
-    public String getVersion();
+    String getPod();
 }

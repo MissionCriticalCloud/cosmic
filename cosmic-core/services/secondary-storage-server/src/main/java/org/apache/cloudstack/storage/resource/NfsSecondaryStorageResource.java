@@ -1982,18 +1982,11 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _eth1ip = (String) params.get("eth1ip");
-        _eth1mask = (String) params.get("eth1mask");
-        if (_eth1ip != null) { // can only happen inside service vm
-            params.put("private.network.device", "eth1");
-        } else {
-            s_logger.warn("eth1ip parameter has not been configured, assuming that we are not inside a system vm");
-        }
-        final String eth2ip = (String) params.get("eth2ip");
-        if (eth2ip != null) {
-            params.put("public.network.device", "eth2");
-        }
-        _publicIp = (String) params.get("eth2ip");
+        s_logger.info("Configuring resource {}", name);
+
+        configurePrivateInterface(params);
+        configuringPublicInterface(params);
+
         _hostname = (String) params.get("name");
 
         final String inSystemVM = (String) params.get("secondary.storage.vm");
@@ -2099,6 +2092,25 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
             return false;
         }
         return true;
+    }
+
+    private void configuringPublicInterface(final Map<String, Object> params) {
+        _publicIp = (String) params.get("eth2ip");
+        s_logger.debug("Configuring public interface with IP {}", _publicIp);
+        if (_publicIp != null) {
+            params.put("public.network.device", "eth2");
+        }
+    }
+
+    private void configurePrivateInterface(final Map<String, Object> params) {
+        _eth1ip = (String) params.get("eth1ip");
+        _eth1mask = (String) params.get("eth1mask");
+        s_logger.debug("Configuring private interface with IP {} and mask {}", _eth1ip, _eth1mask);
+        if (_eth1ip != null) { // can only happen inside service vm
+            params.put("private.network.device", "eth1");
+        } else {
+            s_logger.warn("eth1ip parameter has not been configured, assuming that we are not inside a system vm");
+        }
     }
 
     protected void configureStorageLayerClass(final Map<String, Object> params) throws ConfigurationException {
@@ -2225,6 +2237,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         if (!_inSystemVM) {
             return;
         }
+        s_logger.debug("Configuring SSL in SystemVM for public IP {} and hostname {}", _publicIp, _hostname);
         final Script command = new Script(_configSslScr);
         command.add("-i", _publicIp);
         command.add("-h", _hostname);

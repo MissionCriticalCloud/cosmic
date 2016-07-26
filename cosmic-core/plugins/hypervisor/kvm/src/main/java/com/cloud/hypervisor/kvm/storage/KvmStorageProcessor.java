@@ -25,7 +25,6 @@ import com.cloud.storage.template.Processor;
 import com.cloud.storage.template.Processor.FormatInfo;
 import com.cloud.storage.template.QCOW2Processor;
 import com.cloud.storage.template.TemplateLocation;
-import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.script.Script;
 import com.cloud.utils.storage.S3.S3Utils;
@@ -116,8 +115,7 @@ public class KvmStorageProcessor implements StorageProcessor {
             throw new ConfigurationException("Unable to find the managesnapshot.sh");
         }
 
-        final String value = (String) params.get("cmds.timeout");
-        cmdsTimeout = NumbersUtil.parseInt(value, 7200) * 1000;
+        cmdsTimeout = ((Integer) params.get("cmds.timeout")) * 1000;
         return true;
     }
 

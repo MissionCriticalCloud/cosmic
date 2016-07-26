@@ -41,7 +41,7 @@ public final class LibvirtPvlanSetupCommandWrapper
         String result = null;
         try {
             final String guestBridgeName = libvirtComputingResource.getGuestBridgeName();
-            final int timeout = libvirtComputingResource.getTimeout();
+            final int timeout = libvirtComputingResource.getScriptsTimeout();
 
             if (command.getType() == PvlanSetupCommand.Type.DHCP) {
                 final String ovsPvlanDhcpHostPath = libvirtComputingResource.getOvsPvlanDhcpHostPath();
