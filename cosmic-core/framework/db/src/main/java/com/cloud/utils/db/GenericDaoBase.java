@@ -98,7 +98,7 @@ import org.slf4j.LoggerFactory;
 @DB
 public abstract class GenericDaoBase<T, ID extends Serializable> extends ComponentLifecycleBase implements GenericDao<T, ID>, ComponentMethodInterceptable {
     protected final static TimeZone s_gmtTimeZone = TimeZone.getTimeZone("GMT");
-    protected final static Map<Class<?>, GenericDao<?, ? extends Serializable>> s_daoMaps = new ConcurrentHashMap<>(71);
+    protected final static Map<String, GenericDao<?, ? extends Serializable>> s_daoMaps = new ConcurrentHashMap<>(71);
     protected final static CallbackFilter s_callbackFilter = new UpdateFilter();
     protected static final String FOR_UPDATE_CLAUSE = " FOR UPDATE ";
     protected static final String SHARE_MODE_CLAUSE = " LOCK IN SHARE MODE";
@@ -144,11 +144,11 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
             _entityBeanType = (Class<T>) ((ParameterizedType) ((Class<?>) ((Class<?>) t).getGenericSuperclass()).getGenericSuperclass()).getActualTypeArguments()[0];
         }
 
-        s_daoMaps.put(_entityBeanType, this);
+        s_daoMaps.put(_entityBeanType.getCanonicalName(), this);
         final Class<?>[] interfaceClasses = _entityBeanType.getInterfaces();
         if (interfaceClasses != null) {
             for (final Class<?> interfaceClass : interfaceClasses) {
-                s_daoMaps.put(interfaceClass, this);
+                s_daoMaps.put(interfaceClass.getCanonicalName(), this);
             }
         }
         logDetectedDaos();
@@ -274,9 +274,10 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
     }
 
     public static <J> GenericDao<? extends J, ? extends Serializable> getDao(final Class<J> entityType) {
-        final GenericDao<? extends J, ? extends Serializable> dao = (GenericDao<? extends J, ? extends Serializable>) s_daoMaps.get(entityType);
+        final String className = entityType.getCanonicalName();
+        final GenericDao<? extends J, ? extends Serializable> dao = (GenericDao<? extends J, ? extends Serializable>) s_daoMaps.get(className);
         if (dao == null) {
-            s_logger.info("Unable to find DAO for {}", entityType);
+            s_logger.info("Unable to find DAO for {}", className);
         }
         return dao;
     }
