@@ -363,10 +363,10 @@ public class ClusterManagerImpl extends ManagerBase implements ClusterManager, C
         while (true) {
             try {
                 final ClusterServicePdu pdu = popOutgoingClusterPdu(1000);
-                s_logger.debug("Popped a PDU from the outgoing cluster pdu queue: " + pdu);
                 if (pdu == null) {
                     continue;
                 }
+                s_logger.debug("Popped a PDU from the outgoing cluster pdu queue: " + pdu);
 
                 ClusterService peerService = null;
                 for (int i = 0; i < 2; i++) {
