@@ -151,6 +151,7 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
                 s_daoMaps.put(interfaceClass, this);
             }
         }
+        logDetectedDaos();
 
         _table = DbUtil.getTableName(_entityBeanType);
 
@@ -225,6 +226,10 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
         }
 
         setRunLevel(ComponentLifecycle.RUN_LEVEL_SYSTEM);
+    }
+
+    private void logDetectedDaos() {
+        s_daoMaps.forEach((k, v) -> s_logger.debug("Detected DAO {} for class {}", v, k));
     }
 
     @DB()
