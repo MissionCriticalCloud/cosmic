@@ -1,5 +1,9 @@
 package com.cloud.agent;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+
 import javax.naming.ConfigurationException;
 import java.util.UUID;
 
@@ -12,12 +16,13 @@ public class AgentShellTest {
         final AgentShell shell = new AgentShell();
         final UUID anyUuid = UUID.randomUUID();
         shell.parseCommand(new String[]{"port=55555", "workers=4", "host=localhost", "pod=pod1", "guid=" + anyUuid, "zone=zone1"});
-        Assert.assertEquals(55555, shell.getPort());
-        Assert.assertEquals(4, shell.getWorkers());
-        Assert.assertEquals("localhost", shell.getHost());
-        Assert.assertEquals(anyUuid.toString(), shell.getGuid());
-        Assert.assertEquals("pod1", shell.getPod());
-        Assert.assertEquals("zone1", shell.getZone());
+
+        assertThat(shell.getPort(), is(55555));
+        assertThat(shell.getWorkers(), is(4));
+        assertThat(shell.getHosts(), containsInAnyOrder("localhost"));
+        assertThat(shell.getGuid(), is(anyUuid.toString()));
+        assertThat(shell.getPod(), is("pod1"));
+        assertThat(shell.getZone(), is("zone1"));
     }
 
     @Test

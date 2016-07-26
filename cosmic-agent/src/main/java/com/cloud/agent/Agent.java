@@ -70,6 +70,8 @@ public class Agent implements HandlerFactory, IAgentControl {
     private final AgentProperties agentProperties;
     private final BackoffAlgorithm backOffAlgorithm;
 
+    private final HostRotator hostRotator = new HostRotator();
+
     private NioConnection _connection;
     private final ServerResource resource;
     private Link _link;
@@ -95,7 +97,9 @@ public class Agent implements HandlerFactory, IAgentControl {
         this.resource = resource;
         resource.setAgentControl(this);
 
-        _connection = new NioClient("Agent", agentProperties.getHost(), agentProperties.getPort(), agentProperties.getWorkers(), this);
+        hostRotator.addAll(agentProperties.getHosts());
+
+        createNioClient(agentProperties);
 
         logger.debug("Adding shutdown hook");
         Runtime.getRuntime().addShutdownHook(new ShutdownThread(this));
@@ -108,7 +112,19 @@ public class Agent implements HandlerFactory, IAgentControl {
                         new NamedThreadFactory("agentRequest-Handler"));
 
         logger.info("Agent [id = " + (_id != null ? _id : "new") + " : type = " + getResourceName() + " : zone = " + agentProperties.getZone() + " : pod = "
-                + agentProperties.getPod() + " : workers = " + agentProperties.getWorkers() + " : host = " + agentProperties.getHost() + " : port = " + agentProperties.getPort());
+                + agentProperties.getPod() + " : workers = " + agentProperties.getWorkers() + " : host = " + agentProperties.getHosts() + " : port = " + agentProperties.getPort());
+    }
+
+    private void createNioClient(final AgentProperties agentProperties) {
+        final String host = rotateHost();
+        logger.debug("Creating new NIO Client");
+        _connection = new NioClient("Agent", host, agentProperties.getPort(), agentProperties.getWorkers(), this);
+    }
+
+    private String rotateHost() {
+        final String host = hostRotator.nextHost();
+        logger.debug("Rotating management server host to {}", host);
+        return host;
     }
 
     public String getResourceName() {
@@ -120,25 +136,32 @@ public class Agent implements HandlerFactory, IAgentControl {
     }
 
     public void start() {
+        logger.info("Starting Agent resource");
         if (!resource.start()) {
             logger.error("Unable to start the resource: " + resource.getName());
             throw new CloudRuntimeException("Unable to start the resource: " + resource.getName());
         }
 
         try {
-            _connection.start();
+            connectToManagementServer();
         } catch (final NioConnectionException e) {
-            logger.warn("Attempted to connect to the server, but received an unexpected exception, trying again...", e);
+            logger.warn("Attempted to connect to the  server, but received an unexpected exception, trying again...", e);
         }
         while (!_connection.isStartup()) {
+            logger.info("Backing off for a while before attempting to reconnect to management server");
             backOffAlgorithm.waitBeforeRetry();
-            _connection = new NioClient("Agent", agentProperties.getHost(), agentProperties.getPort(), agentProperties.getWorkers(), this);
+            createNioClient(agentProperties);
             try {
-                _connection.start();
+                connectToManagementServer();
             } catch (final NioConnectionException e) {
                 logger.warn("Attempted to connect to the server, but received an unexpected exception, trying again...", e);
             }
         }
+    }
+
+    private void connectToManagementServer() throws NioConnectionException {
+        logger.info("Opening connection to management server");
+        _connection.start();
     }
 
     public void stop(final String reason) {
@@ -294,7 +317,7 @@ public class Agent implements HandlerFactory, IAgentControl {
             backOffAlgorithm.waitBeforeRetry();
         }
 
-        _connection = new NioClient("Agent", agentProperties.getHost(), agentProperties.getPort(), agentProperties.getWorkers(), this);
+        createNioClient(agentProperties);
         do {
             logger.info("Reconnecting...");
             try {

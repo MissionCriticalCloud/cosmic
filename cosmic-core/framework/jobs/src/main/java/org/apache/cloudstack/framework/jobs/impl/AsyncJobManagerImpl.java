@@ -374,8 +374,10 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
     @Override
     @DB
     public long submitAsyncJob(final AsyncJob job, final String syncObjType, final long syncObjId) {
+        final Class<? extends AsyncJob> jobClass = job.getClass();
+        s_logger.info("Submitting Async Job {} for object type {}", jobClass, syncObjType);
         try {
-            final GenericDao dao = GenericDaoBase.getDao(job.getClass());
+            final GenericDao dao = GenericDaoBase.getDao(jobClass);
 
             publishOnEventBus(job, "submit");
 

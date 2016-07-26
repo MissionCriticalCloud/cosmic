@@ -1,7 +1,9 @@
 package com.cloud.agent;
 
+import java.util.List;
+
 public interface IAgentShell {
-    String getHost();
+    List<String> getHosts();
 
     int getPort();
 
