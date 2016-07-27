@@ -31,23 +31,15 @@ public class ConsoleProxyAjaxImageHandler implements HttpHandler {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug(t.getRequestURI() + "Process time " + (System.currentTimeMillis() - startTick) + " ms");
             }
-        } catch (final IOException e) {
-            throw e;
         } catch (final IllegalArgumentException e) {
             s_logger.warn("Exception, ", e);
             t.sendResponseHeaders(400, -1);     // bad request
-        } catch (final OutOfMemoryError e) {
-            s_logger.error("Unrecoverable OutOfMemory Error, exit and let it be re-launched");
-            System.exit(1);
-        } catch (final Throwable e) {
-            s_logger.error("Unexpected exception, ", e);
-            t.sendResponseHeaders(500, -1);     // server error
         } finally {
             t.close();
         }
     }
 
-    private void doHandle(final HttpExchange t) throws Exception, IllegalArgumentException {
+    private void doHandle(final HttpExchange t) throws IllegalArgumentException, IOException {
         final String queries = t.getRequestURI().getQuery();
         final Map<String, String> queryMap = ConsoleProxyHttpHandlerHelper.getQueryMap(queries);
 

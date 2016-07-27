@@ -456,11 +456,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         _preloadExecutor.execute(new ManagedContextRunnable() {
             @Override
             protected void runInContext() {
-                try {
-                    reallyRun();
-                } catch (final Throwable e) {
-                    s_logger.warn("Unexpected exception ", e);
-                }
+                reallyRun();
             }
 
             private void reallyRun() {

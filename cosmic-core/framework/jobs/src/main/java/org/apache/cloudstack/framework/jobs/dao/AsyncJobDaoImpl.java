@@ -168,8 +168,6 @@ public class AsyncJobDaoImpl extends GenericDaoBase<AsyncJobVO, Long> implements
             pstmt.execute();
         } catch (final SQLException e) {
             s_logger.warn("Unable to reset job status for management server " + msid, e);
-        } catch (final Throwable e) {
-            s_logger.warn("Unable to reset job status for management server " + msid, e);
         }
     }
 

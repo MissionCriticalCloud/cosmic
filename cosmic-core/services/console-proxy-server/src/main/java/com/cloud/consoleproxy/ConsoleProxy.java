@@ -271,7 +271,7 @@ public class ConsoleProxy {
         }
     }
 
-    public static ConsoleProxyClient getVncViewer(final ConsoleProxyClientParam param) throws Exception {
+    public static ConsoleProxyClient getVncViewer(final ConsoleProxyClientParam param) {
         ConsoleProxyClient viewer = null;
 
         boolean reportLoadChange = false;

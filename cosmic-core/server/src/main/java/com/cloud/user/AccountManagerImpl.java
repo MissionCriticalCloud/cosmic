@@ -776,27 +776,18 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("updating user with id: " + userId);
         }
-        try {
-            // check if the apiKey and secretKey are globally unique
-            if (apiKey != null && secretKey != null) {
-                final Pair<User, Account> apiKeyOwner = _accountDao.findUserAccountByApiKey(apiKey);
+        // check if the apiKey and secretKey are globally unique
+        if (apiKey != null && secretKey != null) {
+            final Pair<User, Account> apiKeyOwner = _accountDao.findUserAccountByApiKey(apiKey);
 
-                if (apiKeyOwner != null) {
-                    final User usr = apiKeyOwner.first();
-                    if (usr.getId() != userId) {
-                        throw new InvalidParameterValueException("The api key:" + apiKey + " exists in the system for user id:" + userId + " ,please provide a unique key");
-                    } else {
-                        // allow the updation to take place
-                    }
+            if (apiKeyOwner != null) {
+                final User usr = apiKeyOwner.first();
+                if (usr.getId() != userId) {
+                    throw new InvalidParameterValueException("The api key:" + apiKey + " exists in the system for user id:" + userId + " ,please provide a unique key");
                 }
             }
-
-            _userDao.update(userId, user);
-        } catch (final Throwable th) {
-            s_logger.error("error updating user", th);
-            throw new CloudRuntimeException("Unable to update user " + userId);
         }
-
+        _userDao.update(userId, user);
         CallContext.current().putContextParameter(User.class, user.getUuid());
 
         return _userAccountDao.findById(userId);

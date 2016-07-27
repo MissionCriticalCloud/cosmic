@@ -162,40 +162,36 @@ public class XenServerResourceNewBase extends XenServer620SP1Resource {
         public void run() {
             setName("XS-Listener-" + _host.getIp());
             while (!_stop) {
+                final Connection conn = getConnection();
+                final EventBatch results;
                 try {
-                    final Connection conn = getConnection();
-                    final EventBatch results;
+                    results = Event.from(conn, _classes, _token, new Double(30));
+                } catch (final Exception e) {
+                    s_logger.error("Retrying the waiting on VM events due to: ", e);
+                    continue;
+                }
+
+                _token = results.token;
+                final
+                Set<Event.Record> events = results.events;
+                for (final Event.Record event : events) {
                     try {
-                        results = Event.from(conn, _classes, _token, new Double(30));
-                    } catch (final Exception e) {
-                        s_logger.error("Retrying the waiting on VM events due to: ", e);
-                        continue;
-                    }
-
-                    _token = results.token;
-                    final
-                    Set<Event.Record> events = results.events;
-                    for (final Event.Record event : events) {
-                        try {
-                            if (!(event.snapshot instanceof VM.Record)) {
-                                if (s_logger.isDebugEnabled()) {
-                                    s_logger.debug("The snapshot is not a VM: " + event);
-                                }
-                                continue;
+                        if (!(event.snapshot instanceof VM.Record)) {
+                            if (s_logger.isDebugEnabled()) {
+                                s_logger.debug("The snapshot is not a VM: " + event);
                             }
-                            final VM.Record vm = (VM.Record) event.snapshot;
-
-                            String hostUuid = null;
-                            if (vm.residentOn != null && !vm.residentOn.toWireString().contains("OpaqueRef:NULL")) {
-                                hostUuid = vm.residentOn.getUuid(conn);
-                            }
-                            recordChanges(conn, vm, hostUuid);
-                        } catch (final Exception e) {
-                            s_logger.error("Skipping over " + event, e);
+                            continue;
                         }
+                        final VM.Record vm = (VM.Record) event.snapshot;
+
+                        String hostUuid = null;
+                        if (vm.residentOn != null && !vm.residentOn.toWireString().contains("OpaqueRef:NULL")) {
+                            hostUuid = vm.residentOn.getUuid(conn);
+                        }
+                        recordChanges(conn, vm, hostUuid);
+                    } catch (final Exception e) {
+                        s_logger.error("Skipping over " + event, e);
                     }
-                } catch (final Throwable th) {
-                    s_logger.error("Exception caught in eventlistener thread: ", th);
                 }
             }
         }

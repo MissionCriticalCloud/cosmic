@@ -361,101 +361,93 @@ public class ClusterManagerImpl extends ManagerBase implements ClusterManager, C
 
     private void onSendingClusterPdu() {
         while (true) {
-            try {
-                final ClusterServicePdu pdu = popOutgoingClusterPdu(1000);
-                if (pdu == null) {
-                    continue;
+            final ClusterServicePdu pdu = popOutgoingClusterPdu(1000);
+            if (pdu == null) {
+                continue;
+            }
+
+            ClusterService peerService = null;
+            for (int i = 0; i < 2; i++) {
+                try {
+                    peerService = getPeerService(pdu.getDestPeer());
+                } catch (final RemoteException e) {
+                    s_logger.error("Unable to get cluster service on peer : " + pdu.getDestPeer());
                 }
                 s_logger.debug("Popped a PDU from the outgoing cluster pdu queue: " + pdu);
 
-                ClusterService peerService = null;
-                for (int i = 0; i < 2; i++) {
+                if (peerService != null) {
                     try {
-                        peerService = getPeerService(pdu.getDestPeer());
+                        if (s_logger.isDebugEnabled()) {
+                            s_logger.debug("Cluster PDU " + getSelfPeerName() + " -> " + pdu.getDestPeer() + ". agent: " + pdu.getAgentId() + ", pdu seq: " +
+                                    pdu.getSequenceId() + ", pdu ack seq: " + pdu.getAckSequenceId() + ", json: " + pdu.getJsonPackage());
+                        }
+
+                        final Profiler profiler = new Profiler();
+                        profiler.start();
+
+                        final String strResult = peerService.execute(pdu);
+                        profiler.stop();
+
+                        if (s_logger.isDebugEnabled()) {
+                            s_logger.debug("Cluster PDU " + getSelfPeerName() + " -> " + pdu.getDestPeer() + " completed. time: " +
+                                    profiler.getDurationInMillis() + "ms. agent: " + pdu.getAgentId() + ", pdu seq: " + pdu.getSequenceId() +
+                                    ", pdu ack seq: " + pdu.getAckSequenceId() + ", json: " + pdu.getJsonPackage());
+                        }
+
+                        if ("true".equals(strResult)) {
+                            break;
+                        }
                     } catch (final RemoteException e) {
-                        s_logger.error("Unable to get cluster service on peer : " + pdu.getDestPeer());
-                    }
-
-                    if (peerService != null) {
-                        try {
-                            if (s_logger.isDebugEnabled()) {
-                                s_logger.debug("Cluster PDU " + getSelfPeerName() + " -> " + pdu.getDestPeer() + ". agent: " + pdu.getAgentId() + ", pdu seq: " +
-                                        pdu.getSequenceId() + ", pdu ack seq: " + pdu.getAckSequenceId() + ", json: " + pdu.getJsonPackage());
-                            }
-
-                            final Profiler profiler = new Profiler();
-                            profiler.start();
-
-                            final String strResult = peerService.execute(pdu);
-                            profiler.stop();
-
-                            if (s_logger.isDebugEnabled()) {
-                                s_logger.debug("Cluster PDU " + getSelfPeerName() + " -> " + pdu.getDestPeer() + " completed. time: " +
-                                        profiler.getDurationInMillis() + "ms. agent: " + pdu.getAgentId() + ", pdu seq: " + pdu.getSequenceId() +
-                                        ", pdu ack seq: " + pdu.getAckSequenceId() + ", json: " + pdu.getJsonPackage());
-                            }
-
-                            if ("true".equals(strResult)) {
-                                break;
-                            }
-                        } catch (final RemoteException e) {
-                            invalidatePeerService(pdu.getDestPeer());
-                            if (s_logger.isInfoEnabled()) {
-                                s_logger.info("Exception on remote execution, peer: " + pdu.getDestPeer() + ", iteration: " + i + ", exception message :" +
-                                        e.getMessage());
-                            }
+                        invalidatePeerService(pdu.getDestPeer());
+                        if (s_logger.isInfoEnabled()) {
+                            s_logger.info("Exception on remote execution, peer: " + pdu.getDestPeer() + ", iteration: " + i + ", exception message :" +
+                                    e.getMessage());
                         }
                     }
                 }
-            } catch (final Throwable e) {
-                s_logger.error("Unexpected exception: ", e);
             }
         }
     }
 
     private void onNotifyingClusterPdu() {
         while (true) {
-            try {
-                final ClusterServicePdu pdu = popIncomingClusterPdu(1000);
-                if (pdu == null) {
-                    continue;
-                }
+            final ClusterServicePdu pdu = popIncomingClusterPdu(1000);
+            if (pdu == null) {
+                continue;
+            }
 
-                _executor.execute(new ManagedContextRunnable() {
-                    @Override
-                    protected void runInContext() {
-                        if (pdu.getPduType() == ClusterServicePdu.PDU_TYPE_RESPONSE) {
-                            final ClusterServiceRequestPdu requestPdu = popRequestPdu(pdu.getAckSequenceId());
-                            if (requestPdu != null) {
-                                requestPdu.setResponseResult(pdu.getJsonPackage());
-                                synchronized (requestPdu) {
-                                    requestPdu.notifyAll();
-                                }
-                            } else {
-                                s_logger.warn("Original request has already been cancelled. pdu: " + pdu.getJsonPackage());
+            _executor.execute(new ManagedContextRunnable() {
+                @Override
+                protected void runInContext() {
+                    if (pdu.getPduType() == ClusterServicePdu.PDU_TYPE_RESPONSE) {
+                        final ClusterServiceRequestPdu requestPdu = popRequestPdu(pdu.getAckSequenceId());
+                        if (requestPdu != null) {
+                            requestPdu.setResponseResult(pdu.getJsonPackage());
+                            synchronized (requestPdu) {
+                                requestPdu.notifyAll();
                             }
                         } else {
-                            String result = _dispatcher.dispatch(pdu);
-                            if (result == null) {
-                                result = "";
-                            }
+                            s_logger.warn("Original request has already been cancelled. pdu: " + pdu.getJsonPackage());
+                        }
+                    } else {
+                        String result = _dispatcher.dispatch(pdu);
+                        if (result == null) {
+                            result = "";
+                        }
 
-                            if (pdu.getPduType() == ClusterServicePdu.PDU_TYPE_REQUEST) {
-                                final ClusterServicePdu responsePdu = new ClusterServicePdu();
-                                responsePdu.setPduType(ClusterServicePdu.PDU_TYPE_RESPONSE);
-                                responsePdu.setSourcePeer(pdu.getDestPeer());
-                                responsePdu.setDestPeer(pdu.getSourcePeer());
-                                responsePdu.setAckSequenceId(pdu.getSequenceId());
-                                responsePdu.setJsonPackage(result);
+                        if (pdu.getPduType() == ClusterServicePdu.PDU_TYPE_REQUEST) {
+                            final ClusterServicePdu responsePdu = new ClusterServicePdu();
+                            responsePdu.setPduType(ClusterServicePdu.PDU_TYPE_RESPONSE);
+                            responsePdu.setSourcePeer(pdu.getDestPeer());
+                            responsePdu.setDestPeer(pdu.getSourcePeer());
+                            responsePdu.setAckSequenceId(pdu.getSequenceId());
+                            responsePdu.setJsonPackage(result);
 
-                                addOutgoingClusterPdu(responsePdu);
-                            }
+                            addOutgoingClusterPdu(responsePdu);
                         }
                     }
-                });
-            } catch (final Throwable e) {
-                s_logger.error("Unexcpeted exception: ", e);
-            }
+                }
+            });
         }
     }
 
@@ -682,6 +674,11 @@ public class ClusterManagerImpl extends ManagerBase implements ClusterManager, C
 
                         peerScan();
                         profilerPeerScan.stop();
+                    } catch (final SQLException e) {
+                        s_logger.error("Unexpected exception in cluster heartbeat", e);
+                        if (isRootCauseConnectionRelated(e.getCause())) {
+                            invalidHeartbeatConnection();
+                        }
                     } finally {
                         profiler.stop();
 
@@ -705,11 +702,6 @@ public class ClusterManagerImpl extends ManagerBase implements ClusterManager, C
                     }
                 } catch (final ActiveFencingException e) {
                     queueNotification(new ClusterManagerMessage(ClusterManagerMessage.MessageType.nodeIsolated));
-                } catch (final Throwable e) {
-                    s_logger.error("Unexpected exception in cluster heartbeat", e);
-                    if (isRootCauseConnectionRelated(e.getCause())) {
-                        invalidHeartbeatConnection();
-                    }
                 } finally {
                     txn.transitToAutoManagedConnection(TransactionLegacy.CLOUD_DB);
                     txn.close("ClusterHeartbeat");
@@ -732,60 +724,57 @@ public class ClusterManagerImpl extends ManagerBase implements ClusterManager, C
 
                     ClusterManagerMessage msg = null;
                     while ((msg = getNextNotificationMessage()) != null) {
-                        try {
-                            switch (msg.getMessageType()) {
-                                case nodeAdded:
-                                    if (msg.getNodes() != null && msg.getNodes().size() > 0) {
-                                        final Profiler profiler = new Profiler();
-                                        profiler.start();
+                        switch (msg.getMessageType()) {
+                            case nodeAdded:
+                                if (msg.getNodes() != null && msg.getNodes().size() > 0) {
+                                    final Profiler profiler = new Profiler();
+                                    profiler.start();
 
-                                        notifyNodeJoined(msg.getNodes());
+                                    notifyNodeJoined(msg.getNodes());
 
-                                        profiler.stop();
-                                        if (profiler.getDurationInMillis() > 1000) {
-                                            if (s_logger.isDebugEnabled()) {
-                                                s_logger.debug("Notifying management server join event took " + profiler.getDurationInMillis() + " ms");
-                                            }
-                                        } else {
-                                            s_logger.warn("Notifying management server join event took " + profiler.getDurationInMillis() + " ms");
+                                    profiler.stop();
+                                    if (profiler.getDurationInMillis() > 1000) {
+                                        if (s_logger.isDebugEnabled()) {
+                                            s_logger.debug("Notifying management server join event took " + profiler.getDurationInMillis() + " ms");
                                         }
+                                    } else {
+                                        s_logger.warn("Notifying management server join event took " + profiler.getDurationInMillis() + " ms");
                                     }
-                                    break;
+                                }
+                                break;
 
-                                case nodeRemoved:
-                                    if (msg.getNodes() != null && msg.getNodes().size() > 0) {
-                                        final Profiler profiler = new Profiler();
-                                        profiler.start();
+                            case nodeRemoved:
+                                if (msg.getNodes() != null && msg.getNodes().size() > 0) {
+                                    final Profiler profiler = new Profiler();
+                                    profiler.start();
 
-                                        notifyNodeLeft(msg.getNodes());
+                                    notifyNodeLeft(msg.getNodes());
 
-                                        profiler.stop();
-                                        if (profiler.getDurationInMillis() > 1000) {
-                                            if (s_logger.isDebugEnabled()) {
-                                                s_logger.debug("Notifying management server leave event took " + profiler.getDurationInMillis() + " ms");
-                                            }
-                                        } else {
-                                            s_logger.warn("Notifying management server leave event took " + profiler.getDurationInMillis() + " ms");
+                                    profiler.stop();
+                                    if (profiler.getDurationInMillis() > 1000) {
+                                        if (s_logger.isDebugEnabled()) {
+                                            s_logger.debug("Notifying management server leave event took " + profiler.getDurationInMillis() + " ms");
                                         }
+                                    } else {
+                                        s_logger.warn("Notifying management server leave event took " + profiler.getDurationInMillis() + " ms");
                                     }
-                                    break;
+                                }
+                                break;
 
-                                case nodeIsolated:
-                                    notifyNodeIsolated();
-                                    break;
+                            case nodeIsolated:
+                                notifyNodeIsolated();
+                                break;
 
-                                default:
-                                    assert false;
-                                    break;
-                            }
-                        } catch (final Throwable e) {
-                            s_logger.warn("Unexpected exception during cluster notification. ", e);
+                            default:
+                                assert false;
+                                break;
                         }
                     }
 
                     try {
                         Thread.sleep(1000);
                     } catch (final InterruptedException e) {
+                        s_logger.warn("Caught (previously ignored) interrupted exception", e);
                     }
                 }
             }

@@ -6,7 +6,7 @@ import com.cloud.consoleproxy.vnc.VncClient;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.UnknownHostException;
+import java.net.URISyntaxException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,11 +141,7 @@ public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
                         ConsoleProxy.ensureRoute(getClientHostAddress());
                         client.connectTo(getClientHostAddress(), getClientHostPort(), getClientHostPassword());
                     }
-                } catch (final UnknownHostException e) {
-                    s_logger.error("Unexpected exception", e);
-                } catch (final IOException e) {
-                    s_logger.error("Unexpected exception", e);
-                } catch (final Throwable e) {
+                } catch (final IOException | URISyntaxException e) {
                     s_logger.error("Unexpected exception", e);
                 }
 

@@ -173,88 +173,82 @@ public class ConsoleProxyServlet extends HttpServlet {
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
+        if (_accountMgr == null || _vmMgr == null || _ms == null) {
+            sendResponse(resp, "Service is not ready");
+            return;
+        }
 
-        try {
-            if (_accountMgr == null || _vmMgr == null || _ms == null) {
-                sendResponse(resp, "Service is not ready");
-                return;
-            }
+        if (_keysMgr.getHashKey() == null) {
+            s_logger.debug("Console/thumbnail access denied. Ticket service is not ready yet");
+            sendResponse(resp, "Service is not ready");
+            return;
+        }
 
-            if (_keysMgr.getHashKey() == null) {
-                s_logger.debug("Console/thumbnail access denied. Ticket service is not ready yet");
-                sendResponse(resp, "Service is not ready");
-                return;
-            }
+        String userId = null;
+        String account = null;
+        Account accountObj = null;
 
-            String userId = null;
-            String account = null;
-            Account accountObj = null;
+        final Map<String, Object[]> params = new HashMap<>();
+        params.putAll(req.getParameterMap());
 
-            final Map<String, Object[]> params = new HashMap<>();
-            params.putAll(req.getParameterMap());
-
-            final HttpSession session = req.getSession(false);
-            if (session == null) {
-                if (verifyRequest(params)) {
-                    userId = (String) params.get("userid")[0];
-                    account = (String) params.get("account")[0];
-                    accountObj = (Account) params.get("accountobj")[0];
-                } else {
-                    s_logger.debug("Invalid web session or API key in request, reject console/thumbnail access");
-                    sendResponse(resp, "Access denied. Invalid web session or API key in request");
-                    return;
-                }
+        final HttpSession session = req.getSession(false);
+        if (session == null) {
+            if (verifyRequest(params)) {
+                userId = (String) params.get("userid")[0];
+                account = (String) params.get("account")[0];
+                accountObj = (Account) params.get("accountobj")[0];
             } else {
-                // adjust to latest API refactoring changes
-                if (session.getAttribute("userid") != null) {
-                    userId = ((Long) session.getAttribute("userid")).toString();
-                }
-
-                accountObj = (Account) session.getAttribute("accountobj");
-                if (accountObj != null) {
-                    account = "" + accountObj.getId();
-                }
-            }
-
-            // Do a sanity check here to make sure the user hasn't already been deleted
-            if ((userId == null) || (account == null) || (accountObj == null) || !verifyUser(Long.valueOf(userId))) {
-                s_logger.debug("Invalid user/account, reject console/thumbnail access");
-                sendResponse(resp, "Access denied. Invalid or inconsistent account is found");
+                s_logger.debug("Invalid web session or API key in request, reject console/thumbnail access");
+                sendResponse(resp, "Access denied. Invalid web session or API key in request");
                 return;
             }
-
-            final String cmd = req.getParameter("cmd");
-            if (cmd == null || !isValidCmd(cmd)) {
-                s_logger.debug("invalid console servlet command: " + cmd);
-                sendResponse(resp, "");
-                return;
+        } else {
+            // adjust to latest API refactoring changes
+            if (session.getAttribute("userid") != null) {
+                userId = ((Long) session.getAttribute("userid")).toString();
             }
 
-            final String vmIdString = req.getParameter("vm");
-            final VirtualMachine vm = _entityMgr.findByUuid(VirtualMachine.class, vmIdString);
-            if (vm == null) {
-                s_logger.info("invalid console servlet command parameter: " + vmIdString);
-                sendResponse(resp, "");
-                return;
+            accountObj = (Account) session.getAttribute("accountobj");
+            if (accountObj != null) {
+                account = "" + accountObj.getId();
             }
+        }
 
-            final Long vmId = vm.getId();
+        // Do a sanity check here to make sure the user hasn't already been deleted
+        if ((userId == null) || (account == null) || (accountObj == null) || !verifyUser(Long.valueOf(userId))) {
+            s_logger.debug("Invalid user/account, reject console/thumbnail access");
+            sendResponse(resp, "Access denied. Invalid or inconsistent account is found");
+            return;
+        }
 
-            if (!checkSessionPermision(req, vmId, accountObj)) {
-                sendResponse(resp, "Permission denied");
-                return;
-            }
+        final String cmd = req.getParameter("cmd");
+        if (cmd == null || !isValidCmd(cmd)) {
+            s_logger.debug("invalid console servlet command: " + cmd);
+            sendResponse(resp, "");
+            return;
+        }
 
-            if (cmd.equalsIgnoreCase("thumbnail")) {
-                handleThumbnailRequest(req, resp, vmId);
-            } else if (cmd.equalsIgnoreCase("access")) {
-                handleAccessRequest(req, resp, vmId);
-            } else {
-                handleAuthRequest(req, resp, vmId);
-            }
-        } catch (final Throwable e) {
-            s_logger.error("Unexepected exception in ConsoleProxyServlet", e);
-            sendResponse(resp, "Server Internal Error");
+        final String vmIdString = req.getParameter("vm");
+        final VirtualMachine vm = _entityMgr.findByUuid(VirtualMachine.class, vmIdString);
+        if (vm == null) {
+            s_logger.info("invalid console servlet command parameter: " + vmIdString);
+            sendResponse(resp, "");
+            return;
+        }
+
+        final Long vmId = vm.getId();
+
+        if (!checkSessionPermision(req, vmId, accountObj)) {
+            sendResponse(resp, "Permission denied");
+            return;
+        }
+
+        if (cmd.equalsIgnoreCase("thumbnail")) {
+            handleThumbnailRequest(req, resp, vmId);
+        } else if (cmd.equalsIgnoreCase("access")) {
+            handleAccessRequest(req, resp, vmId);
+        } else {
+            handleAuthRequest(req, resp, vmId);
         }
     }
 

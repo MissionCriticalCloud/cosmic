@@ -37,13 +37,7 @@ public class FtpTemplateUploader implements TemplateUploader {
 
     @Override
     public void run() {
-        try {
-            upload(completionCallback);
-        } catch (final Throwable t) {
-            s_logger.warn("Caught exception during upload " + t.getMessage(), t);
-            errorString = "Failed to install: " + t.getMessage();
-            status = TemplateUploader.Status.UNRECOVERABLE_ERROR;
-        }
+        upload(completionCallback);
     }
 
     @Override

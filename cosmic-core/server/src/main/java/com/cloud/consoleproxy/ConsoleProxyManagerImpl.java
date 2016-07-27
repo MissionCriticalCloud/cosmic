@@ -332,16 +332,12 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
     private boolean hasPreviousSession(final ConsoleProxyVO proxy, final VMInstanceVO vm) {
 
         ConsoleProxyStatus status = null;
-        try {
-            final GsonBuilder gb = new GsonBuilder();
-            gb.setVersion(1.3);
-            final Gson gson = gb.create();
+        final GsonBuilder gb = new GsonBuilder();
+        gb.setVersion(1.3);
+        final Gson gson = gb.create();
 
-            final byte[] details = proxy.getSessionDetails();
-            status = gson.fromJson(details != null ? new String(details, Charset.forName("US-ASCII")) : null, ConsoleProxyStatus.class);
-        } catch (final Throwable e) {
-            s_logger.warn("Unable to parse proxy session details : " + Arrays.toString(proxy.getSessionDetails()));
-        }
+        final byte[] details = proxy.getSessionDetails();
+        status = gson.fromJson(details != null ? new String(details, Charset.forName("US-ASCII")) : null, ConsoleProxyStatus.class);
 
         if (status != null && status.getConnections() != null) {
             final ConsoleProxyConnectionInfo[] connections = status.getConnections();
@@ -439,14 +435,10 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
         }
 
         ConsoleProxyStatus status = null;
-        try {
-            final GsonBuilder gb = new GsonBuilder();
-            gb.setVersion(1.3);
-            final Gson gson = gb.create();
-            status = gson.fromJson(answer.getDetails(), ConsoleProxyStatus.class);
-        } catch (final Throwable e) {
-            s_logger.warn("Unable to parse load info from proxy, proxy vm id : " + answer.getProxyVmId() + ", info : " + answer.getDetails());
-        }
+        final GsonBuilder gb = new GsonBuilder();
+        gb.setVersion(1.3);
+        final Gson gson = gb.create();
+        status = gson.fromJson(answer.getDetails(), ConsoleProxyStatus.class);
 
         if (status != null) {
             int count = 0;
@@ -1354,41 +1346,33 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
     @Override
     @DB
     public void setManagementState(final ConsoleProxyManagementState state) {
-        try {
-            final ConsoleProxyManagementState lastState = getManagementState();
-            if (lastState == null) {
-                return;
-            }
+        final ConsoleProxyManagementState lastState = getManagementState();
+        if (lastState == null) {
+            return;
+        }
 
-            if (lastState != state) {
-                Transaction.execute(new TransactionCallbackNoReturn() {
-                    @Override
-                    public void doInTransactionWithoutResult(final TransactionStatus status) {
-                        _configDao.update(Config.ConsoleProxyManagementLastState.key(), Config.ConsoleProxyManagementLastState.getCategory(), lastState.toString());
-                        _configDao.update(Config.ConsoleProxyManagementState.key(), Config.ConsoleProxyManagementState.getCategory(), state.toString());
-                    }
-                });
-            }
-        } catch (final Throwable e) {
-            s_logger.error("Failed to set managment state", e);
+        if (lastState != state) {
+            Transaction.execute(new TransactionCallbackNoReturn() {
+                @Override
+                public void doInTransactionWithoutResult(final TransactionStatus status) {
+                    _configDao.update(Config.ConsoleProxyManagementLastState.key(), Config.ConsoleProxyManagementLastState.getCategory(), lastState.toString());
+                    _configDao.update(Config.ConsoleProxyManagementState.key(), Config.ConsoleProxyManagementState.getCategory(), state.toString());
+                }
+            });
         }
     }
 
     @Override
     @DB
     public void resumeLastManagementState() {
-        try {
-            final ConsoleProxyManagementState state = getManagementState();
-            final ConsoleProxyManagementState lastState = getLastManagementState();
-            if (lastState == null) {
-                return;
-            }
+        final ConsoleProxyManagementState state = getManagementState();
+        final ConsoleProxyManagementState lastState = getLastManagementState();
+        if (lastState == null) {
+            return;
+        }
 
-            if (lastState != state) {
-                _configDao.update(Config.ConsoleProxyManagementState.key(), Config.ConsoleProxyManagementState.getCategory(), lastState.toString());
-            }
-        } catch (final Throwable e) {
-            s_logger.error("Failed to resume last management state", e);
+        if (lastState != state) {
+            _configDao.update(Config.ConsoleProxyManagementState.key(), Config.ConsoleProxyManagementState.getCategory(), lastState.toString());
         }
     }
 
@@ -1599,14 +1583,10 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
             }
 
             ConsoleProxyStatus status = null;
-            try {
-                final GsonBuilder gb = new GsonBuilder();
-                gb.setVersion(1.3);
-                final Gson gson = gb.create();
-                status = gson.fromJson(cmd.getLoadInfo(), ConsoleProxyStatus.class);
-            } catch (final Throwable e) {
-                s_logger.warn("Unable to parse load info from proxy, proxy vm id : " + cmd.getProxyVmId() + ", info : " + cmd.getLoadInfo());
-            }
+            final GsonBuilder gb = new GsonBuilder();
+            gb.setVersion(1.3);
+            final Gson gson = gb.create();
+            status = gson.fromJson(cmd.getLoadInfo(), ConsoleProxyStatus.class);
 
             if (status != null) {
                 int count = 0;

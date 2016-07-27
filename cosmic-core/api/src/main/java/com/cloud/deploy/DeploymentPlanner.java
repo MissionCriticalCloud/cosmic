@@ -13,8 +13,8 @@ import com.cloud.vm.VirtualMachineProfile;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  */
@@ -43,43 +43,32 @@ public interface DeploymentPlanner extends Adapter {
      */
     boolean canHandle(VirtualMachineProfile vm, DeploymentPlan plan, ExcludeList avoid);
 
-    public enum AllocationAlgorithm {
+    enum AllocationAlgorithm {
         random, firstfit, userdispersing, userconcentratedpod_random, userconcentratedpod_firstfit
     }
 
-    public enum PlannerResourceUsage {
+    enum PlannerResourceUsage {
         Shared, Dedicated
     }
 
-    public static class ExcludeList implements Serializable {
+    class ExcludeList implements Serializable {
         private static final long serialVersionUID = -482175549460148301L;
 
-        private Set<Long> _dcIds;
-        private Set<Long> _podIds;
-        private Set<Long> _clusterIds;
-        private Set<Long> _hostIds;
-        private Set<Long> _poolIds;
+        private final Set<Long> dcIds = new TreeSet<>();
+        private final Set<Long> podIds = new TreeSet<>();
+        private final Set<Long> clusterIds = new TreeSet<>();
+        private final Set<Long> hostIds = new TreeSet<>();
+        private final Set<Long> poolIds = new TreeSet<>();
 
         public ExcludeList() {
         }
 
         public ExcludeList(final Set<Long> dcIds, final Set<Long> podIds, final Set<Long> clusterIds, final Set<Long> hostIds, final Set<Long> poolIds) {
-            if (dcIds != null) {
-                this._dcIds = new HashSet<>(dcIds);
-            }
-            if (podIds != null) {
-                this._podIds = new HashSet<>(podIds);
-            }
-            if (clusterIds != null) {
-                this._clusterIds = new HashSet<>(clusterIds);
-            }
-
-            if (hostIds != null) {
-                this._hostIds = new HashSet<>(hostIds);
-            }
-            if (poolIds != null) {
-                this._poolIds = new HashSet<>(poolIds);
-            }
+            this.dcIds.addAll(dcIds);
+            this.podIds.addAll(podIds);
+            this.clusterIds.addAll(clusterIds);
+            this.hostIds.addAll(hostIds);
+            this.poolIds.addAll(poolIds);
         }
 
         public boolean add(final InsufficientCapacityException e) {
@@ -107,38 +96,23 @@ public interface DeploymentPlanner extends Adapter {
         }
 
         public void addHost(final long hostId) {
-            if (_hostIds == null) {
-                _hostIds = new HashSet<>();
-            }
-            _hostIds.add(hostId);
+            hostIds.add(hostId);
         }
 
         public void addPod(final long podId) {
-            if (_podIds == null) {
-                _podIds = new HashSet<>();
-            }
-            _podIds.add(podId);
+            podIds.add(podId);
         }
 
         public void addDataCenter(final long dataCenterId) {
-            if (_dcIds == null) {
-                _dcIds = new HashSet<>();
-            }
-            _dcIds.add(dataCenterId);
+            dcIds.add(dataCenterId);
         }
 
         public void addCluster(final long clusterId) {
-            if (_clusterIds == null) {
-                _clusterIds = new HashSet<>();
-            }
-            _clusterIds.add(clusterId);
+            clusterIds.add(clusterId);
         }
 
         public void addPool(final long poolId) {
-            if (_poolIds == null) {
-                _poolIds = new HashSet<>();
-            }
-            _poolIds.add(poolId);
+            poolIds.add(poolId);
         }
 
         public boolean add(final ResourceUnavailableException e) {
@@ -166,67 +140,42 @@ public interface DeploymentPlanner extends Adapter {
         }
 
         public void addPodList(final Collection<Long> podList) {
-            if (_podIds == null) {
-                _podIds = new HashSet<>();
-            }
-            _podIds.addAll(podList);
+            podIds.addAll(podList);
         }
 
         public void addClusterList(final Collection<Long> clusterList) {
-            if (_clusterIds == null) {
-                _clusterIds = new HashSet<>();
-            }
-            _clusterIds.addAll(clusterList);
+            clusterIds.addAll(clusterList);
         }
 
         public void addHostList(final Collection<Long> hostList) {
-            if (_hostIds == null) {
-                _hostIds = new HashSet<>();
-            }
-            _hostIds.addAll(hostList);
+            hostIds.addAll(hostList);
         }
 
         public boolean shouldAvoid(final Host host) {
-            if (_dcIds != null && _dcIds.contains(host.getDataCenterId())) {
-                return true;
-            }
-
-            if (_podIds != null && _podIds.contains(host.getPodId())) {
-                return true;
-            }
-
-            if (_clusterIds != null && _clusterIds.contains(host.getClusterId())) {
-                return true;
-            }
-
-            if (_hostIds != null && _hostIds.contains(host.getId())) {
-                return true;
-            }
-
-            return false;
+            return shouldAvoid(host.getDataCenterId(), host.getPodId(), host.getClusterId(), host.getId());
         }
 
         public boolean shouldAvoid(final Cluster cluster) {
-            if (_dcIds != null && _dcIds.contains(cluster.getDataCenterId())) {
+            if (dcIds.contains(cluster.getDataCenterId())) {
                 return true;
             }
 
-            if (_podIds != null && _podIds.contains(cluster.getPodId())) {
+            if (podIds.contains(cluster.getPodId())) {
                 return true;
             }
 
-            if (_clusterIds != null && _clusterIds.contains(cluster.getId())) {
+            if (clusterIds.contains(cluster.getId())) {
                 return true;
             }
             return false;
         }
 
         public boolean shouldAvoid(final Pod pod) {
-            if (_dcIds != null && _dcIds.contains(pod.getDataCenterId())) {
+            if (dcIds.contains(pod.getDataCenterId())) {
                 return true;
             }
 
-            if (_podIds != null && _podIds.contains(pod.getId())) {
+            if (podIds.contains(pod.getId())) {
                 return true;
             }
 
@@ -234,50 +183,59 @@ public interface DeploymentPlanner extends Adapter {
         }
 
         public boolean shouldAvoid(final StoragePool pool) {
-            if (_dcIds != null && _dcIds.contains(pool.getDataCenterId())) {
-                return true;
-            }
-
-            if (_podIds != null && _podIds.contains(pool.getPodId())) {
-                return true;
-            }
-
-            if (_clusterIds != null && _clusterIds.contains(pool.getClusterId())) {
-                return true;
-            }
-
-            if (_poolIds != null && _poolIds.contains(pool.getId())) {
-                return true;
-            }
-
-            return false;
+            return shouldAvoid(pool.getDataCenterId(), pool.getPodId(), pool.getClusterId(), pool.getId());
         }
 
         public boolean shouldAvoid(final DataCenter dc) {
-            if (_dcIds != null && _dcIds.contains(dc.getId())) {
+            if (dcIds.contains(dc.getId())) {
                 return true;
             }
+            return false;
+        }
+
+        private boolean shouldAvoid(final long dataCenterId, final Long podId, final Long clusterId, final long id) {
+            if (dcIds.contains(dataCenterId)) {
+                return true;
+            }
+
+            if (podIds.contains(podId)) {
+                return true;
+            }
+
+            if (clusterIds.contains(clusterId)) {
+                return true;
+            }
+
+            if (hostIds.contains(id)) {
+                return true;
+            }
+
             return false;
         }
 
         public Set<Long> getDataCentersToAvoid() {
-            return _dcIds;
+            return dcIds;
         }
 
         public Set<Long> getPodsToAvoid() {
-            return _podIds;
+            return podIds;
         }
 
         public Set<Long> getClustersToAvoid() {
-            return _clusterIds;
+            return clusterIds;
         }
 
         public Set<Long> getHostsToAvoid() {
-            return _hostIds;
+            return hostIds;
         }
 
         public Set<Long> getPoolsToAvoid() {
-            return _poolIds;
+            return poolIds;
+        }
+
+        @Override
+        public String toString() {
+            return "avoid: dcs " + dcIds + ", pods " + podIds + ", clusters " + clusterIds + ", hosts " + hostIds + ", pools " + poolIds;
         }
     }
 }

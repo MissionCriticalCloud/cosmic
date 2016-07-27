@@ -102,7 +102,6 @@ import com.xensource.xenapi.Host;
 import com.xensource.xenapi.Marshalling;
 import com.xensource.xenapi.Network;
 import com.xensource.xenapi.Pool;
-import com.xensource.xenapi.Types.BadServerResponse;
 import com.xensource.xenapi.Types.XenAPIException;
 import com.xensource.xenapi.VM;
 import com.xensource.xenapi.VMGuestMetrics;
@@ -112,10 +111,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(Pool.class)
 public class CitrixRequestWrapperTest {
 
     @Mock
@@ -975,18 +976,17 @@ public class CitrixRequestWrapperTest {
         try {
             when(citrixResourceBase.getHost()).thenReturn(xsHost);
             when(citrixResourceBase.getHost().getUuid()).thenReturn(uuid);
+            when(xsHost.getPool()).thenReturn("pool");
+
+            PowerMockito.mockStatic(Pool.class);
+            when(Pool.getByUuid(conn, "pool")).thenReturn(pool);
 
             PowerMockito.mockStatic(Pool.Record.class);
-
             when(pool.getRecord(conn)).thenReturn(poolr);
             poolr.master = master;
             when(poolr.master.getRecord(conn)).thenReturn(hostr);
             hostr.uuid = uuid;
-        } catch (final BadServerResponse e) {
-            fail(e.getMessage());
-        } catch (final XenAPIException e) {
-            fail(e.getMessage());
-        } catch (final XmlRpcException e) {
+        } catch (final XenAPIException | XmlRpcException e) {
             fail(e.getMessage());
         }
 

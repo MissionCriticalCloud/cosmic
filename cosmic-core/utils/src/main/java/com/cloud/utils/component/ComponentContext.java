@@ -60,12 +60,7 @@ public class ComponentContext implements ApplicationContextAware {
         final Map<String, SystemIntegrityChecker> integrityCheckers = getApplicationContext().getBeansOfType(SystemIntegrityChecker.class);
         for (final Entry<String, SystemIntegrityChecker> entry : integrityCheckers.entrySet()) {
             s_logger.info("Running SystemIntegrityChecker " + entry.getKey());
-            try {
-                entry.getValue().check();
-            } catch (final Throwable e) {
-                s_logger.error("System integrity check failed. Refuse to startup", e);
-                System.exit(1);
-            }
+            entry.getValue().check();
         }
 
         // configuration phase

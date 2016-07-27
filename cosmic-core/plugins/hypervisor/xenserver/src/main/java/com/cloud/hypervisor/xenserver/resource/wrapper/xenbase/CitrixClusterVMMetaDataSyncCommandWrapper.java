@@ -12,6 +12,8 @@ import java.util.HashMap;
 import com.xensource.xenapi.Connection;
 import com.xensource.xenapi.Host;
 import com.xensource.xenapi.Pool;
+import com.xensource.xenapi.Types.XenAPIException;
+import org.apache.xmlrpc.XmlRpcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +33,7 @@ public final class CitrixClusterVMMetaDataSyncCommandWrapper extends CommandWrap
             if (!citrixResourceBase.getHost().getUuid().equals(hostr.uuid)) {
                 return new ClusterVMMetaDataSyncAnswer(command.getClusterId(), null);
             }
-        } catch (final Throwable e) {
+        } catch (XmlRpcException | XenAPIException e) {
             s_logger.warn("Check for master failed, failing the Cluster sync VMMetaData command");
             return new ClusterVMMetaDataSyncAnswer(command.getClusterId(), null);
         }

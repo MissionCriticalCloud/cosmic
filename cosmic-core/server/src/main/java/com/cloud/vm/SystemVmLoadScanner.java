@@ -39,19 +39,10 @@ public class SystemVmLoadScanner<T> {
 
             @Override
             protected void runInContext() {
-                try {
-                    final CallContext callContext = CallContext.current();
-                    assert (callContext != null);
-
-                    AsyncJobExecutionContext.registerPseudoExecutionContext(
-                            callContext.getCallingAccountId(), callContext.getCallingUserId());
-
-                    reallyRun();
-
-                    AsyncJobExecutionContext.unregister();
-                } catch (final Throwable e) {
-                    s_logger.warn("Unexpected exception " + e.getMessage(), e);
-                }
+                final CallContext callContext = CallContext.current();
+                AsyncJobExecutionContext.registerPseudoExecutionContext(callContext.getCallingAccountId(), callContext.getCallingUserId());
+                reallyRun();
+                AsyncJobExecutionContext.unregister();
             }
 
             private void reallyRun() {

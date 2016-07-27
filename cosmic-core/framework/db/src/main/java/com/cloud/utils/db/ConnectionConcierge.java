@@ -52,11 +52,7 @@ public class ConnectionConcierge {
     }
 
     public void reset(final Connection conn) {
-        try {
-            release();
-        } catch (final Throwable th) {
-            s_logger.error("Unable to release a connection", th);
-        }
+        release();
         _conn = conn;
         try {
             _conn.setAutoCommit(_autoCommit);
@@ -116,9 +112,9 @@ public class ConnectionConcierge {
                 synchronized (conn) {
                     try (PreparedStatement pstmt = conn.prepareStatement("SELECT 1")) {
                         pstmt.executeQuery();
-                    } catch (final Throwable th) {
-                        s_logger.error("Unable to keep the db connection for " + name, th);
-                        return th.toString();
+                    } catch (final SQLException e) {
+                        s_logger.error("Unable to keep the db connection for " + name, e);
+                        return e.toString();
                     }
                 }
             }

@@ -1408,81 +1408,76 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
             for (int i = 0; i < cmds.length; i++) {
                 cmd = cmds[i];
                 Answer answer = null;
-                try {
-                    if (cmd instanceof StartupRoutingCommand) {
-                        final StartupRoutingCommand startup = (StartupRoutingCommand) cmd;
-                        answer = new StartupAnswer(startup, attache.getId(), getPingInterval());
-                    } else if (cmd instanceof StartupProxyCommand) {
-                        final StartupProxyCommand startup = (StartupProxyCommand) cmd;
-                        answer = new StartupAnswer(startup, attache.getId(), getPingInterval());
-                    } else if (cmd instanceof StartupSecondaryStorageCommand) {
-                        final StartupSecondaryStorageCommand startup = (StartupSecondaryStorageCommand) cmd;
-                        answer = new StartupAnswer(startup, attache.getId(), getPingInterval());
-                    } else if (cmd instanceof StartupStorageCommand) {
-                        final StartupStorageCommand startup = (StartupStorageCommand) cmd;
-                        answer = new StartupAnswer(startup, attache.getId(), getPingInterval());
-                    } else if (cmd instanceof ShutdownCommand) {
-                        final ShutdownCommand shutdown = (ShutdownCommand) cmd;
-                        final String reason = shutdown.getReason();
-                        s_logger.info("Host " + attache.getId() + " has informed us that it is shutting down with reason " + reason + " and detail " +
-                                shutdown.getDetail());
-                        if (reason.equals(ShutdownCommand.Update)) {
-                            // disconnectWithoutInvestigation(attache, Event.UpdateNeeded);
-                            throw new CloudRuntimeException("Agent update not implemented");
-                        } else if (reason.equals(ShutdownCommand.Requested)) {
-                            disconnectWithoutInvestigation(attache, Event.ShutdownRequested);
-                        }
-                        return;
-                    } else if (cmd instanceof AgentControlCommand) {
-                        answer = handleControlCommand(attache, (AgentControlCommand) cmd);
-                    } else {
-                        handleCommands(attache, request.getSequence(), new Command[]{cmd});
-                        if (cmd instanceof PingCommand) {
-                            final long cmdHostId = ((PingCommand) cmd).getHostId();
-
-                            // if the router is sending a ping, verify the
-                            // gateway was pingable
-                            if (cmd instanceof PingRoutingCommand) {
-                                final boolean gatewayAccessible = ((PingRoutingCommand) cmd).isGatewayAccessible();
-                                final HostVO host = _hostDao.findById(Long.valueOf(cmdHostId));
-
-                                if (host != null) {
-                                    if (!gatewayAccessible) {
-                                        // alert that host lost connection to
-                                        // gateway (cannot ping the default route)
-                                        final DataCenterVO dcVO = _dcDao.findById(host.getDataCenterId());
-                                        final HostPodVO podVO = _podDao.findById(host.getPodId());
-                                        final String hostDesc =
-                                                "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + dcVO.getName() + ", pod: "
-                                                        + podVO.getName();
-
-                                        _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_ROUTING, host.getDataCenterId(), host.getPodId(),
-                                                "Host lost connection to gateway, " + hostDesc, "Host [" + hostDesc +
-                                                        "] lost connection to gateway (default route) and is possibly having network connection issues.");
-                                    } else {
-                                        _alertMgr.clearAlert(AlertManager.AlertType.ALERT_TYPE_ROUTING, host.getDataCenterId(), host.getPodId());
-                                    }
-                                } else {
-                                    s_logger.debug("Not processing " + PingRoutingCommand.class.getSimpleName() + " for agent id=" + cmdHostId +
-                                            "; can't find the host in the DB");
-                                }
-                            }
-                            answer = new PingAnswer((PingCommand) cmd);
-                        } else if (cmd instanceof ReadyAnswer) {
-                            final HostVO host = _hostDao.findById(attache.getId());
-                            if (host == null) {
-                                if (s_logger.isDebugEnabled()) {
-                                    s_logger.debug("Cant not find host " + attache.getId());
-                                }
-                            }
-                            answer = new Answer(cmd);
-                        } else {
-                            answer = new Answer(cmd);
-                        }
+                if (cmd instanceof StartupRoutingCommand) {
+                    final StartupRoutingCommand startup = (StartupRoutingCommand) cmd;
+                    answer = new StartupAnswer(startup, attache.getId(), getPingInterval());
+                } else if (cmd instanceof StartupProxyCommand) {
+                    final StartupProxyCommand startup = (StartupProxyCommand) cmd;
+                    answer = new StartupAnswer(startup, attache.getId(), getPingInterval());
+                } else if (cmd instanceof StartupSecondaryStorageCommand) {
+                    final StartupSecondaryStorageCommand startup = (StartupSecondaryStorageCommand) cmd;
+                    answer = new StartupAnswer(startup, attache.getId(), getPingInterval());
+                } else if (cmd instanceof StartupStorageCommand) {
+                    final StartupStorageCommand startup = (StartupStorageCommand) cmd;
+                    answer = new StartupAnswer(startup, attache.getId(), getPingInterval());
+                } else if (cmd instanceof ShutdownCommand) {
+                    final ShutdownCommand shutdown = (ShutdownCommand) cmd;
+                    final String reason = shutdown.getReason();
+                    s_logger.info("Host " + attache.getId() + " has informed us that it is shutting down with reason " + reason + " and detail " +
+                            shutdown.getDetail());
+                    if (reason.equals(ShutdownCommand.Update)) {
+                        // disconnectWithoutInvestigation(attache, Event.UpdateNeeded);
+                        throw new CloudRuntimeException("Agent update not implemented");
+                    } else if (reason.equals(ShutdownCommand.Requested)) {
+                        disconnectWithoutInvestigation(attache, Event.ShutdownRequested);
                     }
-                } catch (final Throwable th) {
-                    s_logger.warn("Caught: ", th);
-                    answer = new Answer(cmd, false, th.getMessage());
+                    return;
+                } else if (cmd instanceof AgentControlCommand) {
+                    answer = handleControlCommand(attache, (AgentControlCommand) cmd);
+                } else {
+                    handleCommands(attache, request.getSequence(), new Command[]{cmd});
+                    if (cmd instanceof PingCommand) {
+                        final long cmdHostId = ((PingCommand) cmd).getHostId();
+
+                        // if the router is sending a ping, verify the
+                        // gateway was pingable
+                        if (cmd instanceof PingRoutingCommand) {
+                            final boolean gatewayAccessible = ((PingRoutingCommand) cmd).isGatewayAccessible();
+                            final HostVO host = _hostDao.findById(Long.valueOf(cmdHostId));
+
+                            if (host != null) {
+                                if (!gatewayAccessible) {
+                                    // alert that host lost connection to
+                                    // gateway (cannot ping the default route)
+                                    final DataCenterVO dcVO = _dcDao.findById(host.getDataCenterId());
+                                    final HostPodVO podVO = _podDao.findById(host.getPodId());
+                                    final String hostDesc =
+                                            "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + dcVO.getName() + ", pod: "
+                                                    + podVO.getName();
+
+                                    _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_ROUTING, host.getDataCenterId(), host.getPodId(),
+                                            "Host lost connection to gateway, " + hostDesc, "Host [" + hostDesc +
+                                                    "] lost connection to gateway (default route) and is possibly having network connection issues.");
+                                } else {
+                                    _alertMgr.clearAlert(AlertManager.AlertType.ALERT_TYPE_ROUTING, host.getDataCenterId(), host.getPodId());
+                                }
+                            } else {
+                                s_logger.debug("Not processing " + PingRoutingCommand.class.getSimpleName() + " for agent id=" + cmdHostId +
+                                        "; can't find the host in the DB");
+                            }
+                        }
+                        answer = new PingAnswer((PingCommand) cmd);
+                    } else if (cmd instanceof ReadyAnswer) {
+                        final HostVO host = _hostDao.findById(attache.getId());
+                        if (host == null) {
+                            if (s_logger.isDebugEnabled()) {
+                                s_logger.debug("Cant not find host " + attache.getId());
+                            }
+                        }
+                        answer = new Answer(cmd);
+                    } else {
+                        answer = new Answer(cmd);
+                    }
                 }
                 answers[i] = answer;
             }
@@ -1508,50 +1503,46 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
         protected void runInContext() {
             s_logger.trace("Agent Monitor is started.");
 
-            try {
-                final List<Long> behindAgents = findAgentsBehindOnPing();
-                for (final Long agentId : behindAgents) {
-                    final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
-                    sc.and(sc.entity().getId(), Op.EQ, agentId);
-                    final HostVO h = sc.find();
-                    if (h != null) {
-                        final ResourceState resourceState = h.getResourceState();
-                        if (resourceState == ResourceState.Disabled || resourceState == ResourceState.Maintenance || resourceState == ResourceState.ErrorInMaintenance) {
+            final List<Long> behindAgents = findAgentsBehindOnPing();
+            for (final Long agentId : behindAgents) {
+                final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
+                sc.and(sc.entity().getId(), Op.EQ, agentId);
+                final HostVO h = sc.find();
+                if (h != null) {
+                    final ResourceState resourceState = h.getResourceState();
+                    if (resourceState == ResourceState.Disabled || resourceState == ResourceState.Maintenance || resourceState == ResourceState.ErrorInMaintenance) {
                             /*
                              * Host is in non-operation state, so no investigation and direct put agent to Disconnected
                              */
-                            status_logger.debug("Ping timeout but agent " + agentId + " is in resource state of " + resourceState + ", so no investigation");
+                        status_logger.debug("Ping timeout but agent " + agentId + " is in resource state of " + resourceState + ", so no investigation");
+                        disconnectWithoutInvestigation(agentId, Event.ShutdownRequested);
+                    } else {
+                        final HostVO host = _hostDao.findById(agentId);
+                        if (host != null && (host.getType() == Host.Type.ConsoleProxy || host.getType() == Host.Type.SecondaryStorageVM
+                                || host.getType() == Host.Type.SecondaryStorageCmdExecutor)) {
+
+                            s_logger.warn("Disconnect agent for CPVM/SSVM due to physical connection close. host: " + host.getId());
                             disconnectWithoutInvestigation(agentId, Event.ShutdownRequested);
                         } else {
-                            final HostVO host = _hostDao.findById(agentId);
-                            if (host != null && (host.getType() == Host.Type.ConsoleProxy || host.getType() == Host.Type.SecondaryStorageVM
-                                    || host.getType() == Host.Type.SecondaryStorageCmdExecutor)) {
-
-                                s_logger.warn("Disconnect agent for CPVM/SSVM due to physical connection close. host: " + host.getId());
-                                disconnectWithoutInvestigation(agentId, Event.ShutdownRequested);
-                            } else {
-                                status_logger.debug("Ping timeout for agent " + agentId + ", do invstigation");
-                                disconnectWithInvestigation(agentId, Event.PingTimeout);
-                            }
+                            status_logger.debug("Ping timeout for agent " + agentId + ", do invstigation");
+                            disconnectWithInvestigation(agentId, Event.PingTimeout);
                         }
                     }
                 }
+            }
 
-                final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
-                sc.and(sc.entity().getResourceState(), Op.IN, ResourceState.PrepareForMaintenance, ResourceState.ErrorInMaintenance);
-                final List<HostVO> hosts = sc.list();
+            final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
+            sc.and(sc.entity().getResourceState(), Op.IN, ResourceState.PrepareForMaintenance, ResourceState.ErrorInMaintenance);
+            final List<HostVO> hosts = sc.list();
 
-                for (final HostVO host : hosts) {
-                    if (_resourceMgr.checkAndMaintain(host.getId())) {
-                        final DataCenterVO dcVO = _dcDao.findById(host.getDataCenterId());
-                        final HostPodVO podVO = _podDao.findById(host.getPodId());
-                        final String hostDesc = "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + dcVO.getName() + ", pod: " + podVO.getName();
-                        _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_HOST, host.getDataCenterId(), host.getPodId(), "Migration Complete for host " + hostDesc, "Host ["
-                                + hostDesc + "] is ready for maintenance");
-                    }
+            for (final HostVO host : hosts) {
+                if (_resourceMgr.checkAndMaintain(host.getId())) {
+                    final DataCenterVO dcVO = _dcDao.findById(host.getDataCenterId());
+                    final HostPodVO podVO = _podDao.findById(host.getPodId());
+                    final String hostDesc = "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + dcVO.getName() + ", pod: " + podVO.getName();
+                    _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_HOST, host.getDataCenterId(), host.getPodId(), "Migration Complete for host " + hostDesc, "Host ["
+                            + hostDesc + "] is ready for maintenance");
                 }
-            } catch (final Throwable th) {
-                s_logger.error("Caught the following exception: ", th);
             }
 
             s_logger.trace("Agent Monitor is leaving the building!");

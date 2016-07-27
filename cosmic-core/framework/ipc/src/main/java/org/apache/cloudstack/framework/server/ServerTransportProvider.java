@@ -118,12 +118,8 @@ public class ServerTransportProvider implements TransportProvider {
         _executor.execute(new ManagedContextRunnable() {
             @Override
             protected void runInContext() {
-                try {
-                    site.processOutput();
-                    site.ackOutputProcessSignal();
-                } catch (final Throwable e) {
-                    s_logger.error("Unhandled exception", e);
-                }
+                site.processOutput();
+                site.ackOutputProcessSignal();
             }
         });
     }

@@ -44,8 +44,6 @@ public class SyncQueueDaoImpl extends GenericDaoBase<SyncQueueVO, Long> implemen
             pstmt.execute();
         } catch (final SQLException e) {
             s_logger.warn("Unable to create sync queue " + syncObjType + "-" + syncObjId + ":" + e.getMessage(), e);
-        } catch (final Throwable e) {
-            s_logger.warn("Unable to create sync queue " + syncObjType + "-" + syncObjId + ":" + e.getMessage(), e);
         }
     }
 

@@ -8,18 +8,14 @@ import java.util.Map;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.Factory;
 import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AsyncCallbackDispatcher<T, R> implements AsyncCompletionCallback {
-    private static final Logger s_logger = LoggerFactory.getLogger(AsyncCallbackDispatcher.class);
     private static final Map<Class, Enhancer> enMap = new HashMap<>();
     private final T _targetObject;
     private Method _callbackMethod;
     private Object _contextObject;
     private Object _resultObject;
-    private AsyncCallbackDriver _driver = new InplaceAsyncCallbackDriver();
+    private final AsyncCallbackDriver _driver = new InplaceAsyncCallbackDriver();
 
     private AsyncCallbackDispatcher(final T target) {
         assert (target != null);
@@ -60,13 +56,6 @@ public class AsyncCallbackDispatcher<T, R> implements AsyncCompletionCallback {
         return this;
     }
 
-    public AsyncCallbackDispatcher<T, R> attachDriver(final AsyncCallbackDriver driver) {
-        assert (driver != null);
-        _driver = driver;
-
-        return this;
-    }
-
     public T getTarget() {
         Class<?> clz = _targetObject.getClass();
         final String clzName = clz.getName();
@@ -81,37 +70,23 @@ public class AsyncCallbackDispatcher<T, R> implements AsyncCompletionCallback {
                 en = new Enhancer();
 
                 en.setSuperclass(clz);
-                en.setCallback(new MethodInterceptor() {
-                    @Override
-                    public Object intercept(final Object arg0, final Method arg1, final Object[] arg2, final MethodProxy arg3) throws Throwable {
-                        return null;
-                    }
-                });
+                en.setCallback((MethodInterceptor) (arg0, arg1, arg2, arg3) -> null);
                 enMap.put(clz, en);
             }
         }
 
-        try {
-            final T t = (T) en.create();
-            final Factory factory = (Factory) t;
-            factory.setCallback(0, new MethodInterceptor() {
-                @Override
-                public Object intercept(final Object arg0, final Method arg1, final Object[] arg2, final MethodProxy arg3) throws Throwable {
-                    if (arg1.getParameterTypes().length == 0 && arg1.getName().equals("finalize")) {
-                        return null;
-                    } else {
-                        _callbackMethod = arg1;
-                        _callbackMethod.setAccessible(true);
-                        return null;
-                    }
-                }
-            });
-            return t;
-        } catch (final Throwable e) {
-            s_logger.error("Unexpected exception", e);
-        }
-
-        return null;
+        final T t = (T) en.create();
+        final Factory factory = (Factory) t;
+        factory.setCallback(0, (MethodInterceptor) (arg0, arg1, arg2, arg3) -> {
+            if (arg1.getParameterTypes().length == 0 && arg1.getName().equals("finalize")) {
+                return null;
+            } else {
+                _callbackMethod = arg1;
+                _callbackMethod.setAccessible(true);
+                return null;
+            }
+        });
+        return t;
     }
 
     public AsyncCallbackDispatcher<T, R> setCallback(final Object useless) {

@@ -177,8 +177,6 @@ public class DbUtil {
             }
         } catch (final SQLException e) {
             s_logger.error("GET_LOCK() throws exception ", e);
-        } catch (final Throwable e) {
-            s_logger.error("GET_LOCK() throws exception ", e);
         }
 
         removeConnectionForGlobalLocks(name);
@@ -242,8 +240,6 @@ public class DbUtil {
                 }
             }
         } catch (final SQLException e) {
-            s_logger.error("RELEASE_LOCK() throws exception ", e);
-        } catch (final Throwable e) {
             s_logger.error("RELEASE_LOCK() throws exception ", e);
         }
         return false;

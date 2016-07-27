@@ -71,7 +71,7 @@ public class VncServerPacketReceiver implements Runnable {
                         throw new RuntimeException("Unknown server packet type: " + messageType + ".");
                 }
             }
-        } catch (final Throwable e) {
+        } catch (final IOException e) {
             s_logger.error("Unexpected exception: ", e);
             if (connectionAlive) {
                 closeConnection();

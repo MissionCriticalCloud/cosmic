@@ -42,12 +42,7 @@ public class InaccurateClock extends StandardMBean implements InaccurateClockMBe
     @Override
     public String turnOff() {
         if (s_executor != null) {
-            try {
-                s_executor.shutdown();
-            } catch (final Throwable th) {
-                s_logger.error("Unable to shutdown the Executor", th);
-                return "Unable to turn off check logs";
-            }
+            s_executor.shutdown();
         }
         s_executor = null;
         return "Off";
@@ -73,11 +68,7 @@ public class InaccurateClock extends StandardMBean implements InaccurateClockMBe
     protected class SetTimeTask implements Runnable {
         @Override
         public void run() {
-            try {
-                time = System.currentTimeMillis();
-            } catch (final Throwable th) {
-                s_logger.error("Unable to time", th);
-            }
+            time = System.currentTimeMillis();
         }
     }
 }

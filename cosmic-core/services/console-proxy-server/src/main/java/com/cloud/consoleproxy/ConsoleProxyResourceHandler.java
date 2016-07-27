@@ -58,17 +58,12 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug(t.getRequestURI() + " Process time " + (System.currentTimeMillis() - startTick) + " ms");
             }
-        } catch (final IOException e) {
-            throw e;
-        } catch (final Throwable e) {
-            s_logger.error("Unexpected exception, ", e);
-            t.sendResponseHeaders(500, -1);     // server error
         } finally {
             t.close();
         }
     }
 
-    private void doHandle(final HttpExchange t) throws Exception {
+    private void doHandle(final HttpExchange t) throws IOException {
         final String path = t.getRequestURI().getPath();
 
         if (s_logger.isInfoEnabled()) {
@@ -154,7 +149,7 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
         return isValidResourceFolder(path.substring(0, i));
     }
 
-    private static void responseFileContent(final HttpExchange t, final File f) throws Exception {
+    private static void responseFileContent(final HttpExchange t, final File f) throws IOException {
         try (OutputStream os = t.getResponseBody();
              FileInputStream fis = new FileInputStream(f)) {
             while (true) {

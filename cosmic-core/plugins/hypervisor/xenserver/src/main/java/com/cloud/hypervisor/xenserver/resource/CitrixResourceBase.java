@@ -525,12 +525,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
     public HashMap<String, String> clusterVMMetaDataSync(final Connection conn) {
         final HashMap<String, String> vmMetaDatum = new HashMap<>();
         try {
-            final Map<VM, VM.Record> vm_map = VM.getAllRecords(conn); // USE
-            // THIS TO
-            // GET ALL
-            // VMS
-            // FROM A
-            // CLUSTER
+            final Map<VM, VM.Record> vm_map = VM.getAllRecords(conn);
             if (vm_map != null) {
                 for (final VM.Record record : vm_map.values()) {
                     if (record.isControlDomain || record.isASnapshot || record.isATemplate) {
@@ -543,7 +538,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                     vmMetaDatum.put(record.nameLabel, StringUtils.mapToString(record.platform));
                 }
             }
-        } catch (final Throwable e) {
+        } catch (XmlRpcException | XenAPIException e) {
             final String msg = "Unable to get vms through host " + _host.getUuid() + " due to to " + e.toString();
             s_logger.warn(msg, e);
             throw new CloudRuntimeException(msg);
@@ -2264,13 +2259,13 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                 vm_map = VM.getAllRecords(conn); // USE THIS TO GET ALL VMS FROM
                 // A CLUSTER
                 break;
-            } catch (final Throwable e) {
+            } catch (XmlRpcException | XenAPIException e) {
                 s_logger.warn("Unable to get vms", e);
             }
             try {
                 Thread.sleep(1000);
-            } catch (final InterruptedException ex) {
-
+            } catch (final InterruptedException e) {
+                s_logger.warn("Caught (previously ignored) interrupted exception", e);
             }
         }
 
@@ -2600,7 +2595,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
             final Pool pool = Pool.getByUuid(conn, _host.getPool());
             final Pool.Record poolr = pool.getRecord(conn);
             poolr.master.getRecord(conn);
-        } catch (final Throwable e) {
+        } catch (XmlRpcException | XenAPIException e) {
             s_logger.warn("Check for master failed, failing the FULL Cluster sync command");
         }
         final StartupStorageCommand sscmd = initializeLocalSR(conn);
@@ -3907,8 +3902,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
             s_logger.debug("failed to copy configdrive iso " + vmIso + " to host " + _host, e);
             return false;
         } catch (final XmlRpcException e) {
-            s_logger.debug("Failed to scan config drive iso SR " + _configDriveSRName + _host.getIp() + " in host " + _host,
-                    e);
+            s_logger.debug("Failed to scan config drive iso SR " + _configDriveSRName + _host.getIp() + " in host " + _host, e);
             return false;
         } finally {
             sshConnection.close();

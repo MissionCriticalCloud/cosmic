@@ -10,7 +10,6 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.util.Date;
 import java.util.List;
@@ -88,48 +87,44 @@ public class SecurityGroupWorkDaoImpl extends GenericDaoBase<SecurityGroupWorkVO
     @DB
     public SecurityGroupWorkVO take(final long serverId) {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
-            final SearchCriteria<SecurityGroupWorkVO> sc = UntakenWorkSearch.create();
-            sc.setParameters("step", Step.Scheduled);
+        final SearchCriteria<SecurityGroupWorkVO> sc = UntakenWorkSearch.create();
+        sc.setParameters("step", Step.Scheduled);
 
-            final Filter filter = new Filter(SecurityGroupWorkVO.class, null, true, 0l, 1l);//FIXME: order desc by update time?
+        final Filter filter = new Filter(SecurityGroupWorkVO.class, null, true, 0l, 1l);//FIXME: order desc by update time?
 
-            txn.start();
-            final List<SecurityGroupWorkVO> vos = lockRows(sc, filter, true);
-            if (vos.size() == 0) {
-                txn.commit();
-                if (s_logger.isTraceEnabled()) {
-                    s_logger.trace("Security Group take: no work found");
-                }
-                return null;
-            }
-            final SecurityGroupWorkVO work = vos.get(0);
-            boolean processing = false;
-            if (findByVmIdStep(work.getInstanceId(), Step.Processing) != null) {
-                //ensure that there is no job in Processing state for the same VM
-                processing = true;
-                if (s_logger.isTraceEnabled()) {
-                    s_logger.trace("Security Group work take: found a job in Scheduled and Processing  vmid=" + work.getInstanceId());
-                }
-            }
-            work.setServerId(serverId);
-            work.setDateTaken(new Date());
-            if (processing) {
-                //the caller to take() should check the step and schedule another work item to come back
-                //and take a look.
-                work.setStep(SecurityGroupWork.Step.Done);
-            } else {
-                work.setStep(SecurityGroupWork.Step.Processing);
-            }
-
-            update(work.getId(), work);
-
+        txn.start();
+        final List<SecurityGroupWorkVO> vos = lockRows(sc, filter, true);
+        if (vos.size() == 0) {
             txn.commit();
-
-            return work;
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Unable to execute take", e);
+            if (s_logger.isTraceEnabled()) {
+                s_logger.trace("Security Group take: no work found");
+            }
+            return null;
         }
+        final SecurityGroupWorkVO work = vos.get(0);
+        boolean processing = false;
+        if (findByVmIdStep(work.getInstanceId(), Step.Processing) != null) {
+            //ensure that there is no job in Processing state for the same VM
+            processing = true;
+            if (s_logger.isTraceEnabled()) {
+                s_logger.trace("Security Group work take: found a job in Scheduled and Processing  vmid=" + work.getInstanceId());
+            }
+        }
+        work.setServerId(serverId);
+        work.setDateTaken(new Date());
+        if (processing) {
+            //the caller to take() should check the step and schedule another work item to come back
+            //and take a look.
+            work.setStep(SecurityGroupWork.Step.Done);
+        } else {
+            work.setStep(SecurityGroupWork.Step.Processing);
+        }
+
+        update(work.getId(), work);
+
+        txn.commit();
+
+        return work;
     }
 
     @Override

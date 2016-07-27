@@ -80,6 +80,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,13 +190,6 @@ public class VolumeServiceImpl implements VolumeService {
             }
             templateOnPrimaryStoreObj.processEvent(Event.CreateOnlyRequested);
             motionSrv.copyAsync(template, templateOnPrimaryStoreObj, caller);
-        } catch (final Throwable e) {
-            s_logger.debug("failed to create template on storage", e);
-            templateOnPrimaryStoreObj.processEvent(Event.OperationFailed);
-            dataStore.create(template);  // make sure that template_spool_ref entry is still present so that the second thread can acquire the lock
-            final VolumeApiResult result = new VolumeApiResult(volume);
-            result.setResult(e.toString());
-            future.complete(result);
         } finally {
             if (s_logger.isDebugEnabled()) {
                 s_logger.info("releasing lock for VMTemplateStoragePool " + templatePoolRefId);
@@ -729,29 +723,22 @@ public class VolumeServiceImpl implements VolumeService {
             destPrimaryDataStore.setDetails(details);
 
             motionSrv.copyAsync(srcTemplateInfo, destTemplateInfo, destHost, caller);
-        } catch (final Throwable t) {
-            String errMsg = t.toString();
-
+        } catch (InterruptedException | ExecutionException e) {
+            String errMsg = e.getMessage();
             volumeInfo.processEvent(Event.DestroyRequested);
-
             revokeAccess(volumeInfo, destHost, destPrimaryDataStore);
-
             try {
                 final AsyncCallFuture<VolumeApiResult> expungeVolumeFuture = expungeVolumeAsync(volumeInfo);
-
                 final VolumeApiResult expungeVolumeResult = expungeVolumeFuture.get();
-
                 if (expungeVolumeResult.isFailed()) {
                     errMsg += " : Failed to expunge a volume that was created";
                 }
-            } catch (final Exception ex) {
-                errMsg += " : " + ex.getMessage();
+            } catch (InterruptedException | ExecutionException innerException) {
+                errMsg += " : " + innerException.getMessage();
             }
 
             final VolumeApiResult result = new VolumeApiResult(volumeInfo);
-
             result.setResult(errMsg);
-
             future.complete(result);
         }
 

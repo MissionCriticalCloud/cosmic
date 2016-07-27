@@ -3,6 +3,7 @@ package com.cloud.vm.snapshot;
 import com.cloud.dao.EntityManager;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
+import com.cloud.exception.CloudException;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
@@ -993,7 +994,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
     }
 
     @Override
-    public Pair<JobInfo.Status, String> handleVmWorkJob(final VmWork work) throws Exception {
+    public Pair<JobInfo.Status, String> handleVmWorkJob(final VmWork work) throws CloudException {
         return _jobHandlerProxy.handleVmWorkJob(work);
     }
 

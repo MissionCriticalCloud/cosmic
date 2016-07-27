@@ -243,27 +243,24 @@ public class VncClient {
         if (is != null) {
             try {
                 is.close();
-            } catch (final Throwable e) {
-                s_logger.info("[ignored]"
-                        + "failed to close resource for input: " + e.getLocalizedMessage());
+            } catch (final IOException e) {
+                s_logger.info("[ignored] failed to close resource for input: " + e.getLocalizedMessage());
             }
         }
 
         if (os != null) {
             try {
                 os.close();
-            } catch (final Throwable e) {
-                s_logger.info("[ignored]"
-                        + "failed to get close resource for output: " + e.getLocalizedMessage());
+            } catch (final IOException e) {
+                s_logger.info("[ignored] failed to get close resource for output: " + e.getLocalizedMessage());
             }
         }
 
         if (socket != null) {
             try {
                 socket.close();
-            } catch (final Throwable e) {
-                s_logger.info("[ignored]"
-                        + "failed to get close resource for socket: " + e.getLocalizedMessage());
+            } catch (final IOException e) {
+                s_logger.info("[ignored] failed to get close resource for socket: " + e.getLocalizedMessage());
             }
         }
     }

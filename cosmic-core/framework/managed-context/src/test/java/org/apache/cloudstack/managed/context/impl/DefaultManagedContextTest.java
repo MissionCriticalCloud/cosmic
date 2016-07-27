@@ -128,23 +128,17 @@ public class DefaultManagedContextTest {
         });
 
         try {
-            context.callWithContext(new Callable<Integer>() {
-                @Override
-                public Integer call() throws Exception {
-                    return 5;
-                }
-            }).intValue();
+            context.callWithContext(() -> 5).intValue();
 
             fail();
         } catch (final Throwable t) {
             assertTrue(t instanceof RuntimeException);
             assertEquals("I'm a failure", t.getMessage());
+            assertEquals("enter", touch.get(0));
+            assertEquals("enter1", touch.get(1));
+            assertEquals("leave1", touch.get(2));
+            assertEquals("leave", touch.get(3));
         }
-
-        assertEquals("enter", touch.get(0));
-        assertEquals("enter1", touch.get(1));
-        assertEquals("leave1", touch.get(2));
-        assertEquals("leave", touch.get(3));
     }
 
     @Test

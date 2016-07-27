@@ -459,8 +459,6 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
             return new Pair<>(result, clusterVmCountMap);
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + sql, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + sql, e);
         }
     }
 
@@ -488,8 +486,6 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
             return new Pair<>(result, clusterVmCountMap);
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + sql, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + sql, e);
         }
     }
 
@@ -514,8 +510,6 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
             return new Pair<>(result, podVmCountMap);
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + ORDER_PODS_NUMBER_OF_VMS_FOR_ACCOUNT, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + ORDER_PODS_NUMBER_OF_VMS_FOR_ACCOUNT, e);
         }
     }
 
@@ -553,8 +547,6 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
             return result;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + ORDER_PODS_NUMBER_OF_VMS_FOR_ACCOUNT, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + ORDER_PODS_NUMBER_OF_VMS_FOR_ACCOUNT, e);
         }
     }
 
@@ -714,8 +706,6 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
             return result;
         } catch (final SQLException e) {
             throw new CloudRuntimeException("DB Exception on: " + finalQuery, e);
-        } catch (final Throwable e) {
-            throw new CloudRuntimeException("Caught: " + finalQuery, e);
         }
     }
 

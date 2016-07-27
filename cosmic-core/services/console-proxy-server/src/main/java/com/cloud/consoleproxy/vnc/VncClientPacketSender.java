@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -75,7 +76,7 @@ public class VncClientPacketSender implements Runnable, PaintNotificationListene
                     os.flush();
                 }
             }
-        } catch (final Throwable e) {
+        } catch (final IOException | InterruptedException e) {
             s_logger.error("Unexpected exception: ", e);
             if (connectionAlive) {
                 closeConnection();

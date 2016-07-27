@@ -21,7 +21,6 @@ import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
@@ -50,18 +49,17 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
     StorageLayer _storage;
     boolean inited = true;
     private final String downloadUrl;
-    private String toFile;
+    private String toFile = "";
     private long remoteSize = 0;
-    private GetMethod request;
+    private GetMethod request = null;
     private boolean resume = false;
-    private DownloadCompleteCallback completionCallback;
+    private DownloadCompleteCallback completionCallback = null;
     private String toDir;
     private final long maxTemplateSizeInBytes;
     private ResourceType resourceType = ResourceType.TEMPLATE;
 
-    public HttpTemplateDownloader(final StorageLayer storageLayer, final String downloadUrl, final String toDir, final DownloadCompleteCallback callback, final long
-            maxTemplateSizeInBytes,
-                                  final String user, final String password, final Proxy proxy, final ResourceType resourceType) {
+    public HttpTemplateDownloader(final StorageLayer storageLayer, final String downloadUrl, final String toDir, final DownloadCompleteCallback callback,
+                                  final long maxTemplateSizeInBytes, final String user, final String password, final Proxy proxy, final ResourceType resourceType) {
         _storage = storageLayer;
         this.downloadUrl = downloadUrl;
         setToDir(toDir);
@@ -72,25 +70,22 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
         totalBytes = 0;
         client = new HttpClient(s_httpClientManager);
 
-        myretryhandler = new HttpMethodRetryHandler() {
-            @Override
-            public boolean retryMethod(final HttpMethod method, final IOException exception, final int executionCount) {
-                if (executionCount >= 2) {
-                    // Do not retry if over max retry count
-                    return false;
-                }
-                if (exception instanceof NoHttpResponseException) {
-                    // Retry if the server dropped connection on us
-                    return true;
-                }
-                if (!method.isRequestSent()) {
-                    // Retry if the request has not been sent fully or
-                    // if it's OK to retry methods that have been sent
-                    return true;
-                }
-                // otherwise do not retry
+        myretryhandler = (method, exception, executionCount) -> {
+            if (executionCount >= 2) {
+                // Do not retry if over max retry count
                 return false;
             }
+            if (exception instanceof NoHttpResponseException) {
+                // Retry if the server dropped connection on us
+                return true;
+            }
+            if (!method.isRequestSent()) {
+                // Retry if the request has not been sent fully or
+                // if it's OK to retry methods that have been sent
+                return true;
+            }
+            // otherwise do not retry
+            return false;
         };
 
         try {
@@ -131,8 +126,6 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
             errorString = "Unable to start download -- check url? ";
             status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
             s_logger.warn("Exception in constructor -- " + ex.toString());
-        } catch (final Throwable th) {
-            s_logger.warn("throwable caught ", th);
         }
     }
 

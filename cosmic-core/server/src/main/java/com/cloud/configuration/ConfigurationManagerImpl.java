@@ -185,6 +185,7 @@ import javax.naming.ConfigurationException;
 import java.net.URI;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -3414,7 +3415,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 pstmt.setString(2, "guest.network.device");
 
                 pstmt.executeUpdate();
-            } catch (final Throwable e) {
+            } catch (final SQLException e) {
                 throw new CloudRuntimeException("Failed to update guest.network.device in host_details due to exception ", e);
             }
         } else if (Config.XenServerPrivateNetwork.key().equalsIgnoreCase(name)) {
@@ -3425,7 +3426,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 pstmt.setString(2, "private.network.device");
 
                 pstmt.executeUpdate();
-            } catch (final Throwable e) {
+            } catch (final SQLException e) {
                 throw new CloudRuntimeException("Failed to update private.network.device in host_details due to exception ", e);
             }
         } else if (Config.XenServerPublicNetwork.key().equalsIgnoreCase(name)) {
@@ -3436,7 +3437,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 pstmt.setString(2, "public.network.device");
 
                 pstmt.executeUpdate();
-            } catch (final Throwable e) {
+            } catch (final SQLException e) {
                 throw new CloudRuntimeException("Failed to update public.network.device in host_details due to exception ", e);
             }
         } else if (Config.XenServerStorageNetwork1.key().equalsIgnoreCase(name)) {
@@ -3447,7 +3448,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 pstmt.setString(2, "storage.network.device1");
 
                 pstmt.executeUpdate();
-            } catch (final Throwable e) {
+            } catch (final SQLException e) {
                 throw new CloudRuntimeException("Failed to update storage.network.device1 in host_details due to exception ", e);
             }
         } else if (Config.XenServerStorageNetwork2.key().equals(name)) {
@@ -3458,7 +3459,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 pstmt.setString(2, "storage.network.device2");
 
                 pstmt.executeUpdate();
-            } catch (final Throwable e) {
+            } catch (final SQLException e) {
                 throw new CloudRuntimeException("Failed to update storage.network.device2 in host_details due to exception ", e);
             }
         } else if (Config.SecStorageSecureCopyCert.key().equalsIgnoreCase(name)) {
@@ -3477,7 +3478,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 pstmt.executeUpdate();
                 // Cleanup the download urls
                 _storageManager.cleanupDownloadUrls();
-            } catch (final Throwable e) {
+            } catch (final SQLException e) {
                 throw new CloudRuntimeException("Failed to clean up download URLs in template_store_ref or volume_store_ref due to exception ", e);
             }
         }

@@ -30,18 +30,14 @@ public class ConsoleProxyThumbnailHandler implements HttpHandler {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, w, h);
         g.setColor(Color.WHITE);
-        try {
-            g.setFont(new Font(null, Font.PLAIN, 12));
-            final FontMetrics fm = g.getFontMetrics();
-            final int textWidth = fm.stringWidth(text);
-            int startx = (w - textWidth) / 2;
-            if (startx < 0) {
-                startx = 0;
-            }
-            g.drawString(text, startx, h / 2);
-        } catch (final Throwable e) {
-            s_logger.warn("Problem in generating text to thumnail image, return blank image");
+        g.setFont(new Font(null, Font.PLAIN, 12));
+        final FontMetrics fm = g.getFontMetrics();
+        final int textWidth = fm.stringWidth(text);
+        int startx = (w - textWidth) / 2;
+        if (startx < 0) {
+            startx = 0;
         }
+        g.drawString(text, startx, h / 2);
         return img;
     }
 
@@ -67,47 +63,12 @@ public class ConsoleProxyThumbnailHandler implements HttpHandler {
             final OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
             os.close();
-        } catch (final OutOfMemoryError e) {
-            s_logger.error("Unrecoverable OutOfMemory Error, exit and let it be re-launched");
-            System.exit(1);
-        } catch (final Throwable e) {
-            s_logger.error("Unexpected exception while handing thumbnail request, ", e);
-
-            final String queries = t.getRequestURI().getQuery();
-            final Map<String, String> queryMap = getQueryMap(queries);
-            int width = 0;
-            int height = 0;
-            final String ws = queryMap.get("w");
-            final String hs = queryMap.get("h");
-            try {
-                width = Integer.parseInt(ws);
-                height = Integer.parseInt(hs);
-            } catch (final NumberFormatException ex) {
-                s_logger.debug("Cannot parse width: " + ws + " or height: " + hs, ex);
-            }
-            width = Math.min(width, 800);
-            height = Math.min(height, 600);
-
-            final BufferedImage img = generateTextImage(width, height, "Cannot Connect");
-            final ByteArrayOutputStream bos = new ByteArrayOutputStream(8196);
-            javax.imageio.ImageIO.write(img, "jpg", bos);
-            final byte[] bs = bos.toByteArray();
-            final Headers hds = t.getResponseHeaders();
-            hds.set("Content-Type", "image/jpeg");
-            hds.set("Cache-Control", "no-cache");
-            hds.set("Cache-Control", "no-store");
-            t.sendResponseHeaders(200, bs.length);
-            final OutputStream os = t.getResponseBody();
-            os.write(bs);
-            os.close();
-            s_logger.error("Cannot get console, sent error JPG response for " + t.getRequestURI());
-            return;
         } finally {
             t.close();
         }
     }
 
-    private void doHandle(final HttpExchange t) throws Exception, IllegalArgumentException {
+    private void doHandle(final HttpExchange t) throws IllegalArgumentException, IOException {
         final String queries = t.getRequestURI().getQuery();
         final Map<String, String> queryMap = getQueryMap(queries);
         int width = 0;
@@ -170,23 +131,21 @@ public class ConsoleProxyThumbnailHandler implements HttpHandler {
             return;
         }
 
-        {
-            final Image scaledImage = viewer.getClientScaledImage(width, height);
-            final BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-            final Graphics2D bufImageGraphics = bufferedImage.createGraphics();
-            bufImageGraphics.drawImage(scaledImage, 0, 0, null);
-            final ByteArrayOutputStream bos = new ByteArrayOutputStream(8196);
-            javax.imageio.ImageIO.write(bufferedImage, "jpg", bos);
-            final byte[] bs = bos.toByteArray();
-            final Headers hds = t.getResponseHeaders();
-            hds.set("Content-Type", "image/jpeg");
-            hds.set("Cache-Control", "no-cache");
-            hds.set("Cache-Control", "no-store");
-            t.sendResponseHeaders(200, bs.length);
-            final OutputStream os = t.getResponseBody();
-            os.write(bs);
-            os.close();
-        }
+        final Image scaledImage = viewer.getClientScaledImage(width, height);
+        final BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+        final Graphics2D bufImageGraphics = bufferedImage.createGraphics();
+        bufImageGraphics.drawImage(scaledImage, 0, 0, null);
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream(8196);
+        javax.imageio.ImageIO.write(bufferedImage, "jpg", bos);
+        final byte[] bs = bos.toByteArray();
+        final Headers hds = t.getResponseHeaders();
+        hds.set("Content-Type", "image/jpeg");
+        hds.set("Cache-Control", "no-cache");
+        hds.set("Cache-Control", "no-store");
+        t.sendResponseHeaders(200, bs.length);
+        final OutputStream os = t.getResponseBody();
+        os.write(bs);
+        os.close();
     }
 
     public static Map<String, String> getQueryMap(final String query) {

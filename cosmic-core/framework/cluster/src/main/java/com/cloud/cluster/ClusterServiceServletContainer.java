@@ -150,21 +150,21 @@ public class ClusterServiceServletContainer {
                             }
                         }
                     });
-                } catch (final Throwable e) {
+                } catch (final IOException e) {
                     s_logger.error("Unexpected exception ", e);
 
                     // back off to avoid spinning if the exception condition keeps coming back
                     try {
                         Thread.sleep(1000);
                     } catch (final InterruptedException e1) {
-                        s_logger.debug("[ignored] interupted while waiting to retry running the servlet container.");
+                        s_logger.debug("[ignored] interrupted while waiting to retry running the servlet container.");
                     }
                 }
-            }
 
-            _executor.shutdown();
-            if (s_logger.isInfoEnabled()) {
-                s_logger.info("Cluster service servlet container shutdown");
+                _executor.shutdown();
+                if (s_logger.isInfoEnabled()) {
+                    s_logger.info("Cluster service servlet container shutdown");
+                }
             }
         }
     }

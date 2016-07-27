@@ -226,85 +226,80 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
         //        the amount allocated.  Hopefully it's limited to 3 entry points and will keep the amount allocated
         //        per host accurate.
 
-        try {
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("recalculating system capacity");
+            s_logger.debug("Executing cpu/ram capacity update");
+        }
 
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("recalculating system capacity");
-                s_logger.debug("Executing cpu/ram capacity update");
+        // Calculate CPU and RAM capacities
+        //     get all hosts...even if they are not in 'UP' state
+        final List<HostVO> hosts = _resourceMgr.listAllNotInMaintenanceHostsInOneZone(Host.Type.Routing, null);
+        if (hosts != null) {
+            for (final HostVO host : hosts) {
+                _capacityMgr.updateCapacityForHost(host);
+            }
+        }
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("Done executing cpu/ram capacity update");
+            s_logger.debug("Executing storage capacity update");
+        }
+        // Calculate storage pool capacity
+        final List<StoragePoolVO> storagePools = _storagePoolDao.listAll();
+        for (final StoragePoolVO pool : storagePools) {
+            final long disk = _capacityMgr.getAllocatedPoolCapacity(pool, null);
+            if (pool.isShared()) {
+                _storageMgr.createCapacityEntry(pool, Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED, disk);
+            } else {
+                _storageMgr.createCapacityEntry(pool, Capacity.CAPACITY_TYPE_LOCAL_STORAGE, disk);
+            }
+        }
+
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("Done executing storage capacity update");
+            s_logger.debug("Executing capacity updates for public ip and Vlans");
+        }
+
+        final List<DataCenterVO> datacenters = _dcDao.listAll();
+        for (final DataCenterVO datacenter : datacenters) {
+            final long dcId = datacenter.getId();
+
+            //NOTE
+            //What happens if we have multiple vlans? Dashboard currently shows stats
+            //with no filter based on a vlan
+            //ideal way would be to remove out the vlan param, and filter only on dcId
+            //implementing the same
+
+            // Calculate new Public IP capacity for Virtual Network
+            if (datacenter.getNetworkType() == NetworkType.Advanced) {
+                createOrUpdateIpCapacity(dcId, null, Capacity.CAPACITY_TYPE_VIRTUAL_NETWORK_PUBLIC_IP, datacenter.getAllocationState());
             }
 
-            // Calculate CPU and RAM capacities
-            //     get all hosts...even if they are not in 'UP' state
-            final List<HostVO> hosts = _resourceMgr.listAllNotInMaintenanceHostsInOneZone(Host.Type.Routing, null);
-            if (hosts != null) {
-                for (final HostVO host : hosts) {
-                    _capacityMgr.updateCapacityForHost(host);
-                }
+            // Calculate new Public IP capacity for Direct Attached Network
+            createOrUpdateIpCapacity(dcId, null, Capacity.CAPACITY_TYPE_DIRECT_ATTACHED_PUBLIC_IP, datacenter.getAllocationState());
+
+            if (datacenter.getNetworkType() == NetworkType.Advanced) {
+                //Calculate VLAN's capacity
+                createOrUpdateVlanCapacity(dcId, datacenter.getAllocationState());
             }
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Done executing cpu/ram capacity update");
-                s_logger.debug("Executing storage capacity update");
-            }
-            // Calculate storage pool capacity
-            final List<StoragePoolVO> storagePools = _storagePoolDao.listAll();
-            for (final StoragePoolVO pool : storagePools) {
-                final long disk = _capacityMgr.getAllocatedPoolCapacity(pool, null);
-                if (pool.isShared()) {
-                    _storageMgr.createCapacityEntry(pool, Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED, disk);
-                } else {
-                    _storageMgr.createCapacityEntry(pool, Capacity.CAPACITY_TYPE_LOCAL_STORAGE, disk);
-                }
-            }
+        }
 
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Done executing storage capacity update");
-                s_logger.debug("Executing capacity updates for public ip and Vlans");
-            }
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("Done capacity updates for public ip and Vlans");
+            s_logger.debug("Executing capacity updates for private ip");
+        }
 
-            final List<DataCenterVO> datacenters = _dcDao.listAll();
-            for (final DataCenterVO datacenter : datacenters) {
-                final long dcId = datacenter.getId();
+        // Calculate new Private IP capacity
+        final List<HostPodVO> pods = _podDao.listAll();
+        for (final HostPodVO pod : pods) {
+            final long podId = pod.getId();
+            final long dcId = pod.getDataCenterId();
 
-                //NOTE
-                //What happens if we have multiple vlans? Dashboard currently shows stats
-                //with no filter based on a vlan
-                //ideal way would be to remove out the vlan param, and filter only on dcId
-                //implementing the same
+            createOrUpdateIpCapacity(dcId, podId, Capacity.CAPACITY_TYPE_PRIVATE_IP, _configMgr.findPodAllocationState(pod));
+        }
 
-                // Calculate new Public IP capacity for Virtual Network
-                if (datacenter.getNetworkType() == NetworkType.Advanced) {
-                    createOrUpdateIpCapacity(dcId, null, Capacity.CAPACITY_TYPE_VIRTUAL_NETWORK_PUBLIC_IP, datacenter.getAllocationState());
-                }
-
-                // Calculate new Public IP capacity for Direct Attached Network
-                createOrUpdateIpCapacity(dcId, null, Capacity.CAPACITY_TYPE_DIRECT_ATTACHED_PUBLIC_IP, datacenter.getAllocationState());
-
-                if (datacenter.getNetworkType() == NetworkType.Advanced) {
-                    //Calculate VLAN's capacity
-                    createOrUpdateVlanCapacity(dcId, datacenter.getAllocationState());
-                }
-            }
-
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Done capacity updates for public ip and Vlans");
-                s_logger.debug("Executing capacity updates for private ip");
-            }
-
-            // Calculate new Private IP capacity
-            final List<HostPodVO> pods = _podDao.listAll();
-            for (final HostPodVO pod : pods) {
-                final long podId = pod.getId();
-                final long dcId = pod.getDataCenterId();
-
-                createOrUpdateIpCapacity(dcId, podId, Capacity.CAPACITY_TYPE_PRIVATE_IP, _configMgr.findPodAllocationState(pod));
-            }
-
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Done executing capacity updates for private ip");
-                s_logger.debug("Done recalculating system capacity");
-            }
-        } catch (final Throwable t) {
-            s_logger.error("Caught exception in recalculating capacity", t);
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("Done executing capacity updates for private ip");
+            s_logger.debug("Done recalculating system capacity");
         }
     }
 
@@ -668,13 +663,9 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
     class CapacityChecker extends ManagedContextTimerTask {
         @Override
         protected void runInContext() {
-            try {
-                s_logger.debug("Running Capacity Checker ... ");
-                checkForAlerts();
-                s_logger.debug("Done running Capacity Checker ... ");
-            } catch (final Throwable t) {
-                s_logger.error("Exception in CapacityChecker", t);
-            }
+            s_logger.debug("Running Capacity Checker ... ");
+            checkForAlerts();
+            s_logger.debug("Done running Capacity Checker ... ");
         }
     }
 

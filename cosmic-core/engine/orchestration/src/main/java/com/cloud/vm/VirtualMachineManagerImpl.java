@@ -74,6 +74,7 @@ import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventUtils;
 import com.cloud.exception.AffinityConflictException;
 import com.cloud.exception.AgentUnavailableException;
+import com.cloud.exception.CloudException;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ConnectionException;
 import com.cloud.exception.InsufficientAddressCapacityException;
@@ -1148,7 +1149,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                     l.add(rs.getLong(1));
                 }
             } catch (final SQLException e) {
-            } catch (final Throwable e) {
+                s_logger.warn("Caught (previously ignored) SQLException", e);
             }
         } finally {
             if (txn != null) {
@@ -1250,7 +1251,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                     l.add(rs.getLong(1));
                 }
             } catch (final SQLException e) {
-            } catch (final Throwable e) {
+                s_logger.warn("Caught (previously ignored) SQLException", e);
             }
             return l;
         } finally {
@@ -1572,7 +1573,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                     l.add(rs.getLong(1));
                 }
             } catch (final SQLException e) {
-            } catch (final Throwable e) {
+                s_logger.warn("Caught (previously ignored) SQLException", e);
             }
             return l;
         } finally {
@@ -1694,9 +1695,9 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             try {
                 final VirtualMachine vm = outcome.get();
             } catch (final InterruptedException e) {
-                throw new RuntimeException("Operation is interrupted", e);
+                throw new CloudRuntimeException("Operation is interrupted", e);
             } catch (final java.util.concurrent.ExecutionException e) {
-                throw new RuntimeException("Execution excetion", e);
+                throw new CloudRuntimeException("Execution exception", e);
             }
 
             final Object jobResult = _jobMgr.unmarshallResultObject(outcome.getJob());
@@ -1710,7 +1711,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 } else if (jobResult instanceof RuntimeException) {
                     throw (RuntimeException) jobResult;
                 } else if (jobResult instanceof Throwable) {
-                    throw new RuntimeException("Unexpected exception", (Throwable) jobResult);
+                    throw new CloudRuntimeException("Unexpected exception", (Throwable) jobResult);
                 }
             }
         }
@@ -1821,9 +1822,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             if (avoids == null) {
                 avoids = new ExcludeList();
             }
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Deploy avoids pods: " + avoids.getPodsToAvoid() + ", clusters: " + avoids.getClustersToAvoid() + ", hosts: " + avoids.getHostsToAvoid());
-            }
+            s_logger.debug("VM start orchestration will {}", avoids.toString());
 
             boolean planChangedByVolume = false;
             boolean reuseVolume = true;
@@ -3463,7 +3462,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     }
 
     @Override
-    public Pair<JobInfo.Status, String> handleVmWorkJob(final VmWork work) throws Exception {
+    public Pair<JobInfo.Status, String> handleVmWorkJob(final VmWork work) throws CloudException {
         return _jobHandlerProxy.handleVmWorkJob(work);
     }
 

@@ -181,44 +181,37 @@ public class ImageStoreUploadMonitorImpl extends ManagerBase implements ImageSto
             // 6. In listener check for the answer and update DB accordingly
             final List<VolumeDataStoreVO> volumeDataStores = _volumeDataStoreDao.listByVolumeState(Volume.State.NotUploaded, Volume.State.UploadInProgress);
             for (final VolumeDataStoreVO volumeDataStore : volumeDataStores) {
-                try {
-                    final DataStore dataStore = storeMgr.getDataStore(volumeDataStore.getDataStoreId(), DataStoreRole.Image);
-                    final EndPoint ep = _epSelector.select(dataStore, volumeDataStore.getExtractUrl());
-                    if (ep == null) {
-                        s_logger.warn("There is no secondary storage VM for image store " + dataStore.getName());
-                        continue;
-                    }
-                    final VolumeVO volume = _volumeDao.findById(volumeDataStore.getVolumeId());
-                    if (volume == null) {
-                        s_logger.warn("Volume with id " + volumeDataStore.getVolumeId() + " not found");
-                        continue;
-                    }
-                    final Host host = _hostDao.findById(ep.getId());
-                    final UploadStatusCommand cmd = new UploadStatusCommand(volume.getUuid(), EntityType.Volume);
-                    if (host != null && host.getManagementServerId() != null) {
-                        if (_nodeId == host.getManagementServerId().longValue()) {
-                            Answer answer = null;
-                            try {
-                                answer = ep.sendMessage(cmd);
-                            } catch (final CloudRuntimeException e) {
-                                s_logger.warn("Unable to get upload status for volume " + volume.getUuid() + ". Error details: " + e.getMessage());
-                                answer = new UploadStatusAnswer(cmd, UploadStatus.UNKNOWN, e.getMessage());
-                            }
-                            if (answer == null || !(answer instanceof UploadStatusAnswer)) {
-                                s_logger.warn("No or invalid answer corresponding to UploadStatusCommand for volume " + volumeDataStore.getVolumeId());
-                                continue;
-                            }
-                            handleVolumeStatusResponse((UploadStatusAnswer) answer, volume, volumeDataStore);
+                final DataStore dataStore = storeMgr.getDataStore(volumeDataStore.getDataStoreId(), DataStoreRole.Image);
+                final EndPoint ep = _epSelector.select(dataStore, volumeDataStore.getExtractUrl());
+                if (ep == null) {
+                    s_logger.warn("There is no secondary storage VM for image store " + dataStore.getName());
+                    continue;
+                }
+                final VolumeVO volume = _volumeDao.findById(volumeDataStore.getVolumeId());
+                if (volume == null) {
+                    s_logger.warn("Volume with id " + volumeDataStore.getVolumeId() + " not found");
+                    continue;
+                }
+                final Host host = _hostDao.findById(ep.getId());
+                final UploadStatusCommand cmd = new UploadStatusCommand(volume.getUuid(), EntityType.Volume);
+                if (host != null && host.getManagementServerId() != null) {
+                    if (_nodeId == host.getManagementServerId().longValue()) {
+                        Answer answer = null;
+                        try {
+                            answer = ep.sendMessage(cmd);
+                        } catch (final CloudRuntimeException e) {
+                            s_logger.warn("Unable to get upload status for volume " + volume.getUuid() + ". Error details: " + e.getMessage());
+                            answer = new UploadStatusAnswer(cmd, UploadStatus.UNKNOWN, e.getMessage());
                         }
-                    } else {
-                        final String error = "Volume " + volume.getUuid() + " failed to upload as SSVM is either destroyed or SSVM agent not in 'Up' state";
-                        handleVolumeStatusResponse(new UploadStatusAnswer(cmd, UploadStatus.ERROR, error), volume, volumeDataStore);
+                        if (answer == null || !(answer instanceof UploadStatusAnswer)) {
+                            s_logger.warn("No or invalid answer corresponding to UploadStatusCommand for volume " + volumeDataStore.getVolumeId());
+                            continue;
+                        }
+                        handleVolumeStatusResponse((UploadStatusAnswer) answer, volume, volumeDataStore);
                     }
-                } catch (final Throwable th) {
-                    s_logger.warn("Exception while checking status for uploaded volume " + volumeDataStore.getExtractUrl() + ". Error details: " + th.getMessage());
-                    if (s_logger.isTraceEnabled()) {
-                        s_logger.trace("Exception details: ", th);
-                    }
+                } else {
+                    final String error = "Volume " + volume.getUuid() + " failed to upload as SSVM is either destroyed or SSVM agent not in 'Up' state";
+                    handleVolumeStatusResponse(new UploadStatusAnswer(cmd, UploadStatus.ERROR, error), volume, volumeDataStore);
                 }
             }
 
@@ -226,44 +219,37 @@ public class ImageStoreUploadMonitorImpl extends ManagerBase implements ImageSto
             final List<TemplateDataStoreVO> templateDataStores = _templateDataStoreDao.listByTemplateState(VirtualMachineTemplate.State.NotUploaded, VirtualMachineTemplate.State
                     .UploadInProgress);
             for (final TemplateDataStoreVO templateDataStore : templateDataStores) {
-                try {
-                    final DataStore dataStore = storeMgr.getDataStore(templateDataStore.getDataStoreId(), DataStoreRole.Image);
-                    final EndPoint ep = _epSelector.select(dataStore, templateDataStore.getExtractUrl());
-                    if (ep == null) {
-                        s_logger.warn("There is no secondary storage VM for image store " + dataStore.getName());
-                        continue;
-                    }
-                    final VMTemplateVO template = _templateDao.findById(templateDataStore.getTemplateId());
-                    if (template == null) {
-                        s_logger.warn("Template with id " + templateDataStore.getTemplateId() + " not found");
-                        continue;
-                    }
-                    final Host host = _hostDao.findById(ep.getId());
-                    final UploadStatusCommand cmd = new UploadStatusCommand(template.getUuid(), EntityType.Template);
-                    if (host != null && host.getManagementServerId() != null) {
-                        if (_nodeId == host.getManagementServerId().longValue()) {
-                            Answer answer = null;
-                            try {
-                                answer = ep.sendMessage(cmd);
-                            } catch (final CloudRuntimeException e) {
-                                s_logger.warn("Unable to get upload status for template " + template.getUuid() + ". Error details: " + e.getMessage());
-                                answer = new UploadStatusAnswer(cmd, UploadStatus.UNKNOWN, e.getMessage());
-                            }
-                            if (answer == null || !(answer instanceof UploadStatusAnswer)) {
-                                s_logger.warn("No or invalid answer corresponding to UploadStatusCommand for template " + templateDataStore.getTemplateId());
-                                continue;
-                            }
-                            handleTemplateStatusResponse((UploadStatusAnswer) answer, template, templateDataStore);
+                final DataStore dataStore = storeMgr.getDataStore(templateDataStore.getDataStoreId(), DataStoreRole.Image);
+                final EndPoint ep = _epSelector.select(dataStore, templateDataStore.getExtractUrl());
+                if (ep == null) {
+                    s_logger.warn("There is no secondary storage VM for image store " + dataStore.getName());
+                    continue;
+                }
+                final VMTemplateVO template = _templateDao.findById(templateDataStore.getTemplateId());
+                if (template == null) {
+                    s_logger.warn("Template with id " + templateDataStore.getTemplateId() + " not found");
+                    continue;
+                }
+                final Host host = _hostDao.findById(ep.getId());
+                final UploadStatusCommand cmd = new UploadStatusCommand(template.getUuid(), EntityType.Template);
+                if (host != null && host.getManagementServerId() != null) {
+                    if (_nodeId == host.getManagementServerId().longValue()) {
+                        Answer answer = null;
+                        try {
+                            answer = ep.sendMessage(cmd);
+                        } catch (final CloudRuntimeException e) {
+                            s_logger.warn("Unable to get upload status for template " + template.getUuid() + ". Error details: " + e.getMessage());
+                            answer = new UploadStatusAnswer(cmd, UploadStatus.UNKNOWN, e.getMessage());
                         }
-                    } else {
-                        final String error = "Template " + template.getUuid() + " failed to upload as SSVM is either destroyed or SSVM agent not in 'Up' state";
-                        handleTemplateStatusResponse(new UploadStatusAnswer(cmd, UploadStatus.ERROR, error), template, templateDataStore);
+                        if (answer == null || !(answer instanceof UploadStatusAnswer)) {
+                            s_logger.warn("No or invalid answer corresponding to UploadStatusCommand for template " + templateDataStore.getTemplateId());
+                            continue;
+                        }
+                        handleTemplateStatusResponse((UploadStatusAnswer) answer, template, templateDataStore);
                     }
-                } catch (final Throwable th) {
-                    s_logger.warn("Exception while checking status for uploaded template " + templateDataStore.getExtractUrl() + ". Error details: " + th.getMessage());
-                    if (s_logger.isTraceEnabled()) {
-                        s_logger.trace("Exception details: ", th);
-                    }
+                } else {
+                    final String error = "Template " + template.getUuid() + " failed to upload as SSVM is either destroyed or SSVM agent not in 'Up' state";
+                    handleTemplateStatusResponse(new UploadStatusAnswer(cmd, UploadStatus.ERROR, error), template, templateDataStore);
                 }
             }
         }
