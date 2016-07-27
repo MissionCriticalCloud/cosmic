@@ -51,6 +51,7 @@ import com.cloud.user.AccountManager;
 import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.UserDao;
+import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.Nic;
@@ -382,7 +383,7 @@ public class NetworkHelperImpl implements NetworkHelper {
             try {
                 logger.debug("Starting router {} while trying to {}", router, avoids[i]);
                 result = start(router, params, plan);
-            } catch (final CloudException e) {
+            } catch (final CloudException | CloudRuntimeException e) {
                 logger.debug("Failed to start virtual router {} while trying to {} ({} attempts to go)", avoids[i], retryIndex - i);
                 result = null;
             }

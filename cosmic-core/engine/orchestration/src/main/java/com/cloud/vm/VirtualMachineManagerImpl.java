@@ -1695,9 +1695,9 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             try {
                 final VirtualMachine vm = outcome.get();
             } catch (final InterruptedException e) {
-                throw new RuntimeException("Operation is interrupted", e);
+                throw new CloudRuntimeException("Operation is interrupted", e);
             } catch (final java.util.concurrent.ExecutionException e) {
-                throw new RuntimeException("Execution excetion", e);
+                throw new CloudRuntimeException("Execution exception", e);
             }
 
             final Object jobResult = _jobMgr.unmarshallResultObject(outcome.getJob());
@@ -1711,7 +1711,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 } else if (jobResult instanceof RuntimeException) {
                     throw (RuntimeException) jobResult;
                 } else if (jobResult instanceof Throwable) {
-                    throw new RuntimeException("Unexpected exception", (Throwable) jobResult);
+                    throw new CloudRuntimeException("Unexpected exception", (Throwable) jobResult);
                 }
             }
         }
