@@ -12,6 +12,7 @@ import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.exception.AgentUnavailableException;
+import com.cloud.exception.CloudException;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -372,6 +373,27 @@ public class NetworkHelperImpl implements NetworkHelper {
 
         // We would try best to deploy the router to another place
         final int retryIndex = 5;
+        final ExcludeList[] avoids = getExcludeLists(routerToBeAvoid, retryIndex);
+
+        logger.debug("Will start to deploy router {} with the most strict avoidance rules first (total number of attempts = {})", router, retryIndex);
+        DomainRouterVO result = null;
+        for (int i = 0; i < retryIndex; i++) {
+            plan.setAvoids(avoids[i]);
+            try {
+                logger.debug("Starting router {} while trying to {}", router, avoids[i]);
+                result = start(router, params, plan);
+            } catch (final CloudException e) {
+                logger.debug("Failed to start virtual router {} while trying to {} ({} attempts to go)", avoids[i], retryIndex - i);
+                result = null;
+            }
+            if (result != null) {
+                break;
+            }
+        }
+        return result;
+    }
+
+    private ExcludeList[] getExcludeLists(final DomainRouterVO routerToBeAvoid, final int retryIndex) {
         final ExcludeList[] avoids = new ExcludeList[retryIndex];
         avoids[0] = new ExcludeList();
         avoids[0].addPod(routerToBeAvoid.getPodIdToDeployIn());
@@ -386,22 +408,7 @@ public class NetworkHelperImpl implements NetworkHelper {
         avoids[3] = new ExcludeList();
         avoids[3].addHost(routerToBeAvoid.getHostId());
         avoids[4] = new ExcludeList();
-
-        logger.debug("Will start to deploy router {} with the most strict avoidance rules first", router);
-        DomainRouterVO result = null;
-        for (int i = 0; i < retryIndex; i++) {
-            plan.setAvoids(avoids[i]);
-            try {
-                logger.debug("Starting router {} trying to {}", router, avoids[i]);
-                result = start(router, params, plan);
-            } catch (final InsufficientServerCapacityException ex) {
-                result = null;
-            }
-            if (result != null) {
-                break;
-            }
-        }
-        return result;
+        return avoids;
     }
 
     @Override
