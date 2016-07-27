@@ -133,24 +133,6 @@ public class MessageBusBase implements MessageBus {
     }
 
     @Override
-    public void prune() {
-        if (_gate.enter()) {
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Enter gate in message bus prune");
-            }
-            try {
-                doPrune();
-            } finally {
-                _gate.leave();
-            }
-        } else {
-            synchronized (_pendingActions) {
-                _pendingActions.add(new ActionRecord(ActionType.Prune, null, null));
-            }
-        }
-    }
-
-    @Override
     public void publish(final String senderAddress, final String subject, final PublishScope scope, final Object args) {
         // publish cannot be in DB transaction, which may hold DB lock too long, and we are guarding this here
         if (!noDbTxn()) {
