@@ -43,15 +43,15 @@ public interface DeploymentPlanner extends Adapter {
      */
     boolean canHandle(VirtualMachineProfile vm, DeploymentPlan plan, ExcludeList avoid);
 
-    public enum AllocationAlgorithm {
+    enum AllocationAlgorithm {
         random, firstfit, userdispersing, userconcentratedpod_random, userconcentratedpod_firstfit
     }
 
-    public enum PlannerResourceUsage {
+    enum PlannerResourceUsage {
         Shared, Dedicated
     }
 
-    public static class ExcludeList implements Serializable {
+    class ExcludeList implements Serializable {
         private static final long serialVersionUID = -482175549460148301L;
 
         private Set<Long> _dcIds;
@@ -187,23 +187,7 @@ public interface DeploymentPlanner extends Adapter {
         }
 
         public boolean shouldAvoid(final Host host) {
-            if (_dcIds != null && _dcIds.contains(host.getDataCenterId())) {
-                return true;
-            }
-
-            if (_podIds != null && _podIds.contains(host.getPodId())) {
-                return true;
-            }
-
-            if (_clusterIds != null && _clusterIds.contains(host.getClusterId())) {
-                return true;
-            }
-
-            if (_hostIds != null && _hostIds.contains(host.getId())) {
-                return true;
-            }
-
-            return false;
+            return shouldAvoid(host.getDataCenterId(), host.getPodId(), host.getClusterId(), host.getId());
         }
 
         public boolean shouldAvoid(final Cluster cluster) {
@@ -234,29 +218,33 @@ public interface DeploymentPlanner extends Adapter {
         }
 
         public boolean shouldAvoid(final StoragePool pool) {
-            if (_dcIds != null && _dcIds.contains(pool.getDataCenterId())) {
-                return true;
-            }
-
-            if (_podIds != null && _podIds.contains(pool.getPodId())) {
-                return true;
-            }
-
-            if (_clusterIds != null && _clusterIds.contains(pool.getClusterId())) {
-                return true;
-            }
-
-            if (_poolIds != null && _poolIds.contains(pool.getId())) {
-                return true;
-            }
-
-            return false;
+            return shouldAvoid(pool.getDataCenterId(), pool.getPodId(), pool.getClusterId(), pool.getId());
         }
 
         public boolean shouldAvoid(final DataCenter dc) {
             if (_dcIds != null && _dcIds.contains(dc.getId())) {
                 return true;
             }
+            return false;
+        }
+
+        private boolean shouldAvoid(final long dataCenterId, final Long podId, final Long clusterId, final long id) {
+            if (_dcIds != null && _dcIds.contains(dataCenterId)) {
+                return true;
+            }
+
+            if (_podIds != null && _podIds.contains(podId)) {
+                return true;
+            }
+
+            if (_clusterIds != null && _clusterIds.contains(clusterId)) {
+                return true;
+            }
+
+            if (_hostIds != null && _hostIds.contains(id)) {
+                return true;
+            }
+
             return false;
         }
 
